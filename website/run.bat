@@ -1,1 +1,0 @@
-pserve development.ini --reload

@@ -14,11 +14,13 @@ requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'waitress',
+    'pyramid_beaker',
+    'decorator',
     ]
 
 setup(name='KaraKara',
       version='0.0',
-      description='KaraKara',
+      description='KaraKara: Karaoke Event System - Attendees and view and queue tracks from their mobile phones',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
