@@ -7,6 +7,7 @@ help:
 	# run           -- run the site in development mode
 	# run_production -- run in production mode
 	# clean         -- reset the folder to clean git checkout (removes virtual python env)
+	# import_tracks -- crawl all mediaserver to import tracks data into local Db
 
 env_activate:
 	source env/bin/activate
@@ -43,3 +44,6 @@ clean:
 	rm env -rf
 	rm *.egg-info -rf
 	#rm KaraKara.db
+	
+import_tracks:
+	#not implated yet
