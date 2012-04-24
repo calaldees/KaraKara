@@ -31,7 +31,7 @@ avconv -y -itsoffset -4 -i "$1" -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x
 
 # encode full-size video into a chrome-friendly format
 # mencoder is needed to bake subs into the video, avconv is needed to encode audio to AAC
-mencoder "$1" -slang eng -ovc x264 -oac pcm -o $DIR/video.avi
+mencoder "$1" -ass -slang eng -ovc x264 -oac pcm -o $DIR/video.avi
 avconv -y -i $DIR/video.avi -vcodec copy -acodec libvo_aacenc $DIR/video.mp4
 
 
