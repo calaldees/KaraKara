@@ -8,7 +8,7 @@ for SONG_DIR in files/* ; do
 			IMAGE=`ls $SONG_DIR/original.* | grep -E "original.(jpg|png)"`
 			AUDIO=`ls $SONG_DIR/original.* | grep -E "original.(mp3|ogg)"`
 			AUDIO_LEN=`avconv -i $AUDIO 2>&1 | grep -oE "Duration: [0-9:\.]+" | cut -d " " -f 2` #[\d:\.]+"`
-			ORIGINAL_VIDEO=$SONG_DIR/original.mkv
+			ORIGINAL_VIDEO=$SONG_DIR/generated.mkv
 			if [ "x$IMAGE" = "x"  -o "x$AUDIO" = "x" ] ; then
 				echo "ERROR: $SONG_DIR doesn't contain an original video, nor original audio + image"
 			else
