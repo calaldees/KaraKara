@@ -29,7 +29,7 @@ avconv -y -itsoffset -4 -i "$1" -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x
 
 
 # extract subtitle track
-avconv -i "$1" -scodec ass $DIR/subtitles.ass
+avconv -y -i "$1" -scodec ass $DIR/subtitles.ass
 
 
 # encode full-size video into a chrome-friendly format
