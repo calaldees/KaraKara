@@ -25,8 +25,11 @@ env:
 	virtualenv --no-site-packages -p python3 env
 	cd env;	bin/easy_install pyramid
 
-setup: env
+setup: env blank_db
 	env/bin/python setup.py develop
+
+blank_db:
+	rm KaraKara.db
 	env/bin/populate_KaraKara development.ini
 
 run:

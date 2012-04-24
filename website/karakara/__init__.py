@@ -37,8 +37,9 @@ def main(global_config, **settings):
     # Events -------------------------------------------------------------------
     
     # Events
-    config.add_subscriber(subscribers.handle_new_request , pyramid.events.NewRequest )
-    config.add_subscriber(subscribers.handle_new_response, pyramid.events.NewResponse)
+    # AllanC - These happen for every request, event for static content, sod it, why use the Pyramid framework, when a normal homegrown decorator is more understadable and manageable
+    #config.add_subscriber(subscribers.handle_new_request , pyramid.events.NewRequest )
+    #config.add_subscriber(subscribers.handle_new_response, pyramid.events.NewResponse)
     
     
     # Return -------------------------------------------------------------------
