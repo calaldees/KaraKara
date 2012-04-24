@@ -12,10 +12,9 @@
 #
 # Outputs:
 # - Some_Song/thumb.jpg     (320x240 JPG)
-# - Some_Song/video.mp4     (full size H264/AAC)
+# - Some_Song/video.mp4     (full size H264/AAC with hardcoded subs)
 # - Some_Song/preview.mp4   (320x240 H264/AAC with fade out)
-#
-# TODO: hard code subtitles
+# - Some_Song/subtitles.ass (if possible)
 #
 
 
@@ -27,6 +26,10 @@ DIR="`dirname \"$1\"`"
 
 # pick a thumbnail 4 seconds in
 avconv -y -itsoffset -4 -i "$1" -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x240 $DIR/thumb.jpg
+
+
+# extract subtitle track
+avconv -i "$1" -scodec ass $DIR/subtitles.ass
 
 
 # encode full-size video into a chrome-friendly format
