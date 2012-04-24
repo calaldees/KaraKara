@@ -27,7 +27,7 @@ env:
 
 setup: env
 	env/bin/python setup.py develop
-	#env/bin/populate_KaraKara development.ini
+	env/bin/populate_KaraKara development.ini
 
 run:
 	#$(MAKE) env_activate
