@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<title>KaraKara Video Player</title>
+		<script src="jquery.min.js"></script>
+		<script src="player.js"></script>
+		<link rel="stylesheet" type="text/css" href="player.css" />
+	</head>
+	<body>
+
+<table class="app">
+	<tr>
+		<td colspan="2">
+			<h1>Big-Screen Interface</h1>
+		</td>
+	</tr>
+	<tr>
+		<td>
+
+			<table class='player'>
+				<tr>
+					<td colspan="3">
+						<h2 id="title">Video Player</h2>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<video width="320" height="240" id="player"> <!-- controls="controls" -->
+							Your browser does not support the video tag.
+						</video>
+					</td>
+				</tr>
+				<tr height="40">
+					<td width="20">
+						<button id="prev">Prev</button>
+					</td>
+					<td>
+						<button id="play">Play</button>
+					</td>
+					<td width="20">
+						<button id="next">Next</button>
+					</td>
+				</tr>
+			</table>
+
+		</td>
+		<td>
+
+			<table class='playlist'>
+				<tr>
+					<td colspan="3">
+						<h2 id="title">Playlist</h2>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div id="playlist"></div>
+					</td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+
+	</body>
+</html>

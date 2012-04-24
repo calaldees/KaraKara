@@ -1,0 +1,40 @@
+HTML {
+	background: #080;
+}
+H1, H2 {
+	text-align: center;
+	margin-bottom: 0px;
+}
+TD {
+	vertical-align: top;
+	padding: 0px;
+}
+TD BUTTON {
+	width: 100%;
+	height: 100%;
+}
+
+.app {
+	width: 640px;
+	margin: auto;
+}
+
+.player, .playlist {
+	background: #FFA;
+	border-radius: 8px;
+	width: 320px;
+}
+
+.playlist .current_song {
+	color: red;
+}
+.playlist .current_song:after {
+	content: " - Ready to Start";
+}
+
+.playlist .up_next {
+	color: orange;
+}
+.playlist .up_next:after {
+	content: " - Up Next";
+}
