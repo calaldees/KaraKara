@@ -25,7 +25,7 @@ DIR="`dirname \"$1\"`"
 
 
 # pick a thumbnail 4 seconds in
-avconv -y -itsoffset -4 -i "$1" -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x240 $DIR/thumb.jpg
+avconv -y -itsoffset -4 -i "$1" -vcodec mjpeg -vframes 1 -an -f rawvideo -vf scale=320:-1 $DIR/thumb.jpg
 
 
 # extract subtitle track
@@ -44,7 +44,7 @@ avconv -y -i "$1" -t 00:00:$PREVIEW_LENGTH -vn -f aiff pipe: | \
 	avconv -i pipe: $DIR/preview.m4a
 
 # extract and fade out video preview
-avconv -y -i "$1" -t 00:00:$PREVIEW_LENGTH -an -s 320x240 \
+avconv -y -i "$1" -t 00:00:$PREVIEW_LENGTH -an -vf scale=320:-1 \
 	-vf fade=out:$(($FPS*$PREVIEW_LENGTH-$FPS*$FADE_LENGTH)):$(($FPS*$FADE_LENGTH)) \
 	-vcodec libx264 $DIR/preview.m4v
 
