@@ -1,5 +1,5 @@
 #!/bin/sh
 
-for orig in files/*/[A-Z]* ; do
+for orig in files/*/original.* ; do
 	./encode.sh "$orig"
 done
