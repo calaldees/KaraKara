@@ -5,16 +5,16 @@
 # - avconv (ffmpeg's new command line video converter)
 # - libavcodec with patented format support (ubuntu package libavcodec-extra-53)
 # - sox
+# - mencoder
 #
 # Usage:
 #  ./encode.sh Some_Song/Original_Download.flv
 #
 # Outputs:
 # - Some_Song/thumb.jpg     (320x240 JPG)
-# - Some_Song/video.mp4     (full size H264/AAC)
+# - Some_Song/video.mp4     (full size H264/AAC with hardcoded subs)
 # - Some_Song/preview.mp4   (320x240 H264/AAC with fade out)
-#
-# TODO: hard code subtitles
+# - Some_Song/subtitles.ass (if possible)
 #
 
 
@@ -28,8 +28,14 @@ DIR="`dirname \"$1\"`"
 avconv -y -itsoffset -4 -i "$1" -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x240 $DIR/thumb.jpg
 
 
+# extract subtitle track
+avconv -y -i "$1" -scodec ass $DIR/subtitles.ass
+
+
 # encode full-size video into a chrome-friendly format
-avconv -y -i "$1" -vcodec libx264 -acodec libvo_aacenc $DIR/video.mp4
+# mencoder is needed to bake subs into the video, avconv is needed to encode audio to AAC
+mencoder "$1" -ass -slang eng -ovc x264 -oac pcm -o $DIR/video.avi
+avconv -y -i $DIR/video.avi -vcodec copy -acodec libvo_aacenc $DIR/video.mp4
 
 
 # extract and fade out audio preview
@@ -46,4 +52,4 @@ avconv -y -i "$1" -t 00:00:$PREVIEW_LENGTH -an -s 320x240 \
 avconv -y -i $DIR/preview.m4a -i $DIR/preview.m4v -acodec copy -vcodec copy $DIR/preview.mp4
 
 # tidy up
-rm -f $DIR/preview.m4a $DIR/preview.m4v
+rm -f $DIR/preview.m4a $DIR/preview.m4v $DIR/video.avi
