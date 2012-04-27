@@ -20,7 +20,7 @@ from .pyramid_helpers import get_setting
 
 # Regex to extract 'format' from request URL
 format_regex_path = re.compile(r'.*\.(.*?)($|\?|#)'      , flags=re.IGNORECASE)
-format_regex_qs   = re.compile(r'.*\?.*format=(.*?)($|,)', flags=re.IGNORECASE)
+format_regex_qs   = re.compile(r'.*\?.*format=(.*?)($|,)', flags=re.IGNORECASE) # AllanC - this could be replaced at a later date when web_params_to_kwargs is implemented
 
 #-------------------------------------------------------------------------------
 # Setup
@@ -86,7 +86,7 @@ def auto_format_output(target, *args, **kwargs):
     for format in formats:
         try:
             formatter = _auto_formaters[format]
-            log.debug('Format=%s' % format)
+            log.debug('render format = %s' % format)
             break
         except:
             pass
@@ -100,9 +100,16 @@ def auto_format_output(target, *args, **kwargs):
 #-------------------------------------------------------------------------------
 # Renderer Template
 #-------------------------------------------------------------------------------
+from pyramid.renderers import render_to_response
+import os.path
+
 def render_template(request, result, format):
-    log.debug('Find template %s - %s' % (format, request.path))
-    return pyramid.response.Response('')
+    response = render_to_response(
+        '%s.mako' % (os.path.join(format,request.matched_route.name)), 
+        request.matchdict,
+        request=request,
+    )
+    return response
 
 #-------------------------------------------------------------------------------
 # Formatters
