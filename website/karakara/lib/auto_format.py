@@ -1,4 +1,9 @@
+#-------------------------------------------------------------------------------
+# Imports
+#-------------------------------------------------------------------------------
+
 import pyramid.request
+import pyramid.response
 
 from decorator import decorator
 import re
@@ -9,13 +14,19 @@ log = logging.getLogger(__name__)
 from .pyramid_helpers import get_setting
 
 
+#-------------------------------------------------------------------------------
+# Constants
+#-------------------------------------------------------------------------------
+
 # Regex to extract 'format' from request URL
 format_regex_path = re.compile(r'.*\.(.*?)($|\?|#)'      , flags=re.IGNORECASE)
 format_regex_qs   = re.compile(r'.*\?.*format=(.*?)($|,)', flags=re.IGNORECASE)
 
+#-------------------------------------------------------------------------------
+# Setup
+#-------------------------------------------------------------------------------
 
-
-auto_formaters = {}
+_auto_formaters = {}
 def register_formater(format_name, format_func):
     """
     Register a format processor with a key
@@ -27,9 +38,12 @@ def register_formater(format_name, format_func):
     format_funcs should return a Pyramid Response object
     """
     assert isinstance(format_name, str )
-    assert isinstance(format_func, func)
-    auto_formaters[format] = format_func
+    assert callable(format_func)
+    _auto_formaters[format_name] = format_func
 
+#-------------------------------------------------------------------------------
+# Decorator
+#-------------------------------------------------------------------------------
 
 @decorator
 def auto_format_output(target, *args, **kwargs):
@@ -47,23 +61,81 @@ def auto_format_output(target, *args, **kwargs):
     assert isinstance(request, pyramid.request.Request)
     
     # Pre Processing -----------------------------------------------------------
-    
-    # Get 'format' from URL path or query string
-    format = get_setting('auto_format.default', request) or 'html'
-    try   : format = format_regex_path.match(request.path).group(1)
-    except: pass
-    try   : format = format_regex_qs.match(request.path_qs).group(1)
-    except: pass
-    log.debug('Format=%s' % format)
+    #  None
     
     # Execute ------------------------------------------------------------------
     result = target(*args, **kwargs) 
     
     # Post Processing ----------------------------------------------------------
     
+    # Find format string 'format' based on input params, to then find a render func 'formatter'  - add potential formats in order of precidence
+    formats = []
+    # add kwarg 'format'
+    try   : formats.append(kwargs['format'])
+    except: pass
+    # add 'format' from URL path
+    try   : formats.append(format_regex_path.match(request.path).group(1))
+    except: pass
+    # add 'format' from URL query string
+    try   : formats.append(format_regex_qs.match(request.path_qs).group(1))
+    except: pass
+    # add default format
+    formats.append(get_setting('auto_format.default', request) or 'html')
+    
+    formatter = None
+    for format in formats:
+        try:
+            formatter = _auto_formaters[format]
+            log.debug('Format=%s' % format)
+            break
+        except:
+            pass
+    
     # Attempt auto_format if result is a plain python dict and auto_format func exisits
-    if isinstance(result, dict) and format in auto_formaters:
-        log.debug('Applying %s formater' % format)
-        result = auto_formaters[format](result)
+    if formatter and isinstance(result, dict):
+        result = formatter(request, result)
     
     return result
+
+#-------------------------------------------------------------------------------
+# Renderer Template
+#-------------------------------------------------------------------------------
+def render_template(request, result, format):
+    log.debug('Find template %s - %s' % (format, request.path))
+    return pyramid.response.Response('')
+
+#-------------------------------------------------------------------------------
+# Formatters
+#-------------------------------------------------------------------------------
+
+# Python dict formater -------------
+register_formater('python', lambda result:result)
+
+# JSON -----------------------------
+import json
+def format_json(request, result):
+    response = pyramid.response.Response(json.dumps(result))
+    response.headers['Content-type'] = "application/json; charset=utf-8"
+    return response
+register_formater('json', format_json)
+
+# XML -------------------------------
+from .xml import dictToXMLString
+def format_xml(request, result):
+    response = pyramid.response.Response('<?xml version="1.0" encoding="UTF-8"?>' + dictToXMLString(result))
+    response.headers['Content-type'] = "text/xml; charset=utf-8"
+    return response
+register_formater('xml', format_xml)
+
+# RSS -------------------------------
+def format_rss(request, result):
+    response = render_template(request, result, 'rss')
+    response.headers['Content-type'] = "application/rss+xml; charset=utf-8"
+    return response
+register_formater('rss', format_rss)
+
+# HTML ------------------------------
+def format_html(request, result):
+    response = render_template(request, result, 'html')
+    return response
+register_formater('html', format_html)
