@@ -1,3 +1,3 @@
 <%inherit file="_base.mako"/>
 
-<p>Hello World</p>
+<p>${d['message']}</p>

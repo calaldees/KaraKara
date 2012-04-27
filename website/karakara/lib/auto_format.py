@@ -102,11 +102,14 @@ def auto_format_output(target, *args, **kwargs):
 #-------------------------------------------------------------------------------
 from pyramid.renderers import render_to_response
 import os.path
+import copy
 
-def render_template(request, result, format):
+def render_template(request, result, format, template_data_param='d'):
+    template_params = {template_data_param:result}
+    template_params.update(request.matchdict)
     response = render_to_response(
         '%s.mako' % (os.path.join(format,request.matched_route.name)), 
-        request.matchdict,
+        template_params,
         request=request,
     )
     return response

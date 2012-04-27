@@ -12,14 +12,15 @@
 	<script src ="/static/jquery.mobile/jquery.mobile-1.1.0.min.js"                        ></script>
         <link   href="/static/favicon.ico"                               rel="shortcut icon"  />
     </head>
+    
     <body> 
         
         <div data-role="page">
                 
             <div data-role="header" data-position="fixed" >
                 <h1>KaraKara</h1>
-                <a href="/" data-role="button" data-icon="home"   data-iconpos="left" >Home  </a>
-                <a href="/" data-role="button" data-icon="search" data-iconpos="right">Search</a>
+                <a href="/" data-role="button" data-icon="home"   data-iconpos="notext" data-mini="true" data-inline="true">>Home  </a>
+                <a href="/" data-role="button" data-icon="search" data-iconpos="notext" data-mini="true" data-inline="true">>Search</a>
             </div><!-- /header -->
             
             <div data-role="content">
