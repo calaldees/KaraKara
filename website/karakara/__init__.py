@@ -26,8 +26,12 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     
     # Routes
-    config.add_route('home'      , '/'          )
-    config.add_route('track'     , '/track/{id}')
+    config.add_route('home'          , '/'              )
+    config.add_route('track'         , '/track/{id}'    )
+    config.add_route('track_list'    , '/track_list'    )
+    config.add_route('track_list_all', '/track_list_all')
+    config.add_route('queue'         , '/queue'         )
+    config.add_route('fave'          , '/fave'          )
     
     
     # Events -------------------------------------------------------------------

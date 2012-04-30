@@ -7,6 +7,7 @@ import pyramid.response
 
 from decorator import decorator
 import re
+import copy
 
 import logging
 log = logging.getLogger(__name__)
@@ -57,14 +58,18 @@ def auto_format_output(target, *args, **kwargs):
      - apply a format function to the plain python dict return
     
     """
-    request = args[0]
-    assert isinstance(request, pyramid.request.Request)
+    request = None
+    for arg in args:
+        if isinstance(arg, pyramid.request.Request):
+            request = arg
+            break
+    assert request
     
     # Pre Processing -----------------------------------------------------------
-    #  None
+    # None
     
     # Execute ------------------------------------------------------------------
-    result = target(*args, **kwargs) 
+    result = target(*args, **kwargs)
     
     # Post Processing ----------------------------------------------------------
     
