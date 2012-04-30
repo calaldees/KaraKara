@@ -9,13 +9,15 @@ from ..model.model_tracks import Track
 # Track
 #-------------------------------------------------------------------------------
 
-@view_config(route_name='track')
+@view_config(route_name='track'  )
+#@view_config(route_name='track_f')
 @auto_format_output
 def track_view(request):
     """
     View individual track details
     """
     id    = request.matchdict['id']
+    #id    = 't1'
     track = DBSession.query(Track).with_polymorphic('*').get(id)
     return {'status':'ok','message':track.description}
 

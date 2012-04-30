@@ -20,8 +20,8 @@ from .pyramid_helpers import get_setting
 #-------------------------------------------------------------------------------
 
 # Regex to extract 'format' from request URL
-format_regex_path = re.compile(r'.*\.(.*?)($|\?|#)'      , flags=re.IGNORECASE)
-format_regex_qs   = re.compile(r'.*\?.*format=(.*?)($|,)', flags=re.IGNORECASE) # AllanC - this could be replaced at a later date when web_params_to_kwargs is implemented
+format_regex_path = re.compile(r'.*\.(?P<format>.*?)($|\?|#)'    , flags=re.IGNORECASE)
+format_regex_qs   = re.compile(r'.*(^|,)format=(?P<format>.*?)($|,)', flags=re.IGNORECASE) # AllanC - this could be replaced at a later date when web_params_to_kwargs is implemented , used to use r'.*\?.*format=(.*?)($|,)' for whole url
 
 #-------------------------------------------------------------------------------
 # Setup
@@ -78,11 +78,14 @@ def auto_format_output(target, *args, **kwargs):
     # add kwarg 'format'
     try   : formats.append(kwargs['format'])
     except: pass
+    # matched route 'format' key
+    try   : formats.append(request.matchdict['format'])
+    except: pass
     # add 'format' from URL path
-    try   : formats.append(format_regex_path.match(request.path).group(1))
+    try   : formats.append(format_regex_path.match(request.path).group('format'))
     except: pass
     # add 'format' from URL query string
-    try   : formats.append(format_regex_qs.match(request.path_qs).group(1))
+    try   : formats.append(format_regex_qs.match(request.path_qs).group('format'))
     except: pass
     # add default format
     formats.append(get_setting('auto_format.default', request) or 'html')

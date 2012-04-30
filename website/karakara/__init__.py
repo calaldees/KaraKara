@@ -17,7 +17,7 @@ def main(global_config, **settings):
     init_DBSession(settings)
     
     # Setup Pyramid Global Settings
-    config = Configurator(settings=settings)
+    config = Configurator(settings=settings) #, autocommit=True
     
     
     # Routes -------------------------------------------------------------------
@@ -27,7 +27,11 @@ def main(global_config, **settings):
     
     # Routes
     config.add_route('home'          , '/'              )
+    
+    
     config.add_route('track'         , '/track/{id}'    )
+    #config.add_route('track'         , '/track/{id}.{format}')
+
     config.add_route('track_list'    , '/track_list'    )
     config.add_route('track_list_all', '/track_list_all')
     config.add_route('queue'         , '/queue'         )

@@ -49,4 +49,4 @@ clean:
 	rm KaraKara.db -f
 	
 import_tracks:
-	#not implated yet
+	env/bin/python -mkarakara.scripts.import_tracks '../media_test' --config=development.ini

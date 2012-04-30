@@ -1,6 +1,6 @@
 from .models import DBSession, init_DBSession, init_db
 
-from .model_tracks import Track
+from .model_tracks import Track, Tag
 from .model_queue  import QueueItem
 
 import logging
@@ -19,15 +19,24 @@ def init_base_data():
     
     log.info("Populating tables with base test data")
     
-    t1 = Track()
-    t1.id          = "t1"
-    t1.title       = "Test Track"
-    t1.description = "Test track description"
-    t1.duration    = 120
+    tags = []
+    tags.append(Tag('anime'                           ))
+    tags.append(Tag('series'                , tags[-1]))
+    tags.append(Tag('fist of the north star', tags[-1]))
     
-    DBSession.add(t1)
+    DBSession.add_all(tags)
+    transaction.commit()
+    
+    track1 = Track()
+    track1.id          = "t1"
+    track1.title       = "Test Track"
+    track1.description = "Test track description"
+    track1.duration    = 120
+    track1.tags        = tags
+    
+    DBSession.add(track1)
     transaction.commit() # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
-    
+
 
 #-------------------------------------------------------------------------------
 # Command Line
