@@ -19,7 +19,10 @@ def track_view(request):
     id    = request.matchdict['id']
     #id    = 't1'
     track = DBSession.query(Track).with_polymorphic('*').get(id)
-    return {'status':'ok','message':track.description}
+    
+    request.session['track_views'] = request.session.get('track_views',0) + 1
+    
+    return {'status':'ok','message':track.description, 'views':request.session['track_views']}
 
 
 @view_config(route_name='track_list')

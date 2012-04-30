@@ -45,6 +45,7 @@ shell:
 
 clean:
 	rm env -rf
+	rm data -rf
 	rm *.egg-info -rf
 	rm KaraKara.db -f
 	

@@ -3,9 +3,10 @@ from pyramid.config import Configurator
 import pyramid.events
 
 # SQLAlchemy imports
-
 from .model.models import DBSession, init_DBSession
 
+# Beaker Sessions
+import pyramid_beaker
 
 def main(global_config, **settings):
     """
@@ -13,11 +14,14 @@ def main(global_config, **settings):
     """
     # Setup --------------------------------------------------------------------
     
-    # Setup Db
+    # Db
     init_DBSession(settings)
     
-    # Setup Pyramid Global Settings
+    # Pyramid Global Settings
     config = Configurator(settings=settings) #, autocommit=True
+    
+    # Beaker Session Manager
+    config.set_session_factory(pyramid_beaker.session_factory_from_settings(settings))
     
     
     # Routes -------------------------------------------------------------------
