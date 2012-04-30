@@ -3,7 +3,7 @@ import transaction
 
 from pyramid import testing
 
-from .models import DBSession
+#from ..models import DBSession # AllanC - errors?!, but it exisits?
 
 class TestMyView(unittest.TestCase):
     def setUp(self):

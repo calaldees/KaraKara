@@ -3,11 +3,8 @@ from pyramid.config import Configurator
 import pyramid.events
 
 # SQLAlchemy imports
-from sqlalchemy import engine_from_config
-from .models import DBSession
 
-# package imports
-import karakara.subscribers as subscribers
+from .model.models import DBSession, init_DBSession
 
 
 def main(global_config, **settings):
@@ -17,8 +14,7 @@ def main(global_config, **settings):
     # Setup --------------------------------------------------------------------
     
     # Setup Db
-    engine = engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
+    init_DBSession(settings)
     
     # Setup Pyramid Global Settings
     config = Configurator(settings=settings)
@@ -31,15 +27,10 @@ def main(global_config, **settings):
     
     # Routes
     config.add_route('home'      , '/'          )
-    config.add_route('helloworld', '/helloworld')
+    config.add_route('track'     , '/track/{id}')
     
     
     # Events -------------------------------------------------------------------
-    
-    # Events
-    # AllanC - These happen for every request, event for static content, sod it, why use the Pyramid framework, when a normal homegrown decorator is more understadable and manageable
-    #config.add_subscriber(subscribers.handle_new_request , pyramid.events.NewRequest )
-    #config.add_subscriber(subscribers.handle_new_response, pyramid.events.NewResponse)
     
     
     # Return -------------------------------------------------------------------

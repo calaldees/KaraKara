@@ -3,7 +3,7 @@ help:
 	# Usage: make <target>, where target is
 	# setup         -- setup python egg & install dependencys/env if needed
 	# test          -- run all nosetests
-	# blank-db      -- create a blank database
+	# init-db       -- create a blank database
 	# run           -- run the site in development mode
 	# run_production -- run in production mode
 	# clean         -- reset the folder to clean git checkout (removes virtual python env)
@@ -28,9 +28,9 @@ env:
 setup: env blank_db
 	env/bin/python setup.py develop
 
-blank_db:
-	rm KaraKara.db
-	env/bin/populate_KaraKara development.ini
+init_db:
+	env/bin/python -mkarakara.model.setup development.ini
+	#env/bin/populate_KaraKara development.ini
 
 run:
 	#$(MAKE) env_activate
@@ -46,7 +46,7 @@ shell:
 clean:
 	rm env -rf
 	rm *.egg-info -rf
-	#rm KaraKara.db
+	rm KaraKara.db -f
 	
 import_tracks:
 	#not implated yet

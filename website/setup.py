@@ -41,7 +41,7 @@ setup(name='KaraKara',
       [paste.app_factory]
       main = karakara:main
       [console_scripts]
-      populate_KaraKara = karakara.scripts.populate:main
+      populate_KaraKara = karakara.model.setup:main
       """,
       )
 
