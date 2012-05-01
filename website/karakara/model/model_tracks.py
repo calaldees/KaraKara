@@ -11,7 +11,7 @@ __all__ = [
     "Track", "Tag", "Attachment", "_attachment_types",
 ]
 
-_attachment_types = Enum("image","preview","full","subtitle", name="attachment_types")
+_attachment_types = Enum("image","preview","processed","subtitle", name="attachment_types")
 
 
 class TrackTagMapping(Base):
@@ -35,6 +35,7 @@ class Track(Base):
     title           = Column(Unicode(250),     nullable=False, default="Untitled")
     description     = Column(Unicode(250),     nullable=False, default="")
     duration        = Column(Integer(),        nullable=False, default=0, doc="Duration in seconds")
+    source_filename = Column(Unicode(250),     nullable=True)
     
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
@@ -65,4 +66,4 @@ class Attachment(Base):
 
     id              = Column(Integer(),         primary_key=True)
     location        = Column(Unicode(250),      nullable=False)
-    status          = Column(_attachment_types, nullable=False)
+    type            = Column(_attachment_types, nullable=False)

@@ -14,25 +14,26 @@ requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'waitress',
-    'pyramid_beaker',
+    'pyramid_beaker', # Session/Cache framework
     'decorator',
-    'beautifulsoup4',
+    'beautifulsoup4', # Inspecting html/xml (used in db import crawling)
     ]
 
 setup(name='KaraKara',
       version='0.0',
-      description='KaraKara: Karaoke Event System - Attendees and view and queue tracks from their mobile phones',
+      description='KaraKara: Karaoke Event System - Attendees can view and queue tracks from their mobile phones',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
         "Framework :: Pylons",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
       author='',
-      author_email='',
-      url='',
-      keywords='web wsgi bfg pylons pyramid',
+      author_email='calaldees@hotmail.com',
+      url='http://github.com/calaldees/KaraKara',
+      keywords='web wsgi bfg pylons pyramid jquery jquerymobile karaoke nginx html5',
       packages=find_packages(),
       include_package_data=True,
       zip_safe=False,

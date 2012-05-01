@@ -2,17 +2,39 @@ import os
 import json
 import urllib
 import re
-import io
+#import io
 from bs4 import BeautifulSoup
+import traceback
 
 from ..lib.misc import get_fileext
+
+from ..model.model_tracks import Track, Tag, Attachment, _attachment_types
+
+from ..model.models import init_DBSession, DBSession
+from ..model.actions import get_tag
+import transaction
 
 import logging
 log = logging.getLogger(__name__)
 
+#-------------------------------------------------------------------------------
+# Constants
+#-------------------------------------------------------------------------------
 
 version = "0.0"
 
+file_component_separator = r'[ .\\/\[\]]'
+
+def sep(text):
+    return r'%s%s\d?%s' % (file_component_separator, text, file_component_separator)
+def or_sep(*args):
+    return r'|'.join(args)
+
+tag_extractors = {
+    'opening' : re.compile(or_sep('open','intro','opening','op'), re.IGNORECASE),
+    'ending'  : re.compile(or_sep('end' ,'outro','ending' ,'ed'), re.IGNORECASE),
+    'anime'   : re.compile(r'anime', re.IGNORECASE),
+}
 
 
 #-------------------------------------------------------------------------------
@@ -22,14 +44,18 @@ def walk_url(uri):
     webpage = urllib.request.urlopen(uri)
     soup = BeautifulSoup(webpage.read())
     webpage.close()
-    for href in [link.get('href') for link in soup.find_all('a')] :
+    for href in [link.get('href') for link in soup.find_all('a')]:
         if href.endswith('/'):
             print("dir %s" % href)
         elif href.endswith('.json'):
-            with urllib.request.urlopen(uri+href) as file:
-                import_json_data(file.read().decode('utf-8'), uri)
-                
-    
+            absolute_filename = uri + href #AllanC - todo - this is not absolute!
+            with urllib.request.urlopen(absolute_filename) as file:
+                try:
+                    import_json_data(file.read().decode('utf-8')) #, uri
+                except Exception as e:
+                    log.warn('Failed to process %s' % absolute_filename)
+                    traceback.print_exc()
+
 
 #-------------------------------------------------------------------------------
 # Import from local filesystem
@@ -42,24 +68,46 @@ def walk_local(uri):
             relative_filename = os.path.join(relative_path, json_filename)
             log.debug(relative_filename)
             with open(absolute_filename, 'r') as file:
-                import_json_data(file, relative_path)
+                try:
+                    import_json_data(file.read()) #, relative_path
+                except Exception as e:
+                    log.warn('Failed to process %s' % absolute_filename)
+                    traceback.print_exc()
 
 
 #-------------------------------------------------------------------------------
 # Process JSON leaf
 #-------------------------------------------------------------------------------
-def import_json_data(json_source, root_path):
+def import_json_data(json_source):
     """
     source should be a filetype object for a json file to import
     it shouldnt be relevent that it is local or remote
     """
-    if isinstance(json_source, io.IOBase):
-        data = json.load(json_source)
-    elif isinstance(json_source, str):
-        data = json.loads(json_source)
-    else:
-        raise Exception("unknown json_source type")
-    print(data)
+    data = json.loads(json_source)
+    
+    track = Track()
+    track.id       = data.get('id')
+    track.source   = data.get('source')
+    track.duration = data.get('duration')
+    
+    track.title    = 'Test' #getdata from source
+    
+    # Add Attachments
+    for attachment_type in _attachment_types.enums:
+        for attachment_data in data.get(attachment_type,[]):
+            attachment = Attachment()
+            attachment.type     = attachment_type
+            attachment.location = attachment_data.get('url')
+            track.attachments.append(attachment)
+    
+    # Add known tags (by regexing source filename/path)
+    for tag, regex in tag_extractors.items():
+        if regex.search(track.source):
+            track.tags.append(get_tag(tag))
+    
+    DBSession.add(track)
+    transaction.commit()
+    
 
 
 #-------------------------------------------------------------------------------
@@ -89,7 +137,7 @@ def get_args():
         epilog=""""""
     )
     parser.add_argument('source_uri'  , help='uri of track media data')
-    parser.add_argument('--config_uri', help='config .ini file for logging configuration')
+    parser.add_argument('--config_uri', help='config .ini file for logging configuration', default='development.ini')
     parser.add_argument('--version', action='version', version=version)
 
     return parser.parse_args()
@@ -97,10 +145,11 @@ def get_args():
 def main():
     args = get_args()
     
-    if args.config_uri:
-        # Setup Logging and import Settings
-        from pyramid.paster import setup_logging
-        setup_logging(args.config_uri)
+    # Setup Logging and Db from .ini
+    from pyramid.paster import get_appsettings, setup_logging
+    setup_logging(args.config_uri)
+    settings = get_appsettings(args.config_uri)
+    init_DBSession(settings)
     
     import_media(args.source_uri)
     
