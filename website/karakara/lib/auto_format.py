@@ -196,3 +196,13 @@ def format_html(request, result):
     response = render_template(request, result, 'html')
     return response
 register_formater('html', format_html)
+
+# Redirect---------------------------
+from pyramid.httpexceptions import HTTPFound
+def format_redirect(request, result):
+    """
+    A special case for compatable browsers making REST calls
+    """
+    # flash_message?
+    # Placeholder - Untested!!! 
+    return HTTPFound(location=request.referer)

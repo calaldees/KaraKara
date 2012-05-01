@@ -25,7 +25,7 @@ env:
 	virtualenv --no-site-packages -p python3 env
 	cd env;	bin/easy_install pyramid
 
-setup: env blank_db
+setup: env
 	env/bin/python setup.py develop
 
 init_db:
@@ -54,3 +54,6 @@ import_tracks_local_filesystem:
 
 import_tracks_local_mediaserver:
 	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
+
+import_tracks_test:
+	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini

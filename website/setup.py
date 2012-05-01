@@ -16,6 +16,7 @@ requires = [
     'waitress',
     'pyramid_beaker',
     'decorator',
+    'beautifulsoup4',
     ]
 
 setup(name='KaraKara',
