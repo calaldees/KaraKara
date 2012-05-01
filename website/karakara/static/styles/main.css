@@ -1,0 +1,4 @@
+
+/* Flash Message */
+.flash_message p             {float: left;}
+.flash_message .flash_remove {float: right;}

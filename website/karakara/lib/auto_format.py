@@ -58,6 +58,7 @@ def auto_format_output(target, *args, **kwargs):
      - apply a format function to the plain python dict return
     
     """
+    # Extract request object from args
     request = None
     for arg in args:
         if isinstance(arg, pyramid.request.Request):
@@ -69,7 +70,11 @@ def auto_format_output(target, *args, **kwargs):
     # None
     
     # Execute ------------------------------------------------------------------
-    result = target(*args, **kwargs)
+    try:
+        result = target(*args, **kwargs)
+    except action_error:
+        result = action_error.d
+        log.warn("Auto format exception needs to be handled")
     
     # Post Processing ----------------------------------------------------------
     
@@ -101,9 +106,43 @@ def auto_format_output(target, *args, **kwargs):
     
     # Attempt auto_format if result is a plain python dict and auto_format func exisits
     if formatter and isinstance(result, dict):
-        result = formatter(request, result)
+        # Add pending flash messages to result dict
+        result['messages'] = result['messages'] + request.session.pop_flash()
+        
+        # Format result dict using format func
+        response = formatter(request, result)
+        
+        # Set http response code
+        if isinstance(response, pyramid.response.Response):
+            response.status_int = result.get('code', 200)
+        
+        result = response
     
     return result
+
+#-------------------------------------------------------------------------------
+# Action Returns
+#-------------------------------------------------------------------------------
+
+def action_ok(message='', data={}, code=200, status='ok', **kwargs):
+    assert isinstance(message, str)
+    assert isinstance(data   , dict)
+    assert isinstance(code   , int)
+    d = {
+        'status'  : status  ,
+        'messages': [message],
+        'data'    : data    ,
+        'code'    : code    ,
+    }
+    d.update(kwargs)
+    return d
+    
+class action_error(Exception):
+    def __init__(self, message='', data={}, code=500, status='error', **kwargs):
+        self.d = action_ok(message=message, data=data, code=code, status=status, **kwargs)
+    def __str__( self ):
+        return str(self.d)
+
 
 #-------------------------------------------------------------------------------
 # Renderer Template
