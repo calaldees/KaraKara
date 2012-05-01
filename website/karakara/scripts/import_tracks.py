@@ -46,15 +46,11 @@ def walk_url(uri):
     webpage.close()
     for href in [link.get('href') for link in soup.find_all('a')]:
         if href.endswith('/'):
-            print("dir %s" % href)
+            log.warn("directory crawling from urls is not implmented yet: %s" % href)
         elif href.endswith('.json'):
-            absolute_filename = uri + href #AllanC - todo - this is not absolute!
+            absolute_filename = uri + href #AllanC - todo - this is not absolute if dir's are crawled!
             with urllib.request.urlopen(absolute_filename) as file:
-                try:
-                    import_json_data(file.read().decode('utf-8')) #, uri
-                except Exception as e:
-                    log.warn('Failed to process %s' % absolute_filename)
-                    traceback.print_exc()
+                import_json_data(file, absolute_filename)
 
 
 #-------------------------------------------------------------------------------
@@ -63,27 +59,36 @@ def walk_url(uri):
 def walk_local(uri):
     for root, dirs, files in os.walk(uri):
         for json_filename in [f for f in files if get_fileext(f)=='json']:
-            relative_path = root.replace(uri,'')
             absolute_filename = os.path.join(root         , json_filename)
-            relative_filename = os.path.join(relative_path, json_filename)
-            log.debug(relative_filename)
+            #relative_path = root.replace(uri,'')
+            #relative_filename = os.path.join(relative_path, json_filename)
             with open(absolute_filename, 'r') as file:
-                try:
-                    import_json_data(file.read()) #, relative_path
-                except Exception as e:
-                    log.warn('Failed to process %s' % absolute_filename)
-                    traceback.print_exc()
+                import_json_data(file, absolute_filename)
 
 
 #-------------------------------------------------------------------------------
 # Process JSON leaf
 #-------------------------------------------------------------------------------
-def import_json_data(json_source):
+def import_json_data(source, location=''):
     """
     source should be a filetype object for a json file to import
     it shouldnt be relevent that it is local or remote
     """
-    data = json.loads(json_source)
+    
+    def get_data():
+        try:
+            if hasattr(source,'read'):
+                data = source.read()
+            if isinstance(data, bytes):
+                data = data.decode('utf-8')
+            return json.loads(data)
+        except Exception as e:
+            log.warn('Failed to process %s' % location)
+            traceback.print_exc()
+    
+    data = get_data()
+    if not data:
+        return
     
     track = Track()
     track.id       = data.get('id')
@@ -107,7 +112,6 @@ def import_json_data(json_source):
     
     DBSession.add(track)
     transaction.commit()
-    
 
 
 #-------------------------------------------------------------------------------
