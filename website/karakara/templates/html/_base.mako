@@ -30,8 +30,9 @@
             
             <div data-role="header" data-position="fixed" >
                 <h1>KaraKara</h1>
-                <a href="/" data-role="button" data-icon="home"   data-iconpos="notext" data-mini="true" data-inline="true">>Home  </a>
-                <a href="/" data-role="button" data-icon="search" data-iconpos="notext" data-mini="true" data-inline="true">>Search</a>
+                ## data-iconpos="notext"
+                <a href="/" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Home  </a>
+                <a href="/" data-role="button" data-icon="search" data-mini="true" data-inline="true">Search</a>
             </div><!-- /header -->
             
             <!-- flash messages -->
