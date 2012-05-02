@@ -1,4 +1,5 @@
 
+
 #-------------------------------------------------------------------------------
 # Python Dictionary to XML
 #-------------------------------------------------------------------------------
@@ -9,9 +10,9 @@ def dictToXMLString(d):
 
     def dictToElement(d, tag):
         e = Element(tag)
-        if isinstance(d, basestring): # is String
+        if isinstance(d, str): # is String
             e.text = d
-        elif type(d) in [types.IntType, types.FloatType, types.BooleanType]:
+        elif type(d) in [int, float, bool]: #types.IntType, types.FloatType, types.BooleanType
             e.text = str(d)
         elif hasattr(d,'keys'): # is Dict
             for key in d.keys():

@@ -179,7 +179,8 @@ register_formater('json', format_json)
 # XML -------------------------------
 from .xml import dictToXMLString
 def format_xml(request, result):
-    response = pyramid.response.Response('<?xml version="1.0" encoding="UTF-8"?>' + dictToXMLString(result))
+    xml_head = '<?xml version="1.0" encoding="UTF-8"?>'.encode('utf-8')
+    response = pyramid.response.Response(xml_head + dictToXMLString(result)) 
     response.headers['Content-type'] = "text/xml; charset=utf-8"
     return response
 register_formater('xml', format_xml)

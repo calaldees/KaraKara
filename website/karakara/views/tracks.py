@@ -1,8 +1,9 @@
 from pyramid.view import view_config
 
-from ..lib.auto_format    import auto_format_output
+from ..lib.auto_format    import auto_format_output, action_ok
 from ..model.models       import DBSession
 from ..model.model_tracks import Track
+
 
 
 #-------------------------------------------------------------------------------
@@ -22,7 +23,7 @@ def track_view(request):
     
     request.session['track_views'] = request.session.get('track_views',0) + 1
     
-    return {'status':'ok','message':track.description, 'views':request.session['track_views']}
+    return action_ok(message='track test', data={'description':track.description, 'views':request.session['track_views']})
 
 
 @view_config(route_name='track_list')
