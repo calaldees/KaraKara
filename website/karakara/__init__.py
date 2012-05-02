@@ -11,6 +11,8 @@ import pyramid_beaker
 # Other imports
 import re
 
+# Package Imports
+from .lib.auto_format import registered_formats
 
 
 def main(global_config, **settings):
@@ -53,9 +55,9 @@ def main(global_config, **settings):
     
     # Routes
     def append_format_pattern(route):
-        return re.sub(r'{(.*)}', r'{\1:[^/\.]+}', route) + r'{spacer:[.]?}{format:.*}'
+        return re.sub(r'{(.*)}', r'{\1:[^/\.]+}', route) + r'{spacer:[.]?}{format:(%s)?}' % '|'.join(registered_formats())
     
-    config.add_route('home'          , append_format_pattern('/')              )    
+    config.add_route('home'          , append_format_pattern('/')              )
     config.add_route('track'         , append_format_pattern('/track/{id}')    )
     config.add_route('track_list'    , append_format_pattern('/track_list')    )
     config.add_route('track_list_all', append_format_pattern('/track_list_all'))

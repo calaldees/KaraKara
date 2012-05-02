@@ -42,6 +42,9 @@ def register_formater(format_name, format_func):
     assert callable(format_func)
     _auto_formaters[format_name] = format_func
 
+def registered_formats():
+    return _auto_formaters.keys()
+
 #-------------------------------------------------------------------------------
 # Decorator
 #-------------------------------------------------------------------------------
@@ -130,11 +133,13 @@ def action_ok(message='', data={}, code=200, status='ok', **kwargs):
     assert isinstance(code   , int)
     d = {
         'status'  : status  ,
-        'messages': [message],
+        'messages': []      ,
         'data'    : data    ,
         'code'    : code    ,
     }
     d.update(kwargs)
+    if message:
+        d['messages'].append(message)
     return d
     
 class action_error(Exception):
@@ -152,11 +157,11 @@ import os.path
 import copy
 
 def render_template(request, result, format, template_data_param='d'):
-    template_params = {template_data_param:result}
-    template_params.update(request.matchdict)
+    #template_params = {template_data_param:result}
+    #template_params.update(request.matchdict)
     response = render_to_response(
         '%s.mako' % (os.path.join(format,request.matched_route.name)), 
-        template_params,
+        result,
         request=request,
     )
     return response

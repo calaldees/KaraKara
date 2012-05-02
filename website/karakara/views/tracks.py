@@ -22,7 +22,7 @@ def track_view(request):
     track = DBSession.query(Track).with_polymorphic('*').get(id)
     
     request.session['track_views'] = request.session.get('track_views',0) + 1
-    
+    print('YEAH!!')
     return action_ok(message='track test', data={'description':track.description, 'views':request.session['track_views']})
 
 

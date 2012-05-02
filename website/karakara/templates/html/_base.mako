@@ -35,9 +35,9 @@
             </div><!-- /header -->
             
             <!-- flash messages -->
-            % for message in [m for m in d['messages'] if m]:
+            % for message in messages:
             <div class="flash_message ui-bar ui-bar-e">
-                <p class="status_${d['status']}">${message}</p>
+                <p class="status_${status}">${message}</p>
                 <a href="#" class="flash_remove" data-role="button" data-icon="delete" data-iconpos="notext" onclick="$(this).closest('.flash_message').slideUp(function(){$(this).remove()}); return false;">Remove</a>
             </div>
             % endfor
