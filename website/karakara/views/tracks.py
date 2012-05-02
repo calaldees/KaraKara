@@ -30,7 +30,10 @@ def track_list(request):
     """
     Browse tracks
     """
-    return action_ok()
+    track_list = []
+    for track in DBSession.query(Track).all():
+        track_list.append(track.id)
+    return action_ok(data={'list':track_list})
 
 
 @view_config(route_name='track_list_all')
