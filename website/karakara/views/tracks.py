@@ -10,19 +10,17 @@ from ..model.model_tracks import Track
 # Track
 #-------------------------------------------------------------------------------
 
-@view_config(route_name='track'  )
-#@view_config(route_name='track_f')
+@view_config(route_name='track')
 @auto_format_output
 def track_view(request):
     """
     View individual track details
     """
     id    = request.matchdict['id']
-    #id    = 't1'
     track = DBSession.query(Track).with_polymorphic('*').get(id)
     
     request.session['track_views'] = request.session.get('track_views',0) + 1
-    print('YEAH!!')
+    
     return action_ok(message='track test', data={'description':track.description, 'views':request.session['track_views']})
 
 
@@ -32,7 +30,7 @@ def track_list(request):
     """
     Browse tracks
     """
-    return {'status':'ok','message':'list'}
+    return action_ok()
 
 
 @view_config(route_name='track_list_all')
@@ -41,5 +39,5 @@ def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
     """
-    return {}
+    return action_ok()
 

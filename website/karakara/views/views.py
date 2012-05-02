@@ -9,5 +9,5 @@ from ..lib.auto_format import auto_format_output, action_ok
 @view_config(route_name='home')
 @auto_format_output
 def home(request):
-    request.session.flash('Hello World')
+    #request.session.flash('Hello World')
     return action_ok()

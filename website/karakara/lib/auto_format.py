@@ -110,7 +110,7 @@ def auto_format_output(target, *args, **kwargs):
     # Attempt auto_format if result is a plain python dict and auto_format func exisits
     if formatter and isinstance(result, dict):
         # Add pending flash messages to result dict
-        result['messages'] = result['messages'] + request.session.pop_flash()
+        result['messages'] = result.get('messages',[]) + request.session.pop_flash()
         
         # Format result dict using format func
         response = formatter(request, result)
