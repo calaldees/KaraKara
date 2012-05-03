@@ -29,7 +29,7 @@ setup: env
 	env/bin/python setup.py develop
 
 init_db:
-	env/bin/python -mkarakara.model.setup development.ini
+	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
 run:

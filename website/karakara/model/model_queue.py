@@ -1,4 +1,4 @@
-from .models import Base
+from . import Base
 
 from sqlalchemy import Column, Enum
 from sqlalchemy import String, Unicode, Integer, DateTime

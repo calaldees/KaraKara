@@ -3,7 +3,7 @@ from pyramid.config import Configurator
 import pyramid.events
 
 # SQLAlchemy imports
-from .model.models import DBSession, init_DBSession
+from .model import DBSession, init_DBSession
 
 # Beaker Sessions
 import pyramid_beaker

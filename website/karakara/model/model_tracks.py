@@ -1,11 +1,10 @@
-from .models import Base
+from . import Base
 
 from sqlalchemy     import Column, ForeignKey, Enum
 from sqlalchemy     import String, Unicode, Integer
 from sqlalchemy.orm import relationship, backref
 
-
-
+import copy
 
 __all__ = [
     "Track", "Tag", "Attachment", "_attachment_types",
@@ -40,6 +39,24 @@ class Track(Base):
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     
+    
+    __to_dict__ = copy.deepcopy(Base.__to_dict__)
+    __to_dict__.update({
+        'default': {
+    #Base.to_dict_setup(self, list_type='default', field_processors={
+            'id'           : None ,
+            'title'        : None ,
+            'duration'     : None ,
+        },
+    })
+    
+    __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
+    __to_dict__['full'].update({
+    #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
+            'attachments' : lambda track: [attachment.to_dict() for attachments in track.attachments] ,
+            'tags'        : lambda track: [tag.name for tag in track.tags],
+    })
+
 
 class Tag(Base):
     """

@@ -12,7 +12,7 @@ def dictToXMLString(d):
         e = Element(tag)
         if isinstance(d, str): # is String
             e.text = d
-        elif type(d) in [int, float, bool]: #types.IntType, types.FloatType, types.BooleanType
+        elif type(d) in [int, float, bool]:
             e.text = str(d)
         elif hasattr(d,'keys'): # is Dict
             for key in d.keys():

@@ -10,7 +10,7 @@ from ..lib.misc import get_fileext
 
 from ..model.model_tracks import Track, Tag, Attachment, _attachment_types
 
-from ..model.models import init_DBSession, DBSession
+from ..model         import init_DBSession, DBSession
 from ..model.actions import get_tag
 import transaction
 

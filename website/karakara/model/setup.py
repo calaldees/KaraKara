@@ -1,41 +1,14 @@
-from .models import DBSession, init_DBSession, init_db
+from . import DBSession, init_DBSession
 
-from .model_tracks import Track, Tag
-from .model_queue  import QueueItem
+# AllanC - can anyone help move this into model.__init__
+#          I want all generic stuff to be in __init__.py so the rest of the files in the model relate specificly to the project
+#          when in __init__.py - the DBSession does not setup and engine properly. I'm assuming __init__ needs to finsh??
 
-import logging
-log = logging.getLogger(__name__)
-
-import transaction
+#-------------------------------------------------------------------------------
+# Constants
+#-------------------------------------------------------------------------------
 
 version = "0.0"
-
-#-------------------------------------------------------------------------------
-# Init Base Data
-#-------------------------------------------------------------------------------
-
-def init_base_data():
-    init_db() # Clear current DB and Create Blank Tables
-    
-    log.info("Populating tables with base test data")
-    
-    tags = []
-    tags.append(Tag('anime'                           ))
-    tags.append(Tag('series'                , tags[-1]))
-    tags.append(Tag('fist of the north star', tags[-1]))
-    
-    DBSession.add_all(tags)
-    transaction.commit()
-    
-    track1 = Track()
-    track1.id          = "t1"
-    track1.title       = "Test Track"
-    track1.description = "Test track description"
-    track1.duration    = 120
-    track1.tags        = tags
-    
-    DBSession.add(track1)
-    transaction.commit() # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
 
 
 #-------------------------------------------------------------------------------
@@ -49,8 +22,9 @@ def get_args():
         description="""Init database""",
         epilog=""""""
     )
-    parser.add_argument('--version', action='version', version=version)
-    parser.add_argument('config_uri', help='config .ini uri')
+    parser.add_argument('--version'   , action='version', version=version)
+    parser.add_argument('--config_uri', default='development.ini', help='config .ini uri')
+    parser.add_argument('--init_func' , help='e.g. myapp.model.init_data:init_data')
 
     return parser.parse_args()
 
@@ -64,7 +38,17 @@ def main():
     
     # Setup DB
     init_DBSession(settings) # Connect to DBSession
-    init_base_data()         # Populate base data
+
+    def my_import(name):
+        mod = __import__(name)
+        components = name.split('.')
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod
+    module_name, func_name = tuple(args.init_func.split(':'))
+    init_func = getattr(my_import(module_name), func_name)
+    #from .init_data import init_data as init_func
+    init_func()
     
 if __name__ == "__main__":
-    main()
+    main()    

@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 
 from ..lib.auto_format    import auto_format_output, action_ok
-from ..model.models       import DBSession
+from ..model              import DBSession
 
 
 #-------------------------------------------------------------------------------

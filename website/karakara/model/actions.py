@@ -1,7 +1,8 @@
 from sqlalchemy.orm.exc import NoResultFound
 
+from . import DBSession
 from .model_tracks import Tag
-from .models import DBSession
+
 
 
 def get_tag(tag):
