@@ -29,7 +29,7 @@
         <div data-role="page">
             
             <div data-role="header" data-position="fixed" >
-                <h1>KaraKara</h1>
+                <h1>${request.registry.settings.get('text.title') or 'KaraKara'}</h1>
                 ## data-iconpos="notext"
                 <a href="/" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Home  </a>
                 <a href="/" data-role="button" data-icon="search" data-mini="true" data-inline="true">Search</a>
