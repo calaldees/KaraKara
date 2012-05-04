@@ -129,3 +129,4 @@ def augment_declarative_base(base_class):
     base_class.to_dict_setup  = to_dict_setup
 
 augment_declarative_base(Base)
+

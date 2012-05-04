@@ -64,6 +64,7 @@ def main(global_config, **settings):
     config.add_route('queue'         , append_format_pattern('/queue')         )
     config.add_route('fave'          , append_format_pattern('/fave')          )
     
+    config.add_route('tags'          , '/tags/{tags:.*}')
     
     # Events -------------------------------------------------------------------
     
