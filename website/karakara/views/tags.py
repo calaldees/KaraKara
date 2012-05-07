@@ -23,6 +23,10 @@ def tags(request):
     #    if tag and tag_parent:
     
     tags   = DBSession.query(Tag).filter(Tag.name.in_(tag_strings)).all()
-    tracks = DBSession.query(Track).join(Track.tags).filter(Tag.id.in_([tag.id for tag in tags])).all()
+    #tracks = DBSession.query(Track).join(Track.tags).filter(Tag.id.in_([tag.id for tag in tags])).all()
     
-    return action_ok(data={'tracks': [track.to_dict() for track in tracks]})
+    tracks_with_tags = DBSession.query(Track)
+    for tag in tags:
+        tracks_with_tags = tracks_with_tags.intersect( DBSession.query(Track).join(Track.tags).filter(Tag.id==tag.id) )
+    
+    return action_ok(data={'tracks': [track.to_dict() for track in tracks_with_tags]})
