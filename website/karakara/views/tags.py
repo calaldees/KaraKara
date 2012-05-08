@@ -1,11 +1,14 @@
 from pyramid.view import view_config
 
+from ..lib.misc        import update_dict
 from ..lib.auto_format import auto_format_output, action_ok, registered_formats
 
 from ..model              import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
 
 import re
+from sqlalchemy.orm import joinedload
+from sqlalchemy     import func
 
 
 @view_config(route_name='tags')
@@ -21,12 +24,20 @@ def tags(request):
     #for tag in tag_strings:
     #    tag, tag_parent = tuple(tag.split(':'))
     #    if tag and tag_parent:
-    
-    tags   = DBSession.query(Tag).filter(Tag.name.in_(tag_strings)).all()
     #tracks = DBSession.query(Track).join(Track.tags).filter(Tag.id.in_([tag.id for tag in tags])).all()
     
-    tracks_with_tags = DBSession.query(Track)
-    for tag in tags:
-        tracks_with_tags = tracks_with_tags.intersect( DBSession.query(Track).join(Track.tags).filter(Tag.id==tag.id) )
+    tags = DBSession.query(Tag).filter(Tag.name.in_(tag_strings))
     
-    return action_ok(data={'tracks': [track.to_dict() for track in tracks_with_tags]})
+    trackids = DBSession.query(Track.id)
+    for tag in tags:
+        trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id==tag.id) )
+    
+    tracks   = DBSession.query(Track).filter(Track.id.in_(trackids)).options(joinedload(Track.tags),joinedload(Track.attachments))
+    sub_tags = DBSession.query(Tag  ,func.count(TrackTagMapping.tag_id)).join(TrackTagMapping).filter(TrackTagMapping.track_id.in_(trackids)).group_by(Tag.id).options(joinedload(Tag.parent))
+    
+    return action_ok(
+        data={
+            'tracks'  : [track.to_dict('full') for track in tracks],
+            'sub_tags': [update_dict(tag.to_dict(),{'count':count})   for tag,count in sub_tags],
+        }
+    )
