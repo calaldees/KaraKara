@@ -12,3 +12,4 @@ def get_setting(key, request=None, return_type=None):
     if return_type=='int' or return_type==int:
         value = int(value)
     return value
+

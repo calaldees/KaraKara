@@ -53,7 +53,8 @@ class Track(Base):
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
-            'attachments' : lambda track: [attachment.to_dict() for attachments in track.attachments] ,
+            'description' : None ,
+            'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
             'tags'        : lambda track: [tag.name for tag in track.tags],
     })
 
@@ -100,3 +101,15 @@ class Attachment(Base):
     id              = Column(Integer(),         primary_key=True)
     location        = Column(Unicode(250),      nullable=False)
     type            = Column(_attachment_types, nullable=False)
+
+    __to_dict__ = copy.deepcopy(Base.__to_dict__)
+    __to_dict__.update({
+        'default': {
+            'id'           : None ,
+            'location'     : None ,
+            'type'         : None ,
+        },
+    })
+    __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
+    __to_dict__['full'].update({
+    })

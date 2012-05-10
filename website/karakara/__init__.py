@@ -51,7 +51,12 @@ def main(global_config, **settings):
     # Routes -------------------------------------------------------------------
     
     # Static Routes
-    config.add_static_view(settings["static.assets"], "karakara:static") #cache_max_age=3600
+    config.add_static_view(name=settings["static.assets"], path="karakara:static") #cache_max_age=3600
+    
+    # AllanC - it's official ... static route setup and generation is a mess in pyramid
+    #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
+    config.add_static_view(name='media', path=settings["static.media"])
+    
     
     # Routes
     def append_format_pattern(route):

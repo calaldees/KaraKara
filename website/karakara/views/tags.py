@@ -15,9 +15,10 @@ from sqlalchemy     import func
 @auto_format_output
 def tags(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
-    request.matchdict['tags'] = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
-    
-    tag_strings = request.matchdict['tags'].split('/')
+    tag_string  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
+    tag_strings = []
+    if tag_string:
+        tag_strings = tag_string.split('/')
     
     #tags_single  = []
     #tags_parents = []
@@ -35,9 +36,14 @@ def tags(request):
     tracks   = DBSession.query(Track).filter(Track.id.in_(trackids)).options(joinedload(Track.tags),joinedload(Track.attachments))
     sub_tags = DBSession.query(Tag  ,func.count(TrackTagMapping.tag_id)).join(TrackTagMapping).filter(TrackTagMapping.track_id.in_(trackids)).group_by(Tag.id).options(joinedload(Tag.parent))
     
+    # Don't return tracks if there are too many returns, force the user to select more subtags
+    if tracks.count() > 10:
+        tracks = []
+    
     return action_ok(
         data={
             'tracks'  : [track.to_dict('full') for track in tracks],
-            'sub_tags': [update_dict(tag.to_dict(),{'count':count})   for tag,count in sub_tags],
+            'sub_tags': [update_dict(tag.to_dict(),{'count':count})   for tag,count in sub_tags if tag not in tags],
+            'tags'    : tag_strings,
         }
     )
