@@ -32,6 +32,9 @@ init_db:
 	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
+init_db_test: init_db
+	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.tests.init_data:init_random_data
+
 run:
 	#$(MAKE) env_activate
 	env/bin/pserve --reload development.ini
