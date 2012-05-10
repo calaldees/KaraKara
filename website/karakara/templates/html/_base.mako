@@ -29,7 +29,9 @@
         <div data-role="page">
             
             <div data-role="header" data-position="fixed" >
-                <h1>${request.registry.settings.get('text.title') or 'KaraKara'}</h1>
+                <%def name="title()">${request.registry.settings.get('text.title') or 'KaraKara'}</%def>
+                <h1>${next.title()}</h1>
+                
                 ## data-iconpos="notext"
                 <a href="/" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Home  </a>
                 <a href="/" data-role="button" data-icon="search" data-mini="true" data-inline="true">Search</a>

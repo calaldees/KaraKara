@@ -1,5 +1,7 @@
 <%inherit file="_base.mako"/>
 
+<%def name="title()">Browse Tracks</%def>
+
 <%
     def media_url(file):
         return '/media/%s' % file

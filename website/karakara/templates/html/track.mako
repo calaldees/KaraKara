@@ -15,7 +15,8 @@
     ]
 %>
 
-<h2>${data['title']}</h2>
+<%def name="title()">${data['title']}</%def>
+
 
 <!-- video -->
 <video poster="${get_loc('image')[0]}" controls>
