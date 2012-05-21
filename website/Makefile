@@ -4,6 +4,7 @@ help:
 	# setup         -- setup python egg & install dependencys/env if needed
 	# test          -- run all nosetests
 	# init-db       -- create a blank database
+	# init-db-test  -- create test db
 	# run           -- run the site in development mode
 	# run_production -- run in production mode
 	# clean         -- reset the folder to clean git checkout (removes virtual python env)

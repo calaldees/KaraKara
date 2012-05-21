@@ -5,7 +5,9 @@ Getting Started
 ---------------
 
 make setup
+make init_db_test
 make run
+http://localhost:6543/
 
 
 Features
