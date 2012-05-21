@@ -48,6 +48,8 @@ Within the file and directory holding a media item the structure is as follows:
    Holds (initial) tags on the media item, one per line.
    This file is to be generated with an initial set of tags during 
    the import stage.  It's contents are reprocessed into description.json.
+   This is not JSON so that it is easier for users to update.
+   TODO: is this a good idea?
 
   /source/
     Contains the video, audio, subtitles and images used to generate the media
@@ -75,6 +77,7 @@ The following example is given to elucidate all fields.
 
  {
   'id'      : 'test item',                 -- identifier (as directory name)
+  'source'  : 'path/test item',            -- full path of import source
   'tags'    : [ 'j-pop', 'the pillows' ],  -- tags from tags.txt
   'previews': {                            -- keyed by target system
     'iphone': {
@@ -102,6 +105,7 @@ The following example is given to elucidate all fields.
       'src'       : 'video/0.mp4',         -- path of thumbnail source
       'width'     : 120,                   -- in pixels
       'height'    : 80,                    -- in pixels
+      'size'      : 8192,                  -- in bytes
       'time-index': 3.7                    -- in seconds (offset in video)
     },
     {
@@ -109,15 +113,23 @@ The following example is given to elucidate all fields.
       'src'       : 'video/0.mp4',
       'width'     : 120,
       'height'    : 80,
+      'size'      : 8192,
       'time-index': 16.2
     }
-  ]
+  ],
+  'subtitles': [
+    {
+      'url'        : 'source/subtitles.ssa',
+      'language'   : 'en'
+    }
+  ],
   'videos': [
     {
       'url'        : 'video/0.mp4',        -- url
       'width'      : 1024,                 -- in pixels
       'height'     : 768,                  -- in pixels
       'length'     : 190.2,                -- in seconds
+      'size'       : 4292982,              -- in bytes
       'language'   : 'en',                 -- of subtitles
       'encode-hash': '03972619348',        -- internal to encode stage
     }
@@ -256,7 +268,8 @@ For each media item:
      that stored in sources.json:
     3.1.  extract metadata like size and length
     3.2.  update metadata in sources.json
-          (making sure not to overwrite user modifiable fileds)
+          (making sure not to overwrite user modifiable fields)
+  4. update description.json with details of subtitle files
 
 For the purposes of metadata extraction, if the language of a source is not
 identifiable it should be recorded as 'unknown'.  This allows on the fly
