@@ -19,6 +19,12 @@ def die(*s):
 	warn(*s)
 	sys.exit(1)
 
+def hidden_file_re():
+	return re.compile(r'^\..*$')
+
+def media_file_re():
+	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|ssa|png|jpg|jpeg)$', re.IGNORECASE)
+
 
 class JSONFile(dict):
 	def __init__(self, path):
@@ -89,7 +95,7 @@ class TagList:
 			self.data.clear()
 			for line in lines:
 				tag = line.strip() # FIXME: \r\n?
-				self.data.add(tag)
+				self.data.append(tag)
 			self.loaded = True
 			self.changed = False
 		except IOError:
@@ -128,8 +134,8 @@ class MediaItem:
 		self.thumbnail_path = self.element_path('thumbnail')
 		self.video_path = self.element_path('video')
 
-		self.hidden_re = re.compile(r'^\.')
-		self.media_re = re.compile(r'\.(avi|mp3|mp4|mkv|ogg|png|jpg|jpeg)$', re.IGNORECASE)
+		self.hidden_re = hidden_file_re()
+		self.media_re = media_file_re()
 	
 	def log(self, *s):
 		log('"' + self.name + '": ', *s)
@@ -145,7 +151,7 @@ class MediaItem:
 			for name in os.listdir(self.path):
 				path = os.path.join(self.path, name)
 				if (not self.hidden_re.match(name)) and os.isfile(path) and self.media_re.match(name):
-					media_files.add(name)
+					media_files.append(name)
 
 			self.log("mkdir " + self.source_path)
 			os.mkdir(self.source_path)
@@ -168,13 +174,14 @@ class MediaItem:
 		self.create_directory('preview')
 		self.create_directory('thumbnail')
 		self.create_directory('video')
+		self.create_directory('tmp')
 
 	def source_files(self):
 		sources = []
 		for name in os.listdir(self.source_path):
 			path = os.path.join(self.source_path, name)
 			if (not self.hidden_re.match(name)) and os.isfile(path) and self.media_re.match(name):
-				sources.add(name)
+				sources.append(name)
 		return sources
 	
 	def valid(self):
@@ -182,13 +189,14 @@ class MediaItem:
 
 	def stage_import(self):
 		self.log("import stage")
+		self.initialise_layout()
 
 	def run_stages(self):
 		self.log("processing")
 		self.stage_import()
 
 def find_items(path):
-	hidden_re = re.compile(r'^\.')
+	hidden_re = hidden_file_re()
 	items = []
 	for entry in os.listdir(path):
 		entry_path = os.path.join(path, entry)
@@ -197,23 +205,88 @@ def find_items(path):
 		elif os.path.isdir(entry_path):
 			item = MediaItem(entry_path)
 			if item.valid():
-				items.add(item)
+				items.append(item)
 	return items
+
+def prepare_items(path, label=None):
+	hidden_re = hidden_file_re()
+	media_re = media_file_re()
+	
+	files = os.listdir(path)
+	items = {}
+
+	dir_n = 0
+	item_n = 0
+	media_n = 0
+	rename_n = 0
+
+	for file_name in files:
+		file_path = os.path.join(path, file_name)
+		if (not hidden_re.match(file_name)) and os.path.isfile(file_path) and media_re.match(file_name):
+			(item_name, extension) = os.path.splitext(file_name)
+			if label is not None:
+				item_name = label + " - " + item_name
+			if not items.has_key(item_name):
+				items[item_name] = []
+			items[item_name].append(file_name)
+			media_n += 1
+
+	for (item, files) in items.items():
+		item_dir = os.path.join(path, item)
+		item_n += 1
+		
+		if not os.path.exists(item_dir):
+			log("mkdir " + item_dir)
+			os.mkdir(item_dir)
+			dir_n += 1
+
+		for file_name in files:
+			old_path = os.path.join(path, file_name)
+			new_path = os.path.join(path, item, file_name)
+			log("  " + old_path + " => " + new_path)
+			os.rename(old_path, new_path)
+			rename_n += 1
+
+	log("found {0} media files (from {1} things)".format(media_n, len(files)))
+	log("moved {0} files into {1} media items".format(rename_n, item_n))
+	log("created {0} directories".format(dir_n))
 
 def usage(f):
         print >>f, """Usage:
-  processmedia.py <media-root>
+  processmedia.py <command> ...
+ 
+Where <command> is one of:
+  
+  process <media-root>
+    Scan <media-root> for media items.
+    Perform all processing stages on items.
+
+  prepare <media-root> [<label>]
+    Gather all similarly name media files in <media-root> into directories.
+    This creates media items for processing with the 'process' command.
+    If <label> is supplied it is prepended to the name of each item created.
 """
 
 def main(args):
-	if args == []:
+	if len(args) < 2:
 		usage(sys.stderr)
 		sys.exit(1)
 	else:
-		root = args[0]
-		media = find_items(root)
-		for item in media:
-			item.run_stages()
+		command = args[0]
+		root = args[1]
+		if command == 'process':
+			media = find_items(root)
+			for item in media:
+				item.run_stages()
+		elif command == 'prepare':
+			if len(args) > 2:
+				prepare_items(root, args[2])
+			else:
+				prepare_items(root)
+		else:
+			usage(sys.stderr)
+			sys.exit(1)
+			
 
 if __name__ == "__main__":
         main(sys.argv[1:])
