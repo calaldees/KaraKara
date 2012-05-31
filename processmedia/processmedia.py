@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os, re, string, sys
+import subprocess
 import json
 
 logs = [sys.stdout]
@@ -24,7 +25,6 @@ def hidden_file_re():
 
 def media_file_re():
 	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|ssa|png|jpg|jpeg)$', re.IGNORECASE)
-
 
 class JSONFile(dict):
 	def __init__(self, path):
@@ -80,6 +80,74 @@ class MediaEncoding(JSONFile):
 		super(MediaEncoding, self).__init__(path)
 
 
+class MediaFile:
+	def __init__(self, path, metadata=None):
+		self.path = path
+		self.metadata = metadata
+	
+	def _size(self):
+		return os.stat(self.path).st_size
+	def size(self):
+		if self.metadata is None:
+			return self._size()
+		else:
+			return self.metadata['size']
+
+	def _mtime(self):
+		return int(os.stat(self.path).st_mtime)
+	def mtime(self):
+		if self.metadata is None:
+			return self._mtime()
+		else:
+			return self.metadata['mtime']
+
+	def changed(self):
+		if self.metadata is None:
+			return True
+		else:
+			return (self.mtime() != self._mtime()) or (self.size() != self._size())
+
+	def probe(self):
+		stat = os.stat(self.path)
+		metadata = {
+			'mtime': int(stat.st_mtime),
+			'size': stat.st_size,
+			'language': 'unknown'
+		}
+		
+		raw_probe = subprocess.check_output(['ffprobe', self.path], stderr=subprocess.STDOUT)
+		
+		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
+		raw_video = re.search(r'^\s*Stream\s#\d+:\d+(?:\[.*?\])?:\s*Video:\s*(.*?),\s*(.*?),\s*(\d+)x(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
+
+		if raw_duration is not None:
+			hours = float(raw_duration.group(1))
+			minutes = float(raw_duration.group(2))
+			seconds = float(raw_duration.group(3))
+			factions = float(raw_duration.group(4))
+			length = (hours * 60.0 * 60.0) + (minutes * 60.0) + seconds + factions
+			metadata['length'] = length
+		
+		if raw_video is not None:
+			metadata['codec'] = raw_video.group(1)
+			metadata['colourspace'] = raw_video.group(2)
+			metadata['width'] = raw_video.group(3)
+			metadata['height'] = raw_video.group(4)
+		
+		# FIXME: probe audio for language
+
+		return metadata
+	
+	def update_if_changed(self):
+		if self.changed():
+			if self.metadata is None:
+				self.metadata = {}
+			self.metadata.update(self.probe())
+			return True
+		else:
+			return False
+
+
 class TagList:
 	def __init__(self, path):
 		self.path = path
@@ -133,6 +201,7 @@ class MediaItem:
 		self.preview_path = self.element_path('preview')
 		self.thumbnail_path = self.element_path('thumbnail')
 		self.video_path = self.element_path('video')
+		self.tmp_path = self.element_path('tmp')
 
 		self.hidden_re = hidden_file_re()
 		self.media_re = media_file_re()
@@ -190,6 +259,7 @@ class MediaItem:
 	def stage_import(self):
 		self.log("import stage")
 		self.initialise_layout()
+		# FIXME: extra subtitle files
 
 	def run_stages(self):
 		self.log("processing")
@@ -251,6 +321,12 @@ def prepare_items(path, label=None):
 	log("moved {0} files into {1} media items".format(rename_n, item_n))
 	log("created {0} directories".format(dir_n))
 
+def probe_test(files):
+	for file in files:
+		mf = MediaFile(file)
+		metadata = mf.probe()
+		print metadata
+
 def usage(f):
         print >>f, """Usage:
   processmedia.py <command> ...
@@ -265,6 +341,9 @@ Where <command> is one of:
     Gather all similarly name media files in <media-root> into directories.
     This creates media items for processing with the 'process' command.
     If <label> is supplied it is prepended to the name of each item created.
+
+  probe-test <file> [<file> ...]
+    Test media probing functionality on file(s).
 """
 
 def main(args):
@@ -283,6 +362,8 @@ def main(args):
 				prepare_items(root, args[2])
 			else:
 				prepare_items(root)
+		elif command == 'probe-test':
+			probe_test(args[1:])
 		else:
 			usage(sys.stderr)
 			sys.exit(1)
