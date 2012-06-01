@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os, re, string, sys
-import subprocess
+import subprocess, urllib
 import json
 
 logs = [sys.stdout]
@@ -26,6 +26,15 @@ def hidden_file_re():
 def media_file_re():
 	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|ssa|png|jpg|jpeg)$', re.IGNORECASE)
 
+def video_file_re():
+	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|ogm)$', re.IGNORECASE)
+
+def audio_file_re():
+	return re.compile(r'^.*\.(mp3|ogg)$', re.IGNORECASE)
+
+def subtitle_file_re():
+	return re.compile(r'^.*\.(ssa)$', re.IGNORECASE)
+
 class JSONFile(dict):
 	def __init__(self, path):
 		super(JSONFile, self).__init__()
@@ -33,7 +42,12 @@ class JSONFile(dict):
 		self.loaded = False
 		self.changed = False 
 
-	def load(self):
+	def load_hook(self):
+		pass
+	def save_hook(self):
+		pass
+
+	def _load(self):
 		try:
 			fp = open(self.path, 'r')
 			self.clear()
@@ -43,8 +57,14 @@ class JSONFile(dict):
 			self.changed = False
 		except IOError:
 			self.clear()
+		self.load_hook()
 
-	def save(self):
+	def load(self):
+		if not self.loaded:
+			self._load()
+
+	def _save(self):
+		self.save_hook()
 		try:
 			fp = open(self.path, 'w')
 			json.dumps(fp, self)
@@ -52,32 +72,17 @@ class JSONFile(dict):
 			self.changed = False
 		except IOError as (errno, strerror):
 			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
-	
+
+	def save(self):
+		if self.changed:
+			self._save()
+
 	def exists(self):
 		return os.path.exists(self.path)
 
-	def __getitem__(self, y):
-		if not self.loaded:
-			self.load()
-		return super(JSONFile, self).__getitem__(y)
 	def __setitem__(self, y, v):
 		super(JSONFile, self).__setitem(y, v)
 		self.changed = True
-
-
-class MediaDescriptor(JSONFile):
-	def __init__(self, path):
-		super(MediaDescriptor, self).__init__(path)
-
-
-class MediaSources(JSONFile):
-	def __init__(self, path):
-		super(MediaSources, self).__init__(path)
-
-
-class MediaEncoding(JSONFile):
-	def __init__(self, path):
-		super(MediaEncoding, self).__init__(path)
 
 
 class MediaFile:
@@ -101,6 +106,9 @@ class MediaFile:
 		else:
 			return self.metadata['mtime']
 
+	def exists(self):
+		return os.path.exists(self.path) and os.path.isfile(self.path)
+
 	def changed(self):
 		if self.metadata is None:
 			return True
@@ -111,8 +119,7 @@ class MediaFile:
 		stat = os.stat(self.path)
 		metadata = {
 			'mtime': int(stat.st_mtime),
-			'size': stat.st_size,
-			'language': 'unknown'
+			'size': stat.st_size
 		}
 		
 		raw_probe = subprocess.check_output(['ffprobe', self.path], stderr=subprocess.STDOUT)
@@ -141,11 +148,21 @@ class MediaFile:
 	def update_if_changed(self):
 		if self.changed():
 			if self.metadata is None:
-				self.metadata = {}
+				self.metadata = {
+					'language': 'unknown',
+					'score': 1.0
+				}
 			self.metadata.update(self.probe())
 			return True
 		else:
 			return False
+	
+	def is_video(self):
+		return (video_file_re().match(self.path) is not None)
+	def is_audio(self):
+		return (audio_file_re().match(self.path) is not None)
+	def is_subtitles(self):
+		return (subtitle_file_re().match(self.path) is not None)
 
 
 class TagList:
@@ -155,7 +172,7 @@ class TagList:
 		self.loaded = False
 		self.changed = False
 	
-	def load(self):
+	def _load(self):
 		try:
 			fp = open(self.path, 'r')
 			lines = fp.readlines()
@@ -169,7 +186,11 @@ class TagList:
 		except IOError:
 			self.data.clear()
 
-	def save(self):
+	def load(self):
+		if not self.loaded:
+			self._load()
+
+	def _save(self):
 		try:
 			fp = open(self.path, 'w')
 			for tag in self.data:
@@ -178,13 +199,102 @@ class TagList:
 			self.changed = False
 		except IOError as (errno, strerror):
 			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
-	
+
+	def save(self):
+		if self.changed:
+			self._save()
+
 	def exists(self):
 		return os.path.exists(self.path)
 	
 	def create(self):
 		if not self.exists():
-			self.save()
+			self._save()
+
+	def items(self):
+		return self.data
+
+class MediaDescriptor(JSONFile):
+	def __init__(self, parent):
+		super(MediaDescriptor, self).__init__(parent.element_path('description.json'))
+		self.parent = parent
+	
+	def save_hook(self):
+		self['id'] = parent.name
+		self['tags'] = parent.tags.items()
+	
+	def subtitles(self):
+		return self['subtitles']
+
+	def set_subtitles(self, files):
+		metadata = []
+		for file in files:
+			entry = {
+				'url': "/".join(['source', urllib.quote(file.name)]),
+				'language': file.metadata['language']
+			}
+			metadata.append(entry)
+		self['subtitles'] = metdata
+
+class MediaSources(JSONFile):
+	def __init__(self, parent):
+		super(MediaSources, self).__init__(parent.element_path('sources.json'))
+		self.parent = parent
+		self.index = {}
+
+	def load_hook(self):
+		self.index.clear()
+		for (name, metadata) in self.items():
+			self.index[name] = MediaFile(self.parent.element_path('source', name), metadata=metadata)
+
+	def save_hook(self):
+		for (name, source) in self.index.items():
+			self[name] = source.metadata
+
+	def dir_path(self):
+		return parent.element_path('source')
+	
+	def index(self):
+		self.load()
+
+		missing = []
+		deleted = []
+		changed = []
+		
+		for name in parent.source_files():
+			if not self.index.has_key(name):
+				missing.append(name)
+			elif not self.index[name].exists():
+				deleted.append(name)
+			elif self.index[name].changed():
+				changed.append(name)
+
+		if (len(missing) + len(deleted) + len(changed)) == 0:
+			return False
+
+		for name in deleted:
+			self.parent.log("del source: " + name)
+			del self.index[name]
+		for name in missing:
+			self.parent.log("add source: " + name)
+			self.index[name] = MediaFile(self.parent.element_path('source', name))
+		for (name, source) in self.index.items():
+			source.update_if_changed()
+		
+		self.changed = True
+		self.save()
+
+	def subtitles(self):
+		files = []
+		for (name, source) in self.index.items():
+			if source.is_subtitles():
+				files.append(name)
+		return files
+
+class MediaEncoding(JSONFile):
+	def __init__(self, parent):
+		super(MediaEncoding, self).__init__(parent.element_path('encoding.json'))
+		self.parent = parent
 
 
 class MediaItem:
@@ -192,9 +302,9 @@ class MediaItem:
 		self.name = (os.path.split(path))[1]
 		self.path = path
 
-		self.descriptor = MediaDescriptor(self.element_path('description.json'))
-		self.sources = MediaSources(self.element_path('sources.json'))
-		self.encoding = MediaEncoding(self.element_path('encoding.json'))
+		self.descriptor = MediaDescriptor(self)
+		self.sources = MediaSources(self)
+		self.encoding = MediaEncoding(self)
 		self.tags = TagList(self.element_path('tags.txt'))
 
 		self.source_path = self.element_path('source')
@@ -256,14 +366,22 @@ class MediaItem:
 	def valid(self):
 		return True # FIXME: do some testing
 
-	def stage_import(self):
+	def import_stage(self):
 		self.log("import stage")
 		self.initialise_layout()
-		# FIXME: extra subtitle files
+		# FIXME: extract subtitle files
+		# FIXME: populate tags
+
+	def index_stage(self):
+		self.log("index stage")
+		self.sources.index()
+		subtitles = self.subtitles()
+		self.descriptor.set_subtitles(subtitles)
 
 	def run_stages(self):
 		self.log("processing")
-		self.stage_import()
+		self.import_stage()
+		self.index_stage()
 
 def find_items(path):
 	hidden_re = hidden_file_re()
