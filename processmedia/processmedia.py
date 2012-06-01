@@ -259,7 +259,7 @@ class MediaDescriptor(JSONFile):
 	
 	def video(self):
 		return self['video']
-	def add_video(self, name, description):
+	def set_video(self, name, description):
 		self['video'][name] = description
 		self.changed = True
 	def remove_video(self, name):
@@ -368,6 +368,31 @@ class MediaEncoding(JSONFile):
 		if changed:
 			self.save()
 
+
+class MediaEncoder:
+	def __init__(self, parent, path):
+		self.path = path
+		self.parent = parent
+
+		self.video = None
+		self.image = None
+		self.audio = None
+		self.audio_shift = 0.0
+		self.subtitles = None
+		self.subtitle_shift = 0.0
+
+	def valid():
+		type_4 = ((self.image is not None) and (self.audio is not None) and (self.subtitle is not None))
+		type_3 = ((self.video is not None) and (self.audio is not None) and (self.subtitle is not None))
+		type_2 = ((self.video is not None) and (self.subtitle is not None))
+		type_1 = (self.video is not None)
+		return type_1 or type_2 or type_3 or type_4
+
+	def run():
+		if not self.valid():
+			return False
+
+		return False
 
 class MediaItem:
 	def __init__(self, path):
@@ -567,13 +592,53 @@ class MediaItem:
 			try:
 				os.remove(path)
 			except OSError as (errno, strerror):
-				warn("unable to remove " + path + " ({0}): {1}".format(errno, strerror))
+				self.log("unable to remove " + path + " ({0}): {1}".format(errno, strerror))
 			self.descriptor.remove_video(name)
 
 		self.descriptor.save()
 
 		for name in (added + removed):
-			pass # FIXME: encode
+			self.log("encoding " + name)
+			encoding = encodings[name]
+			
+			ok = True
+			path = self.element_path('video', name)
+			if os.path.exists(path):
+				try:
+					self.log("rm " + path)
+					os.remove(path)
+				except OSError as (errno, strerror):
+					self.log("unable to remove " + path + " ({0}): {1}".format(errno, strerror))
+					ok = False
+
+			if ok:
+				encoder = MediaEncoder(self, self.element_path('video', name))
+				if encoding.has_key('video'):
+					encoder.video = self.element_path('source', encoding['video'])
+				elif encoding.has_key('image'):
+					encoder.image = self.element_path('source', encoding['image'])
+				if encoding.has_key('audio'):
+					encoder.audio = self.element_path('source', encoding['audio'])
+					encoder.audio_shift = encoding['audio-shift']
+				if encoding.has_key('subtitles'):
+					encoder.subtitles = self.element_path('source', encoding['subtitles'])
+					encoder.subtitle_shift = encoding['subtitle-shift']
+				ok = encoder.run()
+			
+			if ok:
+				self.log("  complete")
+				media = MediaFile(path)
+				metadata = media.probe()
+				metadata['url'] = "/".join(['video', urllib.quote(name)]),
+				metadata['src'] = name
+				metadata['encode-hash'] = encoding['encode-hash']
+				metadata['language'] = encoding['language']
+				self.descriptor.set_video(name, )
+			else:
+				self.log("  failed")
+				self.descriptor.remove_video(name)
+
+			self.descriptor.save()
 
 	def run_stages(self):
 		self.log("processing")
