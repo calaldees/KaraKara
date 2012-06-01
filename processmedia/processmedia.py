@@ -340,9 +340,11 @@ class MediaEncoding(JSONFile):
 				if old.has_key('subtitle-shift'):
 					new['subtitle-shift'] = old['subtitle-shift']
 				if dictionary_hash(old) != dictionary_hash(new):
+					self.parent.log("update encoding " + name)
 					self[name] = new
 					changed = True
 			else:
+				self.parent.log("add encoding " + name)
 				self[name] = new
 				changed = True
 		to_remove = []
@@ -351,6 +353,7 @@ class MediaEncoding(JSONFile):
 				to_remove.append(name)
 				changed = True
 		for name in to_remove:
+			self.parent.log("remove encoding " + name)
 			del self[name]
 
 		if changed:
