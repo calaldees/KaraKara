@@ -2,7 +2,10 @@
 
 import os, re, string, sys
 import subprocess, urllib
+import cPickle, hashlib
 import json
+
+from operator import itemgetter
 
 logs = [sys.stdout]
 
@@ -20,17 +23,23 @@ def die(*s):
 	warn(*s)
 	sys.exit(1)
 
+def dictionary_hash(x):
+	return hashlib.sha1(cPickle.dumps(x))
+
 def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|ssa|png|jpg|jpeg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def video_file_re():
 	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|ogm)$', re.IGNORECASE)
 
 def audio_file_re():
 	return re.compile(r'^.*\.(mp3|ogg)$', re.IGNORECASE)
+
+def image_file_re():
+	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def subtitle_file_re():
 	return re.compile(r'^.*\.(ssa)$', re.IGNORECASE)
@@ -89,7 +98,13 @@ class MediaFile:
 	def __init__(self, path, metadata=None):
 		self.path = path
 		self.metadata = metadata
-	
+
+		(dir, name) = os.path.split(path)
+		if name is not None:
+			self.name = name
+		else:
+			self.name = path
+
 	def _size(self):
 		return os.stat(self.path).st_size
 	def size(self):
@@ -161,9 +176,16 @@ class MediaFile:
 		return (video_file_re().match(self.path) is not None)
 	def is_audio(self):
 		return (audio_file_re().match(self.path) is not None)
+	def is_image(self):
+		return (image_file_re().match(self.path) is not None)
 	def is_subtitles(self):
 		return (subtitle_file_re().match(self.path) is not None)
 
+	def __getitem__(self, y):
+		if self.metadata.has_key(y):
+			return self.metadata[y]
+		else:
+			return None
 
 class TagList:
 	def __init__(self, path):
@@ -284,17 +306,55 @@ class MediaSources(JSONFile):
 		self.changed = True
 		self.save()
 
+	def video(self):
+		return [item for item in self.index.items() if item.is_video()]
+	def audio(self):
+		return [item for item in self.index.items() if item.is_audio()]
+	def image(self):
+		return [item for item in self.index.items() if item.is_image()]
 	def subtitles(self):
-		files = []
-		for (name, source) in self.index.items():
-			if source.is_subtitles():
-				files.append(name)
-		return files
+		return [item for item in self.index.items() if item.is_subtitles()]
+
 
 class MediaEncoding(JSONFile):
 	def __init__(self, parent):
 		super(MediaEncoding, self).__init__(parent.element_path('encoding.json'))
 		self.parent = parent
+
+	def update(self, encodings):
+		self.load()
+
+		n = 0
+		files = {}
+		for encoding in encodings:
+			name = "{0}.mp4".format(n)
+			files[name] = encoding
+			n += 1
+		
+		changed = False
+		for (name, new) in files.items():
+			if self.has_key(name):
+				old = self[name]
+				if old.has_key('audio-shift'):
+					new['audio-shift'] = old['audio-shift']
+				if old.has_key('subtitle-shift'):
+					new['subtitle-shift'] = old['subtitle-shift']
+				if dictionary_hash(old) != dictionary_hash(new):
+					self[name] = new
+					changed = True
+			else:
+				self[name] = new
+				changed = True
+		to_remove = []
+		for (name, old) in self.items():
+			if not files.has_key(name):
+				to_remove.append(name)
+				changed = True
+		for name in to_remove:
+			del self[name]
+
+		if changed:
+			self.save()
 
 
 class MediaItem:
@@ -376,12 +436,90 @@ class MediaItem:
 		self.log("index stage")
 		self.sources.index()
 		subtitles = self.subtitles()
+		# FIXME: only save if changed
 		self.descriptor.set_subtitles(subtitles)
+		self.descriptor.save()
+
+	def select_highest_quality(self, files, language=None):
+		if language is not None:
+			matching_files = [file for file in files if file['language'] == language]
+			unknown_files = [file for file in files if file['language'] == 'unknown']
+			if len(matching_files) > 0:
+				files = matching_files
+			elif len(unknown_files) > 0:
+				files = unknown_files
+				
+		if len(files) > 0:
+			sorted_files = sorted(files, key='quality', reverse=True)
+			return sorted_files[0]
+		else:
+			return None
+	
+	def sort_languages(self, languages):
+		priority = { 'ja': 0, 'en': 1, 'unknown': 9000 }
+		results = {}
+		p_n = 10
+		
+		for lang in languages:
+			if priority.has_key(lang):
+				results[lang] = priority[lang]
+			else:
+				results[lang] = p_n
+				p_n += 1
+
+		return map(itemgetter(0), sorted(results.items(), key=itemgetter(1)))
+
+	def pick_and_mix_stage(self):
+		self.log("pick-and-mix stage")
+		
+		video_files = self.sources.video()
+		audio_files = self.sources.audio()
+		image_files = self.sources.image()
+		subtitle_files = self.sources.subtitles()
+		
+		languages = {}
+		for subtitles in subtitle_files:
+			language = subtitles['language']
+			if not languages.has_key(lang):
+				languages[lang] = []
+			languages[lang].append(subtitles)
+
+		encodings = []
+		if (len(languages) == 0) and (len(video_files) > 0):
+			encodings.append({
+				'video': self.select_highest_quality(video_files),
+				'language': 'unknown'
+			})
+		elif len(languages) > 0:
+			for lang in self.sort_languages(languages.keys()):
+				subtitles = self.select_highest_quality(subtitle_files, language=lang)
+				video = self.select_highest_quality(video_files, language=lang)
+				audio = self.select_highest_quality(audio_files, language=lang)
+				image = self.select_highest_quality(image_files)
+
+				encoding = {
+					'subtitles': subtitles.name,
+					'subtitle-shift': 0.0,
+					'language': lang
+				}
+				if video is not None:
+					encoding['video'] = video.name
+				elif image is not None:
+					encoding['image'] = image.name
+
+				if audio is not None:
+					encoding['audio'] = audio.name
+					encoding['audio-shift'] = 0.0
+
+				encodings.append(encoding)
+
+		self.encodings.update(encodings)
 
 	def run_stages(self):
 		self.log("processing")
 		self.import_stage()
 		self.index_stage()
+		self.pick_and_mix_stage()
 
 def find_items(path):
 	hidden_re = hidden_file_re()
