@@ -287,7 +287,7 @@ For each media item where encoding.json does not exist create suitable
 compositions based on the sources described in sources.json.
 
 With preference to sources of higher quality, a composition should be created
-for every subtitle language, such that it is one of:
+for every matching audio and subtitle language, such that it is one of:
   1. video + audio + subtitle
   2. video + subtitle
   3. image + audio + subtitle
