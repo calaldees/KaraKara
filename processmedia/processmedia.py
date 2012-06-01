@@ -247,7 +247,6 @@ class MediaDescriptor(JSONFile):
 	
 	def subtitles(self):
 		return self['subtitles']
-
 	def set_subtitles(self, files):
 		metadata = []
 		for file in files:
@@ -257,6 +256,16 @@ class MediaDescriptor(JSONFile):
 			}
 			metadata.append(entry)
 		self['subtitles'] = metdata
+	
+	def video(self):
+		return self['video']
+	def add_video(self, name, description):
+		self['video'][name] = description
+		self.changed = True
+	def remove_video(self, name):
+		del self['video'][name]
+		self.changed = True
+	
 
 class MediaSources(JSONFile):
 	def __init__(self, parent):
@@ -518,11 +527,60 @@ class MediaItem:
 
 		self.encodings.update(encodings)
 
+	def encode_stage(self):
+		self.log("encode stage")
+
+		encodings = {}
+		for (name, encoding) in self.encodings.items():
+			expanded = dict(encoding)
+			for key in ['video', 'audio', 'image', 'subtitle']:
+				if encoding.has_key(key):
+					expanded[key + '-metadata'] = self.sources[encoding[key]]
+			expanded['encode-hash'] = dictionary_hash(expanded)
+			encodings[name] = expanded
+
+		added = []
+		updated = []
+		removed = []
+
+		video = self.descriptor.video
+		
+		for (name, encoding) in encodings.items():
+			if video.has_key(name):
+				if video[name]['encode-hash'] != encoding['encode-hash']:
+					changed.append(name)
+				elif not os.path.exists(self.element_path('video', name)):
+					changed.append(name)
+			else:
+				added.append(name)
+		for (name, description) in video.items():
+			if not encodings.has_key(name):
+				removed.append(name)
+
+		if (len(added) + len(updated) + len(removed)) == 0:
+			self.log("nothing to encode")
+			return
+
+		for name in removed:
+			path = self.element_path('video', name)
+			self.log("rm " + path)
+			try:
+				os.remove(path)
+			except OSError as (errno, strerror):
+				warn("unable to remove " + path + " ({0}): {1}".format(errno, strerror))
+			self.descriptor.remove_video(name)
+
+		self.descriptor.save()
+
+		for name in (added + removed):
+			pass # FIXME: encode
+
 	def run_stages(self):
 		self.log("processing")
 		self.import_stage()
 		self.index_stage()
 		self.pick_and_mix_stage()
+		self.encode_stage()
 
 def find_items(path):
 	hidden_re = hidden_file_re()
