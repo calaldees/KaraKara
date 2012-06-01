@@ -84,7 +84,7 @@ The following example is given to elucidate all fields.
   'previews': {                            -- keyed by target system
     'iphone': {
       'url'        : 'preview/0_iphone.mp4', -- url
-      'src'        : 'video/0.mp4',          -- path of preview source
+      'src'        : '0.mp4',                -- name of preview source
       'width'      : 480,                    -- in pixels
       'height'     : 320,                    -- in pixels
       'length'     : 30.0,                   -- in seconds
@@ -93,10 +93,10 @@ The following example is given to elucidate all fields.
     },
     'android': {
       'url'        : 'preview/0_android.flv',
-      'src'        : 'video/0.mp4',
-      'length'     : 30.0,
+      'src'        : '0.mp4',
       'width'      : 320,
       'height'     : 240,
+      'length'     : 30.0,
       'size'       : 187502,
       'language'   : 'en'
     }
@@ -104,7 +104,7 @@ The following example is given to elucidate all fields.
   'thumbnails': [                          -- in presentation order
     {
       'url'       : 'thumbnail/0.jpg',     -- url
-      'src'       : 'video/0.mp4',         -- path of thumbnail source
+      'src'       : '0.mp4',               -- name of thumbnail source
       'width'     : 120,                   -- in pixels
       'height'    : 80,                    -- in pixels
       'size'      : 8192,                  -- in bytes
@@ -112,7 +112,7 @@ The following example is given to elucidate all fields.
     },
     {
       'url'       : 'thumbnail/1.jpg',
-      'src'       : 'video/0.mp4',
+      'src'       : '0.mp4',
       'width'     : 120,
       'height'    : 80,
       'size'      : 8192,
@@ -128,6 +128,7 @@ The following example is given to elucidate all fields.
   'videos': [
     {
       'url'        : 'video/0.mp4',        -- url
+      'name'       : '0.mp4',              -- matches encoding name
       'width'      : 1024,                 -- in pixels
       'height'     : 768,                  -- in pixels
       'length'     : 190.2,                -- in seconds
