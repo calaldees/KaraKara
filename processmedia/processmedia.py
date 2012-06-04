@@ -449,6 +449,26 @@ class MediaEncoder:
 
 		self.length = length
 
+	def _clean_files(self, files):
+		for file_path in files:
+			(path_head, path_tail) = os.path.split(file_path)
+			path = os.path.join(self.parent.temp_path, path_tail)
+			if os.path.samefile(path, file_path):
+				os.unlink(file_path)
+
+	def _run_cmd(self, cmd, success, fail, label):
+		try:
+			self.parent.log(" ".join(cmd))
+			ok = subprocess.check_call(cmd)
+			if ok == 0:
+				return success
+			else:
+				self.parent.log(label + " failed")
+				return fail
+		except subprocess.CalledProcessError as error:
+			self.parent.log(label + " failed - " + error)
+			return fail
+
 	def encode_video(self):
 		if self.video is not None:
 			source = self.video
@@ -463,14 +483,8 @@ class MediaEncoder:
 				'-t', str(self.length),
 				source
 			]
-			try:
-				self.parent.log(" ".join(parameters))
-				ok = subprocess.check_call(parameters)
-				if ok != 0:
-					self.parent.log("image to video conversion failed")
-					return None
-			except subprocess.CalledProcessError as error:
-				self.parent.log("image to video conversion failed - " + error)
+			result = self._run_cmd(parameters, True, None, "image to video conversation")
+			if result is None:
 				return None
 		else:
 			return None
@@ -485,7 +499,7 @@ class MediaEncoder:
 			source,
 			'-ass',
 			'-ovc', 'x264',
-			'-oac', 'pcm',
+			'-oac', 'none',
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
@@ -494,17 +508,42 @@ class MediaEncoder:
 			parameters += ['-sub', self.subtitles]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
-		try:
-			self.parent.log(" ".join(parameters))
-			ok = subprocess.check_call(parameters)
-			if ok == 0:
-				return temp_video
-			else:
-				self.parent.log("video encoding failed")
-				return None
-		except subprocess.CalledProcessError as error:
-			self.parent.log("video encoding failed - " + error)
-			return None
+		result = self._run_cmd(parameters, temp_video, None, "video encoding")
+		if source != self.video:
+			self._clean_files([source])
+		return result
+
+	def encode_audio():
+		if self.audio is not None:
+			source = self.audio
+		else:
+			source = self.video
+
+		temp_audio = self.temp_file('audio.aac')
+		parameters = [
+			'avconv',
+			'-y',
+			'-i', source,
+			'-vcodec', 'none',
+			'-strict', 'experimental',
+			temp_audio
+		]
+		
+		return self._run_cmd(parameters, temp_audio, None, "audio encoding")
+
+	def mux(self, video, audio):
+		parameters = [
+			'avconv',
+			'-y',
+			'-i', video,
+			'-vcodec', 'copy',
+			'-vcodec', 'none',
+			'-i', audio,
+			'-vcodec', 'none',
+			'-acodec', 'copy',
+			self.path
+		]
+		return self._run_cmd(parameters, True, False, "a/v muxing")
 
 	def run(self):
 		if not self.valid():
@@ -514,10 +553,17 @@ class MediaEncoder:
 		self.probe_media()
 		# encode video stream with hard subtitles
 		video = self.encode_video()
+		if video is None:
+			return False
 		# encode audio stream
+		audio = self.encode_audio()
+		if audio is None:
+			return False
 		# mux video and audio
-
-		return False
+		result = self.mux(video, audio)
+		self._clean_files([video, audio])
+		
+		return result
 
 class MediaItem:
 	def __init__(self, path):
@@ -758,7 +804,7 @@ class MediaItem:
 				metadata['src'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
-				self.descriptor.set_video(name, )
+				self.descriptor.set_video(name, metadata)
 			else:
 				self.log("  failed")
 				self.descriptor.remove_video(name)
