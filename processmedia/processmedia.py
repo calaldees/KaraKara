@@ -384,6 +384,8 @@ class MediaEncoder:
 		self.base_width = 1024
 		self.base_height = 768
 
+		self.temp_files = []
+
 	def valid(self):
 		type_4 = ((self.image is not None) and (self.audio is not None) and (self.subtitle is not None))
 		type_3 = ((self.video is not None) and (self.audio is not None) and (self.subtitle is not None))
@@ -397,7 +399,9 @@ class MediaEncoder:
 		return filebase
 	
 	def temp_file(self, name):
-		return os.join(self.parent.temp_path, self.filebase() + '_' + name)
+		file_path = os.join(self.parent.temp_path, self.filebase() + '_' + name)
+		self.temp_files.append(file_path)
+		return file_path
 
 	def probe_media(self):
 		if self.video is not None:
@@ -444,19 +448,19 @@ class MediaEncoder:
 		a_metadata = a_media.probe()
 
 		if a_metadata is not None:
-			if (length == 0.0) or (a_metadata['length'] < length):
-				length = a_metadata['length']
+			if (length == 0.0) or ((a_metadata['length'] + self.audio_shift) < length):
+				length = a_metadata['length'] + self.audio_shift
+			if self.audio_shift > 0.0:
+				length += self.audio_shift
 
 		self.length = length
 
-	def _clean_files(self, files):
-		for file_path in files:
-			(path_head, path_tail) = os.path.split(file_path)
-			path = os.path.join(self.parent.temp_path, path_tail)
-			if os.path.samefile(path, file_path):
-				os.unlink(file_path)
+	def clean_temp_files(self):
+		for file_path in self.temp_files:
+			os.unlink(file_path)
+		self.temp_files.clear()
 
-	def _run_cmd(self, cmd, success, fail, label):
+	def _run_cmd(self, cmd, success=True, fail=False, label=""):
 		try:
 			self.parent.log(" ".join(cmd))
 			ok = subprocess.check_call(cmd)
@@ -508,10 +512,7 @@ class MediaEncoder:
 			parameters += ['-sub', self.subtitles]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
-		result = self._run_cmd(parameters, temp_video, None, "video encoding")
-		if source != self.video:
-			self._clean_files([source])
-		return result
+		return self._run_cmd(parameters, temp_video, None, "video encoding")
 
 	def encode_audio():
 		if self.audio is not None:
@@ -519,11 +520,35 @@ class MediaEncoder:
 		else:
 			source = self.video
 
+		source_parameters = ['-i', source]
+
 		temp_audio = self.temp_file('audio.aac')
-		parameters = [
-			'avconv',
-			'-y',
-			'-i', source,
+		if self.audio_shift > 0.0:
+			temp_pad = self.temp_file('audio_pad.wav')
+			result = self._run([
+				'sox', 
+				'-null', temp_pad, 
+				'trim', '0', str(self.audio_shift)
+			])
+			if not result:
+				return None
+			source_parameters = ['-i', temp_pad] + source_parameters
+		elif self.audio_shift < 0.0:
+			temp_raw = self.temp_file('audio_raw.wav')
+			result = self._run(['avconv', '-y', '-i', source, '-vcodec', 'none', temp_raw])
+			if not result:
+				return None
+			temp_cut = self.temp_file('audio_cut.wav')
+			result = self._run([
+				'sox', 
+				temp_raw, temp_cut, 
+				'trim', str(-self.audio_shift), str(self.length)
+			])
+			if not result:
+				return None
+			source_parameters = ['-i', temp_cut]
+
+		parameters = ['avconv', '-y'] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			temp_audio
@@ -551,17 +576,22 @@ class MediaEncoder:
 
 		# setup width, height and duration
 		self.probe_media()
+
 		# encode video stream with hard subtitles
 		video = self.encode_video()
 		if video is None:
+			self.clean_temp_files()
 			return False
+
 		# encode audio stream
 		audio = self.encode_audio()
 		if audio is None:
+			self.clean_temp_files()
 			return False
+
 		# mux video and audio
 		result = self.mux(video, audio)
-		self._clean_files([video, audio])
+		self.clean_temp_files()
 		
 		return result
 
