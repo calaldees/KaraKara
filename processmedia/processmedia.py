@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, re, string, sys
+import math, os, re, string, sys
 import subprocess, urllib
 import cPickle, hashlib
 import json
@@ -380,17 +380,142 @@ class MediaEncoder:
 		self.audio_shift = 0.0
 		self.subtitles = None
 		self.subtitle_shift = 0.0
+		
+		self.base_width = 1024
+		self.base_height = 768
 
-	def valid():
+	def valid(self):
 		type_4 = ((self.image is not None) and (self.audio is not None) and (self.subtitle is not None))
 		type_3 = ((self.video is not None) and (self.audio is not None) and (self.subtitle is not None))
 		type_2 = ((self.video is not None) and (self.subtitle is not None))
 		type_1 = (self.video is not None)
 		return type_1 or type_2 or type_3 or type_4
 
-	def run():
+	def filebase(self):
+		(dirname, filename) = os.path.split(self.path)
+		(filebase, ext) = os.path.splitext(filename)
+		return filebase
+	
+	def temp_file(self, name):
+		return os.join(self.parent.temp_path, self.filebase() + '_' + name)
+
+	def probe_media(self):
+		if self.video is not None:
+			v_source = self.video
+		elif self.image is not None:
+			v_source = self.image
+		if self.audio is not None:
+			a_source = self.audio
+		else:
+			a_source = self.video
+
+		output_width = self.base_width
+		output_height = self.base_height
+		output_border = 0
+
+		v_media = MediaFile(v_source)
+		v_metadata = source_media.probe()
+		aspect = 0.75
+		length = 0.0
+		
+		if v_metadata is not None:
+			width = v_metadata['width']
+			height = v_metadata['height']
+			if width > 0.0 and height > 0.0:
+				aspect = height / width
+			length = v_metadata['length'] 
+
+		if aspect <= 0.75:
+			output_height = output_width * aspect
+		else:
+			output_width = math.floor(output_height / aspect)
+			output_border = math.floor((base_width - output_width) / 2.0)
+			output_width += base_width - (output_width + (output_border * 2.0))
+
+		self.width = output_width
+		self.height = output_height
+		self.border = output_border
+		self.length = length
+
+		if not a_source:
+			return
+
+		a_media = MediaFile(a_source)
+		a_metadata = a_media.probe()
+
+		if a_metadata is not None:
+			if (length == 0.0) or (a_metadata['length'] < length):
+				length = a_metadata['length']
+
+		self.length = length
+
+	def encode_video(self):
+		if self.video is not None:
+			source = self.video
+		elif self.image is not None:
+			source = self.temp_file('imagery.avi')
+			parameters = [
+				'avconv',
+				'-y', 
+				'-loop', '1', 
+				'-i', self.image,
+				'-r', '24',
+				'-t', str(self.length),
+				source
+			]
+			try:
+				self.parent.log(" ".join(parameters))
+				ok = subprocess.check_call(parameters)
+				if ok != 0:
+					self.parent.log("image to video conversion failed")
+					return None
+			except subprocess.CalledProcessError as error:
+				self.parent.log("image to video conversion failed - " + error)
+				return None
+		else:
+			return None
+
+		filters = [ 'ass', 'scale={0}:{1}'.format(self.width, self.height) ]
+		if self.border >= 0.0:
+			filters = [ 'expand={0}:{1}:{2}'.format(self.base_width, self.height) ]
+
+		temp_video = self.temp_file('video.mp4')
+		parameters = [
+			'mencoder',
+			source,
+			'-ass',
+			'-ovc', 'x264',
+			'-oac', 'pcm',
+			'-o', temp_video,
+			'-vf', ",".join(filters)
+		]
+		
+		if self.subtitles is not None:
+			parameters += ['-sub', self.subtitles]
+			parameters += ['-subdelay', self.subtitle_shift]
+		
+		try:
+			self.parent.log(" ".join(parameters))
+			ok = subprocess.check_call(parameters)
+			if ok == 0:
+				return temp_video
+			else:
+				self.parent.log("video encoding failed")
+				return None
+		except subprocess.CalledProcessError as error:
+			self.parent.log("video encoding failed - " + error)
+			return None
+
+	def run(self):
 		if not self.valid():
 			return False
+
+		# setup width, height and duration
+		self.probe_media()
+		# encode video stream with hard subtitles
+		video = self.encode_video()
+		# encode audio stream
+		# mux video and audio
 
 		return False
 
@@ -408,7 +533,7 @@ class MediaItem:
 		self.preview_path = self.element_path('preview')
 		self.thumbnail_path = self.element_path('thumbnail')
 		self.video_path = self.element_path('video')
-		self.tmp_path = self.element_path('tmp')
+		self.temp_path = self.element_path('tmp')
 
 		self.hidden_re = hidden_file_re()
 		self.media_re = media_file_re()
