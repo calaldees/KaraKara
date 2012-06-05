@@ -195,8 +195,7 @@ class MediaFile:
 			seconds = float(raw_duration.group(3))
 			fraction = raw_duration.group(4)
 			fraction = float(fraction) / (10**(len(fraction) - 1))
-			length = (hours * 60.0 * 60.0) + (minutes * 60.0) + seconds + fraction
-			metadata['length'] = length
+			metadara['length'] = hours + minutes + seconds + fraction
 		
 		if raw_video:
 			metadata['codec'] = raw_video.group(1)
