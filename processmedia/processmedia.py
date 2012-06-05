@@ -43,6 +43,24 @@ def image_file_re():
 
 def subtitle_file_re():
 	return re.compile(r'^.*\.(ssa)$', re.IGNORECASE)
+	
+def run_command(cmd, label="", log_object=None, success=True, fail=False):
+	try:
+		if log_object:
+			log_object.log(" ".join(cmd))
+		ok = subprocess.check_call(cmd)
+		if ok == 0:
+			return success
+		else:
+			if label and log_object:
+				log_object.log(label + " failed")
+			return fail
+	except subprocess.CalledProcessError as error:
+		if label and log_object:
+			log_object.log(label + " failed - " + error)
+		else if log:
+			log_object.log(error)
+		return fail
 
 class JSONFile(dict):
 	def __init__(self, path):
@@ -474,18 +492,8 @@ class MediaEncoder:
 			os.unlink(file_path)
 		self.temp_files.clear()
 
-	def _run_cmd(self, cmd, success=True, fail=False, label=""):
-		try:
-			self.parent.log(" ".join(cmd))
-			ok = subprocess.check_call(cmd)
-			if ok == 0:
-				return success
-			else:
-				self.parent.log(label + " failed")
-				return fail
-		except subprocess.CalledProcessError as error:
-			self.parent.log(label + " failed - " + error)
-			return fail
+	def _run_cmd(self, cmd, success=True, fail=False, label=None):
+		return run_command(cmd, log_object=self.parent, label=label, success=success, fail=fail)
 
 	def encode_video(self):
 		if self.video:
