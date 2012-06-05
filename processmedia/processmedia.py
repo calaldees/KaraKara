@@ -5,7 +5,7 @@ import subprocess, urllib
 import cPickle, hashlib
 import json
 
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 
 logs = [sys.stdout]
 
@@ -82,11 +82,12 @@ class JSONFile(dict):
 		try:
 			fp = open(self.path, 'r')
 			self.clear()
-			self.update(json.loads(fp))
+			self.update(json.load(fp))
 			fp.close()
 			self.loaded = True
 			self.changed = False
-		except IOError:
+		except:
+			warn("unable to read JSON from " + self.path)
 			self.clear()
 		self.load_hook()
 
@@ -98,7 +99,7 @@ class JSONFile(dict):
 		self.save_hook()
 		try:
 			fp = open(self.path, 'w')
-			json.dumps(fp, self)
+			json.dump(self, fp)
 			fp.close()
 			self.changed = False
 		except IOError as (errno, strerror):
@@ -112,7 +113,7 @@ class JSONFile(dict):
 		return os.path.exists(self.path)
 
 	def __setitem__(self, y, v):
-		super(JSONFile, self).__setitem(y, v)
+		super(JSONFile, self).__setitem__(y, v)
 		self.changed = True
 
 
@@ -319,10 +320,10 @@ class MediaDescriptor(JSONFile):
 				self[key] = []
 
 	def save_hook(self):
-		self['id'] = parent.name
-		self['tags'] = parent.tags.items()
+		self['name'] = self.parent.name
+		self['tags'] = self.parent.tags.items()
 		for key in self.elements:
-			self[element] = sorted(self[element], key='name')
+			self[key] = sorted(self[key], key=lambda x:x['name'])
 	
 	def subtitles(self):
 		return self['subtitles']
@@ -370,19 +371,19 @@ class MediaSources(JSONFile):
 	def dir_path(self):
 		return parent.element_path('source')
 	
-	def index(self):
+	def index_files(self):
 		self.load()
 
 		missing = []
 		deleted = []
 		changed = []
 		
-		for name in parent.source_files():
+		for name in self.parent.source_files():
 			if not self.index.has_key(name):
 				missing.append(name)
 			elif not self.index[name].exists():
 				deleted.append(name)
-			elif self.index[name].changed():
+			elif self.index[name].has_changed():
 				changed.append(name)
 
 		if (len(missing) + len(deleted) + len(changed)) == 0:
@@ -401,13 +402,13 @@ class MediaSources(JSONFile):
 		self.save()
 
 	def video(self):
-		return [item for item in self.index.items() if item.is_video()]
+		return [item for item in self.index.values() if item.is_video()]
 	def audio(self):
-		return [item for item in self.index.items() if item.is_audio()]
+		return [item for item in self.index.values() if item.is_audio()]
 	def image(self):
-		return [item for item in self.index.items() if item.is_image()]
+		return [item for item in self.index.values() if item.is_image()]
 	def subtitles(self):
-		return [item for item in self.index.items() if item.is_subtitles()]
+		return [item for item in self.index.values() if item.is_subtitles()]
 
 
 class MediaEncoding(JSONFile):
@@ -724,7 +725,7 @@ class MediaItem:
 			media_files = []
 			for name in os.listdir(self.path):
 				path = os.path.join(self.path, name)
-				if (not self.hidden_re.match(name)) and os.isfile(path) and self.media_re.match(name):
+				if (not self.hidden_re.match(name)) and os.path.isfile(path) and self.media_re.match(name):
 					media_files.append(name)
 
 			self.log("mkdir " + self.source_path)
@@ -744,7 +745,7 @@ class MediaItem:
 			os.mkdir(path)
 
 	def initialise_layout(self):
-		self.initialise_sources(self)
+		self.initialise_sources()
 		self.create_directory('preview')
 		self.create_directory('thumbnail')
 		self.create_directory('video')
@@ -754,12 +755,13 @@ class MediaItem:
 		sources = []
 		for name in os.listdir(self.source_path):
 			path = os.path.join(self.source_path, name)
-			if (not self.hidden_re.match(name)) and os.isfile(path) and self.media_re.match(name):
+			if (not self.hidden_re.match(name)) and os.path.isfile(path) and self.media_re.match(name):
 				sources.append(name)
 		return sources
 	
 	def valid(self):
-		return True # FIXME: do some testing
+		# FIXME: do some testing
+		return True
 
 	def import_stage(self):
 		self.log("import stage")
@@ -769,7 +771,7 @@ class MediaItem:
 
 	def index_stage(self):
 		self.log("index stage")
-		self.sources.index()
+		self.sources.index_files()
 		
 		metadata = []
 		for file in self.sources.subtitles():
@@ -779,10 +781,10 @@ class MediaItem:
 				'language': file.metadata['language']
 			}
 			metadata.append(entry)
-		metadata = sorted(metadata, key='name')
+		metadata = sorted(metadata, key=lambda x:x['name'])
 
 		if list_hash(metadata) != list_hash(self.descriptor.subtitles()):
-			self.descriptor.set_subtitles(subtitles)
+			self.descriptor.set_subtitles(metadata)
 			self.descriptor.save()
 
 	def select_highest_quality(self, files, language=None):
@@ -795,7 +797,7 @@ class MediaItem:
 				files = unknown_files
 				
 		if len(files) > 0:
-			sorted_files = sorted(files, key='quality', reverse=True)
+			sorted_files = sorted(files, key=lambda x:x['quality'], reverse=True)
 			return sorted_files[0]
 		else:
 			return None
@@ -825,9 +827,9 @@ class MediaItem:
 		languages = {}
 		for subtitles in subtitle_files:
 			language = subtitles['language']
-			if not languages.has_key(lang):
-				languages[lang] = []
-			languages[lang].append(subtitles)
+			if not languages.has_key(language):
+				languages[language] = []
+			languages[language].append(subtitles)
 
 		encodings = []
 		if (len(languages) == 0) and (len(video_files) > 0):
@@ -858,7 +860,7 @@ class MediaItem:
 
 				encodings.append(encoding)
 
-		self.encodings.update(encodings)
+		self.encoding.update(encodings)
 
 	def encode_stage(self):
 		self.log("encode stage")
@@ -1049,7 +1051,7 @@ def find_items(path):
 	items = []
 	for entry in os.listdir(path):
 		entry_path = os.path.join(path, entry)
-		if not hidden_re.match(name):
+		if hidden_re.match(entry):
 			pass
 		elif os.path.isdir(entry_path):
 			item = MediaItem(entry_path)

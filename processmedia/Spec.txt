@@ -78,7 +78,7 @@ This file provides the description of a given media item to the frontend.
 The following example is given to elucidate all fields.
 
  {
-  'id'      : 'test item',                 -- identifier (as directory name)
+  'name'    : 'test item',                 -- identifier (as directory name)
   'source'  : 'path/test item',            -- full path of import source
   'tags'    : [ 'j-pop', 'the pillows' ],  -- tags from tags.txt
   'previews': {                            -- keyed by target system
