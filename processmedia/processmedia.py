@@ -901,7 +901,7 @@ class MediaItem:
 				media = MediaFile(path)
 				metadata = media.probe()
 				metadata['url'] = "/".join(['video', urllib.quote(name)]),
-				metadata['src'] = name
+				metadata['name'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
 				self.descriptor.set_video(name, metadata)
