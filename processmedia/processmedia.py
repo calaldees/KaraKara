@@ -123,30 +123,33 @@ class MediaFile:
 		else:
 			self.name = path
 
+	def unlink(self):
+		return os.remove(self.path)
+
 	def _size(self):
 		return os.stat(self.path).st_size
 	def size(self):
-		if not self.metadata:
-			return self._size()
-		else:
+		if self.metadata and self.metadata.has_key('size'):
 			return self.metadata['size']
+		else:
+			return self._size()
 
 	def _mtime(self):
 		return int(os.stat(self.path).st_mtime)
 	def mtime(self):
-		if not self.metadata:
-			return self._mtime()
-		else:
+		if self.metadata and self.metadata.has_key('mtime'):
 			return self.metadata['mtime']
+		else:
+			return self._mtime()
 
 	def exists(self):
 		return os.path.exists(self.path) and os.path.isfile(self.path)
 
-	def changed(self):
-		if not self.metadata:
-			return True
-		else:
+	def has_changed(self):
+		if self.metadata and self.metadata.has_key('mtime') and self.metadata.has_key('size'):
 			return (self.mtime() != self._mtime()) or (self.size() != self._size())
+		else:
+			return True
 
 	def probe(self):
 		stat = os.stat(self.path)
@@ -180,7 +183,7 @@ class MediaFile:
 		return metadata
 	
 	def update_if_changed(self):
-		if self.changed():
+		if self.has_changed():
 			if not self.metadata:
 				self.metadata = {
 					'language': 'unknown',
@@ -245,6 +248,7 @@ class MediaFile:
 		else:
 			return None
 
+
 class TagList:
 	def __init__(self, path):
 		self.path = path
@@ -298,7 +302,13 @@ class MediaDescriptor(JSONFile):
 	def __init__(self, parent):
 		super(MediaDescriptor, self).__init__(parent.element_path('description.json'))
 		self.parent = parent
+		self.load_hook()
 	
+	def load_hook(self):
+		for key in ['previews', 'thumbnails', 'subtitles', 'videos']:
+			if not self.has_key(key):
+				self[key] = []
+
 	def save_hook(self):
 		self['id'] = parent.name
 		self['tags'] = parent.tags.items()
@@ -310,18 +320,32 @@ class MediaDescriptor(JSONFile):
 		for file in files:
 			entry = {
 				'url': "/".join(['source', urllib.quote(file.name)]),
+				'name': file.name,
 				'language': file.metadata['language']
 			}
 			metadata.append(entry)
 		self['subtitles'] = metdata
 	
-	def video(self):
-		return self['video']
-	def set_video(self, name, description):
-		self['video'][name] = description
+	def videos(self):
+		return self['videos']
+	def add_video(self, description):
+		self.remove_video(description['name'])
+		self['videos'].append(description)
 		self.changed = True
 	def remove_video(self, name):
-		del self['video'][name]
+		self['videos'] = [ video for video in self.videos() if video['name'] != name ]
+		self.changed = True
+	
+	def thumbnails(self):
+		return self['thumbnails']
+	def add_thumbnail(self, description):
+		self.remove_thumbnails(name=description['name'])
+		self['thumbnails'].append(description)
+	def remove_thumbnails(self, name=None, video=None):
+		if name:
+			self['thumbnails'] = [ thumbnail for thumbnail in self.thumbnails() if thumbnail['name'] != name ]
+		elif video:
+			self['thumbnails'] = [ thumbnail for thumbnail in self.thumbnails() if thumbnail['src'] != video ]
 		self.changed = True
 	
 
@@ -839,7 +863,7 @@ class MediaItem:
 		updated = []
 		removed = []
 
-		video = self.descriptor.video
+		video = self.descriptor.videos()
 		
 		for (name, encoding) in encodings.items():
 			if video.has_key(name):
@@ -904,19 +928,108 @@ class MediaItem:
 				metadata['name'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
-				self.descriptor.set_video(name, metadata)
+				self.descriptor.add_video(metadata)
 			else:
 				self.log("  failed")
 				self.descriptor.remove_video(name)
 
 			self.descriptor.save()
 
+	def preview_stage(self):
+		self.log("preview stage")
+
+	def thumbnail_stage(self):
+		self.log("thumbnail stage")
+
+		# find existing thumbnails
+		thumbnails = {}
+		for thumbnail in self.descriptor.thumbnails():
+			video_name = thumbnail['src']
+			if not thumbnails.has_key(video_name):
+				thumbnails[video_name] = []
+			thumbnails[video_name].append(
+				MediaFile(
+					self.element_path('thumbnail', data['name']), 
+					metadata=thumbnail
+				)
+			)
+		
+		# find videos
+		videos = {}
+		for video in self.descriptor.videos():
+			video_name = data['name']
+			videos[video_name] = MediaFile(
+				self.element_path('video', video_name), 
+				metadata=video
+			)
+
+		# remove thumbnails for none existent videos
+		for video in thumbnails:
+			if not videos.has_key(video):
+				self.log("video " + video + " no longer exists")	
+				for thumbnail in thumbnails[video]:
+					self.log("rm " + thumbnail.path)
+					thumbnail.unlink()
+				self.descriptor.remove_thumbnails(video=video)
+		
+		self.descriptor.save()
+		
+		# find videos for which thumbnails need to be (re)generated
+		to_generate = {}
+		for (name, video) in videos.items():
+			if not thumbnails.has_key(name):
+				to_generate[name] = video
+			else:
+				invalid = [ (not thumbnail.exists()) or (media.mtime() > thumbnail.mtime()) for thumbnail in thumbnails[name] ]
+				if True in invalid:
+					to_generate[name] = video
+
+		# generate thumbnails
+		for (name, video) in to_generate.items():
+			self.log("generating thumbnails for " + name)
+			
+			# remove old metadata
+			self.descriptor.remove_thumbnails(video=name)
+			
+			# setup time indexes
+			times = []
+			for offset in [0.2, 0.4, 0.6, 0.8]:
+				times.append(video.length * offset)
+
+			# create file names and paths
+			(base, ext) = os.path.splitext(name)
+			names = {}
+			files = []
+			for (n, time) in enumerate(times):
+				thumb_name = "{0}_{1}.jpg".format(base, n)
+				thumb_path = self.element_path('thumbnail', thumb_name)
+				names[thumb_path] = thumb_name
+				files.append(thumb_path) 
+
+			# generate thumbnail files
+			results = video.generate_thumbnails(times, files, width=240)
+
+			# create thumbnail metadata
+			for (time, path) in results:
+				thumb_name = names[path]
+				thumb_media = MediaFile(path)
+				metadata = thumb_media.probe()
+				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name)])
+				metadata['name'] = thumb_name
+				metadata['src'] = video['name']
+				metadata['time-index'] = time
+				self.descriptor.add_thumbnail(metadata)
+
+			self.descriptor.save()
+	
 	def run_stages(self):
 		self.log("processing")
 		self.import_stage()
 		self.index_stage()
 		self.pick_and_mix_stage()
 		self.encode_stage()
+		self.preview_stage()
+		self.thumbnail_stage()
 
 def find_items(path):
 	hidden_re = hidden_file_re()
