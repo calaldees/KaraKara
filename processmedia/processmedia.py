@@ -143,7 +143,10 @@ class MediaFile:
 				self.log("unable to remove " + self.path + " ({0}): {1}".format(errno, strerror))
 
 	def _size(self):
-		return os.stat(self.path).st_size
+		try:
+			return long(os.stat(self.path).st_size)
+		except:
+			return 0
 	def size(self):
 		if self.metadata and self.metadata.has_key('size'):
 			return self.metadata['size']
@@ -151,7 +154,10 @@ class MediaFile:
 			return self._size()
 
 	def _mtime(self):
-		return int(os.stat(self.path).st_mtime)
+		try:
+			return int(os.stat(self.path).st_mtime)
+		except:
+			return 0
 	def mtime(self):
 		if self.metadata and self.metadata.has_key('mtime'):
 			return self.metadata['mtime']
@@ -168,7 +174,11 @@ class MediaFile:
 			return True
 
 	def probe(self):
-		stat = os.stat(self.path)
+		try:
+			stat = os.stat(self.path)
+		except:
+			return None
+
 		metadata = {
 			'mtime': int(stat.st_mtime),
 			'size': long(stat.st_size)
@@ -180,11 +190,12 @@ class MediaFile:
 		raw_video = re.search(r'^\s*Stream\s#\d+:\d+(?:\[.*?\])?:\s*Video:\s*(.*?),\s*(.*?),\s*(\d+)x(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 
 		if raw_duration:
-			hours = float(raw_duration.group(1))
-			minutes = float(raw_duration.group(2))
+			hours = float(raw_duration.group(1)) * 60.0 * 60.0
+			minutes = float(raw_duration.group(2)) * 60.0
 			seconds = float(raw_duration.group(3))
-			factions = float(raw_duration.group(4))
-			length = (hours * 60.0 * 60.0) + (minutes * 60.0) + seconds + factions
+			fraction = raw_duration.group(4)
+			fraction = float(fraction) / (10**(len(fraction) - 1))
+			length = (hours * 60.0 * 60.0) + (minutes * 60.0) + seconds + fraction
 			metadata['length'] = length
 		
 		if raw_video:
@@ -211,8 +222,8 @@ class MediaFile:
 			return False
 	
 	def length(self):
-		if metadata and metadata.has_key('length'):
-			return metadata['length']
+		if self.metadata and self.metadata.has_key('length'):
+			return float(self.metadata['length'])
 		else:
 			return 0.0
 
