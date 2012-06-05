@@ -947,7 +947,7 @@ class MediaItem:
 				ok = encoder.encode()
 			
 			if ok:
-				self.log("  complete")
+				self.log("encode complete")
 				media = MediaFile(path)
 				metadata = media.probe()
 				metadata['url'] = "/".join(['video', urllib.quote(name)]),
@@ -956,7 +956,7 @@ class MediaItem:
 				metadata['language'] = encoding['language']
 				self.descriptor.add_video(metadata)
 			else:
-				self.log("  failed")
+				self.log("encode failed")
 				self.descriptor.remove_video(name)
 
 			self.descriptor.save()
