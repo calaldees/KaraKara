@@ -1039,7 +1039,7 @@ class MediaItem:
 			# setup time indexes
 			times = []
 			for offset in [0.2, 0.4, 0.6, 0.8]:
-				times.append(video.length() * offset)
+				times.append(float("%.3f" % (video.length() * offset)))
 			self.log("thumbnail offset: " + str(times))
 
 			# create file names and paths
