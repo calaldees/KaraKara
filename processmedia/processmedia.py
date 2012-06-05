@@ -619,7 +619,7 @@ class MediaEncoder:
 
 		source_parameters = ['-i', source]
 
-		temp_audio = self.temp_file('audio.aac')
+		temp_audio = self.temp_file('audio.wav')
 
 		if self.audio_shift > 0.0:
 			temp_pad = self.temp_file('audio_pad.wav')
@@ -661,6 +661,7 @@ class MediaEncoder:
 			'-i', video,
 			'-i', audio,
 			'-strict', 'experimental',
+			'-vcodec', 'copy',
 			self.path
 		]
 		return self._run_cmd(parameters, True, False, "a/v muxing")
