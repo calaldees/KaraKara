@@ -969,7 +969,7 @@ class MediaItem:
 				self.log("encode complete")
 				media = MediaFile(path)
 				metadata = media.probe()
-				metadata['url'] = "/".join(['video', urllib.quote(name)]),
+				metadata['url'] = "/".join(['video', urllib.quote(name)])
 				metadata['name'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
