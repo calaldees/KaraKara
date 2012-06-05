@@ -84,6 +84,7 @@ The following example is given to elucidate all fields.
   'previews': {                            -- keyed by target system
     'iphone': {
       'url'        : 'preview/0_iphone.mp4', -- url
+      'name'       : '0_iphone.mp4',         -- name of preview
       'src'        : '0.mp4',                -- name of preview source
       'width'      : 480,                    -- in pixels
       'height'     : 320,                    -- in pixels
@@ -93,6 +94,7 @@ The following example is given to elucidate all fields.
     },
     'android': {
       'url'        : 'preview/0_android.flv',
+      'name'       : '0_android.mp4',
       'src'        : '0.mp4',
       'width'      : 320,
       'height'     : 240,
@@ -103,7 +105,8 @@ The following example is given to elucidate all fields.
   ],
   'thumbnails': [                          -- in presentation order
     {
-      'url'       : 'thumbnail/0.jpg',     -- url
+      'url'       : 'thumbnail/0_0.jpg',   -- url
+      'name'      : '0_0.jpg',             -- name of thumbnail
       'src'       : '0.mp4',               -- name of thumbnail source
       'width'     : 120,                   -- in pixels
       'height'    : 80,                    -- in pixels
@@ -111,7 +114,8 @@ The following example is given to elucidate all fields.
       'time-index': 3.7                    -- in seconds (offset in video)
     },
     {
-      'url'       : 'thumbnail/1.jpg',
+      'url'       : 'thumbnail/0_1.jpg',
+      'name'      : '0_1.jpg',
       'src'       : '0.mp4',
       'width'     : 120,
       'height'    : 80,
@@ -122,6 +126,7 @@ The following example is given to elucidate all fields.
   'subtitles': [
     {
       'url'        : 'source/subtitles.ssa',
+      'name'       : 'subtitles.ssa',
       'language'   : 'en'
     }
   ],
