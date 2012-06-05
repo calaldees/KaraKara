@@ -51,6 +51,7 @@ def subtitle_file_re():
 	
 def run_command(cmd, label="", log_object=None, success=True, fail=False):
 	try:
+		cmd = map(unicode, cmd)
 		if log_object:
 			log_object.log(" ".join(cmd))
 		ok = subprocess.check_call(cmd)
@@ -62,7 +63,7 @@ def run_command(cmd, label="", log_object=None, success=True, fail=False):
 			return fail
 	except subprocess.CalledProcessError as error:
 		if label and log_object:
-			log_object.log(label + " failed - " + error)
+			log_object.log(label + " failed - " + unicode(error))
 		elif log_object:
 			log_object.log(error)
 		return fail
@@ -85,12 +86,15 @@ class JSONFile(dict):
 			try:
 				fp = open(self.path, 'rb')
 				self.clear()
-				self.update(json.load(fp))
+				data = json.load(fp)
 				fp.close()
+				super(JSONFile, self).update(data)
 				self.loaded = True
 				self.changed = False
-			except:
-				warn("unable to read JSON from " + self.path)
+			except IOError as (errno, strerror):
+				warn("unable to read " + self.path + " ({0}): {1}".format(errno, strerror))
+			except ValueError as strerror:
+				warn("unable to read JSON from " + self.path + ": " + strerror)
 				self.clear()
 		self.load_hook()
 
@@ -167,7 +171,7 @@ class MediaFile:
 		stat = os.stat(self.path)
 		metadata = {
 			'mtime': int(stat.st_mtime),
-			'size': stat.st_size
+			'size': long(stat.st_size)
 		}
 		
 		raw_probe = subprocess.check_output(['ffprobe', self.path], stderr=subprocess.STDOUT)
@@ -186,8 +190,8 @@ class MediaFile:
 		if raw_video:
 			metadata['codec'] = raw_video.group(1)
 			metadata['colourspace'] = raw_video.group(2)
-			metadata['width'] = raw_video.group(3)
-			metadata['height'] = raw_video.group(4)
+			metadata['width'] = int(raw_video.group(3))
+			metadata['height'] = int(raw_video.group(4))
 		
 		# FIXME: probe audio for language
 		# FIXME: probe subtitles for language and length?
@@ -237,7 +241,7 @@ class MediaFile:
 				'-i', self.path,
 				'-vframes', 1,
 				'-an',
-				'-vf', 'scale={0}:{1}'.format(width, height),
+				'-vf', 'scale={0}:{1}'.format(int(width), int(height)),
 				path
 			], label="thumbnail")
 			if ok:
@@ -422,12 +426,10 @@ class MediaEncoding(JSONFile):
 	def update(self, encodings):
 		self.load()
 
-		n = 0
 		files = {}
-		for encoding in encodings:
+		for (n, encoding) in enumerate(encodings):
 			name = "{0}.mp4".format(n)
 			files[name] = encoding
-			n += 1
 		
 		changed = False
 		for (name, new) in files.items():
@@ -445,6 +447,7 @@ class MediaEncoding(JSONFile):
 				self.parent.log("add encoding " + name)
 				self[name] = new
 				changed = True
+
 		to_remove = []
 		for (name, old) in self.items():
 			if not files.has_key(name):
@@ -501,7 +504,7 @@ class MediaEncoder:
 		return filebase
 	
 	def temp_file(self, name):
-		file_path = os.join(self.parent.temp_path, self.filebase() + '_' + name)
+		file_path = os.path.join(self.parent.temp_path, self.filebase() + '_' + name)
 		self.temp_files.append(file_path)
 		return file_path
 
@@ -520,7 +523,7 @@ class MediaEncoder:
 		output_border = 0
 
 		v_media = MediaFile(v_source)
-		v_metadata = source_media.probe()
+		v_metadata = v_media.probe()
 		aspect = 0.75
 		length = 0.0
 		
@@ -528,7 +531,7 @@ class MediaEncoder:
 			width = v_metadata['width']
 			height = v_metadata['height']
 			if width > 0.0 and height > 0.0:
-				aspect = height / width
+				aspect = float(height) / float(width)
 			length = v_metadata['length'] 
 
 		if aspect <= 0.75:
@@ -550,17 +553,18 @@ class MediaEncoder:
 		a_metadata = a_media.probe()
 
 		if a_metadata:
-			if (length == 0.0) or ((a_metadata['length'] + self.audio_shift) < length):
+			if (length == 0.0) or ((a_metadata['length'] + self.audio_shift) > length):
 				length = a_metadata['length'] + self.audio_shift
-			if self.audio_shift > 0.0:
-				length += self.audio_shift
 
 		self.length = length
 
 	def clean_temp_files(self):
 		for file_path in self.temp_files:
-			os.unlink(file_path)
-		self.temp_files.clear()
+			try:
+				os.unlink(file_path)
+			except:
+				pass
+		self.temp_files[:] = []
 
 	def _run_cmd(self, cmd, success=True, fail=False, label=None):
 		return run_command(cmd, log_object=self.parent, label=label, success=success, fail=fail)
@@ -577,6 +581,7 @@ class MediaEncoder:
 				'-i', self.image,
 				'-r', '24',
 				'-t', str(self.length),
+				'-vf', 'scale={0}:{1}'.format(int(self.base_width), -1),
 				source
 			]
 			result = self._run_cmd(parameters, True, None, "image to video conversation")
@@ -585,17 +590,17 @@ class MediaEncoder:
 		else:
 			return None
 
-		filters = [ 'ass', 'scale={0}:{1}'.format(self.width, self.height) ]
+		filters = [ 'ass', 'scale={0}:{1}'.format(int(self.width), int(self.height)) ]
 		if self.border >= 0.0:
-			filters = [ 'expand={0}:{1}:{2}'.format(self.base_width, self.height) ]
+			filters += [ 'expand={0}:{1}'.format(int(self.base_width), int(self.height)) ]
 
-		temp_video = self.temp_file('video.mp4')
+		temp_video = self.temp_file('video.avi')
 		parameters = [
 			'mencoder',
 			source,
 			'-ass',
+			'-nosound',
 			'-ovc', 'x264',
-			'-oac', 'none',
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
@@ -606,7 +611,7 @@ class MediaEncoder:
 		
 		return self._run_cmd(parameters, temp_video, None, "video encoding")
 
-	def encode_audio():
+	def encode_audio(self):
 		if self.audio:
 			source = self.audio
 		else:
@@ -615,6 +620,7 @@ class MediaEncoder:
 		source_parameters = ['-i', source]
 
 		temp_audio = self.temp_file('audio.aac')
+
 		if self.audio_shift > 0.0:
 			temp_pad = self.temp_file('audio_pad.wav')
 			result = self._run([
@@ -653,11 +659,8 @@ class MediaEncoder:
 			'avconv',
 			'-y',
 			'-i', video,
-			'-vcodec', 'copy',
-			'-vcodec', 'none',
 			'-i', audio,
-			'-vcodec', 'none',
-			'-acodec', 'copy',
+			'-strict', 'experimental',
 			self.path
 		]
 		return self._run_cmd(parameters, True, False, "a/v muxing")
@@ -869,7 +872,7 @@ class MediaItem:
 		self.log("encode stage")
 
 		encodings = {}
-		for (name, encoding) in self.encodings.items():
+		for (name, encoding) in self.encoding.items():
 			expanded = dict(encoding)
 			for key in ['video', 'audio', 'image', 'subtitle']:
 				if encoding.has_key(key):
@@ -881,17 +884,19 @@ class MediaItem:
 		updated = []
 		removed = []
 
-		video = self.descriptor.videos()
+		videos = {}
+		for video in self.descriptor.videos():
+			videos[video['name']] = video
 		
 		for (name, encoding) in encodings.items():
-			if video.has_key(name):
-				if video[name]['encode-hash'] != encoding['encode-hash']:
+			if videos.has_key(name):
+				if videos[name]['encode-hash'] != encoding['encode-hash']:
 					changed.append(name)
 				elif not os.path.exists(self.element_path('video', name)):
 					changed.append(name)
 			else:
 				added.append(name)
-		for (name, description) in video.items():
+		for (name, description) in videos.items():
 			if not encodings.has_key(name):
 				removed.append(name)
 
@@ -913,6 +918,9 @@ class MediaItem:
 		for name in (added + removed):
 			self.log("encoding " + name)
 			encoding = encodings[name]
+
+			self.descriptor.remove_video(name)
+			self.descriptor.save()
 			
 			ok = True
 			path = self.element_path('video', name)
@@ -1048,6 +1056,7 @@ class MediaItem:
 		self.encode_stage()
 		self.preview_stage()
 		self.thumbnail_stage()
+		sys.exit(0)
 
 def find_items(path):
 	hidden_re = hidden_file_re()
