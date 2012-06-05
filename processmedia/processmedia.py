@@ -79,16 +79,18 @@ class JSONFile(dict):
 		pass
 
 	def _load(self):
-		try:
-			fp = open(self.path, 'r')
-			self.clear()
-			self.update(json.load(fp))
-			fp.close()
-			self.loaded = True
-			self.changed = False
-		except:
-			warn("unable to read JSON from " + self.path)
-			self.clear()
+		self.clear()
+		if os.path.exists(self.path):
+			try:
+				fp = open(self.path, 'rb')
+				self.clear()
+				self.update(json.load(fp))
+				fp.close()
+				self.loaded = True
+				self.changed = False
+			except:
+				warn("unable to read JSON from " + self.path)
+				self.clear()
 		self.load_hook()
 
 	def load(self):
@@ -98,8 +100,8 @@ class JSONFile(dict):
 	def _save(self):
 		self.save_hook()
 		try:
-			fp = open(self.path, 'w')
-			json.dump(self, fp)
+			fp = open(self.path, 'wb')
+			json.dump(self, fp, sort_keys=True, indent=4)
 			fp.close()
 			self.changed = False
 		except IOError as (errno, strerror):
