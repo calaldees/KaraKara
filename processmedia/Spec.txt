@@ -346,7 +346,7 @@ TODO: finish these
 
 -- Stage: thumbnail
 
-Generate thumbnails for all each video.
+Generate thumbnails for each video.
 
 For each media item:
   1. load description.json
@@ -355,7 +355,7 @@ For each media item:
     2.1. remove the thumbnail
   3. for each video:
     3.1. generate time indexes of thumbnails (see note below)
-    3.2. for each time of these indexes:
+    3.2. for each of these indexes:
       3.2.1. make sure thumbnail entry exists for time index
       3.2.2. update descriptions.json
     3.3. if thumbnail files are missing for any thumbnail entries:
@@ -365,5 +365,6 @@ Thumbnails should be taken from 20%, 40%, 60% and 80% through the files time
 length.  In future work these time indexes should be adjusted based on the
 visual stability and interest of frames around those time indexes.
 
-TODO: specify a thumbnail size
+Thumbnails have a width of 240 pixels and height dependent on aspect ratio of
+source.
 
