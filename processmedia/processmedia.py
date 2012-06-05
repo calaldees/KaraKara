@@ -2,7 +2,7 @@
 
 import math, os, re, string, sys
 import subprocess, urllib
-import cPickle, hashlib
+import hashlib
 import json
 
 from operator import itemgetter, attrgetter
@@ -24,11 +24,12 @@ def die(*s):
 	sys.exit(1)
 
 def list_hash(x):
-	return hashlib.sha1(cPickle.dumps(x))
+	return hashlib.sha1(json.dumps(x)).hexdigest()
 
 def dictionary_hash(x):
-	# FIXME: do we need to sort the dictionary for this to work consistently?
-	return hashlib.sha1(cPickle.dumps(x))
+	l = [ (k, x[k]) for k in sorted(x.keys()) ]
+	h = hashlib.sha1(json.dumps(l))
+	return h.hexdigest()
 
 def hidden_file_re():
 	return re.compile(r'^\..*$')
