@@ -302,16 +302,19 @@ class MediaDescriptor(JSONFile):
 	def __init__(self, parent):
 		super(MediaDescriptor, self).__init__(parent.element_path('description.json'))
 		self.parent = parent
+		self.elements = ['previews', 'thumbnails', 'subtitles', 'videos']
 		self.load_hook()
 	
 	def load_hook(self):
-		for key in ['previews', 'thumbnails', 'subtitles', 'videos']:
+		for key in self.elements:
 			if not self.has_key(key):
 				self[key] = []
 
 	def save_hook(self):
 		self['id'] = parent.name
 		self['tags'] = parent.tags.items()
+		for key in self.elements:
+			self[element] = sorted(self['element'], key='name'])
 	
 	def subtitles(self):
 		return self['subtitles']
