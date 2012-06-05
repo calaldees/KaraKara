@@ -371,6 +371,10 @@ class MediaEncoding(JSONFile):
 
 
 class MediaEncoder:
+	PROFILE_IPHONE = 1
+	PROFILE_ANDROID = 2
+	PROFILE_MOBILE = 3
+
 	def __init__(self, parent, path):
 		self.path = path
 		self.parent = parent
@@ -581,7 +585,7 @@ class MediaEncoder:
 		return self._run_cmd(parameters, True, False, "a/v muxing")
 
 	def encode(self):
-		if not self.valid():
+		if not self.valid_for_encode():
 			return False
 
 		# setup width, height and duration
@@ -604,6 +608,15 @@ class MediaEncoder:
 		self.clean_temp_files()
 		
 		return result
+	
+	def transcode(self, profile, offset=0.0, length=0.0):
+		if not self.valid_for_transcode():
+			return False
+		if profile not in [MediaEncoder.IPHONE, MediaEncoder.ANDROID, MediaEncoder.MOBILE]:
+			return False
+
+		return False
+		
 
 class MediaItem:
 	def __init__(self, path):
@@ -834,7 +847,7 @@ class MediaItem:
 				if encoding.has_key('subtitles'):
 					encoder.subtitles = self.element_path('source', encoding['subtitles'])
 					encoder.subtitle_shift = encoding['subtitle-shift']
-				ok = encoder.run()
+				ok = encoder.encode()
 			
 			if ok:
 				self.log("  complete")
