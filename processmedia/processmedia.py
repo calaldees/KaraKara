@@ -58,7 +58,7 @@ def run_command(cmd, label="", log_object=None, success=True, fail=False):
 	except subprocess.CalledProcessError as error:
 		if label and log_object:
 			log_object.log(label + " failed - " + error)
-		else if log:
+		elif log_object:
 			log_object.log(error)
 		return fail
 
