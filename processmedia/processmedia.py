@@ -23,7 +23,11 @@ def die(*s):
 	warn(*s)
 	sys.exit(1)
 
+def list_hash(x):
+	return hashlib.sha1(cPickle.dumps(x))
+
 def dictionary_hash(x):
+	# FIXME: do we need to sort the dictionary for this to work consistently?
 	return hashlib.sha1(cPickle.dumps(x))
 
 def hidden_file_re():
@@ -314,20 +318,12 @@ class MediaDescriptor(JSONFile):
 		self['id'] = parent.name
 		self['tags'] = parent.tags.items()
 		for key in self.elements:
-			self[element] = sorted(self[element], key='name'])
+			self[element] = sorted(self[element], key='name')
 	
 	def subtitles(self):
 		return self['subtitles']
-	def set_subtitles(self, files):
-		metadata = []
-		for file in files:
-			entry = {
-				'url': "/".join(['source', urllib.quote(file.name)]),
-				'name': file.name,
-				'language': file.metadata['language']
-			}
-			metadata.append(entry)
-		self['subtitles'] = metdata
+	def set_subtitles(self, metadata):
+		self['subtitles'] = metadata
 	
 	def videos(self):
 		return self['videos']
@@ -770,10 +766,20 @@ class MediaItem:
 	def index_stage(self):
 		self.log("index stage")
 		self.sources.index()
-		subtitles = self.subtitles()
-		# FIXME: only save if changed
-		self.descriptor.set_subtitles(subtitles)
-		self.descriptor.save()
+		
+		metadata = []
+		for file in self.sources.subtitles():
+			entry = {
+				'url': "/".join(['source', urllib.quote(file.name)]),
+				'name': file.name,
+				'language': file.metadata['language']
+			}
+			metadata.append(entry)
+		metadata = sorted(metadata, key='name')
+
+		if list_hash(metadata) != list_hash(self.descriptor.subtitles()):
+			self.descriptor.set_subtitles(subtitles)
+			self.descriptor.save()
 
 	def select_highest_quality(self, files, language=None):
 		if language:
