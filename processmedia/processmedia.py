@@ -195,7 +195,7 @@ class MediaFile:
 			seconds = float(raw_duration.group(3))
 			fraction = raw_duration.group(4)
 			fraction = float(fraction) / (10**(len(fraction) - 1))
-			metadara['length'] = hours + minutes + seconds + fraction
+			metadata['length'] = hours + minutes + seconds + fraction
 		
 		if raw_video:
 			metadata['codec'] = raw_video.group(1)
@@ -246,6 +246,7 @@ class MediaFile:
 
 			ok = run_command([
 				'avconv',
+				'-loglevel', 'panic',
 				'-y',
 				'-itsoffset', str(-time),
 				'-i', self.path,
@@ -586,6 +587,7 @@ class MediaEncoder:
 			source = self.temp_file('imagery.avi')
 			parameters = [
 				'avconv',
+				'-loglevel', 'panic',
 				'-y', 
 				'-loop', '1', 
 				'-i', self.image,
@@ -607,6 +609,7 @@ class MediaEncoder:
 		temp_video = self.temp_file('video.avi')
 		parameters = [
 			'mencoder',
+			'-quiet',
 			source,
 			'-ass',
 			'-nosound',
@@ -656,7 +659,7 @@ class MediaEncoder:
 				return None
 			source_parameters = ['-i', temp_cut]
 
-		parameters = ['avconv', '-y'] + source_parameters + [
+		parameters = ['avconv', '-y', '-loglevel', 'panic'] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			temp_audio
@@ -667,6 +670,7 @@ class MediaEncoder:
 	def mux(self, video, audio):
 		parameters = [
 			'avconv',
+			'-loglevel', 'panic',
 			'-y',
 			'-i', video,
 			'-i', audio,
@@ -882,6 +886,9 @@ class MediaItem:
 	def encode_stage(self):
 		self.log("encode stage")
 
+		self.descriptor.load()
+		self.encoding.load()
+		
 		encodings = {}
 		for (name, encoding) in self.encoding.items():
 			expanded = dict(encoding)
@@ -900,6 +907,7 @@ class MediaItem:
 			videos[video['name']] = video
 		
 		for (name, encoding) in encodings.items():
+			print name, videos.has_key(name)
 			if videos.has_key(name):
 				if videos[name]['encode-hash'] != encoding['encode-hash']:
 					changed.append(name)
@@ -994,7 +1002,7 @@ class MediaItem:
 		# find videos
 		videos = {}
 		for video in self.descriptor.videos():
-			video_name = data['name']
+			video_name = video['name']
 			videos[video_name] = MediaFile(
 				self.element_path('video', video_name), 
 				metadata=video
@@ -1031,7 +1039,8 @@ class MediaItem:
 			# setup time indexes
 			times = []
 			for offset in [0.2, 0.4, 0.6, 0.8]:
-				times.append(video.length * offset)
+				times.append(video.length() * offset)
+			self.log("thumbnail offset: " + str(times))
 
 			# create file names and paths
 			(base, ext) = os.path.splitext(name)
@@ -1055,7 +1064,8 @@ class MediaItem:
 				metadata['name'] = thumb_name
 				metadata['src'] = video['name']
 				metadata['time-index'] = time
-				self.descriptor.add_thumbnail(metadata)
+				if thumb_media.exists():
+					self.descriptor.add_thumbnail(metadata)
 
 			self.descriptor.save()
 	
