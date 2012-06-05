@@ -128,7 +128,11 @@ class MediaFile:
 			self.name = path
 
 	def unlink(self):
-		return os.remove(self.path)
+		if self.exists():
+			try:
+				os.remove(self.path)
+			except OSError as (errno, strerror):
+				self.log("unable to remove " + self.path + " ({0}): {1}".format(errno, strerror))
 
 	def _size(self):
 		return os.stat(self.path).st_size
