@@ -609,7 +609,7 @@ class MediaItem:
 		self.preview_path = self.element_path('preview')
 		self.thumbnail_path = self.element_path('thumbnail')
 		self.video_path = self.element_path('video')
-		self.temp_path = self.element_path('tmp')
+		self.temp_path = self.element_path('temp')
 
 		self.hidden_re = hidden_file_re()
 		self.media_re = media_file_re()
@@ -651,7 +651,7 @@ class MediaItem:
 		self.create_directory('preview')
 		self.create_directory('thumbnail')
 		self.create_directory('video')
-		self.create_directory('tmp')
+		self.create_directory('temp')
 
 	def source_files(self):
 		sources = []
