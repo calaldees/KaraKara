@@ -13,10 +13,10 @@ external data or reprocess existing data producing output in the form of
 new data or annotation on existing data (which is used by later steps).
 
 The processing stages are as follows:
-  import -> index -> pick-and-mix -> encode -> preview -> thumbnail
+  prepare -> import -> index -> pick-and-mix -> encode -> preview -> thumbnail
 
-With the exception of the import stage, all stages should be re-executable at
-and only generate new output where a change has occured in their input.
+With the exception of the prepare/import stage, all stages should be re-executable 
+at and only generate new output where a change has occured in their input.
 
 
 -- Directory Structure
