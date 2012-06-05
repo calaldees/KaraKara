@@ -191,6 +191,45 @@ class MediaFile:
 		else:
 			return False
 	
+	def length(self):
+		if metadata and metadata.has_key('length'):
+			return metadata['length']
+		else:
+			return 0.0
+
+	def generate_thumbnails(self, times, files, width=-1, height=-1):
+		if len(times) != len(files):
+			return False
+		
+		self.update_if_changed()
+		
+		if not (self.is_video() or self.is_image()):
+			return False
+		if self.length() is None:
+			return False
+		
+		result = []
+		for (time, path) in zip(times, files):
+			if time >= (self.length() - 0.1):
+				time = self.length() - 0.1
+			if time < 0.0:
+				time = 0.0
+
+			ok = run_command([
+				'avconv',
+				'-y',
+				'-itsoffset', str(-time),
+				'-i', self.path,
+				'-vframes', 1,
+				'-an',
+				'-vf', 'scale={0}:{1}'.format(width, height),
+				path
+			], label="thumbnail")
+			if ok:
+				result.append((time, path))
+
+		return result
+	
 	def is_video(self):
 		return bool(video_file_re().match(self.path))
 	def is_audio(self):
