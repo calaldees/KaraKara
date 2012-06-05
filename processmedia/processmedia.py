@@ -100,7 +100,7 @@ class MediaFile:
 		self.metadata = metadata
 
 		(dir, name) = os.path.split(path)
-		if name is not None:
+		if name:
 			self.name = name
 		else:
 			self.name = path
@@ -108,7 +108,7 @@ class MediaFile:
 	def _size(self):
 		return os.stat(self.path).st_size
 	def size(self):
-		if self.metadata is None:
+		if not self.metadata:
 			return self._size()
 		else:
 			return self.metadata['size']
@@ -116,7 +116,7 @@ class MediaFile:
 	def _mtime(self):
 		return int(os.stat(self.path).st_mtime)
 	def mtime(self):
-		if self.metadata is None:
+		if not self.metadata:
 			return self._mtime()
 		else:
 			return self.metadata['mtime']
@@ -125,7 +125,7 @@ class MediaFile:
 		return os.path.exists(self.path) and os.path.isfile(self.path)
 
 	def changed(self):
-		if self.metadata is None:
+		if not self.metadata:
 			return True
 		else:
 			return (self.mtime() != self._mtime()) or (self.size() != self._size())
@@ -142,7 +142,7 @@ class MediaFile:
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_video = re.search(r'^\s*Stream\s#\d+:\d+(?:\[.*?\])?:\s*Video:\s*(.*?),\s*(.*?),\s*(\d+)x(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 
-		if raw_duration is not None:
+		if raw_duration:
 			hours = float(raw_duration.group(1))
 			minutes = float(raw_duration.group(2))
 			seconds = float(raw_duration.group(3))
@@ -150,19 +150,20 @@ class MediaFile:
 			length = (hours * 60.0 * 60.0) + (minutes * 60.0) + seconds + factions
 			metadata['length'] = length
 		
-		if raw_video is not None:
+		if raw_video:
 			metadata['codec'] = raw_video.group(1)
 			metadata['colourspace'] = raw_video.group(2)
 			metadata['width'] = raw_video.group(3)
 			metadata['height'] = raw_video.group(4)
 		
 		# FIXME: probe audio for language
+		# FIXME: probe subtitles for language and length?
 
 		return metadata
 	
 	def update_if_changed(self):
 		if self.changed():
-			if self.metadata is None:
+			if not self.metadata:
 				self.metadata = {
 					'language': 'unknown',
 					'score': 1.0
@@ -173,13 +174,13 @@ class MediaFile:
 			return False
 	
 	def is_video(self):
-		return (video_file_re().match(self.path) is not None)
+		return bool(video_file_re().match(self.path))
 	def is_audio(self):
-		return (audio_file_re().match(self.path) is not None)
+		return bool(audio_file_re().match(self.path))
 	def is_image(self):
-		return (image_file_re().match(self.path) is not None)
+		return bool(image_file_re().match(self.path))
 	def is_subtitles(self):
-		return (subtitle_file_re().match(self.path) is not None)
+		return bool(subtitle_file_re().match(self.path))
 
 	def __getitem__(self, y):
 		if self.metadata.has_key(y):
@@ -386,12 +387,21 @@ class MediaEncoder:
 
 		self.temp_files = []
 
-	def valid(self):
-		type_4 = ((self.image is not None) and (self.audio is not None) and (self.subtitle is not None))
-		type_3 = ((self.video is not None) and (self.audio is not None) and (self.subtitle is not None))
-		type_2 = ((self.video is not None) and (self.subtitle is not None))
-		type_1 = (self.video is not None)
+	def valid_for_encode(self):
+		video = bool(self.video)
+		image = bool(self.image)
+		audio = bool(self.audio)
+		subtitles = bool(self.subtitles)
+
+		type_1 = video and not (image or audio or subtitles)
+		type_2 = video and subtitles and not (image or audio)
+		type_3 = video and audio and subtitles and not image
+		type_4 = image and audio and subtitles and not video
+		
 		return type_1 or type_2 or type_3 or type_4
+
+	def valid_for_transcode(self):
+		return (self.video is not None)
 
 	def filebase(self):
 		(dirname, filename) = os.path.split(self.path)
@@ -404,11 +414,11 @@ class MediaEncoder:
 		return file_path
 
 	def probe_media(self):
-		if self.video is not None:
+		if self.video:
 			v_source = self.video
-		elif self.image is not None:
+		elif self.image:
 			v_source = self.image
-		if self.audio is not None:
+		if self.audio:
 			a_source = self.audio
 		else:
 			a_source = self.video
@@ -422,7 +432,7 @@ class MediaEncoder:
 		aspect = 0.75
 		length = 0.0
 		
-		if v_metadata is not None:
+		if v_metadata:
 			width = v_metadata['width']
 			height = v_metadata['height']
 			if width > 0.0 and height > 0.0:
@@ -447,7 +457,7 @@ class MediaEncoder:
 		a_media = MediaFile(a_source)
 		a_metadata = a_media.probe()
 
-		if a_metadata is not None:
+		if a_metadata:
 			if (length == 0.0) or ((a_metadata['length'] + self.audio_shift) < length):
 				length = a_metadata['length'] + self.audio_shift
 			if self.audio_shift > 0.0:
@@ -474,9 +484,9 @@ class MediaEncoder:
 			return fail
 
 	def encode_video(self):
-		if self.video is not None:
+		if self.video:
 			source = self.video
-		elif self.image is not None:
+		elif self.image:
 			source = self.temp_file('imagery.avi')
 			parameters = [
 				'avconv',
@@ -488,7 +498,7 @@ class MediaEncoder:
 				source
 			]
 			result = self._run_cmd(parameters, True, None, "image to video conversation")
-			if result is None:
+			if not result:
 				return None
 		else:
 			return None
@@ -508,14 +518,14 @@ class MediaEncoder:
 			'-vf', ",".join(filters)
 		]
 		
-		if self.subtitles is not None:
+		if self.subtitles:
 			parameters += ['-sub', self.subtitles]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
 		return self._run_cmd(parameters, temp_video, None, "video encoding")
 
 	def encode_audio():
-		if self.audio is not None:
+		if self.audio:
 			source = self.audio
 		else:
 			source = self.video
@@ -570,7 +580,7 @@ class MediaEncoder:
 		]
 		return self._run_cmd(parameters, True, False, "a/v muxing")
 
-	def run(self):
+	def encode(self):
 		if not self.valid():
 			return False
 
@@ -579,13 +589,13 @@ class MediaEncoder:
 
 		# encode video stream with hard subtitles
 		video = self.encode_video()
-		if video is None:
+		if not video:
 			self.clean_temp_files()
 			return False
 
 		# encode audio stream
 		audio = self.encode_audio()
-		if audio is None:
+		if not audio:
 			self.clean_temp_files()
 			return False
 
@@ -679,7 +689,7 @@ class MediaItem:
 		self.descriptor.save()
 
 	def select_highest_quality(self, files, language=None):
-		if language is not None:
+		if language:
 			matching_files = [file for file in files if file['language'] == language]
 			unknown_files = [file for file in files if file['language'] == 'unknown']
 			if len(matching_files) > 0:
@@ -740,12 +750,12 @@ class MediaItem:
 					'subtitle-shift': 0.0,
 					'language': lang
 				}
-				if video is not None:
+				if video:
 					encoding['video'] = video.name
-				elif image is not None:
+				elif image:
 					encoding['image'] = image.name
 
-				if audio is not None:
+				if audio:
 					encoding['audio'] = audio.name
 					encoding['audio-shift'] = 0.0
 
@@ -877,7 +887,7 @@ def prepare_items(path, label=None):
 		file_path = os.path.join(path, file_name)
 		if (not hidden_re.match(file_name)) and os.path.isfile(file_path) and media_re.match(file_name):
 			(item_name, extension) = os.path.splitext(file_name)
-			if label is not None:
+			if label:
 				item_name = label + " - " + item_name
 			if not items.has_key(item_name):
 				items[item_name] = []
