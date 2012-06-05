@@ -314,7 +314,7 @@ class MediaDescriptor(JSONFile):
 		self['id'] = parent.name
 		self['tags'] = parent.tags.items()
 		for key in self.elements:
-			self[element] = sorted(self['element'], key='name'])
+			self[element] = sorted(self[element], key='name'])
 	
 	def subtitles(self):
 		return self['subtitles']
