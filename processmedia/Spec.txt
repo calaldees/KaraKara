@@ -49,7 +49,6 @@ Within the file and directory holding a media item the structure is as follows:
    This file is to be generated with an initial set of tags during 
    the import stage.  It's contents are reprocessed into description.json.
    This is not JSON so that it is easier for users to update.
-   TODO: is this a good idea?
 
   /source/
     Contains the video, audio, subtitles and images used to generate the media
@@ -91,7 +90,7 @@ The following example is given to elucidate all fields.
       'height'     : 320,                    -- in pixels
       'length'     : 30.0,                   -- in seconds
       'size'       : 105834,                 -- in bytes
-      'language'   : 'en'                    -- of subtitles
+      'language'   : 'eng'                   -- of subtitles
     },
     {
       'target'     : 'android',
@@ -102,7 +101,7 @@ The following example is given to elucidate all fields.
       'height'     : 240,
       'length'     : 30.0,
       'size'       : 187502,
-      'language'   : 'en'
+      'language'   : 'eng'
     }
   ],
   'thumbnails': [                          -- in presentation order
@@ -129,7 +128,7 @@ The following example is given to elucidate all fields.
     {
       'url'        : 'source/subtitles.ssa',
       'name'       : 'subtitles.ssa',
-      'language'   : 'en'
+      'language'   : 'eng'
     }
   ],
   'videos': [
@@ -140,7 +139,7 @@ The following example is given to elucidate all fields.
       'height'     : 768,                  -- in pixels
       'length'     : 190.2,                -- in seconds
       'size'       : 4292982,              -- in bytes
-      'language'   : 'en',                 -- of subtitles
+      'language'   : 'eng',                -- of subtitles
       'encode-hash': '03972619348',        -- internal to encode stage
     }
   ]
@@ -164,15 +163,15 @@ are generated and maintained by the processing stages.
    'length'  : 10.5,     -- in seconds
    'md5'     : ...,      -- of data
    'mtime'   : 0,        -- of file (UTC Unix timestamp)
-   'quality' : 1.0,      -- user modifiable, subjective score
-   'language': 'unknown' -- user modifiable
+   'score'   : 1.0,      -- user modifiable, subjective score
+   'language': 'und'     -- user modifiable
   },
   'audio.mp3': {
    'length'  : 10.1,     -- in seconds
    'md5'     : ...,      -- of data
    'mtime'   : 0,        -- of file (UTC Unix timestamp)
-   'quality' : 1.0,      -- user modifiable, subjective score
-   'language': 'ja'      -- user modifiable
+   'score'   : 1.0,      -- user modifiable, subjective score
+   'language': 'jpn'     -- user modifiable
   },
   'subtitles.ssa': {
    'md5'     : ...,      -- of data
@@ -210,7 +209,7 @@ used.
  {
   '0.mp4': {
    'video'         : 'video.avi',     -- source file
-   'language'      : 'en'             -- of output file
+   'language'      : 'eng'            -- of output file
   }
  }
 
@@ -221,7 +220,7 @@ used.
    'video'         : 'video.avi',     -- source file
    'subtitles'     : 'subtitles.ssa', -- source file
    'subtitle-shift': 0.0,             -- in seconds relative to video
-   'language'      : 'en'             -- of output file
+   'language'      : 'eng'            -- of output file
   }
  }
 
@@ -234,7 +233,7 @@ used.
    'audio-shift'   : 0.0,             -- in seconds relative to video
    'subtitles'     : 'subtitles.ssa', -- source file
    'subtitle-shift': 0.0,             -- in seconds relative to video
-   'language'      : 'en'             -- of output file
+   'language'      : 'eng'            -- of output file
   }
  }
 
@@ -246,7 +245,7 @@ used.
    'audio'         : 'audio.mp3',     -- source file
    'subtitles'     : 'subtitles.ssa', -- source file
    'subtitle-shift': 0.0,             -- in seconds relative to video
-   'language'      : 'en'             -- of output file
+   'language'      : 'eng'            -- of output file
   }
  }
 
@@ -282,8 +281,8 @@ For each media item:
   4. update description.json with details of subtitle files
 
 For the purposes of metadata extraction, if the language of a source is not
-identifiable it should be recorded as 'unknown'.  This allows on the fly
-replacement of 'unknown' based on simple heuristics at runtime.
+identifiable it should be recorded as 'und'.  This allows on the fly
+replacement of 'und' based on simple heuristics at runtime.
 
 The md5 checksum maybe used to avoid processor intensive metadata extraction
 if a file's contents have not changed.
