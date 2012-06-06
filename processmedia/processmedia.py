@@ -944,7 +944,7 @@ class MediaItem:
 
 		self.descriptor.save()
 
-		for name in (added + removed):
+		for name in (added + updated):
 			self.log("encoding " + name)
 			encoding = encodings[name]
 
