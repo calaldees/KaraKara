@@ -82,24 +82,24 @@ class JSONFile(dict):
 
 	def _load(self):
 		self.clear()
+
 		if os.path.exists(self.path):
 			try:
 				fp = open(self.path, 'rb')
-				self.clear()
 				data = json.load(fp)
 				fp.close()
 				super(JSONFile, self).update(data)
-				self.loaded = True
-				self.changed = False
 			except IOError as (errno, strerror):
 				warn("unable to read " + self.path + " ({0}): {1}".format(errno, strerror))
 			except ValueError as strerror:
 				warn("unable to read JSON from " + self.path + ": " + strerror)
-				self.clear()
+
+		self.loaded = True
+		self.changed = False
 		self.load_hook()
 
 	def load(self):
-		if not self.loaded:
+		if (not self.loaded) and (not self.changed):
 			self._load()
 
 	def _save(self):
@@ -308,6 +308,7 @@ class TagList:
 				fp.write(tag + "\r\n")
 			fp.close()
 			self.changed = False
+			self.loaded = True
 		except IOError as (errno, strerror):
 			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
 
@@ -336,9 +337,11 @@ class MediaDescriptor(JSONFile):
 		for key in self.elements:
 			if not self.has_key(key):
 				self[key] = []
+		self.changed = False
 
 	def save_hook(self):
-		self['name'] = self.parent.name
+		if not self.has_key('name'):
+			self['name'] = self.parent.name
 		self['tags'] = self.parent.tags.items()
 		for key in self.elements:
 			self[key] = sorted(self[key], key=lambda x:x['name'])
@@ -347,6 +350,7 @@ class MediaDescriptor(JSONFile):
 		return self['subtitles']
 	def set_subtitles(self, metadata):
 		self['subtitles'] = metadata
+		self.changed = True
 	
 	def videos(self):
 		return self['videos']
@@ -363,6 +367,7 @@ class MediaDescriptor(JSONFile):
 	def add_thumbnail(self, description):
 		self.remove_thumbnails(name=description['name'])
 		self['thumbnails'].append(description)
+		self.changed = True
 	def remove_thumbnails(self, name=None, video=None):
 		if name:
 			self['thumbnails'] = [ thumbnail for thumbnail in self.thumbnails() if thumbnail['name'] != name ]
@@ -792,6 +797,9 @@ class MediaItem:
 
 	def index_stage(self):
 		self.log("index stage")
+
+		self.descriptor.load()
+		self.sources.load()
 		self.sources.index_files()
 		
 		metadata = []
@@ -840,6 +848,9 @@ class MediaItem:
 	def pick_and_mix_stage(self):
 		self.log("pick-and-mix stage")
 		
+		self.sources.load()
+		self.encoding.load()
+
 		video_files = self.sources.video()
 		audio_files = self.sources.audio()
 		image_files = self.sources.image()
@@ -907,18 +918,17 @@ class MediaItem:
 			videos[video['name']] = video
 		
 		for (name, encoding) in encodings.items():
-			print name, videos.has_key(name)
 			if videos.has_key(name):
 				if videos[name]['encode-hash'] != encoding['encode-hash']:
-					changed.append(name)
+					updated.append(name)
 				elif not os.path.exists(self.element_path('video', name)):
-					changed.append(name)
+					updated.append(name)
 			else:
 				added.append(name)
 		for (name, description) in videos.items():
 			if not encodings.has_key(name):
 				removed.append(name)
-
+		
 		if (len(added) + len(updated) + len(removed)) == 0:
 			self.log("nothing to encode")
 			return
@@ -985,6 +995,8 @@ class MediaItem:
 
 	def thumbnail_stage(self):
 		self.log("thumbnail stage")
+		
+		self.descriptor.load()
 
 		# find existing thumbnails
 		thumbnails = {}
