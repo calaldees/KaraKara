@@ -190,7 +190,9 @@ class MediaFile:
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_bitrate = re.search(r',\s*bitrate:\s*(\d+)\s*kb/s', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_video = re.search(r'^\s*Stream\s*#\d+[:.]\d+(?:\[.*?\])?(?:\(.*?\))?:\s*Video:\s*(.*)', raw_probe, re.IGNORECASE | re.MULTILINE)
+		raw_video_lang = re.search(r'^\s*Stream\s*#\d+[:.]\d+\((.+)\):\s*Video', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_audio = re.search(r'^\s*Stream\s*#\d+[:.]\d+(?:\[.*?\])?(?:\(.*?\))?:\s*Audio:\s*(.*)', raw_probe, re.IGNORECASE | re.MULTILINE)
+		raw_audio_lang = re.search(r'^\s*Stream\s*#\d+[:.]\d+\((.+)\):\s*Audio', raw_probe, re.IGNORECASE | re.MULTILINE)
 
 		if raw_duration:
 			hours = float(raw_duration.group(1)) * 60.0 * 60.0
@@ -214,6 +216,8 @@ class MediaFile:
 				metadata['height'] = int(wxh.group(2))
 			if vbr and len(vbr) > 0:
 				metadata['vbitrate'] = int(vbr[0])
+		if raw_video_lang:
+			metadata['vlang'] = raw_video_lang.group(1) 
 
 		if raw_audio:
 			parts = re.split(r'\s*,\s*', raw_audio.group(1))
@@ -221,8 +225,14 @@ class MediaFile:
 			metadata['acodec'] = parts[0]
 			if abr and len(abr) > 0:
 				metadata['abitrate'] = int(abr[0])
+		if raw_audio_lang:
+			metadata['alang'] = raw_audio_lang.group(1) 
 		
-		# FIXME: probe audio for language
+		if metadata.has_key('alang'):
+			metadata['language'] = metadata['alang']
+		elif metadata.has_key('vlang'):
+			metadata['language'] = metadata['vlang']
+
 		# FIXME: probe subtitles for language and length?
 
 		return metadata
@@ -604,6 +614,7 @@ class MediaEncoder:
 		self.audio_shift = 0.0
 		self.subtitles = None
 		self.subtitle_shift = 0.0
+		self.language = None
 		
 		self.base_width = 1024
 		self.base_height = 768
@@ -795,8 +806,11 @@ class MediaEncoder:
 			'-i', audio,
 			'-strict', 'experimental',
 			'-vcodec', 'copy',
-			muxed
 		]
+		if self.language:
+			parameters += [ '-metadata', 'language=' + self.language ]
+		parameters += [ muxed ]
+
 		ok = self._run_cmd(parameters, True, False, "a/v muxing")
 		if ok:
 			return self._run_cmd(
@@ -987,7 +1001,7 @@ class MediaItem:
 	def select_highest_quality(self, files, language=None):
 		if language:
 			matching_files = [file for file in files if file['language'] == language]
-			unknown_files = [file for file in files if file['language'] == 'unknown']
+			unknown_files = [file for file in files if file['language'] == 'und']
 			if len(matching_files) > 0:
 				files = matching_files
 			elif len(unknown_files) > 0:
@@ -1000,7 +1014,7 @@ class MediaItem:
 			return None
 	
 	def sort_languages(self, languages):
-		priority = { 'jpn': 0, 'eng': 1, 'unknown': 9000 }
+		priority = { 'jpn': 0, 'eng': 1, 'und': 9000 }
 		results = {}
 		p_n = 10
 		
@@ -1035,7 +1049,7 @@ class MediaItem:
 		if (len(languages) == 0) and (len(video_files) > 0):
 			encodings.append({
 				'video': self.select_highest_quality(video_files),
-				'language': 'unknown'
+				'language': 'und'
 			})
 		elif len(languages) > 0:
 			for lang in self.sort_languages(languages.keys()):
@@ -1141,6 +1155,8 @@ class MediaItem:
 				if encoding.has_key('subtitles'):
 					encoder.subtitles = self.element_path('source', encoding['subtitles'])
 					encoder.subtitle_shift = encoding['subtitle-shift']
+				if encoding.has_key('language'):
+					encoder.language = encoding['language']
 				ok = encoder.encode()
 			
 			if ok:
