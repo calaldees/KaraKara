@@ -188,7 +188,9 @@ class MediaFile:
 		raw_probe = subprocess.check_output(['avprobe', self.path], stderr=subprocess.STDOUT)
 		
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
-		raw_video = re.search(r'^\s*Stream\s#\d+:\d+(?:\[.*?\])?:\s*Video:\s*(.*?),\s*(.*?),\s*(\d+)x(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
+		raw_bitrate = re.search(r',\s*bitrate:\s*(\d+)\s*kb/s', raw_probe, re.IGNORECASE | re.MULTILINE)
+		raw_video = re.search(r'^\s*Stream\s*#\d+[:.]\d+(?:\[.*?\])?(?:\(.*?\))?:\s*Video:\s*(.*)', raw_probe, re.IGNORECASE | re.MULTILINE)
+		raw_audio = re.search(r'^\s*Stream\s*#\d+[:.]\d+(?:\[.*?\])?(?:\(.*?\))?:\s*Audio:\s*(.*)', raw_probe, re.IGNORECASE | re.MULTILINE)
 
 		if raw_duration:
 			hours = float(raw_duration.group(1)) * 60.0 * 60.0
@@ -198,25 +200,53 @@ class MediaFile:
 			fraction = float(fraction) / (10**(len(fraction) - 1))
 			metadata['length'] = hours + minutes + seconds + fraction
 		
+		if raw_bitrate:
+			metadata['bitrate'] = int(raw_bitrate.group(1))
+
 		if raw_video:
-			metadata['codec'] = raw_video.group(1)
-			metadata['colourspace'] = raw_video.group(2)
-			metadata['width'] = int(raw_video.group(3))
-			metadata['height'] = int(raw_video.group(4))
+			parts = re.split(r'\s*,\s*', raw_video.group(1))
+			wxh = re.search(r'\s*(\d+)x(\d+)', raw_video.group(1))
+			vbr = re.findall(r'(\d+)\s*kb/s', raw_video.group(1))
+			metadata['vcodec'] = parts[0]
+			metadata['colourspace'] = parts[1]
+			if wxh:
+				metadata['width'] = int(wxh.group(1))
+				metadata['height'] = int(wxh.group(2))
+			if vbr and len(vbr) > 0:
+				metadata['vbitrate'] = int(vbr[0])
+
+		if raw_audio:
+			parts = re.split(r'\s*,\s*', raw_audio.group(1))
+			abr = re.findall(r'(\d+)\s*kb/s', raw_audio.group(1))
+			metadata['acodec'] = parts[0]
+			if abr and len(abr) > 0:
+				metadata['abitrate'] = int(abr[0])
 		
 		# FIXME: probe audio for language
 		# FIXME: probe subtitles for language and length?
 
 		return metadata
 	
+	def _score(self):
+		score = 1.0
+		if self.metadata.has_key('width') and self.metadata.has_key('height'):
+			score *= (self.metadata['width'] * self.metadata['height']) / (640.0 * 480.0)
+		#if self.metadata.has_key('vbitrate'):
+		#	score *= (self.metadata['vbitrate'] / 1024.0)
+		if self.metadata.has_key('abitrate'):
+			score *= (self.metadata['abitrate'] / 128.0)
+		return float("%.2f" % score)
+
 	def update_if_changed(self):
 		if self.has_changed():
+			new_metadata = self.probe()
 			if not self.metadata:
-				self.metadata = {
-					'language': 'unknown',
-					'score': 1.0
-				}
-			self.metadata.update(self.probe())
+				self.metadata = {'language': 'und'}
+				self.metadata.update(new_metadata)
+				self.metadata['score'] = self._score()
+			else:
+				self.metadata.update(new_metadata)
+			
 			return True
 		else:
 			return False
@@ -701,7 +731,7 @@ class MediaEncoder:
 			'-ass',
 			'-nosound',
 			'-ovc', 'x264',
-			'-x264encopts', 'profile=main,preset=slow',
+			'-x264encopts', 'profile=main:preset=slow',
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
@@ -970,7 +1000,7 @@ class MediaItem:
 			return None
 	
 	def sort_languages(self, languages):
-		priority = { 'ja': 0, 'en': 1, 'unknown': 9000 }
+		priority = { 'jpn': 0, 'eng': 1, 'unknown': 9000 }
 		results = {}
 		p_n = 10
 		
