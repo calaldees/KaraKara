@@ -7,6 +7,7 @@ import json
 
 from operator import itemgetter, attrgetter
 
+avconv_loglevel = 'warning'
 logs = [sys.stdout]
 
 def log(*s):
@@ -246,7 +247,7 @@ class MediaFile:
 
 			ok = run_command([
 				'avconv',
-				'-loglevel', 'panic',
+				'-loglevel', avconv_loglevel,
 				'-y',
 				'-itsoffset', str(-time),
 				'-i', self.path,
@@ -506,19 +507,19 @@ class MediaEncoder:
 	}
 	profile_parameters = {
 		PROFILE_IPHONE: [
-			'-vf',		'scale=320:-1'
+			'-vf',		'scale=320:-1',
 			#'-r',		'30000/1001',
 			'-vcodec',	'libx264',
 			'-pre:v',	'libx264-ipod320',
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'48000',
-			'-ab',		'128k'
+			'-ab',		'128k',
 			'-b',		'200k',
-			'-bt',		'240k',
+			'-bt',		'240k'
 		],
 		PROFILE_ANDROID: [
-			'-vf',		'scale=320:-1'
+			'-vf',		'scale=320:-1',
 			'-vcodec', 	'libx264',
 			'-profile:v',	'baseline',
 			'-acodec', 	'aac',
@@ -526,7 +527,7 @@ class MediaEncoder:
 			'-ar', 		'48000'
 		],
 		PROFILE_GENERIC: [
-			'-vf',		'scale=320:-1'
+			'-vf',		'scale=320:-1',
 			'-r',		'13',
 			'-vcodec',	'mpeg4',
 			'-acodec',	'aac',
@@ -536,7 +537,8 @@ class MediaEncoder:
 		]
 	}
 
-	def profile_id(profile):
+	@classmethod
+	def profile_id(cls, profile):
 		if MediaEncoder.profile_names.has_key(profile):
 			return profile
 		else:
@@ -544,12 +546,15 @@ class MediaEncoder:
 				if v == profile:
 					return k
 			return None
-	def profile_name(profile):
+	@classmethod
+	def profile_name(cls, profile):
 		return MediaEncoder.profile_names[profile]
-	def profile_extension(profile):
+	
+	@classmethod
+	def profile_extension(cls, profile):
 		profile = MediaEncoder.profile_id(profile)
 		if MediaEncoder.profile_extensions.has_key(profile):
-			return MediaEncoder.profile_extension[profile]
+			return MediaEncoder.profile_extensions[profile]
 		else:
 			return None
 	
@@ -663,7 +668,7 @@ class MediaEncoder:
 			source = self.temp_file('imagery.avi')
 			parameters = [
 				'avconv',
-				'-loglevel', 'panic',
+				'-loglevel', avconv_loglevel,
 				'-y', 
 				'-loop', '1', 
 				'-i', self.image,
@@ -736,7 +741,7 @@ class MediaEncoder:
 				return None
 			source_parameters = ['-i', temp_cut]
 
-		parameters = ['avconv', '-y', '-loglevel', 'panic'] + source_parameters + [
+		parameters = ['avconv', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			temp_audio
@@ -748,7 +753,7 @@ class MediaEncoder:
 		muxed = self.temp_file('mux.mp4')
 		parameters = [
 			'avconv',
-			'-loglevel', 'panic',
+			'-loglevel', avconv_loglevel,
 			'-y',
 			'-i', video,
 			'-i', audio,
@@ -794,14 +799,14 @@ class MediaEncoder:
 	def transcode(self, profile, offset=0.0, length=0.0):
 		if not self.valid_for_transcode():
 			return False
-		if profile not in [MediaEncoder.IPHONE, MediaEncoder.ANDROID, MediaEncoder.GENERIC]:
+		if profile not in MediaEncoder.profile_names.keys(): 
 			return False
 
-		transcode = self.temp_file("transcode")
+		transcode = self.temp_file("transcode" + MediaEncoder.profile_extension(profile))
 		
 		parameters = [
 			'avconv',
-			'-loglevel', 'panic',
+			'-loglevel', avconv_loglevel,
 			'-y',
 			'-i', self.video,
 		]
@@ -1105,7 +1110,7 @@ class MediaItem:
 			target_name = preview['target']
 			if not previews.has_key(video_name):
 				previews[video_name] = {}
-			previews[video_name][target] = MediaFile(
+			previews[video_name][target_name] = MediaFile(
 				self.element_path('preview', preview['name']), 
 				metadata=preview
 			)
@@ -1136,22 +1141,21 @@ class MediaItem:
 			if not previews.has_key(name):
 				to_generate += [ (video, target) for target in targets ]
 			else:
-				preview_targets = [ preview['target'] for preview in previews[name] ]
-				to_generate += [ (video, preview['target']) for preview in previews[name] if (not preview.exists()) or (video.mtime() > preview.mtime()) ]
-				to_generate += [ (video, target) for target in targets if target not in preview_targets ]
+				to_generate += [ (video, preview['target']) for preview in previews[name].values() if (not preview.exists()) or (video.mtime() > preview.mtime()) ]
+				to_generate += [ (video, target) for target in targets if target not in previews[name].keys() ]
 
 		# generate previews
 		for (video, target) in to_generate:
 			video_name = video['name'] 
-			self.log("generating previews for " + video_name)
-			
-			# remove old metadata
-			self.descriptor.remove_previews(video=video_name)
+			self.log("generating " + target + " preview for " + video_name)
 			
 			# generate preview name
 			(base_name, ext) = os.path.splitext(name)
 			preview_name = base_name + "_" + target + MediaEncoder.profile_extension(target)
 			path = self.element_path('preview', preview_name)
+			
+			# remove old metadata
+			self.descriptor.remove_previews(name=preview_name)
 
 			# encode video
 			encoder = MediaEncoder(self, path)
