@@ -49,7 +49,19 @@ def image_file_re():
 
 def subtitle_file_re():
 	return re.compile(r'^.*\.(ssa)$', re.IGNORECASE)
-	
+
+def parse_timestamp(ts):
+	ts_match = re.search(r'(\d+):(\d+):(\d+)\.(\d+)', ts)
+	if ts_match:
+		hours = float(ts_match.group(1)) * 60.0 * 60.0
+		minutes = float(ts_match.group(2)) * 60.0
+		seconds = float(ts_match.group(3))
+		fraction = ts_match.group(4)
+		fraction = float(fraction) / (10**(len(fraction) - 1))
+		return hours + minutes + seconds + fraction
+	else:
+		return 0.0
+
 def run_command(cmd, label="", log_object=None, success=True, fail=False):
 	try:
 		cmd = map(unicode, cmd)
@@ -123,6 +135,76 @@ class JSONFile(dict):
 	def __setitem__(self, y, v):
 		super(JSONFile, self).__setitem__(y, v)
 		self.changed = True
+
+class SSAFile:
+	def __init__(self, path):
+		self.path = path
+		self.data = []
+		self.titles = []
+		self.load()
+
+	def load(self):
+		self.data[:] = []
+		try:
+			fp = open(self.path, 'r')
+			lines = fp.readlines()
+			fp.close()
+			for line in lines:
+				self.data.append(line.strip()) # FIXME: \r\n?
+		except IOError:
+			self.data.clear()
+
+		self.parse()
+	
+	def parse(self):
+		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
+		self.titles[:] = []
+		for line in self.data:
+			dialogue = dialogue_re.match(line)
+			if dialogue:
+				parts = dialogue.group(1).split(',', 10)
+				if len(parts) == 10:
+					start = parse_timestamp(parts[1])
+					end = parse_timestamp(parts[2])
+					text = parts[9]
+					self.titles.append((start, end, text))
+	
+	def length(self):
+		max_end = 0.0
+		for (start, end, text) in self.titles:
+			if end > max_end:
+				max_end = end
+		return max_end
+	
+	def lang_ratio(self, match_words):
+		r = 0.0
+		for (start, end, text) in self.titles:
+			words = re.split(r'\s+', text.lower())
+			r += float(sum([ 1 for word in words if match_words.has_key(word) ])) / float(len(words))
+		return r
+
+	def jpn_ratio(self):
+		match_words = {}
+		for m in [ 'wa', 'no', 'yo', 'da', 'ni', 'ga', 'wo', 'kare', 'koi', 'ai' ]:
+			match_words[m] = True
+		return self.lang_ratio(match_words)
+	
+	def eng_ratio(self):
+		match_words = {}
+		for m in [ 'the', 'a', 'on', 'i', 'you', 'he', 'she', 'is', 'yes', 'no' ]:
+			match_words[m] = True
+		return self.lang_ratio(match_words)
+
+	def guess_language(self):
+		ratios = {
+			'jpn': self.jpn_ratio(),
+			'eng': self.eng_ratio()
+		}
+		langs = sorted(ratios.keys(), key=lambda x:ratios[x], reverse=True)
+		if ratios[langs[0]] < 0.1:
+			return 'und'
+		else:
+			return langs[0]
 
 
 class MediaFile:
@@ -233,7 +315,10 @@ class MediaFile:
 		elif metadata.has_key('vlang'):
 			metadata['language'] = metadata['vlang']
 
-		# FIXME: probe subtitles for language and length?
+		if self.is_subtitles():
+			subfile = SSAFile(self.path)
+			metadata['length'] = subfile.length()
+			metadata['language'] = subfile.guess_language()
 
 		return metadata
 	
