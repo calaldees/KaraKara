@@ -1006,7 +1006,7 @@ class MediaItem:
 				thumbnails[video_name] = []
 			thumbnails[video_name].append(
 				MediaFile(
-					self.element_path('thumbnail', data['name']), 
+					self.element_path('thumbnail', thumbnail['name']), 
 					metadata=thumbnail
 				)
 			)
@@ -1037,7 +1037,7 @@ class MediaItem:
 			if not thumbnails.has_key(name):
 				to_generate[name] = video
 			else:
-				invalid = [ (not thumbnail.exists()) or (media.mtime() > thumbnail.mtime()) for thumbnail in thumbnails[name] ]
+				invalid = [ (not thumbnail.exists()) or (video.mtime() > thumbnail.mtime()) for thumbnail in thumbnails[name] ]
 				if True in invalid:
 					to_generate[name] = video
 
