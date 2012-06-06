@@ -375,6 +375,18 @@ class MediaDescriptor(JSONFile):
 			self['thumbnails'] = [ thumbnail for thumbnail in self.thumbnails() if thumbnail['src'] != video ]
 		self.changed = True
 	
+	def previews(self):
+		return self['previews']
+	def add_preview(self, description):
+		self.remove_previews(name=description['name'])
+		self['previews'].append(description)
+		self.changed = True
+	def remove_previews(self, name=None, video=None):
+		if name:
+			self['previews'] = [ preview for preview in self.previews() if preview['name'] != name ]
+		elif video:
+			self['previews'] = [ preview for preview in self.previews() if preview['src'] != video ]
+		self.changed = True
 
 class MediaSources(JSONFile):
 	def __init__(self, parent):
@@ -480,8 +492,67 @@ class MediaEncoding(JSONFile):
 class MediaEncoder:
 	PROFILE_IPHONE = 1
 	PROFILE_ANDROID = 2
-	PROFILE_MOBILE = 3
+	PROFILE_GENERIC = 3
 
+	profile_names = {
+		PROFILE_IPHONE: 'iphone',
+		PROFILE_ANDROID: 'android',
+		PROFILE_GENERIC: 'generic'
+	}
+	profile_extensions = {
+		PROFILE_IPHONE: '.mp4',
+		PROFILE_ANDROID: '.mp4',
+		PROFILE_GENERIC: '.mp4'
+	}
+	profile_parameters = {
+		PROFILE_IPHONE: [
+			'-vf',		'scale=320:-1'
+			#'-r',		'30000/1001',
+			'-vcodec',	'libx264',
+			'-pre:v',	'libx264-ipod320',
+			'-acodec',	'aac',
+			'-ac',		'1',
+			'-ar',		'48000',
+			'-ab',		'128k'
+			'-b',		'200k',
+			'-bt',		'240k',
+		],
+		PROFILE_ANDROID: [
+			'-vf',		'scale=320:-1'
+			'-vcodec', 	'libx264',
+			'-profile:v',	'baseline',
+			'-acodec', 	'aac',
+			'-b',		'510K',
+			'-ar', 		'48000'
+		],
+		PROFILE_GENERIC: [
+			'-vf',		'scale=320:-1'
+			'-r',		'13',
+			'-vcodec',	'mpeg4',
+			'-acodec',	'aac',
+			'-ac',		'1',
+			'-ar',		'16000',
+			'-ab',		'32000',
+		]
+	}
+
+	def profile_id(profile):
+		if MediaEncoder.profile_names.has_key(profile):
+			return profile
+		else:
+			for (k, v) in MediaEncoder.profile_names.items():
+				if v == profile:
+					return k
+			return None
+	def profile_name(profile):
+		return MediaEncoder.profile_names[profile]
+	def profile_extension(profile):
+		profile = MediaEncoder.profile_id(profile)
+		if MediaEncoder.profile_extensions.has_key(profile):
+			return MediaEncoder.profile_extension[profile]
+		else:
+			return None
+	
 	def __init__(self, parent, path):
 		self.path = path
 		self.parent = parent
@@ -619,6 +690,7 @@ class MediaEncoder:
 			'-ass',
 			'-nosound',
 			'-ovc', 'x264',
+			'-x264encopts', 'profile=main,preset=slow',
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
@@ -673,6 +745,7 @@ class MediaEncoder:
 		return self._run_cmd(parameters, temp_audio, None, "audio encoding")
 
 	def mux(self, video, audio):
+		muxed = self.temp_file('mux.mp4')
 		parameters = [
 			'avconv',
 			'-loglevel', 'panic',
@@ -681,9 +754,17 @@ class MediaEncoder:
 			'-i', audio,
 			'-strict', 'experimental',
 			'-vcodec', 'copy',
-			self.path
+			muxed
 		]
-		return self._run_cmd(parameters, True, False, "a/v muxing")
+		ok = self._run_cmd(parameters, True, False, "a/v muxing")
+		if ok:
+			return self._run_cmd(
+				['qt-faststart', muxed, self.path],
+				True, False,
+				'stream optimising'
+			)
+		else:
+			return False
 
 	def encode(self):
 		if not self.valid_for_encode():
@@ -709,15 +790,38 @@ class MediaEncoder:
 		self.clean_temp_files()
 		
 		return result
-	
+
 	def transcode(self, profile, offset=0.0, length=0.0):
 		if not self.valid_for_transcode():
 			return False
-		if profile not in [MediaEncoder.IPHONE, MediaEncoder.ANDROID, MediaEncoder.MOBILE]:
+		if profile not in [MediaEncoder.IPHONE, MediaEncoder.ANDROID, MediaEncoder.GENERIC]:
 			return False
 
-		return False
+		transcode = self.temp_file("transcode")
 		
+		parameters = [
+			'avconv',
+			'-loglevel', 'panic',
+			'-y',
+			'-i', self.video,
+		]
+		parameters += MediaEncoder.profile_parameters[profile]
+		parameters += [
+			'-strict', 'experimental',
+			transcode
+		]
+		
+		ok = self._run_cmd(parameters, True, False, "transcoding")
+		if ok:
+			ok = self._run_cmd(
+				['qt-faststart', transcode, self.path],
+				True, False,
+				'stream optimising'
+			)
+		
+		self.clean_temp_files()
+
+		return ok
 
 class MediaItem:
 	def __init__(self, path):
@@ -992,6 +1096,84 @@ class MediaItem:
 
 	def preview_stage(self):
 		self.log("preview stage")
+		targets = MediaEncoder.profile_names.values()
+		
+		# find existing previews
+		previews = {}
+		for preview in self.descriptor.previews():
+			video_name = preview['src']
+			target_name = preview['target']
+			if not previews.has_key(video_name):
+				previews[video_name] = {}
+			previews[video_name][target] = MediaFile(
+				self.element_path('preview', preview['name']), 
+				metadata=preview
+			)
+		
+		# find videos
+		videos = {}
+		for video in self.descriptor.videos():
+			video_name = video['name']
+			videos[video_name] = MediaFile(
+				self.element_path('video', video_name), 
+				metadata=video
+			)
+
+		# remove previews for none existent videos
+		for video in previews:
+			if not videos.has_key(video):
+				self.log("video " + video + " no longer exists")	
+				for preview in previews[video].values():
+					self.log("rm " + preview.path)
+					preview.unlink()
+				self.descriptor.remove_previews(video=video)
+		
+		self.descriptor.save()
+		
+		# find videos for which previews need to be (re)generated
+		to_generate = []
+		for (name, video) in videos.items():
+			if not previews.has_key(name):
+				to_generate += [ (video, target) for target in targets ]
+			else:
+				preview_targets = [ preview['target'] for preview in previews[name] ]
+				to_generate += [ (video, preview['target']) for preview in previews[name] if (not preview.exists()) or (video.mtime() > preview.mtime()) ]
+				to_generate += [ (video, target) for target in targets if target not in preview_targets ]
+
+		# generate previews
+		for (video, target) in to_generate:
+			video_name = video['name'] 
+			self.log("generating previews for " + video_name)
+			
+			# remove old metadata
+			self.descriptor.remove_previews(video=video_name)
+			
+			# generate preview name
+			(base_name, ext) = os.path.splitext(name)
+			preview_name = base_name + "_" + target + MediaEncoder.profile_extension(target)
+			path = self.element_path('preview', preview_name)
+
+			# encode video
+			encoder = MediaEncoder(self, path)
+			encoder.video = video.path
+			
+			self.log("encoding " + preview_name)
+			ok = encoder.transcode(MediaEncoder.profile_id(target))
+		
+			if ok:
+				self.log("encode complete")
+				media = MediaFile(path)
+				metadata = media.probe()
+				metadata['target'] = target
+				metadata['url'] = "/".join(['preview', urllib.quote(preview_name)])
+				metadata['name'] = preview_name
+				metadata['src'] = name
+				metadata['language'] = video['language']
+				self.descriptor.add_preview(metadata)
+			else:
+				self.log("encode failed")
+
+			self.descriptor.save()
 
 	def thumbnail_stage(self):
 		self.log("thumbnail stage")
