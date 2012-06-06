@@ -81,8 +81,9 @@ The following example is given to elucidate all fields.
   'name'    : 'test item',                 -- identifier (as directory name)
   'source'  : 'path/test item',            -- full path of import source
   'tags'    : [ 'j-pop', 'the pillows' ],  -- tags from tags.txt
-  'previews': {                            -- keyed by target system
-    'iphone': {
+  'previews': [                            -- in video order
+    {
+      'target'     : 'iphone',               -- system type for playback
       'url'        : 'preview/0_iphone.mp4', -- url
       'name'       : '0_iphone.mp4',         -- name of preview
       'src'        : '0.mp4',                -- name of preview source
@@ -92,8 +93,9 @@ The following example is given to elucidate all fields.
       'size'       : 105834,                 -- in bytes
       'language'   : 'en'                    -- of subtitles
     },
-    'android': {
-      'url'        : 'preview/0_android.flv',
+    {
+      'target'     : 'android',
+      'url'        : 'preview/0_android.mp4',
       'name'       : '0_android.mp4',
       'src'        : '0.mp4',
       'width'      : 320,
