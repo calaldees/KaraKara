@@ -1438,7 +1438,6 @@ class MediaItem:
 		self.encode_stage()
 		self.preview_stage()
 		self.thumbnail_stage()
-		sys.exit(0)
 
 def test_program(cmd, package):
 	cmd = map(unicode, cmd)
