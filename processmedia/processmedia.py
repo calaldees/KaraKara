@@ -291,6 +291,7 @@ class MediaFile:
 			parts = re.split(r'\s*,\s*', raw_video.group(1))
 			wxh = re.search(r'\s*(\d+)x(\d+)', raw_video.group(1))
 			vbr = re.findall(r'(\d+)\s*kb/s', raw_video.group(1))
+			# FIXME: retrieve / calculate aspect ratio
 			metadata['vcodec'] = parts[0]
 			metadata['colourspace'] = parts[1]
 			if wxh:
