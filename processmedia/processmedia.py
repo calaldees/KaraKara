@@ -1091,6 +1091,56 @@ class MediaItem:
 		self.thumbnail_stage()
 		sys.exit(0)
 
+def test_program(cmd, package):
+	cmd = map(unicode, cmd)
+	try:
+		return subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+	except subprocess.CalledProcessError as error:
+		warn('error: ' + cmd[0] + " missing or broken (install " + package + "?)")
+		return None
+
+def check_tools():
+	ok = True 
+
+	# avprobe
+	result = test_program(['avprobe', '-version'], 'libav')
+	ok = ok and (result is not None)
+
+	# avconv
+	result = test_program(['avconv', '-codecs'], 'libav')
+	ok = ok and (result is not None)
+	if result:
+		aac = re.search(r'^\s*D?EA[\sSDT]+\s*aac', result, re.MULTILINE)
+		libx264 = re.search(r'^\s*EV[\sSDT]+\s*libx264', result, re.MULTILINE)
+		ok = ok and (aac and libx264)
+		if not aac:
+			warn("error: avconv does not support aac codec")
+		if not libx264:
+			warn("error: avconv does not support libx264 codec")
+
+	# qt-faststart
+	result = test_program(['qt-faststart'], 'libav/tools')
+	ok = ok and (result is not None)
+
+	# mencoder
+	result = test_program(['mencoder', '-ovc', 'help'], 'mplayer')
+	ok = ok and (result is not None)
+	if result:
+		x264 = re.search(r'^\s*x264', result, re.MULTILINE)
+		ok = ok and x264
+		if not x264:
+			warn("error: mencoder does not support x264 codec")
+
+	result = test_program(['mencoder', '-vf', 'help'], 'mplayer')
+	ok = ok and (result is not None)
+	if result:
+		ass = re.search(r'^\s*ass', result, re.MULTILINE)
+		ok = ok and ass
+		if not ass:
+			warn("error: mencoder does not support advanced subtitles (ass)")
+
+	return ok
+
 def find_items(path):
 	hidden_re = hidden_file_re()
 	items = []
@@ -1159,6 +1209,9 @@ def usage(f):
  
 Where <command> is one of:
   
+  check-tools
+    Test that the appropriate 3rd party tools are installed.
+
   process <media-root>
     Scan <media-root> for media items.
     Perform all processing stages on items.
@@ -1173,10 +1226,18 @@ Where <command> is one of:
 """
 
 def main(args):
-	if len(args) < 2:
-		usage(sys.stderr)
-		sys.exit(1)
-	else:
+	if (len(args) >= 1) and (args[0] == 'check-tools'):
+		ok = check_tools()
+		if ok:
+			log("system tools are present and correct")
+		else:
+			warn("system tools are missing or not suitable")
+	elif len(args) >= 2:
+		tools = check_tools()
+		if not tools:
+			warn("system tools are missing or not suitable")
+			sys.exit(1)
+
 		command = args[0]
 		root = args[1]
 		if command == 'process':
@@ -1193,7 +1254,11 @@ def main(args):
 		else:
 			usage(sys.stderr)
 			sys.exit(1)
-			
+
+	else:
+		usage(sys.stderr)
+		sys.exit(1)
 
 if __name__ == "__main__":
         main(sys.argv[1:])
+	sys.exit(0)
