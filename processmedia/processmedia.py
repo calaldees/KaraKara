@@ -1172,7 +1172,10 @@ class MediaItem:
 			expanded = dict(encoding)
 			for key in ['video', 'audio', 'image', 'subtitle']:
 				if encoding.has_key(key):
-					expanded[key + '-metadata'] = self.sources[encoding[key]]
+					source = self.sources[encoding[key]]
+					for source_key in ['mtime', 'size', 'length', 'language']:
+						if source.has_key(source_key):
+							expanded[key + '-' + source_key] = source[source_key]
 			expanded['encode-hash'] = dictionary_hash(expanded)
 			encodings[name] = expanded
 
