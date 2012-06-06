@@ -184,7 +184,7 @@ class MediaFile:
 			'size': long(stat.st_size)
 		}
 		
-		raw_probe = subprocess.check_output(['ffprobe', self.path], stderr=subprocess.STDOUT)
+		raw_probe = subprocess.check_output(['avprobe', self.path], stderr=subprocess.STDOUT)
 		
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_video = re.search(r'^\s*Stream\s#\d+:\d+(?:\[.*?\])?:\s*Video:\s*(.*?),\s*(.*?),\s*(\d+)x(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
