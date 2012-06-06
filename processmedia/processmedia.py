@@ -326,6 +326,12 @@ class TagList:
 
 	def items(self):
 		return self.data
+	
+	def add(self, tag):
+		if tag not in self.data:
+			self.data.append(tag)
+			self.changed = True
+		
 
 class MediaDescriptor(JSONFile):
 	def __init__(self, parent):
@@ -898,11 +904,34 @@ class MediaItem:
 		# FIXME: do some testing
 		return True
 
+	def add_initial_tags(self):
+		data = self.name.split('-')
+		for tag in data:
+			tag = tag.strip().lower()
+			if re.search(r'\(.+?\)', tag):
+				matches = re.findall(r'\((.+?)\)', tag)
+				tag = re.subn(r'\s*\(.+?\)', '', tag)
+				for subtag in matches:
+					self.tags.add(m)
+					subtags = re.split(r'\s+', subtag)
+					if len(subtags) > 1:
+						for subsubtag in subtags:
+							self.tags.add(subsubtag)
+
+			if re.search(r'^ed\d*', tag):
+				self.tags.add('ending')
+			elif re.search(r'^op\d*', tag):
+				self.tags.add('opening')
+			
+			self.tags.add(tag)
+
 	def import_stage(self):
 		self.log("import stage")
 		self.initialise_layout()
+		if not self.tags.exists():
+			self.add_initial_tags()
+			self.tags.save()
 		# FIXME: extract subtitle files
-		# FIXME: populate tags
 
 	def index_stage(self):
 		self.log("index stage")
