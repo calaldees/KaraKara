@@ -256,6 +256,37 @@ class MediaFile:
 		else:
 			return True
 
+	def calculate_aspect(self, width, height):
+		if width >= height:
+			reverse = False
+		else:
+			(width, height) = (height, width)
+			reverse = True
+
+		pure_ratio = float(width) / float(height)
+		ratio = math.floor(pure_ratio * 10.0) / 10.0
+		
+		if ratio == 1.0:
+			result = [1, 1]
+		elif ratio == 1.3:
+			result = [4, 3]
+		elif ratio == 1.5:
+			result = [3, 2]
+		elif ratio == 1.6:
+			result = [5, 2]
+		elif ratio == 1.7:
+			result = [16, 9]
+		else:
+			result = [float("%.2f" % pure_ratio), 1.0]
+
+		if reverse:
+			result.reverse()
+
+		return result
+
+	def sanitise_aspect(self, aspect):
+		return self.calculate_aspect(aspect[0], aspect[1])
+
 	def probe(self):
 		try:
 			stat = os.stat(self.path)
@@ -288,17 +319,29 @@ class MediaFile:
 			metadata['bitrate'] = int(raw_bitrate.group(1))
 
 		if raw_video:
-			parts = re.split(r'\s*,\s*', raw_video.group(1))
-			wxh = re.search(r'\s*(\d+)x(\d+)', raw_video.group(1))
-			vbr = re.findall(r'(\d+)\s*kb/s', raw_video.group(1))
-			# FIXME: retrieve / calculate aspect ratio
+			data = raw_video.group(1)
+			
+			parts = re.split(r'\s*,\s*', data)
+			wxh = re.search(r'\s*(\d+)x(\d+)', data)
+			vbr = re.search(r'(\d+)\s*kb/s', data)
+			aspect = re.search(r'PAR\s*(\d+):(\d+)\s*DAR\s*(\d+):(\d+)', data)
+
 			metadata['vcodec'] = parts[0]
 			metadata['colourspace'] = parts[1]
 			if wxh:
 				metadata['width'] = int(wxh.group(1))
 				metadata['height'] = int(wxh.group(2))
-			if vbr and len(vbr) > 0:
-				metadata['vbitrate'] = int(vbr[0])
+			if vbr:
+				metadata['vbitrate'] = int(vbr.group(1))
+			if aspect:
+				par = [int(aspect.group(1)), int(aspect.group(2))]
+				dar = [int(aspect.group(3)), int(aspect.group(4))]
+				metadata['par'] = self.sanitise_aspect(par)
+				metadata['dar'] = self.sanitise_aspect(dar)
+			elif wxh:
+				metadata['par'] = [1, 1]
+				metadata['dar'] = self.calculate_aspect(metadata['width'], metadata['height'])
+
 		if raw_video_lang:
 			metadata['vlang'] = raw_video_lang.group(1) 
 
@@ -749,26 +792,29 @@ class MediaEncoder:
 
 		v_media = MediaFile(v_source)
 		v_metadata = v_media.probe()
-		aspect = 0.75
+		aspect = [4, 3]
 		length = 0.0
 		
 		if v_metadata:
 			width = v_metadata['width']
 			height = v_metadata['height']
-			if width > 0.0 and height > 0.0:
-				aspect = float(height) / float(width)
 			length = v_metadata['length'] 
+			if v_metadata.has_key('dar'):
+				aspect = v_metadata['dar']
+			elif width > 0.0 and height > 0.0:
+				aspect = [ width, height ]
 
-		if aspect <= 0.75:
-			output_height = output_width * aspect
+		if (aspect[1] / aspect[0]) <= 0.75:
+			output_height = math.floor((output_width / aspect[0]) * aspect[1])
 		else:
-			output_width = math.floor(output_height / aspect)
+			output_width = math.floor((output_height / aspect[1]) * aspect[0])
 			output_border = math.floor((base_width - output_width) / 2.0)
 			output_width += base_width - (output_width + (output_border * 2.0))
 
 		self.width = output_width
 		self.height = output_height
 		self.border = output_border
+		self.aspect = aspect
 		self.length = length
 
 		if not a_source:
@@ -783,6 +829,13 @@ class MediaEncoder:
 
 		self.length = length
 
+	def aspect_string(self):
+		fractional = [ math.floor(a) != a for a in self.aspect ]
+		if True in fractional:
+			return "%.5f" % (self.aspect[0] / self.aspect[1])
+		else:
+			return "%d:%d" % (self.aspect[0], self.aspect[1])
+	
 	def clean_temp_files(self):
 		for file_path in self.temp_files:
 			try:
@@ -827,6 +880,7 @@ class MediaEncoder:
 			source,
 			'-ass',
 			'-nosound',
+			'-aspect', self.aspect_string(),
 			'-ovc', 'x264',
 			'-x264encopts', 'profile=main:preset=slow',
 			'-o', temp_video,
@@ -883,7 +937,6 @@ class MediaEncoder:
 		return self._run_cmd(parameters, temp_audio, None, "audio encoding")
 
 	def mux(self, video, audio):
-		muxed = self.temp_file('mux.mp4')
 		parameters = [
 			'avconv',
 			'-loglevel', avconv_loglevel,
@@ -894,7 +947,14 @@ class MediaEncoder:
 			'-vcodec', 'copy',
 		]
 		if self.language:
-			parameters += [ '-metadata', 'language=' + self.language ]
+			parameters += [
+				'-metadata:s:0', 'language=' + self.language, 
+				'-metadata:s:1', 'language=' + self.language 
+			]
+		if self.aspect:
+			parameters += [ '-aspect', self.aspect_string() ]
+
+		muxed = self.temp_file('mux.mp4')
 		parameters += [ muxed ]
 
 		ok = self._run_cmd(parameters, True, False, "a/v muxing")
