@@ -418,7 +418,7 @@ class MediaFile:
 				'avconv',
 				'-loglevel', avconv_loglevel,
 				'-y',
-				'-itsoffset', str(-time),
+				'-ss', str(time),
 				'-i', self.path,
 				'-vframes', 1,
 				'-an',
