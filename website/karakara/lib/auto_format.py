@@ -114,6 +114,7 @@ def auto_format_output(target, *args, **kwargs):
         if isinstance(response, pyramid.response.Response):
             response.status_int = result.get('code', 200)
         
+        request.response = response
         result = response
     
     return result

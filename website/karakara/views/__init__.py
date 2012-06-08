@@ -1,5 +1,5 @@
 from decorator import decorator
-from ..lib.pyramid_helpers import request_from_args
+from ..lib.pyramid_helpers import request_from_args, get_setting
 
 id_count = 0
 
@@ -19,6 +19,11 @@ def base(target, *args, **kwargs):
     #request.session.flash('Hello World %d' % request.session['id'])
     
     result = target(*args, **kwargs)
+    
+    # Enable Pyramid GZip on all responses - NOTE! In a production this should be handled by nginx for performance!
+    if get_setting('server.gzip', request, return_type=bool):
+        request.response.encode_content(encoding='gzip', lazy=False)
+    
     return result
 
 # AllanC - need to look into Pyramids security model
