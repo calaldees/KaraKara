@@ -36,10 +36,10 @@ def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wmv|ass|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def video_file_re():
-	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|ogm)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv)$', re.IGNORECASE)
 
 def audio_file_re():
 	return re.compile(r'^.*\.(mp3|ogg)$', re.IGNORECASE)
@@ -48,7 +48,7 @@ def image_file_re():
 	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def subtitle_file_re():
-	return re.compile(r'^.*\.(ssa)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(ass|ssa)$', re.IGNORECASE)
 
 def parse_timestamp(ts):
 	ts_match = re.search(r'(\d+):(\d+):(\d+)\.(\d+)', ts)
