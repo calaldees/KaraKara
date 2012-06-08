@@ -1105,9 +1105,9 @@ class MediaItem:
 			tag = tag.strip().lower()
 			if re.search(r'\(.+?\)', tag):
 				matches = re.findall(r'\((.+?)\)', tag)
-				tag = re.subn(r'\s*\(.+?\)', '', tag)
+				tag = (re.subn(r'\s*\(.+?\)', '', tag))[0]
 				for subtag in matches:
-					self.tags.add(m)
+					self.tags.add(subtag)
 					subtags = re.split(r'\s+', subtag)
 					if len(subtags) > 1:
 						for subsubtag in subtags:
