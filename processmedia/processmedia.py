@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import math, os, re, string, sys
+import math, os, re, string, sys, time
 import subprocess, urllib
 import hashlib
 import json
@@ -31,6 +31,11 @@ def dictionary_hash(x):
 	l = [ (k, x[k]) for k in sorted(x.keys()) ]
 	h = hashlib.sha1(json.dumps(l))
 	return h.hexdigest()
+
+def time_string(t=None):
+	if not t:
+		t = time.localtime()
+	return time.strftime("%Y-%m-%d %H:%M:%S", t)
 
 def hidden_file_re():
 	return re.compile(r'^\..*$')
@@ -1492,7 +1497,7 @@ class MediaItem:
 			self.descriptor.save()
 	
 	def run_stages(self):
-		self.log("processing")
+		self.log("processing " + time_string())
 		self.import_stage()
 		self.index_stage()
 		self.pick_and_mix_stage()
