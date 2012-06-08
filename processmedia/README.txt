@@ -1,49 +1,10 @@
-Media will be in all manner of formats and needs to be normalized
+'processmedia' component normalises mixed video/audio/subtitle input in to
+consistent output directory structure with metadata in JSON files.
 
-(Video + subtitle files) or (audio + image + subtitle files) are diceted into
--Image previews
--Video previews (at low res and in a multitute of formats for differing mobile devices)
--Full video (with subtitles hardcoded, usual at a fixed high res)
--subtitle file (avalable to be processed by pyramid server to present lyrics to mobile users)
+See Spec.txt for full processing and output specification.
 
-Each processed video could be in it's own folder and contain the following JSON for import by the pyramid server. Import will crawl folders recursivly for all JSON files.
+Tool requirements:
+  * libav (with x264 support)
+  * qt-faststart (found in the tools/ directory of libav sources)
+  * mencoder (with x264, freetype2, and ass subtitle support)
 
-(draft)
-{
-    id       : 'unique_string',
-    source   : 'path/filename of origninal',
-    duration : seconds,
-
-    previews: [
-        {
-            url: 'from root',
-            target: 'platform target, maybe codec',
-            filesize: bytes,
-        }
-    ],
-    
-    images: [
-        {
-            url: ''
-            width: int,
-            height: int,
-            timestamp: seconds,
-        }
-    ],
-    
-    subtitles: [
-        {
-            url: '',
-            language: '?',
-        }
-    ]
-    
-    processed: [
-        {
-            url: '',
-            width: int,
-            height: int,
-        }
-    ]
-
-}
