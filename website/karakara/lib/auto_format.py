@@ -12,7 +12,7 @@ import copy
 import logging
 log = logging.getLogger(__name__)
 
-from .pyramid_helpers import get_setting
+from .pyramid_helpers import get_setting, request_from_args
 
 
 #-------------------------------------------------------------------------------
@@ -62,12 +62,7 @@ def auto_format_output(target, *args, **kwargs):
     
     """
     # Extract request object from args
-    request = None
-    for arg in args:
-        if isinstance(arg, pyramid.request.Request):
-            request = arg
-            break
-    assert request
+    request = request_from_args(args)
     
     # Pre Processing -----------------------------------------------------------
     # None

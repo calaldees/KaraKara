@@ -1,3 +1,4 @@
+import pyramid.request
 import pyramid.registry
 from pyramid.settings import asbool
 
@@ -13,3 +14,12 @@ def get_setting(key, request=None, return_type=None):
         value = int(value)
     return value
 
+def request_from_args(args):
+    # Extract request object from args
+    request = None
+    for arg in args:
+        if isinstance(arg, pyramid.request.Request):
+            request = arg
+            break
+    assert request
+    return request
