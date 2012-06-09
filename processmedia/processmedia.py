@@ -88,7 +88,7 @@ def run_command(cmd, label="", log_object=None, success=True, fail=False):
 		do_log('+++ ' + " ".join(cmd))
 		output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
 		if output:
-			do_log("---\n" + output + "\n---")
+			do_log("---\n" + output + "---")
 		return success
 	except subprocess.CalledProcessError as error:
 		do_log(error.output)
