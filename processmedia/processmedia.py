@@ -76,22 +76,24 @@ def parse_timestamp(ts):
 		return 0.0
 
 def run_command(cmd, label="", log_object=None, success=True, fail=False):
+	def do_log(msg):
+		if log_object:
+			log_object.log(msg)
+		else:
+			log(msg)
+
 	try:
 		cmd = map(unicode, cmd)
-		if log_object:
-			log_object.log(" ".join(cmd))
-		ok = subprocess.check_call(cmd)
-		if ok == 0:
-			return success
-		else:
-			if label and log_object:
-				log_object.log(label + " failed")
-			return fail
+		do_log(" ".join(cmd))
+		output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+		do_log(output)
+		return success
 	except subprocess.CalledProcessError as error:
-		if label and log_object:
-			log_object.log(label + " failed - " + unicode(error))
-		elif log_object:
-			log_object.log(error)
+		do_log(error.output)
+		if label:
+			do_log(label + " failed - " + unicode(error))
+		else:
+			do_log.log(unicode(error))
 		return fail
 
 class JSONFile(dict):
