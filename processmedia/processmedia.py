@@ -17,6 +17,14 @@ def log(*s):
 		except:
 			pass # out of space, etc
 
+def log_add(filename):
+	global logs
+	try:
+		fp = open(filename, 'a')
+		logs.append(fp)
+	except IOError as (errno, strerror):
+		warn("unable to add log file " + filename + " ({0}): {1}".format(errno, strerror))	
+
 def warn(*s):
 	print >>sys.stderr, "processmedia: " + "".join(map(unicode, s))
 
@@ -1626,7 +1634,7 @@ Where <command> is one of:
   check-tools
     Test that the appropriate 3rd party tools are installed.
 
-  process <media-root>
+  process <media-root> [<log-file>]
     Scan <media-root> for media items.
     Perform all processing stages on items.
 
@@ -1655,6 +1663,9 @@ def main(args):
 		command = args[0]
 		root = args[1]
 		if command == 'process':
+			if len(args) >= 3:
+				log_file = args[2]
+				log_add(log_file)
 			media = find_items(root)
 			for item in media:
 				item.run_stages()
