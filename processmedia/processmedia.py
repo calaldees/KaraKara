@@ -8,6 +8,7 @@ import json
 from operator import itemgetter, attrgetter
 
 avconv_loglevel = 'warning'
+avconv_threads = '1'
 logs = [sys.stdout]
 
 def log(*s):
@@ -432,6 +433,7 @@ class MediaFile:
 			ok = run_command([
 				'avconv',
 				'-loglevel', avconv_loglevel,
+				'-threads', avconv_threads,
 				'-y',
 				'-ss', str(time),
 				'-i', self.path,
@@ -870,6 +872,7 @@ class MediaEncoder:
 			parameters = [
 				'avconv',
 				'-loglevel', avconv_loglevel,
+				'-threads', avconv_threads,
 				'-y', 
 				'-loop', '1', 
 				'-i', self.image,
@@ -930,7 +933,7 @@ class MediaEncoder:
 			source_parameters = ['-i', temp_pad] + source_parameters
 		elif self.audio_shift < 0.0:
 			temp_raw = self.temp_file('audio_raw.wav')
-			result = self._run(['avconv', '-y', '-i', source, '-vcodec', 'none', temp_raw])
+			result = self._run(['avconv', '-threads', avconv_threads, '-y', '-i', source, '-vcodec', 'none', temp_raw])
 			if not result:
 				return None
 			temp_cut = self.temp_file('audio_cut.wav')
@@ -943,7 +946,7 @@ class MediaEncoder:
 				return None
 			source_parameters = ['-i', temp_cut]
 
-		parameters = ['avconv', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
+		parameters = ['avconv', '-threads', '1', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			temp_audio
@@ -955,6 +958,7 @@ class MediaEncoder:
 		parameters = [
 			'avconv',
 			'-loglevel', avconv_loglevel,
+			'-threads', avconv_threads,
 			'-y',
 			'-i', video,
 			'-i', audio,
@@ -1018,6 +1022,7 @@ class MediaEncoder:
 		parameters = [
 			'avconv',
 			'-loglevel', avconv_loglevel,
+			'-threads', avconv_threads,
 			'-y',
 			'-i', self.video,
 		]
