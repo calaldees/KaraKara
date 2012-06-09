@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import math, os, re, string, sys, time
+import math, fcntl, os, re, string, sys, time
 import subprocess, urllib
 import hashlib
 import json
@@ -1048,6 +1048,7 @@ class MediaItem:
 	def __init__(self, path):
 		self.name = (os.path.split(path))[1]
 		self.path = path
+		self.lock_fd = None
 
 		self.descriptor = MediaDescriptor(self)
 		self.sources = MediaSources(self)
@@ -1511,14 +1512,43 @@ class MediaItem:
 
 			self.descriptor.save()
 	
+	def lock(self):
+		if self.lock_fd:
+			self.unlock()
+		try:
+			self.lock_fd = os.open(self.element_path, os.O_WRONLY | os.O_CREAT)
+			fcntl.lockf(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+			return True
+		except:
+			return False
+	
+	def unlock(self):
+		if not self.lock_fd:
+			return
+		
+		try:
+			fcntl.lockf(self.lock_fd, fcntl.LOCK_UN)
+		except:
+			pass
+		finally:
+			try:
+				os.close(self.lock_fd)
+			except:
+				pass
+		
+		self.lock_fd = None
+
 	def run_stages(self):
 		self.log("processing " + time_string())
+		if not self.lock():
+			self.log("ignoring")
 		self.import_stage()
 		self.index_stage()
 		self.pick_and_mix_stage()
 		self.encode_stage()
 		self.preview_stage()
 		self.thumbnail_stage()
+		self.unlock()
 
 def test_program(cmd, package):
 	cmd = map(unicode, cmd)
