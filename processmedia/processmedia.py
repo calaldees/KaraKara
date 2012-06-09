@@ -85,9 +85,10 @@ def run_command(cmd, label="", log_object=None, success=True, fail=False):
 
 	try:
 		cmd = map(unicode, cmd)
-		do_log(" ".join(cmd))
+		do_log('+++ ' + " ".join(cmd))
 		output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-		do_log(output)
+		if output:
+			do_log("---\n" + output + "\n---")
 		return success
 	except subprocess.CalledProcessError as error:
 		do_log(error.output)
@@ -227,6 +228,7 @@ class MediaFile:
 	def __init__(self, path, metadata=None):
 		self.path = path
 		self.metadata = metadata
+		self.log = None
 
 		(dir, name) = os.path.split(path)
 		if name:
@@ -441,7 +443,7 @@ class MediaFile:
 				'-an',
 				'-vf', 'scale={0}:{1}'.format(int(width), int(height)),
 				path
-			], label="thumbnail")
+			], label="thumbnail", log_object=self.log)
 			if ok:
 				result.append((time, path))
 
@@ -1049,6 +1051,7 @@ class MediaItem:
 		self.name = (os.path.split(path))[1]
 		self.path = path
 		self.lock_fd = None
+		self.last_log = None
 
 		self.descriptor = MediaDescriptor(self)
 		self.sources = MediaSources(self)
@@ -1065,7 +1068,17 @@ class MediaItem:
 		self.media_re = media_file_re()
 	
 	def log(self, *s):
-		log('"' + self.name + '": ', *s)
+		now = time.time()
+		
+		if not self.last_log:
+			log('>>> ' + self.name)
+			self.last_log = 0
+
+		if (now - self.last_log) > 30.0:
+			log('@ ' + time_string())
+
+		self.last_log = now
+		log(*s)
 
 	def element_path(self, *e):
 		return os.path.join(self.path, *e)
@@ -1496,6 +1509,7 @@ class MediaItem:
 				files.append(thumb_path) 
 
 			# generate thumbnail files
+			video.log = self
 			results = video.generate_thumbnails(times, files, width=240)
 
 			# create thumbnail metadata
@@ -1516,7 +1530,7 @@ class MediaItem:
 		if self.lock_fd:
 			self.unlock()
 		try:
-			self.lock_fd = os.open(self.element_path, os.O_WRONLY | os.O_CREAT)
+			self.lock_fd = os.open(self.element_path('lock'), os.O_WRONLY | os.O_CREAT)
 			fcntl.lockf(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
 			return True
 		except:
@@ -1539,16 +1553,20 @@ class MediaItem:
 		self.lock_fd = None
 
 	def run_stages(self):
-		self.log("processing " + time_string())
+		self.log("start")
 		if not self.lock():
-			self.log("ignoring")
+			self.log("cannot lock; ignoring")
+			return
+		
 		self.import_stage()
 		self.index_stage()
 		self.pick_and_mix_stage()
 		self.encode_stage()
 		self.preview_stage()
 		self.thumbnail_stage()
+
 		self.unlock()
+		self.log("end")
 
 def test_program(cmd, package):
 	cmd = map(unicode, cmd)
