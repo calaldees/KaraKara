@@ -187,6 +187,42 @@ class SSAFile:
 					text = parts[9]
 					self.titles.append((start, end, text))
 	
+	def raw_lines(self):
+		lines = []
+		for (start, end, text) in sorted(self.titles, key=itemgetter(0)):
+			lines.append(text)
+		return lines
+	
+	def dedup_lines(self, src_lines):
+		src_lines.reverse()
+		lines = []
+		previous = []
+		for line in src_lines:
+			line = line.strip()
+			parts = re.split("\n", line)
+			for (n, p) in enumerate(parts):
+				if p.strip().lower() in previous:
+					parts[n] = None
+			parts = [ p.strip() for p in parts if p ]
+			previous = [ p.lower() for p in parts ]
+			line = "\n".join(parts)
+			lines.append(line)
+		lines.reverse()
+		return lines
+
+	def clean_lines(self, dedup=True):
+		lines = []
+		previous = []
+		for line in self.raw_lines():
+			(line, n) = re.subn(r'({.*?})', '', line)
+			(line, n) = re.subn(r'(\s+)', ' ', line)
+			(line, n) = re.subn(r'(\\N)', "\n", line, flags=re.IGNORECASE)
+			lines.append(line)
+		if dedup:
+			return self.dedup_lines(lines)
+		else:
+			return lines
+
 	def length(self):
 		max_end = 0.0
 		for (start, end, text) in self.titles:
@@ -306,6 +342,9 @@ class MediaFile:
 	def sanitise_aspect(self, aspect):
 		return self.calculate_aspect(aspect[0], aspect[1])
 
+	def subfile(self):
+		return SSAFile(self.path)
+
 	def probe(self):
 		try:
 			stat = os.stat(self.path)
@@ -379,7 +418,7 @@ class MediaFile:
 			metadata['language'] = metadata['vlang']
 
 		if self.is_subtitles():
-			subfile = SSAFile(self.path)
+			subfile = self.subfile()
 			metadata['length'] = subfile.length()
 			metadata['language'] = subfile.guess_language()
 
@@ -1167,10 +1206,13 @@ class MediaItem:
 		
 		metadata = []
 		for file in self.sources.subtitles():
+			subfile = file.subfile()
 			entry = {
 				'url': "/".join(['source', urllib.quote(file.name)]),
 				'name': file.name,
-				'language': file.metadata['language']
+				'language': file.metadata['language'],
+				'lines' : subfile.clean_lines(),
+				'raw_lines' : subfile.raw_lines()
 			}
 			metadata.append(entry)
 		metadata = sorted(metadata, key=lambda x:x['name'])
