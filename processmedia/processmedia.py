@@ -71,7 +71,8 @@ def parse_timestamp(ts):
 		minutes = float(ts_match.group(2)) * 60.0
 		seconds = float(ts_match.group(3))
 		fraction = ts_match.group(4)
-		fraction = float(fraction) / (10**(len(fraction) - 1))
+		fraction = float(fraction) / (10**(len(fraction)))
+		#print ts, hours, minutes, seconds, fraction, (hours + minutes + seconds + fraction)
 		return hours + minutes + seconds + fraction
 	else:
 		return 0.0
@@ -330,7 +331,7 @@ class MediaFile:
 			minutes = float(raw_duration.group(2)) * 60.0
 			seconds = float(raw_duration.group(3))
 			fraction = raw_duration.group(4)
-			fraction = float(fraction) / (10**(len(fraction) - 1))
+			fraction = float(fraction) / (10**(len(fraction)))
 			metadata['length'] = hours + minutes + seconds + fraction
 		
 		if raw_bitrate:
