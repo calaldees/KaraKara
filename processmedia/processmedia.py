@@ -748,7 +748,7 @@ class MediaEncoder:
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'48000',
-			'-ab',		'128k',
+			'-ab',		'64k',
 			'-b',		'200k',
 			'-bt',		'240k'
 		],
@@ -757,8 +757,11 @@ class MediaEncoder:
 			'-vcodec', 	'libx264',
 			'-profile:v',	'baseline',
 			'-acodec', 	'aac',
-			'-b',		'510K',
-			'-ar', 		'48000'
+			'-ac',		'1',
+			'-ar', 		'48000',
+			'-ab',		'64k'
+			'-b',		'200k',
+			'-bt',		'240k'
 		],
 		PROFILE_GENERIC: [
 			'-vf',		'scale=320:-1',
@@ -767,7 +770,7 @@ class MediaEncoder:
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'16000',
-			'-ab',		'32000',
+			'-ab',		'64k'
 		]
 	}
 
