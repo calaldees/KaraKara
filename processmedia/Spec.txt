@@ -128,7 +128,8 @@ The following example is given to elucidate all fields.
     {
       'url'        : 'source/subtitles.ssa',
       'name'       : 'subtitles.ssa',
-      'language'   : 'eng'
+      'language'   : 'eng',
+      'lines'      : [ ... ]
     }
   ],
   'videos': [

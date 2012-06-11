@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import math, os, re, string, sys
+import math, fcntl, os, re, string, sys, time
 import subprocess, urllib
 import hashlib
 import json
@@ -8,6 +8,7 @@ import json
 from operator import itemgetter, attrgetter
 
 avconv_loglevel = 'warning'
+avconv_threads = '1'
 logs = [sys.stdout]
 
 def log(*s):
@@ -16,6 +17,14 @@ def log(*s):
 			print >>f, "".join(map(unicode, s))
 		except:
 			pass # out of space, etc
+
+def log_add(filename):
+	global logs
+	try:
+		fp = open(filename, 'a')
+		logs.append(fp)
+	except IOError as (errno, strerror):
+		warn("unable to add log file " + filename + " ({0}): {1}".format(errno, strerror))	
 
 def warn(*s):
 	print >>sys.stderr, "processmedia: " + "".join(map(unicode, s))
@@ -31,6 +40,11 @@ def dictionary_hash(x):
 	l = [ (k, x[k]) for k in sorted(x.keys()) ]
 	h = hashlib.sha1(json.dumps(l))
 	return h.hexdigest()
+
+def time_string(t=None):
+	if not t:
+		t = time.localtime()
+	return time.strftime("%Y-%m-%d %H:%M:%S", t)
 
 def hidden_file_re():
 	return re.compile(r'^\..*$')
@@ -57,28 +71,32 @@ def parse_timestamp(ts):
 		minutes = float(ts_match.group(2)) * 60.0
 		seconds = float(ts_match.group(3))
 		fraction = ts_match.group(4)
-		fraction = float(fraction) / (10**(len(fraction) - 1))
+		fraction = float(fraction) / (10**(len(fraction)))
+		#print ts, hours, minutes, seconds, fraction, (hours + minutes + seconds + fraction)
 		return hours + minutes + seconds + fraction
 	else:
 		return 0.0
 
 def run_command(cmd, label="", log_object=None, success=True, fail=False):
+	def do_log(msg):
+		if log_object:
+			log_object.log(msg)
+		else:
+			log(msg)
+
 	try:
 		cmd = map(unicode, cmd)
-		if log_object:
-			log_object.log(" ".join(cmd))
-		ok = subprocess.check_call(cmd)
-		if ok == 0:
-			return success
-		else:
-			if label and log_object:
-				log_object.log(label + " failed")
-			return fail
+		do_log('+++ ' + " ".join(cmd))
+		output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+		if output:
+			do_log("---\n" + output + "---")
+		return success
 	except subprocess.CalledProcessError as error:
-		if label and log_object:
-			log_object.log(label + " failed - " + unicode(error))
-		elif log_object:
-			log_object.log(error)
+		do_log(error.output)
+		if label:
+			do_log(label + " failed - " + unicode(error))
+		else:
+			do_log.log(unicode(error))
 		return fail
 
 class JSONFile(dict):
@@ -169,6 +187,42 @@ class SSAFile:
 					text = parts[9]
 					self.titles.append((start, end, text))
 	
+	def raw_lines(self):
+		lines = []
+		for (start, end, text) in sorted(self.titles, key=itemgetter(0)):
+			lines.append(text)
+		return lines
+	
+	def dedup_lines(self, src_lines):
+		src_lines.reverse()
+		lines = []
+		previous = []
+		for line in src_lines:
+			line = line.strip()
+			parts = re.split("\n", line)
+			for (n, p) in enumerate(parts):
+				if p.strip().lower() in previous:
+					parts[n] = None
+			parts = [ p.strip() for p in parts if p ]
+			previous = [ p.lower() for p in parts ]
+			line = "\n".join(parts)
+			lines.append(line)
+		lines.reverse()
+		return lines
+
+	def clean_lines(self, dedup=True):
+		lines = []
+		previous = []
+		for line in self.raw_lines():
+			(line, n) = re.subn(r'({.*?})', '', line)
+			(line, n) = re.subn(r'(\s+)', ' ', line)
+			(line, n) = re.subn(r'(\\N)', "\n", line, flags=re.IGNORECASE)
+			lines.append(line)
+		if dedup:
+			return self.dedup_lines(lines)
+		else:
+			return lines
+
 	def length(self):
 		max_end = 0.0
 		for (start, end, text) in self.titles:
@@ -211,6 +265,7 @@ class MediaFile:
 	def __init__(self, path, metadata=None):
 		self.path = path
 		self.metadata = metadata
+		self.log = None
 
 		(dir, name) = os.path.split(path)
 		if name:
@@ -287,6 +342,9 @@ class MediaFile:
 	def sanitise_aspect(self, aspect):
 		return self.calculate_aspect(aspect[0], aspect[1])
 
+	def subfile(self):
+		return SSAFile(self.path)
+
 	def probe(self):
 		try:
 			stat = os.stat(self.path)
@@ -312,7 +370,7 @@ class MediaFile:
 			minutes = float(raw_duration.group(2)) * 60.0
 			seconds = float(raw_duration.group(3))
 			fraction = raw_duration.group(4)
-			fraction = float(fraction) / (10**(len(fraction) - 1))
+			fraction = float(fraction) / (10**(len(fraction)))
 			metadata['length'] = hours + minutes + seconds + fraction
 		
 		if raw_bitrate:
@@ -360,7 +418,7 @@ class MediaFile:
 			metadata['language'] = metadata['vlang']
 
 		if self.is_subtitles():
-			subfile = SSAFile(self.path)
+			subfile = self.subfile()
 			metadata['length'] = subfile.length()
 			metadata['language'] = subfile.guess_language()
 
@@ -417,6 +475,7 @@ class MediaFile:
 			ok = run_command([
 				'avconv',
 				'-loglevel', avconv_loglevel,
+				'-threads', avconv_threads,
 				'-y',
 				'-ss', str(time),
 				'-i', self.path,
@@ -424,7 +483,7 @@ class MediaFile:
 				'-an',
 				'-vf', 'scale={0}:{1}'.format(int(width), int(height)),
 				path
-			], label="thumbnail")
+			], label="thumbnail", log_object=self.log)
 			if ok:
 				result.append((time, path))
 
@@ -689,7 +748,7 @@ class MediaEncoder:
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'48000',
-			'-ab',		'128k',
+			'-ab',		'64k',
 			'-b',		'200k',
 			'-bt',		'240k'
 		],
@@ -698,8 +757,11 @@ class MediaEncoder:
 			'-vcodec', 	'libx264',
 			'-profile:v',	'baseline',
 			'-acodec', 	'aac',
-			'-b',		'510K',
-			'-ar', 		'48000'
+			'-ac',		'1',
+			'-ar', 		'48000',
+			'-ab',		'64k'
+			'-b',		'200k',
+			'-bt',		'240k'
 		],
 		PROFILE_GENERIC: [
 			'-vf',		'scale=320:-1',
@@ -708,7 +770,7 @@ class MediaEncoder:
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'16000',
-			'-ab',		'32000',
+			'-ab',		'64k'
 		]
 	}
 
@@ -855,6 +917,7 @@ class MediaEncoder:
 			parameters = [
 				'avconv',
 				'-loglevel', avconv_loglevel,
+				'-threads', avconv_threads,
 				'-y', 
 				'-loop', '1', 
 				'-i', self.image,
@@ -915,7 +978,7 @@ class MediaEncoder:
 			source_parameters = ['-i', temp_pad] + source_parameters
 		elif self.audio_shift < 0.0:
 			temp_raw = self.temp_file('audio_raw.wav')
-			result = self._run(['avconv', '-y', '-i', source, '-vcodec', 'none', temp_raw])
+			result = self._run(['avconv', '-threads', avconv_threads, '-y', '-i', source, '-vcodec', 'none', temp_raw])
 			if not result:
 				return None
 			temp_cut = self.temp_file('audio_cut.wav')
@@ -928,7 +991,7 @@ class MediaEncoder:
 				return None
 			source_parameters = ['-i', temp_cut]
 
-		parameters = ['avconv', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
+		parameters = ['avconv', '-threads', '1', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			temp_audio
@@ -940,6 +1003,7 @@ class MediaEncoder:
 		parameters = [
 			'avconv',
 			'-loglevel', avconv_loglevel,
+			'-threads', avconv_threads,
 			'-y',
 			'-i', video,
 			'-i', audio,
@@ -1003,6 +1067,7 @@ class MediaEncoder:
 		parameters = [
 			'avconv',
 			'-loglevel', avconv_loglevel,
+			'-threads', avconv_threads,
 			'-y',
 			'-i', self.video,
 		]
@@ -1028,6 +1093,8 @@ class MediaItem:
 	def __init__(self, path):
 		self.name = (os.path.split(path))[1]
 		self.path = path
+		self.lock_fd = None
+		self.last_log = None
 
 		self.descriptor = MediaDescriptor(self)
 		self.sources = MediaSources(self)
@@ -1044,7 +1111,17 @@ class MediaItem:
 		self.media_re = media_file_re()
 	
 	def log(self, *s):
-		log('"' + self.name + '": ', *s)
+		now = time.time()
+		
+		if not self.last_log:
+			log('>>> ' + self.name)
+			self.last_log = 0
+
+		if (now - self.last_log) > 30.0:
+			log('@ ' + time_string())
+
+		self.last_log = now
+		log(*s)
 
 	def element_path(self, *e):
 		return os.path.join(self.path, *e)
@@ -1100,9 +1177,9 @@ class MediaItem:
 			tag = tag.strip().lower()
 			if re.search(r'\(.+?\)', tag):
 				matches = re.findall(r'\((.+?)\)', tag)
-				tag = re.subn(r'\s*\(.+?\)', '', tag)
+				tag = (re.subn(r'\s*\(.+?\)', '', tag))[0]
 				for subtag in matches:
-					self.tags.add(m)
+					self.tags.add(subtag)
 					subtags = re.split(r'\s+', subtag)
 					if len(subtags) > 1:
 						for subsubtag in subtags:
@@ -1132,10 +1209,13 @@ class MediaItem:
 		
 		metadata = []
 		for file in self.sources.subtitles():
+			subfile = file.subfile()
 			entry = {
 				'url': "/".join(['source', urllib.quote(file.name)]),
 				'name': file.name,
-				'language': file.metadata['language']
+				'language': file.metadata['language'],
+				'lines' : subfile.clean_lines(),
+				'raw_lines' : subfile.raw_lines()
 			}
 			metadata.append(entry)
 		metadata = sorted(metadata, key=lambda x:x['name'])
@@ -1475,6 +1555,7 @@ class MediaItem:
 				files.append(thumb_path) 
 
 			# generate thumbnail files
+			video.log = self
 			results = video.generate_thumbnails(times, files, width=240)
 
 			# create thumbnail metadata
@@ -1491,14 +1572,47 @@ class MediaItem:
 
 			self.descriptor.save()
 	
+	def lock(self):
+		if self.lock_fd:
+			self.unlock()
+		try:
+			self.lock_fd = os.open(self.element_path('lock'), os.O_WRONLY | os.O_CREAT)
+			fcntl.lockf(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+			return True
+		except:
+			return False
+	
+	def unlock(self):
+		if not self.lock_fd:
+			return
+		
+		try:
+			fcntl.lockf(self.lock_fd, fcntl.LOCK_UN)
+		except:
+			pass
+		finally:
+			try:
+				os.close(self.lock_fd)
+			except:
+				pass
+		
+		self.lock_fd = None
+
 	def run_stages(self):
-		self.log("processing")
+		self.log("start")
+		if not self.lock():
+			self.log("cannot lock; ignoring")
+			return
+		
 		self.import_stage()
 		self.index_stage()
 		self.pick_and_mix_stage()
 		self.encode_stage()
 		self.preview_stage()
 		self.thumbnail_stage()
+
+		self.unlock()
+		self.log("end")
 
 def test_program(cmd, package):
 	cmd = map(unicode, cmd)
@@ -1621,7 +1735,7 @@ Where <command> is one of:
   check-tools
     Test that the appropriate 3rd party tools are installed.
 
-  process <media-root>
+  process <media-root> [<log-file>]
     Scan <media-root> for media items.
     Perform all processing stages on items.
 
@@ -1650,6 +1764,9 @@ def main(args):
 		command = args[0]
 		root = args[1]
 		if command == 'process':
+			if len(args) >= 3:
+				log_file = args[2]
+				log_add(log_file)
 			media = find_items(root)
 			for item in media:
 				item.run_stages()
