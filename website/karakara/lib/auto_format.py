@@ -209,5 +209,5 @@ def format_redirect(request, result):
     A special case for compatable browsers making REST calls
     """
     # flash_message?
-    # Placeholder - Untested!!! 
-    return HTTPFound(location=request.referer)
+    raise HTTPFound(location=request.referer)
+register_formater('redirect', format_redirect)

@@ -20,7 +20,7 @@ class QueueItem(Base):
 
     id              = Column(Integer(),        primary_key=True)
     
-    track_id        = Column(Integer(),    ForeignKey('track.id'), nullable=False)
+    track_id        = Column(String(32),    ForeignKey('track.id'), nullable=False)
     
     performer_name  = Column(Unicode(250), nullable=True, default="Untitled")
     session_owner   = Column(Unicode(250), nullable=True)

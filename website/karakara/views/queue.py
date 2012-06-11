@@ -31,14 +31,14 @@ def queue_add(request):
     """
     queue_item = QueueItem()
     
-    for key,value in request.params:
+    for key,value in request.params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
     
     queue_item.session_owner  = request.session['id']
     DBSession.add(queue_item)
     
-    return action_ok(message='Track queued')
+    return action_ok(message='track queued')
 
 @view_config(route_name='queue', request_method='DELETE')
 @base
@@ -78,7 +78,7 @@ def queue_update(request):
         raise action_error(message='you are not the owner of this queue_item')
 
     # Update any params to the db
-    for key,value in request.params:
+    for key,value in request.params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
     queue_item.touched = datetime.datetime.now() # Update touched timestamp
