@@ -114,8 +114,8 @@ def auto_format_output(target, *args, **kwargs):
         response = formatter(request, result)
         
         # Set http response code
-        if isinstance(response, pyramid.response.Response):
-            response.status_int = result.get('code', 200)
+        if isinstance(response, pyramid.response.Response) and result.get('code'):
+            response.status_int = result.get('code')
         
         request.response = response
         result = response
@@ -208,6 +208,8 @@ def format_redirect(request, result):
     """
     A special case for compatable browsers making REST calls
     """
-    # flash_message?
-    raise HTTPFound(location=request.referer)
+    for message in result['messages']:
+        request.session.flash(message)
+    del result['code']
+    return HTTPFound(location=request.referer)
 register_formater('redirect', format_redirect)
