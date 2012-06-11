@@ -759,7 +759,7 @@ class MediaEncoder:
 			'-acodec', 	'aac',
 			'-ac',		'1',
 			'-ar', 		'48000',
-			'-ab',		'64k'
+			'-ab',		'64k',
 			'-b',		'200k',
 			'-bt',		'240k'
 		],
