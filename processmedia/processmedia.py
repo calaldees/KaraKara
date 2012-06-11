@@ -168,7 +168,11 @@ class SSAFile:
 			lines = fp.readlines()
 			fp.close()
 			for line in lines:
-				self.data.append(line.strip()) # FIXME: \r\n?
+				try:
+					line = line.decode('utf-8')
+				except UnicodeDecodeError:
+					line = line.decode('latin-1')
+				self.data.append(line.strip())
 		except IOError:
 			self.data.clear()
 
