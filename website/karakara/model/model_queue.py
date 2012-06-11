@@ -1,6 +1,6 @@
 from . import Base
 
-from sqlalchemy import Column, Enum
+from sqlalchemy import Column, Enum, ForeignKey
 from sqlalchemy import String, Unicode, Integer, DateTime
 
 import datetime
@@ -20,8 +20,10 @@ class QueueItem(Base):
 
     id              = Column(Integer(),        primary_key=True)
     
+    track_id        = Column(Integer(),    ForeignKey('track.id'), nullable=False)
+    
     performer_name  = Column(Unicode(250), nullable=True, default="Untitled")
     session_owner   = Column(Unicode(250), nullable=True)
-    timestamp       = Column(DateTime()  , nullable=False, default=now)
+    touched         = Column(DateTime()  , nullable=False, default=now)
     
     status          = Column(_queueitem_statuss ,  nullable=False, default="pending")

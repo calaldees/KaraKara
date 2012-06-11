@@ -81,6 +81,9 @@ def auto_format_output(target, *args, **kwargs):
     # add kwarg 'format'
     try   : formats.append(kwargs['format'])
     except: pass
+    # From GET/POST params
+    try   : formats.append(request.params['format'])
+    except: pass
     # matched route 'format' key
     try   : formats.append(request.matchdict['format'])
     except: pass

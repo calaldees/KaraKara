@@ -1,6 +1,6 @@
 from . import Base
 
-from sqlalchemy     import Column, ForeignKey, Enum
+from sqlalchemy     import Column, Enum, ForeignKey
 from sqlalchemy     import String, Unicode, Integer
 from sqlalchemy.orm import relationship, backref
 
@@ -38,6 +38,8 @@ class Track(Base):
     
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
+    
+    queued          = relationship("QueueItem") # AllanC - this makes the track aware of the que and tightens coupleling ... ultimatelty the que and tracks should be in differnt db's
     
     
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
