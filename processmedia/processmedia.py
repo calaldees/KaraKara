@@ -1679,7 +1679,7 @@ def find_items(path):
 			item = MediaItem(entry_path)
 			if item.valid():
 				items.append(item)
-	return items
+	return sorted(items, key=lambda x:x.name)
 
 def prepare_items(path, label=None):
 	hidden_re = hidden_file_re()
