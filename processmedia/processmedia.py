@@ -1305,22 +1305,27 @@ class MediaItem:
 				video = self.select_highest_quality(video_files, language=lang)
 				audio = self.select_highest_quality(audio_files, language=lang)
 				image = self.select_highest_quality(image_files)
+				valid = True
 
 				encoding = {
 					'subtitles': subtitles.name,
 					'subtitle-shift': 0.0,
 					'language': lang
 				}
+
 				if video:
 					encoding['video'] = video.name
 				elif image:
 					encoding['image'] = image.name
+				else:
+					valid = False
 
 				if audio:
 					encoding['audio'] = audio.name
 					encoding['audio-shift'] = 0.0
 
-				encodings.append(encoding)
+				if valid:
+					encodings.append(encoding)
 
 		self.encoding.update(encodings)
 
