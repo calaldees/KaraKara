@@ -874,8 +874,8 @@ class MediaEncoder:
 			output_height = math.floor((output_width / aspect[0]) * aspect[1])
 		else:
 			output_width = math.floor((output_height / aspect[1]) * aspect[0])
-			output_border = math.floor((base_width - output_width) / 2.0)
-			output_width += base_width - (output_width + (output_border * 2.0))
+			output_border = math.floor((self.base_width - output_width) / 2.0)
+			output_width += self.base_width - (output_width + (output_border * 2.0))
 
 		self.width = output_width
 		self.height = output_height
