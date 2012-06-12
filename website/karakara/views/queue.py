@@ -6,6 +6,7 @@ from ..lib.auto_format    import auto_format_output, action_ok
 from ..model              import DBSession
 from ..model.model_queue  import QueueItem
 
+from sqlalchemy.orm import joinedload
 
 #-------------------------------------------------------------------------------
 # Queue
@@ -18,8 +19,8 @@ def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').all()
-    queue = [queue_item.to_dict() for queue_item in queue]
+    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').options(joinedload(QueueItem.track)).all()
+    queue = [queue_item.to_dict('full') for queue_item in queue]
     return action_ok(data={'list':queue})
 
 @view_config(route_name='queue', request_method='POST')
@@ -48,6 +49,7 @@ def queue_del(request):
     Remove items from the queue
     
     check session owner or admin
+    state can be passed as "complete" to mark track as played
     """
     queue_item = DBSession.query(QueueItem).get(request.params['queue_item.id'])
 
@@ -57,7 +59,7 @@ def queue_del(request):
         raise action_error(message='you are not the owner of this queue_item')
 
     #DBSession.delete(queue_item)
-    queue_item.status = 'removed'
+    queue_item.status = request.params.get('status','removed')
     
     return action_ok(message='queue_item deleted')
 
