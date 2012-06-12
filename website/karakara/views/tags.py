@@ -1,7 +1,9 @@
 from pyramid.view import view_config
 
+from . import web
+
 from ..lib.misc        import update_dict
-from ..lib.auto_format import auto_format_output, action_ok, registered_formats
+from ..lib.auto_format import action_ok, registered_formats
 
 from ..model              import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -12,7 +14,7 @@ from sqlalchemy     import func
 
 
 @view_config(route_name='tags')
-@auto_format_output
+@web
 def tags(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
     tag_string  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])

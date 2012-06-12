@@ -1,31 +1,30 @@
 from pyramid.view import view_config
 
-from . import base
+from . import web
 
-from ..lib.auto_format    import auto_format_output, action_ok
+from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession
 from ..model.model_queue  import QueueItem
+from ..model.model_tracks import Track
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, joinedload_all
 
 #-------------------------------------------------------------------------------
 # Queue
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='queue', request_method='GET')
-@base
-@auto_format_output
+@web
 def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').options(joinedload(QueueItem.track)).all()
+    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').options(joinedload_all('track.attachments')).all()
     queue = [queue_item.to_dict('full') for queue_item in queue]
     return action_ok(data={'list':queue})
 
 @view_config(route_name='queue', request_method='POST')
-@base
-@auto_format_output
+@web
 def queue_add(request):
     """
     Add items to end of queue
@@ -42,8 +41,7 @@ def queue_add(request):
     return action_ok(message='track queued')
 
 @view_config(route_name='queue', request_method='DELETE')
-@base
-@auto_format_output
+@web
 def queue_del(request):
     """
     Remove items from the queue
@@ -61,11 +59,10 @@ def queue_del(request):
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
     
-    return action_ok(message='queue_item deleted')
+    return action_ok(message='queue_item status changed')
 
 @view_config(route_name='queue', request_method='PUT')
-@base
-@auto_format_output
+@web
 def queue_update(request):
     """
     Used to touch queed items

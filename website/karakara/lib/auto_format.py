@@ -127,9 +127,9 @@ def auto_format_output(target, *args, **kwargs):
 #-------------------------------------------------------------------------------
 
 def action_ok(message='', data={}, code=200, status='ok', **kwargs):
-    assert isinstance(message, str)
+    assert isinstance(message, str )
     assert isinstance(data   , dict)
-    assert isinstance(code   , int)
+    assert isinstance(code   , int )
     d = {
         'status'  : status  ,
         'messages': []      ,
