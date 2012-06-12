@@ -28,7 +28,11 @@
         
         <div data-role="page">
             
-            <div data-role="header" data-position="fixed" >
+            <div data-role="header" data-position="fixed" \
+                % if identity.get('admin',False):
+                data-theme="e"
+                % endif
+>
                 <%def name="title()">${request.registry.settings.get('text.title') or 'KaraKara'}</%def>
                 <h1>${next.title()}</h1>
                 

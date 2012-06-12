@@ -13,3 +13,10 @@ def home(request):
     #request.session.flash('Hello World')
     return action_ok()
 
+
+@view_config(route_name='admin_toggle')
+@web
+def admin_toggle(request):
+    request.session['admin'] = not request.session.get('admin',False)
+    return action_ok()
+

@@ -85,6 +85,3 @@ web  = chained(base, auto_format_output, overlay_identity)
 # AllanC - need to look into Pyramids security model
 def is_admin(request):
     return request.session['admin']
-
-def set_admin(request):
-    request.session['admin'] = True
