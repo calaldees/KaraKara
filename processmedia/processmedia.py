@@ -309,6 +309,9 @@ class MediaFile:
 	def exists(self):
 		return os.path.exists(self.path) and os.path.isfile(self.path)
 
+	def valid(self):
+		return (self.exists() and (self.metadata is not None))
+
 	def has_changed(self):
 		if self.metadata and self.metadata.has_key('mtime') and self.metadata.has_key('size'):
 			return (self.mtime() != self._mtime()) or (self.size() != self._size())
@@ -360,7 +363,10 @@ class MediaFile:
 			'size': long(stat.st_size)
 		}
 		
-		raw_probe = subprocess.check_output(['avprobe', self.path], stderr=subprocess.STDOUT)
+		try:
+			raw_probe = subprocess.check_output(['avprobe', self.path], stderr=subprocess.STDOUT)
+		except subprocess.CalledProcessError:
+			return None
 		
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_bitrate = re.search(r',\s*bitrate:\s*(\d+)\s*kb/s', raw_probe, re.IGNORECASE | re.MULTILINE)
@@ -441,7 +447,10 @@ class MediaFile:
 	def update_if_changed(self):
 		if self.has_changed():
 			new_metadata = self.probe()
-			if not self.metadata:
+
+			if not new_metadata:
+				self.metadata = None
+			elif not self.metadata:
 				self.metadata = {'language': 'und'}
 				self.metadata.update(new_metadata)
 				self.metadata['score'] = self._score()
@@ -464,6 +473,8 @@ class MediaFile:
 		
 		self.update_if_changed()
 		
+		if not self.valid():
+			return False
 		if not (self.is_video() or self.is_image()):
 			return False
 		if self.length() is None:
@@ -666,11 +677,18 @@ class MediaSources(JSONFile):
 		for name in deleted:
 			self.parent.log("del source: " + name)
 			del self.index[name]
+		deleted[:] = []
+
 		for name in missing:
 			self.parent.log("add source: " + name)
 			self.index[name] = MediaFile(self.parent.element_path('source', name))
 		for (name, source) in self.index.items():
 			source.update_if_changed()
+			if not source.valid():
+				deleted.append(name)
+		for name in deleted:
+			self.parent.log("del invalid source: " + name)
+			del self.index[name]
 		
 		self.changed = True
 		self.save()
