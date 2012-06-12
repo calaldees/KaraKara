@@ -336,7 +336,7 @@ class MediaFile:
 			result = [3, 2]
 		elif ratio == 1.6:
 			result = [5, 2]
-		elif ratio == 1.7:
+		elif (ratio == 1.7) or (ratio == 1.8):
 			result = [16, 9]
 		else:
 			result = [float("%.2f" % pure_ratio), 1.0]
