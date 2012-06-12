@@ -4,14 +4,12 @@
 
 <%def name="body()">
 
-## data-role="listview"
-
     <ul data-role="listview" data-split-icon="minus">
         % for queue_item in data.get('list',[]):
         <li>
-            <a href='#'>
+            <a href='${h.track_url(queue_item['track_id'])}'>
                 % if queue_item['image']:
-                <img src='${queue_item['image']}' />
+                <img src='${h.media_url(queue_item['image'])}' />
                 % endif
                 <h3>${queue_item['track']['title']}</h3>
                 <p>${queue_item['performer_name']}</p>

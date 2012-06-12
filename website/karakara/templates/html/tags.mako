@@ -2,10 +2,6 @@
 
 <%def name="title()">Browse Tracks</%def>
 
-<%
-    def media_url(file):
-        return '/media/%s' % file
-%>
 
 
 % if data['tags']:
@@ -21,7 +17,7 @@
         <li>
             <a href="${request.route_path('track', id=track['id'], spacer='', format='')}">
                 <%
-                    try   : img_url = media_url([attachment['location'] for attachment in track['attachments'] if attachment['type']=='image'][0])
+                    try   : img_url = h.media_url([attachment['location'] for attachment in track['attachments'] if attachment['type']=='image'][0])
                     except: img_url = None
                 %>
                 % if img_url:

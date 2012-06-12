@@ -4,6 +4,6 @@
 
 <ul data-role="listview" data-filter="true">
     % for track_id in data['list']:
-    <li><a href="/track/${track_id}">${track_id}</a></li>
+    <li><a href="${h.track_url(track_id)}">${track_id}</a></li>
     % endfor
 </ul>
