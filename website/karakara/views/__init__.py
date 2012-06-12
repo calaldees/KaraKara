@@ -4,7 +4,8 @@ from ..lib.pyramid_helpers import request_from_args, get_setting
 from ..lib.auto_format    import auto_format_output
 
 __all__ = [
-    'base','overlay_identity','auto_format_output','web'
+    'base','overlay_identity','auto_format_output','web',
+    'method_delete_router',
 ]
 
 
@@ -81,6 +82,11 @@ web  = chained(base, auto_format_output, overlay_identity)
 #-------------------------------------------------------------------------------
 # Other ??
 #-------------------------------------------------------------------------------
+
+def method_delete_router(info, request):
+    if request.params.get('method','GET').lower() == 'delete':
+        return True
+
 
 # AllanC - need to look into Pyramids security model
 def is_admin(request):

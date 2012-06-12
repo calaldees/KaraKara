@@ -70,8 +70,8 @@ def auto_format_output(target, *args, **kwargs):
     # Execute ------------------------------------------------------------------
     try:
         result = target(*args, **kwargs)
-    except action_error:
-        result = action_error.d
+    except action_error as ae:
+        result = ae.d
         log.warn("Auto format exception needs to be handled")
     
     # Post Processing ----------------------------------------------------------

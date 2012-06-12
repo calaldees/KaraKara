@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from . import web
+from . import web, method_delete_router
 
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession
@@ -23,12 +23,14 @@ def queue_view(request):
     queue = [queue_item.to_dict('full') for queue_item in queue]
     return action_ok(data={'list':queue})
 
+
 @view_config(route_name='queue', request_method='POST')
 @web
 def queue_add(request):
     """
     Add items to end of queue
     """
+    
     queue_item = QueueItem()
     
     for key,value in request.params.items():
@@ -40,7 +42,8 @@ def queue_add(request):
     
     return action_ok(message='track queued')
 
-@view_config(route_name='queue', request_method='DELETE')
+
+@view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
 @web
 def queue_del(request):
     """
@@ -53,13 +56,14 @@ def queue_del(request):
 
     if not queue_item:
         raise action_error(message='invalid queue_item.id')
-    if request.session.get('admin',False) or queue_item.session_owner != request.session['id']:
+    if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
         raise action_error(message='you are not the owner of this queue_item')
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
     
     return action_ok(message='queue_item status changed')
+
 
 @view_config(route_name='queue', request_method='PUT')
 @web

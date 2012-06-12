@@ -12,7 +12,7 @@
 
 <div data-role="collapsible" data-content-theme="c">
     <h3>Queue Track</h3>
-    <form action='/queue' method='POST'>
+    <form action='/queue' method='POST' data-ajax="false">
         <input type='hidden' name='format'         value='redirect'      />
         <input type='text'   name='performer_name' value=''              />
         <input type='hidden' name='track_id'       value='${data['id']}' />
