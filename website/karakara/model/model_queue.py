@@ -16,6 +16,12 @@ __all__ = [
 
 _queueitem_statuss = Enum("pending", "complete", "removed", name="status_types")
 
+def single_image(queue_item):
+    for attachment in queue_item.track.attachments:
+        if attachment.type == 'image':
+            return attachment.location
+    return None
+
 class QueueItem(Base):
     """
     """
@@ -40,6 +46,7 @@ class QueueItem(Base):
             'id'            : None ,
             'track_id'      : None ,
             'performer_name': None ,
+            'session_owner' : None ,
             'touched'       : None ,
         },
     })
@@ -48,4 +55,5 @@ class QueueItem(Base):
     __to_dict__['full'].update({
             'track'       : lambda queue_item: queue_item.track.to_dict(),
             'status'      : None,
+            'image'       : lambda queue_item: single_image(queue_item),    # AllanC - if you use this ensure you have setup eager loading on your query
     })

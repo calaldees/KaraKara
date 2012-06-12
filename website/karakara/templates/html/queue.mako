@@ -4,11 +4,23 @@
 
 <%def name="body()">
 
-    <table>
-        <tr><th>id</th><th>track_id</th><th>performer_name</th></tr>
+## data-role="listview"
+
+    <ul data-role="listview" data-split-icon="minus">
         % for queue_item in data.get('list',[]):
-        <tr><td>${queue_item['id']}</td><td>${queue_item['track_id']}</td><td>${queue_item['performer_name']}</td></tr>
+        <li>
+            <a href='#'>
+                % if queue_item['image']:
+                <img src='${queue_item['image']}' />
+                % endif
+                <h3>${queue_item['track']['title']}</h3>
+                <p>${queue_item['performer_name']}</p>
+            </a>
+            % if identity['admin'] or identity['id']==queue_item['session_owner']:
+            <a href='#'>remove</a>
+            % endif
+        </li>
         % endfor
-    </table>
+    </ul>
 
 </%def>

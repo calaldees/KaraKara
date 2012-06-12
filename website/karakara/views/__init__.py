@@ -28,7 +28,7 @@ def base(target, *args, **kwargs):
     # The session id is abstracted from the framework. Keep a count/track id's as session values
     global id_count
     if 'id' not in request.session:
-        request.session['id'] = id_count
+        request.session['id'] = str(id_count)
         id_count += 1
     
     #request.session.flash('Hello World %d' % request.session['id'])
