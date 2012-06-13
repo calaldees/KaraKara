@@ -673,7 +673,8 @@ class MediaSources(JSONFile):
 		for name in self.parent.source_files():
 			if not self.index.has_key(name):
 				missing.append(name)
-			elif not self.index[name].exists():
+		for name in self.index.keys():
+			if not self.index[name].exists():
 				deleted.append(name)
 			elif self.index[name].has_changed():
 				changed.append(name)
