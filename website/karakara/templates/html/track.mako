@@ -8,7 +8,7 @@
     <h3>Queue Track</h3>
     <form action='/queue' method='POST' data-ajax="false">
         <input type='hidden' name='format'         value='redirect'      />
-        <input type='text'   name='performer_name' value=''              />
+        <input type='text'   name='performer_name' value=''              placeholder='Enter your name' required />
         <input type='hidden' name='track_id'       value='${data['id']}' />
         <input type='submit' name='submit_'        value='Queue Track'   />
     </form>
