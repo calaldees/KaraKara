@@ -50,13 +50,13 @@ def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wmv|ass|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def video_file_re():
 	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv)$', re.IGNORECASE)
 
 def audio_file_re():
-	return re.compile(r'^.*\.(mp3|ogg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(aac|mp3|ogg|wav)$', re.IGNORECASE)
 
 def image_file_re():
 	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
