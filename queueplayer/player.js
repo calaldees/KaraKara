@@ -18,7 +18,7 @@ function render_playlist() {
 		else {
 			h += "<li>";
 		}
-		h += "<a href='#' onclick='set_playlist_pos("+i+")'>" + playlist[i]['title'] + " - " + playlist[i]['singer'] + "</a>";
+		h += "<a href='#' onclick='set_playlist_pos("+i+")'>" + playlist[i]['track']['title'] + " - " + playlist[i]['performer_name'] + "</a>";
 	}
 	h += "</ul>";
 	$('#playlist').html(h);
@@ -39,9 +39,9 @@ function set_playlist_pos(n) {
 		video.pause();
 	}
 	else {
-		$('title').html(playlist[n]['title']);
-		$('#title').html(playlist[n]['title']);
-		video.src = "../" + playlist[n]['preview'];
+		$('title').html(playlist[n].track.title);
+		$('#title').html(playlist[n].track.title);
+		video.src = "/files/" + playlist[n].track.attachments[1].location;
 		video.loop = true;
 		video.volume = 0.05;
 		video.load();
@@ -52,10 +52,10 @@ function set_playlist_pos(n) {
 $(function() {
 	setInterval(function() {
 		var seconds = new Date().getTime() / 1000;
-		$.getJSON("../api/get_playlist.json", {"uncache": seconds}, function(data) {
+		$.getJSON("/queue.json", {"uncache": seconds}, function(data) {
 			var waiting = (playlist_pos < 0 || playlist_pos >= playlist.length);
 			var current_end = playlist.length;
-			playlist = data;
+			playlist = data.data.list;
 			if(waiting) {
 				if(playlist_pos < 0) {
 					set_playlist_pos(0);
@@ -79,7 +79,7 @@ $(function() {
 		var video = $('#player').get(0);
 		video.loop = false;
 		video.volume = 1.0;
-		video.src = "../" + playlist[playlist_pos]['video'];
+		video.src = "/files/" + playlist[playlist_pos].track.attachments[0].location;
 		video.webkitEnterFullScreen();
 		video.load();
 		video.play();
