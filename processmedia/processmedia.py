@@ -508,7 +508,7 @@ class MediaFile:
 	def _score(self):
 		score = 1.0
 		if self.metadata.has_key('width') and self.metadata.has_key('height'):
-			score *= (self.metadata['width'] * self.metadata['height']) / (640.0 * 480.0)
+			score *= float((self.metadata['width'] * self.metadata['height'])) / (640.0 * 480.0)
 		#if self.metadata.has_key('vbitrate'):
 		#	score *= (self.metadata['vbitrate'] / 1024.0)
 		if self.metadata.has_key('abitrate'):
