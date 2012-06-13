@@ -1,7 +1,7 @@
 from . import Base
 
 from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, Integer
+from sqlalchemy     import String, Unicode, Integer, Float
 from sqlalchemy.orm import relationship, backref
 
 import copy
@@ -10,7 +10,7 @@ __all__ = [
     "Track", "Tag", "Attachment", "_attachment_types",
 ]
 
-_attachment_types = Enum("image","preview","processed","subtitle", name="attachment_types")
+_attachment_types = Enum("video","preview","thumbnail","subtitle", name="attachment_types")
 
 
 class TrackTagMapping(Base):
@@ -30,10 +30,10 @@ class Track(Base):
     """
     __tablename__   = "track"
 
-    id              = Column(String(32),       primary_key=True)
+    id              = Column(String(32)  ,     primary_key=True)
     title           = Column(Unicode(250),     nullable=False, default="Untitled")
     description     = Column(Unicode(250),     nullable=False, default="")
-    duration        = Column(Integer(),        nullable=False, default=0, doc="Duration in seconds")
+    duration        = Column(Float()     ,     nullable=False, default=0, doc="Duration in seconds")
     source_filename = Column(Unicode(250),     nullable=True)
     
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)

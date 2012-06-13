@@ -2,6 +2,8 @@
 
 <%
 
+    t_num = 2 # Thumbnail number
+
     def media_urls_by_type(attachment_type):
         return [h.media_url(attatchment['location']) for attatchment in data['attachments'] if attatchment['type']==attachment_type]
 
@@ -22,7 +24,7 @@
 
 
 <!-- video -->
-<video poster="${media_urls_by_type('image')[0]}" controls>
+<video poster="${media_urls_by_type('thumbnail')[0]}" controls>
     % for attachment in data['attachments']:
         % for extension, video_type in h.video_files:
             % if extension in attachment['location']:
@@ -37,9 +39,8 @@
 <p>${data['description']}</p>
 
 
-<%doc>
+
 <!-- images -->
-% for image_url in media_urls_by_type('image'):
-    <img src="${image_url}" />
+% for thumbnail_url in media_urls_by_type('thumbnail'):
+    <img src="${thumbnail_url}" />
 % endfor
-</%doc>

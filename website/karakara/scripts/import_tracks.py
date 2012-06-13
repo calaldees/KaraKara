@@ -6,7 +6,7 @@ import re
 from bs4 import BeautifulSoup
 import traceback
 
-from ..lib.misc import get_fileext
+from ..lib.misc import get_fileext, random_string
 
 from ..model.model_tracks import Track, Tag, Attachment, _attachment_types
 
@@ -90,28 +90,35 @@ def import_json_data(source, location=''):
     if not data:
         return
     
-    track = Track()
-    track.id       = data.get('id')
-    track.source   = data.get('source')
-    track.duration = data.get('duration')
-    
-    track.title    = 'Test' #getdata from source
-    
-    # Add Attachments
-    for attachment_type in _attachment_types.enums:
-        for attachment_data in data.get(attachment_type,[]):
-            attachment = Attachment()
-            attachment.type     = attachment_type
-            attachment.location = attachment_data.get('url')
-            track.attachments.append(attachment)
-    
-    # Add known tags (by regexing source filename/path)
-    for tag, regex in tag_extractors.items():
-        if regex.search(track.source):
-            track.tags.append(get_tag(tag))
-    
-    DBSession.add(track)
-    transaction.commit()
+    if 'description.json' in location:
+        try: 
+            folder = data['name']
+            
+            track = Track()
+            track.id       = data['videos'][0]['encode-hash']
+            track.source   = ''
+            track.duration = data['videos'][0]['length']
+            track.title    = data['name']
+            
+            # Add Attachments
+            for attachment_type in _attachment_types.enums:
+                for attachment_data in data.get("%ss"%attachment_type,[]):
+                    attachment = Attachment()
+                    attachment.type     = attachment_type
+                    attachment.location = os.path.join(folder,  attachment_data.get('url'))
+                    track.attachments.append(attachment)
+            
+            # Add known tags (by regexing source filename/path)
+            #for tag, regex in tag_extractors.items():
+            #    if regex.search(track.source):
+            #        track.tags.append(get_tag(tag))
+            
+            # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
+            
+            DBSession.add(track)
+            transaction.commit()
+        except Exception as e:
+            log.info('Unable to process %s because %s' % (location, ''))
 
 
 #-------------------------------------------------------------------------------
@@ -151,7 +158,8 @@ def main():
     
     # Setup Logging and Db from .ini
     from pyramid.paster import get_appsettings, setup_logging
-    setup_logging(args.config_uri)
+    #setup_logging(args.config_uri)
+    logging.basicConfig(level=logging.INFO)
     settings = get_appsettings(args.config_uri)
     init_DBSession(settings)
     

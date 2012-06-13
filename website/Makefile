@@ -8,7 +8,8 @@ help:
 	# run           -- run the site in development mode
 	# run_production -- run in production mode
 	# clean         -- reset the folder to clean git checkout (removes virtual python env)
-	# import_tracks -- crawl all mediaserver to import tracks data into local Db
+	# import_tracks_local_filesystem  -- crawl all mediaserver to import tracks data into local Db
+	# import_tracks_local_mediaserver -- crawl http server for to import
 
 env_activate:
 	source env/bin/activate

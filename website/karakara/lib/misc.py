@@ -2,7 +2,10 @@ import re
 import random
 
 def get_fileext(filename):
-    return re.search(r'\.([^\.]+)$', filename).group(1).lower()
+    try:
+        return re.search(r'\.([^\.]+)$', filename).group(1).lower()
+    except:
+        return None
     
 
 def update_dict(dict_a, dict_b):

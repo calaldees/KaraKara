@@ -53,7 +53,7 @@ class QueueItem(Base):
     
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-            'track'       : lambda queue_item: queue_item.track.to_dict(),
+            'track'       : lambda queue_item: queue_item.track.to_dict(include_fields='attachments'),
             'status'      : None,
             'image'       : lambda queue_item: single_image(queue_item),    # AllanC - if you use this ensure you have setup eager loading on your query
     })

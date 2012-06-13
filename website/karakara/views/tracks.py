@@ -35,9 +35,10 @@ def track_list(request):
     """
     Browse tracks
     """
-    track_list = []
-    for track in DBSession.query(Track).all():
-        track_list.append(track.id)
+    #track_list = []
+    #for track in DBSession.query(Track).all():
+    #    track_list.append(track.id)
+    track_list = [track.to_dict() for track in DBSession.query(Track).all()]
     return action_ok(data={'list':track_list})
 
 
