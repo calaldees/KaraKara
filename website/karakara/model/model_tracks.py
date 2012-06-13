@@ -1,4 +1,4 @@
-from . import Base
+from . import Base, JSONEncodedDict
 
 from sqlalchemy     import Column, Enum, ForeignKey
 from sqlalchemy     import String, Unicode, UnicodeText, Integer, Float
@@ -102,6 +102,7 @@ class Attachment(Base):
     id              = Column(Integer(),         primary_key=True)
     location        = Column(Unicode(250),      nullable=False)
     type            = Column(_attachment_types, nullable=False)
+    extra_fields    = Column(JSONEncodedDict(), nullable=False, default={}) #mutable=True
 
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
@@ -109,6 +110,7 @@ class Attachment(Base):
             'id'           : None ,
             'location'     : None ,
             'type'         : None ,
+            'extra_fields' : None ,
         },
     })
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})

@@ -107,6 +107,14 @@ def import_json_data(source, location=''):
                     attachment = Attachment()
                     attachment.type     = attachment_type
                     attachment.location = os.path.join(folder,  attachment_data.get('url'))
+                    
+                    extra_fields = {}
+                    for key,value in attachment_data.items():
+                        if key in ['target','vcodec']:
+                            #print ("%s %s" % (key,value))
+                            extra_fields[key] = value
+                    attachment.extra_fields = extra_fields
+                    
                     track.attachments.append(attachment)
             
             # Add Lyrics
@@ -135,7 +143,7 @@ def import_json_data(source, location=''):
             DBSession.add(track)
             transaction.commit()
         except Exception as e:
-            log.warn('Unable to process %s because %s' % (location, ''))
+            log.warn('Unable to process %s because %s' % (location, e))
 
 
 #-------------------------------------------------------------------------------

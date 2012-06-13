@@ -1,13 +1,5 @@
 <%inherit file="_base.mako"/>
 
-<%
-
-    t_num = 2 # Thumbnail number
-
-    def media_urls_by_type(attachment_type):
-        return [h.media_url(attatchment['location']) for attatchment in data['attachments'] if attatchment['type']==attachment_type]
-
-%>
 
 <%def name="title()">${data['title']}</%def>
 
@@ -24,15 +16,19 @@
 
 
 <!-- video -->
-<video poster="${media_urls_by_type('thumbnail')[0]}" controls>
-    % for attachment in data['attachments']:
-        % for extension, video_type in h.video_files:
-            % if extension in attachment['location']:
-    <source src="${attachment['location']}" type="video/${video_type}" />
-            % endif
-        % endfor
+<video poster="${h.thumbnail_location_from_track(data)}" durationHint="${data['duration']}" controls>
+    % for preview in [attachment for attachment in data['attachments'] if attachment['type']=='preview']:
+        <% url = h.media_url(preview['location']) %>
+        <source src="${url}" type="video/${h.video_mime_type(preview)}" />
+        <a href="${url}">${preview['extra_fields'].get('target','unknown')}</a>
+        ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
     % endfor
-    ##<a href="${preview_url}">preview</a>
+    <%doc>
+        ##% for extension, video_type in h.video_files:
+            ##% if extension in attachment['location']:
+            ##% endif
+        ##% endfor
+    </%doc>
 </video>
 
 <!-- details -->
@@ -41,7 +37,7 @@
 
 
 <!-- thumbnails -->
-% for thumbnail_url in media_urls_by_type('thumbnail'):
+% for thumbnail_url in h.attachment_locations_by_type(data,'thumbnail'):
     <img src="${thumbnail_url}" />
 % endfor
 
