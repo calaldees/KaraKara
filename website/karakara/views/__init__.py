@@ -1,7 +1,7 @@
 from decorator import decorator
+from ..lib.misc            import random_string
 from ..lib.pyramid_helpers import request_from_args, get_setting
-
-from ..lib.auto_format    import auto_format_output
+from ..lib.auto_format     import auto_format_output
 
 __all__ = [
     'base','overlay_identity','auto_format_output','web',
@@ -13,7 +13,7 @@ __all__ = [
 # Global Variables
 #-------------------------------------------------------------------------------
 
-id_count = 0
+
 
 
 #-------------------------------------------------------------------------------
@@ -27,10 +27,8 @@ def base(target, *args, **kwargs):
     request = request_from_args(args)
 
     # The session id is abstracted from the framework. Keep a count/track id's as session values
-    global id_count
     if 'id' not in request.session:
-        request.session['id'] = str(id_count)
-        id_count += 1
+        request.session['id'] = random_string()
     
     #request.session.flash('Hello World %d' % request.session['id'])
     
