@@ -954,12 +954,20 @@ class MediaEncoder:
 		if v_metadata:
 			width = v_metadata['width']
 			height = v_metadata['height']
-			length = v_metadata['length'] 
+			length = v_metadata['length']
+
 			if v_metadata.has_key('dar'):
 				aspect = v_metadata['dar']
+				#if aspect[0] == aspect[1]:
+				#	aspect = [ width, height ]
 			elif width > 0.0 and height > 0.0:
 				aspect = [ width, height ]
 
+			aspect = [ float(aspect[0]), float(aspect[1]) ]
+
+			self.original_sub_width = int(height * (aspect[0] / aspect[1]))
+			self.original_sub_height = height
+			
 		if (aspect[1] / aspect[0]) <= 0.75:
 			output_height = math.floor((output_width / aspect[0]) * aspect[1])
 		else:
@@ -1045,7 +1053,18 @@ class MediaEncoder:
 		]
 		
 		if self.subtitles:
-			parameters += ['-sub', self.subtitles]
+			subpath = self.subtitles
+			subfile = MediaFile(subpath).subfile()
+			
+			(res_x, res_y) = subfile.play_res()
+			if (res_x is None) or (res_y is None):
+				subpath = self.temp_file('subs.ssa')
+				(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
+				subfile.rewrite_play_res(res_x, res_y)
+				if not subfile.save(subpath):
+					subpath = self.subtitles
+			
+			parameters += ['-sub', subpath]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
 		return self._run_cmd(parameters, temp_video, None, "video encoding")
