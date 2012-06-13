@@ -8,7 +8,8 @@
         
         <%
             def static(file):
-                return request.static_url('karakara:static/%s' % file)
+                #return request.static_url('karakara:static/%s' % file)
+				return "/static/"+file
         %>
         
         <!-- CSS Styles -->
