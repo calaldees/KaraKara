@@ -7,6 +7,7 @@ $(document).bind("mobileinit", function(){
     $.mobile.selectmenu.prototype.options.nativeMenu = false;
     $.mobile.fixedToolbars.setTouchToggleEnabled(false);
     */
+    $.mobile.ajaxEnabled = false;
 });
 
 //$(document).bind("pagecreate", function() {

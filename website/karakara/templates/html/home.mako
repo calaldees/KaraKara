@@ -7,4 +7,8 @@
 <a href="queue"          data-role="button">Queue     </a>
 <a href="fave"           data-role="button">Fave's    </a>
 
+% if identity.get('admin', False):
+<a href="admin"       data-role="button">Disable Admin</a>
+% endif
+
 ##<a href="track_list_all" data-role="button">Tracks All</a>

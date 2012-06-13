@@ -14,13 +14,17 @@
     </form>
 </div>
 
+<%
+    def previews(track):
+        previews = [attachment for attachment in track['attachments'] if attachment['type']=='preview']
+        previews = [(preview, h.media_url(preview['location'])) for preview in previews]
+        return previews
+%>
 
 <!-- video -->
 <video poster="${h.thumbnail_location_from_track(data)}" durationHint="${data['duration']}" controls>
-    % for preview in [attachment for attachment in data['attachments'] if attachment['type']=='preview']:
-        <% url = h.media_url(preview['location']) %>
+    % for preview, url in previews(data):
         <source src="${url}" type="video/${h.video_mime_type(preview)}" />
-        <a href="${url}">${preview['extra_fields'].get('target','unknown')}</a>
         ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
     % endfor
     <%doc>
@@ -30,6 +34,13 @@
         ##% endfor
     </%doc>
 </video>
+
+<div data-role="collapsible" data-content-theme="c">
+    <h3>Video Links</h3>
+    % for preview, url in previews(data):
+    <a href="${url}" data-role="button" rel=external>${preview['extra_fields'].get('target','unknown')}</a>
+    % endfor
+</div>
 
 <!-- details -->
 <p>${data['description']}</p>
