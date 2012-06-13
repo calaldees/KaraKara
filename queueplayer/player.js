@@ -1,92 +1,102 @@
 
 var playlist = [];
-var playlist_pos = -1;
+
+function song_finished() {
+	console.log("Song finished");
+	$.get(
+		"/queue", {
+			//http://localhost:8000/queue?method=delete&format=redirect&queue_item.id=3
+			"method": "delete",
+			"format": "redirect",
+			"queue_item.id": playlist[0].id,
+			//"status": "completed",
+			//"uncache": new Date().getTime()
+		},
+		function(data) {
+			update_playlist();
+		}
+	);
+}
+
+function update_playlist() {
+	console.log("Updating playlist");
+
+	function _sig(list) {
+		if(list.length == 0) return "";
+		return list[0].touched + list[list.length-1].touched;
+	}
+
+	$.getJSON("/queue.json", {"uncache": new Date().getTime()}, function(data) {
+		if(_sig(playlist) != _sig(data.data.list)) {
+			playlist = data.data.list;
+			render_playlist();
+			prepare_next_song();
+		}
+	});
+}
 
 function render_playlist() {
+	console.log("Rendering playlist");
 	var h = "<ul>";
 	for(var i=0; i<playlist.length; i++) {
-		if(i < playlist_pos) {
-			// we've played it, hide it
-			continue;
-		}
-		else if(i == playlist_pos) {
+		if(i == 0) {
 			h += "<li class='current_song'>";
 		}
-		else if(i == playlist_pos + 1) {
+		else if(i == 1) {
 			h += "<li class='up_next'>";
 		}
 		else {
 			h += "<li>";
 		}
-		h += "<a href='#' onclick='set_playlist_pos("+i+")'>" + playlist[i]['track']['title'] + " - " + playlist[i]['performer_name'] + "</a>";
+		h += playlist[i]['track']['title'] + " - " + playlist[i]['performer_name'];
 	}
 	h += "</ul>";
 	$('#playlist').html(h);
 }
 
-function set_playlist_pos(n) {
-	playlist_pos = n;
-	var video = $('#player').get(0);
-
-	if(playlist_pos < 0) {
+function prepare_next_song() {
+	if(playlist.length == 0) {
 		$('title').html("Waiting for Songs");
 		$('#title').html("Waiting for Songs");
-		video.pause();
-	}
-	else if(playlist_pos >= playlist.length) {
-		$('title').html("End of Playlist");
-		$('#title').html("End of Playlist");
-		video.pause();
 	}
 	else {
-		$('title').html(playlist[n].track.title);
-		$('#title').html(playlist[n].track.title);
-		video.src = "/files/" + playlist[n].track.attachments[1].location;
-		video.loop = true;
-		video.volume = 0.05;
-		video.load();
-		video.play();
+		var title = playlist[0].track.title;
+		if($('title').html() != title) {
+			console.log("Preparing next song");
+			$('title').html(title);
+			$('#title').html(title);
+			var video = $('#player').get(0);
+			video.src = "/files/" + playlist[0].track.attachments[1].location;
+			video.loop = true;
+			video.volume = 0.05;
+			video.load();
+			video.play();
+		}
 	}
 }
 
 $(function() {
+	update_playlist();
 	setInterval(function() {
-		var seconds = new Date().getTime() / 1000;
-		$.getJSON("/queue.json", {"uncache": seconds}, function(data) {
-			var waiting = (playlist_pos < 0 || playlist_pos >= playlist.length);
-			var current_end = playlist.length;
-			playlist = data.data.list;
-			if(waiting) {
-				if(playlist_pos < 0) {
-					set_playlist_pos(0);
-				}
-				else {
-					set_playlist_pos(current_end);
-				}
-			}
-		});
-		render_playlist();
-	}, 1000);
-	$("#next").click(function(e) {
-		e.preventDefault();
-		set_playlist_pos(playlist_pos + 1);
-	});
-	$("#prev").click(function(e) {
-		e.preventDefault();
-		set_playlist_pos(playlist_pos - 1);
-	});
+		update_playlist();
+	}, 3000);
+
 	$("#play").click(function(e) {
 		var video = $('#player').get(0);
 		video.loop = false;
 		video.volume = 1.0;
-		video.src = "/files/" + playlist[playlist_pos].track.attachments[0].location;
+		video.src = "/files/" + playlist[0].track.attachments[0].location;
 		video.webkitEnterFullScreen();
 		video.load();
 		video.play();
 	});
+	$("#skip").click(function(e) {
+		e.preventDefault();
+		song_finished();
+	});
 	$("#player").bind("ended", function(e) {
 		var video = $('#player').get(0);
 		video.webkitExitFullScreen();
-		set_playlist_pos(playlist_pos + 1);
+		song_finished();
 	});
 });
