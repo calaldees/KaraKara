@@ -6,16 +6,22 @@ import logging
 log = logging.getLogger(__name__)
 
 
-video_files = {
-    '.mp4':'mp4',
-    '.ogv':'ogg',
-    '.mpg':'mpg',
-    '.3gp':'3gp',
+video_fileext_to_mime_types = {
+    'mp4':'mp4' ,
+    'ogv':'ogg' ,
+    'mpg':'mpeg',
+    '3gp':'3gp' ,
+    '???':'webm',
+    'mov':'quicktime',
+    'mkv':'x-matroska',
+    'wmv':'x-ms-wmv',
+    'flv':'x-flv',
 }
 
 
 def media_url(file):
-    return '/media/%s' % file
+    #return '/media/%s' % file
+    return '/files/%s' % file
 
 def track_url(id):
     return '/track/%s' % id
@@ -38,4 +44,4 @@ def thumbnail_location_from_track(track, index=0):
     return thumbnails[index]
 
 def video_mime_type(attachment):
-    return video_files.get(get_fileext(attachment['location']),'mp4')
+    return video_fileext_to_mime_types.get(get_fileext(attachment['location']),'mp4')
