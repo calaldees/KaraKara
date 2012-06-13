@@ -64,6 +64,13 @@ def image_file_re():
 def subtitle_file_re():
 	return re.compile(r'^.*\.(ass|ssa)$', re.IGNORECASE)
 
+def avlib_safe_path(path):
+	# avconv does not correctly handle percentage signs in image paths
+	if image_file_re().match(path):
+		return re.subn(r'%', '%%', path)[0]
+	else:
+		return path
+
 def parse_timestamp(ts):
 	ts_match = re.search(r'(\d+):(\d+):(\d+)\.(\d+)', ts)
 	if ts_match:
@@ -364,7 +371,7 @@ class MediaFile:
 		}
 		
 		try:
-			raw_probe = subprocess.check_output(['avprobe', self.path], stderr=subprocess.STDOUT)
+			raw_probe = subprocess.check_output(['avprobe', avlib_safe_path(self.path)], stderr=subprocess.STDOUT)
 		except subprocess.CalledProcessError:
 			return None
 		
@@ -486,7 +493,7 @@ class MediaFile:
 				time = self.length() - 0.1
 			if time < 0.0:
 				time = 0.0
-
+			
 			ok = run_command([
 				'avconv',
 				'-loglevel', avconv_loglevel,
@@ -497,7 +504,7 @@ class MediaFile:
 				'-vframes', 1,
 				'-an',
 				'-vf', 'scale={0}:{1}'.format(int(width), int(height)),
-				path
+				avlib_safe_path(path)
 			], label="thumbnail", log_object=self.log)
 			if ok:
 				result.append((time, path))
@@ -946,7 +953,7 @@ class MediaEncoder:
 				'-r', '24',
 				'-t', str(self.length),
 				'-vf', 'scale={0}:{1}'.format(int(self.base_width), -1),
-				source
+				avlib_safe_path(source)
 			]
 			result = self._run_cmd(parameters, True, None, "image to video conversation")
 			if not result:
@@ -1000,7 +1007,7 @@ class MediaEncoder:
 			source_parameters = ['-i', temp_pad] + source_parameters
 		elif self.audio_shift < 0.0:
 			temp_raw = self.temp_file('audio_raw.wav')
-			result = self._run(['avconv', '-threads', avconv_threads, '-y', '-i', source, '-vcodec', 'none', temp_raw])
+			result = self._run(['avconv', '-threads', avconv_threads, '-y', '-i', avlib_safe_path(source), '-vcodec', 'none', temp_raw])
 			if not result:
 				return None
 			temp_cut = self.temp_file('audio_cut.wav')
@@ -1011,12 +1018,12 @@ class MediaEncoder:
 			])
 			if not result:
 				return None
-			source_parameters = ['-i', temp_cut]
+			source_parameters = ['-i', avlib_safe_path(temp_cut)]
 
 		parameters = ['avconv', '-threads', '1', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
-			temp_audio
+			avlib_safe_path(temp_audio)
 		]
 		
 		return self._run_cmd(parameters, temp_audio, None, "audio encoding")
@@ -1027,8 +1034,8 @@ class MediaEncoder:
 			'-loglevel', avconv_loglevel,
 			'-threads', avconv_threads,
 			'-y',
-			'-i', video,
-			'-i', audio,
+			'-i', avlib_safe_path(video),
+			'-i', avlib_safe_path(audio),
 			'-strict', 'experimental',
 			'-vcodec', 'copy',
 		]
@@ -1091,7 +1098,7 @@ class MediaEncoder:
 			'-loglevel', avconv_loglevel,
 			'-threads', avconv_threads,
 			'-y',
-			'-i', self.video,
+			'-i', avlib_safe_path(self.video),
 		]
 		parameters += MediaEncoder.profile_parameters[profile]
 		parameters += [
