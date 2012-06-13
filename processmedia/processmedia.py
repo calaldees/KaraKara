@@ -185,6 +185,17 @@ class SSAFile:
 
 		self.parse()
 	
+	def save(self, path):
+		try:
+			fp = open(path, 'w')
+			for line in self.data:
+				fp.write(line + "\r\n")
+			fp.close()
+			return True
+		except IOError as (errno, strerror):
+			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
+			return False
+
 	def parse(self):
 		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
 		self.titles[:] = []
@@ -197,6 +208,59 @@ class SSAFile:
 					end = parse_timestamp(parts[2])
 					text = parts[9]
 					self.titles.append((start, end, text))
+	
+	def play_res(self):
+		res_x = None
+		res_y = None
+
+		res_re = re.compile(r'^PlayRes(X|Y):\s*(\d+).*', re.IGNORECASE)
+		for line in self.data:
+			m = res_re.match(line)
+			if m:
+				x_y = m.group(1)
+				res = int(m.group(2))
+				if x_y.lower() == 'x':
+					res_x = res
+				else:
+					res_y = res
+		
+		return (res_x, res_y)
+	
+	def calculate_play_res(self, display_x, display_y):
+		(res_x, res_y) = self.play_res()
+		if res_x and res_y:
+			return (res_x, res_y)
+		elif res_x:
+			return (res_x, int(res_x * (float(display_y) / float(display_x))))
+		elif res_y:
+			return (int(res_y * (float(display_x) / float(display_y))), res_y)
+		else:
+			return (display_x, display_y)
+
+	def rewrite_play_res(self, res_x, res_y):
+		script_type_re = re.compile(r'^ScriptType:\s*v\d+.*', re.IGNORECASE)
+		res_re = re.compile(r'^PlayRes(X|Y):\s*(\d+).*', re.IGNORECASE)
+		
+		script_pos = None
+		to_delete = []
+
+		for (n, line) in enumerate(self.data):
+			if script_type_re.match(line):
+				script_pos = n
+			elif res_re.match(line):
+				to_delete.append(n)
+
+		if not script_pos:
+			return False
+
+		to_delete.reverse()
+		for n in to_delete:
+			del self.data[n]
+
+		self.data.insert(script_pos + 1, "PlayResX: {0}".format(res_x))
+		self.data.insert(script_pos + 2, "PlayResY: {0}".format(res_y))
+
+		return True
 	
 	def raw_lines(self):
 		lines = []
