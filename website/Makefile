@@ -1,15 +1,17 @@
 
 help:
 	# Usage: make <target>, where target is
-	# setup         -- setup python egg & install dependencys/env if needed
-	# test          -- run all nosetests
-	# init-db       -- create a blank database
-	# init-db-test  -- create test db
-	# run           -- run the site in development mode
+	# setup          -- setup python egg & install dependencys/env if needed
+	# test           -- run all nosetests
+	# init_db        -- create a blank database
+	# init_db_test   -- create test db
+	# run            -- run the site in development mode
 	# run_production -- run in production mode
-	# clean         -- reset the folder to clean git checkout (removes virtual python env)
+	# clean          -- reset the folder to clean git checkout (removes virtual python env)
 	# import_tracks_local_filesystem  -- crawl all mediaserver to import tracks data into local Db
 	# import_tracks_local_mediaserver -- crawl http server for to import
+	#
+	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
 
 env_activate:
 	source env/bin/activate
