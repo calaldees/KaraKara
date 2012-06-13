@@ -17,6 +17,12 @@ env_deactivate:
 	deactivate
 
 env:
+	if dpkg -s python-virtualenv ; then \
+	    echo virtualenv already installed; \
+	else \
+	    echo installing virtualenv; \
+	    sudo apt-get install python-virtualenv; \
+	fi
 	if dpkg -s python3-setuptools ; then \
 	    echo python 3 already installed; \
 	else \
