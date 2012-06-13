@@ -30,6 +30,7 @@
         <div data-role="page">
             
             <div data-role="header" data-position="fixed" \
+
                 % if identity.get('admin',False):
                 data-theme="e"
                 % endif

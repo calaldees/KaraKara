@@ -8,6 +8,7 @@ log = logging.getLogger(__name__)
 
 __all__ = [
     "DBSession", "Base", "init_DBSession", "init_db",
+    "JSONEncodedDict",
 ]
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension())) # auto transaction commit after every request
@@ -41,6 +42,31 @@ def init_db():
     Base.metadata.drop_all  (bind=DBSession.bind, checkfirst=True)
     log.info("Create all tables bound to Base")
     Base.metadata.create_all(bind=DBSession.bind                 ) #, checkfirst=True
+
+
+
+#-------------------------------------------------------------------------------
+# Extra DB Types
+#-------------------------------------------------------------------------------
+
+from sqlalchemy.types import TypeDecorator, VARCHAR
+import json
+
+class JSONEncodedDict(TypeDecorator):
+    "Represents an immutable structure as a json-encoded string."
+
+    impl = VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
+
 
 
 #-------------------------------------------------------------------------------
