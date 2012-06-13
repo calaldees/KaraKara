@@ -8,7 +8,7 @@ import traceback
 
 from ..lib.misc import get_fileext, random_string
 
-from ..model.model_tracks import Track, Tag, Attachment, _attachment_types
+from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
 
 from ..model         import init_DBSession, DBSession
 from ..model.actions import get_tag
@@ -91,8 +91,9 @@ def import_json_data(source, location=''):
         return
     
     if 'description.json' in location:
-        try: 
+        try:
             folder = data['name']
+            log.info('Importing %s' % folder)
             
             track = Track()
             track.id       = data['videos'][0]['encode-hash']
@@ -108,17 +109,33 @@ def import_json_data(source, location=''):
                     attachment.location = os.path.join(folder,  attachment_data.get('url'))
                     track.attachments.append(attachment)
             
+            # Add Lyrics
+            for subtitle in data.get('subtitles',[]):
+                lyrics = Lyrics()
+                lyrics.language = subtitle.get('language','eng')
+                lyrics.content  = "\n".join(subtitle.get('lines',[]))
+                track.lyrics.append(lyrics)
+            
+            # Attempt to get Tags from source filename
             # Add known tags (by regexing source filename/path)
             #for tag, regex in tag_extractors.items():
             #    if regex.search(track.source):
             #        track.tags.append(get_tag(tag))
+            
+            # Import Media Processed Tags
+            try:
+                with open(os.path.join(os.path.dirname(location),'tags.txt'), 'r') as tag_file:
+                    for tag in tag_file:
+                        track.tags.append(get_tag(tag))
+            except Exception as e:
+                log.warn('Unable to imports tags')
             
             # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
             
             DBSession.add(track)
             transaction.commit()
         except Exception as e:
-            log.info('Unable to process %s because %s' % (location, ''))
+            log.warn('Unable to process %s because %s' % (location, ''))
 
 
 #-------------------------------------------------------------------------------

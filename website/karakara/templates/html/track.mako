@@ -40,7 +40,15 @@
 
 
 
-<!-- images -->
+<!-- thumbnails -->
 % for thumbnail_url in media_urls_by_type('thumbnail'):
     <img src="${thumbnail_url}" />
+% endfor
+
+<!-- lyrics -->
+% for lyrics in data['lyrics']:
+    <h3>${lyrics['language']}</h3>
+    % for line in lyrics['content'].split('\n'):
+${line}<br/>
+    % endfor
 % endfor

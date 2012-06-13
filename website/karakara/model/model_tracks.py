@@ -1,7 +1,7 @@
 from . import Base
 
 from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, Integer, Float
+from sqlalchemy     import String, Unicode, UnicodeText, Integer, Float
 from sqlalchemy.orm import relationship, backref
 
 import copy
@@ -24,7 +24,6 @@ class TrackAttachmentMapping(Base):
     attachment_id = Column(Integer(),    ForeignKey('attachment.id'), nullable=False, primary_key=True)
 
 
-
 class Track(Base):
     """
     """
@@ -38,7 +37,7 @@ class Track(Base):
     
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
-    
+    lyrics          = relationship("Lyrics")
     
     
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
@@ -57,6 +56,7 @@ class Track(Base):
             'description' : None ,
             'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
             'tags'        : lambda track: [tag.name for tag in track.tags],
+            'lyrics'      : lambda track: [lyrics.to_dict() for lyrics in track.lyrics] ,
     })
 
 
@@ -109,6 +109,29 @@ class Attachment(Base):
             'id'           : None ,
             'location'     : None ,
             'type'         : None ,
+        },
+    })
+    __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
+    __to_dict__['full'].update({
+    })
+
+
+class Lyrics(Base):
+    """
+    """
+    __tablename__   = "lyrics"
+
+    id              = Column(Integer()    , primary_key=True)
+    track_id        = Column(String(32),    ForeignKey('track.id'), nullable=False)
+    language        = Column(String(4)    , nullable=False, default='eng')
+    content         = Column(UnicodeText())
+    
+    __to_dict__ = copy.deepcopy(Base.__to_dict__)
+    __to_dict__.update({
+        'default': {
+            'id'           : None ,
+            'language'     : None ,
+            'content'      : None ,
         },
     })
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
