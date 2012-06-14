@@ -1387,7 +1387,7 @@ class MediaItem:
 		encodings = []
 		if (len(languages) == 0) and (len(video_files) > 0):
 			encodings.append({
-				'video': self.select_highest_quality(video_files),
+				'video': self.select_highest_quality(video_files).name,
 				'language': 'und'
 			})
 		elif len(languages) > 0:
