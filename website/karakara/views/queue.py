@@ -71,8 +71,9 @@ def queue_del(request):
 
     if not queue_item:
         raise action_error(message='invalid queue_item.id')
-    if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
-        raise action_error(message='you are not the owner of this queue_item')
+    # AllanC - ****!! disbaling for demo
+    #if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
+    #    raise action_error(message='you are not the owner of this queue_item')
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
