@@ -3,6 +3,7 @@
 
 <%def name="title()">${data['title']}</%def>
 
+<h1>${data['title']}</h1>
 
 <div data-role="collapsible" data-content-theme="c">
     <h3>Queue Track</h3>
@@ -52,10 +53,12 @@
     <img src="${thumbnail_url}" />
 % endfor
 
+
 <!-- lyrics -->
+<h2>Lyrics</h2>
 % for lyrics in data['lyrics']:
-    <h3>${lyrics['language']}</h3>
+    ##${lyrics['language']}
     % for line in lyrics['content'].split('\n'):
-${line}<br/>
+        <p>${line}</p>
     % endfor
 % endfor

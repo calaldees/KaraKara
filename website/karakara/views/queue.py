@@ -32,7 +32,7 @@ def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').options(joinedload_all('track.attachments')).all()
+    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.id).options(joinedload_all('track.attachments')).all()
     queue = [queue_item.to_dict('full') for queue_item in queue]
     return action_ok(data={'list':queue})
 
@@ -67,7 +67,7 @@ def queue_del(request):
     check session owner or admin
     state can be passed as "complete" to mark track as played
     """
-    queue_item = DBSession.query(QueueItem).get(request.params['queue_item.id'])
+    queue_item = DBSession.query(QueueItem).get(int(request.params['queue_item.id']))
 
     if not queue_item:
         raise action_error(message='invalid queue_item.id')

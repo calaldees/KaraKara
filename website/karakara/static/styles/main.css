@@ -2,3 +2,5 @@
 /* Flash Message */
 .flash_message p             {float: left;}
 .flash_message .flash_remove {float: right;}
+
+h1,h2,h3,h4,h5,h6 {font-weight: bold;}
