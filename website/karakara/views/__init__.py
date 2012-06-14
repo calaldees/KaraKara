@@ -1,10 +1,10 @@
 from decorator import decorator
 from ..lib.misc            import random_string
-from ..lib.pyramid_helpers import request_from_args, get_setting
+from ..lib.pyramid_helpers import request_from_args, get_setting, etag
 from ..lib.auto_format     import auto_format_output
 
 __all__ = [
-    'base','overlay_identity','auto_format_output','web',
+    'base','overlay_identity','auto_format_output','web','etag'
     'method_delete_router',
 ]
 

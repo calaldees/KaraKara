@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 
-from . import web, method_delete_router
+from . import web, etag, method_delete_router
+
 
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession
@@ -9,11 +10,23 @@ from ..model.model_tracks import Track
 
 from sqlalchemy.orm import joinedload, joinedload_all
 
+# Fake Etag placeholder
+from ..lib.misc import random_string
+queue_instance_id = None
+def queue_updated():
+    global queue_instance_id
+    queue_instance_id = random_string()
+queue_updated()
+def queue_etag(request):
+    global queue_instance_id
+    return queue_instance_id + request.session.get('id','') + str(request.session.get('admin',False)) + str(request.session.peek_flash())
+
 #-------------------------------------------------------------------------------
 # Queue
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='queue', request_method='GET')
+@etag(queue_etag)
 @web
 def queue_view(request):
     """
@@ -40,6 +53,8 @@ def queue_add(request):
     queue_item.session_owner  = request.session['id']
     DBSession.add(queue_item)
     
+    queue_updated() # Invalidate Cache
+    
     return action_ok(message='track queued')
 
 
@@ -61,6 +76,8 @@ def queue_del(request):
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
+    
+    queue_updated() # Invalidate Cache
     
     return action_ok(message='queue_item status changed')
 
@@ -85,5 +102,7 @@ def queue_update(request):
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
     queue_item.touched = datetime.datetime.now() # Update touched timestamp
+    
+    queue_updated() # Invalidate Cache
     
     return action_ok(message='queue_item updated')
