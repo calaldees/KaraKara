@@ -24,11 +24,11 @@ class QueueItem(Base):
 
     id              = Column(Integer(),        primary_key=True)
     
-    track_id        = Column(String(32),    ForeignKey('track.id'), nullable=False)
+    track_id        = Column(String(),    ForeignKey('track.id'), nullable=False)
     
-    performer_name  = Column(Unicode(250), nullable=True, default="Untitled")
-    session_owner   = Column(Unicode(250), nullable=True)
-    touched         = Column(DateTime()  , nullable=False, default=now)
+    performer_name  = Column(Unicode(),   nullable=True, default="Untitled")
+    session_owner   = Column(Unicode(),   nullable=True)
+    touched         = Column(DateTime(),  nullable=False, default=now)
     
     status          = Column(_queueitem_statuss ,  nullable=False, default="pending")
     
