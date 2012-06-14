@@ -822,16 +822,19 @@ class MediaEncoder:
 	PROFILE_IPHONE = 1
 	PROFILE_ANDROID = 2
 	PROFILE_GENERIC = 3
+	PROFILE_GENERIC_MPEG4 = 4
 
 	profile_names = {
 		PROFILE_IPHONE: 'iphone',
 		PROFILE_ANDROID: 'android',
-		PROFILE_GENERIC: 'generic'
+		PROFILE_GENERIC: 'generic',
+		PROFILE_GENERIC_MPEG4: 'generic-mpeg4'
 	}
 	profile_extensions = {
 		PROFILE_IPHONE: '.mp4',
 		PROFILE_ANDROID: '.mp4',
-		PROFILE_GENERIC: '.mp4'
+		PROFILE_GENERIC: '.mp4',
+		PROFILE_GENERIC_MPEG4: '.mp4'
 	}
 	profile_parameters = {
 		PROFILE_IPHONE: [
@@ -858,6 +861,18 @@ class MediaEncoder:
 			'-bt',		'240k'
 		],
 		PROFILE_GENERIC: [
+			'-vf',		'scale=320:-1',
+			#'-r',		'30000/1001',
+			'-vcodec',	'libx264',
+			'-pre:v',	'libx264-ipod320',
+			'-acodec',	'aac',
+			'-ac',		'1',
+			'-ar',		'48000',
+			'-ab',		'64k',
+			'-b',		'200k',
+			'-bt',		'240k'
+		],
+		PROFILE_GENERIC_MPEG4: [
 			'-vf',		'scale=320:-1',
 			'-r',		'13',
 			'-vcodec',	'mpeg4',
@@ -1107,6 +1122,8 @@ class MediaEncoder:
 		parameters = ['avconv', '-threads', '1', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
+			'-ac', '2',
+			'-r', '48000',
 			avlib_safe_path(temp_audio)
 		]
 		
@@ -1122,6 +1139,7 @@ class MediaEncoder:
 			'-i', avlib_safe_path(audio),
 			'-strict', 'experimental',
 			'-vcodec', 'copy',
+			'-ab', '224k'
 		]
 		if self.language:
 			parameters += [
@@ -1523,7 +1541,9 @@ class MediaItem:
 
 	def preview_stage(self):
 		self.log("preview stage")
-		targets = MediaEncoder.profile_names.values()
+
+		# targets = MediaEncoder.profile_names.values()
+		targets = ['generic'] # only generate generic target
 		
 		# find existing previews
 		previews = {}
