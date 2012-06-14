@@ -129,8 +129,8 @@ class JSONFile(dict):
 				super(JSONFile, self).update(data)
 			except IOError as (errno, strerror):
 				warn("unable to read " + self.path + " ({0}): {1}".format(errno, strerror))
-			except ValueError as strerror:
-				warn("unable to read JSON from " + self.path + ": " + strerror)
+			except ValueError as error:
+				warn("unable to read JSON from " + self.path + ": " + str(error))
 
 		self.loaded = True
 		self.changed = False
