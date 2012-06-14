@@ -22,8 +22,11 @@ function update_playlist() {
 	console.log("Updating playlist");
 
 	function _sig(list) {
-		if(list.length == 0) return "";
-		return list[0].touched + list[list.length-1].touched;
+		var sig = "";
+		for(var i=0; i<list.length; i++) {
+			sig = sig + list[i].touched;
+		}
+		return sig;
 	}
 
 	$.getJSON("/queue.json", {"uncache": new Date().getTime()}, function(data) {
