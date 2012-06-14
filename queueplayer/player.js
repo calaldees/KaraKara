@@ -57,9 +57,9 @@ function render_playlist() {
 	$('#playlist').html(h);
 }
 
-function get_video(track) {
+function get_attachment(track, type) {
 	for(var i=0; i<track.attachments.length; i++) {
-		if(track.attachments[i].type == "video") {
+		if(track.attachments[i].type == type) {
 			return track.attachments[i].location;
 		}
 	}
@@ -75,9 +75,9 @@ function prepare_next_song() {
 		if($('title').html() != title) {
 			console.log("Preparing next song");
 			$('title').html(title);
-			$('#title').html("<a href='"+"/files/" + get_video(playlist[0].track)+"'>"+title+"</a>");
+			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
 			var video = $('#player').get(0);
-			video.src = "/files/" + get_video(playlist[0].track);
+			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;
 			video.volume = 0.05;
 			video.load();
@@ -96,7 +96,7 @@ $(function() {
 		var video = $('#player').get(0);
 		video.loop = false;
 		video.volume = 1.0;
-		video.src = "/files/" + get_video(playlist[0].track);
+		video.src = "/files/" + get_attachment(playlist[0].track, "video");
 		video.webkitEnterFullScreen();
 		video.load();
 		video.play();
