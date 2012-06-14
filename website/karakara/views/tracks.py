@@ -17,7 +17,7 @@ def tracks_updated():
 tracks_updated()
 def tracks_etag(request):
     global tracks_instance_id
-    return tracks_instance_id + str(request.session.peek_flash())
+    return tracks_instance_id + str(request.session.get('admin',False)) + str(request.session.peek_flash())
 
 
 #-------------------------------------------------------------------------------
