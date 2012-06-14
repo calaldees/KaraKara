@@ -1756,7 +1756,7 @@ def test_program(cmd, package):
 	cmd = map(unicode, cmd)
 	try:
 		return subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-	except subprocess.CalledProcessError as error:
+	except:
 		warn('error: ' + cmd[0] + " missing or broken (install " + package + "?)")
 		return None
 
