@@ -1599,15 +1599,23 @@ class MediaItem:
 				metadata=video
 			)
 
-		# remove previews for none existent videos
-		for video in previews:
+		# remove previews for none existent videos (and targets)
+		for video in previews.keys():
 			if not videos.has_key(video):
 				self.log("video " + video + " no longer exists")	
 				for preview in previews[video].values():
 					self.log("rm " + preview.path)
 					preview.unlink()
 				self.descriptor.remove_previews(video=video)
+				del previews[video]
+			# remove unrequired targets
+			for preview in previews[video].values():
+				if preview['target'] not in targets:
+					self.log("rm " + preview.path)
+					preview.unlink()
+					self.descriptor.remove_previews(name=preview['name'])
 		
+		# save state
 		self.descriptor.save()
 		
 		# find videos for which previews need to be (re)generated
@@ -1616,7 +1624,7 @@ class MediaItem:
 			if not previews.has_key(name):
 				to_generate += [ (video, target) for target in targets ]
 			else:
-				to_generate += [ (video, preview['target']) for preview in previews[name].values() if (not preview.exists()) or (video.mtime() > preview.mtime()) ]
+				to_generate += [ (video, preview['target']) for preview in previews[name].values() if ((not preview.exists()) or (video.mtime() > preview.mtime())) and (preview['target'] in targets) ]
 				to_generate += [ (video, target) for target in targets if target not in previews[name].keys() ]
 
 		# generate previews
