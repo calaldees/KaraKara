@@ -8,7 +8,8 @@
         
         <%
             def static(file):
-                return request.static_url('karakara:static/%s' % file)
+                #return request.static_url('karakara:static/%s' % file)
+                return "/static/"+file
         %>
         
         <!-- CSS Styles -->
@@ -17,7 +18,8 @@
         <link   href="${static('styles/main.css')}"                           rel="stylesheet"     />
         
         <!-- Scripts -->
-        <script src ="${static('scripts/jquery-1.7.2.min.js')}"                                     ></script>
+        <script src ="${static('scripts/jquery-1.7.1.min.js')}"                                     ></script>
+        <script src ="${static('scripts/jquery.mobile-extras.js')}"                                 ></script>
         <script src ="${static('jquery.mobile/jquery.mobile-1.1.0.min.js')}"                        ></script>
         
         <!-- Other -->
@@ -28,13 +30,18 @@
         
         <div data-role="page">
             
-            <div data-role="header" data-position="fixed" >
+            <div data-role="header" data-position="fixed" \
+
+                % if identity.get('admin',False):
+                data-theme="e"
+                % endif
+>
                 <%def name="title()">${request.registry.settings.get('text.title') or 'KaraKara'}</%def>
                 <h1>${next.title()}</h1>
                 
                 ## data-iconpos="notext"
-                <a href="/" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Home  </a>
-                <a href="/" data-role="button" data-icon="search" data-mini="true" data-inline="true">Search</a>
+                <a href="/track_list" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Tracks</a>
+                <a href="/queue"      data-role="button" data-icon="search" data-mini="true" data-inline="true">Queue</a>
             </div><!-- /header -->
             
             <!-- flash messages -->

@@ -2,6 +2,7 @@
 from pyramid.config import Configurator
 import pyramid.events
 
+
 # SQLAlchemy imports
 from .model import DBSession, init_DBSession
 
@@ -13,6 +14,7 @@ import re
 
 # Package Imports
 from .lib.auto_format import registered_formats
+from .templates import helpers as template_helpers
 
 
 def main(global_config, **settings):
@@ -68,13 +70,19 @@ def main(global_config, **settings):
     config.add_route('track_list_all', append_format_pattern('/track_list_all'))
     config.add_route('queue'         , append_format_pattern('/queue')         )
     config.add_route('fave'          , append_format_pattern('/fave')          )
+    config.add_route('admin_toggle'  , append_format_pattern('/admin')         )
     
     config.add_route('tags'          , '/tags/{tags:.*}')
     
     # Events -------------------------------------------------------------------
-    
+    config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
     
     # Return -------------------------------------------------------------------
     config.scan()
     return config.make_wsgi_app()
 
+
+def add_template_helpers_to_event(event):
+    event['h'] = template_helpers
+
+    

@@ -6,6 +6,7 @@ from ..lib.misc import random_string
 
 from ..model.actions import get_tag
 from ..model.model_tracks import Track, Tag, Attachment
+from ..model.model_queue  import QueueItem
 
 import logging
 log = logging.getLogger(__name__)
