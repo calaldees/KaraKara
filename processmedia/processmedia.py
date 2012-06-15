@@ -185,11 +185,18 @@ class SSAFile:
 
 		self.parse()
 	
-	def save(self, path):
+	def save(self, path, encoding=None):
 		try:
 			fp = open(path, 'w')
 			for line in self.data:
-				fp.write(line + "\r\n")
+				if encoding:
+					fp.write((line + "\r\n").encode(encoding))
+				else:
+					try:
+						fp.write(line + "\r\n")
+					except UnicodeEncodeError:
+						warn("encoding line as latin-1: \"", line, "\"")
+						fp.write((line + "\r\n").encode('latin-1'))
 			fp.close()
 			return True
 		except IOError as (errno, strerror):
