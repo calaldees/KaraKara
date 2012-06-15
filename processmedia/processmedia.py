@@ -1807,6 +1807,10 @@ def check_tools():
 		if not ass:
 			warn("error: mencoder does not support advanced subtitles (ass)")
 
+	# sox
+	result = test_program(['sox', '-h'], 'sox')
+	ok = ok and (result is not None)
+	
 	return ok
 
 def find_items(path):
