@@ -1097,36 +1097,62 @@ class MediaEncoder:
 		else:
 			source = self.video
 
-		source_parameters = ['-i', source]
+		temp_raw = self.temp_file('audio_raw.wav')
+		result = self._run_cmd(['avconv', 
+			'-threads', avconv_threads, 
+			'-loglevel', avconv_loglevel,
+			'-y',
+			'-i', source,
+			'-vcodec', 'none',
+			'-strict', 'experimental',
+			'-ac', '2',
+			'-r', '48000',
+			avlib_safe_path(temp_raw)
+		], temp_raw, None, "audio decoding")
+		if not result:
+			return None
+		
+		temp_norm = self.temp_file('audio_norm.wav')
+		result = self._run_cmd([
+			'sox',
+			temp_raw,
+			temp_norm,
+			'fade', 'l', '0.15', '0', '0.15',
+			'norm'
+		], temp_norm, None, "audio normalisation")
+		if not result:
+			return None
 
 		temp_audio = self.temp_file('audio.wav')
+		source_parameters = ['-i', avlib_safe_path(temp_norm)]
 
 		if self.audio_shift > 0.0:
 			temp_pad = self.temp_file('audio_pad.wav')
-			result = self._run([
+			result = self._run_cmd([
 				'sox', 
 				'-null', temp_pad, 
 				'trim', '0', str(self.audio_shift)
 			])
 			if not result:
 				return None
-			source_parameters = ['-i', temp_pad] + source_parameters
+			source_parameters = ['-i', avlib_safe_path(temp_pad)] + source_parameters
 		elif self.audio_shift < 0.0:
-			temp_raw = self.temp_file('audio_raw.wav')
-			result = self._run(['avconv', '-threads', avconv_threads, '-y', '-i', avlib_safe_path(source), '-vcodec', 'none', temp_raw])
-			if not result:
-				return None
 			temp_cut = self.temp_file('audio_cut.wav')
-			result = self._run([
+			result = self._run_cmd([
 				'sox', 
-				temp_raw, temp_cut, 
-				'trim', str(-self.audio_shift), str(self.length)
+				temp_norm, temp_cut, 
+				'trim', str(-self.audio_shift), str(self.length),
+				'fade', 'l', '0.1'
 			])
 			if not result:
 				return None
 			source_parameters = ['-i', avlib_safe_path(temp_cut)]
 
-		parameters = ['avconv', '-threads', '1', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
+		parameters = ['avconv', 
+			'-threads', avconv_threads,
+			'-loglevel', avconv_loglevel,
+			'-y',
+			] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			'-ac', '2',
