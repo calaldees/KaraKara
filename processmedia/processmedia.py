@@ -50,19 +50,26 @@ def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wmv|ass|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def video_file_re():
 	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv)$', re.IGNORECASE)
 
 def audio_file_re():
-	return re.compile(r'^.*\.(mp3|ogg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(aac|mp3|ogg|wav)$', re.IGNORECASE)
 
 def image_file_re():
 	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def subtitle_file_re():
 	return re.compile(r'^.*\.(ass|ssa)$', re.IGNORECASE)
+
+def avlib_safe_path(path):
+	# avconv does not correctly handle percentage signs in image paths
+	if image_file_re().match(path):
+		return re.subn(r'%', '%%', path)[0]
+	else:
+		return path
 
 def parse_timestamp(ts):
 	ts_match = re.search(r'(\d+):(\d+):(\d+)\.(\d+)', ts)
@@ -168,12 +175,34 @@ class SSAFile:
 			lines = fp.readlines()
 			fp.close()
 			for line in lines:
-				self.data.append(line.strip()) # FIXME: \r\n?
+				try:
+					line = line.decode('utf-8')
+				except UnicodeDecodeError:
+					line = line.decode('latin-1')
+				self.data.append(line.strip())
 		except IOError:
 			self.data.clear()
 
 		self.parse()
 	
+	def save(self, path, encoding=None):
+		try:
+			fp = open(path, 'w')
+			for line in self.data:
+				if encoding:
+					fp.write((line + "\r\n").encode(encoding))
+				else:
+					try:
+						fp.write(line + "\r\n")
+					except UnicodeEncodeError:
+						warn("encoding line as latin-1: \"", line, "\"")
+						fp.write((line + "\r\n").encode('latin-1'))
+			fp.close()
+			return True
+		except IOError as (errno, strerror):
+			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
+			return False
+
 	def parse(self):
 		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
 		self.titles[:] = []
@@ -186,6 +215,59 @@ class SSAFile:
 					end = parse_timestamp(parts[2])
 					text = parts[9]
 					self.titles.append((start, end, text))
+	
+	def play_res(self):
+		res_x = None
+		res_y = None
+
+		res_re = re.compile(r'^PlayRes(X|Y):\s*(\d+).*', re.IGNORECASE)
+		for line in self.data:
+			m = res_re.match(line)
+			if m:
+				x_y = m.group(1)
+				res = int(m.group(2))
+				if x_y.lower() == 'x':
+					res_x = res
+				else:
+					res_y = res
+		
+		return (res_x, res_y)
+	
+	def calculate_play_res(self, display_x, display_y):
+		(res_x, res_y) = self.play_res()
+		if res_x and res_y:
+			return (res_x, res_y)
+		elif res_x:
+			return (res_x, int(res_x * (float(display_y) / float(display_x))))
+		elif res_y:
+			return (int(res_y * (float(display_x) / float(display_y))), res_y)
+		else:
+			return (display_x, display_y)
+
+	def rewrite_play_res(self, res_x, res_y):
+		script_type_re = re.compile(r'^ScriptType:\s*v\d+.*', re.IGNORECASE)
+		res_re = re.compile(r'^PlayRes(X|Y):\s*(\d+).*', re.IGNORECASE)
+		
+		script_pos = None
+		to_delete = []
+
+		for (n, line) in enumerate(self.data):
+			if script_type_re.match(line):
+				script_pos = n
+			elif res_re.match(line):
+				to_delete.append(n)
+
+		if not script_pos:
+			return False
+
+		to_delete.reverse()
+		for n in to_delete:
+			del self.data[n]
+
+		self.data.insert(script_pos + 1, "PlayResX: {0}".format(res_x))
+		self.data.insert(script_pos + 2, "PlayResY: {0}".format(res_y))
+
+		return True
 	
 	def raw_lines(self):
 		lines = []
@@ -305,6 +387,9 @@ class MediaFile:
 	def exists(self):
 		return os.path.exists(self.path) and os.path.isfile(self.path)
 
+	def valid(self):
+		return (self.exists() and (self.metadata is not None))
+
 	def has_changed(self):
 		if self.metadata and self.metadata.has_key('mtime') and self.metadata.has_key('size'):
 			return (self.mtime() != self._mtime()) or (self.size() != self._size())
@@ -329,7 +414,7 @@ class MediaFile:
 			result = [3, 2]
 		elif ratio == 1.6:
 			result = [5, 2]
-		elif ratio == 1.7:
+		elif (ratio == 1.7) or (ratio == 1.8):
 			result = [16, 9]
 		else:
 			result = [float("%.2f" % pure_ratio), 1.0]
@@ -356,7 +441,10 @@ class MediaFile:
 			'size': long(stat.st_size)
 		}
 		
-		raw_probe = subprocess.check_output(['avprobe', self.path], stderr=subprocess.STDOUT)
+		try:
+			raw_probe = subprocess.check_output(['avprobe', avlib_safe_path(self.path)], stderr=subprocess.STDOUT)
+		except subprocess.CalledProcessError:
+			return None
 		
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_bitrate = re.search(r',\s*bitrate:\s*(\d+)\s*kb/s', raw_probe, re.IGNORECASE | re.MULTILINE)
@@ -427,7 +515,7 @@ class MediaFile:
 	def _score(self):
 		score = 1.0
 		if self.metadata.has_key('width') and self.metadata.has_key('height'):
-			score *= (self.metadata['width'] * self.metadata['height']) / (640.0 * 480.0)
+			score *= float((self.metadata['width'] * self.metadata['height'])) / (640.0 * 480.0)
 		#if self.metadata.has_key('vbitrate'):
 		#	score *= (self.metadata['vbitrate'] / 1024.0)
 		if self.metadata.has_key('abitrate'):
@@ -437,7 +525,10 @@ class MediaFile:
 	def update_if_changed(self):
 		if self.has_changed():
 			new_metadata = self.probe()
-			if not self.metadata:
+
+			if not new_metadata:
+				self.metadata = None
+			elif not self.metadata:
 				self.metadata = {'language': 'und'}
 				self.metadata.update(new_metadata)
 				self.metadata['score'] = self._score()
@@ -460,6 +551,8 @@ class MediaFile:
 		
 		self.update_if_changed()
 		
+		if not self.valid():
+			return False
 		if not (self.is_video() or self.is_image()):
 			return False
 		if self.length() is None:
@@ -471,7 +564,7 @@ class MediaFile:
 				time = self.length() - 0.1
 			if time < 0.0:
 				time = 0.0
-
+			
 			ok = run_command([
 				'avconv',
 				'-loglevel', avconv_loglevel,
@@ -482,7 +575,7 @@ class MediaFile:
 				'-vframes', 1,
 				'-an',
 				'-vf', 'scale={0}:{1}'.format(int(width), int(height)),
-				path
+				avlib_safe_path(path)
 			], label="thumbnail", log_object=self.log)
 			if ok:
 				result.append((time, path))
@@ -651,7 +744,8 @@ class MediaSources(JSONFile):
 		for name in self.parent.source_files():
 			if not self.index.has_key(name):
 				missing.append(name)
-			elif not self.index[name].exists():
+		for name in self.index.keys():
+			if not self.index[name].exists():
 				deleted.append(name)
 			elif self.index[name].has_changed():
 				changed.append(name)
@@ -662,11 +756,18 @@ class MediaSources(JSONFile):
 		for name in deleted:
 			self.parent.log("del source: " + name)
 			del self.index[name]
+		deleted[:] = []
+
 		for name in missing:
 			self.parent.log("add source: " + name)
 			self.index[name] = MediaFile(self.parent.element_path('source', name))
 		for (name, source) in self.index.items():
 			source.update_if_changed()
+			if not source.valid():
+				deleted.append(name)
+		for name in deleted:
+			self.parent.log("del invalid source: " + name)
+			del self.index[name]
 		
 		self.changed = True
 		self.save()
@@ -728,16 +829,19 @@ class MediaEncoder:
 	PROFILE_IPHONE = 1
 	PROFILE_ANDROID = 2
 	PROFILE_GENERIC = 3
+	PROFILE_GENERIC_MPEG4 = 4
 
 	profile_names = {
 		PROFILE_IPHONE: 'iphone',
 		PROFILE_ANDROID: 'android',
-		PROFILE_GENERIC: 'generic'
+		PROFILE_GENERIC: 'generic',
+		PROFILE_GENERIC_MPEG4: 'generic-mpeg4'
 	}
 	profile_extensions = {
 		PROFILE_IPHONE: '.mp4',
 		PROFILE_ANDROID: '.mp4',
-		PROFILE_GENERIC: '.mp4'
+		PROFILE_GENERIC: '.mp4',
+		PROFILE_GENERIC_MPEG4: '.mp4'
 	}
 	profile_parameters = {
 		PROFILE_IPHONE: [
@@ -749,21 +853,33 @@ class MediaEncoder:
 			'-ac',		'1',
 			'-ar',		'48000',
 			'-ab',		'64k',
-			'-b',		'200k',
+			'-b',		'150k',
 			'-bt',		'240k'
 		],
 		PROFILE_ANDROID: [
 			'-vf',		'scale=320:-1',
 			'-vcodec', 	'libx264',
 			'-profile:v',	'baseline',
+			'-b',		'150k',
+			'-bt',		'240k',
 			'-acodec', 	'aac',
 			'-ac',		'1',
 			'-ar', 		'48000',
 			'-ab',		'64k'
-			'-b',		'200k',
-			'-bt',		'240k'
 		],
 		PROFILE_GENERIC: [
+			'-vf',		'scale=320:-1',
+			#'-r',		'30000/1001',
+			'-vcodec',	'libx264',
+			'-pre:v',	'libx264-ipod320',
+			'-b',		'150k',
+			'-bt',		'240k',
+			'-acodec',	'aac',
+			'-ac',		'1',
+			'-ar',		'48000',
+			'-ab',		'64k'
+		],
+		PROFILE_GENERIC_MPEG4: [
 			'-vf',		'scale=320:-1',
 			'-r',		'13',
 			'-vcodec',	'mpeg4',
@@ -860,18 +976,26 @@ class MediaEncoder:
 		if v_metadata:
 			width = v_metadata['width']
 			height = v_metadata['height']
-			length = v_metadata['length'] 
+			length = v_metadata['length']
+
 			if v_metadata.has_key('dar'):
 				aspect = v_metadata['dar']
+				#if aspect[0] == aspect[1]:
+				#	aspect = [ width, height ]
 			elif width > 0.0 and height > 0.0:
 				aspect = [ width, height ]
 
+			aspect = [ float(aspect[0]), float(aspect[1]) ]
+
+			self.original_sub_width = int(height * (aspect[0] / aspect[1]))
+			self.original_sub_height = height
+			
 		if (aspect[1] / aspect[0]) <= 0.75:
 			output_height = math.floor((output_width / aspect[0]) * aspect[1])
 		else:
 			output_width = math.floor((output_height / aspect[1]) * aspect[0])
-			output_border = math.floor((base_width - output_width) / 2.0)
-			output_width += base_width - (output_width + (output_border * 2.0))
+			output_border = math.floor((self.base_width - output_width) / 2.0)
+			output_width += self.base_width - (output_width + (output_border * 2.0))
 
 		self.width = output_width
 		self.height = output_height
@@ -924,7 +1048,7 @@ class MediaEncoder:
 				'-r', '24',
 				'-t', str(self.length),
 				'-vf', 'scale={0}:{1}'.format(int(self.base_width), -1),
-				source
+				avlib_safe_path(source)
 			]
 			result = self._run_cmd(parameters, True, None, "image to video conversation")
 			if not result:
@@ -951,7 +1075,18 @@ class MediaEncoder:
 		]
 		
 		if self.subtitles:
-			parameters += ['-sub', self.subtitles]
+			subpath = self.subtitles
+			subfile = MediaFile(subpath).subfile()
+			
+			(res_x, res_y) = subfile.play_res()
+			if (res_x is None) or (res_y is None):
+				subpath = self.temp_file('subs.ssa')
+				(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
+				subfile.rewrite_play_res(res_x, res_y)
+				if not subfile.save(subpath):
+					subpath = self.subtitles
+			
+			parameters += ['-sub', subpath]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
 		return self._run_cmd(parameters, temp_video, None, "video encoding")
@@ -962,39 +1097,67 @@ class MediaEncoder:
 		else:
 			source = self.video
 
-		source_parameters = ['-i', source]
+		temp_raw = self.temp_file('audio_raw.wav')
+		result = self._run_cmd(['avconv', 
+			'-threads', avconv_threads, 
+			'-loglevel', avconv_loglevel,
+			'-y',
+			'-i', source,
+			'-vcodec', 'none',
+			'-strict', 'experimental',
+			'-ac', '2',
+			'-r', '48000',
+			avlib_safe_path(temp_raw)
+		], temp_raw, None, "audio decoding")
+		if not result:
+			return None
+		
+		temp_norm = self.temp_file('audio_norm.wav')
+		result = self._run_cmd([
+			'sox',
+			temp_raw,
+			temp_norm,
+			'fade', 'l', '0.15', '0', '0.15',
+			'norm'
+		], temp_norm, None, "audio normalisation")
+		if not result:
+			return None
 
 		temp_audio = self.temp_file('audio.wav')
+		source_parameters = ['-i', avlib_safe_path(temp_norm)]
 
 		if self.audio_shift > 0.0:
 			temp_pad = self.temp_file('audio_pad.wav')
-			result = self._run([
+			result = self._run_cmd([
 				'sox', 
 				'-null', temp_pad, 
 				'trim', '0', str(self.audio_shift)
 			])
 			if not result:
 				return None
-			source_parameters = ['-i', temp_pad] + source_parameters
+			source_parameters = ['-i', avlib_safe_path(temp_pad)] + source_parameters
 		elif self.audio_shift < 0.0:
-			temp_raw = self.temp_file('audio_raw.wav')
-			result = self._run(['avconv', '-threads', avconv_threads, '-y', '-i', source, '-vcodec', 'none', temp_raw])
-			if not result:
-				return None
 			temp_cut = self.temp_file('audio_cut.wav')
-			result = self._run([
+			result = self._run_cmd([
 				'sox', 
-				temp_raw, temp_cut, 
-				'trim', str(-self.audio_shift), str(self.length)
+				temp_norm, temp_cut, 
+				'trim', str(-self.audio_shift), str(self.length),
+				'fade', 'l', '0.1'
 			])
 			if not result:
 				return None
-			source_parameters = ['-i', temp_cut]
+			source_parameters = ['-i', avlib_safe_path(temp_cut)]
 
-		parameters = ['avconv', '-threads', '1', '-y', '-loglevel', avconv_loglevel] + source_parameters + [
+		parameters = ['avconv', 
+			'-threads', avconv_threads,
+			'-loglevel', avconv_loglevel,
+			'-y',
+			] + source_parameters + [
 			'-vcodec', 'none',
 			'-strict', 'experimental',
-			temp_audio
+			'-ac', '2',
+			'-r', '48000',
+			avlib_safe_path(temp_audio)
 		]
 		
 		return self._run_cmd(parameters, temp_audio, None, "audio encoding")
@@ -1005,10 +1168,11 @@ class MediaEncoder:
 			'-loglevel', avconv_loglevel,
 			'-threads', avconv_threads,
 			'-y',
-			'-i', video,
-			'-i', audio,
+			'-i', avlib_safe_path(video),
+			'-i', avlib_safe_path(audio),
 			'-strict', 'experimental',
 			'-vcodec', 'copy',
+			'-ab', '224k'
 		]
 		if self.language:
 			parameters += [
@@ -1069,7 +1233,7 @@ class MediaEncoder:
 			'-loglevel', avconv_loglevel,
 			'-threads', avconv_threads,
 			'-y',
-			'-i', self.video,
+			'-i', avlib_safe_path(self.video),
 		]
 		parameters += MediaEncoder.profile_parameters[profile]
 		parameters += [
@@ -1274,7 +1438,7 @@ class MediaItem:
 		encodings = []
 		if (len(languages) == 0) and (len(video_files) > 0):
 			encodings.append({
-				'video': self.select_highest_quality(video_files),
+				'video': self.select_highest_quality(video_files).name,
 				'language': 'und'
 			})
 		elif len(languages) > 0:
@@ -1283,22 +1447,27 @@ class MediaItem:
 				video = self.select_highest_quality(video_files, language=lang)
 				audio = self.select_highest_quality(audio_files, language=lang)
 				image = self.select_highest_quality(image_files)
+				valid = True
 
 				encoding = {
 					'subtitles': subtitles.name,
 					'subtitle-shift': 0.0,
 					'language': lang
 				}
+
 				if video:
 					encoding['video'] = video.name
 				elif image:
 					encoding['image'] = image.name
+				else:
+					valid = False
 
 				if audio:
 					encoding['audio'] = audio.name
 					encoding['audio-shift'] = 0.0
 
-				encodings.append(encoding)
+				if valid:
+					encodings.append(encoding)
 
 		self.encoding.update(encodings)
 
@@ -1405,7 +1574,9 @@ class MediaItem:
 
 	def preview_stage(self):
 		self.log("preview stage")
-		targets = MediaEncoder.profile_names.values()
+
+		# targets = MediaEncoder.profile_names.values()
+		targets = ['generic'] # only generate generic target
 		
 		# find existing previews
 		previews = {}
@@ -1428,15 +1599,23 @@ class MediaItem:
 				metadata=video
 			)
 
-		# remove previews for none existent videos
-		for video in previews:
+		# remove previews for none existent videos (and targets)
+		for video in previews.keys():
 			if not videos.has_key(video):
 				self.log("video " + video + " no longer exists")	
 				for preview in previews[video].values():
 					self.log("rm " + preview.path)
 					preview.unlink()
 				self.descriptor.remove_previews(video=video)
+				del previews[video]
+			# remove unrequired targets
+			for preview in previews[video].values():
+				if preview['target'] not in targets:
+					self.log("rm " + preview.path)
+					preview.unlink()
+					self.descriptor.remove_previews(name=preview['name'])
 		
+		# save state
 		self.descriptor.save()
 		
 		# find videos for which previews need to be (re)generated
@@ -1445,7 +1624,7 @@ class MediaItem:
 			if not previews.has_key(name):
 				to_generate += [ (video, target) for target in targets ]
 			else:
-				to_generate += [ (video, preview['target']) for preview in previews[name].values() if (not preview.exists()) or (video.mtime() > preview.mtime()) ]
+				to_generate += [ (video, preview['target']) for preview in previews[name].values() if ((not preview.exists()) or (video.mtime() > preview.mtime())) and (preview['target'] in targets) ]
 				to_generate += [ (video, target) for target in targets if target not in previews[name].keys() ]
 
 		# generate previews
@@ -1618,7 +1797,7 @@ def test_program(cmd, package):
 	cmd = map(unicode, cmd)
 	try:
 		return subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-	except subprocess.CalledProcessError as error:
+	except:
 		warn('error: ' + cmd[0] + " missing or broken (install " + package + "?)")
 		return None
 
@@ -1662,6 +1841,10 @@ def check_tools():
 		if not ass:
 			warn("error: mencoder does not support advanced subtitles (ass)")
 
+	# sox
+	result = test_program(['sox', '-h'], 'sox')
+	ok = ok and (result is not None)
+	
 	return ok
 
 def find_items(path):
@@ -1675,7 +1858,7 @@ def find_items(path):
 			item = MediaItem(entry_path)
 			if item.valid():
 				items.append(item)
-	return items
+	return sorted(items, key=lambda x:x.name)
 
 def prepare_items(path, label=None):
 	hidden_re = hidden_file_re()
