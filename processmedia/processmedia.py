@@ -1945,7 +1945,7 @@ def main(args):
 			sys.exit(1)
 
 		command = args[0]
-		root = args[1]
+		root = unicode(args[1])
 		if command == 'process':
 			if len(args) >= 3:
 				log_file = args[2]
