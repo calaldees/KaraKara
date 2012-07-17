@@ -409,8 +409,8 @@ class SSAFile(SubFile):
 		return lines
 	
 	@classmethod
-	def from_srt(cls, srt, title, header=None):
-		header = ['[Script Info]', 'Title: <untitled>', 'Original Script: <unknown>', 'ScriptType: v4.00']
+	def from_srt(cls, srt, header=None):
+		ssa_header = ['[Script Info]', 'Title: <untitled>', 'Original Script: <unknown>', 'ScriptType: v4.00']
 		styles = ['[V4 Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding', 'Style: Default,Arial,24,65535,16777215,16777215,0,-1,0,3,1,1,2,30,30,10,0,128']
 		events = ['[Events]', 'Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text']
 		
@@ -425,10 +425,11 @@ class SSAFile(SubFile):
 			new_start = titles[0][0] - 5.0
 			if new_start < 0.0:
 				new_start = 0.0
-			titles[0][0] = new_start
+			titles[0] = (new_start, titles[0][1], titles[0][2])
 
 		# add header title at the beginning
-		if header:
+		if header and (len(header) > 0):
+			print 'header: ', header
 			line = '{\\a6}'
 			if len(header) == 1:
 				line += header[0]
@@ -437,7 +438,7 @@ class SSAFile(SubFile):
 			elif len(header) == 3:
 				line += header[0] + ' - {\c&HFFFF00&}' + header[1] + '\\N {\c&H8080FF&}' + header[2]
 			else:
-				line += header
+				line += ''.join(header)
 			start = 0.0
 			end = titles[0][0]
 			if end > 5.0:
@@ -446,11 +447,11 @@ class SSAFile(SubFile):
 
 		# convert titles to SSA dialogue
 		for (start, end, line) in titles:
-			line = re.replace('\n', '\\N', line)
+			line = re.sub('\n', '\\N', line)
 			events.append('Dialogue: Marked=0,{0},{1},Default,Lyrics,0000,0000,0000,!Effect,{2}'.format(as_timestamp(start), as_timestamp(end), line))
 
 		ssa = SSAFile(None)
-		ssa.data = header + [''] + styles + [''] + events
+		ssa.data = ssa_header + [''] + styles + [''] + events
 		ssa.parse()
 
 		return ssa
@@ -1411,8 +1412,7 @@ class MediaItem:
 	
 	def header(self):
 		# FIXME: use tag data?
-		name_parts = re.split(r'\s*-\s*', self.name, 3)
-		return name_parts
+		return re.split(r'\s*-\s*', self.name, 3)
 
 	def log(self, *s):
 		now = time.time()
