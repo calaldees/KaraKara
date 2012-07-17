@@ -1521,7 +1521,7 @@ class MediaItem:
 				files = unknown_files
 				
 		if len(files) > 0:
-			sorted_files = sorted(files, key=lambda x:x['quality'], reverse=True)
+			sorted_files = sorted(files, key=lambda x:x['score'], reverse=True)
 			return sorted_files[0]
 		else:
 			return None
