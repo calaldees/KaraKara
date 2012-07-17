@@ -1192,7 +1192,15 @@ class MediaEncoder:
 		if self.subtitles:
 			subpath = self.subtitles
 			subfile = MediaFile(subpath).subfile()
+
+			# rewrite SRT subtitles to SSA
+			if subfile.type() == 'srt':
+				subpath = self.time_file('converted.ssa')
+				subfile = SSAFile.from_srt(subfile, header=self.parent.header())
+				subfile.path = subpath
+				subfile.save(subpath)
 			
+			# rewrite play resolution of SSA files
 			(res_x, res_y) = subfile.play_res()
 			if (res_x is None) or (res_y is None):
 				subpath = self.temp_file('subs.ssa')
@@ -1401,6 +1409,11 @@ class MediaItem:
 		self.hidden_re = hidden_file_re()
 		self.media_re = media_file_re()
 	
+	def header(self):
+		# FIXME: use tag data?
+		name_parts = re.split(r'\s*-\s*', self.name, 3)
+		return name_parts
+
 	def log(self, *s):
 		now = time.time()
 		
