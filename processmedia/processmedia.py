@@ -845,7 +845,6 @@ class MediaEncoder:
 	}
 	profile_parameters = {
 		PROFILE_IPHONE: [
-			'-vf',		'scale=320:-1',
 			#'-r',		'30000/1001',
 			'-vcodec',	'libx264',
 			'-pre:v',	'libx264-ipod320',
@@ -857,7 +856,6 @@ class MediaEncoder:
 			'-bt',		'240k'
 		],
 		PROFILE_ANDROID: [
-			'-vf',		'scale=320:-1',
 			'-vcodec', 	'libx264',
 			'-profile:v',	'baseline',
 			'-b',		'150k',
@@ -868,7 +866,6 @@ class MediaEncoder:
 			'-ab',		'64k'
 		],
 		PROFILE_GENERIC: [
-			'-vf',		'scale=320:-1',
 			#'-r',		'30000/1001',
 			'-vcodec',	'libx264',
 			'-pre:v',	'libx264-ipod320',
@@ -880,7 +877,6 @@ class MediaEncoder:
 			'-ab',		'64k'
 		],
 		PROFILE_GENERIC_MPEG4: [
-			'-vf',		'scale=320:-1',
 			'-r',		'13',
 			'-vcodec',	'mpeg4',
 			'-acodec',	'aac',
@@ -1220,12 +1216,14 @@ class MediaEncoder:
 		
 		return result
 
-	def transcode(self, profile, offset=0.0, length=0.0):
+	def transcode(self, profile, offset=0.0, length=0.0, width=320, height=0):
 		if not self.valid_for_transcode():
 			return False
 		if profile not in MediaEncoder.profile_names.keys(): 
 			return False
 
+		self.probe_media()
+		
 		transcode = self.temp_file("transcode" + MediaEncoder.profile_extension(profile))
 		
 		parameters = [
@@ -1235,6 +1233,16 @@ class MediaEncoder:
 			'-y',
 			'-i', avlib_safe_path(self.video),
 		]
+		if (width > 0) or (height > 0):
+			if height == 0:
+				height = float(width) * (self.aspect[1] / self.aspect[0])
+			elif width == 0:
+				width = float(height) * (self.aspect[0] / self.aspect[1])
+			width = int(math.floor(width + 0.5))
+			height = int(math.floor(height + 0.5))
+			width += width % 2
+			height += height % 2
+			parameters += [ '-vf', "scale={0}:{1}".format(width, height) ]
 		parameters += MediaEncoder.profile_parameters[profile]
 		parameters += [
 			'-strict', 'experimental',
