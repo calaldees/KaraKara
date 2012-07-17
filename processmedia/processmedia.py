@@ -62,7 +62,7 @@ def image_file_re():
 	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def subtitle_file_re():
-	return re.compile(r'^.*\.(ass|ssa)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(ass|ssa|srt)$', re.IGNORECASE)
 
 def avlib_safe_path(path):
 	# avconv does not correctly handle percentage signs in image paths
@@ -166,7 +166,8 @@ class SubFile:
 		self.path = path
 		self.data = []
 		self.titles = []
-		self.load()
+		if self.path:
+			self.load()
 
 	def load(self):
 		self.data[:] = []
@@ -202,6 +203,9 @@ class SubFile:
 		except IOError as (errno, strerror):
 			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
 			return False
+
+	def parse(self):
+		raise AssertionError
 
 	def raw_lines(self):
 		lines = []
@@ -271,13 +275,39 @@ class SubFile:
 		else:
 			return langs[0]
 
-class SSAFile(SubFile):
-	def __init__(self, path):
-		self.path = path
-		self.data = []
-		self.titles = []
-		self.load()
+class SRTFile(SubFile):
+	def parse(self):
+		index_re = re.compile(r'^(\d+)\s*$')
+		timing_re = re.compile(r'^(\d+:\d+:\d+,\d+)\s*-->\s*(\d+:\d+:\d+,\d+)\s*$')
+		self.titles[:] = []
+		state = 0
+		index = None
+		start = None
+		end = None
+		lines = None
+		for line in self.data:
+			if state == 0:
+				m = index_re.match(line)
+				if m:
+					index = m.group(1)
+					state = 1
+			elif state == 1:
+				m = timing_re.match(line)
+				if m:
+					start = parse_timestamp(m.group(1))
+					end = parse_timestamp(m.group(2))
+					lines[:] = []
+					state = 2
+				else:
+					state = 0
+			elif state == 2:
+				if len(line) == 0:
+					self.titles.append((start, end, '\n'.join(lines)))
+					state = 0
+				else:
+					lines.append(line)
 
+class SSAFile(SubFile):
 	def parse(self):
 		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
 		self.titles[:] = []
@@ -446,7 +476,10 @@ class MediaFile:
 		return self.calculate_aspect(aspect[0], aspect[1])
 
 	def subfile(self):
-		return SSAFile(self.path)
+		if re.match(r'^.*\.srt$', self.path, re.IGNORECASE):
+			return SRTFile(self.path)
+		else:
+			return SSAFile(self.path)
 
 	def probe(self):
 		try:
