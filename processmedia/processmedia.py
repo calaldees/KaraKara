@@ -1375,7 +1375,7 @@ class MediaItem:
 		for file in self.sources.subtitles():
 			subfile = file.subfile()
 			entry = {
-				'url': "/".join(['source', urllib.quote(file.name)]),
+				'url': "/".join(['source', urllib.quote(file.name.encode('utf8'))]),
 				'name': file.name,
 				'language': file.metadata['language'],
 				'lines' : subfile.clean_lines(),
@@ -1561,7 +1561,7 @@ class MediaItem:
 				self.log("encode complete")
 				media = MediaFile(path)
 				metadata = media.probe()
-				metadata['url'] = "/".join(['video', urllib.quote(name)])
+				metadata['url'] = "/".join(['video', urllib.quote(name.encode('utf8'))])
 				metadata['name'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
@@ -1652,7 +1652,7 @@ class MediaItem:
 				media = MediaFile(path)
 				metadata = media.probe()
 				metadata['target'] = target
-				metadata['url'] = "/".join(['preview', urllib.quote(preview_name)])
+				metadata['url'] = "/".join(['preview', urllib.quote(preview_name.encode('utf8'))])
 				metadata['name'] = preview_name
 				metadata['src'] = name
 				metadata['language'] = video['language']
@@ -1742,7 +1742,7 @@ class MediaItem:
 				thumb_name = names[path]
 				thumb_media = MediaFile(path)
 				metadata = thumb_media.probe()
-				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name)])
+				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name.encode('utf8'))])
 				metadata['name'] = thumb_name
 				metadata['src'] = video['name']
 				metadata['time-index'] = time
