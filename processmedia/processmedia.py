@@ -629,6 +629,10 @@ class MediaFile:
 	
 	def _score(self):
 		score = 1.0
+		if self.is_subtitles():
+			subfile = self.subfile()
+			if subfile.type() == 'srt':
+				score = 0.5
 		if self.metadata.has_key('width') and self.metadata.has_key('height'):
 			score *= float((self.metadata['width'] * self.metadata['height'])) / (640.0 * 480.0)
 		#if self.metadata.has_key('vbitrate'):
