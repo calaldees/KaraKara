@@ -1,0 +1,14 @@
+title:
+category:anime,jpop,jdrama,game,cartoon
+from:series_name,game_name
+use:opening,ending,ost,insert,image
+use:op3
+
+artist:can_have_multiple
+artist:can_have_multiple_tags
+genre:pop,rock,metal,rap,
+vocalstyle:female,male
+vocalstyle:duet,group,backing
+lang:en,jp,ln
+vocaltrack:on(default?),off,band
+length:full(default?),short
