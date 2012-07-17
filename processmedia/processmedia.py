@@ -1093,7 +1093,7 @@ class MediaEncoder:
 			width = v_metadata['width']
 			height = v_metadata['height']
 			length = v_metadata['length']
-
+		
 			if v_metadata.has_key('dar'):
 				aspect = v_metadata['dar']
 				#if aspect[0] == aspect[1]:
@@ -1105,13 +1105,20 @@ class MediaEncoder:
 
 			self.original_sub_width = int(height * (aspect[0] / aspect[1]))
 			self.original_sub_height = height
-			
+		
+
 		if (aspect[1] / aspect[0]) <= 0.75:
 			output_height = math.floor((output_width / aspect[0]) * aspect[1])
 		else:
 			output_width = math.floor((output_height / aspect[1]) * aspect[0])
-			output_border = math.floor((self.base_width - output_width) / 2.0)
+			output_border = math.floor((float(self.base_width) - output_width) / 2.0)
 			output_width += self.base_width - (output_width + (output_border * 2.0))
+
+		# override when dealing with image input
+		if self.image:
+			output_width = self.base_width
+			output_height = self.base_height
+			aspect = [ float(self.base_width) / float(self.base_height), 1.0 ] 
 
 		self.width = output_width
 		self.height = output_height
@@ -1160,15 +1167,10 @@ class MediaEncoder:
 			source = self.temp_file('imagery.avi')
 
 			# scale image input to appropriate size and pad
-			scale = 1.0
-			if self.original_sub_width > self.base_width:
-				s = float(self.base_width) / float(self.original_sub_width)
-				if s < scale:
-					scale = s
-			if self.original_sub_height > self.base_height:
-				s = float(self.base_height) / float(self.original_sub_height)
-				if s < scale:
-					scale = s
+			scale = float(self.base_width) / float(self.original_sub_width)
+			s = float(self.base_height) / float(self.original_sub_height)
+			if s < scale:
+				scale = s
 			img_width = int(math.floor(self.original_sub_width * scale))
 			img_width += img_width % 2
 			img_height = int(math.floor(self.original_sub_height * scale))
