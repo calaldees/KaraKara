@@ -1150,10 +1150,30 @@ class MediaEncoder:
 		return run_command(cmd, log_object=self.parent, label=label, success=success, fail=fail)
 
 	def encode_video(self):
+		filters = ['ass']
 		if self.video:
 			source = self.video
+			filters += ['scale={0}:{1}'.format(int(self.width), int(self.height))]
+			if self.border >= 0.0:
+				filters += ['expand={0}:{1}'.format(int(self.base_width), int(self.height))]
 		elif self.image:
 			source = self.temp_file('imagery.avi')
+
+			# scale image input to appropriate size and pad
+			scale = 1.0
+			if self.original_sub_width > self.base_width:
+				s = float(self.base_width) / float(self.original_sub_width)
+				if s < scale:
+					scale = s
+			if self.original_sub_height > self.base_height:
+				s = float(self.base_height) / float(self.original_sub_height)
+				if s < scale:
+					scale = s
+			img_width = int(math.floor(self.original_sub_width * scale))
+			img_width += img_width % 2
+			img_height = int(math.floor(self.original_sub_height * scale))
+			img_height += img_height % 2
+
 			parameters = [
 				'avconv',
 				'-loglevel', avconv_loglevel,
@@ -1161,9 +1181,11 @@ class MediaEncoder:
 				'-y', 
 				'-loop', '1', 
 				'-i', self.image,
+				'-vf', 'scale={0}:{1}'.format(img_width, img_height) + ',pad={0}:{1}:(ow-iw)/2:(oh-ih)/2,setsar=1:1'.format(self.base_width, self.base_height),
 				'-r', '24',
 				'-t', str(self.length),
-				'-vf', 'scale={0}:{1}'.format(int(self.base_width), -1),
+				'-bf', '0',
+				'-qmax', '2',
 				avlib_safe_path(source)
 			]
 			result = self._run_cmd(parameters, True, None, "image to video conversation")
@@ -1171,10 +1193,6 @@ class MediaEncoder:
 				return None
 		else:
 			return None
-
-		filters = [ 'ass', 'scale={0}:{1}'.format(int(self.width), int(self.height)) ]
-		if self.border >= 0.0:
-			filters += [ 'expand={0}:{1}'.format(int(self.base_width), int(self.height)) ]
 
 		temp_video = self.temp_file('video.avi')
 		parameters = [
@@ -1205,7 +1223,12 @@ class MediaEncoder:
 			(res_x, res_y) = subfile.play_res()
 			if (res_x is None) or (res_y is None):
 				subpath = self.temp_file('subs.ssa')
-				(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
+				
+				if source == self.video:
+					(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
+				else:
+					(res_x, res_y) = subfile.calculate_play_res(self.base_width, self.base_height)
+				
 				subfile.rewrite_play_res(res_x, res_y)
 				if not subfile.save(subpath):
 					subpath = self.subtitles
