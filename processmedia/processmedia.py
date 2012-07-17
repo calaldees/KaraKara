@@ -161,7 +161,7 @@ class JSONFile(dict):
 		super(JSONFile, self).__setitem__(y, v)
 		self.changed = True
 
-class SSAFile:
+class SubFile:
 	def __init__(self, path):
 		self.path = path
 		self.data = []
@@ -202,6 +202,81 @@ class SSAFile:
 		except IOError as (errno, strerror):
 			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
 			return False
+
+	def raw_lines(self):
+		lines = []
+		for (start, end, text) in sorted(self.titles, key=itemgetter(0)):
+			lines.append(text)
+		return lines
+	
+	def dedup_lines(self, src_lines):
+		return src_lines
+
+	def clean_lines(self, dedup=True):
+		lines = []
+		previous = []
+		for line in self.raw_lines():
+			(line, n) = re.subn(r'({.*?})', '', line)
+			(line, n) = re.subn(r'(\s+)', ' ', line)
+			(line, n) = re.subn(r'(\\N)', "\n", line, flags=re.IGNORECASE)
+			lines.append(line)
+		if dedup:
+			return self.dedup_lines(lines)
+		else:
+			return lines
+
+	def length(self):
+		max_end = 0.0
+		for (start, end, text) in self.titles:
+			if end > max_end:
+				max_end = end
+		return max_end
+	
+	def play_res(self):
+		return (None, None)
+
+	def calculate_play_res(self, display_x, display_y):
+		raise AssertionError
+
+	def rewrite_play_res(self, res_x, res_y):
+		raise AssertionError
+	
+	def lang_ratio(self, match_words):
+		r = 0.0
+		for (start, end, text) in self.titles:
+			words = re.split(r'\s+', text.lower())
+			r += float(sum([ 1 for word in words if match_words.has_key(word) ])) / float(len(words))
+		return r
+
+	def jpn_ratio(self):
+		match_words = {}
+		for m in [ 'wa', 'no', 'yo', 'da', 'ni', 'ga', 'wo', 'kare', 'koi', 'ai' ]:
+			match_words[m] = True
+		return self.lang_ratio(match_words)
+	
+	def eng_ratio(self):
+		match_words = {}
+		for m in [ 'the', 'a', 'on', 'i', 'you', 'he', 'she', 'is', 'yes', 'no' ]:
+			match_words[m] = True
+		return self.lang_ratio(match_words)
+
+	def guess_language(self):
+		ratios = {
+			'jpn': self.jpn_ratio(),
+			'eng': self.eng_ratio()
+		}
+		langs = sorted(ratios.keys(), key=lambda x:ratios[x], reverse=True)
+		if ratios[langs[0]] < 0.1:
+			return 'und'
+		else:
+			return langs[0]
+
+class SSAFile(SubFile):
+	def __init__(self, path):
+		self.path = path
+		self.data = []
+		self.titles = []
+		self.load()
 
 	def parse(self):
 		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
@@ -269,12 +344,6 @@ class SSAFile:
 
 		return True
 	
-	def raw_lines(self):
-		lines = []
-		for (start, end, text) in sorted(self.titles, key=itemgetter(0)):
-			lines.append(text)
-		return lines
-	
 	def dedup_lines(self, src_lines):
 		src_lines.reverse()
 		lines = []
@@ -291,57 +360,6 @@ class SSAFile:
 			lines.append(line)
 		lines.reverse()
 		return lines
-
-	def clean_lines(self, dedup=True):
-		lines = []
-		previous = []
-		for line in self.raw_lines():
-			(line, n) = re.subn(r'({.*?})', '', line)
-			(line, n) = re.subn(r'(\s+)', ' ', line)
-			(line, n) = re.subn(r'(\\N)', "\n", line, flags=re.IGNORECASE)
-			lines.append(line)
-		if dedup:
-			return self.dedup_lines(lines)
-		else:
-			return lines
-
-	def length(self):
-		max_end = 0.0
-		for (start, end, text) in self.titles:
-			if end > max_end:
-				max_end = end
-		return max_end
-	
-	def lang_ratio(self, match_words):
-		r = 0.0
-		for (start, end, text) in self.titles:
-			words = re.split(r'\s+', text.lower())
-			r += float(sum([ 1 for word in words if match_words.has_key(word) ])) / float(len(words))
-		return r
-
-	def jpn_ratio(self):
-		match_words = {}
-		for m in [ 'wa', 'no', 'yo', 'da', 'ni', 'ga', 'wo', 'kare', 'koi', 'ai' ]:
-			match_words[m] = True
-		return self.lang_ratio(match_words)
-	
-	def eng_ratio(self):
-		match_words = {}
-		for m in [ 'the', 'a', 'on', 'i', 'you', 'he', 'she', 'is', 'yes', 'no' ]:
-			match_words[m] = True
-		return self.lang_ratio(match_words)
-
-	def guess_language(self):
-		ratios = {
-			'jpn': self.jpn_ratio(),
-			'eng': self.eng_ratio()
-		}
-		langs = sorted(ratios.keys(), key=lambda x:ratios[x], reverse=True)
-		if ratios[langs[0]] < 0.1:
-			return 'und'
-		else:
-			return langs[0]
-
 
 class MediaFile:
 	def __init__(self, path, metadata=None):
