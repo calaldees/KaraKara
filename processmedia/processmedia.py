@@ -627,7 +627,7 @@ class TagList:
 		try:
 			fp = open(self.path, 'w')
 			for tag in self.data:
-				fp.write(tag + "\r\n")
+				fp.write(tag.encode('utf8') + "\r\n")
 			fp.close()
 			self.changed = False
 			self.loaded = True
