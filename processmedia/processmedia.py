@@ -84,6 +84,17 @@ def parse_timestamp(ts):
 	else:
 		return 0.0
 
+def as_timestamp(time):
+	hours = int(time / (60.0 * 60.0))
+	time -= float(hours) * (60.0 * 60.0)
+	minutes = int(time / 60.0)
+	time -= float(minutes) * 60.0
+	seconds = int(math.floor(time))
+	time -= float(seconds)
+	fraction = "%.2f" % time
+	fraction = (fraction.split('.'))[1]
+	return "%01d:%02d:%02d.%s" % (hours, minutes, seconds, fraction)
+
 def run_command(cmd, label="", log_object=None, success=True, fail=False):
 	def do_log(msg):
 		if log_object:
@@ -276,6 +287,9 @@ class SubFile:
 			return langs[0]
 
 class SRTFile(SubFile):
+	def type(self):
+		return 'srt'
+
 	def parse(self):
 		index_re = re.compile(r'^(\d+)\s*$')
 		timing_re = re.compile(r'^(\d+:\d+:\d+,\d+)\s*-->\s*(\d+:\d+:\d+,\d+)\s*$')
@@ -308,6 +322,9 @@ class SRTFile(SubFile):
 					lines.append(line)
 
 class SSAFile(SubFile):
+	def type(self):
+		return 'ssa'
+
 	def parse(self):
 		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
 		self.titles[:] = []
@@ -390,6 +407,53 @@ class SSAFile(SubFile):
 			lines.append(line)
 		lines.reverse()
 		return lines
+	
+	@classmethod
+	def from_srt(cls, srt, title, header=None):
+		header = ['[Script Info]', 'Title: <untitled>', 'Original Script: <unknown>', 'ScriptType: v4.00']
+		styles = ['[V4 Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding', 'Style: Default,Arial,24,65535,16777215,16777215,0,-1,0,3,1,1,2,30,30,10,0,128']
+		events = ['[Events]', 'Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text']
+		
+		titles = sorted(srt.titles, key=itemgetter(0))
+		if len(titles) > 0:
+			# copy next line on to end of previous line and adjust time stamps
+			for n in range(len(titles) - 1):
+				n_t = titles[n]
+				np_t = titles[n+1]
+				titles[n] = (n_t[0], np_t[0], n_t[2] + '\\N {\\c&HFFFFFF&}' + np_t[2])
+			# pull initial line backward
+			new_start = titles[0][0] - 5.0
+			if new_start < 0.0:
+				new_start = 0.0
+			titles[0][0] = new_start
+
+		# add header title at the beginning
+		if header:
+			line = '{\\a6}'
+			if len(header) == 1:
+				line += header[0]
+			elif len(header) == 2:
+				line += header[0] + '\\N {\c&H8080FF&}' + header[1]
+			elif len(header) == 3:
+				line += header[0] + ' - {\c&HFFFF00&}' + header[1] + '\\N {\c&H8080FF&}' + header[2]
+			else:
+				line += header
+			start = 0.0
+			end = titles[0][0]
+			if end > 5.0:
+				end = 5.0
+			titles.insert(0, (start, end, line))
+
+		# convert titles to SSA dialogue
+		for (start, end, line) in titles:
+			line = re.replace('\n', '\\N', line)
+			events.append('Dialogue: Marked=0,{0},{1},Default,Lyrics,0000,0000,0000,!Effect,{2}'.format(as_timestamp(start), as_timestamp(end), line))
+
+		ssa = SSAFile(None)
+		ssa.data = header + [''] + styles + [''] + events
+		ssa.parse()
+
+		return ssa
 
 class MediaFile:
 	def __init__(self, path, metadata=None):
