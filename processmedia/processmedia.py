@@ -298,7 +298,7 @@ class SRTFile(SubFile):
 		index = None
 		start = None
 		end = None
-		lines = None
+		lines = []
 		for line in self.data:
 			if state == 0:
 				m = index_re.match(line)
@@ -1195,7 +1195,7 @@ class MediaEncoder:
 
 			# rewrite SRT subtitles to SSA
 			if subfile.type() == 'srt':
-				subpath = self.time_file('converted.ssa')
+				subpath = self.temp_file('converted.ssa')
 				subfile = SSAFile.from_srt(subfile, header=self.parent.header())
 				subfile.path = subpath
 				subfile.save(subpath)
