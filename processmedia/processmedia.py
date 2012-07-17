@@ -72,7 +72,7 @@ def avlib_safe_path(path):
 		return path
 
 def parse_timestamp(ts):
-	ts_match = re.search(r'(\d+):(\d+):(\d+)\.(\d+)', ts)
+	ts_match = re.search(r'(\d+):(\d+):(\d+)[\.,](\d+)', ts)
 	if ts_match:
 		hours = float(ts_match.group(1)) * 60.0 * 60.0
 		minutes = float(ts_match.group(2)) * 60.0
