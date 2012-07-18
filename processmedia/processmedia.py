@@ -410,9 +410,15 @@ class SSAFile(SubFile):
 		return lines
 	
 	@classmethod
-	def from_srt(cls, srt, header=None):
+	def from_srt(cls, srt, header=None, width=1024):
+		scale = float(width) / 1024.0
+		font_size = int(math.floor(48.0 * scale))
+
 		ssa_header = ['[Script Info]', 'Title: <untitled>', 'Original Script: <unknown>', 'ScriptType: v4.00']
-		styles = ['[V4 Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding', 'Style: Default,Arial,24,65535,16777215,16777215,0,-1,0,3,1,1,2,30,30,10,0,128']
+
+		styles = ['[V4 Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding']
+		styles.append('Style: Default,Arial,{0},65535,16777215,16777215,0,-1,0,3,1,1,2,30,30,10,0,128'.format(font_size))
+		
 		events = ['[Events]', 'Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text']
 		
 		titles = sorted(srt.titles, key=itemgetter(0))
@@ -430,7 +436,6 @@ class SSAFile(SubFile):
 
 		# add header title at the beginning
 		if header and (len(header) > 0):
-			print 'header: ', header
 			line = '{\\a6}'
 			if len(header) == 1:
 				line += header[0]
