@@ -1164,7 +1164,41 @@ class MediaEncoder:
 		return run_command(cmd, log_object=self.parent, label=label, success=success, fail=fail)
 
 	def encode_video(self):
-		filters = ['ass']
+		sub_prescale = True
+
+		if self.subtitles:
+			subpath = self.subtitles
+			subfile = MediaFile(subpath).subfile()
+
+			# rewrite SRT subtitles to SSA
+			if subfile.type() == 'srt':
+				sub_prescale = False
+				subpath = self.temp_file('converted.ssa')
+				subfile = SSAFile.from_srt(subfile, header=self.parent.header(), width=self.width)
+				subfile.path = subpath
+				if not subfile.save(subpath):
+					warn("unable to save converted subtitles to " + subpath + ", using original subtitles instead")
+					subpath = self.subtitles
+			
+			# rewrite play resolution of SSA files
+			(res_x, res_y) = subfile.play_res()
+			if (res_x is None) or (res_y is None):
+				subpath = self.temp_file('subs.ssa')
+				
+				if self.video and sub_prescale:
+					(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
+				else:
+					(res_x, res_y) = subfile.calculate_play_res(self.width, self.height)
+				
+				subfile.rewrite_play_res(res_x, res_y)
+				if not subfile.save(subpath):
+					warn("unable to save rewritten subtitles to " + subpath + ", using original subtitles instead")
+					subpath = self.subtitles
+			
+		
+		filters = []
+		if sub_prescale:
+			filters += ['ass']
 		if self.video:
 			source = self.video
 			filters += ['scale={0}:{1}'.format(int(self.width), int(self.height))]
@@ -1202,6 +1236,9 @@ class MediaEncoder:
 				return None
 		else:
 			return None
+		
+		if not sub_prescale:
+			filters += ['ass']
 
 		temp_video = self.temp_file('video.avi')
 		parameters = [
@@ -1216,32 +1253,8 @@ class MediaEncoder:
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
-		
-		if self.subtitles:
-			subpath = self.subtitles
-			subfile = MediaFile(subpath).subfile()
 
-			# rewrite SRT subtitles to SSA
-			if subfile.type() == 'srt':
-				subpath = self.temp_file('converted.ssa')
-				subfile = SSAFile.from_srt(subfile, header=self.parent.header())
-				subfile.path = subpath
-				subfile.save(subpath)
-			
-			# rewrite play resolution of SSA files
-			(res_x, res_y) = subfile.play_res()
-			if (res_x is None) or (res_y is None):
-				subpath = self.temp_file('subs.ssa')
-				
-				if source == self.video:
-					(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
-				else:
-					(res_x, res_y) = subfile.calculate_play_res(self.base_width, self.base_height)
-				
-				subfile.rewrite_play_res(res_x, res_y)
-				if not subfile.save(subpath):
-					subpath = self.subtitles
-			
+		if self.subtitles:
 			parameters += ['-sub', subpath]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
