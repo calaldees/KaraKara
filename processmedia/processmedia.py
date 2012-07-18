@@ -431,7 +431,7 @@ class SSAFile(SubFile):
 				np_t = titles[n+1]
 				titles[n] = (n_t[0], np_t[0], n_t[2] + '\\N {\\c&HFFFFFF&}' + np_t[2])
 			# pull initial line backward
-			new_start = titles[0][0] - 5.0
+			new_start = titles[0][0] - 2.5
 			if new_start < 0.0:
 				new_start = 0.0
 			titles[0] = (new_start, titles[0][1], titles[0][2])
