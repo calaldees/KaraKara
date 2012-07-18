@@ -4,6 +4,7 @@ import math, fcntl, os, re, string, sys, time
 import subprocess, urllib
 import hashlib
 import json
+import codecs
 
 from operator import itemgetter, attrgetter
 
@@ -177,13 +178,14 @@ class SubFile:
 		self.path = path
 		self.data = []
 		self.titles = []
+		self.encoding = 'utf-8'
 		if self.path:
 			self.load()
 
 	def load(self):
 		self.data[:] = []
 		try:
-			fp = open(self.path, 'r')
+			fp = open(self.path, 'rb')
 			lines = fp.readlines()
 			fp.close()
 			for line in lines:
@@ -191,24 +193,23 @@ class SubFile:
 					line = line.decode('utf-8')
 				except UnicodeDecodeError:
 					line = line.decode('latin-1')
-				self.data.append(line.strip())
+
+				# Remove BOM and strip
+				line = line.replace(u'\ufeff', '')
+				line = line.strip()
+				self.data.append(line)
 		except IOError:
 			self.data.clear()
 
 		self.parse()
 	
 	def save(self, path, encoding=None):
+		if not encoding:
+			encoding = self.encoding
 		try:
-			fp = open(path, 'w')
+			fp = codecs.open(path, 'wb', encoding)
 			for line in self.data:
-				if encoding:
-					fp.write((line + "\r\n").encode(encoding))
-				else:
-					try:
-						fp.write(line + "\r\n")
-					except UnicodeEncodeError:
-						warn("encoding line as latin-1: \"", line, "\"")
-						fp.write((line + "\r\n").encode('latin-1'))
+				fp.write(line + "\r\n")
 			fp.close()
 			return True
 		except IOError as (errno, strerror):
@@ -727,12 +728,13 @@ class TagList:
 	
 	def _load(self):
 		try:
-			fp = open(self.path, 'r')
+			fp = open(self.path, 'rb')
 			lines = fp.readlines()
 			fp.close()
 			self.data.clear()
 			for line in lines:
-				tag = line.strip() # FIXME: \r\n?
+				line = line.decode('utf-8')
+				tag = line.replace(u'\ufeff', '').strip()
 				self.data.append(tag)
 			self.loaded = True
 			self.changed = False
@@ -745,9 +747,9 @@ class TagList:
 
 	def _save(self):
 		try:
-			fp = open(self.path, 'w')
+			fp = codecs.open(self.path, 'wb', 'utf-8')
 			for tag in self.data:
-				fp.write(tag.encode('utf8') + "\r\n")
+				fp.write(tag + "\r\n")
 			fp.close()
 			self.changed = False
 			self.loaded = True
@@ -1540,7 +1542,7 @@ class MediaItem:
 		for file in self.sources.subtitles():
 			subfile = file.subfile()
 			entry = {
-				'url': "/".join(['source', urllib.quote(file.name.encode('utf8'))]),
+				'url': "/".join(['source', urllib.quote(file.name.encode('utf-8'))]),
 				'name': file.name,
 				'language': file.metadata['language'],
 				'lines' : subfile.clean_lines(),
@@ -1726,7 +1728,7 @@ class MediaItem:
 				self.log("encode complete")
 				media = MediaFile(path)
 				metadata = media.probe()
-				metadata['url'] = "/".join(['video', urllib.quote(name.encode('utf8'))])
+				metadata['url'] = "/".join(['video', urllib.quote(name.encode('utf-8'))])
 				metadata['name'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
@@ -1817,7 +1819,7 @@ class MediaItem:
 				media = MediaFile(path)
 				metadata = media.probe()
 				metadata['target'] = target
-				metadata['url'] = "/".join(['preview', urllib.quote(preview_name.encode('utf8'))])
+				metadata['url'] = "/".join(['preview', urllib.quote(preview_name.encode('utf-8'))])
 				metadata['name'] = preview_name
 				metadata['src'] = name
 				metadata['language'] = video['language']
@@ -1907,7 +1909,7 @@ class MediaItem:
 				thumb_name = names[path]
 				thumb_media = MediaFile(path)
 				metadata = thumb_media.probe()
-				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name.encode('utf8'))])
+				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name.encode('utf-8'))])
 				metadata['name'] = thumb_name
 				metadata['src'] = video['name']
 				metadata['time-index'] = time
