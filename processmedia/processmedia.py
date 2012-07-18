@@ -413,11 +413,13 @@ class SSAFile(SubFile):
 	def from_srt(cls, srt, header=None, width=1024):
 		scale = float(width) / 1024.0
 		font_size = int(math.floor(48.0 * scale))
+		margin_h_size = int(math.floor(50.0 * scale))
+		margin_v_size = int(math.floor(20.0 * scale))
 
 		ssa_header = ['[Script Info]', 'Title: <untitled>', 'Original Script: <unknown>', 'ScriptType: v4.00']
 
 		styles = ['[V4 Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding']
-		styles.append('Style: Default,Arial,{0},65535,16777215,16777215,0,-1,0,3,1,1,2,30,30,10,0,128'.format(font_size))
+		styles.append('Style: Default,Arial,{0},65535,16777215,16777215,0,-1,0,3,1,1,2,{1},{1},{2},0,128'.format(font_size, margin_h_size, margin_v_size))
 		
 		events = ['[Events]', 'Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text']
 		
