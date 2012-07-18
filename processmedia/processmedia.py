@@ -446,9 +446,7 @@ class SSAFile(SubFile):
 			else:
 				line += ''.join(header)
 			start = 0.0
-			end = titles[0][0]
-			if end > 5.0:
-				end = 5.0
+			end = 6.0
 			titles.insert(0, (start, end, line))
 
 		# convert titles to SSA dialogue
