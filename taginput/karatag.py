@@ -11,7 +11,7 @@ name   = __file__.split('.')[0]
 
 path_root = './data/'
 path_tags = 'tags.txt'
-time_limit = datetime.datetime(year=2012, month=7, day=1)
+time_limit = datetime.datetime(year=2012, month=7, day=18)
 
 #----------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ def print_file(filename):
 	file = open(filename,'r')
 	for line in file:
 		print(line.replace('\n',''))
-        file.close()
+	file.close()
 	print("</pre>")
 
 def html_doc(func_body, title=''):
@@ -44,23 +44,29 @@ def html_doc(func_body, title=''):
 	print("")
 	print("</body></html>")
 
-def tag_link(id, text=None):
-	time_mod = datetime.datetime.fromtimestamp(os.path.getmtime(id_to_filename(id)))
-	class_   = ''
-	if not text:
-		text = id
-	if time_mod > time_limit:
-		class_ = 'edited'
-	return "<a href='%(script)s?id=%(id)s' class='%(class_)s'>%(text)s</a>" % dict(script=__file__, id=urllib.quote(id), text=text, class_=class_)
-
+edited_file_count = 0 #AllanC - OH MY GOD!!! HACK!! FOR GODS SAKE FIX THIS ATROCITY!!
 def list_all():
+	total_file_count  = 0
+	def tag_link(id, text=None):
+		time_mod = datetime.datetime.fromtimestamp(os.path.getmtime(id_to_filename(id)))
+		class_   = ''
+		if not text:
+			text = id
+		if time_mod > time_limit:
+			class_ = 'edited'
+			global edited_file_count
+			edited_file_count += 1
+		return "<a href='%(script)s?id=%(id)s' class='%(class_)s' target='_blank'>%(text)s</a>" % dict(script=__file__, id=urllib.quote(id), text=text, class_=class_)
+
 	for root, dirs, files in os.walk(path_root):
 		for file in files:
 			print("<p>%s</p>" % tag_link(filename_to_id(os.path.join(root,file))) )
+			total_file_count += 1
+	print("<p>%d of %d complete (%.2f)</p>" % (edited_file_count, total_file_count, edited_file_count/float(total_file_count)*100))
 
 def edit_tags(id):
 	print("<h1>%s</h1>" % id)
-	print("<a href='http://192.168.1.69:8000/files/%s/preview/0_generic.mp4' target='_blank'>video preview</a>" % urllib.quote(id) )
+	print("<a href='http://perlfu.co.uk/karakara/previews/%s.mp4' target='_blank'>video preview</a>" % urllib.quote(id) )
 	
 	if 'tag_data' in form:
 		file = open(id_to_filename(id), 'w')
@@ -86,4 +92,4 @@ def main():
 	html_doc(func_body, title='KaraKara Tag')
 
 if __name__ == "__main__":
-  main()
+	main()

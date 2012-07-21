@@ -9,17 +9,21 @@ find -iname '*.txt' -print0 | xargs -0 tar -zcf - | ssh calaldees@calaldees.drea
 http://www.lamolabs.org/blog/1766/pushing-pulling-files-around-using-tar-ssh-scp-rsync/
 http://superuser.com/questions/299448/linux-compressing-all-pdf-files-recursively-tar
 
+rsync calaldees@calaldees.dreamhosters.com:calaldees.dreamhosters.com/karakara/data/ /home/allan/code/KaraKara/mediaserver/www/files/ -e ssh --archive --verbose --update --inplace --stats --compress
+
 rsync --------------------------------
 
 ssh calaldess@calaldees.dreamhosters.com
 
+
+to test - add params
+--verbose --dry-run (or add the letters 'vn' to the param list)
+
 Up
-rsync -e ssh -av local_directory username@server.dreamhost.com:remote_directory
---delete --update --inplace --stats --compress
+rsync local_directory username@server.dreamhost.com:remote_directory -e ssh --archive --verbose --update --inplace --stats --compress --delete
 
 down
-rsync -e ssh -av username@server.dreamhost.com:remote_directory local_directory 
---inplace --update --stats --compress
+rsync username@server.dreamhost.com:remote_directory local_directory -e ssh --archive --verbose --update --inplace --stats --compress
 
 
 http://wiki.dreamhost.com/Rsync
