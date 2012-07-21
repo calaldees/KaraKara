@@ -4,6 +4,7 @@ import math, fcntl, os, re, string, sys, time
 import subprocess, urllib
 import hashlib
 import json
+import codecs
 
 from operator import itemgetter, attrgetter
 
@@ -50,7 +51,7 @@ def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|bmp|png|jpg|jpeg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|srt|bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def video_file_re():
 	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv)$', re.IGNORECASE)
@@ -62,7 +63,7 @@ def image_file_re():
 	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
 
 def subtitle_file_re():
-	return re.compile(r'^.*\.(ass|ssa)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(ass|ssa|srt)$', re.IGNORECASE)
 
 def avlib_safe_path(path):
 	# avconv does not correctly handle percentage signs in image paths
@@ -72,7 +73,7 @@ def avlib_safe_path(path):
 		return path
 
 def parse_timestamp(ts):
-	ts_match = re.search(r'(\d+):(\d+):(\d+)\.(\d+)', ts)
+	ts_match = re.search(r'(\d+):(\d+):(\d+)[\.,](\d+)', ts)
 	if ts_match:
 		hours = float(ts_match.group(1)) * 60.0 * 60.0
 		minutes = float(ts_match.group(2)) * 60.0
@@ -83,6 +84,17 @@ def parse_timestamp(ts):
 		return hours + minutes + seconds + fraction
 	else:
 		return 0.0
+
+def as_timestamp(time):
+	hours = int(time / (60.0 * 60.0))
+	time -= float(hours) * (60.0 * 60.0)
+	minutes = int(time / 60.0)
+	time -= float(minutes) * 60.0
+	seconds = int(math.floor(time))
+	time -= float(seconds)
+	fraction = "%.2f" % time
+	fraction = (fraction.split('.'))[1]
+	return "%01d:%02d:%02d.%s" % (hours, minutes, seconds, fraction)
 
 def run_command(cmd, label="", log_object=None, success=True, fail=False):
 	def do_log(msg):
@@ -161,17 +173,19 @@ class JSONFile(dict):
 		super(JSONFile, self).__setitem__(y, v)
 		self.changed = True
 
-class SSAFile:
+class SubFile:
 	def __init__(self, path):
 		self.path = path
 		self.data = []
 		self.titles = []
-		self.load()
+		self.encoding = 'utf-8'
+		if self.path:
+			self.load()
 
 	def load(self):
 		self.data[:] = []
 		try:
-			fp = open(self.path, 'r')
+			fp = open(self.path, 'rb')
 			lines = fp.readlines()
 			fp.close()
 			for line in lines:
@@ -179,29 +193,138 @@ class SSAFile:
 					line = line.decode('utf-8')
 				except UnicodeDecodeError:
 					line = line.decode('latin-1')
-				self.data.append(line.strip())
+
+				# Remove BOM and strip
+				line = line.replace(u'\ufeff', '')
+				line = line.strip()
+				self.data.append(line)
 		except IOError:
 			self.data.clear()
 
 		self.parse()
 	
 	def save(self, path, encoding=None):
+		if not encoding:
+			encoding = self.encoding
 		try:
-			fp = open(path, 'w')
+			fp = codecs.open(path, 'wb', encoding)
 			for line in self.data:
-				if encoding:
-					fp.write((line + "\r\n").encode(encoding))
-				else:
-					try:
-						fp.write(line + "\r\n")
-					except UnicodeEncodeError:
-						warn("encoding line as latin-1: \"", line, "\"")
-						fp.write((line + "\r\n").encode('latin-1'))
+				fp.write(line + "\r\n")
 			fp.close()
 			return True
 		except IOError as (errno, strerror):
 			warn("unable to write " + self.path + " ({0}): {1}".format(errno, strerror))
 			return False
+
+	def parse(self):
+		raise AssertionError
+
+	def raw_lines(self):
+		lines = []
+		for (start, end, text) in sorted(self.titles, key=itemgetter(0)):
+			lines.append(text)
+		return lines
+	
+	def dedup_lines(self, src_lines):
+		return src_lines
+
+	def clean_lines(self, dedup=True):
+		lines = []
+		previous = []
+		for line in self.raw_lines():
+			(line, n) = re.subn(r'({.*?})', '', line)
+			(line, n) = re.subn(r'(\s+)', ' ', line)
+			(line, n) = re.subn(r'(\\N)', "\n", line, flags=re.IGNORECASE)
+			lines.append(line)
+		if dedup:
+			return self.dedup_lines(lines)
+		else:
+			return lines
+
+	def length(self):
+		max_end = 0.0
+		for (start, end, text) in self.titles:
+			if end > max_end:
+				max_end = end
+		return max_end
+	
+	def play_res(self):
+		return (None, None)
+
+	def calculate_play_res(self, display_x, display_y):
+		raise AssertionError
+
+	def rewrite_play_res(self, res_x, res_y):
+		raise AssertionError
+	
+	def lang_ratio(self, match_words):
+		r = 0.0
+		for (start, end, text) in self.titles:
+			words = re.split(r'\s+', text.lower())
+			r += float(sum([ 1 for word in words if match_words.has_key(word) ])) / float(len(words))
+		return r
+
+	def jpn_ratio(self):
+		match_words = {}
+		for m in [ 'wa', 'no', 'yo', 'da', 'ni', 'ga', 'wo', 'kare', 'koi', 'ai' ]:
+			match_words[m] = True
+		return self.lang_ratio(match_words)
+	
+	def eng_ratio(self):
+		match_words = {}
+		for m in [ 'the', 'a', 'on', 'i', 'you', 'he', 'she', 'is', 'yes', 'no' ]:
+			match_words[m] = True
+		return self.lang_ratio(match_words)
+
+	def guess_language(self):
+		ratios = {
+			'jpn': self.jpn_ratio(),
+			'eng': self.eng_ratio()
+		}
+		langs = sorted(ratios.keys(), key=lambda x:ratios[x], reverse=True)
+		if ratios[langs[0]] < 0.1:
+			return 'und'
+		else:
+			return langs[0]
+
+class SRTFile(SubFile):
+	def type(self):
+		return 'srt'
+
+	def parse(self):
+		index_re = re.compile(r'^(\d+)\s*$')
+		timing_re = re.compile(r'^(\d+:\d+:\d+,\d+)\s*-->\s*(\d+:\d+:\d+,\d+)\s*$')
+		self.titles[:] = []
+		state = 0
+		index = None
+		start = None
+		end = None
+		lines = []
+		for line in self.data:
+			if state == 0:
+				m = index_re.match(line)
+				if m:
+					index = m.group(1)
+					state = 1
+			elif state == 1:
+				m = timing_re.match(line)
+				if m:
+					start = parse_timestamp(m.group(1))
+					end = parse_timestamp(m.group(2))
+					lines[:] = []
+					state = 2
+				else:
+					state = 0
+			elif state == 2:
+				if len(line) == 0:
+					self.titles.append((start, end, '\n'.join(lines)))
+					state = 0
+				else:
+					lines.append(line)
+
+class SSAFile(SubFile):
+	def type(self):
+		return 'ssa'
 
 	def parse(self):
 		dialogue_re = re.compile(r'^Dialogue:\s*(.*)')
@@ -269,12 +392,6 @@ class SSAFile:
 
 		return True
 	
-	def raw_lines(self):
-		lines = []
-		for (start, end, text) in sorted(self.titles, key=itemgetter(0)):
-			lines.append(text)
-		return lines
-	
 	def dedup_lines(self, src_lines):
 		src_lines.reverse()
 		lines = []
@@ -291,57 +408,59 @@ class SSAFile:
 			lines.append(line)
 		lines.reverse()
 		return lines
-
-	def clean_lines(self, dedup=True):
-		lines = []
-		previous = []
-		for line in self.raw_lines():
-			(line, n) = re.subn(r'({.*?})', '', line)
-			(line, n) = re.subn(r'(\s+)', ' ', line)
-			(line, n) = re.subn(r'(\\N)', "\n", line, flags=re.IGNORECASE)
-			lines.append(line)
-		if dedup:
-			return self.dedup_lines(lines)
-		else:
-			return lines
-
-	def length(self):
-		max_end = 0.0
-		for (start, end, text) in self.titles:
-			if end > max_end:
-				max_end = end
-		return max_end
 	
-	def lang_ratio(self, match_words):
-		r = 0.0
-		for (start, end, text) in self.titles:
-			words = re.split(r'\s+', text.lower())
-			r += float(sum([ 1 for word in words if match_words.has_key(word) ])) / float(len(words))
-		return r
+	@classmethod
+	def from_srt(cls, srt, header=None, width=1024):
+		scale = float(width) / 1024.0
+		font_size = int(math.floor(48.0 * scale))
+		margin_h_size = int(math.floor(50.0 * scale))
+		margin_v_size = int(math.floor(20.0 * scale))
 
-	def jpn_ratio(self):
-		match_words = {}
-		for m in [ 'wa', 'no', 'yo', 'da', 'ni', 'ga', 'wo', 'kare', 'koi', 'ai' ]:
-			match_words[m] = True
-		return self.lang_ratio(match_words)
-	
-	def eng_ratio(self):
-		match_words = {}
-		for m in [ 'the', 'a', 'on', 'i', 'you', 'he', 'she', 'is', 'yes', 'no' ]:
-			match_words[m] = True
-		return self.lang_ratio(match_words)
+		ssa_header = ['[Script Info]', 'Title: <untitled>', 'Original Script: <unknown>', 'ScriptType: v4.00']
 
-	def guess_language(self):
-		ratios = {
-			'jpn': self.jpn_ratio(),
-			'eng': self.eng_ratio()
-		}
-		langs = sorted(ratios.keys(), key=lambda x:ratios[x], reverse=True)
-		if ratios[langs[0]] < 0.1:
-			return 'und'
-		else:
-			return langs[0]
+		styles = ['[V4 Styles]', 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding']
+		styles.append('Style: Default,Arial,{0},65535,16777215,16777215,0,-1,0,3,1,1,2,{1},{1},{2},0,128'.format(font_size, margin_h_size, margin_v_size))
+		
+		events = ['[Events]', 'Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text']
+		
+		titles = sorted(srt.titles, key=itemgetter(0))
+		if len(titles) > 0:
+			# copy next line on to end of previous line and adjust time stamps
+			for n in range(len(titles) - 1):
+				n_t = titles[n]
+				np_t = titles[n+1]
+				titles[n] = (n_t[0], np_t[0], n_t[2] + '\\N {\\c&HFFFFFF&}' + np_t[2])
+			# pull initial line backward
+			new_start = titles[0][0] - 2.5
+			if new_start < 0.0:
+				new_start = 0.0
+			titles[0] = (new_start, titles[0][1], titles[0][2])
 
+		# add header title at the beginning
+		if header and (len(header) > 0):
+			line = '{\\a6}'
+			if len(header) == 1:
+				line += header[0]
+			elif len(header) == 2:
+				line += header[0] + '\\N {\c&H8080FF&}' + header[1]
+			elif len(header) == 3:
+				line += header[0] + ' - {\c&HFFFF00&}' + header[1] + '\\N {\c&H8080FF&}' + header[2]
+			else:
+				line += ''.join(header)
+			start = 0.0
+			end = 6.0
+			titles.insert(0, (start, end, line))
+
+		# convert titles to SSA dialogue
+		for (start, end, line) in titles:
+			line = re.sub('\n', '\\N', line)
+			events.append('Dialogue: Marked=0,{0},{1},Default,Lyrics,0000,0000,0000,!Effect,{2}'.format(as_timestamp(start), as_timestamp(end), line))
+
+		ssa = SSAFile(None)
+		ssa.data = ssa_header + [''] + styles + [''] + events
+		ssa.parse()
+
+		return ssa
 
 class MediaFile:
 	def __init__(self, path, metadata=None):
@@ -428,7 +547,10 @@ class MediaFile:
 		return self.calculate_aspect(aspect[0], aspect[1])
 
 	def subfile(self):
-		return SSAFile(self.path)
+		if re.match(r'^.*\.srt$', self.path, re.IGNORECASE):
+			return SRTFile(self.path)
+		else:
+			return SSAFile(self.path)
 
 	def probe(self):
 		try:
@@ -514,6 +636,10 @@ class MediaFile:
 	
 	def _score(self):
 		score = 1.0
+		if self.is_subtitles():
+			subfile = self.subfile()
+			if subfile.type() == 'srt':
+				score = 0.5
 		if self.metadata.has_key('width') and self.metadata.has_key('height'):
 			score *= float((self.metadata['width'] * self.metadata['height'])) / (640.0 * 480.0)
 		#if self.metadata.has_key('vbitrate'):
@@ -607,12 +733,13 @@ class TagList:
 	
 	def _load(self):
 		try:
-			fp = open(self.path, 'r')
+			fp = open(self.path, 'rb')
 			lines = fp.readlines()
 			fp.close()
 			self.data.clear()
 			for line in lines:
-				tag = line.strip() # FIXME: \r\n?
+				line = line.decode('utf-8')
+				tag = line.replace(u'\ufeff', '').strip()
 				self.data.append(tag)
 			self.loaded = True
 			self.changed = False
@@ -625,7 +752,7 @@ class TagList:
 
 	def _save(self):
 		try:
-			fp = open(self.path, 'w')
+			fp = codecs.open(self.path, 'wb', 'utf-8')
 			for tag in self.data:
 				fp.write(tag + "\r\n")
 			fp.close()
@@ -845,7 +972,6 @@ class MediaEncoder:
 	}
 	profile_parameters = {
 		PROFILE_IPHONE: [
-			'-vf',		'scale=320:-1',
 			#'-r',		'30000/1001',
 			'-vcodec',	'libx264',
 			'-pre:v',	'libx264-ipod320',
@@ -857,7 +983,6 @@ class MediaEncoder:
 			'-bt',		'240k'
 		],
 		PROFILE_ANDROID: [
-			'-vf',		'scale=320:-1',
 			'-vcodec', 	'libx264',
 			'-profile:v',	'baseline',
 			'-b',		'150k',
@@ -868,7 +993,6 @@ class MediaEncoder:
 			'-ab',		'64k'
 		],
 		PROFILE_GENERIC: [
-			'-vf',		'scale=320:-1',
 			#'-r',		'30000/1001',
 			'-vcodec',	'libx264',
 			'-pre:v',	'libx264-ipod320',
@@ -880,7 +1004,6 @@ class MediaEncoder:
 			'-ab',		'64k'
 		],
 		PROFILE_GENERIC_MPEG4: [
-			'-vf',		'scale=320:-1',
 			'-r',		'13',
 			'-vcodec',	'mpeg4',
 			'-acodec',	'aac',
@@ -977,7 +1100,7 @@ class MediaEncoder:
 			width = v_metadata['width']
 			height = v_metadata['height']
 			length = v_metadata['length']
-
+		
 			if v_metadata.has_key('dar'):
 				aspect = v_metadata['dar']
 				#if aspect[0] == aspect[1]:
@@ -989,13 +1112,20 @@ class MediaEncoder:
 
 			self.original_sub_width = int(height * (aspect[0] / aspect[1]))
 			self.original_sub_height = height
-			
+		
+
 		if (aspect[1] / aspect[0]) <= 0.75:
 			output_height = math.floor((output_width / aspect[0]) * aspect[1])
 		else:
 			output_width = math.floor((output_height / aspect[1]) * aspect[0])
-			output_border = math.floor((self.base_width - output_width) / 2.0)
+			output_border = math.floor((float(self.base_width) - output_width) / 2.0)
 			output_width += self.base_width - (output_width + (output_border * 2.0))
+
+		# override when dealing with image input
+		if self.image:
+			output_width = self.base_width
+			output_height = self.base_height
+			aspect = [ float(self.base_width) / float(self.base_height), 1.0 ] 
 
 		self.width = output_width
 		self.height = output_height
@@ -1034,10 +1164,59 @@ class MediaEncoder:
 		return run_command(cmd, log_object=self.parent, label=label, success=success, fail=fail)
 
 	def encode_video(self):
+		sub_prescale = True
+
+		if self.subtitles:
+			subpath = self.subtitles
+			subfile = MediaFile(subpath).subfile()
+
+			# rewrite SRT subtitles to SSA
+			if subfile.type() == 'srt':
+				sub_prescale = False
+				subpath = self.temp_file('converted.ssa')
+				subfile = SSAFile.from_srt(subfile, header=self.parent.header(), width=self.width)
+				subfile.path = subpath
+				if not subfile.save(subpath):
+					warn("unable to save converted subtitles to " + subpath + ", using original subtitles instead")
+					subpath = self.subtitles
+			
+			# rewrite play resolution of SSA files
+			(res_x, res_y) = subfile.play_res()
+			if (res_x is None) or (res_y is None):
+				subpath = self.temp_file('subs.ssa')
+				
+				if self.video and sub_prescale:
+					(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
+				else:
+					(res_x, res_y) = subfile.calculate_play_res(self.width, self.height)
+				
+				subfile.rewrite_play_res(res_x, res_y)
+				if not subfile.save(subpath):
+					warn("unable to save rewritten subtitles to " + subpath + ", using original subtitles instead")
+					subpath = self.subtitles
+			
+		
+		filters = []
+		if sub_prescale:
+			filters += ['ass']
 		if self.video:
 			source = self.video
+			filters += ['scale={0}:{1}'.format(int(self.width), int(self.height))]
+			if self.border >= 0.0:
+				filters += ['expand={0}:{1}'.format(int(self.base_width), int(self.height))]
 		elif self.image:
 			source = self.temp_file('imagery.avi')
+
+			# scale image input to appropriate size and pad
+			scale = float(self.base_width) / float(self.original_sub_width)
+			s = float(self.base_height) / float(self.original_sub_height)
+			if s < scale:
+				scale = s
+			img_width = int(math.floor(self.original_sub_width * scale))
+			img_width += img_width % 2
+			img_height = int(math.floor(self.original_sub_height * scale))
+			img_height += img_height % 2
+
 			parameters = [
 				'avconv',
 				'-loglevel', avconv_loglevel,
@@ -1045,9 +1224,11 @@ class MediaEncoder:
 				'-y', 
 				'-loop', '1', 
 				'-i', self.image,
+				'-vf', 'scale={0}:{1}'.format(img_width, img_height) + ',pad={0}:{1}:(ow-iw)/2:(oh-ih)/2,setsar=1:1'.format(self.base_width, self.base_height),
 				'-r', '24',
 				'-t', str(self.length),
-				'-vf', 'scale={0}:{1}'.format(int(self.base_width), -1),
+				'-bf', '0',
+				'-qmax', '2',
 				avlib_safe_path(source)
 			]
 			result = self._run_cmd(parameters, True, None, "image to video conversation")
@@ -1055,10 +1236,9 @@ class MediaEncoder:
 				return None
 		else:
 			return None
-
-		filters = [ 'ass', 'scale={0}:{1}'.format(int(self.width), int(self.height)) ]
-		if self.border >= 0.0:
-			filters += [ 'expand={0}:{1}'.format(int(self.base_width), int(self.height)) ]
+		
+		if not sub_prescale:
+			filters += ['ass']
 
 		temp_video = self.temp_file('video.avi')
 		parameters = [
@@ -1073,19 +1253,8 @@ class MediaEncoder:
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
-		
+
 		if self.subtitles:
-			subpath = self.subtitles
-			subfile = MediaFile(subpath).subfile()
-			
-			(res_x, res_y) = subfile.play_res()
-			if (res_x is None) or (res_y is None):
-				subpath = self.temp_file('subs.ssa')
-				(res_x, res_y) = subfile.calculate_play_res(self.original_sub_width, self.original_sub_height)
-				subfile.rewrite_play_res(res_x, res_y)
-				if not subfile.save(subpath):
-					subpath = self.subtitles
-			
 			parameters += ['-sub', subpath]
 			parameters += ['-subdelay', self.subtitle_shift]
 		
@@ -1220,12 +1389,14 @@ class MediaEncoder:
 		
 		return result
 
-	def transcode(self, profile, offset=0.0, length=0.0):
+	def transcode(self, profile, offset=0.0, length=0.0, width=320, height=0):
 		if not self.valid_for_transcode():
 			return False
 		if profile not in MediaEncoder.profile_names.keys(): 
 			return False
 
+		self.probe_media()
+		
 		transcode = self.temp_file("transcode" + MediaEncoder.profile_extension(profile))
 		
 		parameters = [
@@ -1235,6 +1406,16 @@ class MediaEncoder:
 			'-y',
 			'-i', avlib_safe_path(self.video),
 		]
+		if (width > 0) or (height > 0):
+			if height == 0:
+				height = float(width) * (self.aspect[1] / self.aspect[0])
+			elif width == 0:
+				width = float(height) * (self.aspect[0] / self.aspect[1])
+			width = int(math.floor(width + 0.5))
+			height = int(math.floor(height + 0.5))
+			width += width % 2
+			height += height % 2
+			parameters += [ '-vf', "scale={0}:{1}".format(width, height) ]
 		parameters += MediaEncoder.profile_parameters[profile]
 		parameters += [
 			'-strict', 'experimental',
@@ -1274,6 +1455,10 @@ class MediaItem:
 		self.hidden_re = hidden_file_re()
 		self.media_re = media_file_re()
 	
+	def header(self):
+		# FIXME: use tag data?
+		return re.split(r'\s*-\s*', self.name, 3)
+
 	def log(self, *s):
 		now = time.time()
 		
@@ -1375,7 +1560,7 @@ class MediaItem:
 		for file in self.sources.subtitles():
 			subfile = file.subfile()
 			entry = {
-				'url': "/".join(['source', urllib.quote(file.name)]),
+				'url': "/".join(['source', urllib.quote(file.name.encode('utf-8'))]),
 				'name': file.name,
 				'language': file.metadata['language'],
 				'lines' : subfile.clean_lines(),
@@ -1398,7 +1583,7 @@ class MediaItem:
 				files = unknown_files
 				
 		if len(files) > 0:
-			sorted_files = sorted(files, key=lambda x:x['quality'], reverse=True)
+			sorted_files = sorted(files, key=lambda x:x['score'], reverse=True)
 			return sorted_files[0]
 		else:
 			return None
@@ -1561,7 +1746,7 @@ class MediaItem:
 				self.log("encode complete")
 				media = MediaFile(path)
 				metadata = media.probe()
-				metadata['url'] = "/".join(['video', urllib.quote(name)])
+				metadata['url'] = "/".join(['video', urllib.quote(name.encode('utf-8'))])
 				metadata['name'] = name
 				metadata['encode-hash'] = encoding['encode-hash']
 				metadata['language'] = encoding['language']
@@ -1652,7 +1837,7 @@ class MediaItem:
 				media = MediaFile(path)
 				metadata = media.probe()
 				metadata['target'] = target
-				metadata['url'] = "/".join(['preview', urllib.quote(preview_name)])
+				metadata['url'] = "/".join(['preview', urllib.quote(preview_name.encode('utf-8'))])
 				metadata['name'] = preview_name
 				metadata['src'] = name
 				metadata['language'] = video['language']
@@ -1742,7 +1927,7 @@ class MediaItem:
 				thumb_name = names[path]
 				thumb_media = MediaFile(path)
 				metadata = thumb_media.probe()
-				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name)])
+				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name.encode('utf-8'))])
 				metadata['name'] = thumb_name
 				metadata['src'] = video['name']
 				metadata['time-index'] = time
@@ -1945,7 +2130,7 @@ def main(args):
 			sys.exit(1)
 
 		command = args[0]
-		root = args[1]
+		root = unicode(args[1])
 		if command == 'process':
 			if len(args) >= 3:
 				log_file = args[2]
