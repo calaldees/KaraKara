@@ -62,11 +62,11 @@ clean:
 	rm *.egg-info -rf
 	rm KaraKara.db -f
 	
-import_tracks_local_filesystem:
+import_tracks_local_filesystem: init_db
 	env/bin/python -mkarakara.scripts.import_tracks '../mediaserver/www/files' --config=development.ini
 
-import_tracks_local_mediaserver:
+import_tracks_local_mediaserver: init_db
 	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
 
-import_tracks_test:
+import_tracks_test: init_db
 	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini

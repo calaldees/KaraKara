@@ -75,6 +75,45 @@ def import_json_data(source, location=''):
     it shouldnt be relevent that it is local or remote
     """
     
+    def gen_id_for_track(track):
+        id = ''
+        
+        # Gen 3 letter ID from category,from,title
+        def get_tag_name(tags,parent):
+            for tag in tags:
+                if tag.parent and tag.parent.name == parent:
+                    return tag.name
+            return ''
+        def get_first_alpha_char(s):
+            for char in s:
+                if re.match('[a-zA-Z]',char):
+                    return char
+            return ''
+        for tag_name in [get_tag_name(track.tags,tag_type) for tag_type in ['category','from','title']]:
+            id += get_first_alpha_char(tag_name)
+        
+        # If the tags were not present; then split the title string and get the first 3 characters
+        if not id:
+            s = [f.strip() for f in track.title.split(" ") if '-' not in f]
+            try:
+                id = "".join([get_first_alpha_char(s[0]), get_first_alpha_char(s[1]), get_first_alpha_char(s[2])])
+            except Exception as e:
+                id = random_string()
+        
+        # Normaize to uppercase
+        id = id.lower()
+        
+        # Check for colistions and make unique number
+        def get_id_number(id):
+            count = 0
+            while DBSession.query(Track).filter_by(id=id+str(count)).count():
+                count += 1
+            return str(count)
+        id += get_id_number(id)
+        
+        return id
+    
+    
     def get_data():
         try:
             if hasattr(source,'read'):
@@ -96,7 +135,7 @@ def import_json_data(source, location=''):
             log.info('Importing %s' % folder)
             
             track = Track()
-            track.id       = data['videos'][0]['encode-hash']
+            #track.id       = get_id_from_foldername(folder)#data['videos'][0]['encode-hash']
             track.source   = ''
             track.duration = data['videos'][0]['length']
             track.title    = data['name']
@@ -137,15 +176,20 @@ def import_json_data(source, location=''):
                         track.tags.append(get_tag(tag))
             except Exception as e:
                 log.warn('Unable to imports tags')
-                traceback.print_exc()
+                #traceback.print_exc()
                 #exit()
             
             # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
+            
+            # Finally, use the tags to make a unique id for this track
+            track.id = gen_id_for_track(track)
             
             DBSession.add(track)
             transaction.commit()
         except Exception as e:
             log.warn('Unable to process %s because %s' % (location, e))
+            #traceback.print_exc()
+            #exit()
 
 
 #-------------------------------------------------------------------------------

@@ -94,6 +94,9 @@ class Tag(Base):
             assert isinstance(parent,Base)
             self.parent = parent
 
+    def __str__(self):
+        get_parent = lambda: self.parent.name if self.parent else None
+        return "Tag(%s,%s)" % (get_parent(), self.name)
 
 class Attachment(Base):
     """
