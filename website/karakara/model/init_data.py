@@ -23,10 +23,61 @@ def init_data():
     
     log.info("Populating tables with base data")
     
-    tags = []
-    tags.append(Tag('anime'                           ))
-    tags.append(Tag('series'                , tags[-1]))
-    tags.append(Tag('opening'                         ))
+    base_tags = [
+        'category:anime',
+        'category:jdrama',
+        'category:jpop',
+        'category:cartoon',
+        'category:tokusatsu',
+        'category:musical',
+        'category:game',
+        'from',
+        'title',
+        'lang:en',
+        'lang:jp',
+        'lang:ln',
+        'artist',
+        'vocalstyle:female',
+        'vocalstyle:male',
+        'vocalstyle:duet',
+        'vocalstyle:group',
+        'vocalstyle:backing',
+        'vocaltrack:on',
+        'vocaltrack:off',
+        'vocaltrack:band',
+        'length:full',
+        'length:short',
+        'use:opening',
+        'use:ending',
+        'use:ost',
+        'use:insert',
+        'use:image',
+        'use:op',
+        'use:ed',
+        'use:op1',
+        'use:op2',
+        'use:op3',
+        'use:op4',
+        'use:op5',
+        'use:op6',
+        'use:op7',
+        'use:op8',
+        'use:op9',
+        'use:ed1',
+        'use:ed2',
+        'use:ed3',
+        'use:ed4',
+        'use:ed5',
+        'use:ed6',
+        'use:ed7',
+        'use:ed8',
+        'use:ed9',
+    ]
     
-    DBSession.add_all(tags)
+    for tag in base_tags:
+        get_tag(tag)
+    
+    #DBSession.add_all(tags)
     transaction.commit()  # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
+
+    

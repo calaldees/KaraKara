@@ -137,6 +137,8 @@ def import_json_data(source, location=''):
                         track.tags.append(get_tag(tag))
             except Exception as e:
                 log.warn('Unable to imports tags')
+                traceback.print_exc()
+                #exit()
             
             # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
             

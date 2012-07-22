@@ -88,6 +88,7 @@ class Tag(Base):
 
 
     def __init__(self, name=None, parent=None):
+        #print("Making new tag as %s:%s" % (name,parent))
         self.name = name
         if parent:
             assert isinstance(parent,Base)

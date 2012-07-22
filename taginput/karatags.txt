@@ -1,5 +1,5 @@
 title:
-category:anime,jpop,jdrama,game,cartoon
+category:anime,jpop,jdrama,game,cartoon,tokusatsu,musical
 from:series_name,game_name
 use:opening,ending,ost,insert,image
 use:op3
