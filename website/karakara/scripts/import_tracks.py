@@ -2,7 +2,7 @@ import os
 import json
 import urllib
 import re
-#import io
+
 from bs4 import BeautifulSoup
 import traceback
 
@@ -132,6 +132,8 @@ def import_json_data(source, location=''):
     if 'description.json' in location:
         try:
             folder = data['name']
+            if not data['videos']:
+                return
             log.info('Importing %s' % folder)
             
             track = Track()
@@ -172,8 +174,12 @@ def import_json_data(source, location=''):
             # Import Media Processed Tags
             try:
                 with open(os.path.join(os.path.dirname(location),'tags.txt'), 'r') as tag_file:
-                    for tag in tag_file:
-                        track.tags.append(get_tag(tag))
+                    for tag_string in tag_file:
+                        tag = get_tag(tag_string) 
+                        if tag:
+                            track.tags.append(tag)
+                        elif tag_string:
+                            log.warn('%s: null tag "%s"' % (location, tag_string))
             except Exception as e:
                 log.warn('Unable to imports tags')
                 #traceback.print_exc()
@@ -188,8 +194,8 @@ def import_json_data(source, location=''):
             transaction.commit()
         except Exception as e:
             log.warn('Unable to process %s because %s' % (location, e))
-            #traceback.print_exc()
-            #exit()
+            traceback.print_exc()
+            exit()
 
 
 #-------------------------------------------------------------------------------

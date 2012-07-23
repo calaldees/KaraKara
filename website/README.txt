@@ -32,3 +32,6 @@ flash message:
   your up in 'xx' min
 per phone limit?
 duplicate name warning - one track
+
+ini option to disable track adding my phones (just in case it get abused and needs turning off)
+messaging/disabling individual devices
