@@ -4,12 +4,16 @@
 
 
 
-% if data['tags']:
+% if data.get('tags'):
     <!-- back -->
     <a href="${request.route_path('tags', tags="/".join(data['tags'][0:-1]))}" data-role="button" data-icon="back">Back</a>
 % endif
 
-% if data['tracks']:
+<%doc>
+    
+    ## OLD ASS CODE for reference
+    
+% if data.get('tracks'):
     <!-- tracks -->
     <h2>Tracks</h2>
     <ul data-role="listview" data-inset="true">
@@ -30,7 +34,7 @@
     </ul>
 % endif
 
-% if not data['tracks']:
+% if not data.get('tracks'):
     <!-- sub tags -->
     <h2>Sub Tags</h2>
     <ul data-role="listview" data-inset="true">
@@ -39,3 +43,4 @@
     % endfor
     </ul>
 % endif
+</%doc>

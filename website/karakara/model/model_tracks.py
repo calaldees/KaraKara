@@ -30,8 +30,8 @@ class Track(Base):
     __tablename__   = "track"
 
     id              = Column(String(),      primary_key=True)
-    title           = Column(Unicode(),     nullable=False, default="Untitled")
-    description     = Column(Unicode(),     nullable=False, default="")
+    #title           = Column(Unicode(),     nullable=False, default="Untitled")
+    #description     = Column(Unicode(),     nullable=False, default="")
     duration        = Column(Float(),       nullable=False, default=0, doc="Duration in seconds")
     source_filename = Column(Unicode(),     nullable=True)
     
@@ -55,7 +55,8 @@ class Track(Base):
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
             'description' : None ,
             'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
-            'tags'        : lambda track: [tag.name for tag in track.tags],
+            'tags'        : lambda track: {parent:tag for parent,tag in [(tag.parent.name,tag.name) for tag in track.tags if tag.parent] },
+            'tags_other'  : lambda track: [tag.name for tag in track.tags if not tag.parent],
             'lyrics'      : lambda track: [lyrics.to_dict() for lyrics in track.lyrics] ,
     })
 

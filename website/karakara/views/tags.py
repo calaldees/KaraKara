@@ -18,10 +18,20 @@ from sqlalchemy     import func
 def tags(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
     tag_string  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
+    
     tag_strings = []
     if tag_string:
         tag_strings = tag_string.split('/')
     
+    print(tag_strings)
+    
+    return action_ok(
+        data={
+            'tags'    : tag_strings,
+        }
+    )
+
+def tags_old():
     #tags_single  = []
     #tags_parents = []
     #for tag in tag_strings:

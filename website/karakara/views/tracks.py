@@ -49,8 +49,7 @@ def track_list(request):
     #track_list = []
     #for track in DBSession.query(Track).all():
     #    track_list.append(track.id)
-    track_list = [track.to_dict() for track in DBSession.query(Track).all()]
-    return action_ok(data={'list':track_list})
+    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
 
 
 @view_config(route_name='track_list_all')
@@ -59,5 +58,5 @@ def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
     """
-    return action_ok()
+    return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in DBSession.query(Track).all()]})
 

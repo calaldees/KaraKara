@@ -169,10 +169,11 @@ def import_json_data(source, location=''):
             #    if regex.search(track.source):
             #        track.tags.append(get_tag(tag))
             
-            # Import Media Processed Tags
+            # Import tags.txt
             try:
                 with open(os.path.join(os.path.dirname(location),'tags.txt'), 'r') as tag_file:
                     for tag_string in tag_file:
+                        tag_string = tag_string.strip()
                         tag = get_tag(tag_string) 
                         if tag:
                             track.tags.append(tag)
@@ -193,7 +194,7 @@ def import_json_data(source, location=''):
         except Exception as e:
             log.warn('Unable to process %s because %s' % (location, e))
             traceback.print_exc()
-            exit()
+            #exit()
 
 
 #-------------------------------------------------------------------------------
