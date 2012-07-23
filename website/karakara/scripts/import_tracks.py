@@ -132,8 +132,6 @@ def import_json_data(source, location=''):
     if 'description.json' in location:
         try:
             folder = data['name']
-            if not data['videos']:
-                return
             log.info('Importing %s' % folder)
             
             track = Track()
