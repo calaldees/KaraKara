@@ -31,6 +31,7 @@ def init_data():
         'category:tokusatsu',
         'category:musical',
         'category:game',
+        'category:meme',
         'from',
         'title',
         'lang:en',

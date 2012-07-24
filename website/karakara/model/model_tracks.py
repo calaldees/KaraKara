@@ -77,7 +77,7 @@ class Tag(Base):
         'default': {
     #Base.to_dict_setup(self, list_type='default', field_processors={
             'id'           : None ,
-            'name'         : None ,
+            'name'         : None , #lambda tag: str(tag)
         },
     })
     
@@ -96,8 +96,9 @@ class Tag(Base):
             self.parent = parent
 
     def __str__(self):
-        get_parent = lambda: self.parent.name if self.parent else None
-        return "Tag(%s,%s)" % (get_parent(), self.name)
+        if self.parent:
+            return '%s:%s' % (self.parent.name,self.name)
+        return self.name
 
 class Attachment(Base):
     """
