@@ -75,7 +75,7 @@ def init_data():
     ]
     
     for tag in base_tags:
-        get_tag(tag)
+        get_tag(tag, create_if_missing=True)
     
     #DBSession.add_all(tags)
     transaction.commit()  # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!

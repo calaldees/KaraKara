@@ -7,6 +7,7 @@ from ..lib.auto_format import action_ok, registered_formats
 
 from ..model              import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
+from ..model.actions      import get_tag
 
 import re
 from sqlalchemy.orm import joinedload
@@ -17,17 +18,35 @@ from sqlalchemy     import func
 @web
 def tags(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
-    tag_string  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
+    url  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
     
-    tag_strings = []
-    if tag_string:
-        tag_strings = tag_string.split('/')
+    try   : tags     = url.split('/')
+    except: tags     = []
+    try   : keywords = request.params['keywords'].split(' ')
+    except: keywords = []
     
-    print(tag_strings)
+    # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
+    #  any tags that dont match are added as keywords
+    tag_objs = []
+    for tag in tags:
+        tag_obj = get_tag(tag)
+        if tag_obj:
+            tag_objs.append(tag_obj)
+        else:
+            keywords.append(tag)
+    tags = tag_objs
+    
+    trackids = DBSession.query(Track.id)
+    for tag in tags:
+        trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id              == tag.id  ) )
+    for keyword in keywords:
+        trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
     
     return action_ok(
         data={
-            'tags'    : tag_strings,
+            'tags'    : [str(tag) for tag in tags],
+            'keywords': keywords,
+            'trackids': [trackid[0] for trackid in trackids.all()],
         }
     )
 

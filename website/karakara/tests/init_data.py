@@ -34,7 +34,7 @@ def init_random_data(num_tracks=100):
     
     
     # Random Tag generation ----------------------------------------------------
-    parent_tag = get_tag('series')
+    parent_tag = get_tag('from')
     for series_num in range(10):
         DBSession.add(Tag('Series %s'%random_string(1), parent_tag))
     

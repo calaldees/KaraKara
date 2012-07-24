@@ -163,18 +163,12 @@ def import_json_data(source, location=''):
                 lyrics.content  = "\n".join(subtitle.get('lines',[]))
                 track.lyrics.append(lyrics)
             
-            # Attempt to get Tags from source filename
-            # Add known tags (by regexing source filename/path)
-            #for tag, regex in tag_extractors.items():
-            #    if regex.search(track.source):
-            #        track.tags.append(get_tag(tag))
-            
             # Import tags.txt
             try:
                 with open(os.path.join(os.path.dirname(location),'tags.txt'), 'r') as tag_file:
                     for tag_string in tag_file:
                         tag_string = tag_string.strip()
-                        tag = get_tag(tag_string) 
+                        tag = get_tag(tag_string, create_if_missing=True) 
                         if tag:
                             track.tags.append(tag)
                         elif tag_string:
