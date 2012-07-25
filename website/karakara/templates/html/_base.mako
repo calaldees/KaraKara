@@ -18,6 +18,7 @@
         <link   href="${static('styles/main.css')}"                           rel="stylesheet"     />
         
         <!-- Scripts -->
+        <script src ="${static('scripts/modernizer.custom.js')}"                                    ></script>
         <script src ="${static('scripts/jquery-1.7.1.min.js')}"                                     ></script>
         <script src ="${static('scripts/jquery.mobile-extras.js')}"                                 ></script>
         <script src ="${static('jquery.mobile/jquery.mobile-1.1.0.min.js')}"                        ></script>
