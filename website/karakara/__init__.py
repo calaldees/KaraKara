@@ -72,7 +72,8 @@ def main(global_config, **settings):
     config.add_route('fave'          , append_format_pattern('/fave')          )
     config.add_route('admin_toggle'  , append_format_pattern('/admin')         )
     
-    config.add_route('tags'          , '/tags/{tags:.*}')
+    config.add_route('search_tags'   , '/search/tags/{tags:.*}')
+    config.add_route('search_list'   , '/search/list/{tags:.*}')
     
     # Events -------------------------------------------------------------------
     config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)

@@ -85,6 +85,7 @@ class Tag(Base):
     __to_dict__['full'].update({
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
             'parent' : lambda track: track.parent.name ,
+            'full'   : lambda track: '%s:%s' % (track.parent.name, track.name) if track.parent else track.name,
     })
 
 
