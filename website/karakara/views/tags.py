@@ -72,7 +72,7 @@ def search(request):
     )
     
 
-@view_config(route_name='tags')
+#@view_config(route_name='tags')
 @web
 def tags(request):
     action_return = search(request)
@@ -97,6 +97,28 @@ def tags(request):
         'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags], # if tag not in tags
     })
     return action_return
+
+
+@view_config(route_name='tags')
+@web
+def list(request):
+    action_return = search(request)
+
+    trackids = action_return['data']['trackids']
+
+    tracks   = DBSession.query(Track).\
+                        filter(Track.id.in_(trackids)).\
+                        options(\
+                            joinedload(Track.tags),\
+                            joinedload(Track.attachments),\
+                            joinedload('tags.parent'),\
+                        )
+    
+    action_return['data'].update({
+        'tracks'  : [track.to_dict('full', exclude_fields='lyrics') for track in tracks],
+    })
+    return action_return
+
 
 #-------------------------------------------------------------------------------
 
