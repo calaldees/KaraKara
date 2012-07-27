@@ -23,24 +23,29 @@
 %>
 
 <!-- video -->
-<video poster="${h.thumbnail_location_from_track(data)}" durationHint="${data['duration']}" controls>
-    % for preview, url in previews(data):
-        <source src="${url}" type="video/${h.video_mime_type(preview)}" />
-        ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
-    % endfor
-    <%doc>
-        ##% for extension, video_type in h.video_files:
-            ##% if extension in attachment['location']:
-            ##% endif
-        ##% endfor
-    </%doc>
-</video>
 
-<div data-role="collapsible" data-content-theme="c">
-    <h3>Video Links</h3>
-    % for preview, url in previews(data):
-    <a href="${url}" data-role="button" rel=external>${preview['extra_fields'].get('target','unknown')}</a>
-    % endfor
+<div class="hide_if_no_html5_video">
+    <video poster="${h.thumbnail_location_from_track(data)}" durationHint="${data['duration']}" controls>
+        % for preview, url in previews(data):
+            <source src="${url}" type="video/${h.video_mime_type(preview)}" />
+            ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
+        % endfor
+        <%doc>
+            ##% for extension, video_type in h.video_files:
+                ##% if extension in attachment['location']:
+                ##% endif
+            ##% endfor
+        </%doc>
+    </video>
+</div>
+
+<div class="hide_if_html5_video">
+    ##<div data-role="collapsible" data-content-theme="c">
+    ##    <h3>Video Links</h3>
+        % for preview, url in previews(data):
+        <a href="${url}" data-role="button" rel=external target="_blank">Preview ${preview['extra_fields'].get('target','unknown')} Video</a>
+        % endfor
+    ##</div>
 </div>
 
 <!-- details -->

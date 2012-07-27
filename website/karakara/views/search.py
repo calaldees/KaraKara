@@ -45,7 +45,7 @@ def search(request):
         tag_obj = get_tag(tag)
         if tag_obj:
             tag_objs.append(tag_obj)
-        else:
+        elif tag:
             keywords.append(tag)
     tags = tag_objs
     
@@ -60,11 +60,9 @@ def search(request):
     #    and remove any selection of previous tags with the same parent
     try   : sub_tags_allowed = copy.copy(tag_cats[str(tags[-1])])
     except: sub_tags_allowed = copy.copy(tag_cats['root'])
-    print(sub_tags_allowed)
     for tag in tags:
         try   : sub_tags_allowed.remove(tag.parent.name)
         except: pass
-    print(sub_tags_allowed)
     
     return action_ok(
         data={
