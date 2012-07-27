@@ -23,8 +23,9 @@
 %>
 
 <!-- video -->
+## class="hide_if_no_html5_video"
 
-<div class="hide_if_no_html5_video">
+<div id="html5_video_embed" style="display: none;">
     <video poster="${h.thumbnail_location_from_track(data)}" durationHint="${data['duration']}" controls>
         % for preview, url in previews(data):
             <source src="${url}" type="video/${h.video_mime_type(preview)}" />
@@ -39,7 +40,8 @@
     </video>
 </div>
 
-<div class="hide_if_html5_video">
+## class="hide_if_html5_video"
+<div id="html5_video_link">
     ##<div data-role="collapsible" data-content-theme="c">
     ##    <h3>Video Links</h3>
         % for preview, url in previews(data):
@@ -47,6 +49,13 @@
         % endfor
     ##</div>
 </div>
+
+<script type="text/javascript">
+    if (Modernizr.video.h264) {
+        $('#html5_video_embed').show();
+        $('#html5_video_link' ).hide();
+    }
+</script>
 
 <!-- details -->
 <p>${data['description']}</p>
