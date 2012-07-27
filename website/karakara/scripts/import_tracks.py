@@ -36,6 +36,7 @@ tag_extractors = {
     'anime'   : re.compile(r'anime', re.IGNORECASE),
 }
 
+#skippy = 'string in filename to skip to'
 
 #-------------------------------------------------------------------------------
 # Import from URL
@@ -129,6 +130,12 @@ def import_json_data(source, location=''):
     if not data:
         return
     
+    # AllanC - useful code to skip to a particular track in processing - i've needed it a couple if times so just leaving it here.
+    #global skippy
+    #if skippy:
+    #    if skippy not in location: return
+    #    skippy = False
+    
     if 'description.json' in location:
         try:
             folder = data['name']
@@ -177,6 +184,10 @@ def import_json_data(source, location=''):
                 log.warn('Unable to imports tags')
                 #traceback.print_exc()
                 #exit()
+            
+            for duplicate_tag in [tag for tag in track.tags if track.tags.count(tag) > 1]:
+                log.warn('Unneeded duplicate tag found %s in %s' %(duplicate_tag, location))
+                track.tags.remove(duplicate_tag)
             
             # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
             
