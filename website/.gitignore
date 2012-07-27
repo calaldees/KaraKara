@@ -1,4 +1,5 @@
 KaraKara.db
+*.db-journal
 *.egg-info
 env/
 data/

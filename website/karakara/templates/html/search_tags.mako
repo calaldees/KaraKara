@@ -59,7 +59,7 @@
             except:
                 pass
         %>
-        % if show_dividers and new_heading:
+        % if show_dividers and new_heading and False:
 	<li data-role="list-divider">${new_heading}</li>
         ##<div data-role="collapsible" data-collapsed="true">
         % endif 
