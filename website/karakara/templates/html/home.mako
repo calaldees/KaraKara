@@ -7,7 +7,7 @@
 <!-- <a href="/fave"           data-role="button">Fave's    </a> -->
 
 % if identity.get('admin', False):
-<a href="track_list" data-role="button">List All Tracks</a>
-<a href="/admin"     data-role="button">Exit Admin Mode</a>
+<a href="track_list" data-role="button" data-theme="e">List All Tracks</a>
+<a href="/admin"     data-role="button" data-theme="e">Exit Admin Mode</a>
 % endif
 

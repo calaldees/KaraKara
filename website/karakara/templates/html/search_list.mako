@@ -1,9 +1,11 @@
 <%inherit file="_base.mako"/>
 
+<%namespace name="search_tags" file="search_tags.mako" import="search_url"/>
+
 <%def name="title()">Search Tracks</%def>
 
 
-<a href="${request.route_path('search_tags', tags="/".join(data['tags']))}" data-role="button" data-icon="back">Back to tag browser</a>
+<a href="${search_url()}" data-role="button" data-icon="back">Back to tag browser</a>
 
 <!-- tracks -->
 <h2>Tracks</h2>

@@ -2,12 +2,21 @@
 
 <%def name="title()">Search Tracks</%def>
 
-<%
-    def search_url(tags,keywords,route='search_tags'):
-        return request.route_path(route, tags="/".join(tags), keywords=",".join(keywords))
+<%def name="search_url(tags=None,keywords=None,route='search_tags')"><%
+        if tags    ==None: tags     = data.get('tags'    ,[])
+        if keywords==None: keywords = data.get('keywords',[])
+##    def search_url(tags,keywords,route='search_tags'):
+        route_path = request.route_path(route, tags="/".join(tags))
+        if keywords:
+            route_path += '?keywords=%s' % " ".join(keywords) #AllanC - WTF!!! Why do I have to do this HACK to append the query string ... jesus, I don't understand pyramids ***ing url gen and crappy routing ...
+        ##return route_path
+%>${route_path}</%def>
 
-    tags     = data.get('tags'    ,[])
-    keywords = data.get('keywords',[])
+
+<%
+
+    #tags     = data.get('tags'    ,[])
+    #keywords = data.get('keywords',[])
 
     try   : tag_up1 = tags[-1]
     except: tag_up1 = 'root'
@@ -16,19 +25,19 @@
     
 %>
 
-% for tag in tags:
+% for tag in data['tags']:
     <%
-        tags_modifyed = list(data.get('tags'))
+        tags_modifyed = list(data['tags'])
         tags_modifyed.remove(tag)
     %>
-    <a href="${search_url(tags_modifyed,keywords)}" data-role="button" data-icon="delete">${tag}</a>
+    <a href="${search_url(tags=tags_modifyed)}" data-role="button" data-icon="delete">${tag}</a>
 % endfor
-% for keyword in keywords:
+% for keyword in data['keywords']:
     <%
-        keywords_modifyed = list(keywords)
+        keywords_modifyed = list(data['keywords'])
         keywords_modifyed.remove(keyword)
     %>
-    <a href="${search_url(tags,keywords_modifyed)}" data-role="button" data-icon="delete">${keyword}</a>
+    <a href="${search_url(keywords=keywords_modifyed)}" data-role="button" data-icon="delete">${keyword}</a>
 % endfor
 
 ##% if data.get('tags'):    
@@ -36,11 +45,11 @@
 ##    <a href="${request.route_path('search_tags', tags="/".join(data['tags'][0:-1]))}" data-role="button" data-icon="back">Back to ${tag_up2}</a>
 ##% endif
 
-<form action="${search_url(tags,keywords)}" method="GET">
+<form action="${search_url()}" method="GET">
     <input type="text" name="keywords" placeholder="Add search keywords">
 </form>
 
-<a href="${search_url(tags,keywords,route='search_list')}" data-role="button" data-icon="arrow-r">List ${len(data.get('trackids',[]))} Tracks</a>
+<a href="${search_url(route='search_list')}" data-role="button" data-icon="arrow-r">List ${len(data.get('trackids',[]))} Tracks</a>
 
 <!-- sub tags -->
 % for parent_tag in data.get('sub_tags_allowed',[]):
