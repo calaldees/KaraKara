@@ -1,5 +1,7 @@
 from pyramid.view import view_config
 
+from sqlalchemy.orm import joinedload
+
 from . import web, etag
 
 from ..lib.auto_format    import action_ok
@@ -39,24 +41,24 @@ def track_view(request):
     return action_ok(data=track.to_dict('full'))
 
 
+#@view_config(route_name='track_list')
+#@etag(tracks_etag)
+#@web
+#def track_list(request):
+#    """
+#    Browse tracks
+#    """
+#    #track_list = []
+#    #for track in DBSession.query(Track).all():
+#    #    track_list.append(track.id)
+#    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
+
+
 @view_config(route_name='track_list')
-@etag(tracks_etag)
-@web
-def track_list(request):
-    """
-    Browse tracks
-    """
-    #track_list = []
-    #for track in DBSession.query(Track).all():
-    #    track_list.append(track.id)
-    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
-
-
-@view_config(route_name='track_list_all')
 @web
 def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
     """
-    return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in DBSession.query(Track).all()]})
+    return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in DBSession.query(Track).options(joinedload(Track.tags),joinedload('tags.parent')).all()]})
 
