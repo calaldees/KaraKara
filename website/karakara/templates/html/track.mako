@@ -55,14 +55,14 @@
         cycleThumbnail();
         function cycleThumbnail() {
             
-            if (current_thumbnail!=null) {
+            if (current_thumbnail) {
                 current_thumbnail.hide();
                 current_thumbnail = current_thumbnail.next();
             }
             if (current_thumbnail==null || current_thumbnail.length==0) {
                 current_thumbnail = $('.thumbnails').children('img:first');
             }
-            if (current_thumbnail!=null) {
+            if (current_thumbnail) {
                 current_thumbnail.show();
             }
         }

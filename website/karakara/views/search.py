@@ -26,7 +26,6 @@ tag_cats = {
     'category:jdrama': ['from'],
     'category:game'  : ['from'],
     'category:jpop'  : ['artist','from'],
-
 }
 
 #-------------------------------------------------------------------------------
@@ -37,7 +36,7 @@ def search(request):
     
     try   : tags     = url.split('/')
     except: tags     = []
-    try   : keywords = request.params['keywords'].split(' ')
+    try   : keywords = [keyword for keyword in request.params['keywords'].split(' ') if keyword]
     except: keywords = []
     
     # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
@@ -88,9 +87,9 @@ def tags(request):
     
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
     if request.matchdict['format']=='html':
-        if len(trackids)==1:
+        if len(trackids)== 1:
             raise HTTPFound(location=track_url(trackids[0]))
-        if len(trackids)<10:
+        if len(trackids)< 15:
             raise HTTPFound(location=search_url(tags,keywords,'search_list'))
     
     # Get a list of all the tags for all the trackids
