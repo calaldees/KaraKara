@@ -9,25 +9,11 @@
 <%def name="search_url(tags=None,keywords=None,route='search_tags')"><%
         if tags    ==None: tags     = data.get('tags'    ,[])
         if keywords==None: keywords = data.get('keywords',[])
-##    def search_url(tags,keywords,route='search_tags'):
         route_path = request.route_path(route, tags="/".join(tags))
         if keywords:
             route_path += '?keywords=%s' % " ".join(keywords) #AllanC - WTF!!! Why do I have to do this HACK to append the query string ... jesus, I don't understand pyramids ***ing url gen and crappy routing ...
-        ##return route_path
 %>${route_path}</%def>
 
-
-<%
-
-    #tags     = data.get('tags'    ,[])
-    #keywords = data.get('keywords',[])
-
-    try   : tag_up1 = tags[-1]
-    except: tag_up1 = 'root'
-    #try   : tag_up2 = data['tags'][-2]
-    #except: tag_up2 = 'root'
-    
-%>
 
 % for tag in data['tags']:
     <%
@@ -44,11 +30,7 @@
     <a href="${search_url(keywords=keywords_modifyed)}" data-role="button" data-icon="delete">${keyword}</a>
 % endfor
 
-##% if data.get('tags'):    
-##    <!-- back -->
-##    <a href="${request.route_path('search_tags', tags="/".join(data['tags'][0:-1]))}" data-role="button" data-icon="back">Back to ${tag_up2}</a>
-##% endif
-
+<!-- add keywords -->
 <form action="${search_url()}" method="GET">
     <input type="text" name="keywords" placeholder="Add search keywords">
 </form>
@@ -61,8 +43,8 @@
     <%
         tags = [tag for tag in data.get('sub_tags',[]) if tag.get('parent')==parent_tag]  # AllanC - humm .. inefficent filtering in a template .. could be improved
         
-        try   : renderer = jquerymobile_accordian if tags[-1]['parent'] in ['from','artist'] else jquerymobile_list
-        except: renderer =                                                                        jquerymobile_list
+        try   : renderer = jquerymobile_accordian if tags[-1]['parent'] in ['from','artist'] and len(tags)>40 else jquerymobile_list
+        except: renderer =                                                                                         jquerymobile_list
     %>
     ${renderer(tags)}
 % endfor
