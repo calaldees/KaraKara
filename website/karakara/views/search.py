@@ -1,4 +1,5 @@
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPFound
 
 from . import web
 
@@ -8,6 +9,7 @@ from ..lib.auto_format import action_ok, registered_formats
 from ..model              import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
 from ..model.actions      import get_tag
+from ..templates.helpers  import search_url, track_url
 
 import re
 import copy
@@ -79,8 +81,17 @@ def search(request):
 def tags(request):
     action_return = search(request)
 
+    tags             = action_return['data']['tags']
+    keywords         = action_return['data']['keywords']
     sub_tags_allowed = action_return['data']['sub_tags_allowed']
     trackids         = action_return['data']['trackids']
+    
+    # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
+    if request.matchdict['format']=='html':
+        if len(trackids)==1:
+            raise HTTPFound(location=track_url(trackids[0]))
+        if len(trackids)<10:
+            raise HTTPFound(location=search_url(tags,keywords,'search_list'))
     
     # Get a list of all the tags for all the trackids
     # Group them by tag name
@@ -94,7 +105,6 @@ def tags(request):
                         group_by(Tag.id).\
                         order_by(alias_parent_tag.name,Tag.name).\
                         options(joinedload(Tag.parent))
-                        
     
     action_return['data'].update({
         'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags], # if tag not in tags

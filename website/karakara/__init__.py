@@ -57,7 +57,7 @@ def main(global_config, **settings):
     
     # AllanC - it's official ... static route setup and generation is a mess in pyramid
     #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
-    config.add_static_view(name='media', path=settings["static.media"])
+    config.add_static_view(name='files', path=settings["static.media"])
     
     
     # Routes

@@ -9,9 +9,7 @@
 <%def name="search_url(tags=None,keywords=None,route='search_tags')"><%
         if tags    ==None: tags     = data.get('tags'    ,[])
         if keywords==None: keywords = data.get('keywords',[])
-        route_path = request.route_path(route, tags="/".join(tags))
-        if keywords:
-            route_path += '?keywords=%s' % " ".join(keywords) #AllanC - WTF!!! Why do I have to do this HACK to append the query string ... jesus, I don't understand pyramids ***ing url gen and crappy routing ...
+        route_path = h.search_url(tags,keywords,route)
 %>${route_path}</%def>
 
 

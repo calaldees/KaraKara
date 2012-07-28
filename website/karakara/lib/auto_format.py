@@ -65,17 +65,7 @@ def auto_format_output(target, *args, **kwargs):
     request = request_from_args(args)
     
     # Pre Processing -----------------------------------------------------------
-    # None
-    
-    # Execute ------------------------------------------------------------------
-    try:
-        result = target(*args, **kwargs)
-    except action_error as ae:
-        result = ae.d
-        log.warn("Auto format exception needs to be handled")
-    
-    # Post Processing ----------------------------------------------------------
-    
+
     # Find format string 'format' based on input params, to then find a render func 'formatter'  - add potential formats in order of precidence
     formats = []
     # add kwarg 'format'
@@ -95,6 +85,21 @@ def auto_format_output(target, *args, **kwargs):
     except: pass
     # add default format
     formats.append(get_setting('auto_format.default', request) or 'html')
+    
+    request.matchdict['format'] = formats[0] # A way for all methods wraped by this decorator to determin what format they are targeted for
+    
+    # Execute ------------------------------------------------------------------
+    try:
+        result = target(*args, **kwargs)
+    except action_error as ae:
+        result = ae.d
+        log.warn("Auto format exception needs to be handled")
+    
+    # Post Processing ----------------------------------------------------------
+
+    # the result may have an overriding format that should always take precident
+    try   : formats.insert(0,result['format'])
+    except: pass
     
     formatter = None
     for format in formats:
@@ -211,5 +216,5 @@ def format_redirect(request, result):
     for message in result['messages']:
         request.session.flash(message)
     del result['code']
-    return HTTPFound(location=request.referer)
+    raise HTTPFound(location=request.referer)
 register_formater('redirect', format_redirect)

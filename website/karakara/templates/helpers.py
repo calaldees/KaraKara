@@ -26,6 +26,12 @@ def media_url(file):
 def track_url(id):
     return '/track/%s' % id
 
+def search_url(tags=[],keywords=[],route='search_tags'):
+    route_path = "/%s/%s" % (route.replace('_','/'), "/".join(tags))
+    if keywords:
+        route_path += '?keywords=%s' % " ".join(keywords) #AllanC - WTF!!! Why do I have to do this HACK to append the query string ... jesus, I don't understand pyramids ***ing url gen and crappy routing ...
+    return route_path
+
 def duration_str(duration):
     """
     duration in seconds to human readable string form

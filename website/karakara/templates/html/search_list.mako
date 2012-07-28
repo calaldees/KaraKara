@@ -4,7 +4,7 @@
 
 <%def name="title()">Search Tracks</%def>
 
-
+## AllanC - BUG!! pressing the back button on pages with less than 10 items creates a redirect loop .. this is an issue for iphone users
 <a href="${search_url()}" data-role="button" data-icon="back">Back to tag browser</a>
 
 <!-- tracks -->
