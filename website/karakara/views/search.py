@@ -36,8 +36,13 @@ def search(request):
     
     try   : tags     = url.split('/')
     except: tags     = []
-    try   : keywords = [keyword for keyword in request.params['keywords'].split(' ') if keyword]
+    try   : keywords = [keyword for keyword in re.findall(r'\w+', request.params['keywords']) if keyword]
     except: keywords = []
+    try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
+    except: trackids = []
+    
+    
+
     
     # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
     #  any tags that dont match are added as keywords
@@ -50,12 +55,14 @@ def search(request):
             keywords.append(tag)
     tags = tag_objs
     
-    # Get trackids for all tracks that match the tags and keywords
-    trackids = DBSession.query(Track.id)
-    for tag in tags:
-        trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
-    for keyword in keywords:
-        trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
+    # If trackids not manually given in request - Get trackids for all tracks that match the tags and keywords
+    if not trackids:
+        trackids = DBSession.query(Track.id)
+        for tag in tags:
+            trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
+        for keyword in keywords:
+            trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
+        trackids = [trackid[0] for trackid in trackids.all()]
     
     # Limit sub tag categorys for last tag selected
     #    and remove any selection of previous tags with the same parent
@@ -69,7 +76,7 @@ def search(request):
         data={
             'tags'    : [str(tag) for tag in tags],
             'keywords': keywords,
-            'trackids': [trackid[0] for trackid in trackids.all()],
+            'trackids': trackids,
             'sub_tags_allowed': sub_tags_allowed,
         }
     )
@@ -86,11 +93,15 @@ def tags(request):
     trackids         = action_return['data']['trackids']
     
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
+
+    
     if request.matchdict['format']=='html':
+        # If there is only one track present - abort and redirect to single track view, there is no point in doing any more work
         if len(trackids)== 1:
             raise HTTPFound(location=track_url(trackids[0]))
+        # If there is only a small list, we might as well just show them all
         if len(trackids)< 15:
-            raise HTTPFound(location=search_url(tags,keywords,'search_list'))
+            raise HTTPFound(location=search_url(tags=tags,keywords=keywords,route='search_list'))
     
     # Get a list of all the tags for all the trackids
     # Group them by tag name

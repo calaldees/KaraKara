@@ -9,7 +9,7 @@
 <%def name="search_url(tags=None,keywords=None,route='search_tags')"><%
         if tags    ==None: tags     = data.get('tags'    ,[])
         if keywords==None: keywords = data.get('keywords',[])
-        route_path = h.search_url(tags,keywords,route)
+        route_path = h.search_url(tags=tags,keywords=keywords,route=route)
 %>${route_path}</%def>
 
 

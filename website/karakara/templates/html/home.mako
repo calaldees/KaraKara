@@ -2,7 +2,7 @@
 
 
 ## AllanC - ****! I need the slash here because of the broken routing ... rarararar
-<a href="/search/tags/"   data-role="button">Browser Tracks</a>
+<a href="/search_tags/"   data-role="button">Browser Tracks</a>
 <a href="/queue"          data-role="button">Queue         </a>
 <!-- <a href="/fave"           data-role="button">Fave's    </a> -->
 
