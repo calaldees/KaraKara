@@ -4,7 +4,7 @@
     import string
 %>
 
-<%def name="title()">Search Tracks</%def>
+<%def name="title()">Explore Tracks</%def>
 
 <%def name="search_url(tags=None,keywords=None,route='search_tags')"><%
         if tags    ==None: tags     = data.get('tags'    ,[])

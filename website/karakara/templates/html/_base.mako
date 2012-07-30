@@ -27,12 +27,12 @@
         <link   href="${static('favicon.ico')}"                               rel="shortcut icon"  />
     </head>
     
-    <body> 
+    <body>
         
         <div data-role="page">
             
             <div data-role="header" data-position="fixed" \
-
+                
                 % if identity.get('admin',False):
                 data-theme="e"
                 % endif
@@ -42,8 +42,13 @@
                 
                 ## data-iconpos="notext"
                 ##<a href="/track_list" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Tracks</a>
-                <a href="/"           data-role="button" data-icon="home"   data-mini="true" data-inline="true">Home</a>
-                <a href="/queue"      data-role="button" data-icon="search" data-mini="true" data-inline="true">Queue</a>
+                ##<a href="/queue"      data-role="button" data-icon="search" data-mini="true" class="ui-btn-right">Queue</a>
+                ##
+                % if request.path != '/':
+                <a data-role="button" data-role="button "data-icon="back"   data-mini="true"  class="ui-btn-left" data-rel="back">Back</a>
+                <a href="/"           data-role="button" data-icon="home"   data-mini="true"  class="ui-btn-right"                >Home</a>
+                % endif
+                
             </div><!-- /header -->
             
             <!-- flash messages -->

@@ -8,6 +8,12 @@ $(document).bind("mobileinit", function(){
     $.mobile.fixedToolbars.setTouchToggleEnabled(false);
     */
     $.mobile.ajaxEnabled = false;
+    /*
+     broken shit that dosnt work ... broken broken software! :(
+    $.mobile.page.prototype.options.addBackBtn  = "true";
+    $.mobile.page.prototype.options.backBtnText = "previous";
+    $.mobile.page.prototype.options.backBtnTheme = "a";
+    */
 });
 
 //$(document).bind("pagecreate", function() {
