@@ -48,9 +48,10 @@ def track_view(request):
                 order_by(QueueItem.id)
     queue = [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue]
     
+    track['queued'] = queue
+    
     return action_ok(data={
-        'track' : track,
-        'queued': queue,
+        'track' : track
     })
 
 

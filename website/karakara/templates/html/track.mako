@@ -126,10 +126,10 @@
 
 ##------------------------------------------------------------------------------
 
-% 'queued' in data:
+% if 'queued' in track:
 <h3>Queued by</h3>
 <ul>
-% for queue_item in data['queued']:
+% for queue_item in track['queued']:
 <li>${queue_item['performer_name']}</li>
 % endfor
 </ul>

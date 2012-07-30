@@ -2,7 +2,6 @@ from pyramid.view import view_config
 
 from . import web, etag, method_delete_router
 
-
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
@@ -51,7 +50,7 @@ def queue_view(request):
     for queue_item in queue:
         queue_item['track'] = tracks[queue_item['track_id']]
     
-    return action_ok(data={'list':queue})
+    return action_ok(data={'queue':queue})
 
 
 @view_config(route_name='queue', request_method='POST')
@@ -60,9 +59,7 @@ def queue_add(request):
     """
     Add items to end of queue
     """
-    
     queue_item = QueueItem()
-    
     for key,value in request.params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)

@@ -70,6 +70,7 @@ def main(global_config, **settings):
     config.add_route('queue'         , append_format_pattern('/queue')         )
     config.add_route('fave'          , append_format_pattern('/fave')          )
     config.add_route('admin_toggle'  , append_format_pattern('/admin')         )
+    config.add_route('feedback'      , append_format_pattern('/feedback')      )
     
     config.add_route('search_tags'   , '/search_tags/{tags:.*}')
     config.add_route('search_list'   , '/search_list/{tags:.*}')

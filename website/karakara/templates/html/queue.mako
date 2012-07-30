@@ -6,7 +6,7 @@
 
     <ul data-role="listview" data-split-icon="minus">
         <% total_duration = 0 %>
-        % for queue_item in data.get('list',[]):
+        % for queue_item in data.get('queue',[]):
         <li>
             <a href='${h.track_url(queue_item['track_id'])}'>
                 <img src='${h.thumbnail_location_from_track(queue_item['track'])}' />
