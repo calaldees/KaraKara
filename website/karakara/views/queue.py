@@ -4,11 +4,14 @@ from . import web, etag, method_delete_router
 
 
 from ..lib.auto_format    import action_ok, action_error
-from ..model              import DBSession
+from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
 from ..model.model_tracks import Track
 
 from sqlalchemy.orm import joinedload, joinedload_all
+
+import logging
+log = logging.getLogger(__name__)
 
 # Fake Etag placeholder
 from ..lib.misc import random_string
@@ -32,8 +35,22 @@ def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.id).options(joinedload_all('track.attachments')).all()
+    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.id).all()
     queue = [queue_item.to_dict('full') for queue_item in queue]
+    
+    trackids = [queue_item['track_id'] for queue_item in queue]    
+    tracks   = DBSession.query(Track).\
+                        filter(Track.id.in_(trackids)).\
+                        options(\
+                            joinedload(Track.tags),\
+                            joinedload(Track.attachments),\
+                            joinedload('tags.parent'),\
+                        )
+    tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
+    
+    for queue_item in queue:
+        queue_item['track'] = tracks[queue_item['track_id']]
+    
     return action_ok(data={'list':queue})
 
 
@@ -55,6 +72,7 @@ def queue_add(request):
     
     queue_updated() # Invalidate Cache
     
+    log.info('%s added to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     return action_ok(message='track queued')
 
 

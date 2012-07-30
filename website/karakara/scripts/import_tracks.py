@@ -10,9 +10,9 @@ from ..lib.misc import get_fileext, random_string
 
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
 
-from ..model         import init_DBSession, DBSession
+from ..model         import init_DBSession, DBSession, commit
 from ..model.actions import get_tag
-import transaction
+
 
 import logging
 log = logging.getLogger(__name__)
@@ -195,7 +195,7 @@ def import_json_data(source, location=''):
             track.id = gen_id_for_track(track)
             
             DBSession.add(track)
-            transaction.commit()
+            commit()
         except Exception as e:
             log.warn('Unable to process %s because %s' % (location, e))
             traceback.print_exc()

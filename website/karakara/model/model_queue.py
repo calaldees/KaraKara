@@ -32,8 +32,9 @@ class QueueItem(Base):
     
     status          = Column(_queueitem_statuss ,  nullable=False, default="pending")
     
-    track           = relationship("Track", backref=backref('queued')) # # AllanC - this makes the queue aware of the track and tightens coupleling ... ultimatelty the que and tracks should be in differnt db's but then the sqla links wont function ... think neo!!
-
+    # AllanC - there is no linking of the models now. Track and Queue are linked at an API level and can be in two separate DB's
+    #track           = relationship("Track", backref=backref('queued')) # # AllanC - this makes the queue aware of the track and tightens coupleling ... ultimatelty the que and tracks should be in differnt db's but then the sqla links wont function ... think neo!!
+    
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
@@ -41,14 +42,14 @@ class QueueItem(Base):
             'id'            : None ,
             'track_id'      : None ,
             'performer_name': None ,
-            'session_owner' : None ,
             'touched'       : None ,
         },
     })
     
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-            'track'       : lambda queue_item: queue_item.track.to_dict(include_fields='attachments'),
-            'status'      : None,
+            'status'       : None ,
+            'session_owner': None ,
+            #'track'       : lambda queue_item: queue_item.track.to_dict(include_fields='attachments'),
             #'image'       : lambda queue_item: single_image(queue_item),    # AllanC - if you use this ensure you have setup eager loading on your query
     })

@@ -1,20 +1,17 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm             import scoped_session, sessionmaker
-from zope.sqlalchemy            import ZopeTransactionExtension
-
+__all__ = [
+    "DBSession", "Base", "init_DBSession", "init_db", "commit"
+    "JSONEncodedDict",
+]
 
 import logging
 log = logging.getLogger(__name__)
 
-__all__ = [
-    "DBSession", "Base", "init_DBSession", "init_db",
-    "JSONEncodedDict",
-]
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension())) # auto transaction commit after every request
-Base      = declarative_base()
-
-
+from sqlalchemy.orm             import scoped_session, sessionmaker
+from zope.sqlalchemy            import ZopeTransactionExtension      # AllanC - Apparently, the recomended way to use Pyramid is with a transaction manager
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 #-------------------------------------------------------------------------------
 # DB Setup
@@ -156,3 +153,18 @@ def augment_declarative_base(base_class):
 
 augment_declarative_base(Base)
 
+
+#-------------------------------------------------------------------------------
+# Commit
+#-------------------------------------------------------------------------------
+
+import transaction
+
+def commit():
+    """
+    Commits the db session regardless of if it was setup with the zope transaction manager
+    """
+    try:
+        DBSession.commit()
+    except AssertionError as ae:
+        transaction.commit()

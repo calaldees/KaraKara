@@ -217,5 +217,5 @@ def format_redirect(request, result):
     for message in result['messages']:
         request.session.flash(message)
     del result['code']
-    raise HTTPFound(location=request.referer)
+    return HTTPFound(location=request.referer)
 register_formater('redirect', format_redirect)

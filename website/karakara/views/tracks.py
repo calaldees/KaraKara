@@ -7,6 +7,7 @@ from . import web, etag
 from ..lib.auto_format    import action_ok
 from ..model              import DBSession
 from ..model.model_tracks import Track
+from ..model.model_queue  import QueueItem
 
 
 
@@ -38,17 +39,18 @@ def track_view(request):
                     joinedload(Track.tags),\
                     joinedload(Track.attachments),\
                     joinedload('tags.parent'),\
-                ).\
-            get(id)
+                )
+    track = track.get(id).to_dict('full')
     
-    #request.session['track_views'] = request.session.get('track_views',0) + 1
-    #d = {'description':track.description, 'views':request.session['track_views']}
-    
-    track = track.to_dict('full')
+    queue = DBSession.query(QueueItem).\
+                filter(QueueItem.status=='pending').\
+                filter(QueueItem.track_id==track['id']).\
+                order_by(QueueItem.id)
+    queue = [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue]
     
     return action_ok(data={
-        'track'         :track,
-        #'track_in_faves':track['id'] in request.session.get('faves',[]), # Unneeded as faves in identiy dict
+        'track' : track,
+        'queued': queue,
     })
 
 

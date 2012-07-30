@@ -123,3 +123,14 @@
     <input type="hidden" name="id" value="${track['id']}" />
     <input type="submit" value="${'Remove from faves' if fave else 'Add to faves'}" />
 </form>
+
+##------------------------------------------------------------------------------
+
+% 'queued' in data:
+<h3>Queued by</h3>
+<ul>
+% for queue_item in data['queued']:
+<li>${queue_item['performer_name']}</li>
+% endfor
+</ul>
+% endif

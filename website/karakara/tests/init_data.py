@@ -1,7 +1,7 @@
 import random
-import transaction
 
-from ..model import DBSession
+
+from ..model import DBSession, commit
 from ..lib.misc import random_string
 
 from ..model.actions import get_tag
@@ -38,7 +38,7 @@ def init_random_data(num_tracks=100):
     for series_num in range(10):
         DBSession.add(Tag('Series %s'%random_string(1), parent_tag))
     
-    transaction.commit()
+    commit()
     
     
     # --------------------------------------------------------------------------
@@ -72,4 +72,4 @@ def init_random_data(num_tracks=100):
         track.attachments = attachments
         DBSession.add(track)
     
-    transaction.commit()
+    commit()

@@ -1,5 +1,5 @@
-from . import DBSession, init_db
-import transaction
+from . import DBSession, init_db, commit
+
 
 import logging
 log = logging.getLogger(__name__)
@@ -8,8 +8,9 @@ log = logging.getLogger(__name__)
 # DB Objects
 #-------------------------------------------------------------------------------
 
-from .model_tracks import Track, Tag
-from .model_queue  import QueueItem
+from .model_tracks   import Track, Tag
+from .model_queue    import QueueItem
+from .model_feedback import Feedback
 
 # db action import
 from .actions import get_tag
@@ -79,6 +80,6 @@ def init_data():
         get_tag(tag, create_if_missing=True)
     
     #DBSession.add_all(tags)
-    transaction.commit()  # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
+    commit()  # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
 
     
