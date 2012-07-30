@@ -33,7 +33,13 @@ def track_view(request):
     View individual track details
     """
     id    = request.matchdict['id']
-    track = DBSession.query(Track).with_polymorphic('*').get(id)
+    track = DBSession.query(Track).\
+                options(\
+                    joinedload(Track.tags),\
+                    joinedload(Track.attachments),\
+                    joinedload('tags.parent'),\
+                ).\
+            get(id)
     
     #request.session['track_views'] = request.session.get('track_views',0) + 1
     #d = {'description':track.description, 'views':request.session['track_views']}
@@ -65,5 +71,10 @@ def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
     """
-    return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in DBSession.query(Track).options(joinedload(Track.tags),joinedload('tags.parent')).all()]})
+    tracks = DBSession.query(Track).\
+                options(\
+                    joinedload(Track.tags),\
+                    joinedload('tags.parent')\
+                )
+    return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in tracks]})
 

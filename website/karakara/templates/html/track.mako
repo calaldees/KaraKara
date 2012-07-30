@@ -9,8 +9,10 @@
 <h1 class="track_title">${h.track_title_only(track)}</h1>
 
 <table class="track_tags">
-% for key,value in track['tags'].items():
-    <tr><th>${key}</th><td>${value}</td></tr>
+% for key,values in track['tags'].items():
+    % if values:
+    <tr><th>${key}</th><td>${", ".join(values)}</td></tr>
+    % endif
 % endfor
 </table>
 

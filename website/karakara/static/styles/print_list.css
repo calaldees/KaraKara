@@ -1,0 +1,25 @@
+html {
+    font-family: sans-serif;
+    padding: 0.5em;
+}
+table {
+    font-size: 8px;
+}
+thead {
+    display: table-header-group;
+}
+tr:nth-child(even) {
+    background-color: #eeeeee;
+}
+td {
+    vertical-align: top;
+    text-transform:capitalize;
+}
+th {
+    font-weight: bold;
+    background: #dddddd;
+    text-transform:capitalize;
+}
+td.col_id {
+    text-transform:none;
+}

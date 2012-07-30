@@ -1,4 +1,6 @@
-from ..lib.misc import get_fileext
+from ..lib.misc import get_fileext, substring_in
+
+
 
 import random
 
@@ -18,6 +20,9 @@ video_fileext_to_mime_types = {
     'flv':'x-flv',
 }
 
+def static_url(file):
+    #return request.static_url('karakara:static/%s' % file)
+    return "/static/"+file
 
 def media_url(file):
     #return '/media/%s' % file
@@ -59,17 +64,17 @@ title_tags_for_category = {
 }
 def track_title(tags, exclude_tags=[]):
     exclude_tags = [tag.split(':')[0] for tag in exclude_tags]
-    if tags.get('title')==tags.get('from'):
+    if substring_in(tags.get('title'),tags.get('from')):
         exclude_tags.append('title')
-    title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT'), title_tags_for_category['DEFAULT'])
+    title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT')[0], title_tags_for_category['DEFAULT'])
     tags_to_use  = [tag for tag in title_tags if tag not in exclude_tags]
-    return " - ".join([t for t in [tags.get(tag_to_use,'') for tag_to_use in tags_to_use] if t])
+    return " - ".join([t for t in [", ".join(tags.get(tag_to_use,[])) for tag_to_use in tags_to_use] if t])
 
 def track_title_only(track):
     title = track.get('title')
     for tag in ['title','from','artist']:
         try:
-            title = track['tags'][tag]
+            title = track['tags'][tag][0]
             break
         except: pass
     return title.capitalize()

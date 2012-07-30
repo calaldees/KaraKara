@@ -6,25 +6,19 @@
         
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
-        <%
-            def static(file):
-                #return request.static_url('karakara:static/%s' % file)
-                return "/static/"+file
-        %>
-        
         <!-- CSS Styles -->
-        <link   href="${static('styles/yui-3.5.0-cssreset-min.css')}"         rel="stylesheet"     />
-        <link   href="${static('jquery.mobile/jquery.mobile-1.1.0.min.css')}" rel="stylesheet"     />
-        <link   href="${static('styles/main.css')}"                           rel="stylesheet"     />
+        <link   href="${h.static_url('styles/yui-3.5.0-cssreset-min.css')}"         rel="stylesheet"     />
+        <link   href="${h.static_url('jquery.mobile/jquery.mobile-1.1.0.min.css')}" rel="stylesheet"     />
+        <link   href="${h.static_url('styles/main.css')}"                           rel="stylesheet"     />
         
         <!-- Scripts -->
-        <script src ="${static('scripts/modernizer.custom.js')}"                                    ></script>
-        <script src ="${static('scripts/jquery-1.7.1.min.js')}"                                     ></script>
-        <script src ="${static('scripts/jquery.mobile-extras.js')}"                                 ></script>
-        <script src ="${static('jquery.mobile/jquery.mobile-1.1.0.min.js')}"                        ></script>
+        <script src ="${h.static_url('scripts/modernizer.custom.js')}"                                    ></script>
+        <script src ="${h.static_url('scripts/jquery-1.7.1.min.js')}"                                     ></script>
+        <script src ="${h.static_url('scripts/jquery.mobile-extras.js')}"                                 ></script>
+        <script src ="${h.static_url('jquery.mobile/jquery.mobile-1.1.0.min.js')}"                        ></script>
         
         <!-- Other -->
-        <link   href="${static('favicon.ico')}"                               rel="shortcut icon"  />
+        <link   href="${h.static_url('favicon.ico')}"                               rel="shortcut icon"  />
     </head>
     
     <body>

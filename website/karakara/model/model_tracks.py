@@ -39,6 +39,14 @@ class Track(Base):
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     lyrics          = relationship("Lyrics")
     
+    def tags_with_parents_dict(self):
+        t = {None:[tag.name for tag in self.tags if not tag.parent]}
+        for parent_name,tag_name in [(tag.parent.name,tag.name) for tag in self.tags if tag.parent]:
+            if not t.get(parent_name):
+                t[parent_name] = [tag_name]
+            else:
+                t[parent_name].append(tag_name)
+        return t
     
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
@@ -55,8 +63,7 @@ class Track(Base):
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
             'description' : None ,
             'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
-            'tags'        : lambda track: {parent:tag for parent,tag in [(tag.parent.name,tag.name) for tag in track.tags if tag.parent] },
-            'tags_other'  : lambda track: [tag.name for tag in track.tags if not tag.parent],
+            'tags'        : lambda track: track.tags_with_parents_dict(),
             'lyrics'      : lambda track: [lyrics.to_dict() for lyrics in track.lyrics] ,
     })
 
