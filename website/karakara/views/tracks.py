@@ -42,7 +42,7 @@ def track_view(request):
     
     return action_ok(data={
         'track'         :track,
-        'track_in_faves':track['id'] in request.session.get('faves',[]),
+        #'track_in_faves':track['id'] in request.session.get('faves',[]), # Unneeded as faves in identiy dict
     })
 
 

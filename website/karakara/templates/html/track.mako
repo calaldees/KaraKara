@@ -114,11 +114,11 @@
 </div>
 
 <!-- fave -->
-<% fave_remove = data.get('track_in_faves') %>
-<form action="/fave.redirect" method="${'DELETE' if fave_remove else 'POST'}">
-    % if fave_remove:
+<% fave = track['id'] in identity.get('faves',[]) %>
+<form action="/fave.redirect" method="${'DELETE' if fave else 'POST'}">
+    % if fave:
     <input type='hidden' name='method' value='delete' />
     % endif
     <input type="hidden" name="id" value="${track['id']}" />
-    <input type="submit" value="${'Add to faves' if not data.get('track_in_faves') else 'Remove from faves'}" />
+    <input type="submit" value="${'Remove from faves' if fave else 'Add to faves'}" />
 </form>

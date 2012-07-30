@@ -14,6 +14,8 @@ from ..templates.helpers  import search_url
 def fave_view(request):
     """
     view current faves
+    
+    not really needed as faves are also part of the identity dict
     """    
     trackids = request.session['faves']
     

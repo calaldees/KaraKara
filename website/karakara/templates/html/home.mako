@@ -1,11 +1,12 @@
 <%inherit file="_base.mako"/>
 
-<a href="/search_tags/"   data-role="button">Tracks</a>
-<a href="/queue"          data-role="button">Queue </a>
-<a href="/fave"           data-role="button">Fave's</a>
+<a href="/search_tags/"   data-role="button">Explore tracks</a>
+<a href="/queue"          data-role="button">Queued tracks </a>
+% if identity.get('faves',[]):
+<a href="/fave"           data-role="button">My favorites</a>
+% endif
 
 % if identity.get('admin', False):
 <a href="track_list" data-role="button" data-theme="e">List All Tracks</a>
 <a href="/admin"     data-role="button" data-theme="e">Exit Admin Mode</a>
 % endif
-

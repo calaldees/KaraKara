@@ -56,7 +56,7 @@ def overlay_identity(target, *args, **kwargs):
     # Overlay a new dict called identity onto each request
     if isinstance(result, dict):
         identity_dict = {}
-        for key in ['id','admin']:
+        for key in ['id','admin','faves']:
             identity_dict[key] = request.session.get(key,None)
         result['identity'] = identity_dict
     
