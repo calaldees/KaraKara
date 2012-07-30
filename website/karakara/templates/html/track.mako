@@ -1,19 +1,16 @@
 <%inherit file="_base.mako"/>
 
+<%
+    track = data['track']
+    
+    ## TODO - need uniform way of aquireing title
+%>
 
-<%def name="title()">${data['title']}</%def>
+<%def name="title()">${data['track']['title']}</%def>
 
-<h1>${data['title']}</h1>
 
-<div data-role="collapsible" data-content-theme="c">
-    <h3>Queue Track</h3>
-    <form action='/queue' method='POST' data-ajax="false">
-        <input type='hidden' name='format'         value='redirect'      />
-        <input type='text'   name='performer_name' value=''              placeholder='Enter your name' required />
-        <input type='hidden' name='track_id'       value='${data['id']}' />
-        <input type='submit' name='submit_'        value='Queue Track'   />
-    </form>
-</div>
+<h1>${track['title']}</h1>
+
 
 <%
     def previews(track):
@@ -25,8 +22,8 @@
 <!-- html5 video -->
 ## class="hide_if_no_html5_video"
 <div class="html5_video_embed" style="display: none;">
-    <video class="video_placeholder" poster="${h.thumbnail_location_from_track(data)}" durationHint="${data['duration']}" controls>
-        % for preview, url in previews(data):
+    <video class="video_placeholder" poster="${h.thumbnail_location_from_track(track)}" durationHint="${track['duration']}" controls>
+        % for preview, url in previews(track):
             <source src="${url}" type="video/${h.video_mime_type(preview)}" />
             ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
         % endfor
@@ -39,12 +36,14 @@
     </video>
 </div>
 
+## Preview ---------------------------------------------------------------------
+
 <!-- video link & thumbnail carousel -->
 ## class="hide_if_html5_video"
 <div class="html5_video_link">
     <!-- thumbnails -->
     <div class="thumbnails">
-    % for thumbnail_url in h.attachment_locations_by_type(data,'thumbnail'):
+    % for thumbnail_url in h.attachment_locations_by_type(track,'thumbnail'):
         <img src="${thumbnail_url}" class="video_placeholder" style="display: none;"/>
     % endfor
     </div>
@@ -80,23 +79,46 @@
     </script>
     
 
-    % for preview, url in previews(data):
+    % for preview, url in previews(track):
     <a href="${url}" data-role="button" rel=external target="_blank">Preview Video</a>
     ## ${preview['extra_fields'].get('target','unknown')}
     % endfor
 </div>
 
+## Details ---------------------------------------------------------------------
+
+<!-- Details -->
+<p>${track['description']}</p>
 
 
-<!-- details -->
-<p>${data['description']}</p>
-
-
-<!-- lyrics -->
+<!-- Lyrics -->
 <h2>Lyrics</h2>
-% for lyrics in data['lyrics']:
+% for lyrics in track['lyrics']:
     ##${lyrics['language']}
     % for line in lyrics['content'].split('\n'):
         <p>${line}</p>
     % endfor
 % endfor
+
+## Actions ---------------------------------------------------------------------
+
+<!-- Queue -->
+<div data-role="collapsible" data-content-theme="c">
+    <h3>Queue Track</h3>
+    <form action='/queue' method='POST' data-ajax="false">
+        <input type='hidden' name='format'         value='redirect'      />
+        <input type='text'   name='performer_name' value=''              placeholder='Enter your name' required />
+        <input type='hidden' name='track_id'       value='${track['id']}' />
+        <input type='submit' name='submit_'        value='Queue Track'   />
+    </form>
+</div>
+
+<!-- fave -->
+<% fave_remove = data.get('track_in_faves') %>
+<form action="/fave.redirect" method="${'DELETE' if fave_remove else 'POST'}">
+    % if fave_remove:
+    <input type='hidden' name='method' value='delete' />
+    % endif
+    <input type="hidden" name="id" value="${track['id']}" />
+    <input type="submit" value="${'Add to faves' if not data.get('track_in_faves') else 'Remove from faves'}" />
+</form>

@@ -38,7 +38,12 @@ def track_view(request):
     #request.session['track_views'] = request.session.get('track_views',0) + 1
     #d = {'description':track.description, 'views':request.session['track_views']}
     
-    return action_ok(data=track.to_dict('full'))
+    track = track.to_dict('full')
+    
+    return action_ok(data={
+        'track'         :track,
+        'track_in_faves':track['id'] in request.session.get('faves',[]),
+    })
 
 
 #@view_config(route_name='track_list')

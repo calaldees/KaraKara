@@ -85,6 +85,7 @@ def auto_format_output(target, *args, **kwargs):
     except: pass
     # add default format
     formats.append(get_setting('auto_format.default', request) or 'html')
+    formats = [format for format in formats if format] # remove any blank entries in formats list
     
     request.matchdict['format'] = formats[0] # A way for all methods wraped by this decorator to determin what format they are targeted for
     
