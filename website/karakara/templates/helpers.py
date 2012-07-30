@@ -51,3 +51,25 @@ def thumbnail_location_from_track(track, index=0):
 
 def video_mime_type(attachment):
     return video_fileext_to_mime_types.get(get_fileext(attachment['location']),'mp4')
+
+title_tags_for_category = {
+    'DEFAULT':['from','use','title','length','lang'],
+    'jpop'   :['artist','title'],
+    'meme'   :['title','from'],
+}
+def track_title(tags, exclude_tags=[]):
+    exclude_tags = [tag.split(':')[0] for tag in exclude_tags]
+    if tags.get('title')==tags.get('from'):
+        exclude_tags.append('title')
+    title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT'), title_tags_for_category['DEFAULT'])
+    tags_to_use  = [tag for tag in title_tags if tag not in exclude_tags]
+    return " - ".join([t for t in [tags.get(tag_to_use,'') for tag_to_use in tags_to_use] if t])
+
+def track_title_only(track):
+    title = track.get('title')
+    for tag in ['title','from','artist']:
+        try:
+            title = track['tags'][tag]
+            break
+        except: pass
+    return title.capitalize()

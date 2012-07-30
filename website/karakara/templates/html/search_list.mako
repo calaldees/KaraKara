@@ -17,7 +17,7 @@
             % if img_url:
             <img src="${img_url}" />
             % endif
-            ${track['tags'].get('from')} ${track['tags'].get('use')} ${track['tags'].get('title')}
+            ${h.track_title(track['tags'], exclude_tags=data['tags'])}
         </a>
     </li>
 % endfor

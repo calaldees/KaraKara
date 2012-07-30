@@ -1,16 +1,20 @@
 <%inherit file="_base.mako"/>
 
+<%def name="title()">Track</%def>
+
 <%
     track = data['track']
-    
-    ## TODO - need uniform way of aquireing title
 %>
 
-<%def name="title()">${data['track']['title']}</%def>
+<h1 class="track_title">${h.track_title_only(track)}</h1>
 
+<table class="track_tags">
+% for key,value in track['tags'].items():
+    <tr><th>${key}</th><td>${value}</td></tr>
+% endfor
+</table>
 
-<h1>${track['title']}</h1>
-
+## Video Preview ---------------------------------------------------------------
 
 <%
     def previews(track):
@@ -19,8 +23,7 @@
         return previews
 %>
 
-<!-- html5 video -->
-## class="hide_if_no_html5_video"
+<!-- html5 - video -->
 <div class="html5_video_embed" style="display: none;">
     <video class="video_placeholder" poster="${h.thumbnail_location_from_track(track)}" durationHint="${track['duration']}" controls>
         % for preview, url in previews(track):
@@ -28,18 +31,15 @@
             ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
         % endfor
         <%doc>
-            ##% for extension, video_type in h.video_files:
-                ##% if extension in attachment['location']:
-                ##% endif
-            ##% endfor
+            % for extension, video_type in h.video_files:
+                % if extension in attachment['location']:
+                % endif
+            % endfor
         </%doc>
     </video>
 </div>
 
-## Preview ---------------------------------------------------------------------
-
-<!-- video link & thumbnail carousel -->
-## class="hide_if_html5_video"
+<!-- non html5 - video link & thumbnail carousel -->
 <div class="html5_video_link">
     <!-- thumbnails -->
     <div class="thumbnails">
@@ -78,7 +78,6 @@
         });
     </script>
     
-
     % for preview, url in previews(track):
     <a href="${url}" data-role="button" rel=external target="_blank">Preview Video</a>
     ## ${preview['extra_fields'].get('target','unknown')}
@@ -113,7 +112,7 @@
     </form>
 </div>
 
-<!-- fave -->
+<!-- Fave -->
 <% fave = track['id'] in identity.get('faves',[]) %>
 <form action="/fave.redirect" method="${'DELETE' if fave else 'POST'}">
     % if fave:

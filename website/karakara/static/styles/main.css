@@ -11,3 +11,10 @@ HTML.video    .hide_if_html5_video    {display: none;}
 .video_placeholder {
     width : 100%;
 }
+
+.track_title {
+    text-align: center;
+    font-size: 130%;
+}
+.track_tags {
+}
