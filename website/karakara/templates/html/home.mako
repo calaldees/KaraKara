@@ -6,6 +6,8 @@
 <a href="/fave"           data-role="button">My favorites</a>
 % endif
 
+<a href="/feedback"       data-role="button">Give Feedback</a>
+
 % if identity.get('admin', False):
 <a href="track_list" data-role="button" data-theme="e">List All Tracks</a>
 <a href="/admin"     data-role="button" data-theme="e">Exit Admin Mode</a>

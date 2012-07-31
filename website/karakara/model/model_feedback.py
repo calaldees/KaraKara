@@ -17,23 +17,23 @@ class Feedback(Base):
     __tablename__   = "feedback"
 
     id              = Column(Integer(),  primary_key=True)
-    type            = Column(_feedback_types, nullable=False)
-    session_owner   = Column(Unicode(),   nullable=True)
+    #type            = Column(_feedback_types, nullable=False)
     
     contact         = Column(Unicode()    , nullable=True)
-    feedback        = Column(UnicodeText(), nullable=False, default="")
+    details         = Column(UnicodeText(), nullable=False, default="")
+    environ         = Column(JSONEncodedDict(), nullable=False, default={}) #mutable=True
     
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
-            'id'           : None ,
-            'type'         : None ,
-            'session_owner': None ,
-            'feedback'     : None ,
+            'id'          : None ,
+            #'type'         : None ,
+            'contact'     : None ,
+            'details'     : None ,
         },
     })
     
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-
+            'environ'     : None ,
     })
