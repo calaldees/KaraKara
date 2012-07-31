@@ -138,7 +138,7 @@ def list(request):
                         )
     
     action_return['data'].update({
-        'tracks'  : [track.to_dict('full', exclude_fields='lyrics') for track in tracks],
+        'tracks'  : [track.to_dict('full', exclude_fields='lyrics,attachments') for track in tracks],
     })
     return action_return
 

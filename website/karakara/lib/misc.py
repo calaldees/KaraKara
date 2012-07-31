@@ -1,5 +1,6 @@
 import re
 import random
+import datetime
 
 def get_fileext(filename):
     try:
@@ -44,7 +45,8 @@ def random_string(length=8):
         r += random_symbols[random.randint(0,len(random_symbols)-1)]
     return r
 
-def substring_in(substrings, string_list):
+
+def substring_in(substrings, string_list, ignore_case=True):
     """
     Find a substrings in a list of string_list
     Think of it as
@@ -66,7 +68,26 @@ def substring_in(substrings, string_list):
     if not hasattr(string_list, '__iter__') or not hasattr(substrings, '__iter__'):
         raise TypeError('params mustbe iterable')
     for s in string_list:
+        if not s:
+            continue
+        if ignore_case:
+            s = s.lower()
         for ss in substrings:
+            if ignore_case:
+                ss = ss.lower()
             if ss in s:
                 return True
     return False
+
+def normalize_datetime(d, accuracy='hour'):
+    """
+    Normalizez datetime down to hour or day
+    Dates are immutable (thank god)
+    """
+    if   accuracy=='hour':
+        return d.replace(minute=0, second=0, microsecond=0)
+    elif accuracy=='day' :
+        return d.replace(minute=0, second=0, microsecond=0, hour=0)
+    elif accuracy=='week':
+        return d.replace(minute=0, second=0, microsecond=0, hour=0) - datetime.timedelta(days=d.weekday())
+    return d

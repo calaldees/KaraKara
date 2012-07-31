@@ -28,7 +28,9 @@ class QueueItem(Base):
     
     performer_name  = Column(Unicode(),   nullable=True, default="Untitled")
     session_owner   = Column(Unicode(),   nullable=True)
-    touched         = Column(DateTime(),  nullable=False, default=now)
+    
+    time_added      = Column(DateTime(),  nullable=False, default=now)
+    time_touched    = Column(DateTime(),  nullable=False, default=now)
     
     status          = Column(_queueitem_statuss ,  nullable=False, default="pending")
     

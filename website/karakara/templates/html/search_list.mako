@@ -11,8 +11,10 @@
     <li>
         <a href="${request.route_path('track', id=track['id'], spacer='', format='')}">
             <%
-                try   : img_url = h.media_url([attachment['location'] for attachment in track['attachments'] if attachment['type']=='image'][0])
-                except: img_url = None
+                #try   :
+                    img_url = h.media_url(track['image']) #[attachment['location'] for attachment in track['attachments'] if attachment['type']=='image'][0]
+                #except:
+                #    img_url = None
             %>
             % if img_url:
             <img src="${img_url}" />

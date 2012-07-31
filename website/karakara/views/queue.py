@@ -117,7 +117,7 @@ def queue_update(request):
     for key,value in request.params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
-    queue_item.touched = datetime.datetime.now() # Update touched timestamp
+    queue_item.time_touched = datetime.datetime.now() # Update touched timestamp
     
     queue_updated() # Invalidate Cache
     

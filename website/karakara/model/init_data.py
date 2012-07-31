@@ -8,6 +8,7 @@ log = logging.getLogger(__name__)
 # DB Objects
 #-------------------------------------------------------------------------------
 
+# The DB modules imported here will be created as part of the blank database.
 from .model_tracks   import Track, Tag
 from .model_queue    import QueueItem
 from .model_feedback import Feedback

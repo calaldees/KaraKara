@@ -126,7 +126,7 @@
 
 ##------------------------------------------------------------------------------
 
-% if 'queued' in track:
+% if track.get('queued'):
 <h3>Queued by</h3>
 <ul>
 % for queue_item in track['queued']:

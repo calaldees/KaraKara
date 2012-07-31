@@ -48,6 +48,13 @@ class Track(Base):
                 t[parent_name].append(tag_name)
         return t
     
+    @property
+    def image(self):
+        for attachment in self.attachments:
+            if attachment.type == 'thumbnail':
+                return attachment.location
+        return ''
+    
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
@@ -65,6 +72,7 @@ class Track(Base):
             'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
             'tags'        : lambda track: track.tags_with_parents_dict(),
             'lyrics'      : lambda track: [lyrics.to_dict() for lyrics in track.lyrics] ,
+            'image'       : None ,
     })
 
 
