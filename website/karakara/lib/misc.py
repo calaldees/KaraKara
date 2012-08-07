@@ -92,22 +92,26 @@ def normalize_datetime(d, accuracy='hour'):
         return d.replace(minute=0, second=0, microsecond=0, hour=0) - datetime.timedelta(days=d.weekday())
     return d
 
-def is_base_types(d):
+def strip_non_base_types(d):
     """
     Recursively steps though a python dictionary
     Identifies strings and removes/replaces harmful/unwanted characters + collapses white space
+    
+    >>> strip_non_base_types('a')
+    'a'
+    >>> strip_non_base_types({'a':1, 'b:'2', 'c':[3,4,5], 'd':{'e':'6'}})
+    {'a':1, 'b:'2', 'c':[3,4,5], 'd':{'e':'6'}}
+    >>> strip_non_base_types({'a':1, 'b:'2', 'c':[3,4,5], 'd':{'e':datetime.datetime.now()}})
+    {'a':1, 'b:'2', 'c':[3,4,5], 'd':{'e':None}}
+
     """
-    #if isinstance(d, basestring):
-    #    d = re.sub("'"   , "`", d)
-    #    d = re.sub("\n"  , " ", d)
-    #    d = re.sub(r"\s+", " ", d)
-    #    d = d.strip()
+    for t in [str,int,float,bool]:
+        if isinstance(d,t):
+            return d
     if hasattr(d, 'items'):
-        for key, value in d.items():
-            d[key] = is_base_types(value)
-    elif hasattr(d,'__iter__'):
-        for value in d:
-            is_base_types(value)
+        return {key:strip_non_base_types(value) for key, value in d.items()}
+    for t in [list,set,tuple]:
+        if isinstance(d,t):
+            return [strip_non_base_types(value) for value in d]
+    return None
     
-    
-    return d

@@ -2,6 +2,7 @@ from pyramid.view import view_config
 
 from . import web
 from ..lib.auto_format    import action_ok
+from ..lib.misc           import strip_non_base_types
 
 from ..model                import DBSession
 from ..model.model_feedback import Feedback
@@ -25,7 +26,7 @@ def feedback_view(request):
     for field, value in request.params.items():
         try   : setattr(feedback,field,value)
         except: pass
-    feedback.environ = request.environ
+    feedback.environ = strip_non_base_types(request.environ)
     DBSession.add(feedback)
     
     return action_ok(message='feedback recived')
