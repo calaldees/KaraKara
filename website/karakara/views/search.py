@@ -114,7 +114,7 @@ def tags(request):
                         options(joinedload(Tag.parent))
     
     action_return['data'].update({
-        'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags], # if tag not in tags
+        'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],
     })
     return action_return
 
