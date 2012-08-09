@@ -109,9 +109,11 @@ def tags(request):
                         join(alias_parent_tag, Tag.parent).\
                         filter(TrackTagMapping.track_id.in_(trackids)).\
                         filter(alias_parent_tag.name.in_(sub_tags_allowed)).\
-                        group_by(Tag.id).\
+                        group_by('tag_1.id',alias_parent_tag.name,Tag.id).\
                         order_by(alias_parent_tag.name,Tag.name).\
                         options(joinedload(Tag.parent))
+    
+    #'tag_1.id','tag_2.name'
     
     action_return['data'].update({
         'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],

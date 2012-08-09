@@ -24,14 +24,14 @@ function update_playlist() {
 	function _sig(list) {
 		var sig = "";
 		for(var i=0; i<list.length; i++) {
-			sig = sig + list[i].touched;
+			sig = sig + list[i].time_touched;
 		}
 		return sig;
 	}
 
 	$.getJSON("/queue.json", {"uncache": new Date().getTime()}, function(data) {
-		if(_sig(playlist) != _sig(data.data.list)) {
-			playlist = data.data.list;
+		if(_sig(playlist) != _sig(data.data.queue)) {
+			playlist = data.data.queue;
 			render_playlist();
 			prepare_next_song();
 		}

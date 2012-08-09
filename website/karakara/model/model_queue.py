@@ -44,7 +44,8 @@ class QueueItem(Base):
             'id'            : None ,
             'track_id'      : None ,
             'performer_name': None ,
-            'touched'       : None ,
+            'time_touched'  : None ,
+            'time_added'    : None ,
         },
     })
     
