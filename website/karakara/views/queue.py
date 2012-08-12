@@ -7,6 +7,8 @@ from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
 from ..model.model_tracks import Track
 
+from ..templates.helpers import track_title
+
 from sqlalchemy.orm import joinedload, joinedload_all
 
 import logging
@@ -46,6 +48,13 @@ def queue_view(request):
                             joinedload('tags.parent'),\
                         )
     tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
+    
+    # AllanC - Hack to overlay title on API return.
+    # This technically cant be part of the model because the title rendering in 'helpers' uses the dict version of a track object rather than the DB object
+    # This is half the best place for it. We want the model to be as clean as possible
+    # But we need the 'title' field to be consistant for all API returns for tracks ... more consideration needed
+    for track in tracks.values():
+        track['title'] = track_title(track['tags'])
     
     for queue_item in queue:
         queue_item['track'] = tracks[queue_item['track_id']]
