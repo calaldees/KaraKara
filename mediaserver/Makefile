@@ -1,5 +1,5 @@
 
-run: tmp log www/files
+run: tmp log #www/files
 	nginx -p `pwd`/ -c nginx.conf
 
 tmp:

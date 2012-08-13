@@ -47,6 +47,8 @@ class Track(Base):
             else:
                 t[parent_name].append(tag_name)
         return t
+
+    # TODO - Event to activate before save to DB to render the title from tags
     
     @property
     def image(self):

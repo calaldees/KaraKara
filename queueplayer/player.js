@@ -29,7 +29,7 @@ function update_playlist() {
 		return sig;
 	}
 
-	$.getJSON("/queue.json", {"uncache": new Date().getTime()}, function(data) {
+	$.getJSON("/queue.json", {}, function(data) { //AllanC - removed unique URL to facilitate eTag - "uncache": new Date().getTime()
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			playlist = data.data.queue;
 			render_playlist();
