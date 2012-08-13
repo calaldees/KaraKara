@@ -33,7 +33,9 @@
     <input type="text" name="keywords" placeholder="Add search keywords">
 </form>
 
+% if data['tags'] or data['keywords']:
 <a href="${search_url(route='search_list')}" data-role="button" data-icon="arrow-r">List ${len(data.get('trackids',[]))} Tracks</a>
+% endif
 
 <!-- sub tags -->
 % for parent_tag in data.get('sub_tags_allowed',[]):
