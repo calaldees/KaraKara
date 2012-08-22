@@ -20,6 +20,9 @@ from sqlalchemy.orm import joinedload, aliased
 
 #-------------------------------------------------------------------------------
 # Constants
+
+# A list of the sub tags allowed when browsing by specific tags
+# rather than overwelming the user with all possible tags, limit the browsing to a subset under known circumstances.
 tag_cats = {
     'root'           : ['category','vocalstyle','vocaltrack','lang'],
     'category:anime' : ['from'],
@@ -31,6 +34,21 @@ tag_cats = {
 #-------------------------------------------------------------------------------
 
 def search(request):
+    """
+    The base call for API methods 'list' and 'tags'
+    
+    Uses URL, Query string and form input to query trackdb for trackid's that match tags and keyworkds
+    
+    returns action_ok dict
+        - that is overlalyed by additional query data by 'list' and 'tags' API calls
+        
+        data {
+            tags     - tags involved in this query
+            keywords - keywords involved in this query
+            trackids - of all tracks returned by the tag/keyword search (used by calling methods querys)
+            sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
+        }
+    """
     # Hack - remove any format tags from route match - idealy this would be done at the route level
     url  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
     
@@ -82,6 +100,16 @@ def search(request):
 @view_config(route_name='search_tags')
 @web
 def tags(request):
+    """
+    Browse tacks by 'tag'
+    
+    if there is only one track then redirect to show the single track
+    if the number of tracks being browsed is less then 15 then redirect to 'list'
+    
+    Get all tags from all the tracks trackid's provided and count the number of occurances.
+    
+    return search dict + sub_tags( a list of all tags with counts )
+    """
     action_return = search(request)
 
     tags             = action_return['data']['tags']
@@ -113,7 +141,10 @@ def tags(request):
                         order_by(alias_parent_tag.name,Tag.name).\
                         options(joinedload(Tag.parent))
     
-    #'tag_1.id','tag_2.name'
+    # AllanC - RRRRRRRAAAAAAAAA!!!! Postgres creates an alias 'tag_1.id' under the hood, but wont actually return results unless it's in the group_by clause
+    #          it works without the tag_1.id in sqllite. So right now, the SQLLite version is broken with 'tag_1' and postgres dies without it.
+    #          is there a way to alias this properly?
+    # tried alias's 'tag_1.id','tag_2.name'
     
     action_return['data'].update({
         'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],
@@ -124,6 +155,14 @@ def tags(request):
 @view_config(route_name='search_list')
 @web
 def list(request):
+    """
+    Browse tacks by 'list'
+    
+    List all the tracks listed in trackids
+    
+    return search dict (see above) + tracks (a list of tracks with basic details)
+    """
+
     action_return = search(request)
 
     trackids = action_return['data']['trackids']
