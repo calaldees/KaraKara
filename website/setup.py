@@ -18,7 +18,8 @@ requires = [
     'decorator',
     'beautifulsoup4', # Inspecting html/xml (used in db import crawling)
     'py-postgresql', # any DB API should do, this one is pure python
-    ]
+    'pytest',
+]
 
 setup(name='KaraKara',
       version='0.0',

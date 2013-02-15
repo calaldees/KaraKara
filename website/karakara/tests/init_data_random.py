@@ -62,7 +62,7 @@ def init_random_data(num_tracks=100):
     
     
     # Track generation ---------------------------------------------------------
-    for track_number in range(num_tracks):    
+    for track_number in range(num_tracks):
         track = Track()
         track.id          = "track_%d"      % track_number
         track.title       = "Test Track %s" % track_number

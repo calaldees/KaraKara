@@ -23,6 +23,8 @@ def init_DBSession(settings):
     This binds inits DBSession and Base
     
     To be called AFTER all extentisons to Base have been imported/setup
+    Import the files with your datamodel, before calling this.
+    Upon this call is the SQLa tables are build/linked
     """
     log.info("Bind DBSession to engine")
     from sqlalchemy import engine_from_config
