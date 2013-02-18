@@ -18,6 +18,10 @@ class TestKaraKara():
         """
         log.info("teardown")
     
-    def test_example(self, example):
-        print('example {0}'.format(example))
-        assert False
+    #def test_example(self, example):
+    #    print('example {0}'.format(example))
+    #    assert False
+
+    def test_db(self, base_data):
+        print('base_data')
+        
