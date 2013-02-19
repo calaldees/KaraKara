@@ -51,6 +51,22 @@ class Track(Base):
     # TODO - Event to activate before save to DB to render the title from tags
     
     @property
+    def title(self):
+        """
+        'title' is a tag
+        tracks COULD have more than one title (english name and japanise name)
+        This just returns the first one matched
+        """
+        return next(filter(lambda tag: tag.parent=='title', self.tags))
+
+    #@title.setter
+    #def title(self, value):
+    #    self._x = value
+    #@title.deleter
+    #def title(self):
+    #    #del self._x    
+    
+    @property
     def image(self):
         for attachment in self.attachments:
             if attachment.type == 'thumbnail':

@@ -22,6 +22,6 @@ class TestKaraKara():
     #    print('example {0}'.format(example))
     #    assert False
 
-    def test_db(self, base_data):
+    def test_db(self, tracks):
         print('base_data')
         
