@@ -79,7 +79,7 @@ def main(global_config, **settings):
     config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
     
     # Return -------------------------------------------------------------------
-    config.scan()
+    config.scan(ignore='.tests')
     return config.make_wsgi_app()
 
 

@@ -61,6 +61,7 @@ clean:
 	rm data -rf
 	rm *.egg-info -rf
 	rm KaraKara.db -f
+	rm KaraKara_test.db -f
 	
 import_tracks_dev: init_db
 	env/bin/python -mkarakara.scripts.import_tracks '../mediaserver/www/files' --config=development.ini
@@ -76,4 +77,5 @@ import_tracks_production:
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test:
-	env/bin/py.test karakara -q --capture=sys --pdb
+	env/bin/py.test karakara -q
+	#--pdb --capture=sys

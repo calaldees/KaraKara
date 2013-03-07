@@ -3,7 +3,7 @@
 import pytest
 
 from ..model import init_DBSession, DBSession, commit
-from ..model.init_data import init_data # humm ... could this be part of .model.__init__ ?
+from ..model.init_data import init_data
 
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics
 from ..model.model_queue  import QueueItem
@@ -11,6 +11,29 @@ from ..model.actions import get_tag
 
 import logging
 log = logging.getLogger(__name__)
+
+
+
+
+#ROOT_PATH = os.path.dirname(__file__)
+
+def _pytest_sessionstart():
+    # Only run database setup on master (in case of xdist/multiproc mode)
+    if not hasattr(pytest.config, 'slaveinput'):
+        from models import initialize_sql
+        from pyramid.config import Configurator
+        from paste.deploy.loadwsgi import appconfig
+        from sqlalchemy import engine_from_config
+        import os
+
+        #ROOT_PATH = os.path.dirname(__file__)
+        settings = appconfig('config:' + os.path.join(ROOT_PATH, 'test.ini'))
+        engine = engine_from_config(settings, prefix='sqlalchemy.')
+
+        print('Creating the tables on the test database {0}'.format(engine))
+
+        config = Configurator(settings=settings)
+        initialize_sql(settings, config)
 
 
 @pytest.fixture(scope="session")
@@ -26,6 +49,7 @@ def test_db(request):
     init_data()
     
     def finalizer():
+        print('finalze db')
         commit()
     request.addfinalizer(finalizer)
     
@@ -102,6 +126,7 @@ def attachments(request, test_db):
     def finalizer():
         #(DBSession.delete(attachment) for attachment in attachments)
         #commit()
+        print('finalze attach')
         pass
     request.addfinalizer(finalizer)
         
@@ -132,6 +157,7 @@ def lyrics(request, test_db):
     def finalizer():
         #(DBSession.delete(lyrics) for lyrics in lyrics_list)
         #commit()
+        print('finalze lyrics')
         pass
     request.addfinalizer(finalizer)
     
@@ -197,6 +223,7 @@ def tracks(request, test_db, tags, attachments, lyrics):
     def finalizer():
         #(DBSession.delete(track) for track in tracks)
         #commit()
+        print('finalze tracks')
         pass
     request.addfinalizer(finalizer)
     

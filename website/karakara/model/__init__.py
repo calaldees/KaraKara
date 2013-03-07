@@ -13,6 +13,8 @@ from sqlalchemy.orm             import scoped_session, sessionmaker
 from zope.sqlalchemy            import ZopeTransactionExtension      # AllanC - Apparently, the recomended way to use Pyramid is with a transaction manager
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
+engine = None
+
 #-------------------------------------------------------------------------------
 # DB Setup
 #-------------------------------------------------------------------------------
@@ -26,10 +28,18 @@ def init_DBSession(settings):
     Import the files with your datamodel, before calling this.
     Upon this call is the SQLa tables are build/linked
     """
+    global engine
     log.info("Bind DBSession to engine")
     from sqlalchemy import engine_from_config
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
+
+#def init_DBSession(transactional=False):
+    #connection = engine.connect()
+    #if transactional:
+    #    transaction = connection.begin()
+    #return DBSession.configure(bind=connection), transaction
+    #transaction.rollback() # can roll back with
 
 def init_db():
     """

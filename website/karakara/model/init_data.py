@@ -1,3 +1,9 @@
+"""
+Init KaraKara base tables
+This should by convention be separate to the DBSession as this imports Model objects
+and therefore binding to Base
+"""
+
 from . import DBSession, init_db, commit
 
 
