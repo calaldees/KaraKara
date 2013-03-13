@@ -14,3 +14,7 @@ class TestViewTracks():
         #assert False
         pass
         
+
+
+def test_app(app):
+    assert False

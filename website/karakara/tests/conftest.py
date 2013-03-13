@@ -36,6 +36,25 @@ def _pytest_sessionstart():
         initialize_sql(settings, config)
 
 
+
+@pytest.fixture(scope="session")
+def app(request):
+    from webtest import TestApp
+    from pyramid.paster import get_appsettings
+    from karakara import main as karakara_main
+    
+    print('setup WebApp')
+    application = karakara_main({}, **get_appsettings('development.ini'))
+    app = TestApp(application)
+    
+    def finalizer():
+        print('tearDown WebApp')
+    request.addfinalizer(finalizer)
+    
+    return app
+
+    
+
 @pytest.fixture(scope="session")
 def test_db(request):
     """

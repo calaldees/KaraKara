@@ -77,5 +77,5 @@ import_tracks_production:
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test:
-	env/bin/py.test karakara -q
+	env/bin/py.test karakara -q --pdb
 	#--pdb --capture=sys
