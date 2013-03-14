@@ -1,4 +1,9 @@
 
+INI_DEV  = development.ini
+INI_TEST = test.ini
+INI_PROD = production.ini
+STATIC_FILE_PATH = ../mediaserver/www/files
+
 help:
 	# Usage: make <target>, where target is
 	# setup          -- setup python egg & install dependencys/env if needed
@@ -39,22 +44,22 @@ setup: env
 	env/bin/python setup.py develop
 
 init_db:
-	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.model.init_data:init_data
+	env/bin/python -mkarakara.model.setup --config_uri $(INI_DEV) --init_func karakara.model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-init_db_test: init_db
-	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.tests.init_data:init_random_data
+#init_db_test: init_db
+#	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.tests.init_data:init_random_data
 
 run:
 	#$(MAKE) env_activate
-	env/bin/pserve --reload development.ini
+	env/bin/pserve --reload $(INI_DEV)
 	#$(MAKE) env_deactivate
 
-run_production:
-	env/bin/pserve production.ini
+run_production: ini_production
+	env/bin/pserve $(INI_PROD)
 
 shell:
-	env/bin/pshell development.ini
+	env/bin/pshell $(INI_DEV)
 
 clean:
 	rm env -rf
@@ -62,15 +67,15 @@ clean:
 	rm *.egg-info -rf
 	rm KaraKara.db -f
 	rm KaraKara_test.db -f
-	rm test.ini
-	rm production.ini
+	rm $(INI_TEST)
+	rm $(INI_PROD)
 	
 import_tracks_dev: init_db
-	env/bin/python -mkarakara.scripts.import_tracks '../mediaserver/www/files' --config=development.ini
+	env/bin/python -mkarakara.scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
-import_tracks_production:
-	env/bin/python -mkarakara.model.setup --config_uri production.ini --init_func karakara.model.init_data:init_data
-	env/bin/python -mkarakara.scripts.import_tracks '../mediaserver/www/files' --config=production.ini
+import_tracks_production: ini_production
+	env/bin/python -mkarakara.model.setup --config_uri $(INI_PROD) --init_func karakara.model.init_data:init_data
+	env/bin/python -mkarakara.scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 #import_tracks_local_mediaserver: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
@@ -78,10 +83,11 @@ import_tracks_production:
 #import_tracks_test: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
-test:
+test: ini_test
 	env/bin/py.test karakara -q --pdb
 	#--pdb --capture=sys
 
-ini:
+ini_test:
 	env/bin/python3 karakara/scripts/make_ini.py test
+ini_production:
 	env/bin/python3 karakara/scripts/make_ini.py production
