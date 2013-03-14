@@ -62,6 +62,8 @@ clean:
 	rm *.egg-info -rf
 	rm KaraKara.db -f
 	rm KaraKara_test.db -f
+	rm test.ini
+	rm production.ini
 	
 import_tracks_dev: init_db
 	env/bin/python -mkarakara.scripts.import_tracks '../mediaserver/www/files' --config=development.ini
@@ -79,3 +81,7 @@ import_tracks_production:
 test:
 	env/bin/py.test karakara -q --pdb
 	#--pdb --capture=sys
+
+ini:
+	env/bin/python3 karakara/scripts/make_ini.py test
+	env/bin/python3 karakara/scripts/make_ini.py production

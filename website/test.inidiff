@@ -1,0 +1,2 @@
+[app:main]
+sqlalchemy.url = sqlite:///%(here)s/KaraKara_test.db
