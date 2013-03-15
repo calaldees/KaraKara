@@ -1,17 +1,17 @@
+import pytest
 import random
 
+#from ..model import DBSession, commit
+from karakara.lib.misc import random_string
 
-from ..model import DBSession, commit
-from ..lib.misc import random_string
-
-from ..model.actions import get_tag
-from ..model.model_tracks import Track, Tag, Attachment
-from ..model.model_queue  import QueueItem
+from karakara.model.actions import get_tag
+from karakara.model.model_tracks import Track, Tag, Attachment
+from karakara.model.model_queue  import QueueItem
 
 import logging
 log = logging.getLogger(__name__)
 
-
+@pytest.fixture(scope="session")
 def init_random_data(num_tracks=100):
 
     # Attachment generation ----------------------------------------------------

@@ -67,8 +67,8 @@ clean:
 	rm *.egg-info -rf
 	rm KaraKara.db -f
 	rm KaraKara_test.db -f
-	rm $(INI_TEST)
-	rm $(INI_PROD)
+	rm $(INI_TEST) -f
+	rm $(INI_PROD) -f
 	
 import_tracks_dev: init_db
 	env/bin/python -mkarakara.scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)

@@ -1,7 +1,7 @@
 *.db
 *.db-journal
 *.egg-info
-^env/
-^data/
-test.ini
-production.ini
+/env/
+/data/
+/test.ini
+/production.ini
