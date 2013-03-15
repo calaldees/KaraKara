@@ -180,3 +180,88 @@ class TestKaraKara():
         #print('base_data')
         #assert False
         
+
+
+
+class TestViews(UnitTestBase):
+    def test_login_fails_empty(self):
+        """ Make sure we can't login with empty credentials"""
+        from app.accounts.views import LoginView
+        self.config.add_route('index', '/')
+        self.config.add_route('dashboard', '/')
+
+        request = testing.DummyRequest(post={
+            'submit': True,
+        })
+
+        view = LoginView(request)
+        response = view.post()
+        errors = response['errors']
+
+        assert errors[0].node.name == u'csrf_token'
+        assert errors[0].msg == u'Required'
+        assert errors[1].node.name == u'Username'
+        assert errors[1].msg == u'Required'
+        assert errors[2].node.name == u'Password'
+        assert errors[2].msg == u'Required'
+
+
+    def test_login_succeeds(self):
+        """ Make sure we can login """
+        admin = User(username='sontek', password='temp', kind=u'admin')
+        admin.activated = True
+        self.session.add(admin)
+        self.session.flush()
+
+        from app.accounts.views import LoginView
+        self.config.add_route('index', '/')
+        self.config.add_route('dashboard', '/dashboard')
+
+        request = self.get_csrf_request(post={
+                'submit': True,
+                'Username': 'sontek',
+                'Password': 'temp',
+            })
+
+        view = LoginView(request)
+        response = view.post()
+
+        assert response.status_int == 302
+        
+#-------------------------------------------------------------------------------
+
+class TestViews(IntegrationTestBase):
+    def test_get_login(self):
+        """ Call the login view, make sure routes are working """
+        res = self.app.get('/login')
+        self.assertEqual(res.status_int, 200)
+
+    def test_empty_login(self):
+        """ Empty login fails """
+        res = self.app.post('/login', {'submit': True})
+
+        assert "There was a problem with your submission" in res.body
+        assert "Required" in res.body
+        assert res.status_int == 200
+
+    def test_valid_login(self):
+        """ Call the login view, make sure routes are working """
+        admin = User(username='sontek', password='temp', kind=u'admin')
+        admin.activated = True
+        self.session.add(admin)
+        self.session.flush()
+
+        res = self.app.get('/login')
+
+        csrf = res.form.fields['csrf_token'][0].value
+
+        res = self.app.post('/login',
+            {
+                'submit': True,
+                'Username': 'sontek',
+                'Password': 'temp',
+                'csrf_token': csrf
+            }
+        )
+
+        assert res.status_int == 302
