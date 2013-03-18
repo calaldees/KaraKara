@@ -8,7 +8,7 @@ INI = 'test.ini'
 from karakara.tests.data.tracks import *
 
 @pytest.fixture(scope="session")
-def settings():
+def settings(request):
     from pyramid.paster import get_appsettings
     return get_appsettings(INI)
 

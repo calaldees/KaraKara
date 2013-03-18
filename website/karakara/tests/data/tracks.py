@@ -22,10 +22,11 @@ def tags(request, DBSession, commit):
         tags.append(tag)
     
     def finalizer():
-        for tag in tags:
-            DBSession.delete(tag)
-        commit()
-    request.addfinalizer(finalizer)
+        pass
+        #for tag in tags:
+        #    DBSession.delete(tag)
+        #commit()
+    #request.addfinalizer(finalizer)
     
     commit()
     return tags
@@ -84,10 +85,10 @@ def lyrics(request, DBSession, commit):
         lyrics_list.append(lyrics)
     
     def finalizer():
-        for lyrics in lyrics_list:
-            DBSession.delete(lyrics)
-        commit()
-
+        pass
+        #for lyrics in lyrics_list:
+        #    DBSession.delete(lyrics)
+        #commit()
     request.addfinalizer(finalizer)
     
     #commit()
@@ -102,7 +103,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'duration': 100,
             'tags':[
                 'title      :Test Track 1',
-                #'description:Test track for the KaraKara system with キ',
+                'description:Test track for the KaraKara system with キ',
                 'opening','male','jp','anime','jpop', 'series X',
             ],
             'attachments': ['image1','preview1'],
@@ -113,7 +114,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'duration': 200,
             'tags':[
                 'title      :Test Track 2',
-                #'description:Test track for the KaraKara system with キ'
+                'description:Test track for the KaraKara system with キ'
                 'ending','female','en','anime', 'series X',
             ],
             'attachments': ['image2','preview2'],
@@ -124,7 +125,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'duration': 300,
             'tags':[
                 'title      :Test Track 3',
-                #'description:Test track for the KaraKara system with キ',
+                'description:Test track for the KaraKara system with キ',
                 'ending','female','en','anime', 'series Y',
             ],
             'attachments': ['image3','preview3'],
@@ -137,7 +138,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
         return DBSession.query(Attachment).filter(Attachment.location.like('%%{0}%%'.format(filename))).one()
     
     tracks = [] # Keep tabs on all tracks generated 
-    for track_data in tracks_data:    
+    for track_data in tracks_data:
         track = Track()
         track.id          = track_data['id']
         track.duration    = track_data['duration']
@@ -149,9 +150,10 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
         tracks.append(track)
 
     def finalizer():
-        for track in tracks:
-            DBSession.delete(track)
-        commit()
+        pass
+        #for track in tracks:
+        #    DBSession.delete(track)
+        #commit()
     request.addfinalizer(finalizer)
     
     commit()
