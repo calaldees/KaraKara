@@ -39,7 +39,7 @@ def attachments(request, DBSession, commit):
     attachments_data = [
         ('test/preview1.3gp' , 'preview'  ),
         ('test/preview2.flv' , 'preview'  ),        
-        ('test/preview3.flv' , 'preview'  ),
+        ('test/preview3.mp4' , 'preview'  ),
         ('test/image1.jpg'   , 'thumbnail'),
         ('test/image2.jpg'   , 'thumbnail'),
         ('test/image3.png'   , 'thumbnail'),
@@ -103,7 +103,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'duration': 100,
             'tags':[
                 'title      :Test Track 1',
-                'description:Test track for the KaraKara system with キ',
+                #'description:Test track for the KaraKara system with キ',
                 'opening','male','jp','anime','jpop', 'series X',
             ],
             'attachments': ['image1','preview1'],
@@ -114,7 +114,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'duration': 200,
             'tags':[
                 'title      :Test Track 2',
-                'description:Test track for the KaraKara system with キ'
+                #'description:Test track for the KaraKara system with キ'
                 'ending','female','en','anime', 'series X',
             ],
             'attachments': ['image2','preview2'],
@@ -124,8 +124,8 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'id'      :"t3",
             'duration': 300,
             'tags':[
-                'title      :Test Track 3',
-                'description:Test track for the KaraKara system with キ',
+                'title      :Test Track 3 キ',
+                #'description:Test track for the KaraKara system with キ',
                 'ending','female','en','anime', 'series Y',
             ],
             'attachments': ['image3','preview3'],
