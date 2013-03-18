@@ -5,15 +5,20 @@ log = logging.getLogger(__name__)
 
 INI = 'test.ini'
 
+from karakara.tests.data.tracks import *
+
 @pytest.fixture(scope="session")
-def app(request):
-    from webtest import TestApp
+def settings():
     from pyramid.paster import get_appsettings
+    return get_appsettings(INI)
+
+@pytest.fixture(scope="session")
+def app(request, settings):
+    from webtest import TestApp
     from karakara import main as karakara_main
     
     #print('setup WebApp')
-    application = karakara_main({}, **get_appsettings(INI))
-    app = TestApp(application)
+    app = TestApp(karakara_main({}, **settings))
     
     def finalizer():
         #print('tearDown WebApp')
@@ -29,7 +34,8 @@ def DBSession(request, app):
     The WSGI app has already been started,
     we can import the session safly knowing it has been setup
     """
-    from karakara.model import DBSession
+    from karakara.model import DBSession, init_db
+    init_db()
     return DBSession
 
 @pytest.fixture(scope="session")

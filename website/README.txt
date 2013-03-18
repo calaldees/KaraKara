@@ -1,6 +1,12 @@
 KaraKara README
 ==================
 
+Installation
+------------
+
+Linux - ubuntu 12.10
+ git clone git://github.com/calaldees/KaraKara.git && cd KaraKara && make setup && make test
+
 Getting Started
 ---------------
 

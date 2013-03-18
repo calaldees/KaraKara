@@ -57,7 +57,10 @@ class Track(Base):
         tracks COULD have more than one title (english name and japanise name)
         This just returns the first one matched
         """
-        return next(filter(lambda tag: tag.parent=='title', self.tags))
+        try:
+            return next(filter(lambda tag: tag.parent=='title', self.tags))
+        except StopIteration:
+            return ''
 
     #@title.setter
     #def title(self, value):
