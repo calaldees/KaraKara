@@ -130,6 +130,15 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             ],
             'attachments': ['image3','preview3'],
         },
+        {
+            'id'      :"xxx",
+            'duration': 400,
+            'tags':[
+                'title      :Wildcard',
+                'fr',
+            ],
+            'attachments': [],
+        },
     ]
 
     def _get_tag(tag):

@@ -29,8 +29,12 @@ def test_track_view_api(app, tracks):
     assert 'ここ' in data['track']['lyrics'][0]['content']
     
 def test_track_list_all(app, tracks):
+    """
+    Track list displays all tracks in one giant document
+    Used for printing
+    """
     response = app.get('/track_list')
-    for text in ['track 1', 'track 2', 'track 3']:
+    for text in ['track 1', 'track 2', 'track 3', 'wildcard']:
         assert text in response.text
 
 def test_track_list_all_api(app, tracks):
