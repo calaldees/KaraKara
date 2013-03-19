@@ -126,7 +126,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'tags':[
                 'title      :Test Track 3 キ',
                 #'description:Test track for the KaraKara system with キ',
-                'ending','female','en','anime', 'series Y',
+                'ending','female','en','jpop', 'series Y',
             ],
             'attachments': ['image3','preview3'],
         },

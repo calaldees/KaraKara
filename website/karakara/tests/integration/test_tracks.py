@@ -5,7 +5,7 @@ import pytest
 @pytest.mark.parametrize(('track_id', 'expected_response', 'text_list',), [
     ('t1', 200, ['Test Track 1'   , 'series X', 'anime', 'ここ', 'test/image1.jpg'  ]),
     ('t2', 200, ['Test Track 2'   , 'series X', 'anime', 'äöü', 'test/preview2.flv']),
-    ('t3', 200, ['Test Track 3 キ', 'series Y', 'anime',        'test/preview3.mp4']),
+    ('t3', 200, ['Test Track 3 キ', 'series Y', 'jpop' ,        'test/preview3.mp4']),
     #('t4', 404),
 ])
 def test_track_view(app, tracks, track_id, expected_response, text_list):
@@ -39,4 +39,4 @@ def test_track_list_all(app, tracks):
 
 def test_track_list_all_api(app, tracks):
     data = app.get('/track_list?format=json').json['data']
-    #assert 'test track 2' in [title for title in track['tags']['title'] for track in data['list']]
+    assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
