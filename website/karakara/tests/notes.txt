@@ -265,3 +265,12 @@ class TestViews(IntegrationTestBase):
         )
 
         assert res.status_int == 302
+
+# Param injection example
+#test_formats = ['html'] #, 'json', 'xml'
+
+#def pytest_generate_tests (metafunc):
+#    if 'format' in metafunc.fixturenames:
+#        metafunc.parametrize('format', test_formats)
+#if format:
+#    url += '?format='+format
