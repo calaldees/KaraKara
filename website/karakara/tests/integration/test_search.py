@@ -34,7 +34,8 @@ def test_track_list(app, tracks, url, expected_text, not_expected_text):
 
 @pytest.mark.parametrize(('search_tags', 'in_sub_tags_allowed', 'not_in_sub_tags_allowed'), [
     ([]                     , ['category','lang','vocalstyle'] , []),
-    (['anime','en']         , ['from']                         , ['category']),
+    (['en','anime']         , ['from']                         , ['category']),
+    (['anime','en']         , ['vocalstyle']                   , ['category','lang']),
     (['jpop']               , ['from']                         , ['category','lang']),
     (['male']               , ['category','lang']              , ['vocalstyle']),
     (['monkeys1','monkeys2'], ['category','lang','vocalstyle'] , []),
@@ -52,12 +53,35 @@ def test_track_search_sub_tags_allowed(app, tracks, search_tags, in_sub_tags_all
     for tag in not_in_sub_tags_allowed:
         assert tag not in tags_allowed
 
-
-def test_search_tags(app, tracks):
+@pytest.mark.parametrize(('search_tags', 'redirect_expected', 'expected_location'), [
+    (['en']  , True , 'search_list'),  # 2 Tracks returned, that is less than threshold, redirect to list
+    (['jp']  , True , 'track/t1'),  # Only one track should be returned, so redirect to single track view
+    (['test'], False, 'search_tags')  # no redirect as more tracks than threshold
+])
+def test_search_tags_html_redirect(app, tracks, tracks_volume, search_tags, redirect_expected, expected_location):
     """
     Test /search_tags/ endpoint
-    search_tags has some special behaviour
+    search_tags has some special behaviour in html format
       - less than 15 tracks redirect view switch
       - single view redirect to track view
     """
-    pass
+    url = '/search_tags/{0}'.format('/'.join([tag for tag in search_tags]))
+    response = app.get(url)
+    if redirect_expected:
+        assert response.status_code == 302
+        response.follow()
+        assert expected_location in response.location
+    else:
+        assert response.status_code == 200
+
+
+@pytest.mark.parametrize(('search_tags', 'expected_count'), [
+    ([], 0),
+])
+def test_search_tags_sub_tags(app, tracks, search_tags, expected_count):
+    """
+    Sub tags (for browsing) have counts of the number of tracks under them
+    test the correct tag counts
+    """
+    url = '/search_tags/{0}?format=json'.format('/'.join([tag for tag in search_tags]))
+    data = app.get(url).json['data']
