@@ -2,12 +2,15 @@
 
 import pytest
 
+from karakara.lib.misc import random_string, random
+
+from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
 from karakara.model.model_tracks import Track, Tag, Attachment, Lyrics
 
 
 @pytest.fixture(scope="session")
-def tags(request, DBSession, commit):
+def tags(request): #, DBSession, commit
     """
     """
     tags_data = [
@@ -33,7 +36,7 @@ def tags(request, DBSession, commit):
     
 
 @pytest.fixture(scope="session")
-def attachments(request, DBSession, commit):
+def attachments(request): #, DBSession, commit
     """
     """
     attachments_data = [
@@ -65,7 +68,7 @@ def attachments(request, DBSession, commit):
     
 
 @pytest.fixture(scope="session")
-def lyrics(request, DBSession, commit):
+def lyrics(request): #, DBSession, commit
     lyrics_data = [
         {
             'language':'jp',
@@ -140,21 +143,10 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'attachments': [],
         },
     ]
-
-    def _get_tag(tag):
-        return get_tag(tag, create_if_missing=True)    
-    def _get_attachment(filename):
-        return DBSession.query(Attachment).filter(Attachment.location.like('%%{0}%%'.format(filename))).one()
     
     tracks = [] # Keep tabs on all tracks generated 
     for track_data in tracks_data:
-        track = Track()
-        track.id          = track_data['id']
-        track.duration    = track_data['duration']
-        [track.tags       .append(_get_tag       (t)) for t in track_data['tags']       ]
-        [track.attachments.append(_get_attachment(a)) for a in track_data['attachments']]
-        if 'lyrics' in track_data:
-            track.lyrics.append(track_data['lyrics'])
+        track = create_test_track(**track_data)
         DBSession.add(track)
         tracks.append(track)
 
@@ -167,3 +159,33 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
     
     commit()
     return tracks
+
+@pytest.fixture(scope="function")
+def tracks_volume(request):
+    tracks = [create_test_track(tags=['test']) for track_num in range(15)]
+    [DBSession.add(track) for track in tracks]
+    
+    def finalizer():
+        for track in tracks:
+            DBSession.delete(track)
+        commit()
+    request.addfinalizer(finalizer)
+    
+    commit()
+    return tracks
+    
+
+def create_test_track(id=None, duration=None, tags=[], attachments=[], lyrics=None):
+    def _get_tag(tag):
+        return get_tag(tag, create_if_missing=True)    
+    def _get_attachment(filename):
+        return DBSession.query(Attachment).filter(Attachment.location.like('%%{0}%%'.format(filename))).one()
+
+    track = Track()
+    track.id          = id       if id       else random_string(10)
+    track.duration    = duration if duration else random.randint(60,360)
+    [track.tags       .append(_get_tag       (t)) for t in tags       ]
+    [track.attachments.append(_get_attachment(a)) for a in attachments]
+    if lyrics:
+        track.lyrics.append(lyrics)
+    return track

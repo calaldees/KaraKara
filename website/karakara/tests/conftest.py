@@ -34,8 +34,9 @@ def DBSession(request, app):
     The WSGI app has already been started,
     we can import the session safly knowing it has been setup
     """
-    from karakara.model import DBSession, init_db
-    init_db()
+    from karakara.model import DBSession
+    from karakara.model.init_data import init_data
+    init_data()
     return DBSession
 
 @pytest.fixture(scope="session")
