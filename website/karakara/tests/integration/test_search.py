@@ -75,13 +75,18 @@ def test_search_tags_html_redirect(app, tracks, tracks_volume, search_tags, redi
         assert response.status_code == 200
 
 
-@pytest.mark.parametrize(('search_tags', 'expected_count'), [
-    ([], 0),
+@pytest.mark.parametrize(('search_tags', 'expected_tag_set'), [
+    (['']                , set([('category:anime',2),('category:jpop',2),('lang:en',2),('lang:jp',1),('lang:fr',1)])),  # expected counts for base view
+    (['category:anime']  , set([('from:series x',2)])),  # anime has 2 languages in it, but the subtags allowed forces 'from' # ,('lang:en',1),('lang:jp',1)
+    (['vocalstyle:male'] , set([('category:anime',1),('category:jpop',1),('lang:jp',1),])),  # 1 in each category, they actually all point to the same single track
 ])
-def test_search_tags_sub_tags(app, tracks, search_tags, expected_count):
+def test_search_tags_sub_tags(app, tracks, tracks_volume, search_tags, expected_tag_set):
     """
     Sub tags (for browsing) have counts of the number of tracks under them
     test the correct tag counts
+    This tests the API counts as format=html will redirect (see test above)
     """
     url = '/search_tags/{0}?format=json'.format('/'.join([tag for tag in search_tags]))
     data = app.get(url).json['data']
+    tag_set = set([(tag['full'],tag['count']) for tag in data['sub_tags']])
+    assert expected_tag_set <= tag_set

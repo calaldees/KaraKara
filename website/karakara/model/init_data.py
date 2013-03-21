@@ -45,6 +45,7 @@ def init_data():
         'lang:en',
         'lang:jp',
         'lang:ln',
+        'lang:fr',
         'artist',
         'vocalstyle:female',
         'vocalstyle:male',
