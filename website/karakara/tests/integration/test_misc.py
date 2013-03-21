@@ -14,9 +14,14 @@ def test_admin_toggle(app):
     Swich to admin mode
     check main menu for admin options
     """
+    assert not app.get('/?format=json').json['identity']['admin']
+    
     response = app.get('/admin')
     assert 'admin' in response.text
     response = app.get('/')
     for text in ['Exit Admin Mode']:
         assert text in response.text
+    
+    assert app.get('/?format=json').json['identity']['admin']
+
     response = app.get('/admin')
