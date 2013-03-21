@@ -95,6 +95,8 @@ def queue_del(request):
     
     check session owner or admin
     state can be passed as "complete" to mark track as played
+    
+    TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
     queue_item = DBSession.query(QueueItem).get(int(request.params['queue_item.id']))
 
