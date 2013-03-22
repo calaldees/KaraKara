@@ -27,7 +27,7 @@
             
             <div data-role="header" data-position="fixed" \
                 
-                % if identity.get('admin',False):
+                % if identity and identity.get('admin',False):
                 data-theme="e"
                 % endif
 >

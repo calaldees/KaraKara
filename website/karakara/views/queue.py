@@ -104,7 +104,7 @@ def queue_del(request):
         raise action_error(message='invalid queue_item.id')
     # AllanC - ****!! disbaling for demo
     #if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
-    #    raise action_error(message='you are not the owner of this queue_item')
+    #    raise action_error(message='you are not the owner of this queue_item', code=403)
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
@@ -121,13 +121,15 @@ def queue_update(request):
     Used to touch queed items
     
     check session owner or admin
+    
+    TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
     queue_item = DBSession.query(QueueItem).get(request.params['queue_item.id'])
 
     if not queue_item:
-        raise action_error(message='invalid queue_item.id')
+        raise action_error(message='invalid queue_item.id', code=400)
     if request.session.get('admin',False) or queue_item.session_owner != request.session['id']:
-        raise action_error(message='you are not the owner of this queue_item')
+        raise action_error(message='you are not the owner of this queue_item', code=403)
 
     # Update any params to the db
     for key,value in request.params.items():
