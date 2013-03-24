@@ -7,11 +7,13 @@ Installation
 Linux - ubuntu 12.10
  git clone git://github.com/calaldees/KaraKara.git && cd KaraKara && make setup && make test
 
+
 Getting Started
 ---------------
 
+git clone <git repo>
 make setup
-make init_db_test
+make test
 make run
 http://localhost:6543/
 
@@ -38,7 +40,8 @@ flash message:
   your up in 'xx' min
 per phone limit?
 duplicate name warning - one track
-feedback button
+queue track order + admin change + list obscure
+print css
 
 ini option to disable track adding by phones (just in case it get abused and needs turning off)
 messaging/disabling individual devices

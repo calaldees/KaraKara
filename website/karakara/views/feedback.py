@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 
 from . import web
-from ..lib.auto_format    import action_ok
+from ..lib.auto_format    import action_ok, action_error
 from ..lib.misc           import strip_non_base_types
 
 from ..model                import DBSession
@@ -21,6 +21,9 @@ def feedback_view(request):
         if request.session.get('admin'):
             return action_ok(data={'feedback': [feedback.to_dict() for feedback in DBSession.query(Feedback)]})
         return action_ok()
+    
+    if not request.params.get('details'):
+        raise action_error('please provide feedback details', code=400)
     
     feedback = Feedback()
     for field, value in request.params.items():
