@@ -97,3 +97,24 @@ def test_queue_view_update(app, tracks):
     response = app.get('/admin')
 
     assert get_queue(app) == []
+
+@unfinished
+def test_queue_order(app, tracks):
+    """
+    Test the queue ordering and weighting system
+    Admin user should be able to modify the track order
+    The track order returned by the template should deliberatly obscure
+    the order of tracks passed a configurable intavle (eg. 15 min)
+    """
+    pass
+
+@unfinished
+def test_queue_limit(app, tracks):
+    """
+    Users should not be able to queue over 45 minuets of tracks (settable in config)
+    Users trying to add tracks after this time have a 'window period of priority'
+    where they have first dibs.
+    The user should be informed by the status flash message how long before they
+    should retry there selection.
+    """
+    pass

@@ -1,7 +1,7 @@
 from . import Base
 
 from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, Integer, DateTime
+from sqlalchemy     import String, Unicode, Integer, DateTime, Float
 from sqlalchemy.orm import relationship, backref
 
 import copy
@@ -19,6 +19,17 @@ _queueitem_statuss = Enum("pending", "complete", "removed", name="status_types")
 
 class QueueItem(Base):
     """
+    
+    queue_weight - rational and description
+    The id will never change, but the queue will be sorted by this weight
+    An admin can change the order of the queue,
+    The algorithum with list the queed items in weight order and set the
+    new weight to be inbetween the prev,next queued item values.
+    This supports order but without changing the primary key
+    To ensure the queue_weight is set approriately, a post save handler will
+    query the to find an approriate values on first save
+    
+    
     """
     __tablename__   = "queue"
 
@@ -28,6 +39,8 @@ class QueueItem(Base):
     
     performer_name  = Column(Unicode(),   nullable=True, default="Untitled")
     session_owner   = Column(Unicode(),   nullable=True)
+    
+    queue_weight    = Column(Float()  ,   index=True) # nullable=False, # this by default is set to the id on first save,
     
     time_added      = Column(DateTime(),  nullable=False, default=now)
     time_touched    = Column(DateTime(),  nullable=False, default=now)
@@ -46,6 +59,7 @@ class QueueItem(Base):
             'performer_name': None ,
             'time_touched'  : None ,
             'time_added'    : None ,
+            'queue_weight'  : None ,
         },
     })
     

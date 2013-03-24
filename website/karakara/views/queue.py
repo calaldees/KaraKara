@@ -36,7 +36,7 @@ def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.id).all()
+    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight).all()
     queue = [queue_item.to_dict('full') for queue_item in queue]
     
     trackids = [queue_item['track_id'] for queue_item in queue]    
@@ -130,6 +130,17 @@ def queue_update(request):
         raise action_error(message='invalid queue_item.id', code=400)
     if request.session.get('admin',False) or queue_item.session_owner != request.session['id']:
         raise action_error(message='you are not the owner of this queue_item', code=403)
+
+    # If moving, lookup new weighting
+    if request.params['queue_item.id-move']:
+        # get next and previous queueitem weights
+        queue_weights = DBSession \
+                            .query   (QueueItem.queue_weight) \
+                            .filter  (QueueItem.id==request.params['queue_item.id-move']) \
+                            .order_by(QueueItem.queue_weight)
+        # calculate weight inbetween 
+        request.params['queue_weight'] = 0
+        del request.params['queue_item.id-move']
 
     # Update any params to the db
     for key,value in request.params.items():
