@@ -1,5 +1,6 @@
 from . import Base
 
+from sqlalchemy     import event
 from sqlalchemy     import Column, Enum, ForeignKey
 from sqlalchemy     import String, Unicode, Integer, DateTime, Float
 from sqlalchemy.orm import relationship, backref
@@ -70,3 +71,13 @@ class QueueItem(Base):
             #'track'       : lambda queue_item: queue_item.track.to_dict(include_fields='attachments'),
             #'image'       : lambda queue_item: single_image(queue_item),    # AllanC - if you use this ensure you have setup eager loading on your query
     })
+    
+    @staticmethod
+    def after_insert_listener(mapper, connection, target):
+        #import pdb ; pdb.set_trace()
+        if not target.queue_weight:
+            target.queue_weight = float(target.id)
+            # These changes are not commited because the transaction has been closed, how the **** am I going to auto generate the weight. Answers on a postcard please ...
+            #from . import commit ; commit()
+    
+event.listen(QueueItem, 'after_insert', QueueItem.after_insert_listener)

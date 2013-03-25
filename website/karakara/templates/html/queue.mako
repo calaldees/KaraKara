@@ -5,7 +5,11 @@
 <%def name="body()">
 
     <ul data-role="listview" data-split-icon="minus">
-        <% total_duration = 0 %>
+        <%
+            total_duration = 0
+            queue_visible = h.get_setting('karakara.queue_visible', request, 'time')
+        %>
+        ##% while total_duration
         % for queue_item in data.get('queue',[]):
         <li>
             <a href='${h.track_url(queue_item['track_id'])}'>

@@ -18,6 +18,7 @@ install_requires = [
     'decorator',
     'beautifulsoup4', # Inspecting html/xml (used in db import crawling)
     'py-postgresql', # any DB API should do, this one is pure python
+    'python-dateutil',
 ]
 test_requires = [
     'pytest',
@@ -54,4 +55,3 @@ setup(name='KaraKara',
       populate_KaraKara = karakara.model.setup:main
       """,
       )
-

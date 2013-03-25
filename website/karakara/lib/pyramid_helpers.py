@@ -1,3 +1,6 @@
+import datetime
+import dateutil.parser
+
 import pyramid.request
 import pyramid.registry
 from pyramid.settings import asbool
@@ -18,6 +21,12 @@ def get_setting(key, request=None, return_type=None):
         value = asbool(value)
     if return_type=='int' or return_type==int:
         value = int(value)
+    if return_type=='time' or return_type==datetime.time:
+        value = dateutil.parser.parse(value).time()
+    if return_type=='date' or return_type==datetime.date:
+        value = dateutil.parser.parse(value).date()
+    if return_type=='datetime' or return_type==datetime:
+        value = dateutil.parser.parse(value)
     return value
 
 def request_from_args(args):

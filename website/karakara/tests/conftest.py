@@ -19,7 +19,7 @@ def pytest_runtest_setup(item):
 
 unimplemented = pytest.mark.unimplemented # Server dose not support the functionlity this test is asserting yet
 unfinished    = pytest.mark.unfinished    # The test is unfinished and currently is know to fail
-
+xfail         = pytest.mark.xfail
 # Fixtures ---------------------------------------------------------------------
 
 @pytest.fixture(scope="session")

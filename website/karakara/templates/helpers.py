@@ -1,5 +1,10 @@
-from ..lib.misc import get_fileext, substring_in
+"""
+Template helpers
+These will be accessible as 'h.' in all mako templates
+"""
 
+from ..lib.misc import get_fileext, substring_in
+from ..lib.pyramid_helpers import get_setting
 
 
 import random

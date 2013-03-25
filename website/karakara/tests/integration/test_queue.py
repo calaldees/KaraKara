@@ -1,4 +1,4 @@
-from karakara.tests.conftest import unimplemented, unfinished
+from karakara.tests.conftest import unimplemented, unfinished, xfail
 
 # Utils ------------------------------------------------------------------------
 
