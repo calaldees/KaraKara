@@ -3,7 +3,8 @@ from . import Base
 from sqlalchemy     import event
 from sqlalchemy     import Column, Enum, ForeignKey
 from sqlalchemy     import String, Unicode, Integer, DateTime, Float
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, Session
+from sqlalchemy.orm.exc import NoResultFound
 
 import copy
 
@@ -73,11 +74,16 @@ class QueueItem(Base):
     })
     
     @staticmethod
-    def after_insert_listener(mapper, connection, target):
-        #import pdb ; pdb.set_trace()
+    def before_insert_listener(mapper, connection, target):
+        """
+        Event to set weight of queued item before first commit.
+        Find the maximum 'weight' in the database
+        This queue item weight will be set to max_weight + 1.0
+        """
         if not target.queue_weight:
-            target.queue_weight = float(target.id)
-            # These changes are not commited because the transaction has been closed, how the **** am I going to auto generate the weight. Answers on a postcard please ...
-            #from . import commit ; commit()
-    
-event.listen(QueueItem, 'after_insert', QueueItem.after_insert_listener)
+            try:
+                (max_weight,) = Session(bind=connection).query(QueueItem.queue_weight).order_by(QueueItem.queue_weight).limit(1).one()
+            except NoResultFound:
+                max_weight = 0.0
+            target.queue_weight = max_weight + 1.0    
+event.listen(QueueItem, 'before_insert', QueueItem.before_insert_listener)
