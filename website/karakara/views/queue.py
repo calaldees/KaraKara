@@ -1,3 +1,4 @@
+import datetime
 from pyramid.view import view_config
 
 from . import web, etag, method_delete_router
@@ -9,7 +10,8 @@ from ..model.model_tracks import Track
 
 from ..templates.helpers import track_title
 
-from sqlalchemy.orm import joinedload, joinedload_all
+from sqlalchemy.orm     import joinedload, joinedload_all
+from sqlalchemy.orm.exc import NoResultFound
 
 import logging
 log = logging.getLogger(__name__)
@@ -73,6 +75,11 @@ def queue_add(request):
     """
     Add items to end of queue
     """
+    # Validation
+    for field in ['track_id', 'performer_name']:
+        if not request.params.get(field):
+            raise action_error(message='no {0}'.format(field), code=400)
+    
     queue_item = QueueItem()
     for key,value in request.params.items():
         if hasattr(queue_item, key):
@@ -124,30 +131,34 @@ def queue_update(request):
     
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
-    queue_item = DBSession.query(QueueItem).get(request.params['queue_item.id'])
+    params = dict(request.params)
+    queue_item = DBSession.query(QueueItem).get(params['queue_item.id'])
 
     if not queue_item:
         raise action_error(message='invalid queue_item.id', code=400)
-    if request.session.get('admin',False) or queue_item.session_owner != request.session['id']:
+    if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
         raise action_error(message='you are not the owner of this queue_item', code=403)
 
-    # If moving, lookup new weighting
-    if request.params['queue_item.id-move']:
+    # If moving, lookup new weighting from the target track id
+    # The source is moved infront of the target_id
+    if params.get('queue_item.move.target_id'):
+        if not request.session.get('admin',False):
+            raise action_error(message='admin only action', code=403)
         # get next and previous queueitem weights
-        queue_weights = DBSession \
-                            .query   (QueueItem.queue_weight) \
-                            .filter  (QueueItem.id==request.params['queue_item.id-move']) \
-                            .order_by(QueueItem.queue_weight)
-        # calculate weight inbetween 
-        request.params['queue_weight'] = 0
-        del request.params['queue_item.id-move']
+        queue_item_target = DBSession.query(QueueItem).get(params.pop('queue_item.move.target_id'))
+        try:
+            target_weight_next,  = DBSession.query(QueueItem.queue_weight).filter(QueueItem.queue_weight<queue_item_target.queue_weight).order_by(QueueItem.queue_weight.desc()).limit(1).one()
+        except NoResultFound:
+            target_weight_next = 0.0
+        # calculate weight inbetween and inject that weight into the form params for saving
+        params['queue_weight'] = (queue_item_target.queue_weight + target_weight_next) / 2.0
 
     # Update any params to the db
-    for key,value in request.params.items():
+    for key,value in params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
     queue_item.time_touched = datetime.datetime.now() # Update touched timestamp
-    
+
     queue_updated() # Invalidate Cache
-    
+
     return action_ok(message='queue_item updated')

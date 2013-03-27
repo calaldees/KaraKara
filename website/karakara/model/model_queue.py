@@ -28,7 +28,7 @@ class QueueItem(Base):
     The algorithum with list the queed items in weight order and set the
     new weight to be inbetween the prev,next queued item values.
     This supports order but without changing the primary key
-    To ensure the queue_weight is set approriately, a post save handler will
+    To ensure the queue_weight is set approriately, a pre save handler will
     query the to find an approriate values on first save
     
     
@@ -42,7 +42,7 @@ class QueueItem(Base):
     performer_name  = Column(Unicode(),   nullable=True, default="Untitled")
     session_owner   = Column(Unicode(),   nullable=True)
     
-    queue_weight    = Column(Float()  ,   index=True) # nullable=False, # this by default is set to the id on first save,
+    queue_weight    = Column(Float()  ,   index=True, nullable=False) # this by default is set to the id on first save,
     
     time_added      = Column(DateTime(),  nullable=False, default=now)
     time_touched    = Column(DateTime(),  nullable=False, default=now)
@@ -82,8 +82,9 @@ class QueueItem(Base):
         """
         if not target.queue_weight:
             try:
-                (max_weight,) = Session(bind=connection).query(QueueItem.queue_weight).order_by(QueueItem.queue_weight).limit(1).one()
+                (max_weight,) = Session(bind=connection).query(QueueItem.queue_weight).order_by(QueueItem.queue_weight.desc()).limit(1).one()
             except NoResultFound:
                 max_weight = 0.0
-            target.queue_weight = max_weight + 1.0    
+            target.queue_weight = max_weight + 1.0
+
 event.listen(QueueItem, 'before_insert', QueueItem.before_insert_listener)
