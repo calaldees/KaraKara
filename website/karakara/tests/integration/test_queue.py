@@ -55,15 +55,19 @@ def test_queue_errors(app, tracks):
 
 
 @unimplemented
-def test_queue_view_add_del_permissions(app, tracks):
+def test_queue_permissions(app, tracks):
     """
-    Check only the correct users can remove a queued item 
+    Check only the correct users can remove a queued item
+    Check only admin can move items
     """
     assert get_queue(app) == []
     
     # Queue a track
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     queue_item_id = get_queue(app)[0]['id']
+    # Try to move the track (only admins can move things)
+    response = app.put('/queue', {'queue_item.id':queue_item_id}, expect_errors=True)
+    assert response.status_code == 403
     # Clear the cookies (ensure we are a new user)
     app.cookiejar.clear()
     # Attempt to delete the queued track (should fail)
@@ -112,8 +116,6 @@ def test_queue_order(app, tracks):
     """
     Test the queue ordering and weighting system
     Only Admin user should be able to modify the track order
-    
-    TODO: need to test pleb premissions
     """
     response = app.get('/admin')
     assert get_queue(app) == []
