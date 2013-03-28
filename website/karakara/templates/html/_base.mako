@@ -39,8 +39,8 @@
                 ##<a href="/queue"      data-role="button" data-icon="search" data-mini="true" class="ui-btn-right">Queue</a>
                 ##
                 % if request.path != '/':
-                <a data-role="button" data-role="button "data-icon="back"   data-mini="true"  class="ui-btn-left" data-rel="back">Back</a>
-                <a href="/"           data-role="button" data-icon="home"   data-mini="true"  class="ui-btn-right"                >Home</a>
+                <a href="#" data-role="button" data-icon="back" data-mini="true" class="ui-btn-left"  data-rel="back">Back</a>
+                <a href="/" data-role="button" data-icon="home" data-mini="true" class="ui-btn-right"                >Home</a>
                 % endif
                 
             </div><!-- /header -->
