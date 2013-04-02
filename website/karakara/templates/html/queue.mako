@@ -35,7 +35,7 @@ import random
             tracks_later = []
     %>
 
-    <%def name="show_queue_item(queue_item, show_estimated_time=True)">
+    <%def name="show_queue_item(queue_item)">
         <a href='${h.track_url(queue_item['track_id'])}'>
             <% img_src = h.thumbnail_location_from_track(queue_item['track']) %>
             % if img_src:
@@ -43,9 +43,7 @@ import random
             % endif
             <h3>${queue_item['track']['title']}</h3>
             <p>${queue_item['performer_name']}</p>
-            % if show_estimated_time:
             <p class="ui-li-aside">${h.duration_str(queue_item['total_duration'])}</p>
-            % endif
         </a>
         % if identity['admin'] or identity['id']==queue_item['session_owner']:
         <a href='/queue?method=delete&format=redirect&queue_item.id=${queue_item['id']}' rel=external>remove</a>
@@ -73,17 +71,19 @@ import random
         The feature exisits because 3 big long tracks in a row can kill a Karaokoe
     </%doc>
     % if tracks_later:
-    <h2>Coming up ...</h2>
-    <% block_lookup = ['a','b','c'] %>
-    <div class="ui-grid-${block_lookup[len(block_lookup)-2]} ui-responsive">
+    ##<h2>Coming up ...</h2>
+    ##<% block_lookup = ['a','b','c'] %>
+    <ul class="queue-grid">
+    ##<div class="ui-grid-${block_lookup[len(block_lookup)-2]} ui-responsive">
         % for queue_item in tracks_later:
-        <div class="ui-block-${block_lookup[loop.index%len(block_lookup)]}">
+        <li class="ui-btn ui-btn-icon-right ui-li ui-li-has-alt ui-btn-up-c">
+        ##<div class="ui-block-${block_lookup[loop.index%len(block_lookup)]}">
             ##<div class="ui-body ui-body-d">
-            ${show_queue_item(queue_item, show_estimated_time=False)}
+            ${show_queue_item(queue_item)}
             ##</div>
-        </div>
+        </li>
         % endfor
-    </div>
+    </ul>
     % endif
 
 </%def>

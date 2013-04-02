@@ -18,3 +18,17 @@ HTML.video    .hide_if_html5_video    {display: none;}
 }
 .track_tags {
 }
+
+.queue-grid {margin-top: 15px;} /* jQuery Mobile has a margin of -15px on lists ... this is to put the content below in the corret place */
+.queue-grid li {float: left;}
+.queue-grid li img {display: none;}
+.queue-grid .ui-li-aside {display: none;}
+@media all and (min-width: 20em) {
+    .queue-grid li {width: 50%;}
+}
+@media all and (min-width: 30em) {
+    .queue-grid li {width: 33%;}
+}
+@media all and (min-width: 40em) {
+    .queue-grid li {width: 25%;}
+}
