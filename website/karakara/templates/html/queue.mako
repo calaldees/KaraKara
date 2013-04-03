@@ -40,6 +40,11 @@ import random
             tracks_later = []
     %>
 
+    <%def name="btn_remove(queue_item, attrs='')">
+        % if identity['admin'] or identity['id']==queue_item['session_owner']:
+        <a href='/queue?method=delete&format=redirect&queue_item.id=${queue_item['id']}' rel=external ${attrs |n}>remove</a>
+        % endif
+    </%def>
     <%def name="show_queue_item(queue_item)">
         <a href='${h.track_url(queue_item['track_id'])}'>
             <% img_src = h.thumbnail_location_from_track(queue_item['track']) %>
@@ -50,9 +55,7 @@ import random
             <p>${queue_item['performer_name']}</p>
             <p class="ui-li-aside">${h.duration_str(queue_item['total_duration'])}</p>
         </a>
-        % if identity['admin'] or identity['id']==queue_item['session_owner']:
-        <a href='/queue?method=delete&format=redirect&queue_item.id=${queue_item['id']}' rel=external>remove</a>
-        % endif
+
     </%def>
 
     <%doc>
@@ -65,6 +68,7 @@ import random
         % for queue_item in tracks_next:
         <li>
             ${show_queue_item(queue_item)}
+            ${btn_remove(queue_item)}
         </li>
         % endfor
     </ul>
@@ -84,7 +88,9 @@ import random
         <li data-role="button" data-theme="c" data-mini="true" data-shadow="false" data-corners="false">
         ##<div class="ui-block-${block_lookup[loop.index%len(block_lookup)]}">
             ##<div class="ui-body ui-body-d">
+            ${btn_remove(queue_item, 'data-role="button" data-icon="minus" data-iconpos="notext" data-inline="true" data-theme="b"')}
             ${show_queue_item(queue_item)}
+            
             ##</div>
         </li>
         % endfor

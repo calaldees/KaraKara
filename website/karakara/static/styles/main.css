@@ -26,8 +26,12 @@ HTML.video    .hide_if_html5_video    {display: none;}
     float: left;
     margin: -1px -1px -1px -1px;
     text-align: left;
-    
 }
+.queue-grid li a     {text-decoration: none;}
+.queue-grid li a h3  {color: #2F3E46;}
+.queue-grid li a p   {color: #2F3E46; font-weight: normal;}
+.queue-grid li a:nth-child(1) {float: right;}
+
 .queue-grid li img {display: none;}
 .queue-grid .ui-li-aside {display: none;}
 @media all and (min-width: 20em) {
