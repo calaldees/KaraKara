@@ -20,13 +20,18 @@ import random
         time_visible = totalseconds(h.get_setting('karakara.queue_visible', request, 'time') or 0)
         
         # Overlay 'total_duration' on all tracks
+        # It takes time for performers to change, so each track add a padding time
         total_duration = 0
         queue = data.get('queue',[])
         for queue_item in queue:
             queue_item['total_duration'] = total_duration + time_padding
             total_duration += queue_item['track']['duration']
         
-        if time_visible:
+        # Setup the separate 'next' and 'later' lists
+        # 'next' tracks are shown in order
+        # 'later' tracks order is obscured
+        # admin users always see the complete ordered queue
+        if time_visible and not identity['admin']:
             tracks_next  = [q for q in queue if q['total_duration'] <= time_visible]
             tracks_later = [q for q in queue if q['total_duration'] >  time_visible]
             random.shuffle(tracks_later) # Obscure order of upcomming tracks
@@ -55,7 +60,7 @@ import random
         The tracks are shown in a list with image previews
         we will always have tracks_next (even if it is empty)
     </%doc>
-    <ul data-role="listview" data-split-icon="minus" data-divider-theme="a">
+    <ul data-role="listview" data-split-icon="minus" data-divider-theme="a" class="queue-list">
         ##<li data-role="list-divider">Next Tracks</li>
         % for queue_item in tracks_next:
         <li>
@@ -76,7 +81,7 @@ import random
     <ul class="queue-grid">
     ##<div class="ui-grid-${block_lookup[len(block_lookup)-2]} ui-responsive">
         % for queue_item in tracks_later:
-        <li class="ui-btn ui-btn-icon-right ui-li ui-li-has-alt ui-btn-up-c">
+        <li data-role="button" data-theme="c" data-mini="true" data-shadow="false" data-corners="false">
         ##<div class="ui-block-${block_lookup[loop.index%len(block_lookup)]}">
             ##<div class="ui-body ui-body-d">
             ${show_queue_item(queue_item)}
