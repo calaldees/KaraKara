@@ -19,18 +19,33 @@ HTML.video    .hide_if_html5_video    {display: none;}
 .track_tags {
 }
 
-.queue-list .ui-li-aside {width: 3em;} /* The 'aside' by default takes 50% of the space, for the time remaining we only need a small space */
+.queue-list {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.queue-list li.sortable-placeholder {
+    border: 1px dashed #CCC;
+    background: none;
+    height: 5em;
+}
+.queue-list .ui-li-aside {width: 4em;} /* The 'aside' by default takes 50% of the space, for the time remaining we only need a small space */
 
 .queue-grid {margin: 15px -15px; margin-bottom: 0px;} /* jQuery Mobile has a margin of -15px on lists ... this is to put the content below in the corret place */
 .queue-grid li {
     float: left;
     margin: -1px -1px -1px -1px;
     text-align: left;
+    overflow: hidden;
 }
-.queue-grid li a     {text-decoration: none;}
-.queue-grid li a h3  {color: #2F3E46;}
+.queue-grid li a     {text-decoration: none; display: inline;}
+.queue-grid li a h3  {color: #2F3E46; overflow: hidden;}
 .queue-grid li a p   {color: #2F3E46; font-weight: normal;}
 .queue-grid li a:nth-child(1) {float: right;}
+.queue-grid li a:nth-child(2) {padding-right: 3em;}
 
 .queue-grid li img {display: none;}
 .queue-grid .ui-li-aside {display: none;}
@@ -38,7 +53,7 @@ HTML.video    .hide_if_html5_video    {display: none;}
     .queue-grid li {width: 50%;}
 }
 @media all and (min-width: 30em) {
-    .queue-grid li {width: 33%;}
+    .queue-grid li {width: 33.333%;}
 }
 @media all and (min-width: 40em) {
     .queue-grid li {width: 25%;}

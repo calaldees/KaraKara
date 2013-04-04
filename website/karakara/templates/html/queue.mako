@@ -66,7 +66,7 @@ import random
     <ul data-role="listview" data-split-icon="minus" data-divider-theme="a" class="queue-list">
         ##<li data-role="list-divider">Next Tracks</li>
         % for queue_item in tracks_next:
-        <li>
+        <li data-queue-item-id="${queue_item['id']}">
             ${show_queue_item(queue_item)}
             ${btn_remove(queue_item)}
         </li>
@@ -90,11 +90,21 @@ import random
             ##<div class="ui-body ui-body-d">
             ${btn_remove(queue_item, 'data-role="button" data-icon="minus" data-iconpos="notext" data-inline="true" data-theme="b"')}
             ${show_queue_item(queue_item)}
-            
             ##</div>
         </li>
         % endfor
     </ul>
+    % endif
+
+    % if identity['admin']:
+    <script src="${h.static_url('jquery/jquery.sortable.js')}"></script>
+	<script>
+		$(function() {
+			$('.queue-list').sortable().bind('sortupdate', function(e, ui) {
+                console.log(ui.item.next().attr('data-queue-item-id'));
+            });
+		});
+	</script>
     % endif
 
 </%def>
