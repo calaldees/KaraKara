@@ -98,13 +98,27 @@ import random
 
     % if identity['admin']:
     <script src="${h.static_url('jquery/jquery.sortable.js')}"></script>
-	<script>
-		$(function() {
-			$('.queue-list').sortable().bind('sortupdate', function(e, ui) {
-                console.log(ui.item.next().attr('data-queue-item-id'));
+    <script>
+        $(function() {
+            $('.queue-list').sortable().bind('sortupdate', function(e, ui) {
+                $('.ui-li-aside').html('');
+                var queue_item_id_source      = ui.item.attr('data-queue-item-id');
+                var queue_item_id_destination = ui.item.next().attr('data-queue-item-id');
+                $.ajax({
+                    type:'PUT',
+                    url:'/queue.json',
+                    dataType:'json',
+                    data: 'queue_item.id='+queue_item_id_source+'&queue_item.move.target_id='+queue_item_id_destination,
+                    success: function(data) {
+                        //console.log(queue_item_id_source, queue_item_id_destination);
+                    },
+                    error: function(data) {
+                        alert('error moving queue_item')
+                    }
+                });
             });
-		});
-	</script>
+        });
+    </script>
     % endif
 
 </%def>
