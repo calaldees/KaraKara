@@ -120,9 +120,19 @@ def test_queue_order(app, tracks):
     """
     Test the queue ordering and weighting system
     Only Admin user should be able to modify the track order
+    Admin users should always see the queue in order
     """
+    # Test Normal template dose not have form values to move items
+    response = app.get('/queue')
+    assert 'queue_item.move.target_id' not in response.text, 'Normal users should not be able to move items'
+    
+    # Ensure queue user is Admin and starting queue state is empty
     response = app.get('/admin')
     assert get_queue(app) == []
+
+    # Test Admin users have form values to move items
+    response = app.get('/queue')
+    assert 'queue_item.move.target_id' in response.text, 'Admin users should be able to move items'
     
     # Setup queue
     for track_id, performer_name in [
