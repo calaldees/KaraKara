@@ -1,7 +1,7 @@
 from decorator import decorator
 from ..lib.misc            import random_string
 from ..lib.pyramid_helpers import request_from_args, get_setting, etag
-from ..lib.auto_format     import auto_format_output
+from ..lib.auto_format     import auto_format_output, action_error
 
 __all__ = [
     'base','overlay_identity','auto_format_output','web','etag'
@@ -51,14 +51,22 @@ def overlay_identity(target, *args, **kwargs):
     """
     request = request_from_args(args)
     
-    result = target(*args, **kwargs)
-    
-    # Overlay a new dict called identity onto each request
-    if isinstance(result, dict):
+    def overlay_identity_onto(target_dict):
         identity_dict = {}
         for key in ['id','admin','faves']:
             identity_dict[key] = request.session.get(key,None)
-        result['identity'] = identity_dict
+        target_dict['identity'] = identity_dict
+
+    try:
+        result = target(*args, **kwargs)
+    except action_error as ae:
+        # overlay identity onto action_errors
+        overlay_identity_onto(ae.d)
+        raise ae
+    
+    # Overlay a new dict called identity onto each request
+    if isinstance(result, dict):
+        overlay_identity_onto(result)
     
     return result
 

@@ -51,7 +51,11 @@ def test_queue_view_simple_add_delete_cycle(app, tracks):
 def test_queue_errors(app, tracks):
     response = app.post('/queue', dict(track_id='t1000'), expect_errors=True)
     assert response.status_code == 400
-    assert 'performer' in response.text
+    assert 'performer' in response.text  # test should grumble about needing a 'performer' name
+
+    response = app.post('/queue', dict(track_id='t1000', performer_name='test_user'), expect_errors=True)
+    assert response.status_code == 400
+    assert 'not exist' in response.text
 
 
 @unimplemented

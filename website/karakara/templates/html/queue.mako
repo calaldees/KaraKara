@@ -31,7 +31,7 @@ import random
         # 'next' tracks are shown in order
         # 'later' tracks order is obscured
         # admin users always see the complete ordered queue
-        if time_visible and not identity['admin']:
+        if time_visible and not identity.get('admin'):
             tracks_next  = [q for q in queue if q['total_duration'] <= time_visible]
             tracks_later = [q for q in queue if q['total_duration'] >  time_visible]
             random.shuffle(tracks_later) # Obscure order of upcomming tracks
@@ -41,7 +41,7 @@ import random
     %>
 
     <%def name="btn_remove(queue_item, attrs='')">
-        % if identity['admin'] or identity['id']==queue_item['session_owner']:
+        % if identity.get('admin') or identity['id']==queue_item['session_owner']:
         <a href='/queue?method=delete&format=redirect&queue_item.id=${queue_item['id']}' rel=external ${attrs |n}>remove</a>
         % endif
     </%def>
@@ -96,7 +96,7 @@ import random
     </ul>
     % endif
 
-    % if identity['admin']:
+    % if identity.get('admin'):
     <script src="${h.static_url('jquery/jquery.sortable.js')}"></script>
     <script>
         $(function() {

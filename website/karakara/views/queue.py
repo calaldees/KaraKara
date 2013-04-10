@@ -79,6 +79,10 @@ def queue_add(request):
     for field in ['track_id', 'performer_name']:
         if not request.params.get(field):
             raise action_error(message='no {0}'.format(field), code=400)
+    try:
+        assert DBSession.query(Track).get(request.params.get('track_id'))
+    except AssertionError:
+        raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
     
     queue_item = QueueItem()
     for key,value in request.params.items():
