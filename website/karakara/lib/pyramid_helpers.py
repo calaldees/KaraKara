@@ -29,6 +29,8 @@ def get_setting(key, request=None, return_type=None):
         value = dateutil.parser.parse(value).date()
     if return_type=='datetime' or return_type==datetime:
         value = dateutil.parser.parse(value)
+    if return_type=='list' or return_type==list:
+        value = [v.strip() for v in value.split(',') if v.strip()]
     return value
 
 def request_from_args(args):

@@ -25,3 +25,8 @@ def test_admin_toggle(app):
     assert app.get('/?format=json').json['identity']['admin']
 
     response = app.get('/admin')
+
+
+def test_settings(app):
+    settings = app.get('/settings.json').json['data']['settings']
+    assert settings
