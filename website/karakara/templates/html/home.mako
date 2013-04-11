@@ -10,5 +10,6 @@
 
 % if identity.get('admin', False):
 <a href="track_list" data-role="button" data-theme="e">List All Tracks</a>
+<a href="/settings"  data-role="button" data-theme="e">Settings</a>
 <a href="/admin"     data-role="button" data-theme="e">Exit Admin Mode</a>
 % endif

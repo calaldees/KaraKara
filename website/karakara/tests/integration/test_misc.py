@@ -28,5 +28,10 @@ def test_admin_toggle(app):
 
 
 def test_settings(app):
+    # Settings API
     settings = app.get('/settings.json').json['data']['settings']
     assert settings
+    
+    # Settings Template
+    response = app.get('/settings')
+    assert 'setting' in response.text
