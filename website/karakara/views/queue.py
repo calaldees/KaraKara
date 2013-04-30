@@ -1,9 +1,10 @@
 import datetime
 from pyramid.view import view_config
 
-from . import web, etag, method_delete_router
+from . import web, etag, method_delete_router, is_admin
 
 from ..lib.auto_format    import action_ok, action_error
+from ..lib.pyramid_helpers import get_setting
 from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
 from ..model.model_tracks import Track
@@ -80,9 +81,14 @@ def queue_add(request):
         if not request.params.get(field):
             raise action_error(message='no {0}'.format(field), code=400)
     try:
-        assert DBSession.query(Track).get(request.params.get('track_id'))
+        track = DBSession.query(Track).get(request.params.get('track_id'))
+        assert track
     except AssertionError:
         raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
+    
+    duplicate_allow     = get_setting('karakara.queue.add.duplicate_allow'    , request, bool         )
+    duplicate_threshold = get_setting('karakara.queue.add.duplicate_threshold', request, datetime.time)
+    #existing_tracks_in_queue = DBSession.query(QueueItem).filter(QueueItem.track_id==track.id).filter(QueueItem.status!='removed').filter(QueueItem.time_touched>=datetime.datetime.now()-duplicate_threshold)
     
     queue_item = QueueItem()
     for key,value in request.params.items():
@@ -112,10 +118,9 @@ def queue_del(request):
     queue_item = DBSession.query(QueueItem).get(int(request.params['queue_item.id']))
 
     if not queue_item:
-        raise action_error(message='invalid queue_item.id')
-    # AllanC - ****!! disbaling for demo
-    #if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
-    #    raise action_error(message='you are not the owner of this queue_item', code=403)
+        raise action_error(message='invalid queue_item.id', code=404)
+    if not is_admin(request) and queue_item.session_owner != request.session['id']:
+        raise action_error(message='you are not the owner of this queue_item', code=403)
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
@@ -139,14 +144,14 @@ def queue_update(request):
     queue_item = DBSession.query(QueueItem).get(params['queue_item.id'])
 
     if not queue_item:
-        raise action_error(message='invalid queue_item.id', code=400)
-    if not request.session.get('admin',False) and queue_item.session_owner != request.session['id']:
+        raise action_error(message='invalid queue_item.id', code=404)
+    if not is_admin(request) and queue_item.session_owner != request.session['id']:
         raise action_error(message='you are not the owner of this queue_item', code=403)
 
     # If moving, lookup new weighting from the target track id
     # The source is moved infront of the target_id
     if params.get('queue_item.move.target_id'):
-        if not request.session.get('admin',False):
+        if not is_admin(request):
             raise action_error(message='admin only action', code=403)
         # get next and previous queueitem weights
         queue_item_target = DBSession.query(QueueItem).get(params.pop('queue_item.move.target_id'))

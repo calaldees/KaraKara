@@ -96,4 +96,4 @@ def method_delete_router(info, request):
 
 # AllanC - need to look into Pyramids security model
 def is_admin(request):
-    return request.session['admin']
+    return request.session.get('admin',False)  # request.session['admin']

@@ -27,22 +27,19 @@ def get_setting(key, request=None, return_type=None):
         value = dateutil.parser.parse(value).time()
     if return_type=='date' or return_type==datetime.date:
         value = dateutil.parser.parse(value).date()
-    if return_type=='datetime' or return_type==datetime:
+    if return_type=='datetime' or return_type==datetime.datetime:
         value = dateutil.parser.parse(value)
     if return_type=='list' or return_type==list:
         value = [v.strip() for v in value.split(',') if v.strip()]
     return value
 
+
 def request_from_args(args):
     # Extract request object from args
-    request = None
     for arg in args:
         if isinstance(arg, pyramid.request.Request):
-            request = arg
-            break
-    assert request
-    return request
-
+            return arg
+    raise Exception('no pyramid.request.Request in args')
 
 
 def etag(etag_render_func):

@@ -22,6 +22,14 @@ from .pyramid_helpers import get_setting, request_from_args
 # Regex to extract 'format' from request URL
 format_regex_path = re.compile(r'.*\.(?P<format>.*?)($|\?|#)'    , flags=re.IGNORECASE)
 format_regex_qs   = re.compile(r'.*(^|,)format=(?P<format>.*?)($|,)', flags=re.IGNORECASE) # AllanC - this could be replaced at a later date when web_params_to_kwargs is implemented , used to use r'.*\?.*format=(.*?)($|,)' for whole url
+format_request_accept = {
+    'text/html'           : 'html',
+    'application/json'    : 'json',
+    'text/xml'            : 'xml' ,
+    'application/xml'     : 'xml' ,
+    'application/atom+xml': 'rss' ,
+    'application/xml+rss' : 'rss' ,
+}
 
 #-------------------------------------------------------------------------------
 # Setup
@@ -83,8 +91,11 @@ def auto_format_output(target, *args, **kwargs):
     # add 'format' from URL query string
     try   : formats.append(format_regex_qs.match(request.path_qs).group('format'))
     except: pass
+    # add 'format' from request content type
+    try   : formats.append(format_request_accept[request.accept.header_value.split(',')[0]])
+    except: pass
     # add default format
-    formats.append(get_setting('auto_format.default', request) or 'html')
+    formats.append(get_setting('api.format.default', request) or 'html')
     formats = [format for format in formats if format] # remove any blank entries in formats list
     
     request.matchdict['format'] = formats[0] # A way for all methods wraped by this decorator to determin what format they are targeted for
@@ -109,7 +120,7 @@ def auto_format_output(target, *args, **kwargs):
             log.debug('render format = %s' % format)
             break
         except:
-            pass
+            log.warn('format unsupported = %s' % format)
     
     # Attempt auto_format if result is a plain python dict and auto_format func exisits
     if formatter and isinstance(result, dict):

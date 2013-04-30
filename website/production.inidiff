@@ -2,7 +2,8 @@
 pyramid.reload_templates    = false
 pyramid.debug_templates     = false
 text.title = KaraKara
-sqlalchemy.url = postgresql+pypostgresql://karakara:kara4000@localhost/karakara
+#sqlalchemy.url = postgresql+pypostgresql://karakara:kara4000@localhost/karakara
+sqlalchemy.url = sqlite:///%(here)s/KaraKara_test.db
 
 [logger_root]
 level = WARN

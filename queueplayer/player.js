@@ -1,16 +1,16 @@
-
+var settings = {};
 var playlist = [];
 
 function song_finished() {
 	console.log("Song finished");
-	$.get(
+	$.getJSON(
 		"/queue", {
 			//http://localhost:8000/queue?method=delete&format=redirect&queue_item.id=3
-			"method": "delete",
-			"format": "redirect",
+			"method": "put",
+			//"format": "json",
 			"queue_item.id": playlist[0].id,
-			//"status": "completed",
-			//"uncache": new Date().getTime()
+			"status": "played",
+			"uncache": new Date().getTime()
 		},
 		function(data) {
 			update_playlist();
@@ -29,7 +29,7 @@ function update_playlist() {
 		return sig;
 	}
 
-	$.getJSON("/queue.json", {}, function(data) { //AllanC - removed unique URL to facilitate eTag - "uncache": new Date().getTime()
+	$.getJSON("/queue", {}, function(data) { //AllanC - removed unique URL to facilitate eTag - "uncache": new Date().getTime()
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			playlist = data.data.queue;
 			render_playlist();
@@ -88,9 +88,6 @@ function prepare_next_song() {
 
 $(function() {
 	update_playlist();
-	setInterval(function() {
-		update_playlist();
-	}, 3000);
 
 	$("#play").click(function(e) {
 		var video = $('#player').get(0);
@@ -110,4 +107,24 @@ $(function() {
 		video.webkitExitFullScreen();
 		song_finished();
 	});
+	
+	$.getJSON("/settings", {}, function(data) {
+		settings = data.data.settings;
+		
+		// Identify player.js as admin with admin cookie
+		if (!data.identity.admin) {
+			$.getJSON("/admin", {}, function(data) {
+				if (!data.identity.admin) {
+					console.error("Unable to set player as admin. The player may not function correctly");
+				}
+			})
+		}
+		
+		// Set update interval
+		var update_inverval = parseInt(settings["karakara.player.update_time"]) * 1000;
+		if (!update_inverval) {update_inverval = 3000;}
+		settings['interval'] = setInterval(update_playlist, update_inverval);
+		console.log('update_interval='+update_inverval);
+	});
+	
 });

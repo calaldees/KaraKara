@@ -16,8 +16,8 @@ import random
                 return time.hour*60*60 + time.minute*60 + time.second
             return 0
         
-        time_padding = totalseconds(h.get_setting('karakara.queue_padding', request, 'time') or 0)
-        time_visible = totalseconds(h.get_setting('karakara.queue_visible', request, 'time') or 0)
+        time_padding = totalseconds(h.get_setting('karakara.queue.template.padding', request, 'time') or 0)
+        time_visible = totalseconds(h.get_setting('karakara.queue.template.visible', request, 'time') or 0)
         
         # Overlay 'total_duration' on all tracks
         # It takes time for performers to change, so each track add a padding time
