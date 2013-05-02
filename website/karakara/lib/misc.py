@@ -93,6 +93,54 @@ def normalize_datetime(d, accuracy='hour'):
         return d.replace(minute=0, second=0, microsecond=0, hour=0) - datetime.timedelta(days=d.weekday())
     return d
 
+def parse_timedelta(text):
+    """
+    Takes string and converts to timedelta
+
+    ##>>> parse_timedelta('00:01:00.01')
+    ##datetime.timedelta(0, 60, 1)
+    
+    >>> parse_timedelta('00:00:01.00')
+    datetime.timedelta(0, 1)
+    >>> parse_timedelta('01:00:00')
+    datetime.timedelta(0, 3600)
+    >>> parse_timedelta('5')
+    datetime.timedelta(0, 5)
+    >>> parse_timedelta('1:01')
+    datetime.timedelta(0, 3660)
+    """
+    hours = "0"
+    minutes = "0"
+    seconds = "0"
+    milliseconds = "0"
+    time_components = text.strip().split(':')
+    if   len(time_components) == 1:
+        seconds = time_components[0]
+    elif len(time_components) == 2:
+        hours = time_components[0]
+        minutes = time_components[1]
+    elif len(time_components) == 3:
+        hours   = time_components[0]
+        minutes = time_components[1]
+        seconds = time_components[2]
+    second_components = seconds.split('.')
+    if len(second_components) == 2:
+        seconds      = second_components[0]
+        milliseconds = second_components[1]
+    hours = int(hours)
+    minutes = int(minutes)
+    seconds = int(seconds)
+    milliseconds = int(milliseconds)
+    assert hours>=0
+    assert minutes>=0
+    assert seconds>=0
+    assert milliseconds==0, 'milliseconds are not implemented properly .01 is parsed as int(01), this is incorrect, fix this!' 
+    return datetime.timedelta(
+        seconds      = seconds + minutes*60 + hours*60*60,
+        milliseconds = milliseconds
+    )
+
+
 def strip_non_base_types(d):
     """
     Recursively steps though a python dictionary

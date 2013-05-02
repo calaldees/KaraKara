@@ -8,6 +8,8 @@ from pyramid.httpexceptions import exception_response
 
 from decorator import decorator
 
+from karakara.lib.misc import parse_timedelta
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -29,6 +31,8 @@ def get_setting(key, request=None, return_type=None):
         value = dateutil.parser.parse(value).date()
     if return_type=='datetime' or return_type==datetime.datetime:
         value = dateutil.parser.parse(value)
+    if return_type=='timedelta' or return_type==datetime.timedelta:
+        value = parse_timedelta(value)
     if return_type=='list' or return_type==list:
         value = [v.strip() for v in value.split(',') if v.strip()]
     return value
