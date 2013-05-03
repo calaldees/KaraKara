@@ -1,7 +1,7 @@
 import datetime
 from pyramid.view import view_config
 
-from . import web, etag, method_delete_router, is_admin
+from . import web, etag, method_delete_router, method_put_router, is_admin
 
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession, commit
@@ -129,7 +129,7 @@ def queue_del(request):
     return action_ok(message='queue_item status changed')
 
 
-@view_config(route_name='queue', request_method='PUT')
+@view_config(route_name='queue', custom_predicates=(method_put_router,) ) #request_method='PUT'
 @web
 def queue_update(request):
     """

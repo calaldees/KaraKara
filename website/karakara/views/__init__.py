@@ -5,7 +5,7 @@ from ..lib.auto_format     import auto_format_output, action_error
 
 __all__ = [
     'base','overlay_identity','auto_format_output','web','etag'
-    'method_delete_router',
+    'method_delete_router', 'method_put_router',
 ]
 
 
@@ -90,7 +90,11 @@ web  = chained(base, auto_format_output, overlay_identity)
 #-------------------------------------------------------------------------------
 
 def method_delete_router(info, request):
-    if request.params.get('method','GET').lower() == 'delete':
+    if request.method == 'DELETE' or request.params.get('method','GET').upper() == 'DELETE':
+        return True
+
+def method_put_router(info, request):
+    if request.method == 'PUT' or request.params.get('method','GET').upper() == 'PUT':
         return True
 
 

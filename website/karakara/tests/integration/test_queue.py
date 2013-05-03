@@ -98,7 +98,7 @@ def test_queue_view_update(app, tracks):
     """
     assert get_queue(app) == []
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
-    app.cookiejar.clear()
+    app.cookiejar.clear() # Loose the cookie so we are not identifyed as the creator of this queue item.
     
     response = app.put('/queue', {'queue_item.id':'not_real_id'}, expect_errors=True)
     assert response.status_code == 400
@@ -115,6 +115,25 @@ def test_queue_view_update(app, tracks):
 
     assert get_queue(app) == []
 
+def test_queue_played(app, tracks):
+    """
+    Player system gets track list and removes first queue_item.id when played
+    """
+    assert get_queue(app) == []
+    
+    # Add track to queue
+    response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    app.cookiejar.clear()
+    
+    # As admin player mark track as played
+    response = app.get('/admin')
+    queue_item_id = get_queue(app)[0]['id']
+    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'})
+    assert 'update' in response.json['messages'][0]
+    response = app.get('/admin')
+    
+    assert get_queue(app) == []
+    #assert DBSession.query # could query actual queue item in db, but that would mean more imports
 
 def test_queue_order(app, tracks):
     """

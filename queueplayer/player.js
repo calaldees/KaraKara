@@ -1,3 +1,5 @@
+var DEFAULT_PLAYLIST_UPDATE_TIME = 3; //Seconds to poll server
+
 var settings = {};
 var playlist = [];
 
@@ -122,7 +124,7 @@ $(function() {
 		
 		// Set update interval
 		var update_inverval = parseInt(settings["karakara.player.update_time"]) * 1000;
-		if (!update_inverval) {update_inverval = 3000;}
+		if (!update_inverval) {update_inverval = DEFAULT_PLAYLIST_UPDATE_TIME*1000;}
 		settings['interval'] = setInterval(update_playlist, update_inverval);
 		console.log('update_interval='+update_inverval);
 	});
