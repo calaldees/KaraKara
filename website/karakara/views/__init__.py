@@ -1,6 +1,6 @@
 from decorator import decorator
 from ..lib.misc            import random_string
-from ..lib.pyramid_helpers import request_from_args, get_setting, etag
+from ..lib.pyramid_helpers import request_from_args, etag
 from ..lib.auto_format     import auto_format_output, action_error
 
 __all__ = [
@@ -35,7 +35,7 @@ def base(target, *args, **kwargs):
     result = target(*args, **kwargs)
     
     # Enable Pyramid GZip on all responses - NOTE! In a production this should be handled by nginx for performance!
-    if get_setting('server.gzip', request, return_type=bool):
+    if request.registry.settings.get('server.gzip'):
         request.response.encode_content(encoding='gzip', lazy=False)
     
     return result

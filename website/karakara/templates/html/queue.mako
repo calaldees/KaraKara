@@ -1,6 +1,7 @@
 <%inherit file="_base.mako"/>
 <%!
 import random
+import datetime
 %>
 
 <%def name="title()">Queue</%def>
@@ -11,21 +12,17 @@ import random
         # Break Queue into sections
         #  - the next 15 mins of tracks in order
         #  - tracks after 15 mins randomized
-        def totalseconds(time):
-            if time:
-                return time.hour*60*60 + time.minute*60 + time.second
-            return 0
         
-        time_padding = totalseconds(h.get_setting('karakara.queue.template.padding', request, 'time') or 0)
-        time_visible = totalseconds(h.get_setting('karakara.queue.template.visible', request, 'time') or 0)
+        time_padding = request.registry.settings.get('karakara.queue.template.padding')
+        time_visible = request.registry.settings.get('karakara.queue.template.visible')
         
         # Overlay 'total_duration' on all tracks
         # It takes time for performers to change, so each track add a padding time
-        total_duration = 0
+        total_duration = datetime.timedelta(seconds=0)
         queue = data.get('queue',[])
         for queue_item in queue:
             queue_item['total_duration'] = total_duration + time_padding
-            total_duration += queue_item['track']['duration']
+            total_duration += datetime.timedelta(seconds=queue_item['track']['duration'])
         
         # Setup the separate 'next' and 'later' lists
         # 'next' tracks are shown in order

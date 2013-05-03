@@ -31,7 +31,7 @@
                 data-theme="e"
                 % endif
 >
-                <%def name="title()">${h.get_setting('text.title', request) or 'KaraKara'}</%def>
+                <%def name="title()">${request.registry.settings.get('text.title') or 'KaraKara'}</%def>
                 <h1>${next.title()}</h1>
                 
                 ## data-iconpos="notext"

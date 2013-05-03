@@ -4,7 +4,6 @@ from pyramid.view import view_config
 from . import web, etag, method_delete_router, is_admin
 
 from ..lib.auto_format    import action_ok, action_error
-from ..lib.pyramid_helpers import get_setting
 from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
 from ..model.model_tracks import Track
@@ -86,8 +85,8 @@ def queue_add(request):
     except AssertionError:
         raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
     
-    duplicate_allow     = get_setting('karakara.queue.add.duplicate_allow'    , request, bool         )
-    duplicate_threshold = get_setting('karakara.queue.add.duplicate_threshold', request, datetime.time)
+    duplicate_allow     = request.registry.settings.get('karakara.queue.add.duplicate_allow')
+    duplicate_threshold = request.registry.settings.get('karakara.queue.add.duplicate_threshold')
     #existing_tracks_in_queue = DBSession.query(QueueItem).filter(QueueItem.track_id==track.id).filter(QueueItem.status!='removed').filter(QueueItem.time_touched>=datetime.datetime.now()-duplicate_threshold)
     
     queue_item = QueueItem()

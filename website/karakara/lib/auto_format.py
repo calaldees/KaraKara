@@ -12,7 +12,7 @@ import copy
 import logging
 log = logging.getLogger(__name__)
 
-from .pyramid_helpers import get_setting, request_from_args
+from .pyramid_helpers import request_from_args
 
 
 #-------------------------------------------------------------------------------
@@ -24,11 +24,15 @@ format_regex_path = re.compile(r'.*\.(?P<format>.*?)($|\?|#)'    , flags=re.IGNO
 format_regex_qs   = re.compile(r'.*(^|,)format=(?P<format>.*?)($|,)', flags=re.IGNORECASE) # AllanC - this could be replaced at a later date when web_params_to_kwargs is implemented , used to use r'.*\?.*format=(.*?)($|,)' for whole url
 format_request_accept = {
     'text/html'           : 'html',
+    'text/csv'            : 'csv' ,
+    'text/plain'          : 'csv' ,
+    'text/javascript'     : 'json',
     'application/json'    : 'json',
     'text/xml'            : 'xml' ,
     'application/xml'     : 'xml' ,
     'application/atom+xml': 'rss' ,
     'application/xml+rss' : 'rss' ,
+    'application/pdf'     : 'pdf' ,
 }
 
 #-------------------------------------------------------------------------------
@@ -95,7 +99,7 @@ def auto_format_output(target, *args, **kwargs):
     try   : formats.append(format_request_accept[request.accept.header_value.split(',')[0]])
     except: pass
     # add default format
-    formats.append(get_setting('api.format.default', request) or 'html')
+    formats.append(request.registry.settings.get('api.format.default', 'html'))
     formats = [format for format in formats if format] # remove any blank entries in formats list
     
     request.matchdict['format'] = formats[0] # A way for all methods wraped by this decorator to determin what format they are targeted for
@@ -191,8 +195,15 @@ register_formater('python', lambda result:result)
 
 # JSON -----------------------------
 import json
+import datetime
+def json_object_handler(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    if isinstance(obj, datetime.timedelta):
+        return obj.total_seconds()
+    raise TypeError
 def format_json(request, result):
-    response = pyramid.response.Response(json.dumps(result))
+    response = pyramid.response.Response(json.dumps(result, default=json_object_handler))
     response.headers['Content-type'] = "application/json; charset=utf-8"
     return response
 register_formater('json', format_json)

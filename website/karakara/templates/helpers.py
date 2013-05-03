@@ -4,7 +4,6 @@ These will be accessible as 'h.' in all mako templates
 """
 
 from ..lib.misc import get_fileext, substring_in
-from ..lib.pyramid_helpers import get_setting
 
 
 import random
@@ -46,6 +45,10 @@ def duration_str(duration):
     """
     duration in seconds to human readable string form
     """
+    try:
+        duration = duration.total_seconds()
+    except Exception:
+        pass
     return "%d min" % (duration/60)
     
 def attachment_locations_by_type(track, attachment_type):

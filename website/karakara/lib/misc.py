@@ -2,6 +2,9 @@ import re
 import random
 import datetime
 
+from pyramid.settings import asbool
+
+
 def get_fileext(filename):
     try:
         return re.search(r'\.([^\.]+)$', filename).group(1).lower()
@@ -165,4 +168,23 @@ def strip_non_base_types(d):
         if isinstance(d,t):
             return [strip_non_base_types(value) for value in d]
     return None
+
     
+def convert_str(value, return_type):
+    if not value or not isinstance(value, str) or not return_type:
+        return value
+    if return_type=='bool' or return_type==bool:
+        return asbool(value)
+    if return_type=='int' or return_type==int:
+        return int(value)
+    if return_type=='time' or return_type==datetime.time:
+        return dateutil.parser.parse(value).time()
+    if return_type=='date' or return_type==datetime.date:
+        return dateutil.parser.parse(value).date()
+    if return_type=='datetime' or return_type==datetime.datetime:
+        return dateutil.parser.parse(value)
+    if return_type=='timedelta' or return_type==datetime.timedelta:
+        return parse_timedelta(value)
+    if return_type=='list' or return_type==list:
+        return [v.strip() for v in value.split(',') if v.strip()]
+    assert False, 'unable to convert {0} to {1}'.format(value, return_type)
