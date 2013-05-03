@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 
-_queueitem_statuss = Enum("pending", "played", "removed", name="status_types")
+_queueitem_statuss = Enum("pending", "played", "skipped", "removed", name="status_types")
 
 
 class QueueItem(Base):

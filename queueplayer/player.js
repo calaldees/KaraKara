@@ -3,7 +3,7 @@ var DEFAULT_PLAYLIST_UPDATE_TIME = 3; //Seconds to poll server
 var settings = {};
 var playlist = [];
 
-function song_finished() {
+function song_finished(status) {
 	console.log("Song finished");
 	$.getJSON(
 		"/queue", {
@@ -11,7 +11,7 @@ function song_finished() {
 			"method": "put",
 			//"format": "json",
 			"queue_item.id": playlist[0].id,
-			"status": "played",
+			"status": status,
 			"uncache": new Date().getTime()
 		},
 		function(data) {
@@ -102,12 +102,12 @@ $(function() {
 	});
 	$("#skip").click(function(e) {
 		e.preventDefault();
-		song_finished();
+		song_finished("skipped");
 	});
 	$("#player").bind("ended", function(e) {
 		var video = $('#player').get(0);
 		video.webkitExitFullScreen();
-		song_finished();
+		song_finished("played");
 	});
 	
 	$.getJSON("/settings", {}, function(data) {
