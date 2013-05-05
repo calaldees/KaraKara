@@ -145,7 +145,7 @@ def import_json_data(source, location=''):
             #track.id       = get_id_from_foldername(folder)#data['videos'][0]['encode-hash']
             track.source   = ''
             track.duration = data['videos'][0]['length']
-            track.title    = data['name']
+            #track.title    = data['name']
             
             # Add Attachments
             for attachment_type in _attachment_types.enums:

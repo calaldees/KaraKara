@@ -46,12 +46,14 @@
             </div><!-- /header -->
             
             <!-- flash messages -->
+            <div class="flash_messages">
             % for message in messages:
-            <div class="flash_message ui-bar ui-bar-e">
-                <p class="status_${status}">${message}</p>
+            <div class="flash_message ui-bar ui-bar-e status_${status}">
+                <p>${message}</p>
                 <a href="#" class="flash_remove" data-role="button" data-icon="delete" data-iconpos="notext" onclick="$(this).closest('.flash_message').slideUp(function(){$(this).remove()}); return false;">Remove</a>
             </div>
             % endfor
+            </div>
             <!-- /flash messages -->
             
             <div data-role="content">

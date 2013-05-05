@@ -2,6 +2,13 @@
 /* Flash Message */
 .flash_message p             {float: left;}
 .flash_message .flash_remove {float: right;}
+.flash_messages .status_error {
+    background: linear-gradient(#e89496, #e87b7e) repeat scroll 0 0 #e85a5d;
+    border: 1px solid #e83c40;
+    color: #333333;
+    font-weight: bold;
+    text-shadow: 0 1px 0 #FFFFFF;
+}
 
 h1,h2,h3,h4,h5,h6 {font-weight: bold;}
 

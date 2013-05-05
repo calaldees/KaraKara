@@ -123,6 +123,7 @@ def tags(request):
     if request.matchdict['format']=='html':
         # If there is only one track present - abort and redirect to single track view, there is no point in doing any more work
         if len(trackids)== 1:
+            # TODO if the hostname has a port, the port is stripped ... WTF?!
             raise HTTPFound(location=track_url(trackids[0]))
         # If there is only a small list, we might as well just show them all
         if len(trackids)< 15:
