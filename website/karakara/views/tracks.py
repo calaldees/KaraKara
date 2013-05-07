@@ -3,6 +3,7 @@ from pyramid.view import view_config
 from sqlalchemy.orm import joinedload
 
 from . import web, etag
+from ._logic import queue_item_for_track
 
 from ..lib.auto_format    import action_ok
 from ..model              import DBSession
@@ -42,16 +43,16 @@ def track_view(request):
                     joinedload('tags.parent'),\
                     joinedload('lyrics')
                 )
-    track = track.get(id).to_dict('full')
-    
-    queue = DBSession.query(QueueItem).\
-                filter(QueueItem.track_id==track['id']).\
-                filter(QueueItem.time_added>datetime.datetime.now()-datetime.timedelta(hours=12)).\
-                order_by(QueueItem.id)
-                #filter(QueueItem.status=='pending').\
-    queue = [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue]
-    
-    track['queued'] = queue
+    track = track.get(id)
+    if not track:
+        raise action_error(message='track {0} not found'.format(id))
+    track = track.to_dict('full')
+
+    queued, queue_duplicate_status = queue_item_for_track(request, DBSession, track['id'])    
+    track['queue'] = {
+        'queued': [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queued],
+        'status': queue_duplicate_status,
+    }
     
     return action_ok(data={
         'track' : track

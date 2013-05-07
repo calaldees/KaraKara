@@ -86,7 +86,7 @@ web  = chained(base, auto_format_output, overlay_identity)
 
 
 #-------------------------------------------------------------------------------
-# Other ??
+# Predicates
 #-------------------------------------------------------------------------------
 
 def method_delete_router(info, request):
@@ -97,6 +97,10 @@ def method_put_router(info, request):
     if request.method == 'PUT' or request.params.get('method','GET').upper() == 'PUT':
         return True
 
+
+#-------------------------------------------------------------------------------
+# State
+#-------------------------------------------------------------------------------
 
 # AllanC - need to look into Pyramids security model
 def is_admin(request):

@@ -2,6 +2,7 @@ import datetime
 from pyramid.view import view_config
 
 from . import web, etag, method_delete_router, method_put_router, is_admin
+from ._logic import queue_item_for_track, QUEUE_DUPLICATE
 
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession, commit
@@ -10,7 +11,6 @@ from ..model.model_tracks import Track
 
 from ..templates.helpers import track_title
 
-from sqlalchemy         import or_
 from sqlalchemy.orm     import joinedload, joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -87,15 +87,18 @@ def queue_add(request):
         raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
     
     # Duplicate Addition Restrictions
-    duplicate_allow     = request.registry.settings.get('karakara.queue.add.duplicate_allow')
-    duplicate_threshold = request.registry.settings.get('karakara.queue.add.duplicate_threshold')
-    # If we are restricting duplicates then perform additional querys to enforce this.
-    if duplicate_threshold:
-        existing_tracks_in_queue = DBSession.query(QueueItem).filter(QueueItem.track_id==track.id).filter(or_(QueueItem.status=='played',QueueItem.status=='pending')).filter(QueueItem.time_touched>=datetime.datetime.now()-duplicate_threshold).all()
-        if [queue_item for queue_item in existing_tracks_in_queue if queue_item.status=='played']:
-            raise action_error(message='track {0} has already been been played in the last {1}'.format(track.title, duplicate_threshold))
-        elif [queue_item for queue_item in existing_tracks_in_queue if queue_item.status=='pending']:
-            raise action_error(message='track {0} currently in the queue'.format(track.title))
+    queue_items_for_track, queue_duplicate_status = queue_item_for_track(request, DBSession, track.id)
+    if queue_duplicate_status:
+        if queue_duplicate_status==QUEUE_DUPLICATE.THRESHOLD:
+            raise action_error(message='unable to queue track. duplicate track in queue limit reached', code=400)
+        #elif queue_duplicate_status==QUEUE_DUPLICATE.PLAYED:
+        #    raise action_error(message='track played before')
+        #elif queue_duplicate_status==QUEUE_DUPLICATE.PENDING:
+        #    raise action_error(message='track aready in queue')
+    
+    # Check Que max length
+    #karakara.queue.add.limit
+    #karakara.queue.add.priority_window
     
     queue_item = QueueItem()
     for key,value in request.params.items():
