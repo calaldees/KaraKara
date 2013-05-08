@@ -48,11 +48,11 @@ def track_view(request):
         raise action_error(message='track {0} not found'.format(id))
     track = track.to_dict('full')
 
-    queued, queue_duplicate_status = queue_item_for_track(request, DBSession, track['id'])    
-    track['queue'] = {
-        'queued': [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queued],
-        'status': queue_duplicate_status,
-    }
+    def queue_item_list_to_dict(queue_items):
+        return [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue_items]
+    track['queue'] = queue_item_for_track(request, DBSession, track['id'])
+    track['queue']['played' ] = queue_item_list_to_dict(track['queue']['played'] )
+    track['queue']['pending'] = queue_item_list_to_dict(track['queue']['pending'])
     
     return action_ok(data={
         'track' : track

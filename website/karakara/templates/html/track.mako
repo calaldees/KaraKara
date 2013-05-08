@@ -138,10 +138,19 @@
 
 ##------------------------------------------------------------------------------
 
-% if track.get('queue'):
-<h3>Queued by</h3>
+% if track.get('queue',{}).get('played'):
+<h3>Played</h3>
 <ul>
-% for queue_item in track['queue']['queued']:
+% for queue_item in track['queue']['played']:
+<li>${queue_item['performer_name']}</li>
+% endfor
+</ul>
+% endif
+
+% if track.get('queue',{}).get('pending'):
+<h3>Pending</h3>
+<ul>
+% for queue_item in track['queue']['pending']:
 <li>${queue_item['performer_name']}</li>
 % endfor
 </ul>

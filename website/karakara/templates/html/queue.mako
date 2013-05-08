@@ -12,22 +12,13 @@ import datetime
         # Break Queue into sections
         #  - the next 15 mins of tracks in order
         #  - tracks after 15 mins randomized
-        
-        time_padding = request.registry.settings.get('karakara.queue.template.padding')
         time_visible = request.registry.settings.get('karakara.queue.template.visible')
-        
-        # Overlay 'total_duration' on all tracks
-        # It takes time for performers to change, so each track add a padding time
-        total_duration = datetime.timedelta(seconds=0)
-        queue = data.get('queue',[])
-        for queue_item in queue:
-            queue_item['total_duration'] = total_duration + time_padding
-            total_duration += datetime.timedelta(seconds=queue_item['track']['duration'])
         
         # Setup the separate 'next' and 'later' lists
         # 'next' tracks are shown in order
         # 'later' tracks order is obscured
         # admin users always see the complete ordered queue
+        queue = data.get('queue',[])
         if time_visible and not identity.get('admin'):
             tracks_next  = [q for q in queue if q['total_duration'] <= time_visible]
             tracks_later = [q for q in queue if q['total_duration'] >  time_visible]

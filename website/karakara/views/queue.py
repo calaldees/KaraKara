@@ -1,8 +1,7 @@
 import datetime
 from pyramid.view import view_config
 
-from . import web, etag, method_delete_router, method_put_router, is_admin
-from ._logic import queue_item_for_track, QUEUE_DUPLICATE
+from . import web, etag, method_delete_router, method_put_router, is_admin, _logic
 
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession, commit
@@ -39,7 +38,7 @@ def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight).all()
+    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
     queue = [queue_item.to_dict('full') for queue_item in queue]
     
     trackids = [queue_item['track_id'] for queue_item in queue]    
@@ -63,9 +62,19 @@ def queue_view(request):
     #           This is to be removed ...
     for track in tracks.values():
         track['title'] = track_title(track['tags'])
-    
+
+    # Attach track to queue_item
     for queue_item in queue:
         queue_item['track'] = tracks[queue_item['track_id']]
+
+    # Calculate estimated track time
+    # Overlay 'total_duration' on all tracks
+    # It takes time for performers to change, so each track add a padding time
+    time_padding = request.registry.settings.get('karakara.queue.template.padding')
+    total_duration = datetime.timedelta(seconds=0)
+    for queue_item in queue:
+        queue_item['total_duration'] = total_duration
+        total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
     
     return action_ok(data={'queue':queue})
 
@@ -87,14 +96,9 @@ def queue_add(request):
         raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
     
     # Duplicate Addition Restrictions
-    queue_items_for_track, queue_duplicate_status = queue_item_for_track(request, DBSession, track.id)
-    if queue_duplicate_status:
-        if queue_duplicate_status==QUEUE_DUPLICATE.THRESHOLD:
-            raise action_error(message='unable to queue track. duplicate track in queue limit reached', code=400)
-        #elif queue_duplicate_status==QUEUE_DUPLICATE.PLAYED:
-        #    raise action_error(message='track played before')
-        #elif queue_duplicate_status==QUEUE_DUPLICATE.PENDING:
-        #    raise action_error(message='track aready in queue')
+    queue = _logic.queue_item_for_track(request, DBSession, track.id)
+    if queue['status']==_logic.QUEUE_DUPLICATE.THRESHOLD:
+        raise action_error(message='unable to queue track. duplicate "track in queue" limit reached', code=400)
     
     # Check Que max length
     #karakara.queue.add.limit
