@@ -32,7 +32,7 @@ def queue_etag(request):
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='queue', request_method='GET')
-@etag(queue_etag)
+#@etag(queue_etag)
 @web
 def queue_view(request):
     """
