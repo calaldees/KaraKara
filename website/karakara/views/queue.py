@@ -41,15 +41,17 @@ def queue_view(request):
     queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
     queue = [queue_item.to_dict('full') for queue_item in queue]
     
-    trackids = [queue_item['track_id'] for queue_item in queue]    
-    tracks   = DBSession.query(Track).\
-                        filter(Track.id.in_(trackids)).\
-                        options(\
-                            joinedload(Track.tags),\
-                            joinedload(Track.attachments),\
-                            joinedload('tags.parent'),\
-                        )
-    tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
+    trackids = [queue_item['track_id'] for queue_item in queue]
+    tracks   = {}
+    if trackids:
+        tracks = DBSession.query(Track).\
+                            filter(Track.id.in_(trackids)).\
+                            options(\
+                                joinedload(Track.tags),\
+                                joinedload(Track.attachments),\
+                                joinedload('tags.parent'),\
+                            )
+        tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
 
     # HACK
     # AllanC - Hack to overlay title on API return.
@@ -95,14 +97,20 @@ def queue_add(request):
     except AssertionError:
         raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
     
-    # Duplicate Addition Restrictions
-    queue = _logic.queue_item_for_track(request, DBSession, track.id)
-    if queue['status']==_logic.QUEUE_DUPLICATE.THRESHOLD:
-        raise action_error(message='unable to queue track. duplicate "track in queue" limit reached', code=400)
-    
-    # Check Que max length
-    #karakara.queue.add.limit
-    #karakara.queue.add.priority_window
+    # If not admin, check addition restrictions
+    if not is_admin(request):
+        # Duplicate Addition Restrictions
+        track_queued = _logic.queue_item_for_track(request, DBSession, track.id)
+        if track_queued['status']==_logic.QUEUE_DUPLICATE.THRESHOLD:
+            raise action_error(message='unable to queue track. duplicate "track in queue" limit reached', code=400)
+        
+        # Max queue length restrictions
+        #karakara.queue.add.priority_window
+        queue_limit = request.registry.settings.get('karakara.queue.add.limit')
+        if queue_limit:
+            queue = queue_view(request)['data']['queue']
+            if queue and queue[-1]['total_duration'] > queue_limit:
+                raise action_error(message='queue limit reached', code=400)
     
     queue_item = QueueItem()
     for key,value in request.params.items():

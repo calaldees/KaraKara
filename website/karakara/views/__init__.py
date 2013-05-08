@@ -25,6 +25,10 @@ def base(target, *args, **kwargs):
     The base instructions to be executed for most calls
     """
     request = request_from_args(args)
+    
+    # Abort if internal call
+    if 'internal_request' in request.matchdict:
+        return target(*args, **kwargs)
 
     # The session id is abstracted from the framework. Keep a count/track id's as session values
     if 'id' not in request.session:
@@ -51,6 +55,10 @@ def overlay_identity(target, *args, **kwargs):
     """
     request = request_from_args(args)
     
+    # Abort if internal call
+    if 'internal_request' in request.matchdict:
+        return target(*args, **kwargs)
+    
     def overlay_identity_onto(target_dict):
         identity_dict = {}
         for key in ['id','admin','faves']:
@@ -70,6 +78,19 @@ def overlay_identity(target, *args, **kwargs):
     
     return result
 
+@decorator
+def mark_external_request(target, *args, **kwargs):
+    """
+    All the decorators fire on almost every call.
+    If we have 'internal_request' in our request, then most of the decorators should short circit and abort.
+    this enables us to use internal API calls.
+    decorators that may still fire for internal calls are things like cache lookup
+    This should be the absolute closest decorator to the actual method call as possible
+    """
+    request_from_args(args).matchdict['internal_request'] = True
+    return target(*args, **kwargs)
+
+
 #-------------------------------------------------------------------------------
 # Web - the decorators merged
 #-------------------------------------------------------------------------------
@@ -82,7 +103,7 @@ def chained(*dec_funs):
         return f
     return _inner_chain
 
-web  = chained(base, auto_format_output, overlay_identity)
+web  = chained(base, auto_format_output, overlay_identity, mark_external_request)
 
 
 #-------------------------------------------------------------------------------

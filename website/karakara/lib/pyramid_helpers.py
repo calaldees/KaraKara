@@ -54,8 +54,12 @@ def etag(etag_render_func=_etag_render_func_default):
     
     TODO: Only trigger on top level request
     """
-    def etag(f, *args, **kwargs):
+    def etag(target, *args, **kwargs):
         request = request_from_args(args)
+        
+        # Abort if internal call
+        if 'internal_request' in request.matchdict:
+            return target(*args, **kwargs)
         
         etag_enabled = request.registry.settings.get('server.etag.enabled')
         
@@ -65,7 +69,7 @@ def etag(etag_render_func=_etag_render_func_default):
                 log.debug('etag matched - aborting render - %s' % etag)
                 raise exception_response(304)
         
-        result = f(*args, **kwargs) # Execute the wrapped function
+        result = target(*args, **kwargs) # Execute the wrapped function
         
         if etag_enabled:
             log.debug('etag set - %s' % etag)

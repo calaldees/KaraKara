@@ -76,6 +76,10 @@ def auto_format_output(target, *args, **kwargs):
     # Extract request object from args
     request = request_from_args(args)
     
+    # Abort if internal call
+    if 'internal_request' in request.matchdict:
+        return target(*args, **kwargs)
+    
     # Pre Processing -----------------------------------------------------------
 
     # Find format string 'format' based on input params, to then find a render func 'formatter'  - add potential formats in order of precidence
