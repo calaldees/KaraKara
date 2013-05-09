@@ -220,12 +220,12 @@ def test_queue_limit(app, tracks):
     should retry there selection.
     """
     assert get_queue(app) == []
-    response = app.put('/settings', {'karakara.queue.add.limit'       :'0:05:00 -> timedelta',
+    response = app.put('/settings', {'karakara.queue.add.limit'       :'0:02:30 -> timedelta',  # 150sec
                                      'karakara.queue.template.padding':'0:00:30 -> timedelta'})
 
-    response = app.post('/queue', dict(track_id='t1', performer_name='bob1')) #1min30sec (1min track + 30sec padding)
-    response = app.post('/queue', dict(track_id='t1', performer_name='bob2')) #3min00sec (1min track + 30sec padding)
-    response = app.post('/queue', dict(track_id='t1', performer_name='bob3')) #4min30sec (1min track + 30sec padding)
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob1')) #total_duration = 0sec
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob2')) # 90sec (1min track + 30sec padding)
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob3')) #180sec (1min track + 30sec padding) - by adding this track we will be at 180sec, that is now OVER 150sec, the next addition will error
     response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True) # 6min > 5min
     assert response.status_code == 400
     
