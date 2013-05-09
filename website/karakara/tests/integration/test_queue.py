@@ -13,6 +13,12 @@ def del_queue(app, queue_item_id, expect_errors=False):
     """
     return app.post('/queue', {'method':'delete', 'queue_item.id':queue_item_id}, expect_errors=expect_errors)
 
+def clear_queue(app):
+    for queue_item in get_queue(app):
+        del_queue(app, queue_item['id'])
+    assert get_queue(app) == []
+
+
 
 # Tests ------------------------------------------------------------------------
 
@@ -189,17 +195,20 @@ def test_queue_template(app,tracks):
     """
     pass
 
+
 def test_queue_track_duplicate(app, tracks):
     """
     Adding duplicate tracks should error (if appsetting is set)
     """
-    response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'      1 -> int',
+    assert get_queue(app) == []
+    response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'1 -> int',
                                      'karakara.queue.add.duplicate.time_limit' :'1:00:00 -> timedelta'})
     response = app.post('/queue', dict(track_id='t1', performer_name='bob1'))
     response = app.post('/queue', dict(track_id='t1', performer_name='bob2'), expect_errors=True)
     assert response.status_code==400
-    del_queue(app,get_queue(app)[0]['id'])
-    assert get_queue(app) == []
+    
+    response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'0 -> int'})
+    clear_queue(app)
     
 
 def test_queue_limit(app, tracks):
@@ -210,4 +219,15 @@ def test_queue_limit(app, tracks):
     The user should be informed by the status flash message how long before they
     should retry there selection.
     """
-    pass
+    assert get_queue(app) == []
+    response = app.put('/settings', {'karakara.queue.add.limit'       :'0:05:00 -> timedelta',
+                                     'karakara.queue.template.padding':'0:00:30 -> timedelta'})
+
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob1')) #1min30sec (1min track + 30sec padding)
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob2')) #3min00sec (1min track + 30sec padding)
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob3')) #4min30sec (1min track + 30sec padding)
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True) # 6min > 5min
+    assert response.status_code == 400
+    
+    response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
+    clear_queue(app)

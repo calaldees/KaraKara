@@ -47,7 +47,7 @@ def queue_item_for_track(request, DBSession, track_id):
     pending = [q for q in queue_items if q.status=='pending']
     
     status  = QUEUE_DUPLICATE.NONE
-    if len(played+pending) > count_limit:
+    if count_limit and len(played+pending) > count_limit:
         status = QUEUE_DUPLICATE.THRESHOLD
     elif pending:
         status = QUEUE_DUPLICATE.PENDING

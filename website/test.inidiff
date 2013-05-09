@@ -3,4 +3,8 @@ sqlalchemy.url = sqlite:///%(here)s/KaraKara_test.db
 
 karakara.server.mode = test
 
+karakara.queue.add.limit                 = 0:00:00 -> timedelta
+karakara.queue.add.duplicate.count_limit = 0       -> int
+
+
 server.etag_enabled = False -> bool

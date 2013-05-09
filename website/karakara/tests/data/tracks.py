@@ -103,7 +103,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
     tracks_data = [
         {
             'id'      :"t1",
-            'duration': 100,
+            'duration': 60, # 1min
             'tags':[
                 'title      :Test Track 1',
                 #'description:Test track for the KaraKara system with キ',
@@ -114,7 +114,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
         },
         {
             'id'      :"t2",
-            'duration': 200,
+            'duration': 120, # 2min
             'tags':[
                 'title      :Test Track 2',
                 #'description:Test track for the KaraKara system with キ'
@@ -125,7 +125,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
         },
         {
             'id'      :"t3",
-            'duration': 300,
+            'duration': 240, # 4min
             'tags':[
                 'title      :Test Track 3 キ',
                 #'description:Test track for the KaraKara system with キ',
@@ -135,7 +135,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
         },
         {
             'id'      :"xxx",
-            'duration': 400,
+            'duration': 300, # 5min
             'tags':[
                 'title      :Wildcard',
                 'fr',
