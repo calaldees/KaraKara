@@ -123,7 +123,7 @@ def queue_add(request):
     queue_updated() # Invalidate Cache
     
     log.info('%s added to queue by %s' % (queue_item.track_id, queue_item.performer_name))
-    return action_ok(message='track queued')
+    return action_ok(message='track queued') #TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
 
 
 @view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',

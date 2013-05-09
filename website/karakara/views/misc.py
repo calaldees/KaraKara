@@ -4,6 +4,7 @@ import re
 
 from . import web, method_put_router
 from ..lib.auto_format import action_ok
+from ..lib.misc import convert_str_with_type
 
 
 #-------------------------------------------------------------------------------

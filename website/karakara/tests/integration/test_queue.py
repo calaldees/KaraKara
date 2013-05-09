@@ -58,7 +58,7 @@ def test_queue_errors(app, tracks):
     assert 'not exist' in response.text
 
 
-@unimplemented
+#@unimplemented
 def test_queue_permissions(app, tracks):
     """
     Check only the correct users can remove a queued item
@@ -70,7 +70,7 @@ def test_queue_permissions(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     queue_item_id = get_queue(app)[0]['id']
     # Try to move the track (only admins can move things)
-    response = app.put('/queue', {'queue_item.id':queue_item_id}, expect_errors=True)
+    response = app.put('/queue', {'queue_item.id':queue_item_id, 'queue_item.move.target_id':'any_data'}, expect_errors=True)
     assert response.status_code == 403
     # Clear the cookies (ensure we are a new user)
     app.cookiejar.clear()
@@ -132,6 +132,8 @@ def test_queue_played(app, tracks):
     assert 'update' in response.json['messages'][0]
     response = app.get('/admin')
     
+    # TODO: skipped status needs testing too
+    
     assert get_queue(app) == []
     #assert DBSession.query # could query actual queue item in db, but that would mean more imports
 
@@ -187,6 +189,18 @@ def test_queue_template(app,tracks):
     """
     pass
 
+def test_queue_track_duplicate(app, tracks):
+    """
+    Adding duplicate tracks should error (if appsetting is set)
+    """
+    response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'      1 -> int',
+                                     'karakara.queue.add.duplicate.time_limit' :'1:00:00 -> timedelta'})
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob1'))
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob2'), expect_errors=True)
+    assert response.status_code==400
+    del_queue(app,get_queue(app)[0]['id'])
+    assert get_queue(app) == []
+    
 
 def test_queue_limit(app, tracks):
     """
