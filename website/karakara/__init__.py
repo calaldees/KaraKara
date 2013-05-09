@@ -13,7 +13,7 @@ import pyramid_beaker
 import re
 
 # Package Imports
-from .lib.misc import convert_str
+from .lib.misc import convert_str_with_type
 from .lib.auto_format import registered_formats
 from .templates import helpers as template_helpers
 
@@ -35,11 +35,7 @@ def main(global_config, **settings):
     
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
-        try:
-            value, return_type = config.registry.settings[key].split('->')
-            config.registry.settings[key] = convert_str(value.strip(), return_type.strip())
-        except (ValueError, AttributeError) as e:
-            pass
+        config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
     
     # Renderers ----------------------------------------------------------------
     

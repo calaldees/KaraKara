@@ -169,7 +169,14 @@ def strip_non_base_types(d):
             return [strip_non_base_types(value) for value in d]
     return None
 
-    
+
+def convert_str_with_type(value_string, value_split='->'):
+    try:
+        value, return_type = value_string.split(value_split)
+        return convert_str(value.strip(), return_type.strip())
+    except (ValueError, AttributeError) as e:
+        return value_string
+
 def convert_str(value, return_type):
     if not value or not isinstance(value, str) or not return_type:
         return value

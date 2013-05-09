@@ -11,7 +11,6 @@ from decorator import decorator
 import logging
 log = logging.getLogger(__name__)
 
-    
 
 
 def request_from_args(args):

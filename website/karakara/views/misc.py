@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 import re
 
-from . import web
+from . import web, method_put_router
 from ..lib.auto_format import action_ok
 
 
@@ -28,6 +28,11 @@ def settings(request):
     Surface settings as an API.
     This allows clients to qurey server settup rather than having to hard code bits into the clients
     """
+    # with PUT requests, update settings
+    if request.registry.settings.get('karakara.server.mode')!='production' and method_put_router(None, request):
+        for key, value in request.params.items():
+            request.registry.settings[key] = convert_str_with_type(value)
+    
     setting_regex = re.compile(request.registry.settings.get('api.settings.regex','TODOmatch_nothing_regex'))
     return action_ok(
         data={

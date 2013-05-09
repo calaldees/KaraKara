@@ -97,7 +97,7 @@ def queue_add(request):
     except AssertionError:
         raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
     
-    # If not admin, check addition restrictions
+    # If not admin, check additional restrictions
     if not is_admin(request):
         # Duplicate Addition Restrictions
         track_queued = _logic.queue_item_for_track(request, DBSession, track.id)

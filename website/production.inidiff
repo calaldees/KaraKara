@@ -5,6 +5,7 @@ text.title = KaraKara
 #sqlalchemy.url = postgresql+pypostgresql://karakara:kara4000@localhost/karakara
 sqlalchemy.url = sqlite:///%(here)s/KaraKara_test.db
 server.etag_enabled = True -> bool
+karakara.server.mode = production
 
 [logger_root]
 level = WARN

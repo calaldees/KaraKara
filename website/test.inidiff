@@ -1,4 +1,6 @@
 [app:main]
 sqlalchemy.url = sqlite:///%(here)s/KaraKara_test.db
 
+karakara.server.mode = test
+
 server.etag_enabled = False -> bool
