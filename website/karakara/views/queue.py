@@ -1,7 +1,7 @@
 import datetime
 from pyramid.view import view_config
 
-from . import web, etag, method_delete_router, method_put_router, is_admin, _logic
+from . import web, etag, etag_generate, method_delete_router, method_put_router, is_admin ,_logic
 
 from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession, commit
@@ -18,21 +18,21 @@ log = logging.getLogger(__name__)
 
 # Fake Etag placeholder
 from ..lib.misc import random_string
-queue_instance_id = None
+queue_version = None
 def queue_updated():
-    global queue_instance_id
-    queue_instance_id = random_string()
+    global queue_version
+    queue_version = random_string()
 queue_updated()
-def queue_etag(request):
-    global queue_instance_id
-    return queue_instance_id + request.session.get('id','') + str(request.session.get('admin',False)) + str(request.session.peek_flash())
+def etag_generate_queue(request):
+    global queue_version
+    return '-'.join([etag_generate(request), queue_version])
 
 #-------------------------------------------------------------------------------
 # Queue
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='queue', request_method='GET')
-#@etag(queue_etag)
+@etag(etag_generate_queue)
 @web
 def queue_view(request):
     """

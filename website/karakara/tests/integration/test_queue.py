@@ -63,8 +63,26 @@ def test_queue_errors(app, tracks):
     assert response.status_code == 400
     assert 'not exist' in response.text
 
+    response = app.put('/queue', {'queue_item.id':'not_real_id'}, expect_errors=True)
+    assert response.status_code == 404
+    assert 'invalid queue_item.id' in response.text
 
-#@unimplemented
+
+def test_queue_etag(app, tracks):
+    response = app.get('/queue')
+    etag = response.etag
+
+    response = app.get('/queue')
+    assert etag == response.etag
+    
+    response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    
+    response = app.get('/queue')
+    assert etag != response.etag
+    
+    clear_queue(app)
+    
+
 def test_queue_permissions(app, tracks):
     """
     Check only the correct users can remove a queued item
@@ -106,10 +124,6 @@ def test_queue_view_update(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     app.cookiejar.clear() # Loose the cookie so we are not identifyed as the creator of this queue item.
     
-    response = app.put('/queue', {'queue_item.id':'not_real_id'}, expect_errors=True)
-    assert response.status_code == 400
-    assert 'invalid queue_item.id' in response.text
-
     response = del_queue(app, queue_item_id, expect_errors=True)
 
     # What status's are updated?
@@ -213,7 +227,7 @@ def test_queue_track_duplicate(app, tracks):
 
 def test_queue_limit(app, tracks):
     """
-    Users should not be able to queue over 45 minuets of tracks (settable in config)
+    Users should not be able to queue over xx minuets of tracks (settable in config)
     Users trying to add tracks after this time have a 'window period of priority'
     where they have first dibs.
     The user should be informed by the status flash message how long before they
@@ -226,7 +240,7 @@ def test_queue_limit(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='bob1')) #total_duration = 0sec
     response = app.post('/queue', dict(track_id='t1', performer_name='bob2')) # 90sec (1min track + 30sec padding)
     response = app.post('/queue', dict(track_id='t1', performer_name='bob3')) #180sec (1min track + 30sec padding) - by adding this track we will be at 180sec, that is now OVER 150sec, the next addition will error
-    response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True) # 6min > 5min
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
     assert response.status_code == 400
     
     response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})

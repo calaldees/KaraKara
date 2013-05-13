@@ -83,11 +83,13 @@ def substring_in(substrings, string_list, ignore_case=True):
                 return True
     return False
 
-def normalize_datetime(d, accuracy='hour'):
+def normalize_datetime(d=None, accuracy='hour'):
     """
     Normalizez datetime down to hour or day
     Dates are immutable (thank god)
     """
+    if not d:
+        d = datetime.datetime.now()
     if   accuracy=='hour':
         return d.replace(minute=0, second=0, microsecond=0)
     elif accuracy=='day' :

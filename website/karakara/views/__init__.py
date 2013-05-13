@@ -1,10 +1,10 @@
 from decorator import decorator
 from ..lib.misc            import random_string
-from ..lib.pyramid_helpers import request_from_args, etag
+from ..lib.pyramid_helpers import request_from_args, etag, _etag_render_func_default
 from ..lib.auto_format     import auto_format_output, action_error
 
 __all__ = [
-    'base','overlay_identity','auto_format_output','web','etag'
+    'base','overlay_identity','auto_format_output','web','etag', 'etag_generate'
     'method_delete_router', 'method_put_router',
 ]
 
@@ -126,3 +126,9 @@ def method_put_router(info, request):
 # AllanC - need to look into Pyramids security model
 def is_admin(request):
     return request.session.get('admin',False)  # request.session['admin']
+
+#-------------------------------------------------------------------------------
+# eTag
+#-------------------------------------------------------------------------------
+def etag_generate(request):
+    return '-'.join([_etag_render_func_default(request), str(is_admin(request)), str(request.session.peek_flash())])

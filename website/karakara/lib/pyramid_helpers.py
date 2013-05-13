@@ -7,6 +7,7 @@ from pyramid.httpexceptions import exception_response
 
 from decorator import decorator
 
+from .misc import normalize_datetime
 
 import logging
 log = logging.getLogger(__name__)
