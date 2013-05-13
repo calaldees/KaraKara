@@ -1,6 +1,6 @@
 from decorator import decorator
 from ..lib.misc            import random_string
-from ..lib.pyramid_helpers import request_from_args, etag, _etag_render_func_default
+from ..lib.pyramid_helpers import request_from_args, etag, _generate_cache_key_default
 from ..lib.auto_format     import auto_format_output, action_error
 
 __all__ = [
@@ -130,5 +130,5 @@ def is_admin(request):
 #-------------------------------------------------------------------------------
 # eTag
 #-------------------------------------------------------------------------------
-def etag_generate(request):
-    return '-'.join([_etag_render_func_default(request), str(is_admin(request)), str(request.session.peek_flash())])
+def generate_cache_key(request):
+    return '-'.join([_generate_cache_key_default(request), str(is_admin(request)), str(request.session.peek_flash())])

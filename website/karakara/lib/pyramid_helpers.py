@@ -26,7 +26,7 @@ def request_from_args(args):
 # TODO: etag should be the cache key - maybe rename method?
 
 
-def _etag_render_func_default(request):
+def _generate_cache_key_default(request):
     return "-".join([
         request.path_qs,
         normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime(),
@@ -34,7 +34,7 @@ def _etag_render_func_default(request):
         # request.session_id ??,
     ])
 
-def etag(etag_render_func=_etag_render_func_default):
+def etag(generate_cache_key=_generate_cache_key_default):
     """
     eTag decorator
     
@@ -64,7 +64,7 @@ def etag(etag_render_func=_etag_render_func_default):
         etag_enabled = request.registry.settings.get('server.etag.enabled')
         
         if etag_enabled:
-            etag = etag_render_func(request)
+            etag = generate_cache_key(request)
             if etag and etag in request.if_none_match:
                 log.debug('etag matched - aborting render - %s' % etag)
                 raise exception_response(304)
