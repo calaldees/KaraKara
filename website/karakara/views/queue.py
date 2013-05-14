@@ -110,6 +110,7 @@ def queue_add(request):
         if queue_limit:
             queue = queue_view(request)['data']['queue']
             if queue and queue[-1]['total_duration'] > queue_limit:
+                #request.response.set_cookie('abc','12345');
                 raise action_error(message='queue limit reached', code=400)
     
     queue_item = QueueItem()

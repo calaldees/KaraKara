@@ -230,8 +230,8 @@ register_formater('rss', format_rss)
 
 # HTML ------------------------------
 def format_html(request, result):
-    response = render_template(request, result, 'html')
-    return response
+    request.response = render_template(request, result, 'html')
+    return request.response
 register_formater('html', format_html)
 
 # Redirect---------------------------
