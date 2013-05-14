@@ -207,24 +207,24 @@ def json_object_handler(obj):
         return obj.total_seconds()
     raise TypeError
 def format_json(request, result):
-    response = pyramid.response.Response(json.dumps(result, default=json_object_handler))
-    response.headers['Content-type'] = "application/json; charset=utf-8"
-    return response
+    request.response.text = json.dumps(result, default=json_object_handler)
+    request.response.content_type = "application/json; charset=utf-8"
+    return request.response
 register_formater('json', format_json)
 
 # XML -------------------------------
 from .xml import dictToXMLString
 def format_xml(request, result):
     xml_head = '<?xml version="1.0" encoding="UTF-8"?>'.encode('utf-8')
-    response = pyramid.response.Response(xml_head + dictToXMLString(result)) 
-    response.headers['Content-type'] = "text/xml; charset=utf-8"
-    return response
+    request.response.body = xml_head + dictToXMLString(result)
+    request.response.content_type = "text/xml; charset=utf-8"
+    return request.response
 register_formater('xml', format_xml)
 
 # RSS -------------------------------
 def format_rss(request, result):
     response = render_template(request, result, 'rss')
-    response.headers['Content-type'] = "application/rss+xml; charset=utf-8"
+    request.response.content_type = "application/rss+xml; charset=utf-8"
     return response
 register_formater('rss', format_rss)
 
