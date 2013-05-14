@@ -62,5 +62,7 @@
         
         </div><!-- /page -->
         
+        <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
+        
     </body>
 </html>
