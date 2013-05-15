@@ -7,8 +7,10 @@ __all__ = [
     "PriorityToken",
 ]
 
-import datetime
-now = lambda: datetime.datetime.now()
+import copy
+
+from karakara.lib.misc import now
+
 
 
 
@@ -28,3 +30,13 @@ class PriorityToken(Base):
     session_owner   = Column(Unicode() , nullable=False)
     start           = Column(DateTime(), nullable=False)
     end             = Column(DateTime(), nullable=False)
+
+    __to_dict__ = copy.deepcopy(Base.__to_dict__)
+    __to_dict__.update({
+        'default': {
+            'id'            : None ,
+            'issued'        : None ,
+            'start'         : None ,
+            'end'           : None ,
+        },
+    })

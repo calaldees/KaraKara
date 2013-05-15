@@ -60,16 +60,23 @@ def queue_item_for_track(request, DBSession, track_id):
     return {'played':played, 'pending':pending, 'status':status}
 
 def new_priority_token(request, DBSession):
-    event_end = request.registry.settings.get('karakara.event.end')
+    event_end       = request.registry.settings.get('karakara.event.end')
+    priority_window = request.registry.settings.get('karakara.queue.add.priority_window')
 
-    oldest_token = DBSession.query(PriorityToken).order_by(PriorityToken.end.desc()).limit(1).one()
+    latest_token = DBSession.query(PriorityToken).filter(used==False).order_by(PriorityToken.end.desc()).limit(1).one()
     
-    if event_end and oldest_token > event_end:
+    if event_end and latest_token.end > event_end:
         # Unable to issue token as event end
         pass
     
-    session_owner = request.session['id']
+    priority_token = PriorityToken()
+    priority_token.session_owner = request.session['id']
+    priority_token.start = latest_token.end
+    priority_token.end   = latest_token.end + priority_window
     
+    DBSession.add(priority_token)
+    
+    return priority_token
     
 
 

@@ -186,9 +186,8 @@ def convert_str_with_type(value_string, value_split='->'):
     """
     >>> convert_str_with_type("5 -> int")
     5
-    
-    #>>> convert_str_with_type("00:00:01 -> timedelta")
-    #datetime.timedelta(1)
+    >>> convert_str_with_type("00:00:01 -> timedelta")
+    datetime.timedelta(0, 1)
     """
     try:
         value, return_type = value_string.split(value_split)
