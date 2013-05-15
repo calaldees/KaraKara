@@ -4,6 +4,16 @@ import datetime
 
 from pyramid.settings import asbool
 
+# TODO - @property to get/set now?
+_now_override = None
+def now(new_override=None):
+    global _now_override
+    if new_override:
+        _now_override = new_override
+    if _now_override:
+        return _now_override
+    return datetime.datetime.now()
+
 
 def get_fileext(filename):
     try:
@@ -173,6 +183,13 @@ def strip_non_base_types(d):
 
 
 def convert_str_with_type(value_string, value_split='->'):
+    """
+    >>> convert_str_with_type("5 -> int")
+    5
+    
+    #>>> convert_str_with_type("00:00:01 -> timedelta")
+    #datetime.timedelta(1)
+    """
     try:
         value, return_type = value_string.split(value_split)
         return convert_str(value.strip(), return_type.strip())
@@ -180,6 +197,16 @@ def convert_str_with_type(value_string, value_split='->'):
         return value_string
 
 def convert_str(value, return_type):
+    """
+    >>> convert_str('bob', None)
+    'bob'
+    >>> convert_str('1', int)
+    1
+    >>> convert_str('yes', 'bool')
+    True
+    >>> convert_str('a,b ,c', 'list')
+    ['a', 'b', 'c']
+    """
     if not value or not isinstance(value, str) or not return_type:
         return value
     if return_type=='bool' or return_type==bool:

@@ -1,11 +1,14 @@
 from . import Base
 
 from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, Integer, DateTime, Float
+from sqlalchemy     import String, Unicode, Integer, DateTime, Float, Boolean
 
 __all__ = [
     "PriorityToken",
 ]
+
+import datetime
+now = lambda: datetime.datetime.now()
 
 
 
@@ -19,4 +22,9 @@ class PriorityToken(Base):
     """
     __tablename__   = "priority_tokens"
 
-    id              = Column(Integer(),        primary_key=True)
+    id              = Column(Integer() , primary_key=True)
+    issued          = Column(DateTime(), nullable=False, default=now)
+    used            = Column(Boolean() , nullable=False, default=False)
+    session_owner   = Column(Unicode() , nullable=False)
+    start           = Column(DateTime(), nullable=False)
+    end             = Column(DateTime(), nullable=False)

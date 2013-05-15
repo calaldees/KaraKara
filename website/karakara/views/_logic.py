@@ -8,12 +8,15 @@ Acess to settings does not belong in the model
 import datetime
 from sqlalchemy import or_, and_
 
+from karakara.lib.misc import now
 from karakara.model.model_queue import QueueItem
 
 
 __all__ = [
     'queue_item_for_track', 'QUEUE_DUPLICATE',
 ]
+
+
 
 # Constants ----------
 
@@ -56,4 +59,27 @@ def queue_item_for_track(request, DBSession, track_id):
 
     return {'played':played, 'pending':pending, 'status':status}
 
+def new_priority_token(request, DBSession):
+    event_end = request.registry.settings.get('karakara.event.end')
 
+    oldest_token = DBSession.query(PriorityToken).order_by(PriorityToken.end.desc()).limit(1).one()
+    
+    if event_end and oldest_token > event_end:
+        # Unable to issue token as event end
+        pass
+    
+    session_owner = request.session['id']
+    
+    
+
+
+def get_priority_token(request, DBSession):
+    session_owner = request.session['id']
+    tokens = DBSession.query(PriorityToken) \
+        .filter(PriorityToken.session_owner==session_owner) \
+        .filter(PriorityToken.start>=now, PriorityToken.end<now) \
+        .all()
+    if tokens:
+        #DBSession.delete(token[0])
+        return tokens[0]
+    return None
