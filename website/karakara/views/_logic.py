@@ -77,6 +77,11 @@ def issue_priority_token(request, DBSession):
         # Unable to issue token as event end
         return None
     
+    priority_token_limit = request.registry.settings.get('karakara.queue.add.limit.priority_token')
+    if priority_token_limit and latest_token_end > now()+priority_token_limit:
+        # Unable to issue token as priority tokens are time limited
+        return None
+    
     priority_window = request.registry.settings.get('karakara.queue.add.priority_window')
     
     priority_token = PriorityToken()

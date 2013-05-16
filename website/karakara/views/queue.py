@@ -4,6 +4,7 @@ from pyramid.view import view_config
 from . import web, etag, generate_cache_key, method_delete_router, method_put_router, is_admin ,_logic
 
 from ..lib.auto_format    import action_ok, action_error
+from ..lib.misc           import now
 from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
 from ..model.model_tracks import Track
@@ -112,7 +113,7 @@ def queue_add(request):
             queue = queue_view(request)['data']['queue']
             if queue:
                 queue_end = queue[-1]['total_duration']
-                if event_end and queue_end > event_end:
+                if event_end and now()+queue_end > event_end:
                     raise action_error(message='event submissions are closed', code=400)
                 if queue_limit and queue_end > queue_limit:
                     priority_token = _logic.issue_priority_token(request, DBSession)
