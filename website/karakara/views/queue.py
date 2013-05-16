@@ -107,11 +107,16 @@ def queue_add(request):
         # Max queue length restrictions
         #karakara.queue.add.priority_window
         queue_limit = request.registry.settings.get('karakara.queue.add.limit')
-        if queue_limit:
+        event_end   = request.registry.settings.get('karakara.event.end')
+        if queue_limit or event_end:
             queue = queue_view(request)['data']['queue']
-            if queue and queue[-1]['total_duration'] > queue_limit:
-                #request.response.set_cookie('abc','12345');
-                raise action_error(message='queue limit reached', code=400)
+            if queue:
+                queue_end = queue[-1]['total_duration']
+                if event_end and queue_end > event_end:
+                    raise action_error(message='event submissions are closed', code=400)
+                if queue_limit and queue_end > queue_limit:
+                    priority_token = _logic.issue_priority_token(request, DBSession)
+                    raise action_error(message='queue limit reached', code=400)
     
     queue_item = QueueItem()
     for key,value in request.params.items():

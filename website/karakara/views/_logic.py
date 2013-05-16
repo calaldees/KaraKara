@@ -6,14 +6,17 @@ The rational behind placing these in the views is because they can acess pyramid
 Acess to settings does not belong in the model
 """
 import datetime
+import json
 from sqlalchemy import or_, and_
+from sqlalchemy.orm.exc import NoResultFound
 
 from karakara.lib.misc import now
 from karakara.model.model_queue import QueueItem
-
+from karakara.model.model_token import PriorityToken
 
 __all__ = [
     'queue_item_for_track', 'QUEUE_DUPLICATE',
+    'issue_priority_token',
 ]
 
 
@@ -59,22 +62,30 @@ def queue_item_for_track(request, DBSession, track_id):
 
     return {'played':played, 'pending':pending, 'status':status}
 
-def new_priority_token(request, DBSession):
-    event_end       = request.registry.settings.get('karakara.event.end')
-    priority_window = request.registry.settings.get('karakara.queue.add.priority_window')
 
-    latest_token = DBSession.query(PriorityToken).filter(used==False).order_by(PriorityToken.end.desc()).limit(1).one()
+def issue_priority_token(request, DBSession):
+    # Aquire most recent priority token
+    try:
+        latest_token = DBSession.query(PriorityToken).filter(PriorityToken.used==False).order_by(PriorityToken.end.desc()).limit(1).one()
+        latest_token_end = latest_token.end
+    except NoResultFound:
+        latest_token_end = now()
     
-    if event_end and latest_token.end > event_end:
+    # Do not issue tokens past the end of the event
+    event_end = request.registry.settings.get('karakara.event.end')
+    if event_end and latest_token_end > event_end:
         # Unable to issue token as event end
-        pass
+        return None
+    
+    priority_window = request.registry.settings.get('karakara.queue.add.priority_window')
     
     priority_token = PriorityToken()
     priority_token.session_owner = request.session['id']
-    priority_token.start = latest_token.end
-    priority_token.end   = latest_token.end + priority_window
-    
+    priority_token.start = latest_token_end
+    priority_token.end   = latest_token_end + priority_window
     DBSession.add(priority_token)
+
+    request.response.set_cookie('priority_token',json.dumps(priority_token.to_dict()));
     
     return priority_token
     
