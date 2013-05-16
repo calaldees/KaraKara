@@ -28,8 +28,8 @@ class PriorityToken(Base):
     issued          = Column(DateTime(), nullable=False, default=now)
     used            = Column(Boolean() , nullable=False, default=False)
     session_owner   = Column(Unicode() , nullable=False)
-    start           = Column(DateTime(), nullable=False)
-    end             = Column(DateTime(), nullable=False)
+    valid_start     = Column(DateTime(), nullable=False)
+    valid_end       = Column(DateTime(), nullable=False)
 
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({

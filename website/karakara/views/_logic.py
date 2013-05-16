@@ -66,8 +66,8 @@ def queue_item_for_track(request, DBSession, track_id):
 def issue_priority_token(request, DBSession):
     # Aquire most recent priority token
     try:
-        latest_token = DBSession.query(PriorityToken).filter(PriorityToken.used==False).order_by(PriorityToken.end.desc()).limit(1).one()
-        latest_token_end = latest_token.end
+        latest_token = DBSession.query(PriorityToken).filter(PriorityToken.used==False).order_by(PriorityToken.valid_end.desc()).limit(1).one()
+        latest_token_end = latest_token.valid_end
     except NoResultFound:
         latest_token_end = now()
     
@@ -86,23 +86,25 @@ def issue_priority_token(request, DBSession):
     
     priority_token = PriorityToken()
     priority_token.session_owner = request.session['id']
-    priority_token.start = latest_token_end
-    priority_token.end   = latest_token_end + priority_window
+    priority_token.valid_start = latest_token_end
+    priority_token.valid_end   = latest_token_end + priority_window
     DBSession.add(priority_token)
 
     request.response.set_cookie('priority_token',json.dumps(priority_token.to_dict()));
     
     return priority_token
+
+def consume_priority_token(request, DBSession):
+    try:
+        token = DBSession.query(PriorityToken) \
+            .filter(PriorityToken.used==False) \
+            .filter(PriorityToken.session_owner==request.session['id']) \
+            .filter(PriorityToken.valid_start>=now(), PriorityToken.valid_end<now()) \
+            .one()
+        token.used = True
+        request.unset_cookie('priority_token') # may not work with format='redirect'
+        #DBSession.delete(token)
+        return True
+    except NoResultFound:
+        return False
     
-
-
-def get_priority_token(request, DBSession):
-    session_owner = request.session['id']
-    tokens = DBSession.query(PriorityToken) \
-        .filter(PriorityToken.session_owner==session_owner) \
-        .filter(PriorityToken.start>=now, PriorityToken.end<now) \
-        .all()
-    if tokens:
-        #DBSession.delete(token[0])
-        return tokens[0]
-    return None
