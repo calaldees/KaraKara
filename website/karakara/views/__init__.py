@@ -13,6 +13,12 @@ __all__ = [
 # Global Variables
 #-------------------------------------------------------------------------------
 
+from dogpile.cache import make_region
+from dogpile.cache.api import NO_VALUE as cache_none
+
+cache = make_region().configure(
+    'dogpile.cache.memory'
+)
 
 
 
