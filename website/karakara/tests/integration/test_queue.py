@@ -1,5 +1,7 @@
 from karakara.tests.conftest import unimplemented, unfinished, xfail
 
+import json
+
 # Utils ------------------------------------------------------------------------
 
 def get_queue(app):
@@ -17,6 +19,9 @@ def clear_queue(app):
     for queue_item in get_queue(app):
         del_queue(app, queue_item['id'])
     assert get_queue(app) == []
+
+def get_cookie(app, key):
+    return json.loads({cookie.name:cookie for cookie in app.cookiejar}[key].value)
 
 
 
@@ -251,8 +256,8 @@ def test_queue_limit(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
     assert response.status_code == 400
     
-    #assert False
-    #{cookie.name:cookie for cookie in app.cookiejar}
+    get_cookie(app, 'priority_token')
+    assert False
     
     response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
     clear_queue(app)

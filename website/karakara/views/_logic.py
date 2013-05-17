@@ -10,7 +10,7 @@ import json
 from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
 
-from karakara.lib.misc import now
+from karakara.lib.misc import now, json_object_handler
 from karakara.model.model_queue import QueueItem
 from karakara.model.model_token import PriorityToken
 
@@ -64,12 +64,15 @@ def queue_item_for_track(request, DBSession, track_id):
 
 
 def issue_priority_token(request, DBSession):
-    # Aquire most recent priority token
+    # Aquire most recent priority token - if most recent token in past, set recent token to now
     try:
         latest_token = DBSession.query(PriorityToken).filter(PriorityToken.used==False).order_by(PriorityToken.valid_end.desc()).limit(1).one()
         latest_token_end = latest_token.valid_end
     except NoResultFound:
-        latest_token_end = now()
+        latest_token_end = None
+    if not latest_token_end or latest_token_end < now():
+        # TODO: Should not really be now(), should be end of queue, if the queue is empty then now is sufficent
+        latest_token_end = now() # humm ... no
     
     # Do not issue tokens past the end of the event
     event_end = request.registry.settings.get('karakara.event.end')
@@ -82,6 +85,18 @@ def issue_priority_token(request, DBSession):
         # Unable to issue token as priority tokens are time limited
         return None
     
+    # Do not issue another priority_token if current user alrady has a priority_token
+    try:
+        priority_token = DBSession.query(PriorityToken) \
+                            .filter(PriorityToken.used==False) \
+                            .filter(PriorityToken.session_owner==request.session['id']) \
+                            .filter(PriorityToken.valid_end>now()) \
+                            .one()
+        if priority_token:
+            return None
+    except NoResultFound:
+        pass
+    
     priority_window = request.registry.settings.get('karakara.queue.add.priority_window')
     
     priority_token = PriorityToken()
@@ -90,7 +105,7 @@ def issue_priority_token(request, DBSession):
     priority_token.valid_end   = latest_token_end + priority_window
     DBSession.add(priority_token)
 
-    request.response.set_cookie('priority_token',json.dumps(priority_token.to_dict()));
+    request.response.set_cookie('priority_token',json.dumps(priority_token.to_dict(), default=json_object_handler));
     
     return priority_token
 

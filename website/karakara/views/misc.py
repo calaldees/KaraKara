@@ -14,6 +14,9 @@ from ..lib.misc import convert_str_with_type
 @web
 def home(request):
     #request.session.flash('Hello World')
+    from ..model import DBSession
+    from ._logic import issue_priority_token
+    issue_priority_token(request, DBSession)
     return action_ok()
 
 @view_config(route_name='admin_toggle')

@@ -91,7 +91,6 @@ def obj_to_dict(obj, field_processors):
     d = {}
     for field_name, field_processor in field_processors.items():
         field_value = None
-        
         # Get value ------------------------------------------------------------
         if not field_processor:         # No processor - just get value
             field_value = getattr(obj,field_name,'')
@@ -105,11 +104,11 @@ def obj_to_dict(obj, field_processors):
                 pass
             elif field_value_type in [int, float, bool]:
                 pass
-            elif field_value_type == datetime.datetime:
-                field_value = field_value.strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                try   : field_value = str(field_value)
-                except: raise Exception('Object types are not allowed in object dictionaries [%s]' % (field_name, ))
+            #elif isinstance(field_value, datetime.datetime):
+            #    field_value = field_value.strftime("%Y-%m-%d %H:%M:%S")
+            #else:
+            #    try   : field_value = str(field_value)
+            #    except: raise Exception('Object types are not allowed in object dictionaries [%s]' % (field_name, ))
         
         d[field_name] = field_value
     return d

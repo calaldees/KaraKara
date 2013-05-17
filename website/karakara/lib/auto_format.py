@@ -13,7 +13,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from .pyramid_helpers import request_from_args
-
+from .misc import json_object_handler
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -200,12 +200,6 @@ register_formater('python', lambda result:result)
 # JSON -----------------------------
 import json
 import datetime
-def json_object_handler(obj):
-    if isinstance(obj, datetime.datetime):
-        return obj.isoformat()
-    if isinstance(obj, datetime.timedelta):
-        return obj.total_seconds()
-    raise TypeError
 def format_json(request, result):
     request.response.text = json.dumps(result, default=json_object_handler)
     request.response.content_type = "application/json; charset=utf-8"

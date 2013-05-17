@@ -34,9 +34,9 @@ class PriorityToken(Base):
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
-            'id'            : None ,
-            'issued'        : None ,
-            'start'         : None ,
-            'end'           : None ,
+            #'id'            : None ,
+            #'issued'        : None ,
+            'valid_start'   : None ,
+            'valid_end'     : None ,
         },
     })

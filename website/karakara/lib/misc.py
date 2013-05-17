@@ -15,6 +15,18 @@ def now(new_override=None):
         return _now_override
     return datetime.datetime.now()
 
+def json_object_handler(obj):
+    """
+    Used with json lib to serialize json output
+    e.g
+    text = json.dumps(result, default=json_object_handler)
+    """
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    if isinstance(obj, datetime.timedelta):
+        return obj.total_seconds()
+    raise TypeError
+
 
 def get_fileext(filename):
     try:
