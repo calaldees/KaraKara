@@ -14,6 +14,8 @@ from ..templates.helpers import track_title
 from sqlalchemy.orm     import joinedload, joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
+from .tracks import invalidate_track
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -135,6 +137,7 @@ def queue_add(request):
     DBSession.add(queue_item)
     
     queue_updated() # Invalidate Cache
+    invalidate_track(track.id)
     
     log.info('%s added to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     return action_ok(message='track queued') #TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
@@ -162,6 +165,7 @@ def queue_del(request):
     queue_item.status = request.params.get('status','removed')
     
     queue_updated() # Invalidate Cache
+    invalidate_track(queue_item.track_id)
     
     return action_ok(message='queue_item status changed')
 
@@ -205,5 +209,6 @@ def queue_update(request):
     queue_item.time_touched = datetime.datetime.now() # Update touched timestamp
 
     queue_updated() # Invalidate Cache
+    invalidate_track(queue_item.track_id)
 
     return action_ok(message='queue_item updated')

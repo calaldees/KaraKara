@@ -69,8 +69,7 @@ def track_view(request):
         track['queue']['pending'] = queue_item_list_to_dict(track['queue']['pending'])
         return track
     
-    #track = cache.get_or_create(track_key(id), lambda: get_track_and_queued_dict(id))
-    track = get_track_and_queued_dict(id)
+    track = cache.get_or_create(track_key(id), lambda: get_track_and_queued_dict(id))
     if not track:
         raise action_error(message='track {0} not found'.format(id))
     
