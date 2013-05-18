@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 from sqlalchemy.orm import joinedload
 
-from . import web, etag, cache, cache_none
+from . import web, etag, cache, cache_none, generate_cache_key
 from ._logic import queue_item_for_track
 
 from ..lib.auto_format    import action_ok
@@ -11,6 +11,7 @@ from ..model.model_tracks import Track
 from ..model.model_queue  import QueueItem
 
 import datetime
+import random
 
 import logging
 log = logging.getLogger(__name__)
@@ -20,16 +21,25 @@ log = logging.getLogger(__name__)
 # Cache Management
 #-------------------------------------------------------------------------------
 
+track_version = {}
 def track_key(id):
     return "track:{0}".format(id)
 def invalidate_track(id):
     cache.delete(track_key(id))
+    global track_version
+    if id not in track_version:
+        track_version[id] = random.randint(0,65535)
+    track_version[id] += 1
+def generate_cache_key_track(request):
+    global track_version
+    return '-'.join([generate_cache_key(request), str(track_version.get(request.matchdict['id'],-1))])
 
 #-------------------------------------------------------------------------------
 # Track
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='track')
+@etag(generate_cache_key_track)
 @web
 def track_view(request):
     """

@@ -113,7 +113,9 @@ def normalize_datetime(d=None, accuracy='hour'):
     """
     if not d:
         d = datetime.datetime.now()
-    if   accuracy=='hour':
+    if not accuracy or accuracy=='none':
+        return None
+    elif accuracy=='hour':
         return d.replace(minute=0, second=0, microsecond=0)
     elif accuracy=='day' :
         return d.replace(minute=0, second=0, microsecond=0, hour=0)

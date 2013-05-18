@@ -1,7 +1,9 @@
 import datetime
+import random
 from pyramid.view import view_config
 
-from . import web, etag, generate_cache_key, method_delete_router, method_put_router, is_admin ,_logic
+from . import web, etag, cache, cache_none, generate_cache_key, method_delete_router, method_put_router, is_admin
+from . import _logic
 
 from ..lib.auto_format    import action_ok, action_error
 from ..lib.misc           import now
@@ -19,16 +21,19 @@ from .tracks import invalidate_track
 import logging
 log = logging.getLogger(__name__)
 
-# Fake Etag placeholder
-from ..lib.misc import random_string
-queue_version = None
+
+#-------------------------------------------------------------------------------
+# Cache Management
+#-------------------------------------------------------------------------------
+
+queue_version = random.randint(0,65535)
 def queue_updated():
     global queue_version
-    queue_version = random_string()
+    queue_version += 1
 queue_updated()
 def generate_cache_key_queue(request):
     global queue_version
-    return '-'.join([generate_cache_key(request), queue_version])
+    return '-'.join([generate_cache_key(request), str(queue_version)])
 
 #-------------------------------------------------------------------------------
 # Queue
