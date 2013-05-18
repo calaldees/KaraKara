@@ -12,6 +12,10 @@ from ..model.model_queue  import QueueItem
 
 import datetime
 
+import logging
+log = logging.getLogger(__name__)
+
+
 #-------------------------------------------------------------------------------
 # Cache Management
 #-------------------------------------------------------------------------------
@@ -47,6 +51,7 @@ def track_view(request):
     
     def get_track_dict(id):
         try:
+            log.debug('generating track_dict for {0}'.format(id))
             return DBSession.query(Track) \
                     .options( \
                         joinedload(Track.tags), \
@@ -62,6 +67,7 @@ def track_view(request):
         track = cache.get_or_create("track_dict:{0}".format(id), lambda: get_track_dict(id))
         if not track:
             return cache_none
+        log.debug('generating track_queue_dict for {0}'.format(id))
         def queue_item_list_to_dict(queue_items):
             return [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue_items]
         track['queue'] = queue_item_for_track(request, DBSession, track['id'])
