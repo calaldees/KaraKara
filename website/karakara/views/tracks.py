@@ -12,18 +12,14 @@ from ..model.model_queue  import QueueItem
 
 import datetime
 
+#-------------------------------------------------------------------------------
+# Cache Management
+#-------------------------------------------------------------------------------
 
-# Fake Etag placeholder
-from ..lib.misc import random_string
-tracks_instance_id = None
-def tracks_updated():
-    global tracks_instance_id
-    tracks_instance_id = random_string()
-tracks_updated()
-def tracks_etag(request):
-    global tracks_instance_id
-    return tracks_instance_id + str(request.session.get('admin',False)) + str(request.session.peek_flash())
-
+def track_key(id):
+    return "track:{0}".format(id)
+def invalidate_track(id):
+    cache.delete(track_key(id))
 
 #-------------------------------------------------------------------------------
 # Track
@@ -34,6 +30,11 @@ def tracks_etag(request):
 def track_view(request):
     """
     View individual track details
+    
+    This method has two levels of cache:
+     - track_dict cache - cache the track data (should not change)
+     - track_dict + queue_dict - every time this track is modifyed in the queue it will invalidate the cache
+    
     The track dicts that are fetched from the DB are cached with infinate expiray
     time as they will not change once the system is running
     
@@ -42,6 +43,7 @@ def track_view(request):
      which is invalidatated on shutdown,
      but if we were going to use memcache or redis then this is nessisary)
     """
+    id = request.matchdict['id']
     
     def get_track_dict(id):
         try:
@@ -56,20 +58,23 @@ def track_view(request):
         except AttributeError:
             return cache_none
     
-    id = request.matchdict['id']
-    track = cache.get_or_create("track:{0}".format(id), lambda: get_track_dict(id))
+    def get_track_and_queued_dict(id):
+        track = cache.get_or_create("track_dict:{0}".format(id), lambda: get_track_dict(id))
+        if not track:
+            return cache_none
+        def queue_item_list_to_dict(queue_items):
+            return [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue_items]
+        track['queue'] = queue_item_for_track(request, DBSession, track['id'])
+        track['queue']['played' ] = queue_item_list_to_dict(track['queue']['played'] )
+        track['queue']['pending'] = queue_item_list_to_dict(track['queue']['pending'])
+        return track
+    
+    #track = cache.get_or_create(track_key(id), lambda: get_track_and_queued_dict(id))
+    track = get_track_and_queued_dict(id)
     if not track:
         raise action_error(message='track {0} not found'.format(id))
     
-    def queue_item_list_to_dict(queue_items):
-        return [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue_items]
-    track['queue'] = queue_item_for_track(request, DBSession, track['id'])
-    track['queue']['played' ] = queue_item_list_to_dict(track['queue']['played'] )
-    track['queue']['pending'] = queue_item_list_to_dict(track['queue']['pending'])
-    
-    return action_ok(data={
-        'track' : track
-    })
+    return action_ok(data={'track' : track})
 
 
 #@view_config(route_name='track_list')
