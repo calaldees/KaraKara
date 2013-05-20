@@ -88,7 +88,7 @@ function prepare_next_song() {
 	}
 }
 
-$(function() {
+$(document).ready(function() {
 	update_playlist();
 
 	$("#play").click(function(e) {
