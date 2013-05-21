@@ -25,12 +25,14 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 # Cache Management
 #-------------------------------------------------------------------------------
+QUEUE_CACHE_KEY = 'queue'
 
 queue_version = random.randint(0,65535)
-def queue_updated():
+def invalidate_queue():
     global queue_version
     queue_version += 1
-queue_updated()
+    cache.delete(QUEUE_CACHE_KEY)
+invalidate_queue()
 def generate_cache_key_queue(request):
     global queue_version
     return '-'.join([generate_cache_key(request), str(queue_version)])
@@ -46,47 +48,54 @@ def queue_view(request):
     """
     view current queue
     """
-    queue = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
-    queue = [queue_item.to_dict('full') for queue_item in queue]
     
-    trackids = [queue_item['track_id'] for queue_item in queue]
-    tracks   = {}
-    if trackids:
-        tracks = DBSession.query(Track).\
-                            filter(Track.id.in_(trackids)).\
-                            options(\
-                                joinedload(Track.tags),\
-                                joinedload(Track.attachments),\
-                                joinedload('tags.parent'),\
-                            )
-        tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
-
-    # HACK
-    # AllanC - Hack to overlay title on API return.
-    # This technically cant be part of the model because the title rendering in 'helpers' uses the dict version of a track object rather than the DB object
-    # This is half the best place for it. We want the model to be as clean as possible
-    # But we need the 'title' field to be consistant for all API returns for tracks ... more consideration needed
-    #
-    # Solution: Setup SQLAlchemy event to render the title before commiting a track to the DB - like a DB trigger by handled Python size for cross db compatibility
-    #           Stub created in model_track.py
-    #           This is to be removed ...
-    for track in tracks.values():
-        track['title'] = track_title(track['tags'])
-
-    # Attach track to queue_item
-    for queue_item in queue:
-        queue_item['track'] = tracks[queue_item['track_id']]
-
-    # Calculate estimated track time
-    # Overlay 'total_duration' on all tracks
-    # It takes time for performers to change, so each track add a padding time
-    time_padding = request.registry.settings.get('karakara.queue.template.padding')
-    total_duration = datetime.timedelta(seconds=0)
-    for queue_item in queue:
-        queue_item['total_duration'] = total_duration
-        total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
+    def get_queue_dict():
+        # Get queue order
+        queue_dict = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
+        queue_dict = [queue_item.to_dict('full') for queue_item in queue_dict]
+        
+        # Fetch all tracks with id's in the queue
+        trackids = [queue_item['track_id'] for queue_item in queue_dict]
+        tracks   = {}
+        if trackids:
+            tracks = DBSession.query(Track).\
+                                filter(Track.id.in_(trackids)).\
+                                options(\
+                                    joinedload(Track.tags),\
+                                    joinedload(Track.attachments),\
+                                    joinedload('tags.parent'),\
+                                )
+            tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
     
-    return action_ok(data={'queue':queue})
+        # HACK
+        # AllanC - Hack to overlay title on API return.
+        # This technically cant be part of the model because the title rendering in 'helpers' uses the dict version of a track object rather than the DB object
+        # This is half the best place for it. We want the model to be as clean as possible
+        # But we need the 'title' field to be consistant for all API returns for tracks ... more consideration needed
+        #
+        # Solution: Setup SQLAlchemy event to render the title before commiting a track to the DB - like a DB trigger by handled Python size for cross db compatibility
+        #           Stub created in model_track.py
+        #           This is to be removed ...
+        for track in tracks.values():
+            track['title'] = track_title(track['tags'])
+        
+        # Attach track to queue_item
+        for queue_item in queue_dict:
+            queue_item['track'] = tracks[queue_item['track_id']]
+    
+        # Calculate estimated track time
+        # Overlay 'total_duration' on all tracks
+        # It takes time for performers to change, so each track add a padding time
+        time_padding = request.registry.settings.get('karakara.queue.template.padding')
+        total_duration = datetime.timedelta(seconds=0)
+        for queue_item in queue_dict:
+            queue_item['total_duration'] = total_duration
+            total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
+        
+        return queue_dict
+    
+    queue_dict = cache.get_or_create(QUEUE_CACHE_KEY, get_queue_dict)
+    return action_ok(data={'queue':queue_dict})
 
 
 @view_config(route_name='queue', request_method='POST')
@@ -141,7 +150,7 @@ def queue_add(request):
     queue_item.session_owner  = request.session['id']
     DBSession.add(queue_item)
     
-    queue_updated() # Invalidate Cache
+    invalidate_queue() # Invalidate Cache
     invalidate_track(track.id)
     
     log.info('%s added to queue by %s' % (queue_item.track_id, queue_item.performer_name))
@@ -169,7 +178,7 @@ def queue_del(request):
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
     
-    queue_updated() # Invalidate Cache
+    invalidate_queue() # Invalidate Cache
     invalidate_track(queue_item.track_id)
     
     return action_ok(message='queue_item status changed')
@@ -213,7 +222,7 @@ def queue_update(request):
             setattr(queue_item, key, value)
     queue_item.time_touched = datetime.datetime.now() # Update touched timestamp
 
-    queue_updated() # Invalidate Cache
+    invalidate_queue() # Invalidate Cache
     invalidate_track(queue_item.track_id)
 
     return action_ok(message='queue_item updated')

@@ -20,10 +20,11 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 # Cache Management
 #-------------------------------------------------------------------------------
+TRACK_CACHE_KEY = 'track'
 
 track_version = {}
 def track_key(id):
-    return "track:{0}".format(id)
+    return "{0}:{1}".format(TRACK_CACHE_KEY, id)
 def invalidate_track(id):
     cache.delete(track_key(id))
     global track_version
