@@ -122,25 +122,24 @@ def queue_add(request):
             raise action_error(message='unable to queue track. duplicate "track in queue" limit reached', code=400)
         
         # Max queue length restrictions
+        queue_duration = _logic.get_queue_duration(request)
+        
+        # Event end time
+        event_end = request.registry.settings.get('karakara.event.end')
+        if event_end and now()+queue_duration > event_end:
+            raise action_error(message='event submissions are closed', code=400)
+        
+        # Queue time limit
         queue_limit = request.registry.settings.get('karakara.queue.add.limit')
-        event_end   = request.registry.settings.get('karakara.event.end')
-        if queue_limit or event_end:
-            queue = queue_view(request)['data']['queue']
-            if queue:
-                # Get total queue length/duration
-                queue_end = queue[-1]['total_duration']
-                # Event end time
-                if event_end and now()+queue_end > event_end:
-                    raise action_error(message='event submissions are closed', code=400)
-                # Queue time limit
-                if queue_limit and queue_end > queue_limit:
-                    # If no device priority token - issue token and abort
-                    if not _logic.consume_priority_token(request, DBSession):
-                        # Issue a priority token
-                        priority_token = _logic.issue_priority_token(request, DBSession)
-                        if priority_token:
-                            raise action_error(message='queue limit reached - priority token issued', code=400)
-                        raise action_error(message='queue limit reached', code=400)
+        if queue_limit and queue_duration > queue_limit:
+            # If no device priority token - issue token and abort
+            # else consume the token and proceed with addition
+            if not _logic.consume_priority_token(request, DBSession):
+                # Issue a priority token
+                priority_token = _logic.issue_priority_token(request, DBSession)
+                if priority_token:
+                    raise action_error(message='queue limit reached - priority token issued', code=400)
+                raise action_error(message='queue limit reached', code=400)
     
     queue_item = QueueItem()
     for key,value in request.params.items():
