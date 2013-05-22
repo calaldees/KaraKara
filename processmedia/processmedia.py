@@ -1276,7 +1276,7 @@ class MediaEncoder:
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			'-ac', '2',
-			'-r', '48000',
+			'-ar', '48000',
 			avlib_safe_path(temp_raw)
 		], temp_raw, None, "audio decoding")
 		if not result:
@@ -1326,7 +1326,7 @@ class MediaEncoder:
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			'-ac', '2',
-			'-r', '48000',
+			'-ar', '48000',
 			avlib_safe_path(temp_audio)
 		]
 		
