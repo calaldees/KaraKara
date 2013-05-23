@@ -112,7 +112,7 @@ def normalize_datetime(d=None, accuracy='hour'):
     Dates are immutable (thank god)
     """
     if not d:
-        d = datetime.datetime.now()
+        d = now()
     if not accuracy or accuracy=='none':
         return None
     elif accuracy=='hour':
