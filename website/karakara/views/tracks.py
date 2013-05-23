@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 from sqlalchemy.orm import joinedload
 
-from . import web, etag, cache, cache_none, generate_cache_key
+from . import web, etag_decorator, cache, cache_none, generate_cache_key
 from ._logic import queue_item_for_track
 
 from ..lib.auto_format    import action_ok
@@ -40,7 +40,7 @@ def generate_cache_key_track(request):
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='track')
-@etag(generate_cache_key_track)
+@etag_decorator(generate_cache_key_track)
 @web
 def track_view(request):
     """

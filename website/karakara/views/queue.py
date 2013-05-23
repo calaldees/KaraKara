@@ -2,7 +2,7 @@ import datetime
 import random
 from pyramid.view import view_config
 
-from . import web, etag, cache, cache_none, generate_cache_key, method_delete_router, method_put_router, is_admin
+from . import web, etag_decorator, cache, cache_none, generate_cache_key, method_delete_router, method_put_router, is_admin
 from . import _logic
 
 from ..lib.auto_format    import action_ok, action_error
@@ -42,7 +42,7 @@ def generate_cache_key_queue(request):
 #-------------------------------------------------------------------------------
 
 @view_config(route_name='queue', request_method='GET')
-@etag(generate_cache_key_queue)
+@etag_decorator(generate_cache_key_queue)
 @web
 def queue_view(request):
     """
