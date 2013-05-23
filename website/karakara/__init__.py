@@ -58,11 +58,12 @@ def main(global_config, **settings):
     # Routes -------------------------------------------------------------------
     
     # Static Routes
-    config.add_static_view(name=settings["static.assets"], path="karakara:static") #cache_max_age=3600
+    config.add_static_view(name='static', path='karakara:{0}'.format(settings["static.assets"])) #cache_max_age=3600 # settings["static.assets"]
+    config.add_static_view(name='player', path='karakara:{0}'.format(settings["static.player"]))
     
     # AllanC - it's official ... static route setup and generation is a mess in pyramid
     #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
-    config.add_static_view(name='files', path=settings["static.media"])
+    config.add_static_view(name='files' , path=settings["static.media"])
     
     
     # Routes
@@ -75,6 +76,7 @@ def main(global_config, **settings):
     config.add_route('queue'         , append_format_pattern('/queue')         )
     config.add_route('fave'          , append_format_pattern('/fave')          )
     config.add_route('admin_toggle'  , append_format_pattern('/admin')         )
+    config.add_route('admin_lock'    , append_format_pattern('/admin_lock')    )
     config.add_route('feedback'      , append_format_pattern('/feedback')      )
     config.add_route('settings'      , append_format_pattern('/settings')      )
     

@@ -71,8 +71,7 @@ def issue_priority_token(request, DBSession):
     except NoResultFound:
         latest_token_end = None
     if not latest_token_end or latest_token_end < now():
-        # TODO: Should not really be now(), should be end of queue, if the queue is empty then now is sufficent
-        latest_token_end = now() # humm ... no
+        latest_token_end = now() + get_queue_duration(request)
     
     # Do not issue tokens past the end of the event
     event_end = request.registry.settings.get('karakara.event.end')
@@ -122,4 +121,21 @@ def consume_priority_token(request, DBSession):
         return True
     except NoResultFound:
         return False
+
+def get_queue_duration(request):
+    """
+    Get total queue length/duration
+    will always return a timedelta
     
+    BOLLOX! Had to prevent circular dependency.
+    I wanted to rely on only having the 'duration' logic in one place,
+    so here I opted to use the cahced API out to get the track duration.
+    Long winded, I know. But the complexity of loading the queue, manually
+    linking the tracks, then the logic to add with the padding size ...
+    Just use the API out
+    """
+    from .queue import queue_view # 
+    queue = queue_view(request)['data']['queue']
+    if queue:
+        return queue[-1]['total_duration']
+    return datetime.timedelta()

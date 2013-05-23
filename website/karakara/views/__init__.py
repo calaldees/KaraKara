@@ -137,4 +137,6 @@ def is_admin(request):
 # eTag
 #-------------------------------------------------------------------------------
 def generate_cache_key(request):
-    return '-'.join([_generate_cache_key_default(request), str(is_admin(request)), str(request.session.peek_flash())])
+    if request.session.peek_flash():
+        raise LookupError  # Response is not cacheable/indexable if there is a custom flash message
+    return '-'.join([_generate_cache_key_default(request), str(is_admin(request))])

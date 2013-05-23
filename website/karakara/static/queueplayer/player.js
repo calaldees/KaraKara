@@ -88,7 +88,7 @@ function prepare_next_song() {
 	}
 }
 
-$(function() {
+$(document).ready(function() {
 	update_playlist();
 
 	$("#play").click(function(e) {
@@ -117,7 +117,8 @@ $(function() {
 		if (!data.identity.admin) {
 			$.getJSON("/admin", {}, function(data) {
 				if (!data.identity.admin) {
-					console.error("Unable to set player as admin. The player may not function correctly");
+					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
+					alert("Unable to set Admin mode for player interface");
 				}
 			})
 		}

@@ -27,9 +27,11 @@ def request_from_args(args):
 
 
 def _generate_cache_key_default(request):
+    """
+    """
     return "-".join([
         request.path_qs,
-        normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime(),
+        normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime(), #if normalize_datetime returns None, this dies hard. Fix it!
         # request.POST ??,
         # request.session_id ??,
     ])
@@ -52,7 +54,7 @@ def etag(generate_cache_key=_generate_cache_key_default):
     def my_route_view(request):
         pass
     
-    TODO: Only trigger on top level request
+    the generator function can raise a LookupError if the return is not cacheable
     """
     def etag(target, *args, **kwargs):
         request = request_from_args(args)
@@ -64,14 +66,18 @@ def etag(generate_cache_key=_generate_cache_key_default):
         etag_enabled = request.registry.settings.get('server.etag.enabled')
         
         if etag_enabled:
-            etag = generate_cache_key(request)
+            try:
+                etag = generate_cache_key(request)
+            except LookupError:
+                log.debug('etag generation aborted, custom response detected')
+                etag = None
             if etag and etag in request.if_none_match:
                 log.debug('etag matched - aborting render - %s' % etag)
                 raise exception_response(304)
         
         result = target(*args, **kwargs) # Execute the wrapped function
         
-        if etag_enabled:
+        if etag_enabled and etag:
             log.debug('etag set - %s' % etag)
             result.etag = etag
         
