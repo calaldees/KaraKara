@@ -41,12 +41,12 @@ def base(target, *args, **kwargs):
         request.session['id'] = random_string()
     
     #request.session.flash('Hello World %d' % request.session['id'])
-    
-    result = target(*args, **kwargs)
-    
+
     # Enable Pyramid GZip on all responses - NOTE! In a production this should be handled by nginx for performance!
     if request.registry.settings.get('server.gzip'):
         request.response.encode_content(encoding='gzip', lazy=False)
+    
+    result = target(*args, **kwargs)
     
     return result
 

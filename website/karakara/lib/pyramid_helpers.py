@@ -63,23 +63,21 @@ def etag(generate_cache_key=_generate_cache_key_default):
         if 'internal_request' in request.matchdict:
             return target(*args, **kwargs)
         
-        etag_enabled = request.registry.settings.get('server.etag.enabled')
-        
-        if etag_enabled:
+        if request.registry.settings.get('server.etag.enabled'):
             try:
                 etag = generate_cache_key(request)
             except LookupError:
                 log.debug('etag generation aborted, custom response detected')
                 etag = None
-            if etag and etag in request.if_none_match:
-                log.debug('etag matched - aborting render - %s' % etag)
-                raise exception_response(304)
+            if etag:
+                if etag in request.if_none_match:
+                    log.debug('etag matched - aborting render - %s' % etag)
+                    raise exception_response(304)
+                else:
+                    log.debug('etag set - %s' % etag)
+                    request.response.etag = etag
         
         result = target(*args, **kwargs) # Execute the wrapped function
-        
-        if etag_enabled and etag:
-            log.debug('etag set - %s' % etag)
-            result.etag = etag
         
         return result
     return decorator(etag)

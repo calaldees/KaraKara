@@ -59,6 +59,10 @@ def search(request):
     try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
     except: trackids = []
     
+    def _generate_cache_key(request):
+        pass
+    
+    
     # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
     #  any tags that dont match are added as keywords
     tag_objs = []
