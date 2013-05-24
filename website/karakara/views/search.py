@@ -31,9 +31,25 @@ tag_cats = {
     'category:jpop'  : ['artist','from'],
 }
 
+# Utils ------------------------------------------------------------------------
+
+def search_params(request):
+    # Hack - remove any format tags from route match - idealy this would be done at the route level
+    url  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
+    
+    try   : tags     = url.split('/')
+    except: tags     = []
+    try   : keywords = sorted([keyword for keyword in re.findall(r'\w+', request.params['keywords']) if keyword])
+    except: keywords = []
+    try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
+    except: trackids = []
+
+    return tags, keywords, trackids
+
+
 #-------------------------------------------------------------------------------
 
-def search(request):
+def search(request, tags, keywords, trackids):
     """
     The base call for API methods 'list' and 'tags'
     
@@ -48,20 +64,7 @@ def search(request):
             trackids - of all tracks returned by the tag/keyword search (used by calling methods querys)
             sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
         }
-    """
-    # Hack - remove any format tags from route match - idealy this would be done at the route level
-    url  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
-    
-    try   : tags     = url.split('/')
-    except: tags     = []
-    try   : keywords = [keyword for keyword in re.findall(r'\w+', request.params['keywords']) if keyword]
-    except: keywords = []
-    try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
-    except: trackids = []
-    
-    def _generate_cache_key(request):
-        pass
-    
+    """    
     
     # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
     #  any tags that dont match are added as keywords
@@ -114,7 +117,8 @@ def tags(request):
     
     return search dict + sub_tags( a list of all tags with counts )
     """
-    action_return = search(request)
+    tags, keywords, trackids = search_params(request)
+    action_return = search(request, tags, keywords, trackids)
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
@@ -122,7 +126,6 @@ def tags(request):
     trackids         = action_return['data']['trackids']
     
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
-
     
     if request.matchdict['format']=='html':
         # If there is only one track present - abort and redirect to single track view, there is no point in doing any more work
@@ -167,8 +170,8 @@ def list(request):
     
     return search dict (see above) + tracks (a list of tracks with basic details)
     """
-
-    action_return = search(request)
+    tags, keywords, trackids = search_params(request)
+    action_return = search(request, tags, keywords, trackids)
 
     trackids = action_return['data']['trackids']
 
