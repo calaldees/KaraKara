@@ -10,6 +10,7 @@ from operator import itemgetter, attrgetter
 
 avconv_loglevel = 'warning'
 avconv_threads = '1'
+avconv_h264 = 'h264'
 logs = [sys.stdout]
 
 def log(*s):
@@ -51,10 +52,10 @@ def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|srt|bmp|png|jpg|jpeg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|srt|bmp|png|jpg|jpeg|cdg)$', re.IGNORECASE)
 
 def video_file_re():
-	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv|cdg)$', re.IGNORECASE)
 
 def audio_file_re():
 	return re.compile(r'^.*\.(aac|mp3|ogg|wav)$', re.IGNORECASE)
@@ -973,8 +974,8 @@ class MediaEncoder:
 	profile_parameters = {
 		PROFILE_IPHONE: [
 			#'-r',		'30000/1001',
-			'-vcodec',	'libx264',
-			'-pre:v',	'libx264-ipod320',
+			'-vcodec',	avconv_h264,
+			'-pre:v',	'libx264-ipod320', # FIXME: check
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'48000',
@@ -983,7 +984,7 @@ class MediaEncoder:
 			'-bt',		'240k'
 		],
 		PROFILE_ANDROID: [
-			'-vcodec', 	'libx264',
+			'-vcodec', 	avconv_h264,
 			'-profile:v',	'baseline',
 			'-b',		'150k',
 			'-bt',		'240k',
@@ -994,8 +995,8 @@ class MediaEncoder:
 		],
 		PROFILE_GENERIC: [
 			#'-r',		'30000/1001',
-			'-vcodec',	'libx264',
-			'-pre:v',	'libx264-ipod320',
+			'-vcodec',	avconv_h264,
+			'-pre:v',	'libx264-ipod320', # FIXME: check
 			'-b',		'150k',
 			'-bt',		'240k',
 			'-acodec',	'aac',
@@ -1275,7 +1276,7 @@ class MediaEncoder:
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			'-ac', '2',
-			'-r', '48000',
+			'-ar', '48000',
 			avlib_safe_path(temp_raw)
 		], temp_raw, None, "audio decoding")
 		if not result:
@@ -1325,7 +1326,7 @@ class MediaEncoder:
 			'-vcodec', 'none',
 			'-strict', 'experimental',
 			'-ac', '2',
-			'-r', '48000',
+			'-ar', '48000',
 			avlib_safe_path(temp_audio)
 		]
 		
@@ -1997,13 +1998,17 @@ def check_tools():
 	result = test_program(['avconv', '-codecs'], 'libav')
 	ok = ok and (result is not None)
 	if result:
-		aac = re.search(r'^\s*D?EA[\sSDT]+\s*aac', result, re.MULTILINE)
+		aac = re.search(r'^\s*[D\.\s]EA[\s\.SDTLS]+\s*aac', result, re.MULTILINE)
+		h264 = re.search(r'^\s*[D\.\s]EV[\s\.SDTLS]+\s*h264', result, re.MULTILINE)
 		libx264 = re.search(r'^\s*EV[\sSDT]+\s*libx264', result, re.MULTILINE)
-		ok = ok and (aac and libx264)
+		ok = ok and (aac and (h264 or libx264))
 		if not aac:
-			warn("error: avconv does not support aac codec")
-		if not libx264:
-			warn("error: avconv does not support libx264 codec")
+			warn("error: avconv does not support aac codec for encoding")
+        if not (h264 or libx264):
+            warn("error: avconv does not support h264 or libx264 codec for encoding")
+        elif libx264:
+            global avconv_h264
+            avconv_h264 = 'libx264'
 
 	# qt-faststart
 	result = test_program(['qt-faststart'], 'libav/tools')
