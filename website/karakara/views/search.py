@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from . import web
+from . import web, cache, generate_cache_key
 
 from ..lib.misc        import update_dict
 from ..lib.auto_format import action_ok, registered_formats
@@ -46,10 +46,14 @@ def search_params(request):
 
     return tags, keywords, trackids
 
+def search_cache_key(tags, keywords, trackids):
+    return "{0}-{1}-{2}".format(tags, keywords, trackids)
+
 
 #-------------------------------------------------------------------------------
 
-def search(request, tags, keywords, trackids):
+@cache.cache_on_arguments()
+def search(tags, keywords, trackids):
     """
     The base call for API methods 'list' and 'tags'
     
@@ -118,7 +122,8 @@ def tags(request):
     return search dict + sub_tags( a list of all tags with counts )
     """
     tags, keywords, trackids = search_params(request)
-    action_return = search(request, tags, keywords, trackids)
+    cache_key = "search_tags:"+search_cache_key(tags, keywords, trackids)
+    action_return = search(tags, keywords, trackids)
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
@@ -157,6 +162,8 @@ def tags(request):
     action_return['data'].update({
         'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],
     })
+    
+    #action_return = cache.get_or_create(cache_key, lambda: get_track_and_queued_dict(id))
     return action_return
 
 
@@ -171,7 +178,8 @@ def list(request):
     return search dict (see above) + tracks (a list of tracks with basic details)
     """
     tags, keywords, trackids = search_params(request)
-    action_return = search(request, tags, keywords, trackids)
+    cache_key = "search_list:"+search_cache_key(tags, keywords, trackids)
+    action_return = search(tags, keywords, trackids)
 
     trackids = action_return['data']['trackids']
 
