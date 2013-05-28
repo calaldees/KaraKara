@@ -17,6 +17,9 @@ from sqlalchemy     import func
 from sqlalchemy.sql import null
 from sqlalchemy.orm import joinedload, aliased
 
+import logging
+log = logging.getLogger(__name__)
+
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -68,7 +71,8 @@ def search(tags, keywords, trackids):
             trackids - of all tracks returned by the tag/keyword search (used by calling methods querys)
             sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
         }
-    """    
+    """
+    log.debug('cache gen - search {0}'.format(search_cache_key(tags, keywords, trackids)))
     
     # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
     #  any tags that dont match are added as keywords
@@ -144,6 +148,7 @@ def tags(request):
             raise HTTPFound(location=search_url(tags=tags,keywords=keywords,route='search_list'))
     
     def get_action_return_with_sub_tags():
+        log.debug('cache gen - subtags')
         # Get a list of all the tags for all the trackids
         # Group them by tag name
         # only allow tags in the allowed list (there could be 100's of title's and from's), we just want the browsable ones
@@ -184,8 +189,9 @@ def list(request):
     cache_key = "search_list:"+search_cache_key(tags, keywords, trackids)
     etag(request, cache_key)  # Abort if 'etag' match
     
-    def get_list():    
+    def get_list():
         action_return = search(tags, keywords, trackids)
+        log.debug('cache gen get_list')
         
         _trackids = action_return['data']['trackids']
         
