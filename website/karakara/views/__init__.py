@@ -1,10 +1,11 @@
 from decorator import decorator
 from ..lib.misc            import random_string
-from ..lib.pyramid_helpers import request_from_args, etag_decorator, _generate_cache_key_default
+from ..lib.pyramid_helpers import request_from_args, etag, etag_decorator, _generate_cache_key_default
 from ..lib.auto_format     import auto_format_output, action_error
 
 __all__ = [
-    'base','overlay_identity','auto_format_output','web','etag_decorator', #'etag_generate'
+    'base','overlay_identity','auto_format_output','web',
+    'etag','etag_decorator', #'etag_generate'
     'method_delete_router', 'method_put_router',
 ]
 

@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from . import web, cache, generate_cache_key
+from . import web, cache, generate_cache_key, etag
 
 from ..lib.misc        import update_dict
 from ..lib.auto_format import action_ok, registered_formats
@@ -123,7 +123,7 @@ def tags(request):
     """
     tags, keywords, trackids = search_params(request)
     cache_key = "search_tags:"+search_cache_key(tags, keywords, trackids)
-    
+    etag(request, cache_key)  # Abort if 'etag' match
     
     action_return = search(tags, keywords, trackids)
 
@@ -182,6 +182,7 @@ def list(request):
     """
     tags, keywords, trackids = search_params(request)
     cache_key = "search_list:"+search_cache_key(tags, keywords, trackids)
+    etag(request, cache_key)  # Abort if 'etag' match
     
     def get_list():    
         action_return = search(tags, keywords, trackids)
