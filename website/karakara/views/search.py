@@ -123,6 +123,8 @@ def tags(request):
     """
     tags, keywords, trackids = search_params(request)
     cache_key = "search_tags:"+search_cache_key(tags, keywords, trackids)
+    
+    
     action_return = search(tags, keywords, trackids)
 
     tags             = action_return['data']['tags']
@@ -131,7 +133,7 @@ def tags(request):
     trackids         = action_return['data']['trackids']
     
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
-    
+    # TODO: I'm unsure if these 'raise' returns can be cached - right now this call always makes 2 hits to the cache search() and get_action_return_with_sub_tags()
     if request.matchdict['format']=='html':
         # If there is only one track present - abort and redirect to single track view, there is no point in doing any more work
         if len(trackids)== 1:
@@ -180,20 +182,24 @@ def list(request):
     """
     tags, keywords, trackids = search_params(request)
     cache_key = "search_list:"+search_cache_key(tags, keywords, trackids)
-    action_return = search(tags, keywords, trackids)
-
-    trackids = action_return['data']['trackids']
-
-    tracks   = DBSession.query(Track).\
-                        filter(Track.id.in_(trackids)).\
-                        options(\
-                            joinedload(Track.tags),\
-                            joinedload(Track.attachments),\
-                            joinedload('tags.parent'),\
-                        )
     
-    action_return['data'].update({
-        'tracks'  : [track.to_dict('full', exclude_fields='lyrics,attachments') for track in tracks],
-    })
-    return action_return
+    def get_list():    
+        action_return = search(tags, keywords, trackids)
+        
+        _trackids = action_return['data']['trackids']
+        
+        tracks   = DBSession.query(Track).\
+                            filter(Track.id.in_(_trackids)).\
+                            options(\
+                                joinedload(Track.tags),\
+                                joinedload(Track.attachments),\
+                                joinedload('tags.parent'),\
+                            )
+        
+        action_return['data'].update({
+            'tracks'  : [track.to_dict('full', exclude_fields='lyrics,attachments') for track in tracks],
+        })
+        return action_return
+    
+    return cache.get_or_create(cache_key, get_list)
 
