@@ -141,30 +141,31 @@ def tags(request):
         if len(trackids)< 15:
             raise HTTPFound(location=search_url(tags=tags,keywords=keywords,route='search_list'))
     
-    # Get a list of all the tags for all the trackids
-    # Group them by tag name
-    # only allow tags in the allowed list (there could be 100's of title's and from's), we just want the browsable ones
-    alias_parent_tag = aliased(Tag)
-    sub_tags = DBSession.query(Tag  ,func.count(TrackTagMapping.tag_id)).\
-                        join(TrackTagMapping).\
-                        join(alias_parent_tag, Tag.parent).\
-                        filter(TrackTagMapping.track_id.in_(trackids)).\
-                        filter(alias_parent_tag.name.in_(sub_tags_allowed)).\
-                        group_by('tag_1.id',alias_parent_tag.name,Tag.id).\
-                        order_by(alias_parent_tag.name,Tag.name).\
-                        options(joinedload(Tag.parent))
+    def get_action_return_with_sub_tags():
+        # Get a list of all the tags for all the trackids
+        # Group them by tag name
+        # only allow tags in the allowed list (there could be 100's of title's and from's), we just want the browsable ones
+        alias_parent_tag = aliased(Tag)
+        sub_tags = DBSession.query(Tag  ,func.count(TrackTagMapping.tag_id)).\
+                            join(TrackTagMapping).\
+                            join(alias_parent_tag, Tag.parent).\
+                            filter(TrackTagMapping.track_id.in_(trackids)).\
+                            filter(alias_parent_tag.name.in_(sub_tags_allowed)).\
+                            group_by('tag_1.id',alias_parent_tag.name,Tag.id).\
+                            order_by(alias_parent_tag.name,Tag.name).\
+                            options(joinedload(Tag.parent))
+        
+        # AllanC - RRRRRRRAAAAAAAAA!!!! Postgres creates an alias 'tag_1.id' under the hood, but wont actually return results unless it's in the group_by clause
+        #          it works without the tag_1.id in sqllite. So right now, the SQLLite version is broken with 'tag_1' and postgres dies without it.
+        #          is there a way to alias this properly?
+        # tried alias's 'tag_1.id','tag_2.name'
+        
+        action_return['data'].update({
+            'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],
+        })
+        return action_return
     
-    # AllanC - RRRRRRRAAAAAAAAA!!!! Postgres creates an alias 'tag_1.id' under the hood, but wont actually return results unless it's in the group_by clause
-    #          it works without the tag_1.id in sqllite. So right now, the SQLLite version is broken with 'tag_1' and postgres dies without it.
-    #          is there a way to alias this properly?
-    # tried alias's 'tag_1.id','tag_2.name'
-    
-    action_return['data'].update({
-        'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],
-    })
-    
-    #action_return = cache.get_or_create(cache_key, lambda: get_track_and_queued_dict(id))
-    return action_return
+    return cache.get_or_create(cache_key, get_action_return_with_sub_tags)
 
 
 @view_config(route_name='search_list')
