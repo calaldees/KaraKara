@@ -15,6 +15,7 @@ help:
 	# clean          -- reset the folder to clean git checkout (removes virtual python env)
 	# import_tracks_local_filesystem  -- crawl all mediaserver to import tracks data into local Db
 	# import_tracks_local_mediaserver -- crawl http server for to import
+	# insert_random_tracks            -- insert random named tracks for dev/testing
 	#
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
 
@@ -69,7 +70,10 @@ clean:
 	rm KaraKara_test.db -f
 	rm $(INI_TEST) -f
 	rm $(INI_PROD) -f
-	
+
+insert_random_tracks:
+	env/bin/python -mkarakara.scripts.insert_random_tracks 800 --config=$(INI_DEV)
+
 import_tracks_dev: init_db
 	env/bin/python -mkarakara.scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 

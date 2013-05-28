@@ -244,6 +244,7 @@ def main():
     settings = get_appsettings(args.config_uri)
     init_DBSession(settings)
     
+    log.info('Importing tracks from {0}'.format(args.source_uri))
     import_media(args.source_uri)
     
     
