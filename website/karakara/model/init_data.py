@@ -42,6 +42,7 @@ def init_data():
         'category:meme',
         'from',
         'title',
+        'description',
         'lang:en',
         'lang:jp',
         'lang:ln',

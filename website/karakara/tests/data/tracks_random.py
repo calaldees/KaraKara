@@ -1,6 +1,8 @@
 import pytest
 import random
 
+from sqlalchemy.orm import aliased, joinedload
+
 #from ..model import DBSession, commit
 from karakara.lib.misc import random_string
 
@@ -43,7 +45,9 @@ def init_random_data(DBSession, commit, num_tracks=100):
     
     # --------------------------------------------------------------------------
     
-    tags = DBSession.query(Tag).all()
+    tags = DBSession.query(Tag).options(joinedload(Tag.parent)).all()
+    alias_parent_tag = aliased(Tag)
+    tags_category = DBSession.query(Tag).join(alias_parent_tag, Tag.parent).filter(alias_parent_tag.name=='category').all()
     
     def get_random_tags(num_tags=None):
         random_tags = []
@@ -51,6 +55,11 @@ def init_random_data(DBSession, commit, num_tracks=100):
             num_tags = random.randint(1,5)
         for tag_num in range(num_tags):
             random_tags.append(tags[random.randint(0,len(tags)-1)])
+        
+        # if we have from tags and NO category tag, then add a random category
+        if [t for t in random_tags if t.parent and t.parent.name=='from'] and not [t for t in random_tags if t.parent and t.parent.name=='category']:
+            random_tags.append(random.choice(tags_category))
+        
         return random_tags
     
     def get_random_description(words=None, word_size=None):
@@ -59,15 +68,15 @@ def init_random_data(DBSession, commit, num_tracks=100):
         if not word_size:
             word_size = random.randint(2,16)
         return " ".join([random_string(word_size) for word in range(words)])
-    
-    tag_titles = [get_tag('Test Track {0}'.format(i), 'title', create_if_missing=True) for i in range(num_tracks)]
-    commit()
-    
+        
     # Track generation ---------------------------------------------------------
+    tag_titles = [get_tag('Test Track {0}'.format(i), 'title', create_if_missing=True) for i in range(num_tracks)]
+    #commit()
+
     for track_number in range(num_tracks):
         track = Track()
         track.id          = "track_%d"      % track_number
-        track.description = get_random_description()
+        #track.description = get_random_description()
         track.duration    = random.randint(60,360)
         track.tags        = list(set(get_random_tags())) + [tag_titles[track_number]]
         track.attachments = attachments
