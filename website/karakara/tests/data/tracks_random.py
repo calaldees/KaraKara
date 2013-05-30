@@ -48,6 +48,7 @@ def init_random_data(DBSession, commit, num_tracks=100):
     tags = DBSession.query(Tag).options(joinedload(Tag.parent)).all()
     alias_parent_tag = aliased(Tag)
     tags_category = DBSession.query(Tag).join(alias_parent_tag, Tag.parent).filter(alias_parent_tag.name=='category').all()
+    tags_from     = DBSession.query(Tag).join(alias_parent_tag, Tag.parent).filter(alias_parent_tag.name=='from').all()
     
     def get_random_tags(num_tags=None):
         random_tags = []
@@ -56,9 +57,19 @@ def init_random_data(DBSession, commit, num_tracks=100):
         for tag_num in range(num_tags):
             random_tags.append(tags[random.randint(0,len(tags)-1)])
         
-        # if we have from tags and NO category tag, then add a random category
-        if [t for t in random_tags if t.parent and t.parent.name=='from'] and not [t for t in random_tags if t.parent and t.parent.name=='category']:
+        # if we have 'from' tags and NO category tag, then add a random category
+        from_tags = [t for t in random_tags if t.parent and t.parent.name=='from']
+        category_tags = [t for t in random_tags if t.parent and t.parent.name=='category']
+        if from_tags and not category_tags:
             random_tags.append(random.choice(tags_category))
+        if category_tags and not from_tags:
+            random_tags.append(random.choice(tags_from))
+        # only have 1 'from' tag
+        for tag in from_tags[1:]:
+            random_tags.remove(tag)
+        # only have one category tag
+        for tag in category_tags[1:]:
+            random_tags.remove(tag)
         
         return random_tags
     
