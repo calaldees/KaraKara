@@ -1,3 +1,11 @@
+import re
+import copy
+import random
+
+from sqlalchemy     import func
+from sqlalchemy.sql import null
+from sqlalchemy.orm import joinedload, aliased
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
@@ -11,18 +19,14 @@ from ..model.model_tracks import Track, Tag, TrackTagMapping
 from ..model.actions      import get_tag
 from ..templates.helpers  import search_url, track_url
 
-import re
-import copy
-from sqlalchemy     import func
-from sqlalchemy.sql import null
-from sqlalchemy.orm import joinedload, aliased
-
 import logging
 log = logging.getLogger(__name__)
 
 
 #-------------------------------------------------------------------------------
 # Constants
+
+search_version = random.randint(0,65535)
 
 # A list of the sub tags allowed when browsing by specific tags
 # rather than overwelming the user with all possible tags, limit the browsing to a subset under known circumstances.
@@ -126,7 +130,7 @@ def tags(request):
     return search dict + sub_tags( a list of all tags with counts )
     """
     tags, keywords, trackids = search_params(request)
-    cache_key = "search_tags:"+search_cache_key(tags, keywords, trackids)
+    cache_key = "search_tags_{0}:{1}".format(search_version, search_cache_key(tags, keywords, trackids))
     etag(request, cache_key)  # Abort if 'etag' match
     
     action_return = search(tags, keywords, trackids)
@@ -186,7 +190,7 @@ def list(request):
     return search dict (see above) + tracks (a list of tracks with basic details)
     """
     tags, keywords, trackids = search_params(request)
-    cache_key = "search_list:"+search_cache_key(tags, keywords, trackids)
+    cache_key = "search_list_{0}:{1}".format(search_version, search_cache_key(tags, keywords, trackids))
     etag(request, cache_key)  # Abort if 'etag' match
     
     def get_list():
