@@ -256,8 +256,7 @@ def test_queue_limit(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
     assert response.status_code == 400
     
-    #get_cookie(app, 'priority_token')
-    #assert False
+    assert 'valid_start' in get_cookie(app, 'priority_token')
     
     response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
     clear_queue(app)

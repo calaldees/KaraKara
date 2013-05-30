@@ -104,7 +104,9 @@ def issue_priority_token(request, DBSession):
     priority_token.valid_end   = latest_token_end + priority_window
     DBSession.add(priority_token)
 
-    request.response.set_cookie('priority_token',json.dumps(priority_token.to_dict(), default=json_object_handler));
+    #request.response.set_cookie('priority_token', json_cookie);  # WebOb.set_cookie mangles the cookie with m.serialize() - so I rolled my own set_cookie
+    json_cookie = json.dumps(priority_token.to_dict(), default=json_object_handler)
+    request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))
     
     return priority_token
 

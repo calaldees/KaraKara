@@ -16,6 +16,10 @@
         <script src ="${h.static_url('jquery/jquery-1.9.1.min.js')}"                                      ></script>
         <script src ="${h.static_url('scripts/jquery.mobile-extras.js')}"                                 ></script>
         <script src ="${h.static_url('jquery.mobile/jquery.mobile-1.3.0.min.js')}"                        ></script>
+        <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
+        <script type="application/x-javascript">
+            $.cookie.json = true;
+        </script>
         
         <!-- Other -->
         <link   href="${h.static_url('favicon.ico')}"                               rel="shortcut icon"  />
@@ -61,8 +65,6 @@
             </div><!-- /content -->
         
         </div><!-- /page -->
-        
-        <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
         
     </body>
 </html>
