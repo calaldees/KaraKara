@@ -29,6 +29,7 @@ QUEUE_CACHE_KEY = 'queue'
 
 queue_version = random.randint(0,65535)
 def invalidate_queue():
+    commit() # Before invalidating any cache data, ensure the new data is persisted
     global queue_version
     queue_version += 1
     cache.delete(QUEUE_CACHE_KEY)
@@ -108,11 +109,12 @@ def queue_add(request):
     for field in ['track_id', 'performer_name']:
         if not request.params.get(field):
             raise action_error(message='no {0}'.format(field), code=400)
+    track_id = request.params.get('track_id')
     try:
-        track = DBSession.query(Track).get(request.params.get('track_id'))
+        track = DBSession.query(Track).get(track_id)
         assert track
     except AssertionError:
-        raise action_error(message='track {0} does not exist'.format(request.params.get('track_id')), code=400)
+        raise action_error(message='track {0} does not exist'.format(track_id), code=400)
     
     # If not admin, check additional restrictions
     if not is_admin(request):
@@ -148,11 +150,11 @@ def queue_add(request):
     
     queue_item.session_owner  = request.session['id']
     DBSession.add(queue_item)
+    log.info('%s adding to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     
     invalidate_queue() # Invalidate Cache
-    invalidate_track(track.id)
+    invalidate_track(track_id)
     
-    log.info('%s added to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     return action_ok(message='track queued') #TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
 
 
@@ -177,8 +179,11 @@ def queue_del(request):
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
     
+    log.info('%s removing from queue' % (queue_item.track_id))
+    queue_item_track_id = queue_item.track_id
+    
     invalidate_queue() # Invalidate Cache
-    invalidate_track(queue_item.track_id)
+    invalidate_track(queue_item_track_id)
     
     return action_ok(message='queue_item status changed')
 
@@ -221,7 +226,10 @@ def queue_update(request):
             setattr(queue_item, key, value)
     queue_item.time_touched = datetime.datetime.now() # Update touched timestamp
 
+    log.info('%s updating' % (queue_item.track_id))
+    queue_item_track_id = queue_item.track_id
+
     invalidate_queue() # Invalidate Cache
-    invalidate_track(queue_item.track_id)
+    invalidate_track(queue_item_track_id)
 
     return action_ok(message='queue_item updated')
