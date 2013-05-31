@@ -19,6 +19,24 @@
         <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
         <script type="application/x-javascript">
             $.cookie.json = true;
+            var now    = new Date();
+            var cookie = $.cookie('priority_token');
+            if (cookie) {
+                var valid_start = new Date(cookie.valid_start);
+                var valid_end   = new Date(cookie.valid_end  );
+                var to_delta = valid_start - now;
+                /**
+                if (to_delta < 0) {
+                    //console.log("Delete state cookie");
+                    //console.log(priority_start);
+                    //$.removeCookie('priority_token');
+                }
+                if (to_delta > 0) {
+                    console.log("yeah");
+                    $("#priority_countdown")[0].innerHTML = "shit"; //to_delta
+                }
+                */
+            }
         </script>
         
         <!-- Other -->
@@ -36,7 +54,7 @@
                 % endif
 >
                 <%def name="title()">${request.registry.settings.get('text.title') or 'KaraKara'}</%def>
-                <h1>${next.title()}</h1>
+                <h1>${next.title()}</h1><span id="priority_countdown"></span>
                 
                 ## data-iconpos="notext"
                 ##<a href="/track_list" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Tracks</a>
