@@ -7,40 +7,20 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <!-- CSS Styles -->
-        <link   href="${h.static_url('styles/yui-3.5.0-cssreset-min.css')}"         rel="stylesheet"     />
-        <link   href="${h.static_url('jquery.mobile/jquery.mobile-1.3.0.min.css')}" rel="stylesheet"     />
-        <link   href="${h.static_url('styles/main.css')}"                           rel="stylesheet"     />
+        <link   href="${h.static_url('styles/yui-3.5.0-cssreset-min.css')}"         rel="stylesheet" />
+        <link   href="${h.static_url('jquery.mobile/jquery.mobile-1.3.0.min.css')}" rel="stylesheet" />
+        <link   href="${h.static_url('styles/main.css')}"                           rel="stylesheet" />
         
         <!-- Scripts -->
-        <script src ="${h.static_url('scripts/modernizer.custom.js')}"                                    ></script>
-        <script src ="${h.static_url('jquery/jquery-1.9.1.min.js')}"                                      ></script>
-        <script src ="${h.static_url('scripts/jquery.mobile-extras.js')}"                                 ></script>
-        <script src ="${h.static_url('jquery.mobile/jquery.mobile-1.3.0.min.js')}"                        ></script>
+        <script src ="${h.static_url('scripts/modernizer.custom.js')}"></script>
+        <script src ="${h.static_url('jquery/jquery-1.9.1.min.js')}"></script>
+        <script src ="${h.static_url('scripts/jquery.mobile-extras.js')}"></script>
+        <script src ="${h.static_url('jquery.mobile/jquery.mobile-1.3.0.min.js')}"></script>
         <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
-        <script type="application/x-javascript">
-            $.cookie.json = true;
-            var now    = new Date();
-            var cookie = $.cookie('priority_token');
-            if (cookie) {
-                var valid_start = new Date(cookie.valid_start);
-                var valid_end   = new Date(cookie.valid_end  );
-                var to_delta = valid_start - now;
-                /**
-                if (to_delta < 0) {
-                    //console.log("Delete state cookie");
-                    //console.log(priority_start);
-                    //$.removeCookie('priority_token');
-                }
-                if (to_delta > 0) {
-                    console.log("yeah");
-                    $("#priority_countdown")[0].innerHTML = "shit"; //to_delta
-                }
-                */
-            }
-        </script>
+        <script src ="${h.static_url('scripts/karakara.js')}"></script>
         
         <!-- Other -->
-        <link   href="${h.static_url('favicon.ico')}"                               rel="shortcut icon"  />
+        <link   href="${h.static_url('favicon.ico')}" rel="shortcut icon" />
     </head>
     
     <body>
