@@ -1,7 +1,7 @@
 $.cookie.json = true;
 
 var priority_token_cookie = $.cookie('priority_token');
-
+var interval_id;
 
 function timedelta_str(timedelta) {
     var seconds_total = Math.floor(timedelta/1000);
@@ -23,7 +23,9 @@ function update_priority_token_feedback() {
         
         if (delta_end < 0) {
             $.removeCookie('priority_token');
+            clearInterval(interval_id);
             priority_token_cookie = null;
+            $("#priority_countdown")[0].innerHTML = "";
             console.log("Deleted stale 'priority_token' cookie");
         }
         if (delta_start > 0) {
@@ -38,7 +40,7 @@ function update_priority_token_feedback() {
 
 $(document).ready(function() {
     if (priority_token_cookie) {
-        var interval_id = setInterval(update_priority_token_feedback, 1000);
+        interval_id = setInterval(update_priority_token_feedback, 1000);
         update_priority_token_feedback();
     }
 });
