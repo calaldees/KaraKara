@@ -24,6 +24,7 @@ install_requires = [
 test_requires = [
     'pytest',
     'webtest',
+    'distribute',
 ]
 # http://stackoverflow.com/questions/4734292/specifying-where-to-install-tests-require-dependecies-of-a-distribute-setuptoo
 
