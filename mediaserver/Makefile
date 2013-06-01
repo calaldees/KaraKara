@@ -1,6 +1,7 @@
 
 run: setup tmp log #www/files
-	nginx -p `pwd`/ -c nginx.conf
+	echo "user `whoami`;" > nginx_user.conf
+	sudo nginx -p `pwd`/ -c nginx.conf
 
 tmp:
 	mkdir tmp
