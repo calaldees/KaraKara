@@ -16,7 +16,7 @@ def main(args):
     address = sys.argv[2]
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.setsockopt(SOL_SOCKET, SO_REUSEADDR, True)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
     s.bind((sys.argv[1], 53))
 
     os.setgid(1000)
