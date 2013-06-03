@@ -246,12 +246,14 @@ def test_queue_obscure(app,tracks):
     
     # Test Template Display
     soup = BeautifulSoup(app.get('/queue').text)
-    queue_list = [re.match(r'.*/(.*)', li.a['href']).group(1) for li in soup.find(**{'class':'queue-list'}).find_all('li')]
+    def get_track_ids(_class):
+        return [re.match(r'.*/(.*)', li.a['href']).group(1) for li in soup.find(**{'class':_class}).find_all('li')]
+    queue_list = get_track_ids('queue-list')
     assert 't1' == queue_list[0]
     assert 't2' == queue_list[1]
     assert len(queue_list) == 2
-    queue_grid = [re.match(r'.*/(.*)', li.a['href']).group(1) for li in soup.find(**{'class':'queue-grid'}).find_all('li')]
-    assert 't3' in queue_grid    
+    queue_grid = get_track_ids('queue-grid')
+    assert 't3' in queue_grid
     
     clear_queue(app)
 
