@@ -9,6 +9,8 @@ import datetime
 <%def name="body()">
 
     <%
+        ## TODO: SPLIT IS DEPRECATED - The API now performs this logic
+        
         # Break Queue into sections
         #  - the next 15 mins of tracks in order
         #  - tracks after 15 mins randomized

@@ -52,11 +52,11 @@ def queue_view(request):
     
     def get_queue_dict():
         # Get queue order
-        queue_dict = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
-        queue_dict = [queue_item.to_dict('full') for queue_item in queue_dict]
+        queue_dicts = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
+        queue_dicts = [queue_item.to_dict('full') for queue_item in queue_dicts]
         
         # Fetch all tracks with id's in the queue
-        trackids = [queue_item['track_id'] for queue_item in queue_dict]
+        trackids = [queue_item['track_id'] for queue_item in queue_dicts]
         tracks   = {}
         if trackids:
             tracks = DBSession.query(Track).\
@@ -81,22 +81,32 @@ def queue_view(request):
             track['title'] = track_title(track['tags'])
         
         # Attach track to queue_item
-        for queue_item in queue_dict:
+        for queue_item in queue_dicts:
             queue_item['track'] = tracks[queue_item['track_id']]
     
         # Calculate estimated track time
         # Overlay 'total_duration' on all tracks
         # It takes time for performers to change, so each track add a padding time
+        #  +
+        # Calculate the index to split the queue list
+        #  - non admin users do not see the whole queue in order.
+        #  - after a specifyed time threshold, the quque order is obscured
+        #  - it is expected that consumers of this api return will obscure the
+        #    order passed the specifyed 'split_index'
+        time_visible = request.registry.settings.get('karakara.queue.template.visible')
         time_padding = request.registry.settings.get('karakara.queue.template.padding')
+        split_index = None
         total_duration = datetime.timedelta(seconds=0)
-        for queue_item in queue_dict:
+        for index, queue_item in enumerate(queue_dicts):
             queue_item['total_duration'] = total_duration
             total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
+            if time_visible and total_duration > time_visible and split_index==None:
+                split_index = index
         
-        return queue_dict
+        return {'queue':queue_dicts, 'queue_split_index':split_index}
     
-    queue_dict = cache.get_or_create(QUEUE_CACHE_KEY, get_queue_dict)
-    return action_ok(data={'queue':queue_dict})
+    queue_data = cache.get_or_create(QUEUE_CACHE_KEY, get_queue_dict)
+    return action_ok(data=queue_data)
 
 
 @view_config(route_name='queue', request_method='POST')
