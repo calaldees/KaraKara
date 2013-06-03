@@ -21,7 +21,6 @@ function song_finished(status) {
 }
 
 function update_playlist() {
-	console.log("Updating playlist");
 
 	function _sig(list) {
 		var sig = "";
@@ -33,6 +32,7 @@ function update_playlist() {
 
 	$.getJSON("/queue", {}, function(data) { //AllanC - removed unique URL to facilitate eTag - "uncache": new Date().getTime()
 		if(_sig(playlist) != _sig(data.data.queue)) {
+			console.log("Updating playlist");
 			playlist = data.data.queue;
 			render_playlist();
 			prepare_next_song();
