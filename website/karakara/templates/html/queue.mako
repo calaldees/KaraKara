@@ -9,21 +9,12 @@ import datetime
 <%def name="body()">
 
     <%
-        ## TODO: SPLIT IS DEPRECATED - The API now performs this logic
-        
-        # Break Queue into sections
-        #  - the next 15 mins of tracks in order
-        #  - tracks after 15 mins randomized
-        time_visible = request.registry.settings.get('karakara.queue.template.visible')
-        
-        # Setup the separate 'next' and 'later' lists
-        # 'next' tracks are shown in order
-        # 'later' tracks order is obscured
-        # admin users always see the complete ordered queue
+        # Split Queue into 'next' and 'later'(order obscured) lists
         queue = data.get('queue',[])
-        if time_visible and not identity.get('admin'):
-            tracks_next  = [q for q in queue if q['total_duration'] <= time_visible]
-            tracks_later = [q for q in queue if q['total_duration'] >  time_visible]
+        split_index = data.get('queue_split_index')
+        if split_index and not identity.get('admin'):
+            tracks_next  = queue[:split_index]
+            tracks_later = queue[split_index:]
             random.shuffle(tracks_later) # Obscure order of upcomming tracks
         else:
             tracks_next = queue

@@ -1,6 +1,8 @@
 from karakara.tests.conftest import unimplemented, unfinished, xfail
 
 import json
+import re
+from bs4 import BeautifulSoup
 
 # Utils ------------------------------------------------------------------------
 
@@ -22,6 +24,9 @@ def clear_queue(app):
 
 def get_cookie(app, key):
     return json.loads({cookie.name:cookie for cookie in app.cookiejar}[key].value)
+
+def add_queue(app, track_id, performer_name):
+    response = app.post('/queue', dict(track_id=track_id, performer_name=performer_name))
 
 
 
@@ -170,7 +175,7 @@ def test_queue_played(app, tracks):
     assert get_queue(app) == []
     #assert DBSession.query # could query actual queue item in db, but that would mean more imports
 
-def test_queue_order(app, tracks):
+def test_queue_reorder(app, tracks):
     """
     Test the queue ordering and weighting system
     Only Admin user should be able to modify the track order
@@ -194,7 +199,7 @@ def test_queue_order(app, tracks):
         ('t2','testperformer2'),
         ('t3','testperformer3'),
         ('xxx','testperformer4')]:
-        response = app.post('/queue', dict(track_id=track_id, performer_name=performer_name))
+        add_queue(app, track_id, performer_name)
     queue = get_queue(app)
     assert ['t1','t2','t3','xxx'] == [q['track_id'] for q in queue]
     
@@ -215,12 +220,40 @@ def test_queue_order(app, tracks):
     response = app.get('/admin')
 
 
-def test_queue_template(app,tracks):
+def test_queue_obscure(app,tracks):
     """
-    The track order returned by the template should deliberatly obscure
+    The track order returned by the template should deliberatly obscured
     the order of tracks passed a configurable intavle (eg. 15 min)
+    
+    This is acomplished by calculating a split_index
+    clients of the api are expected to obscure the order where nessisary
     """
-    pass
+    assert get_queue(app) == []
+
+    response = app.put('/settings', {'karakara.queue.template.visible':'0:02:00 -> timedelta'})
+
+    # Test API and Logic
+    
+    for track_id, performer_name in [
+        ('t1','testperformer1'), #  60sec + 30sec padding = 1:00 + 0:30        = 1:30
+        ('t2','testperformer2'), # 120sec + padding       = 1:30 + 2:00 + 0:30 = 4:00 
+        ('t3','testperformer3'), # 240sec + padding       = 4:00 + 4:00 + 0:30 = 8:30
+    ]: 
+        add_queue(app, track_id, performer_name)
+    
+    data = app.get('/queue?format=json').json['data']
+    assert data['queue_split_index'] == 2
+    
+    # Test Template Display
+    soup = BeautifulSoup(app.get('/queue').text)
+    queue_list = [re.match(r'.*/(.*)', li.a['href']).group(1) for li in soup.find(**{'class':'queue-list'}).find_all('li')]
+    assert 't1' == queue_list[0]
+    assert 't2' == queue_list[1]
+    assert len(queue_list) == 2
+    queue_grid = [re.match(r'.*/(.*)', li.a['href']).group(1) for li in soup.find(**{'class':'queue-grid'}).find_all('li')]
+    assert 't3' in queue_grid    
+    
+    clear_queue(app)
 
 
 def test_queue_track_duplicate(app, tracks):

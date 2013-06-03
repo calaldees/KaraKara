@@ -101,7 +101,7 @@ def queue_view(request):
             queue_item['total_duration'] = total_duration
             total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
             if time_visible and total_duration > time_visible and split_index==None:
-                split_index = index
+                split_index = index + 1
         
         return {'queue':queue_dicts, 'queue_split_index':split_index}
     
