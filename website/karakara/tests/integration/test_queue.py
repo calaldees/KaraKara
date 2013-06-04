@@ -81,21 +81,30 @@ def test_queue_errors(app, tracks):
 def test_queue_etag(app, tracks):
     # First response has etag
     response = app.get('/queue')
-    etag = response.etag
+    etag_queue = response.etag
+    response = app.get('/track/t1')
+    etag_track = response.etag    
 
     # Second request to same resource has same etag
     response = app.get('/queue')
-    assert etag == response.etag
+    assert etag_queue == response.etag
+    response = app.get('/track/t1')
+    assert etag_track == response.etag
     
     # Change the queue - this should invalidate the etag
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     
     # Assert etag has changed
     response = app.get('/queue')
-    assert etag != response.etag
-    etag = response.etag
+    assert etag_queue != response.etag
+    etag_queue = response.etag
+    response = app.get('/track/t1')
+    assert etag_track != response.etag
+    etag_track = response.etag   
     
-    response = app.get('/queue', headers={'If-None-Match':etag})
+    response = app.get('/queue', headers={'If-None-Match':etag_queue})
+    assert response.status_code == 304
+    response = app.get('/track/t1', headers={'If-None-Match':etag_track})
     assert response.status_code == 304
     
     clear_queue(app)

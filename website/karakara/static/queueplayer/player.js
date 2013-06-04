@@ -34,6 +34,7 @@ function update_playlist() {
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			console.log("Updating playlist");
 			playlist = data.data.queue;
+			//TODO - split_index the list
 			render_playlist();
 			prepare_next_song();
 		}

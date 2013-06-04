@@ -90,3 +90,19 @@ def test_search_tags_sub_tags(app, tracks, tracks_volume, search_tags, expected_
     data = app.get(url).json['data']
     tag_set = set([(tag['full'],tag['count']) for tag in data['sub_tags']])
     assert expected_tag_set <= tag_set
+
+
+@pytest.mark.parametrize(('url',), [
+    ('/search_list/',),
+    ('/search_list/?keywords=test',),
+    ('/track/t1',),
+])
+def test_search_etag(app, tracks, url):
+    """
+    Check the etags for 2 requests to the same section abort with etag
+    """
+    response = app.get(url)
+    etag = response.etag
+    assert etag
+    response = app.get(url, headers={'If-None-Match':etag})
+    assert response.status_code == 304
