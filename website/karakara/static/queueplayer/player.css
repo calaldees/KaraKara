@@ -40,3 +40,7 @@ TD BUTTON {
 #playlist li:nth-child(2):after {
 	content: " - Up Next";
 }
+
+#playlist_obscured li {
+	display: inline-block;
+}
