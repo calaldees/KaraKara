@@ -51,7 +51,8 @@ function render_playlist() {
 	if (split_index && playlist.length) {
 		playlist_ordered  = playlist.slice(0,split_index);
 		playlist_obscured = playlist.slice(split_index);
-		// TODO: randomize order of playlist_obscured
+		// randomize order of playlist_obscured
+		playlist_obscured.sort(function(){return 0.5-Math.random();});
 	}
 	else {
 		playlist_ordered  = playlist
@@ -103,7 +104,7 @@ function prepare_next_song() {
 			var video = $('#player').get(0);
 			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;
-			video.volume = 0.05;
+			video.volume = 0.20;
 			video.load();
 			video.play();
 		}
