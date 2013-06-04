@@ -9,9 +9,7 @@ function song_finished(status) {
 	console.log("Song finished");
 	$.getJSON(
 		"/queue", {
-			//http://localhost:8000/queue?method=delete&format=redirect&queue_item.id=3
 			"method": "put",
-			//"format": "json",
 			"queue_item.id": playlist[0].id,
 			"status": status,
 			"uncache": new Date().getTime()
@@ -62,7 +60,8 @@ function render_playlist() {
 	// Playlist Ordered
 	var h = "<ol>";
 	for(var i=0; i<playlist_ordered.length; i++) {
-		h += "<li>"+playlist_ordered[i]['track']['title'] + " - " + playlist_ordered[i]['performer_name'];
+		var t = playlist_ordered[i];
+		h += "<li>" + t['track']['title'] + " - " + t['performer_name'] + " - " + timedelta_str(t['total_duration']*1000);
 	}
 	h += "</ol>";
 	$('#playlist').html(h);
@@ -70,7 +69,8 @@ function render_playlist() {
 	// Playlist Obscured
 	var h = "<ul>";
 	for(var i=0; i<playlist_obscured.length; i++) {
-		h += "<li>"+playlist_obscured[i]['track']['title'] + " - " + playlist_obscured[i]['performer_name'];
+		var t = playlist_obscured[i];
+		h += "<li>" + t['track']['title'] + " - " + t['performer_name'];
 	}
 	h += "</ul>";
 	$('#playlist_obscured').html(h);
