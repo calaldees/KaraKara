@@ -25,16 +25,18 @@ TD BUTTON {
 	width: 320px;
 }
 
-.playlist .current_song {
+/* song current */
+#playlist li:nth-child(1)  { 
 	color: red;
 }
-.playlist .current_song:after {
+#playlist li:nth-child(1):after {
 	content: " - Ready to Start";
 }
 
-.playlist .up_next {
+/* song next */
+#playlist li:nth-child(2) {
 	color: orange;
 }
-.playlist .up_next:after {
+#playlist li:nth-child(2):after {
 	content: " - Up Next";
 }

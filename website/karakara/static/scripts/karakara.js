@@ -3,16 +3,6 @@ $.cookie.json = true;
 var priority_token_cookie = $.cookie('priority_token');
 var interval_id;
 
-function timedelta_str(timedelta) {
-    var seconds_total = Math.floor(timedelta/1000);
-    var seconds       = seconds_total % 60;
-    var minutes       = Math.floor(seconds_total/60);
-    if (minutes>=1) {
-        return minutes+"min";
-    }
-    return seconds+"sec";
-}
-
 function update_priority_token_feedback() {
     if (priority_token_cookie) {
         var now = new Date();

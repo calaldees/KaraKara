@@ -1,4 +1,5 @@
 var DEFAULT_PLAYLIST_UPDATE_TIME = 3; //Seconds to poll server
+var DEFAULT_VIDEO_BACKGROUND_VOLUME = 0.2;
 
 var settings = {};
 var playlist = [];
@@ -51,8 +52,7 @@ function render_playlist() {
 	if (split_index && playlist.length) {
 		playlist_ordered  = playlist.slice(0,split_index);
 		playlist_obscured = playlist.slice(split_index);
-		// randomize order of playlist_obscured
-		playlist_obscured.sort(function(){return 0.5-Math.random();});
+		randomize(playlist_obscured);
 	}
 	else {
 		playlist_ordered  = playlist
@@ -62,10 +62,7 @@ function render_playlist() {
 	// Playlist Ordered
 	var h = "<ol>";
 	for(var i=0; i<playlist_ordered.length; i++) {
-		if     (i == 0) {h += "<li class='current_song'>";}
-		else if(i == 1) {h += "<li class='up_next'>";}
-		else            {h += "<li>";}
-		h += playlist_ordered[i]['track']['title'] + " - " + playlist_ordered[i]['performer_name'];
+		h += "<li>"+playlist_ordered[i]['track']['title'] + " - " + playlist_ordered[i]['performer_name'];
 	}
 	h += "</ol>";
 	$('#playlist').html(h);
@@ -73,9 +70,7 @@ function render_playlist() {
 	// Playlist Obscured
 	var h = "<ul>";
 	for(var i=0; i<playlist_obscured.length; i++) {
-		h += "<li>";
-		h += playlist_obscured[i]['track']['title'] + " - " + playlist_obscured[i]['performer_name'];
-		h += "</li>";
+		h += "<li>"+playlist_obscured[i]['track']['title'] + " - " + playlist_obscured[i]['performer_name'];
 	}
 	h += "</ul>";
 	$('#playlist_obscured').html(h);
@@ -104,7 +99,7 @@ function prepare_next_song() {
 			var video = $('#player').get(0);
 			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;
-			video.volume = 0.20;
+			video.volume = DEFAULT_VIDEO_BACKGROUND_VOLUME;
 			video.load();
 			video.play();
 		}

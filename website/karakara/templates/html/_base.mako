@@ -17,6 +17,7 @@
         <script src ="${h.static_url('scripts/jquery.mobile-extras.js')}"></script>
         <script src ="${h.static_url('jquery.mobile/jquery.mobile-1.3.1.min.js')}"></script>
         <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
+        <script src ="${h.static_url('scripts/lib.js')}"></script>
         <script src ="${h.static_url('scripts/karakara.js')}"></script>
         
         <!-- Other -->
