@@ -2,6 +2,7 @@ var DEFAULT_PLAYLIST_UPDATE_TIME = 3; //Seconds to poll server
 
 var settings = {};
 var playlist = [];
+var split_index = null;
 
 function song_finished(status) {
 	console.log("Song finished");
@@ -30,11 +31,11 @@ function update_playlist() {
 		return sig;
 	}
 
-	$.getJSON("/queue", {}, function(data) { //AllanC - removed unique URL to facilitate eTag - "uncache": new Date().getTime()
+	$.getJSON("/queue", {}, function(data) {
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			console.log("Updating playlist");
-			playlist = data.data.queue;
-			//TODO - split_index the list
+			playlist    = data.data.queue;
+			split_index = data.data.queue_split_index;
 			render_playlist();
 			prepare_next_song();
 		}
@@ -43,21 +44,41 @@ function update_playlist() {
 
 function render_playlist() {
 	console.log("Rendering playlist");
+	
+	// Split playlist with split_index (if one is provided)
+	var playlist_ordered;
+	var playlist_obscured;
+	if (split_index && playlist.length) {
+		playlist_ordered  = playlist.slice(0,split_index);
+		playlist_obscured = playlist.slice(split_index);
+		// TODO: randomize order of playlist_obscured
+	}
+	else {
+		playlist_ordered  = playlist
+		playlist_obscured = [];
+	}
+	
+	// Playlist Ordered
+	var h = "<ol>";
+	for(var i=0; i<playlist_ordered.length; i++) {
+		if     (i == 0) {h += "<li class='current_song'>";}
+		else if(i == 1) {h += "<li class='up_next'>";}
+		else            {h += "<li>";}
+		h += playlist_ordered[i]['track']['title'] + " - " + playlist_ordered[i]['performer_name'];
+	}
+	h += "</ol>";
+	$('#playlist').html(h);
+	
+	// Playlist Obscured
 	var h = "<ul>";
-	for(var i=0; i<playlist.length; i++) {
-		if(i == 0) {
-			h += "<li class='current_song'>";
-		}
-		else if(i == 1) {
-			h += "<li class='up_next'>";
-		}
-		else {
-			h += "<li>";
-		}
-		h += playlist[i]['track']['title'] + " - " + playlist[i]['performer_name'];
+	for(var i=0; i<playlist_obscured.length; i++) {
+		h += "<li>";
+		h += playlist_obscured[i]['track']['title'] + " - " + playlist_obscured[i]['performer_name'];
+		h += "</li>";
 	}
 	h += "</ul>";
-	$('#playlist').html(h);
+	$('#playlist_obscured').html(h);
+	
 }
 
 function get_attachment(track, type) {
