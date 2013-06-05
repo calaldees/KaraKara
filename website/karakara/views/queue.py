@@ -93,17 +93,18 @@ def queue_view(request):
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
-        time_visible = request.registry.settings.get('karakara.queue.template.visible')
+        split_markers = list(request.registry.settings.get('karakara.queue.group.split_markers'))
         time_padding = request.registry.settings.get('karakara.queue.template.padding')
-        split_index = None
+        split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
             queue_item['total_duration'] = total_duration
             total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
-            if time_visible and total_duration > time_visible and split_index==None:
-                split_index = index + 1
+            if split_markers and total_duration > split_markers[0]:
+                split_indexs.append(index + 1)
+                del split_markers[0]
         
-        return {'queue':queue_dicts, 'queue_split_index':split_index}
+        return {'queue':queue_dicts, 'queue_split_indexs':split_indexs}
     
     queue_data = cache.get_or_create(QUEUE_CACHE_KEY, get_queue_dict)
     return action_ok(data=queue_data)

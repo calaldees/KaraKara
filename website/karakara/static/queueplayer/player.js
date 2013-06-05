@@ -3,7 +3,7 @@ var DEFAULT_VIDEO_BACKGROUND_VOLUME = 0.2;
 
 var settings = {};
 var playlist = [];
-var split_index = null;
+var split_indexs = [];
 
 function song_finished(status) {
 	console.log("Song finished");
@@ -33,8 +33,8 @@ function update_playlist() {
 	$.getJSON("/queue", {}, function(data) {
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			console.log("Updating playlist");
-			playlist    = data.data.queue;
-			split_index = data.data.queue_split_index;
+			playlist     = data.data.queue;
+			split_indexs = data.data.queue_split_indexs;
 			render_playlist();
 			prepare_next_song();
 		}
@@ -47,9 +47,10 @@ function render_playlist() {
 	// Split playlist with split_index (if one is provided)
 	var playlist_ordered;
 	var playlist_obscured;
-	if (split_index && playlist.length) {
-		playlist_ordered  = playlist.slice(0,split_index);
-		playlist_obscured = playlist.slice(split_index);
+	if (split_indexs.length && playlist.length) {
+		// TODO split_indexs[0] is short term until we can support multiple groups in template
+		playlist_ordered  = playlist.slice(0,split_indexs[0]);
+		playlist_obscured = playlist.slice(split_indexs[0]);
 		randomize(playlist_obscured);
 	}
 	else {

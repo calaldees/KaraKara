@@ -239,7 +239,7 @@ def test_queue_obscure(app,tracks):
     """
     assert get_queue(app) == []
 
-    response = app.put('/settings', {'karakara.queue.template.visible':'0:02:00 -> timedelta'})
+    response = app.put('/settings', {'karakara.queue.group.split_markers':'[0:02:00, 0:10:00] -> timedelta'})
 
     # Test API and Logic
     
@@ -251,7 +251,8 @@ def test_queue_obscure(app,tracks):
         add_queue(app, track_id, performer_name)
     
     data = app.get('/queue?format=json').json['data']
-    assert data['queue_split_index'] == 2
+    assert len(data['queue_split_indexs']) == 1
+    assert data['queue_split_indexs'][0] == 2
     
     # Test Template Display
     soup = BeautifulSoup(app.get('/queue').text)
@@ -263,6 +264,7 @@ def test_queue_obscure(app,tracks):
     assert len(queue_list) == 2
     queue_grid = get_track_ids('queue-grid')
     assert 't3' in queue_grid
+    assert len(queue_grid) == 1
     
     clear_queue(app)
 

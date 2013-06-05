@@ -223,9 +223,14 @@ def convert_str(value, return_type):
     True
     >>> convert_str('a,b ,c', 'list')
     ['a', 'b', 'c']
+    >>> convert_str('[true, yes, no, false]', 'bool')
+    [True, True, False, False]
+    
     """
     if not value or not isinstance(value, str) or not return_type:
         return value
+    if value.startswith('[') and value.endswith(']'):
+        return [convert_str(v.strip(), return_type) for v in value[1:-1].split(',')]
     if return_type=='bool' or return_type==bool:
         return asbool(value)
     if return_type=='int' or return_type==int:

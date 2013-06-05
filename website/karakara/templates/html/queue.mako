@@ -11,8 +11,9 @@ import datetime
     <%
         # Split Queue into 'next' and 'later'(order obscured) lists
         queue = data.get('queue',[])
-        split_index = data.get('queue_split_index')
-        if split_index and not identity.get('admin'):
+        split_indexs = data.get('queue_split_indexs')
+        if split_indexs and not identity.get('admin'):
+            split_index = split_indexs[0]  # TODO: Short term botch until template can be updated to render mutiple split groups
             tracks_next  = queue[:split_index]
             tracks_later = queue[split_index:]
             random.shuffle(tracks_later) # Obscure order of upcomming tracks
