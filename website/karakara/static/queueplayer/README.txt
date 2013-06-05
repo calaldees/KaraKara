@@ -1,5 +1,8 @@
 An HTML5/Javascript full screen player for the queued items
 
+Design for low res projector of 1024x768
+800x600 would be useful but not nessisary
+
 Spec:
 - After track completed playing
   - if http://pyramid_server/ avalable
@@ -22,3 +25,8 @@ Items in que may not be video items - concept is to que notices or other custom 
   
 Suggest:
 Player should be developed for compatability initially on one cross platform browser type e.g chrome, firefox, opera
+
+
+sim links:
+ - lib.js
+ - jquery.min.js
