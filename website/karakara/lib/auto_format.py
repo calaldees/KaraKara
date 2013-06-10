@@ -28,8 +28,8 @@ format_request_accept = {
     'text/plain'          : 'csv' ,
     'text/javascript'     : 'json',
     'application/json'    : 'json',
-    'text/xml'            : 'xml' ,
-    'application/xml'     : 'xml' ,
+    #'text/xml'            : 'xml' ,
+    #'application/xml'     : 'xml' ,
     'application/atom+xml': 'rss' ,
     'application/xml+rss' : 'rss' ,
     'application/pdf'     : 'pdf' ,
@@ -239,3 +239,4 @@ def format_redirect(request, result):
     del result['code']
     return HTTPFound(location=request.referer)
 register_formater('redirect', format_redirect)
+
