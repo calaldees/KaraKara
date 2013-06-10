@@ -30,6 +30,7 @@ setup:
 	else \
 	    echo installing nginx; \
 	    sudo apt-get install nginx; \
+	    sudo update-rc.d -f nginx disable; \
 	fi
 	if dpkg -s postgresql ; then \
 	    echo ; \
