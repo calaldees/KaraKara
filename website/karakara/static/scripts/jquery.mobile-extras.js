@@ -7,7 +7,7 @@ $(document).bind("mobileinit", function(){
     $.mobile.selectmenu.prototype.options.nativeMenu = false;
     */
     $.mobile.ajaxEnabled = false;
-    $.mobile.fixedToolbars.setTouchToggleEnabled(false);
+    //$.mobile.fixedToolbars.setTouchToggleEnabled(false);
     /*
      broken shit that dosnt work ... broken broken software! :(
     $.mobile.page.prototype.options.addBackBtn  = "true";
