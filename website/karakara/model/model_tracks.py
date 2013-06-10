@@ -1,5 +1,6 @@
 from . import Base, JSONEncodedDict
 
+from sqlalchemy     import event
 from sqlalchemy     import Column, Enum, ForeignKey
 from sqlalchemy     import String, Unicode, UnicodeText, Integer, Float
 from sqlalchemy.orm import relationship, backref
@@ -136,6 +137,16 @@ class Tag(Base):
         if self.parent:
             return '%s:%s' % (self.parent.name,self.name)
         return self.name
+
+    @staticmethod
+    def before_insert_listener(mapper, connection, target):
+        """
+        Event to ensure all tags are inserted lower case only
+        because all searches are normalized to lower case
+        """
+        target.name = target.name.lower()
+
+event.listen(Tag, 'before_insert', Tag.before_insert_listener)
 
 class Attachment(Base):
     """
