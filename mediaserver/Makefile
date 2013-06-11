@@ -12,6 +12,9 @@ help:
 	# run            -- run nginx server
 	# run_dns        -- run nginx and dns server
 	#
+	# data_backup    -- utility to compress tag/data from www/files/
+	# data_restore   --
+	#
 	# To run with DNS/DCHP server
 	#  - Turn off DCHP on router
 	#  - Setup network interface with following settings
@@ -64,8 +67,8 @@ setup:
 	sudo -u postgres psql -c "create database karakara with owner karakara encoding 'utf8';" || true
 	touch setup
 
-tags_backup:
+data_backup:
 	find $(BACKUP_SELECTOR) -print0 | xargs -0 tar --gzip --create --file $(FILENAME_TAG_BACKUP)
 
-tags_restore:
+data_restore:
 	tar --gzip --extract --file $(FILENAME_TAG_BACKUP)
