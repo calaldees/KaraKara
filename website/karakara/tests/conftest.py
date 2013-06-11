@@ -4,6 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 INI = 'test.ini'
+#INI = 'production.ini'
 
 from karakara.tests.data.tracks import *
 

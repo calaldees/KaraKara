@@ -210,6 +210,13 @@ def queue_update(request):
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
     params = dict(request.params)
+    
+    for field in [f for f in ['queue_item.id', 'queue_item.move.target_id'] if f in params]:
+        try:
+            params[field] = int(params[field])
+        except ValueError:
+            raise action_error(message='invalid {0}'.format(field), code=404)
+    
     queue_item = DBSession.query(QueueItem).get(params['queue_item.id'])
 
     if not queue_item:

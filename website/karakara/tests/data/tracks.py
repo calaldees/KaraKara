@@ -58,9 +58,10 @@ def attachments(request): #, DBSession, commit
         attachments.append(attachment)
     
     def finalizer():
-        for attachment in attachments:
-            DBSession.delete(attachment)
-        commit()
+        pass
+        #for attachment in attachments:
+        #    DBSession.delete(attachment)
+        #commit()
     request.addfinalizer(finalizer)
         
     commit()

@@ -121,7 +121,7 @@ def test_queue_permissions(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     queue_item_id = get_queue(app)[0]['id']
     # Try to move the track (only admins can move things)
-    response = app.put('/queue', {'queue_item.id':queue_item_id, 'queue_item.move.target_id':'any_data'}, expect_errors=True)
+    response = app.put('/queue', {'queue_item.id':queue_item_id, 'queue_item.move.target_id':9999}, expect_errors=True)
     assert response.status_code == 403
     # Clear the cookies (ensure we are a new user)
     app.cookiejar.clear()
@@ -239,7 +239,8 @@ def test_queue_obscure(app,tracks):
     """
     assert get_queue(app) == []
 
-    response = app.put('/settings', {'karakara.queue.group.split_markers':'[0:02:00, 0:10:00] -> timedelta'})
+    response = app.put('/settings.json', {'karakara.queue.group.split_markers':'[0:02:00, 0:10:00] -> timedelta'})
+    assert app.put('/settings.json').json['data']['settings']['karakara.queue.group.split_markers'][0] == 120.0, 'Settings not updated'
 
     # Test API and Logic
     
