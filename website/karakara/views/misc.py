@@ -42,7 +42,8 @@ def settings(request):
     This allows clients to qurey server settup rather than having to hard code bits into the clients
     """
     # with PUT requests, update settings
-    if request.registry.settings.get('karakara.server.mode')!='production' and method_put_router(None, request):
+    #  only changing in production is bit over zelious #request.registry.settings.get('karakara.server.mode')!='production'
+    if is_admin(request) and method_put_router(None, request): 
         for key, value in request.params.items():
             request.registry.settings[key] = convert_str_with_type(value)
     
