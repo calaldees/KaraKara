@@ -235,6 +235,8 @@ def convert_str(value, return_type):
         return asbool(value)
     if return_type=='int' or return_type==int:
         return int(value)
+    if return_type=='float' or return_type==float:
+        return float(value)
     if return_type=='time' or return_type==datetime.time:
         return dateutil.parser.parse(value).time()
     if return_type=='date' or return_type==datetime.date:
