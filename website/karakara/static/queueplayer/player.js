@@ -100,7 +100,7 @@ function prepare_next_song() {
 			var video = $('#player').get(0);
 			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;
-			video.volume = DEFAULT_VIDEO_BACKGROUND_VOLUME;
+			video.volume = settings["karakara.player.video.preview_volume"];
 			video.load();
 			video.play();
 		}
@@ -111,6 +111,7 @@ $(document).ready(function() {
 	update_playlist();
 
 	$("#play").click(function(e) {
+		console.log('#play');
 		var video = $('#player').get(0);
 		video.loop = false;
 		video.volume = 1.0;
@@ -120,16 +121,19 @@ $(document).ready(function() {
 		video.play();
 	});
 	$("#skip").click(function(e) {
+		console.log('#skip');
 		e.preventDefault();
 		song_finished("skipped");
 	});
 	$("#player").bind("ended", function(e) {
+		console.log('#player:ended');
 		var video = $('#player').get(0);
 		video.webkitExitFullScreen();
 		song_finished("played");
 	});
 	
 	$.getJSON("/settings", {}, function(data) {
+		console.log("Get Settings")
 		settings = data.data.settings;
 		
 		// Identify player.js as admin with admin cookie
@@ -143,10 +147,11 @@ $(document).ready(function() {
 		}
 		
 		// Set update interval
-		var update_inverval = parseInt(settings["karakara.player.update_time"]) * 1000;
-		if (!update_inverval) {update_inverval = DEFAULT_PLAYLIST_UPDATE_TIME*1000;}
-		settings['interval'] = setInterval(update_playlist, update_inverval);
-		console.log('update_interval='+update_inverval);
+		settings["karakara.player.queue.update_time"] = settings["karakara.player.queue.update_time"] || DEFAULT_PLAYLIST_UPDATE_TIME; //parseInt(
+		settings['interval'] = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
+		console.log('update_interval='+settings["karakara.player.queue.update_time"]);
+		
+		settings["karakara.player.video.preview_volume"] = settings["karakara.player.video.preview_volume"] || DEFAULT_VIDEO_BACKGROUND_VOLUME;
 	});
 	
 });
