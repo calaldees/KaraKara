@@ -116,7 +116,7 @@ $(document).ready(function() {
 		video.loop = false;
 		video.volume = 1.0;
 		video.src = "/files/" + get_attachment(playlist[0].track, "video");
-		video.webkitEnterFullScreen();
+		video.webkitRequestFullScreen();
 		video.load();
 		video.play();
 	});
