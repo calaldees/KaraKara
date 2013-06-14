@@ -5,8 +5,17 @@ var settings = {};
 var playlist = [];
 var split_indexs = [];
 
+function get_attachment(track, type) {
+	for(var i=0; i<track.attachments.length; i++) {
+		if(track.attachments[i].type == type) {
+			return track.attachments[i].location;
+		}
+	}
+	return "";
+}
+
 function song_finished(status) {
-	console.log("Song finished");
+	console.log("song_finished");
 	$.getJSON(
 		"/queue", {
 			"method": "put",
@@ -21,7 +30,7 @@ function song_finished(status) {
 }
 
 function update_playlist() {
-
+	//console.log("update_playlist");
 	function _sig(list) {
 		var sig = "";
 		for(var i=0; i<list.length; i++) {
@@ -31,8 +40,9 @@ function update_playlist() {
 	}
 
 	$.getJSON("/queue", {}, function(data) {
+		//console.log("update_playlist getJSON response");
 		if(_sig(playlist) != _sig(data.data.queue)) {
-			console.log("Updating playlist");
+			//console.log("update_playlist:updated");
 			playlist     = data.data.queue;
 			split_indexs = data.data.queue_split_indexs;
 			render_playlist();
@@ -42,7 +52,7 @@ function update_playlist() {
 }
 
 function render_playlist() {
-	console.log("Rendering playlist");
+	console.log("render_playlist");
 	
 	// Split playlist with split_index (if one is provided)
 	var playlist_ordered;
@@ -78,13 +88,6 @@ function render_playlist() {
 	
 }
 
-function get_attachment(track, type) {
-	for(var i=0; i<track.attachments.length; i++) {
-		if(track.attachments[i].type == type) {
-			return track.attachments[i].location;
-		}
-	}
-}
 
 function prepare_next_song() {
 	if(playlist.length == 0) {
@@ -133,7 +136,7 @@ $(document).ready(function() {
 	});
 	
 	$.getJSON("/settings", {}, function(data) {
-		console.log("Get Settings")
+		console.log("/settings");
 		settings = data.data.settings;
 		
 		// Identify player.js as admin with admin cookie
@@ -147,7 +150,7 @@ $(document).ready(function() {
 		}
 		
 		// Set update interval
-		settings["karakara.player.queue.update_time"] = settings["karakara.player.queue.update_time"] || DEFAULT_PLAYLIST_UPDATE_TIME; //parseInt(
+		settings["karakara.player.queue.update_time"] = settings["karakara.player.queue.update_time"] || DEFAULT_PLAYLIST_UPDATE_TIME;
 		settings['interval'] = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
 		console.log('update_interval='+settings["karakara.player.queue.update_time"]);
 		
