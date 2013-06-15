@@ -533,7 +533,11 @@ class EchoServerManager(ServerManager):
     def disconnect(self, client):
         log('connection','%s disconnected' % client.id)
     def recv(self, data, source=None):
-        log('message', '{0} - {1}'.format(source.id,str(data,'utf8')))
+        try:
+            source_id = source.id
+        except:
+            source_id = None
+        log('message', '{0} - {1}'.format(source_id,str(data,'utf8')))
         #if isinstance(data,str):
         #    data = data.encode('utf8')
         self.send(data, source)

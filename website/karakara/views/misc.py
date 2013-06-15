@@ -42,6 +42,7 @@ def remote(request):
     cmd = request.params.get('cmd')
     if cmd:
         log.debug("sending {0}".format(cmd))
+        request.registry['socket_manager'].recv(cmd.encode('utf-8'))
     return action_ok()
 
 @view_config(route_name='settings')
