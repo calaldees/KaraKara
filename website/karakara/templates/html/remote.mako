@@ -4,8 +4,8 @@
 <script>
     var socket = null;
     $(document).ready(function() {
-        var host = location.hostname()
-        var port = "9873";
+        var host = location.hostname();
+        var port = ${request.registry.settings['karakara.websocket.port']};
         try {
             socket = new WebSocket("ws://" + host + ":" + port + "/");
         }
