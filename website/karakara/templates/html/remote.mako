@@ -1,7 +1,33 @@
 <%inherit file="_base.mako"/>
 
 <%def name="title()">Remote Control</%def>
+<script>
+    var socket = null;
+    $(document).ready(function() {
+        var host = location.hostname()
+        var port = "9873";
+        try {
+            socket = new WebSocket("ws://" + host + ":" + port + "/");
+        }
+        catch(err) {
+            //alert("Websockets not supported. using request method");
+        }
+    });
+    
+    function send(message) {
+        if (socket != null) {
+            socket.send(message);
+            alert("websocket sent");
+            return false;
+        }
+        return true;
+        
+        
+    }
+</script>
 
-Remote control stuff ...
+Big Screen Remote Control
 
-<button onclick='alert("Hello")'>Hello</button>
+<a href='?cmd=play' data-role="button" onclick='return send("play");'>Play</a>
+<a href='?cmd=pause' data-role="button" onclick='return send("pause");'>Pause</a>
+<a href='?cmd=skip' data-role="button" onclick='return send("skip");'>Skip</a>

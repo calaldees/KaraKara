@@ -6,6 +6,8 @@ from . import web, method_put_router, is_admin
 from ..lib.auto_format import action_ok, action_error
 from ..lib.misc import convert_str_with_type
 
+import logging
+log = logging.getLogger(__name__)
 
 #-------------------------------------------------------------------------------
 # Misc
@@ -37,6 +39,9 @@ def admin_toggle(request):
 @view_config(route_name='remote')
 @web
 def remote(request):
+    cmd = request.params.get('cmd')
+    if cmd:
+        log.debug("sending {0}".format(cmd))
     return action_ok()
 
 @view_config(route_name='settings')
