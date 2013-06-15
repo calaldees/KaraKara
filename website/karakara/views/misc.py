@@ -34,6 +34,11 @@ def admin_toggle(request):
     request.session['admin'] = not request.session.get('admin',False)
     return action_ok()
 
+@view_config(route_name='remote')
+@web
+def remote(request):
+    return action_ok()
+
 @view_config(route_name='settings')
 @web
 def settings(request):

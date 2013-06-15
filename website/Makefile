@@ -39,7 +39,7 @@ env:
 	fi
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
-	cd env;	bin/easy_install pyramid
+	env/bin/easy_install pyramid
 
 setup: env
 	env/bin/python setup.py develop
