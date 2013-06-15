@@ -39,7 +39,7 @@ def main(global_config, **settings):
     
     # WebSocket ----------------------------------------------------------------
     
-    socket_manager = EchoServerManager(websocket_port=config.registry.settings['websocket.port'], tcp_port=9872)
+    socket_manager = EchoServerManager(websocket_port=config.registry.settings['karakara.websocket.port'], tcp_port=9872)
     socket_manager.start()
     
     # Renderers ----------------------------------------------------------------

@@ -7,13 +7,13 @@ var split_indexs = [];
 var socket;
 
 function setup_remote() {
-		var socket = new WebSocket("ws://"+location.hostname+":"+settings['websocket.port']+"/");
-		function receive(msg) {
-			var cmd = $.trim(msg.data);
-			console.log('remote control: '+cmd);
-			if (cmd in commands) {commands[cmd]();}
-		};
-		socket.onmessage = receive;
+	var socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
+	function receive(msg) {
+		var cmd = $.trim(msg.data);
+		console.log('remote control: '+cmd);
+		if (cmd in commands) {commands[cmd]();}
+	};
+	socket.onmessage = receive;
 }
 
 var commands = {
