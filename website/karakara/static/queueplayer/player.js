@@ -4,6 +4,41 @@ var DEFAULT_VIDEO_BACKGROUND_VOLUME = 0.2;
 var settings = {};
 var playlist = [];
 var split_indexs = [];
+var socket;
+
+function setup_remote() {
+		var socket = new WebSocket("ws://"+location.hostname+":"+settings['websocket.port']+"/");
+		function receive(msg) {
+			var cmd = $.trim(msg.data);
+			console.log('remote control: '+cmd);
+			if (cmd in commands) {commands[cmd]();}
+		};
+		socket.onmessage = receive;
+}
+
+var commands = {
+	'play': function(e) {
+		console.log('#play');
+		var video = $('#player').get(0);
+		video.loop = false;
+		video.volume = 1.0;
+		video.src = "/files/" + get_attachment(playlist[0].track, "video");
+		video.webkitRequestFullScreen();
+		video.load();
+		video.play();
+	},
+	'skip': function(e) {
+		console.log('#skip');
+		//e.preventDefault();
+		song_finished("skipped");
+	},
+	'ended': function(e) {
+		console.log('#player:ended');
+		var video = $('#player').get(0);
+		video.webkitExitFullScreen();
+		song_finished("played");
+	}
+};
 
 function get_attachment(track, type) {
 	for(var i=0; i<track.attachments.length; i++) {
@@ -112,28 +147,10 @@ function prepare_next_song() {
 
 $(document).ready(function() {
 	update_playlist();
-
-	$("#play").click(function(e) {
-		console.log('#play');
-		var video = $('#player').get(0);
-		video.loop = false;
-		video.volume = 1.0;
-		video.src = "/files/" + get_attachment(playlist[0].track, "video");
-		video.webkitRequestFullScreen();
-		video.load();
-		video.play();
-	});
-	$("#skip").click(function(e) {
-		console.log('#skip');
-		e.preventDefault();
-		song_finished("skipped");
-	});
-	$("#player").bind("ended", function(e) {
-		console.log('#player:ended');
-		var video = $('#player').get(0);
-		video.webkitExitFullScreen();
-		song_finished("played");
-	});
+	
+	$("#play").click(commands.play);
+	$("#skip").click(commands.skip);
+	$("#player").bind("ended", commands.ended);
 	
 	$.getJSON("/settings", {}, function(data) {
 		console.log("/settings");
@@ -155,6 +172,8 @@ $(document).ready(function() {
 		console.log('update_interval='+settings["karakara.player.queue.update_time"]);
 		
 		settings["karakara.player.video.preview_volume"] = settings["karakara.player.video.preview_volume"] || DEFAULT_VIDEO_BACKGROUND_VOLUME;
+		
+		setup_remote();
 	});
 	
 });
