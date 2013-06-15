@@ -17,7 +17,7 @@
     function send(message) {
         if (socket != null) {
             socket.send(message);
-            alert("websocket sent");
+            //alert("websocket sent");
             return false;
         }
         return true;
