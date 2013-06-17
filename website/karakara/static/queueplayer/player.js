@@ -107,7 +107,7 @@ function render_playlist() {
 	var h = "<ol>";
 	for(var i=0; i<playlist_ordered.length; i++) {
 		var t = playlist_ordered[i];
-		h += "<li><p id='addTitle'>" + t['track']['title'] + " </p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
+		h += "<li><p id='addTitle'>" + t['track']['tags']['title'] + " </p><p id=addFrom>" + t['track']['tags']['from'] + "</p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
 	}
 	h += "</ol>";
 	$('#playlist').html(h);
@@ -134,7 +134,7 @@ function prepare_next_song() {
 		if($('title').html() != title) {
 			console.log("Preparing next song");
 			$('title').html(title);
-			$('#title').html("<a style='color: black; text-decoration: none;' href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+			$('#title').html("<a style='color: white; text-decoration: none;' href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
 			var video = $('#player').get(0);
 			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;

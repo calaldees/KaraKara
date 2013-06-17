@@ -7,11 +7,25 @@ html {
 h1, h2 {
 	text-align: center;
 	margin-bottom: 0px;
+	border: 1px solid #222;
+	color: white;
+	border-radius: 8px 8px 0px 0px;
+	margin-top: 0px;
+	margin-bottom: 20px;
+	background-color: #222;
+}
+
+ul {font-size: 12px;}
+
+ol {
+	list-style-position: inside;
+	font-size: 12px;
 }
 
 ol li {
 	margin: 5px 5px 5px 5px;
-	background-color: #ccc;
+	color: black;
+	background-color: #222;
 	border: 1px solid #777;
 	-webkit-border-radius: .2em;
 	
@@ -90,31 +104,40 @@ button:before {
 
 
 /* song current */
-#playlist li:nth-child(1)  { 
-	color: red;
+#playlist li:nth-child(1)  {
+	background-color: #ccc;
 	white-space: pre-line;
 	-webkit-animation-name: pulse;
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-timing-function: ease-in-out;
 	-webkit-animation-direction: alternate;
 	-webkit-animation-duration: 0.75s;
+	
 }
-#playlist li:nth-child(1):before {
-	content: "Ready to Start \A";
+#playlist li:nth-child(1):after {
+	font-weight: bold;
+	content: "Ready to Start";
 }
 
 /* song next */
 #playlist li:nth-child(2) {
-	color: orange;
+	background-color: #777;
+	white-space: pre-line;
 }
 #playlist li:nth-child(2):after {
-	content: " - Up Next";
+	font-weight: bold;
+	content: "Up Next";
 }
 
 #playlist_obscured li {
 	display: inline-block;
 }
 
-#addTitle:before{content: "Title:\A";}
-#addPerformer:before{content: "Performer Name:\A";}
-#addTime:before{content: "Time before song:\A";}
+#playlist li:nth-child(n+3) {
+	color: #aaa;
+}
+
+#addTitle:before{content: "Title: "; font-weight: bold;}
+#addFrom:before{content: "From: "; font-weight: bold;}
+#addPerformer:before{content: "Performer Name: "; font-weight: bold;}
+#addTime:before{content: "Time before song: "; font-weight: bold;}
