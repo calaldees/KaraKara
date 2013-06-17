@@ -59,6 +59,9 @@ run:
 run_production: ini_production
 	env/bin/pserve $(INI_PROD)
 
+run_socket_server:
+	env/bin/python3 -mkarakara.lib.socket_server
+
 shell:
 	env/bin/pshell $(INI_DEV)
 

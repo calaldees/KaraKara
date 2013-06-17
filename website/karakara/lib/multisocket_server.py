@@ -7,25 +7,28 @@ import socketserver
 import socket
 
 import logging
+logger = {
+    'status'    : logging.getLogger(__name__+'.status').info,
+    'connection': logging.getLogger(__name__+'.connection').info,
+    'message'   : print,
+}
 
 
 # Constants---------------------------------------------------------------------
 __version__ = 0.1
 recv_size   = 4096
 
-options_defaults = {
-    'udp_port': 9871,
-    'tcp_port': 9872,
-    'websocket_port':9873,
-    'hide_status': True,
-    'hide_connections': True,
-    'show_messages':False,
-}
+#options_defaults = {
+#    'udp_port': 9871,
+#    'tcp_port': 9872,
+#    'websocket_port':9873,
+#    'hide_status': True,
+#    'hide_connections': True,
+#    'show_messages':False,
+#}
 
-log_params = {}
 def log(catagory, msg):
-    if log_params.get(catagory):
-        print(msg.strip())
+    logger.get(catagory, lambda msg: None)(msg.strip())
 
 class TCPBaseServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True
@@ -412,10 +415,12 @@ class ServerManager():
     def __init__(self, auto_setup_default_server_wrappers=True, **options):
         self.servers = {}
         if auto_setup_default_server_wrappers:
-            
-            WebsocketServerWrapper(self, **options)
-            TCPServerWrapper      (self, **options)
-            UDPServerWrapper      (self, **options)
+            if options.get('websocket_port'):
+                WebsocketServerWrapper(self, **options)
+            if options.get('tcp_port'):
+                TCPServerWrapper      (self, **options)
+            if options.get('udb_port'):
+                UDPServerWrapper      (self, **options)
     
     def start(self):
         for server in self.servers.values():
@@ -577,9 +582,12 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     
-    log_params['status'    ] = args.hide_status
-    log_params['message'   ] = args.show_messages
-    log_params['connection'] = args.hide_connections
+    if args.hide_status:
+        del logger['status']
+    if args.hide_connections:
+        del logger['connection']
+    if not args.show_messages:
+        del logger['message']
 
     options = vars(args)
     manager = EchoServerManager(**options)

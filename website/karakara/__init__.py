@@ -16,7 +16,7 @@ import re
 from .lib.misc import convert_str_with_type
 from .lib.auto_format import registered_formats
 from .templates import helpers as template_helpers
-from .lib.websocket_server import EchoServerManager
+from .lib.multisocket_server import EchoServerManager
 
 def main(global_config, **settings):
     """
@@ -39,7 +39,7 @@ def main(global_config, **settings):
     
     # WebSocket ----------------------------------------------------------------
     
-    socket_manager = EchoServerManager(websocket_port=config.registry.settings['karakara.websocket.port'], tcp_port=9872)
+    socket_manager = EchoServerManager(websocket_port=config.registry.settings['karakara.websocket.port']) #, tcp_port=9872
     socket_manager.start()
     config.registry['socket_manager'] = socket_manager
     
