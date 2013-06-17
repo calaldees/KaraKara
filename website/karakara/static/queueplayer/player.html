@@ -10,58 +10,40 @@
 	
 	<body>
 
-<table class="app">
-	<tr>
-		<td colspan="2">
-			<h1>Big-Screen Interface</h1>
-		</td>
-	</tr>
-	<tr>
-		<td>
-
-			<table class='player'>
-				<tr>
-					<td colspan="3">
-						<h2 id="title">Video Player</h2>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
-						<video width="320" height="240" id="player"> <!-- controls="controls" -->
-							Your browser does not support the video tag.
-						</video>
-					</td>
-				</tr>
-				<tr height="40">
-					<td>
-						<button id="play">Play</button>
-					</td>
-					<td width="20">
-						<button id="skip">Skip</button>
-					</td>
-				</tr>
-			</table>
-
-		</td>
-		<td>
-
-			<table class='playlist'>
-				<tr>
-					<td colspan="3">
-						<h2 id="title">Playlist</h2>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
-						<div id="playlist"></div>
-						<div id="playlist_obscured"></div>
-					</td>
-				</tr>
-			</table>
-
-		</td>
-	</tr>
-</table>
+<div class="app">
+	<div>
+		<h1>Big-Screen Interface</h1>
+	</div>
+	<div>
+		<div>
+			<div class='player'>
+				<div>
+					<h2 id="title">Video Player</h2>
+				</div>
+				<div id='videoHolder'>
+					<video width="380" height="285" id="player"> <!-- controls="controls" -->
+						Your browser does not support the video tag.
+					</video>
+				</div>
+				<div id='buttonHolder'>
+					<button id="play">Play</button>
+					<button id="skip">Skip</button>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class='playlist'>
+				<div>
+					<h2 id="title">Playlist</h2>
+				</div>
+				<div>
+					<div id="playlist"></div>
+					<div id="playlist_obscured"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 	</body>
 </html>
