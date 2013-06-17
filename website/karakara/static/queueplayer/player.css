@@ -1,3 +1,5 @@
+@-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
+
 html {
 	background: #eee;
 	font-family: Arial, Helvetica;
@@ -14,6 +16,9 @@ ol li {
 	-webkit-border-radius: .2em;
 	
 }
+
+ol li p {margin:0;}
+
 
 button {
 	/*text and spacing*/
@@ -88,6 +93,11 @@ button:before {
 #playlist li:nth-child(1)  { 
 	color: red;
 	white-space: pre-line;
+	-webkit-animation-name: pulse;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-duration: 0.75s;
 }
 #playlist li:nth-child(1):before {
 	content: "Ready to Start \A";
@@ -104,3 +114,7 @@ button:before {
 #playlist_obscured li {
 	display: inline-block;
 }
+
+#addTitle:before{content: "Title:\A";}
+#addPerformer:before{content: "Performer Name:\A";}
+#addTime:before{content: "Time before song:\A";}

@@ -107,7 +107,7 @@ function render_playlist() {
 	var h = "<ol>";
 	for(var i=0; i<playlist_ordered.length; i++) {
 		var t = playlist_ordered[i];
-		h += "<li>" + t['track']['title'] + " <br> " + t['performer_name'] + " <br> " + timedelta_str(t['total_duration']*1000);
+		h += "<li><p id='addTitle'>" + t['track']['title'] + " </p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
 	}
 	h += "</ol>";
 	$('#playlist').html(h);
