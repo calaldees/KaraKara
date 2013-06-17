@@ -116,7 +116,7 @@ function render_playlist() {
 	var h = "<ul>";
 	for(var i=0; i<playlist_obscured.length; i++) {
 		var t = playlist_obscured[i];
-		h += "<li>" + t['track']['title'] + " - " + t['performer_name'];
+		h += "<li>" + t['track']['tags']['title'] + " (" + t['track']['tags']['from'] + ")" + " - " + t['performer_name'];
 	}
 	h += "</ul>";
 	$('#playlist_obscured').html(h);
