@@ -40,7 +40,7 @@ def admin_toggle(request):
 @web
 def remote(request):
     cmd = request.params.get('cmd')
-    if cmd:
+    if is_admin(request) and cmd:
         log.debug("sending {0}".format(cmd))
         request.registry['socket_manager'].recv(cmd.encode('utf-8'))
     return action_ok()
