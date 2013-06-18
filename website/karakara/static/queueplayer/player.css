@@ -1,5 +1,4 @@
 @-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
-
 html {
 	background: #eee;
 	font-family: Arial, Helvetica;
@@ -25,10 +24,11 @@ ol {
 
 ol li {
 	margin: 5px 5px 5px 5px;
+	padding: 5px 5px 5px 5px;
 	color: black;
-	background-color: #222;
+	background-color: #777;
 	border: 1px solid #777;
-	-webkit-border-radius: .2em;
+	-webkit-border-radius: 8px;
 	
 }
 
@@ -56,7 +56,7 @@ button {
 }
 
 button:hover {
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#ddd));
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
 }
 
 button:before {
@@ -70,18 +70,11 @@ button:before {
 	-webkit-border-radius: .15em 0 0 .15em;
 }
 
-#play:before {
-	content: "\25B6";
-}
+#play:before {content: "\25B6";}
 
-#skip:before {
-	content: "\279C";
-}
+#skip:before {content: "\279C";}
 
-.app {
-	width: 820px;
-	margin: auto;
-}
+.app {width: 820px;margin: auto;}
 
 
 .player, .playlist {
@@ -93,51 +86,47 @@ button:before {
 	-webkit-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
 }
 
-#videoHolder {
-	background-color: #000;
-	border-radius: 8px;
-	padding: 10px;
-}
-
-#buttonHolder {
-	float: right;
-}
+#videoHolder {background-color: #000;border-radius: 8px;padding: 10px;}
+#buttonHolder {float: right;}
 
 
 /* song current */
 #playlist li:nth-child(1)  {
 	background-color: #ccc;
-	white-space: pre-line;
+	border: 1px solid #ccc;
 	-webkit-animation-name: pulse;
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-timing-function: ease-in-out;
 	-webkit-animation-direction: alternate;
 	-webkit-animation-duration: 0.75s;
-	
 }
 #playlist li:nth-child(1):after {
 	font-weight: bold;
+	float: right;
+	position: relative;
+	top: -15px;
+	left: -5px;
+	color: #c12;
 	content: "Ready to Start";
 }
 
 /* song next */
-#playlist li:nth-child(2) {
-	background-color: #777;
-	white-space: pre-line;
-}
+#playlist li:nth-child(2) {background-color: #777;}
 #playlist li:nth-child(2):after {
 	font-weight: bold;
 	content: "Up Next";
+	float: right;
+	position: relative;
+	top: -15px;
+	left: -5px;
+	color: #6b3;
 }
 
-#playlist_obscured li {
-	display: inline-block;
-}
+/*obscured playlist*/
+#playlist_obscured li {display: inline-block;}
 
-#playlist li:nth-child(n+3) {
-	color: #aaa;
-}
 
+/*add tags*/
 #addTitle:before{content: "Title: "; font-weight: bold;}
 #addFrom:before{content: "From: "; font-weight: bold;}
 #addPerformer:before{content: "Performer Name: "; font-weight: bold;}
