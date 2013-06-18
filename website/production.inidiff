@@ -10,6 +10,10 @@ sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 
 server.etag.enabled = True -> bool
 
+session.type    = ext:database
+session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+
+
 [logger_root]
 level = WARN
 
