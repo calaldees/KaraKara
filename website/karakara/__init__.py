@@ -18,6 +18,13 @@ from .lib.auto_format import registered_formats
 from .templates import helpers as template_helpers
 from .lib.multisocket_server import EchoServerManager
 
+
+# HACK! - Monkeypatch Mako 0.8.1 - HACK!
+import mako.filters
+html_escape_mako = mako.filters.html_escape
+mako.filters.html_escape = lambda s: html_escape_mako(str(s) if not isinstance(s, str) else s)
+
+
 def main(global_config, **settings):
     """
         This function returns a Pyramid WSGI application.
