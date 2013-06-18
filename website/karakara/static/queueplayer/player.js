@@ -119,6 +119,9 @@ function render_playlist() {
 		h += "<li>" + t['track']['tags']['title'] + " (" + t['track']['tags']['from'] + ")" + " - " + t['performer_name'];
 	}
 	h += "</ul>";
+	if (h != "<ul></ul>") {
+		$('#upLater').html('<h2>Up Later</h2>')
+	}
 	$('#playlist_obscured').html(h);
 	
 }
