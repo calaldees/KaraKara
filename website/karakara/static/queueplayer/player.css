@@ -16,6 +16,14 @@ h1, h2 {
 }
 
 ul {font-size: 12px;}
+ul li {
+	color: black;
+	background-color: #777;
+	border: 1px solid #777;
+	-webkit-border-radius: 8px;
+	padding: 2px 2px 2px 2px;
+	margin: 1px 1px 1px 1px;
+}
 
 ol {
 	list-style-position: inside;

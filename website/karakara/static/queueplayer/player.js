@@ -107,7 +107,10 @@ function render_playlist() {
 	var h = "<ol>";
 	for(var i=0; i<playlist_ordered.length; i++) {
 		var t = playlist_ordered[i];
-		h += "<li><p id='addTitle'>" + t['track']['tags']['title'] + " </p><p id=addFrom>" + t['track']['tags']['from'] + "</p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
+		var t_split = t['track']['title'].split(' - ');
+		var t_trackName = t_split[1];
+		var t_from = t_split[0];
+		h += "<li><p id='addTitle'>" + t_trackName + " </p><p id=addFrom>" + t_from + "</p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
 	}
 	h += "</ol>";
 	$('#playlist').html(h);
