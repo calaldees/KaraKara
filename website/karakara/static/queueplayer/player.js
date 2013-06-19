@@ -86,6 +86,23 @@ function update_playlist() {
 	});
 }
 
+function tags_exist(t) {
+	//returns true if the track has both title and from tags
+	if (typeof t['track']['tags']['title'] == undefined) {
+		return false;
+	}
+	else {
+		if (typeof t['track']['tags']['from'] == undefined) {
+			return false;
+		}
+		else{
+			return true;
+		}
+		
+	}
+}
+
+
 function render_playlist() {
 	console.log("render_playlist");
 	
@@ -107,9 +124,16 @@ function render_playlist() {
 	var h = "<ol>";
 	for(var i=0; i<playlist_ordered.length; i++) {
 		var t = playlist_ordered[i];
-		var t_split = t['track']['title'].split(' - ');
-		var t_trackName = t_split[1];
-		var t_from = t_split[0];
+		if (tags_exist) {
+			var t_trackName = t['track']['tags']['title'];
+			var t_from = t['track']['tags']['from'];
+		}
+		else {
+			var t_split = t['track']['title'].split(' - ');
+			var t_trackName = t_split[1];
+			var t_from = t_split[0];
+		}
+		
 		h += "<li><p id='addTitle'>" + t_trackName + " </p><p id=addFrom>" + t_from + "</p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
 	}
 	h += "</ol>";
@@ -119,7 +143,16 @@ function render_playlist() {
 	var h = "<ul>";
 	for(var i=0; i<playlist_obscured.length; i++) {
 		var t = playlist_obscured[i];
-		h += "<li>" + t['track']['tags']['title'] + " (" + t['track']['tags']['from'] + ")" + " - " + t['performer_name'];
+		if (tags_exist) {
+			var t_trackName = t['track']['tags']['title'];
+			var t_from = t['track']['tags']['from'];
+		}
+		else {
+			var t_split = t['track']['title'].split(' - ');
+			var t_trackName = t_split[1];
+			var t_from = t_split[0];
+		}
+		h += "<li>" + t_trackName + " (" + t_from + ")" + " - " + t['performer_name'];
 	}
 	h += "</ul>";
 	if (h != "<ul></ul>") {
