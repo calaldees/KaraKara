@@ -129,9 +129,15 @@ function render_playlist() {
 			var t_from = t['track']['tags']['from'];
 		}
 		else {
-			var t_split = t['track']['title'].split(' - ');
-			var t_trackName = t_split[1];
-			var t_from = t_split[0];
+			try {
+				var t_split = t['track']['title'].split(' - ');
+				var t_trackName = t_split[1];
+				var t_from = t_split[0];
+			} catch(e) {
+				var t_trackName = t['track']['title'];
+				var t_from = "";
+			}
+			
 		}
 		
 		h += "<li><p id='addTitle'>" + t_trackName + " </p><p id=addFrom>" + t_from + "</p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
