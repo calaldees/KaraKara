@@ -115,6 +115,7 @@ button:before {
 	top: -15px;
 	left: -5px;
 	color: #c12;
+	text-shadow: 0 0 4px #ff1, 0 0 30px #fe6;
 	content: "Ready to Start";
 }
 
