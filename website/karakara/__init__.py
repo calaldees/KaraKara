@@ -1,5 +1,6 @@
 # Pyramid imports
 from pyramid.config import Configurator
+from pyramid.request import Request
 import pyramid.events
 
 
@@ -16,7 +17,7 @@ import re
 from .lib.misc import convert_str_with_type
 from .lib.auto_format import registered_formats
 from .templates import helpers as template_helpers
-from .lib.multisocket_server import EchoServerManager
+from .socket.auth_echo_server import AuthEchoServerManager
 
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
@@ -38,7 +39,9 @@ def main(global_config, **settings):
     config = Configurator(settings=settings) #, autocommit=True
     
     # Beaker Session Manager
-    config.set_session_factory(pyramid_beaker.session_factory_from_settings(settings))
+    session_factory = pyramid_beaker.session_factory_from_settings(settings)
+    config.set_session_factory(session_factory)
+    #import pdb ; pdb.set_trace()
     
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
@@ -46,9 +49,16 @@ def main(global_config, **settings):
     
     # WebSocket ----------------------------------------------------------------
     
-    socket_manager = EchoServerManager(websocket_port=config.registry.settings['karakara.websocket.port']) #, tcp_port=9872
-    socket_manager.start()
+    def authenicator(key):
+        """Only admin authenticated keys can connect to the websocket"""
+        session_data = session_factory(Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.key'],key)}))
+        return session_data and session_data.get('admin')
+    socket_manager = AuthEchoServerManager(
+        authenticator=authenicator,
+        websocket_port=config.registry.settings['karakara.websocket.port'],
+    )
     config.registry['socket_manager'] = socket_manager
+    socket_manager.start()
     
     # Renderers ----------------------------------------------------------------
     

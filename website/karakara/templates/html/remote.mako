@@ -9,6 +9,9 @@
         var port = ${request.registry.settings['karakara.websocket.port']};
         try {
             socket = new WebSocket("ws://" + host + ":" + port + "/");
+            socket.onopen = function(){  //Authenicate client with session key on socket connect
+                socket.send(document.cookie.match(/${request.registry.settings['session.key']}=(.+?)(\;|\b)/)[1]);
+            };
         }
         catch(err) {
             console.error("Websockets not supported. Using request method", err);

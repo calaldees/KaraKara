@@ -8,6 +8,9 @@ var socket;
 
 function setup_remote() {
 	var socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
+	socket.onopen = function(){ // Authenicate client with session key on socket connect
+		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key']
+	};
 	function receive(msg) {
 		var cmd = $.trim(msg.data);
 		console.log('remote control: '+cmd);
