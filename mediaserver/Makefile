@@ -4,13 +4,16 @@ BACKUP_SELECTOR = -iregex '.*\\\.\(txt\|json\)'
 LAN_IP = 172.20.1.2
 DCHP_MIN = 172.20.1.10
 DCHP_MAX = 172.20.200.254
+NGINX_CFG_OVERRIDES =
 
 
 help:
 	# Usage: make <target>, where target is
 	# setup          -- install dependancys and setup db account
-	# run            -- run nginx server
-	# run_dns        -- run nginx and dns server
+	# start_nginx    -- start nginx server
+	# stop_nginx     -- stop nginx and dns server
+	# start          -- start nginx and dnsserver
+	# stop -         -- stop nginx and dnsserver
 	#
 	# data_backup    -- utility to compress tag/data from www/files/
 	# data_restore   --
@@ -23,18 +26,32 @@ help:
 	#
 	# Typical first use should be: sudo make setup, sudo make run
 
-run: setup tmp log www/files
+start_nginx: setup tmp log www/files stop_nginx
 	echo "user `whoami`;" > nginx_user.conf
-	sudo nginx -p `pwd`/ -c nginx.conf
+	sudo nginx -p `pwd`/ -c nginx.conf -g "${NGINX_CFG_OVERRIDES}"
 
-stop_dns_server:
-	sudo killall dnsmasq || true
+stop_nginx:
+	#sudo nginx -s quit
+	sudo pkill nginx || true
 
 start_dns_server: stop_dns_server
 	sudo dnsmasq --conf-file --bind-interfaces --except-interface=lo --listen-address=$(LAN_IP) --dhcp-range=$(DCHP_MIN),$(DCHP_MAX),24h --dhcp-option=option:router,$(LAN_IP) --address="/#/$(LAN_IP)"
 
-run_dns: start_dns_server run stop_dns_server
-	echo server
+stop_dns_server:
+	sudo killall dnsmasq || true
+
+#run_dns: start_dns_server start_nginx stop_dns_server
+#	echo server
+
+#start: NGINX_CFG_OVERRIDES += daemon on;
+#start: run
+#	echo "starting nginx and dnsmasq running in backgorund"
+
+start: start_dns_server start_nginx
+	echo "starting nginx and dnsmasq"
+
+stop: stop_dns_server stop_nginx
+	echo "stopping nginx and dnsmasq"
 
 tmp:
 	mkdir tmp
@@ -43,7 +60,8 @@ log:
 	mkdir log
 
 www/files:
-	test -z www/files && mkdir www/files
+	mkdir www/files
+	#test -z www/files && 
 
 clean:
 	rm -rf tmp log setup
@@ -55,7 +73,7 @@ setup:
 		echo installing nginx; \
 		sudo apt-get install nginx; \
 		sudo update-rc.d -f nginx disable; \
-		sudo echo "127.0.0.1 int.karakara.local" >> /etc/hosts \
+		sudo echo "127.0.0.1 int.karakara.local" >> /etc/hosts; \
 	fi
 	if dpkg -s postgresql ; then \
 		echo ; \
