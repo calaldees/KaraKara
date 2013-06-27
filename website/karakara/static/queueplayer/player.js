@@ -89,21 +89,6 @@ function update_playlist() {
 	});
 }
 
-function tags_exist(t) {
-	//returns true if the track has both title and from tags
-	if (typeof t['track']['tags']['title'] == undefined) {
-		return false;
-	}
-	else {
-		if (typeof t['track']['tags']['from'] == undefined) {
-			return false;
-		}
-		else{
-			return true;
-		}
-		
-	}
-}
 
 
 function render_playlist() {
@@ -123,52 +108,42 @@ function render_playlist() {
 		playlist_obscured = [];
 	}
 	
-	// Playlist Ordered
-	var h = "<ol>";
-	for(var i=0; i<playlist_ordered.length; i++) {
-		var t = playlist_ordered[i];
-		if (tags_exist) {
-			var t_trackName = t['track']['tags']['title'];
-			var t_from = t['track']['tags']['from'];
+	// Render queue_item scaffold
+	function render_queue_items(queue, renderer_queue_item) {
+		var output_buffer = "";
+		for(var i=0; i<queue.length; i++) {
+			var queue_item = queue[i];
+			var track = queue_item['track'];
+			track.tags.get = function(tag){
+				if (tag in this) {return this[tag];}
+				return ""
+			};
+			output_buffer += "<li>\n"+renderer_queue_item(queue_item, track)+"</li>\n";
 		}
-		else {
-			try {
-				var t_split = t['track']['title'].split(' - ');
-				var t_trackName = t_split[1];
-				var t_from = t_split[0];
-			} catch(e) {
-				var t_trackName = t['track']['title'];
-				var t_from = "";
-			}
-			
-		}
-		
-		h += "<li><p id='addTitle'>" + t_trackName + " </p><p id=addFrom>" + t_from + "</p><p id='addPerformer'> " + t['performer_name'] + " </p><p id='addTime'> " + timedelta_str(t['total_duration']*1000) + "</p>";
+		return output_buffer;
 	}
-	h += "</ol>";
-	$('#playlist').html(h);
 	
-	// Playlist Obscured
-	var h = "<ul>";
-	for(var i=0; i<playlist_obscured.length; i++) {
-		var t = playlist_obscured[i];
-		if (tags_exist) {
-			var t_trackName = t['track']['tags']['title'];
-			var t_from = t['track']['tags']['from'];
-		}
-		else {
-			var t_split = t['track']['title'].split(' - ');
-			var t_trackName = t_split[1];
-			var t_from = t_split[0];
-		}
-		h += "<li>" + t_trackName + " (" + t_from + ")" + " - " + t['performer_name'];
-	}
-	h += "</ul>";
-	if (h != "<ul></ul>") {
-		$('#upLater').html('<h2>Up Later</h2>')
-	}
-	$('#playlist_obscured').html(h);
+	// Render Playlist Ordered
+	var queue_html = render_queue_items(playlist_ordered, function(queue_item, track) {
+		return "" +
+			"<p id='addTitle'>"     + track.tags.get("title")   + "</p>\n" +
+			"<p id='addFrom'>"      + track.tags.get("from")    + "</p>\n" +
+			"<p id='addPerformer'>" + queue_item.performer_name + "</p>\n" +
+			"<p id='addTime'> "     + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
+	});
+	$('#playlist').html("<ol>"+queue_html+"</ol>\n");
 	
+	// Render Playlist Obscured
+	if (playlist_obscured.length) {
+		$('#upLater').html('<h2>Up Later</h2>');
+	}
+	var queue_html = render_queue_items(playlist_obscured, function(queue_item, track) {
+		return "" +
+			track.tags.get("title") +
+			track.tags.get("from") ? " ("+track.tags.get("from")+")" : "" +
+			" - "+queue_item.performer_name+"\n";
+	});
+	$('#playlist_obscured').html("<ul>"+queue_html+"</ul>");
 }
 
 
