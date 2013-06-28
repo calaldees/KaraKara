@@ -136,7 +136,7 @@ button:before {
 
 
 /*add tags*/
-#addTitle:before{content: "Title: "; font-weight: bold;}
-#addFrom:before{content: "From: "; font-weight: bold;}
-#addPerformer:before{content: "Performer Name: "; font-weight: bold;}
-#addTime:before{content: "Time before song: "; font-weight: bold;}
+#playlist .title:before{content: "Title: "; font-weight: bold;}
+#playlist .from:before{content: "From: "; font-weight: bold;}
+#playlist .performer:before{content: "Performer Name: "; font-weight: bold;}
+#playlist .time:before{content: "Time before song: "; font-weight: bold;}

@@ -126,10 +126,10 @@ function render_playlist() {
 	// Render Playlist Ordered
 	var queue_html = render_queue_items(playlist_ordered, function(queue_item, track) {
 		return "" +
-			"<p id='addTitle'>"     + track.tags.get("title")   + "</p>\n" +
-			"<p id='addFrom'>"      + track.tags.get("from")    + "</p>\n" +
-			"<p id='addPerformer'>" + queue_item.performer_name + "</p>\n" +
-			"<p id='addTime'> "     + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
+			"<p class='title'>"     + track.tags.get("title")   + "</p>\n" +
+			"<p class='from'>"      + track.tags.get("from")    + "</p>\n" +
+			"<p class='performer'>" + queue_item.performer_name + "</p>\n" +
+			"<p class='time'> "     + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
 	});
 	$('#playlist').html("<ol>"+queue_html+"</ol>\n");
 	
