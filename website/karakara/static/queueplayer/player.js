@@ -138,10 +138,11 @@ function render_playlist() {
 		$('#upLater').html('<h2>Up Later</h2>');
 	}
 	var queue_html = render_queue_items(playlist_obscured, function(queue_item, track) {
-		return "" +
-			track.tags.get("title") +
-			track.tags.get("from") ? " ("+track.tags.get("from")+")" : "" +
-			" - "+queue_item.performer_name+"\n";
+		var buffer = "";
+		buffer += track.tags.get("title");
+		track.tags.get("from") ? buffer += " ("+track.tags.get("from")+")" : null;
+		buffer += " - "+queue_item.performer_name+"\n";
+		return buffer;
 	});
 	$('#playlist_obscured').html("<ul>"+queue_html+"</ul>");
 }
