@@ -32,5 +32,9 @@ h2. Additional components
 h2. Setup
 
 * Each component has it's own readme.txt and requirements.
-* Makfiles are provided for Linux/Mac setup
-** Windows setup will follow at somepoint
+* Makfiles are provided for Linux setup
+* Windows/Mac
+** install http://www.vagrantup.com/
+** vagrant box add precise32 http://files.vagrantup.com/precise32.box
+** vagrant up
+* copy/mount media files to mediaserver/www/files
