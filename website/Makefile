@@ -3,12 +3,12 @@ INI_DEV  = development.ini
 INI_TEST = test.ini
 INI_PROD = production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
-APTGET_EXTRAS = 
 
-TTY=$(shell tty)
-ifndef TTY
-APTGET_EXTRAS+=-y
-endif
+#APTGET_EXTRAS = 
+#TTY=$(shell tty)
+#ifndef TTY
+#APTGET_EXTRAS+=-y
+#endif
 
 
 help:
@@ -33,16 +33,16 @@ env_deactivate:
 
 env:
 	if dpkg -s python-virtualenv ; then \
-	    echo virtualenv already installed; \
+		echo virtualenv already installed; \
 	else \
-	    echo installing virtualenv; \
-	    sudo apt-get install python-virtualenv $(APTGET_EXTRAS) ; \
+		echo installing virtualenv; \
+		sudo apt-get install python-virtualenv -y ; \
 	fi
 	if dpkg -s python3-setuptools ; then \
-	    echo python 3 already installed; \
+		echo python 3 already installed; \
 	else \
-	    echo installing python 3; \
-	    sudo apt-get install python3-setuptools $(APTGET_EXTRAS) ; \
+		echo installing python 3; \
+		sudo apt-get install python3-setuptools -y ; \
 	fi
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
