@@ -6,6 +6,12 @@ DCHP_MIN = 172.20.1.10
 DCHP_MAX = 172.20.200.254
 NGINX_CFG_OVERRIDES =
 
+APTGET_EXTRAS = 
+TTY=$(shell tty)
+ifndef TTY
+APTGET_EXTRAS+=-y
+endif
+
 
 help:
 	# Usage: make <target>, where target is
@@ -71,7 +77,7 @@ setup:
 		echo ; \
 	else \
 		echo installing nginx; \
-		sudo apt-get install nginx; \
+		sudo apt-get install nginx $(APTGET_EXTRAS) ; \
 		sudo update-rc.d -f nginx disable; \
 		sudo echo "127.0.0.1 int.karakara.local" >> /etc/hosts; \
 	fi
@@ -79,7 +85,7 @@ setup:
 		echo ; \
 	else \
 		echo installing postgresql; \
-		sudo apt-get install postgresql; \
+		sudo apt-get install postgresql $(APTGET_EXTRAS) ; \
 	fi
 	sudo -u postgres psql -c "create user karakara with password 'karakara';" || true
 	sudo -u postgres psql -c "create database karakara with owner karakara encoding 'utf8';" || true
