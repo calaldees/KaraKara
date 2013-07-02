@@ -4,6 +4,6 @@ run_production:
 	cd website ; make run_production
 
 vagrant:
-	sudo apt-get install vagrant
-    vagrant box add precise32 http://files.vagrantup.com/precise32.box
-    vagrant up
+	sudo apt-get install vagrant -y
+	vagrant box add precise32 http://files.vagrantup.com/precise32.box
+	cd vagrant ; vagrant up
