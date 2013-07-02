@@ -8,7 +8,7 @@ else
 #--------------------------------------------------------
 
 apt-get update
-apt-get install -y git
+apt-get install -y git make
 
 #cd /home/vagrant/
 
@@ -21,9 +21,10 @@ if [ -f "website" ]
 then
 	echo "codebase already checked out"
 else
-	git clone http://
+	git clone https://github.com/calaldees/KaraKara.git
 	mv KaraKara/* .
 	rm -rf KaraKara
+fi
 
 # Setup Website Python Project
 cd /vagrant/website
