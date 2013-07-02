@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+cd /vagrant
 if [ -f "setup" ]
 then
 	echo "Install previously completed"
@@ -48,5 +49,6 @@ make setup
 echo 'cd /vagrant && make run_production' >> /home/vagrant/.profile
 
 #---------------------------------------------------------
+cd /vagrant
 touch setup
 fi
