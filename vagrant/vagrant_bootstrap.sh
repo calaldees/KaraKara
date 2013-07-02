@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-cd /vagrant
-if [ -f "setup" ]
+$HOME=/home/vagrant
+$SHARE=/vagrant
+$GIT_REPO=https://github.com/calaldees/KaraKara.git
+
+if [ -f "$HOME/setup" ]
 then
 	echo "Install previously completed"
 else
@@ -11,44 +14,34 @@ else
 apt-get update
 apt-get install -y git make
 
-#cd /home/vagrant/
-
 # Checkout (if needed)
 #  - for windows machines where installing git is a rather cumbersom task,
 #    it is just nessisarry to distribute the Vagrantfile and checkout the
 #    codebase from within the vm.
-cd /vagrant
-if [ -f "website" ]
+cd $HOME
+if [ -f "KaraKara" ]
 then
 	echo "codebase already checked out"
 else
-	git clone https://github.com/calaldees/KaraKara.git
-	mv KaraKara/* .
-	rm -rf KaraKara
+	git clone $GIT_REPO
 fi
 
 # Setup Website Python Project
-cd /vagrant/website
+cd $HOME/KaraKara/website
 make setup
 make test
 
 # Setup nginx and PostgreSQL
-cd /vagrant/mediaserver
+cd $HOME/KaraKara/mediaserver
 make setup
-
-# TODO
-#  Setup LAN_IP and ports to forward in Vagrantfile
-#
-#
-#
 
 # Enable autorun of server on system startup
 #  - this is not the best way, ideally the server should start on startup
 #    and when user uses 'vagrant ssh' they are taken to the screen session
-#    of the running server 
-echo 'cd /vagrant && make run_production' >> /home/vagrant/.profile
+#    of the running server
+# TODO: check that this is further
+echo 'cd $(SHARE) && make run_production' >> $HOME/.profile
 
 #---------------------------------------------------------
-cd /vagrant
-touch setup
+touch $HOME/setup
 fi
