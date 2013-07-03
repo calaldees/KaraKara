@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-$HOME=/home/vagrant
-$SHARE=/vagrant
-$GIT_REPO=https://github.com/calaldees/KaraKara.git
+HOME="/home/vagrant"
+SHARE="/vagrant"
+GIT_REPO="https://github.com/calaldees/KaraKara.git"
 
 if [ -f "$HOME/setup" ]
 then
@@ -11,8 +11,14 @@ else
 	echo "Installing packages"
 #--------------------------------------------------------
 
-apt-get update
-apt-get install -y git make
+#if dpkg -s git ; then
+#    echo prerequesits already installed
+#else
+    apt-get update
+    apt-get install -y git make
+#fi
+
+su vagrant
 
 # Checkout (if needed)
 #  - for windows machines where installing git is a rather cumbersom task,
@@ -40,7 +46,7 @@ make setup
 #    and when user uses 'vagrant ssh' they are taken to the screen session
 #    of the running server
 # TODO: check that this is further
-echo 'cd $(SHARE) && make run_production' >> $HOME/.profile
+echo "cd KaraKara && sudo make run_production" >> $HOME/.profile
 
 #---------------------------------------------------------
 touch $HOME/setup
