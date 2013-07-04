@@ -46,7 +46,9 @@ make setup
 #    and when user uses 'vagrant ssh' they are taken to the screen session
 #    of the running server
 # TODO: check that this is further
-echo "cd KaraKara && sudo make run_production" >> $HOME/.profile
+#echo "cd KaraKara && sudo make run_production" >> $HOME/.profile
+# unable to put this in .profile as it runs on boot and blocks the vagrant from returning to terminal
+# need a way of running the python project as a process
 
 #---------------------------------------------------------
 touch $HOME/setup

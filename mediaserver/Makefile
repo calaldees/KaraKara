@@ -82,7 +82,7 @@ setup:
 		sudo apt-get install postgresql -y ; \
 	fi
 	sudo -u postgres psql -c "create user karakara with password 'karakara';" || true
-	sudo -u postgres psql -c "create database karakara with owner karakara encoding 'utf8';" || true
+	sudo -u postgres psql -c "create database karakara with owner karakara encoding 'utf8' TEMPLATE=template0 LC_CTYPE='en_US.UTF-8' LC_COLLATE='en_US.UTF-8';" || true
 	touch setup
 
 data_backup:
