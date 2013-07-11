@@ -1,17 +1,20 @@
 $.cookie.json = true;
 
 var priority_token_cookie = $.cookie('priority_token');
-var server_datetime_offset;
 var interval_id;
 
 function update_priority_token_feedback() {
     if (priority_token_cookie) {
+        // If the server time and the client time differ, calculate an offset
+        // TODO - this needs to be persistantly stored in the cookie because we loose our state each page view
+        if (!priority_token_cookie.server_datetime_offset) {
+            priority_token_cookie.server_datetime_offset = new Date() - new Date(priority_token_cookie.server_datetime);
+            console.log("Calculated server_datetime_offset: " + priority_token_cookie.server_datetime_offset);
+        }
+        var now = new Date() - priority_token_cookie.server_datetime_offset;
+        
         var valid_start = new Date(priority_token_cookie.valid_start);
         var valid_end   = new Date(priority_token_cookie.valid_end  );
-        if (!server_datetime_offset) {
-            server_datetime_offset = new Date() - new Date(priority_token_cookie.server_datetime);
-        }
-        var now = new Date() - server_datetime_offset;
         var delta_start = valid_start - now;
         var delta_end   = valid_end   - now;
         
@@ -19,7 +22,6 @@ function update_priority_token_feedback() {
             $.removeCookie('priority_token');
             clearInterval(interval_id);
             priority_token_cookie = null;
-            server_datetime_offset = null;
             $("#priority_countdown")[0].innerHTML = "";
             console.log("Deleted stale 'priority_token' cookie");
         }
