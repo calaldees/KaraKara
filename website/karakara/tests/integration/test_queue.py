@@ -270,13 +270,21 @@ def test_queue_obscure(app,tracks):
     clear_queue(app)
 
 
-def test_queue_track_duplicate(app, tracks):
+def test_queue_track_duplicate(app, tracks, DBSession, commit):
     """
     Adding duplicate tracks should error (if appsetting is set)
     """
     assert get_queue(app) == []
     response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'1 -> int',
                                      'karakara.queue.add.duplicate.time_limit' :'1:00:00 -> timedelta'})
+    
+    # Duplicate also looks at 'played' tracks
+    # These are not surfaced by the queue API so we need to DB access to clean out the leftover played references
+    from karakara.model.model_queue import QueueItem
+    for queue_item in DBSession.query(QueueItem).filter(QueueItem.track_id=='t1').filter(QueueItem.status=='played').all():
+        DBSession.delete(queue_item)
+    commit()
+    
     response = app.post('/queue', dict(track_id='t1', performer_name='bob1'))
     response = app.post('/queue', dict(track_id='t1', performer_name='bob2'), expect_errors=True)
     assert response.status_code==400
@@ -303,7 +311,9 @@ def test_queue_limit(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
     assert response.status_code == 400
     
-    assert 'valid_start' in get_cookie(app, 'priority_token')
+    cookie_priority_token = get_cookie(app, 'priority_token')
+    assert 'valid_start'     in cookie_priority_token
+    assert 'server_datetime' in cookie_priority_token
     
     response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
     clear_queue(app)
