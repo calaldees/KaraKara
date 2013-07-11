@@ -38,5 +38,6 @@ class PriorityToken(Base):
             #'issued'        : None ,
             'valid_start'   : None ,
             'valid_end'     : None ,
+            'server_datetime': now(),  # The client datetime and server datetime may be out. we need to return the server time so the client can calculate the difference
         },
     })
