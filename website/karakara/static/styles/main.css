@@ -10,6 +10,16 @@
     text-shadow: 0 1px 0 #FFFFFF;
 }
 
+#priority_countdown {
+    position: absolute;
+    right: 0em;
+    font-size: 75%;
+    font-weight: normal;
+    background-color: red;
+    color: white;
+    padding: 0.25em;
+}
+
 h1,h2,h3,h4,h5,h6 {font-weight: bold;}
 
 HTML.no-video .hide_if_no_html5_video {display: none;}

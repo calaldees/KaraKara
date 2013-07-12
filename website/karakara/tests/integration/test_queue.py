@@ -312,8 +312,8 @@ def test_queue_limit(app, tracks):
     assert response.status_code == 400
     
     cookie_priority_token = get_cookie(app, 'priority_token')
-    assert 'valid_start'     in cookie_priority_token
-    assert 'server_datetime' in cookie_priority_token
+    assert cookie_priority_token.get('valid_start')
+    assert cookie_priority_token.get('server_datetime')
     
     response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
     clear_queue(app)
