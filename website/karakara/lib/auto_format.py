@@ -36,6 +36,14 @@ format_request_accept = {
 }
 
 #-------------------------------------------------------------------------------
+# Class's
+#-------------------------------------------------------------------------------
+
+class FormatError(Exception):
+    pass
+
+
+#-------------------------------------------------------------------------------
 # Setup
 #-------------------------------------------------------------------------------
 
@@ -120,23 +128,23 @@ def auto_format_output(target, *args, **kwargs):
     # the result may have an overriding format that should always take precident
     try   : formats.insert(0,result['format'])
     except: pass
-    
-    formatter = None
-    for format in formats:
-        try:
-            formatter = _auto_formaters[format]
-            log.debug('render format = %s' % format)
-            break
-        except:
-            log.warn('format unsupported = %s' % format)
-    
+
     # Attempt auto_format if result is a plain python dict and auto_format func exisits
-    if formatter and isinstance(result, dict):
+    if isinstance(result, dict):
         # Add pending flash messages to result dict
         result['messages'] = result.get('messages',[]) + request.session.pop_flash()
-        
-        # Format result dict using format func
-        response = formatter(request, result)
+
+        for formatter in filter(lambda i: i, [_auto_formaters.get(format) for format in formats]):
+            try:
+                # Format result dict using format func
+                response = formatter(request, result)
+                break
+            except FormatError:
+                log.warn('format refused')
+                # TODO - useful error message .. what was the exceptions message
+            except Exception:
+                log.warn('format rendering erorrs')
+                # TODO - print stack trace here
         
         # Set http response code
         if isinstance(response, pyramid.response.Response) and result.get('code'):
@@ -234,6 +242,8 @@ def format_redirect(request, result):
     """
     A special case for compatable browsers making REST calls
     """
+    if request.response.headers.get('Set-Cookie'):
+        raise FormatError('format_redirect cannot function when cookies are being set')
     for message in result['messages']:
         request.session.flash(message)
     del result['code']

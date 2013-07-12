@@ -116,7 +116,7 @@
 % endif
 % if queue_status != 'THRESHOLD':
     <form action='/queue' method='POST' data-ajax="false">
-        ##<input type='hidden' name='format'         value='redirect'      />
+        <input type='hidden' name='format'         value='redirect'      />
         <input type='text'   name='performer_name' value=''              placeholder='Enter your name' required />
         <input type='hidden' name='track_id'       value='${track['id']}' />
         <input type='submit' name='submit_'        value='Queue Track'   />
