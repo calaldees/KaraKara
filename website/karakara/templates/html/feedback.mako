@@ -17,7 +17,7 @@
     <% readonly_field = 'readonly="True"' if request.params.get('details','') else '' %>
     <form action="" method="POST">
         <input    type="text" name="contact" ${readonly_field} value="${request.params.get('contact','')}" placeholder="contact email or name (optional)"/>
-        <textarea             name="details" ${readonly_field}                                             placeholder="What were you doing, what did you expect to happen, what did happen">${request.params.get('details','')}</textarea>
+        <textarea             name="details" ${readonly_field}                                             placeholder="What do you think, what were you doing, what did you expect to happen, what did happen" rows="5" style="height: auto;">${request.params.get('details','')}</textarea>
         % if not readonly_field:
         <input type="submit" name="submit"  value      ="submit" />
         % endif
