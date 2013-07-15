@@ -115,10 +115,11 @@ def consume_priority_token(request, DBSession):
         token = DBSession.query(PriorityToken) \
             .filter(PriorityToken.used==False) \
             .filter(PriorityToken.session_owner==request.session['id']) \
-            .filter(PriorityToken.valid_start>=now(), PriorityToken.valid_end<now()) \
+            .filter(PriorityToken.valid_start<=now(), PriorityToken.valid_end>now()) \
             .one()
         token.used = True
-        request.unset_cookie('priority_token') # may not work with format='redirect'
+        #request.unset_cookie('priority_token') # may not work with format='redirect'
+        request.cookies.pop('priority_token',None)
         #DBSession.delete(token)
         return True
     except NoResultFound:

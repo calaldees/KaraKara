@@ -4,6 +4,9 @@ import json
 import re
 from bs4 import BeautifulSoup
 
+import datetime
+from karakara.lib.misc import now
+
 # Utils ------------------------------------------------------------------------
 
 def get_queue(app):
@@ -23,7 +26,11 @@ def clear_queue(app):
     assert get_queue(app) == []
 
 def get_cookie(app, key):
-    return json.loads({cookie.name:cookie for cookie in app.cookiejar}[key].value)
+    try:
+        return json.loads({cookie.name:cookie for cookie in app.cookiejar}[key].value)
+    except KeyError:
+        return None
+    
 
 def add_queue(app, track_id, performer_name):
     response = app.post('/queue', dict(track_id=track_id, performer_name=performer_name))
@@ -302,18 +309,40 @@ def test_queue_limit(app, tracks):
     should retry there selection.
     """
     assert get_queue(app) == []
-    response = app.put('/settings', {'karakara.queue.add.limit'       :'0:02:30 -> timedelta',  # 150sec
-                                     'karakara.queue.template.padding':'0:00:30 -> timedelta'})
+    response = app.put('/settings', {
+        'karakara.queue.add.limit'          :'0:02:30 -> timedelta',  # 150sec
+        'karakara.queue.template.padding'   :'0:00:30 -> timedelta',
+        'karakara.queue.add.priority_window':'0:05:00 -> timedelta',
+    })
 
+    # Ensure we don't have an existing priority token
+    assert not get_cookie(app, 'priority_token')
+
+    # Fill the Queue
     response = app.post('/queue', dict(track_id='t1', performer_name='bob1')) #total_duration = 0sec
     response = app.post('/queue', dict(track_id='t1', performer_name='bob2')) # 90sec (1min track + 30sec padding)
     response = app.post('/queue', dict(track_id='t1', performer_name='bob3')) #180sec (1min track + 30sec padding) - by adding this track we will be at 180sec, that is now OVER 150sec, the next addition will error
+    
+    # Fail quque add, get priority token
     response = app.post('/queue', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
     assert response.status_code == 400
-    
     cookie_priority_token = get_cookie(app, 'priority_token')
     assert cookie_priority_token.get('valid_start')
     assert cookie_priority_token.get('server_datetime')
     
+    # Try queue add again and not get priority token give as we already have one
+    response = app.post('/queue.json', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
+    assert 'limit' in response.json['messages'][0]
+    
+    # Shift server time forward - simulate waiting 5 minuets - we should be in our priority token range
+    now(now() + datetime.timedelta(minutes=5))
+    
+    # Add the track using the power of the priority token
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob4'))
+    assert 'bob4' in [q['performer_name'] for q in get_queue(app)]
+    #assert not get_cookie(app, 'priority_token')  # The priority token should be consumed and removed from the client
+    
+    # Tidyup after test
+    now(datetime.datetime.now())
     response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
     clear_queue(app)
