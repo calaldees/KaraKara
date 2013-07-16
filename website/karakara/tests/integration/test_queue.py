@@ -395,3 +395,20 @@ def test_queue_limit(app, tracks):
         'karakara.queue.add.limit'       :'0:00:00 -> timedelta'
     })
     clear_queue(app)
+
+
+def test_event_end(app, tracks):
+    assert get_queue(app) == []
+
+    response = app.put('/settings', {
+        'karakara.event.end':'{0} -> datetime'.format(now()+datetime.timedelta(minutes=0, seconds=30)),
+    })
+    
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
+    assert response.status_code==400
+    assert 'submissions are closed' in response.text
+
+    response = app.put('/settings', {
+        'karakara.event.end':' -> datetime',
+    })

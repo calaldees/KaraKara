@@ -145,5 +145,5 @@ def get_queue_duration(request):
     from .queue import queue_view # 
     queue = queue_view(request)['data']['queue']
     if queue:
-        return queue[-1]['total_duration']
+        return queue[-1]['total_duration'] + datetime.timedelta(seconds=queue[-1]['track']['duration'])
     return datetime.timedelta()
