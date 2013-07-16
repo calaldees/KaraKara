@@ -2,7 +2,7 @@
 pyramid.reload_templates    = false
 pyramid.debug_templates     = false
 
-text.title = KaraKara
+karakara.template.title = KaraKara
 
 karakara.server.mode = production
 

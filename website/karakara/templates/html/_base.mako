@@ -34,7 +34,7 @@
                 data-theme="e"
                 % endif
 >
-                <%def name="title()">${request.registry.settings.get('text.title') or 'KaraKara'}</%def>
+                <%def name="title()">${request.registry.settings.get('karakara.template.title') or 'KaraKara'}</%def>
                 <h1>${next.title()}</h1><span id="priority_countdown"></span>
                 
                 ## data-iconpos="notext"

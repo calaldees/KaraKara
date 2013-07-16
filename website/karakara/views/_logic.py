@@ -28,9 +28,20 @@ class QUEUE_DUPLICATE():
     THRESHOLD = 'THRESHOLD'
     PLAYED    = 'PLAYED'
     PENDING   = 'PENDING'
+    PERFORMER = 'PERFORMER'
 
 
 # Methods -----------
+
+def queue_item_base_query(request, DBSession):
+    time_limit = request.registry.settings.get('karakara.queue.add.duplicate.time_limit')
+    return DBSession.query(QueueItem) \
+        .filter(or_(
+            QueueItem.status=='pending',
+            and_(QueueItem.status=='played', QueueItem.time_touched>=datetime.datetime.now()-time_limit)
+        )) \
+        .order_by(QueueItem.queue_weight)
+
 
 def queue_item_for_track(request, DBSession, track_id):
     """
@@ -38,16 +49,10 @@ def queue_item_for_track(request, DBSession, track_id):
     Could be 2 DB querys, both involved in limit setting
     """
     count_limit = request.registry.settings.get('karakara.queue.add.duplicate.count_limit')
-    time_limit  = request.registry.settings.get('karakara.queue.add.duplicate.time_limit')
     # If we are restricting duplicates then perform additional querys to enforce this.
     
-    queue_items = DBSession.query(QueueItem) \
+    queue_items = queue_item_base_query(request, DBSession) \
         .filter(QueueItem.track_id==track_id) \
-        .filter(or_(
-            QueueItem.status=='pending',
-            and_(QueueItem.status=='played', QueueItem.time_touched>=datetime.datetime.now()-time_limit)
-        )) \
-        .order_by(QueueItem.queue_weight) \
         .all()
     played  = [q for q in queue_items if q.status=='played' ]
     pending = [q for q in queue_items if q.status=='pending']
@@ -59,7 +64,7 @@ def queue_item_for_track(request, DBSession, track_id):
         status = QUEUE_DUPLICATE.PENDING
     elif played:
         status = QUEUE_DUPLICATE.PLAYED
-
+    
     return {'played':played, 'pending':pending, 'status':status}
 
 

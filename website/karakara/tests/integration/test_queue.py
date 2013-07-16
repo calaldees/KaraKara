@@ -35,6 +35,17 @@ def get_cookie(app, key):
 def add_queue(app, track_id, performer_name):
     response = app.post('/queue', dict(track_id=track_id, performer_name=performer_name))
 
+def admin_play_next_track(app):
+    """
+    As admin player mark track as played
+    """
+    response = app.get('/admin')
+    queue_item_id = get_queue(app)[0]['id']
+    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'})
+    assert 'update' in response.json['messages'][0]
+    response = app.get('/admin')
+
+
 
 
 # Tests ------------------------------------------------------------------------
@@ -177,14 +188,16 @@ def test_queue_played(app, tracks):
     
     # Add track to queue
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    
+    # TODO - insert this and get it working
+    # Try to set as 'played' as normal user - and get rejected
+    #queue_item_id = get_queue(app)[0]['id']
+    #response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'}, expect_errors=True)
+    
     app.cookiejar.clear()
     
     # As admin player mark track as played
-    response = app.get('/admin')
-    queue_item_id = get_queue(app)[0]['id']
-    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'})
-    assert 'update' in response.json['messages'][0]
-    response = app.get('/admin')
+    admin_play_next_track(app)
     
     # TODO: skipped status needs testing too
     
@@ -298,7 +311,32 @@ def test_queue_track_duplicate(app, tracks, DBSession, commit):
     
     response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'0 -> int'})
     clear_queue(app)
+
+
+@unfinished
+def test_queue_performer_duplicate(app, tracks, DBSession, commit):
+    assert get_queue(app) == []
+    response = app.put('/settings', {
+        'karakara.queue.add.duplicate.performer_limit':'1 -> int',
+    })
+
+    # Duplicate also looks at 'played' tracks
+    # These are not surfaced by the queue API so we need to DB access to clean out the leftover played references
+    from karakara.model.model_queue import QueueItem
+    for queue_item in DBSession.query(QueueItem).filter(QueueItem.performer_name=='bob').filter(QueueItem.status=='played').all():
+        DBSession.delete(queue_item)
+    commit()
+
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
+    assert response.status_code==400
     
+    response = app.put('/settings', {
+        'karakara.queue.add.duplicate.performer_limit':'0 -> int',
+    })
+    clear_queue(app)
+
+
 
 def test_queue_limit(app, tracks):
     """
@@ -344,5 +382,7 @@ def test_queue_limit(app, tracks):
     
     # Tidyup after test
     now(datetime.datetime.now())
-    response = app.put('/settings', {'karakara.queue.add.limit'       :'0:00:00 -> timedelta'})
+    response = app.put('/settings', {
+        'karakara.queue.add.limit'       :'0:00:00 -> timedelta'
+    })
     clear_queue(app)
