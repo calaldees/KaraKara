@@ -320,13 +320,15 @@ def test_queue_performer_duplicate(app, tracks, DBSession, commit):
         'karakara.queue.add.duplicate.performer_limit':'1 -> int',
     })
 
-    # Duplicate also looks at 'played' tracks
-    # These are not surfaced by the queue API so we need to DB access to clean out the leftover played references
-    from karakara.model.model_queue import QueueItem
-    for queue_item in DBSession.query(QueueItem).filter(QueueItem.performer_name=='bob').filter(QueueItem.status=='played').all():
-        DBSession.delete(queue_item)
-    commit()
-
+    def clear_played():
+        # Duplicate also looks at 'played' tracks
+        # These are not surfaced by the queue API so we need to DB access to clean out the leftover played references
+        from karakara.model.model_queue import QueueItem
+        for queue_item in DBSession.query(QueueItem).filter(QueueItem.performer_name=='bob').filter(QueueItem.status=='played').all():
+            DBSession.delete(queue_item)
+        commit()
+    clear_played()
+    
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
     assert response.status_code==400
@@ -335,7 +337,14 @@ def test_queue_performer_duplicate(app, tracks, DBSession, commit):
         'karakara.queue.add.duplicate.performer_limit':'0 -> int',
     })
     clear_queue(app)
+    clear_played()
 
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
+
+    clear_queue(app)
+    clear_played()
+    
 
 
 def test_queue_limit(app, tracks):
