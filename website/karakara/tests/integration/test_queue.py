@@ -313,7 +313,7 @@ def test_queue_track_duplicate(app, tracks, DBSession, commit):
     clear_queue(app)
 
 
-@unfinished
+
 def test_queue_performer_duplicate(app, tracks, DBSession, commit):
     assert get_queue(app) == []
     response = app.put('/settings', {

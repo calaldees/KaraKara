@@ -133,7 +133,7 @@ def queue_add(request):
         performer_limit = request.registry.settings.get('karakara.queue.add.duplicate.performer_limit')
         if performer_limit:
             performer_name_count = _logic.queue_item_base_query(request, DBSession).filter(QueueItem.performer_name==request.params.get('performer_name')).count()
-            if performer_name_count > performer_limit:
+            if performer_name_count >= performer_limit:
                 raise action_error(message='unable to queue track. duplicate "performer_name" limit reached', code=400)
         
         # Duplicate Addition Restrictions
