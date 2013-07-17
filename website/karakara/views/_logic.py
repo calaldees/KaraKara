@@ -30,6 +30,12 @@ class QUEUE_DUPLICATE():
     PENDING   = 'PENDING'
     PERFORMER = 'PERFORMER'
 
+class TOKEN_ISSUE_ERROR(object):
+    NONE = None
+    EVENT_END    = 'EVENT_END'
+    TOKEN_LIMIT  = 'TOKEN_LIMIT'
+    TOKEN_ISSUED = 'TOKEN_ISSUED'
+
 
 # Methods -----------
 
@@ -82,12 +88,12 @@ def issue_priority_token(request, DBSession):
     event_end = request.registry.settings.get('karakara.event.end')
     if event_end and latest_token_end > event_end:
         # Unable to issue token as event end
-        return None
+        return TOKEN_ISSUE_ERROR.EVENT_END
     
     priority_token_limit = request.registry.settings.get('karakara.queue.add.limit.priority_token')
     if priority_token_limit and latest_token_end > now()+priority_token_limit:
         # Unable to issue token as priority tokens are time limited
-        return None
+        return TOKEN_ISSUE_ERROR.TOKEN_LIMIT
     
     # Do not issue another priority_token if current user alrady has a priority_token
     try:
@@ -97,7 +103,7 @@ def issue_priority_token(request, DBSession):
                             .filter(PriorityToken.valid_end>now()) \
                             .one()
         if priority_token:
-            return None
+            return TOKEN_ISSUE_ERROR.TOKEN_ISSUED
     except NoResultFound:
         pass
     

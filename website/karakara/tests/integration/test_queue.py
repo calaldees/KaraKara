@@ -379,7 +379,7 @@ def test_queue_limit(app, tracks):
     
     # Try queue add again and not get priority token give as we already have one
     response = app.post('/queue.json', dict(track_id='t1', performer_name='bob4'), expect_errors=True)
-    assert 'limit' in response.json['messages'][0]
+    assert 'already have' in response.json['messages'][0]
     
     # Shift server time forward - simulate waiting 5 minuets - we should be in our priority token range
     now(now() + datetime.timedelta(minutes=5))
@@ -407,7 +407,7 @@ def test_event_end(app, tracks):
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
     assert response.status_code==400
-    assert 'submissions are closed' in response.text
+    assert 'ending soon' in response.text
 
     response = app.put('/settings', {
         'karakara.event.end':' -> datetime',

@@ -10,6 +10,7 @@ from ..lib.misc           import now
 from ..model              import DBSession, commit
 from ..model.model_queue  import QueueItem
 from ..model.model_tracks import Track
+from ..model.model_token  import PriorityToken
 
 from ..templates.helpers import track_title
 
@@ -147,7 +148,7 @@ def queue_add(request):
         # Event end time
         event_end = request.registry.settings.get('karakara.event.end')
         if event_end and now()+queue_duration > event_end:
-            raise action_error(message='event submissions are closed', code=400)
+            raise action_error(message='Event will be ending soon and all the time has been alocated', code=400)
         
         # Queue time limit
         queue_limit = request.registry.settings.get('karakara.queue.add.limit')
@@ -157,9 +158,13 @@ def queue_add(request):
             if not _logic.consume_priority_token(request, DBSession):
                 # Issue a priority token
                 priority_token = _logic.issue_priority_token(request, DBSession)
-                if priority_token:
-                    raise action_error(message='queue limit reached - priority token issued', code=400)
-                raise action_error(message='queue limit reached', code=400)
+                if isinstance(priority_token, PriorityToken):
+                    raise action_error(message='Queue limit reached - You have been given a priority token and will have priority to queue a track in your priority timeslot', code=400)
+                if priority_token==_logic.TOKEN_ISSUE_ERROR.EVENT_END:
+                    raise action_error(message='Event will be ending soon and all the time has been alocated', code=400)
+                if priority_token==_logic.TOKEN_ISSUE_ERROR.TOKEN_ISSUED:
+                    raise action_error(message='You already have a priority token timeslot. Queue your track when your timeslot occurs', code=400)
+                raise action_error(message='Queue limit reached - try queing a track later', code=400)
     
     queue_item = QueueItem()
     for key,value in request.params.items():
