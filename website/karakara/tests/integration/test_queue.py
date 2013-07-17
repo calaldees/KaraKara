@@ -157,29 +157,6 @@ def test_queue_permissions(app, tracks):
     assert get_queue(app) == []
 
 
-@unfinished
-def test_queue_view_update(app, tracks):
-    """
-    Update track status
-    played
-    performer?
-    order?
-    """
-    assert get_queue(app) == []
-    response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
-    app.cookiejar.clear() # Loose the cookie so we are not identifyed as the creator of this queue item.
-    
-    response = del_queue(app, queue_item_id, expect_errors=True)
-
-    # What status's are updated?
-    
-    
-    response = app.get('/admin')
-    del_queue(app, queue_item_id)
-    response = app.get('/admin')
-
-    assert get_queue(app) == []
-
 def test_queue_played(app, tracks):
     """
     Player system gets track list and removes first queue_item.id when played
@@ -189,12 +166,10 @@ def test_queue_played(app, tracks):
     # Add track to queue
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     
-    # TODO - insert this and get it working
     # Try to set as 'played' as normal user - and get rejected
-    #queue_item_id = get_queue(app)[0]['id']
-    #response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'}, expect_errors=True)
-    
-    app.cookiejar.clear()
+    app.cookiejar.clear() # Loose the cookie so we are not identifyed as the creator of this queue item.
+    queue_item_id = get_queue(app)[0]['id']
+    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'}, expect_errors=True)
     
     # As admin player mark track as played
     admin_play_next_track(app)
@@ -242,11 +217,17 @@ def test_queue_reorder(app, tracks):
     queue = get_queue(app)
     assert ['xxx','t2','t1','t3'] == [q['track_id'] for q in queue]
     
+    # Check normal users cannot change order
+    response = app.get('/admin') # turn off admin
+    response = app.put('/queue', {'queue_item.id':queue[1]['id'], 'queue_item.move.target_id':queue[3]['id']}, expect_errors=True)
+    assert response.status_code==403
+    assert 'admin only' in response.text
+    queue = get_queue(app)
+    assert ['xxx','t2','t1','t3'] == [q['track_id'] for q in queue]
+    
     # Tidy queue
-    for queue_item in get_queue(app):
-        del_queue(app, queue_item['id'])
-    assert get_queue(app) == []
-    response = app.get('/admin')
+    clear_queue(app)
+    
 
 
 def test_queue_obscure(app,tracks):
