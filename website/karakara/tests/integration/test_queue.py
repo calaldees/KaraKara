@@ -357,9 +357,9 @@ def test_queue_limit(app, tracks):
     """
     assert get_queue(app) == []
     response = app.put('/settings', {
-        'karakara.queue.add.limit'          :'0:02:30 -> timedelta',  # 150sec
-        'karakara.queue.template.padding'   :'0:00:30 -> timedelta',
-        'karakara.queue.add.priority_window':'0:05:00 -> timedelta',
+        'karakara.queue.add.limit'                :'0:02:30 -> timedelta',  # 150sec
+        'karakara.queue.track.padding'            :'0:00:30 -> timedelta',
+        'karakara.queue.add.limit.priority_window':'0:05:00 -> timedelta',
     })
 
     # Ensure we don't have an existing priority token

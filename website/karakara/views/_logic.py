@@ -101,7 +101,7 @@ def issue_priority_token(request, DBSession):
     except NoResultFound:
         pass
     
-    priority_window = request.registry.settings.get('karakara.queue.add.priority_window')
+    priority_window = request.registry.settings.get('karakara.queue.add.limit.priority_window')
     
     priority_token = PriorityToken()
     priority_token.session_owner = request.session['id']

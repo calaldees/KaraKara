@@ -94,7 +94,7 @@ def queue_view(request):
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
         split_markers = list(request.registry.settings.get('karakara.queue.group.split_markers'))
-        time_padding = request.registry.settings.get('karakara.queue.template.padding')
+        time_padding = request.registry.settings.get('karakara.queue.track.padding')
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
