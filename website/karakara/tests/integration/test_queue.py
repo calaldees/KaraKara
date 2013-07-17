@@ -387,7 +387,7 @@ def test_queue_limit(app, tracks):
     # Add the track using the power of the priority token
     response = app.post('/queue', dict(track_id='t1', performer_name='bob4'))
     assert 'bob4' in [q['performer_name'] for q in get_queue(app)]
-    #assert not get_cookie(app, 'priority_token')  # The priority token should be consumed and removed from the client
+    assert not get_cookie(app, 'priority_token')  # The priority token should be consumed and removed from the client
     
     # Tidyup after test
     now(datetime.datetime.now())
