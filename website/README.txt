@@ -39,9 +39,8 @@ todo
 log.info access to files for profiling
 flash message:
   query session+queid 'refresh required'
-  your up in 'xx' min
+  your up in 'xx' min (client cookie)
 per phone limit?
-duplicate name warning - one track
 print css
 session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
 ini option to disable track adding by phones (just in case it get abused and needs turning off)

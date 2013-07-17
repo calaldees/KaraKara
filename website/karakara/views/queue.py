@@ -2,7 +2,7 @@ import datetime
 import random
 from pyramid.view import view_config
 
-from . import web, etag_decorator, cache, cache_none, generate_cache_key, method_delete_router, method_put_router, is_admin
+from . import web, etag_decorator, cache, cache_none, generate_cache_key, method_delete_router, method_put_router, is_admin, modification_action
 from . import _logic
 
 from ..lib.auto_format    import action_ok, action_error
@@ -113,6 +113,7 @@ def queue_view(request):
 
 @view_config(route_name='queue', request_method='POST')
 @web
+@modification_action
 def queue_add(request):
     """
     Add items to end of queue
@@ -183,6 +184,7 @@ def queue_add(request):
 
 @view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
 @web
+@modification_action
 def queue_del(request):
     """
     Remove items from the queue
@@ -213,6 +215,7 @@ def queue_del(request):
 
 @view_config(route_name='queue', custom_predicates=(method_put_router,) ) #request_method='PUT'
 @web
+@modification_action
 def queue_update(request):
     """
     Used to touch queed items
