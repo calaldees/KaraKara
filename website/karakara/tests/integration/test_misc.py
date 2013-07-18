@@ -50,3 +50,36 @@ def test_settings(app):
     # Settings Template
     response = app.get('/settings')
     assert 'setting' in response.text
+
+def test_readonly_mode(app):
+    response = app.get('/track/t1')
+    assert "form action='/queue" in response.text
+    
+    response = app.put('/settings', {
+        'karakara.system.user.readonly':'True -> bool',
+    })
+
+    # Normal users are restricted
+    response = app.get('/track/t1')
+    assert "form action='/queue" not in response.text
+
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
+    assert response.status_code==403
+    assert 'readonly' in response.text
+    
+    # Admin users function as normal
+    response = app.get('/admin')
+    response = app.get('/track/t1')
+    assert "form action='/queue" in response.text
+    #response = app.post('/queue.json', dict(track_id='t1', performer_name='bob')).json['data']
+    #assert False
+    response = app.get('/admin')
+    
+    # TODO - test 'update' and 'delete'? - for now testing the decoration once (above) is light enough
+    
+    response = app.put('/settings', {
+        'karakara.system.user.readonly':'False -> bool',
+    })
+    
+    
+    

@@ -106,22 +106,26 @@
 <!-- Queue -->
 <div data-role="collapsible" data-content-theme="c">
     <h3>Queue Track</h3>
-<% queue_status = track.get('queue',{}).get('status') %>
-% if   queue_status == 'THRESHOLD':
-<p>Track is not requestable because it has already been requested and has reached the request limit</p>
-% elif queue_status == 'PLAYED':
-<p>Track already been played recently.</p>
-% elif queue_status == 'PENDING':
-<p>This track has already been queued. Are you sure you want to still request it?</p>
-% endif
-% if queue_status != 'THRESHOLD':
-    <form action='/queue' method='POST' data-ajax="false">
-        <input type='hidden' name='format'         value='redirect'      />
-        <input type='text'   name='performer_name' value=''              placeholder='${request.registry.settings.get('karakara.template.input.performer_name', 'Enter your name')}' required />
-        <input type='hidden' name='track_id'       value='${track['id']}' />
-        <input type='submit' name='submit_'        value='Queue Track'   />
-    </form>
-% endif
+    % if not (identity and identity.get('admin',False)) and request.registry.settings.get('karakara.system.user.readonly'):
+        <p>Queuing tracks has been disabled</p>
+    % else:
+        <% queue_status = track.get('queue',{}).get('status') %>
+        % if   queue_status == 'THRESHOLD':
+        <p>Track is not requestable because it has already been requested and has reached the request limit</p>
+        % elif queue_status == 'PLAYED':
+        <p>Track already been played recently.</p>
+        % elif queue_status == 'PENDING':
+        <p>This track has already been queued. Are you sure you want to still request it?</p>
+        % endif
+        % if queue_status != 'THRESHOLD':
+            <form action='/queue' method='POST' data-ajax="false">
+                <input type='hidden' name='format'         value='redirect'      />
+                <input type='text'   name='performer_name' value=''              placeholder='${request.registry.settings.get('karakara.template.input.performer_name', 'Enter your name')}' required />
+                <input type='hidden' name='track_id'       value='${track['id']}' />
+                <input type='submit' name='submit_'        value='Queue Track'   />
+            </form>
+        % endif
+    % endif
 </div>
 
 

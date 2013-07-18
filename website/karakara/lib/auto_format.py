@@ -142,9 +142,10 @@ def auto_format_output(target, *args, **kwargs):
             except FormatError:
                 log.warn('format refused')
                 # TODO - useful error message .. what was the exceptions message
-            except Exception:
-                log.warn('format rendering erorrs')
-                # TODO - print stack trace here
+            except Exception as e:
+                log.warn('format rendering erorrs', exc_info=True)
+        else:
+            raise Exception('no format was able to render')
         
         # Set http response code
         if isinstance(response, pyramid.response.Response) and result.get('code'):

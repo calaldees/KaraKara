@@ -179,7 +179,7 @@ def queue_add(request):
     invalidate_queue() # Invalidate Cache
     invalidate_track(track_id)
     
-    return action_ok(message='track queued') #TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
+    return action_ok(message='track queued', data={'queue_item.id':''}, code=201) #TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
 
 
 @view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
