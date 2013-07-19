@@ -1,14 +1,45 @@
 
 def test_home(app):
     """
-    Main Menu
+    Main Menu    
     """
     response = app.get('/')
     assert response.status_code == 200
     assert 'html' in response.content_type
     for text in ['KaraKara', 'jquery-1.', 'jquery.mobile', 'Feedback', 'Explore']:
         assert text in response.text
+        
+
+def test_home_disabled(app):
+    """
+    Menu has - a lightweight menu message diabler:
+    In the event of load affecting the presentation screen we want a
+    lightweight way to diable the system and inform users.
+    We still want the system to operate for admins.
+    Rather than locking down everthing venomusly, we can just disable the main menu.
+    This will inform most users and throttle most traffic.
+    """
+    response = app.put('/settings', {
+        'karakara.template.menu.disable':'test menu disbaled',
+    })
+
+    response = app.get('/')
+    assert 'test menu disbaled' in response.text
     
+    response = app.get('/admin')
+    response = app.get('/')
+    assert 'test menu disbaled' not in response.text
+    response = app.get('/admin')
+
+    response = app.put('/settings', {
+        'karakara.template.menu.disable':'',
+    })
+
+    response = app.get('/')
+    assert 'test menu disbaled' not in response.text
+
+    
+
 def test_admin_toggle(app):
     """
     Swich to admin mode
