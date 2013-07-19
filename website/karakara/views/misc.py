@@ -57,7 +57,7 @@ def settings(request):
         # with PUT requests, update settings
         #  only changing in production is bit over zelious #request.registry.settings.get('karakara.server.mode')!='production'
         if request.registry.settings.get('karakara.server.mode')!='test' and not is_admin(request):
-            raise action_error(message='Settings unavalable for non admin users', code=403)
+            raise action_error(message='Settings modification for non admin users forbidden', code=403)
         
         for key, value in request.params.items():
             request.registry.settings[key] = convert_str_with_type(value)

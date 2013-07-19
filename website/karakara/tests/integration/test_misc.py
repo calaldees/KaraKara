@@ -102,6 +102,8 @@ def test_readonly_mode(app):
     response = app.get('/admin')
     response = app.get('/track/t1')
     assert "form action='/queue" in response.text
+    # TODO - we need a way of adding to the queue and getting the queue_item.id back in the response
+    #        currently this is not possible as the commit happens at the transaction level automatically
     #response = app.post('/queue.json', dict(track_id='t1', performer_name='bob')).json['data']
     #assert False
     response = app.get('/admin')

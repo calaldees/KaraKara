@@ -28,7 +28,7 @@
         
         <div data-role="page">
             
-            <div data-role="header" data-position="fixed" \
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" \
                 
                 % if identity and identity.get('admin',False):
                 data-theme="e"
