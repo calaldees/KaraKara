@@ -158,7 +158,7 @@ function prepare_next_song() {
 		if($('title').html() != title) {
 			console.log("Preparing next song");
 			$('title').html(title);
-			$('#title').html("<a style='color: white; text-decoration: none;' href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
 			var video = $('#player').get(0);
 			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;
