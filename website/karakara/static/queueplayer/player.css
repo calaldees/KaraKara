@@ -1,12 +1,12 @@
-
 @-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
+@-webkit-keyframes marquee {0%{}100%{}}
 
 body {
 	background: #eee;
 	font-family: Arial, Helvetica;
 }
 a {
-	color: black;
+	color: #fff;
 	text-decoration: none;
 }
 
@@ -30,14 +30,26 @@ a {
 
 #playerHolder {
 	float: left;
-	width: 70%;
+	width: 60%;
+}
+
+#playerHolder h2 {
+	color: #fff;
+	text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
+	position: relative;
+	top: -10px;
+	width: 78%;
+	text-align: center;
 }
 
 #videoHolder {
+	position: relative;
+	top: -65px;
+	z-index: -1;
 	background-color: #000;
 	border-radius: 8px;
 	padding: 10px;
-	width: 50%;
+	width: 78%;
 }
 
 #buttonHolder {
@@ -45,7 +57,7 @@ a {
 }
 #playlist ol {
 	list-style-position: inside;
-	font-size: 12px;
+	font-size: 18px;
 }
 
 #playlist ol li {
@@ -59,7 +71,7 @@ a {
 }
 
 #playlist ol li p {
-	margin: 0;
+	margin: -1%;
 }
 
 #playlist li:nth-child(1)  {
@@ -141,22 +153,48 @@ button:before {
 
 #playlistHolder {
 	float: left;
-	width: 30%;
+	width: 38%;
+	padding: 0px;
+	border: 1px solid #999;
+	border-radius: 8px;
+	margin-top: 5px;
+	background-color: #999;
 }
 
 #marqueeHolder {
 	height: 20%;
+	position: absolute;
+	bottom: -3%;
+	
+}
+
+#marqueeHolder h2 {
+	margin-top: 1.75%;
+	margin-bottom: 0;
+	text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
+	color: #fff;
+	padding-left: 35%;
+	background-color: #000;
+	border-radius: 8px 8px 0px 0px;
+	
 	
 }
 
 #marqueeHolder ul {
-	
+	margin-top: 0;
+	padding-top: 0;
 }
 
 #marqueeHolder ul li {
 	float: left;
 	border: 1px solid black;
 	border-radius: 8px;
-	padding: 5px 5px 5px 5px;
-	margin: 5px 5px 5px 5px;
+	padding: 1px 5px 1px 5px;
+	margin: 1px 5px 1px 5px;
+}
+
+#playlist_obscured {
+	margin-top: 0.25%;
+	white-space: nowrap;
+	overflow-x: hidden;
 }

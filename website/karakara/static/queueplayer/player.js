@@ -135,7 +135,7 @@ function render_playlist() {
 	
 	// Render Playlist Obscured
 	if (playlist_obscured.length) {
-		$('#upLater').html('<h2>Up Later</h2>');
+		$('#upLater').html('<h2>Later On</h2>');
 	}
 	var queue_html = render_queue_items(playlist_obscured, function(queue_item, track) {
 		var buffer = "";
