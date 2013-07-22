@@ -10,9 +10,10 @@
 % endif
 
 % if identity.get('admin', False):
-    <form action="" method="PUT">
+    <form action="" method="POST">
         <label id="setting_label" for="setting_input"></label>
         <input id="setting_input" name="" value=" -> bool">
+        <input type="hidden" name="method" value="PUT">
         <input type="submit" value="Update setting">
     </form>
     
@@ -29,4 +30,21 @@
         });
     });
     </script>
+    
+    <div data-role="collapsible" data-content-theme="c">
+        <h3>Quick Settings</h3>
+        
+        <%def name="quick_setting(title, key, value)">
+            <form action="" method="POST">
+                <input type="hidden" name="method" value="PUT">
+                <input type="hidden" name="${key}" value="${value}">
+                <input type="submit" value="${title}">
+            </form>
+        </%def>
+        
+        ${quick_setting('Readonly Mobile Interface', 'karakara.system.user.readonly' , 'True -> bool')}
+        ${quick_setting('Disable Mobile Interface' , 'karakara.template.menu.disable', 'Appolgies. The mobile interface has been disabled.')}
+        
+    </div>
+
 % endif
