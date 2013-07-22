@@ -43,7 +43,7 @@ flash message:
 per phone limit?
 print css
 session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
-ini option to disable track adding by phones (just in case it get abused and needs turning off)
 messaging/disabling individual devices
+way of recovering tracks that have been played/skipped (just in case of crash or problem)
 
 status_error message style dose not propergate to flash message with format='redirect'
