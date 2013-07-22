@@ -1,104 +1,79 @@
 @-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
-html {
+@-webkit-keyframes marquee {0%{}100%{}}
+
+body {
 	background: #eee;
 	font-family: Arial, Helvetica;
 }
-h1, h2 {
+a {
+	color: #fff;
+	text-decoration: none;
+}
+
+#headerHolder {
+	background-color: #000;
+	border: 1px solid black;
+	border-radius: 15px;
+	height: 10%;
+}
+
+#headerHolder h1 {
+	color: #fff;
 	text-align: center;
-	margin-bottom: 0px;
-	border: 1px solid #222;
-	color: white;
-	border-radius: 8px 8px 0px 0px;
-	margin-top: 0px;
-	margin-bottom: 20px;
-	background-color: #222;
+	margin-top: 1%;
 	text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
 }
 
-ul {font-size: 12px;}
-ul li {
-	color: black;
-	background-color: #777;
-	border: 1px solid #777;
-	-webkit-border-radius: 8px;
-	padding: 2px 2px 2px 2px;
-	margin: 1px 1px 1px 1px;
+#middle {
+	height: 70%;
 }
 
-ol {
+#playerHolder {
+	float: left;
+	width: 60%;
+}
+
+#playerHolder h2 {
+	color: #fff;
+	text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
+	position: relative;
+	top: -10px;
+	width: 78%;
+	text-align: center;
+}
+
+#videoHolder {
+	position: relative;
+	top: -65px;
+	z-index: -1;
+	background-color: #000;
+	border-radius: 8px;
+	padding: 10px;
+	width: 78%;
+}
+
+#buttonHolder {
+	margin-right: 1%;
+}
+#playlist ol {
 	list-style-position: inside;
-	font-size: 12px;
+	font-size: 18px;
 }
 
-ol li {
+#playlist ol li {
 	margin: 5px 5px 5px 5px;
 	padding: 5px 5px 5px 5px;
 	color: black;
 	background-color: #777;
 	border: 1px solid #777;
-	-webkit-border-radius: 8px;
-	
-}
-
-ol li p {margin:0;}
-
-
-button {
-	/*text and spacing*/
-	color:#333;
-	font: bold 1em/2em Arial, Helvetica;
-	text-decoration: none;
-	text-shadow: 0 1px 0 rgba(255,255,255,.8);
-	padding: 0 1.5em;
-	margin: 0.5em 0.1em 0.5em 0.1em;
-	display: inline-block;
-	white-space: nowrap;
-	
-	/*backgrounds*/
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
-	
-	/*border*/
-	border: 1px solid #777;
-	-webkit-border-radius: .2em;
-	-webkit-box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
-}
-
-button:hover {
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
-}
-
-button:before {
-	float: left;
-	width: 1em;
-	text-align: center;
-	font-size: 1.5em;
-	margin: 0 1em 0 -1em;
-	padding: 0 .2em;
-	-webkit-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
-	-webkit-border-radius: .15em 0 0 .15em;
-}
-
-#play:before {content: "\25B6";}
-
-#skip:before {content: "\279C";}
-
-.app {width: 820px;margin: auto;}
-
-
-.player, .playlist {
-	float: left;
-	background: /*#FFA*/#999;
 	border-radius: 8px;
-	width: 400px;
-	margin: 0px 5px 0px 5px;
-	-webkit-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+	
 }
 
-#videoHolder {background-color: #000;border-radius: 8px;padding: 10px;}
-#buttonHolder {float: right;}
+#playlist ol li p {
+	margin: -1%;
+}
 
-
-/* song current */
 #playlist li:nth-child(1)  {
 	background-color: #ccc;
 	border: 1px solid #ccc;
@@ -131,12 +106,95 @@ button:before {
 	color: #6b3;
 }
 
-/*obscured playlist*/
-#playlist_obscured li {display: inline-block;}
-
-
-/*add tags*/
 #playlist .title:before{content: "Title: "; font-weight: bold;}
 #playlist .from:before{content: "From: "; font-weight: bold;}
 #playlist .performer:before{content: "Performer Name: "; font-weight: bold;}
 #playlist .time:before{content: "Time before song: "; font-weight: bold;}
+
+button {
+	/*text and spacing*/
+	color:#333;
+	font: bold 1em/2em Arial, Helvetica;
+	text-decoration: none;
+	text-shadow: 0 1px 0 rgba(255,255,255,.8);
+	padding: 0 1.5em;
+	margin: 0.5em 0.1em 0.5em 0.1em;
+	display: inline-block;
+	white-space: nowrap;
+	float: right;
+	
+	/*backgrounds*/
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#ccc));
+	
+	/*border*/
+	border: 1px solid #777;
+	-webkit-border-radius: .2em;
+	-webkit-box-shadow: 0 0 1px 1px rgba(255,255,255,.8) inset, 0 1px 0 rgba(0,0,0,.3);
+}
+
+button:hover {
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+}
+
+button:before {
+	float: left;
+	width: 1em;
+	text-align: center;
+	font-size: 1.5em;
+	margin: 0 1em 0 -1em;
+	padding: 0 .2em;
+	-webkit-box-shadow: 1px 0 0 rgba(0,0,0,.5), 2px 0 0 rgba(255,255,255,.5);
+	-webkit-border-radius: .15em 0 0 .15em;
+}
+
+#play:before {content: "\25B6";}
+
+#skip:before {content: "\279C";}
+
+#playlistHolder {
+	float: left;
+	width: 38%;
+	padding: 0px;
+	border: 1px solid #999;
+	border-radius: 8px;
+	margin-top: 5px;
+	background-color: #999;
+}
+
+#marqueeHolder {
+	height: 20%;
+	position: absolute;
+	bottom: -3%;
+	
+}
+
+#marqueeHolder h2 {
+	margin-top: 1.75%;
+	margin-bottom: 0;
+	text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
+	color: #fff;
+	padding-left: 35%;
+	background-color: #000;
+	border-radius: 8px 8px 0px 0px;
+	
+	
+}
+
+#marqueeHolder ul {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+#marqueeHolder ul li {
+	float: left;
+	border: 1px solid black;
+	border-radius: 8px;
+	padding: 1px 5px 1px 5px;
+	margin: 1px 5px 1px 5px;
+}
+
+#playlist_obscured {
+	margin-top: 0.25%;
+	white-space: nowrap;
+	overflow-x: hidden;
+}
