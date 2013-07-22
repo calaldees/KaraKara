@@ -13,8 +13,8 @@ from karakara.model.model_tracks import Track, Tag, Attachment
 import logging
 log = logging.getLogger(__name__)
 
-@pytest.fixture(scope="session")
-def init_random_data(DBSession, commit, num_tracks=100):
+@pytest.fixture(scope="function")
+def random_tracks(request, DBSession, commit, num_tracks=100):
     log.info('Generating {0} random tracks'.format(num_tracks))
 
     # Attachment generation ----------------------------------------------------

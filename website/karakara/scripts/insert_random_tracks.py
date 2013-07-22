@@ -1,4 +1,4 @@
-from karakara.tests.data.tracks_random import init_random_data
+from karakara.tests.data.tracks_random import random_tracks
 from karakara.model                    import init_DBSession, DBSession, commit
 
 import logging
@@ -39,7 +39,7 @@ def main():
     
     
     # Insert tracks
-    init_random_data(DBSession, commit, args.num_tracks)
+    random_tracks(None, DBSession, commit, args.num_tracks)
     
 if __name__ == "__main__":
     main()
