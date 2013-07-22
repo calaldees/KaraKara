@@ -1,13 +1,15 @@
+
 import datetime
 import resource
 from bs4 import BeautifulSoup
 
-from karakara.tests.conftest import unimplemented, unfinished, xfail
+from karakara.tests.conftest import unimplemented, unfinished, xfail, slow
 
 
 def get_ram():
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024
 
+@slow
 def test_crawl(app, tracks, random_tracks):
     """
     Test to:

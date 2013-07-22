@@ -18,10 +18,18 @@ def pytest_runtest_setup(item):
         pytest.skip('unimplemented functionality') #"need --runslow option to run"
     if 'unfinished' in item.keywords:
         pytest.skip('unfinished functionality') #"need --runslow option to run"
+    try:
+        runslow = item.config.getoption("--runslow")
+    except ValueError:
+        runslow = False
+    if 'slow' in item.keywords and not runslow:
+        pytest.skip("need --runslow option to run")
 
 unimplemented = pytest.mark.unimplemented # Server dose not support the functionlity this test is asserting yet
 unfinished    = pytest.mark.unfinished    # The test is unfinished and currently is know to fail
 xfail         = pytest.mark.xfail
+slow          = pytest.mark.slow
+
 # Fixtures ---------------------------------------------------------------------
 
 @pytest.fixture(scope="session")
