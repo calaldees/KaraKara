@@ -40,3 +40,10 @@ def test_track_list_all(app, tracks):
 def test_track_list_all_api(app, tracks):
     data = app.get('/track_list?format=json').json['data']
     assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
+
+def test_track_list_all(app):
+    """
+    Uknown track
+    """
+    response = app.get('/track/unknown_track_id', expect_errors=True)
+    assert response.status_code == 404

@@ -3,7 +3,9 @@
 <%def name="title()">Track</%def>
 
 <%
-    track = data['track']
+    track = data.get('track')
+    if not track:
+        return ''
 %>
 
 <h1 class="track_title">${h.track_title_only(track)}</h1>

@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from . import web, etag_decorator, cache, cache_none, generate_cache_key
 from ._logic import queue_item_for_track
 
-from ..lib.auto_format    import action_ok
+from ..lib.auto_format    import action_ok, action_error
 from ..model              import DBSession
 from ..model.model_tracks import Track
 from ..model.model_queue  import QueueItem
@@ -86,9 +86,13 @@ def track_view(request):
         track['queue']['pending'] = queue_item_list_to_dict(track['queue']['pending'])
         return track
     
+    # TODO: Put some thought into the idea that a malicious cock could deliberately
+    #       perform repeated calls knowing a cache key could will be created and
+    #       take the system down with an 'out of memory'. Then again, if they want to
+    #       attack this system with brains there is very little we can do.
     track = cache.get_or_create(track_key(id), lambda: get_track_and_queued_dict(id))
     if not track:
-        raise action_error(message='track {0} not found'.format(id))
+        raise action_error(message='track {0} not found'.format(id), code=404)
     
     return action_ok(data={'track' : track})
 

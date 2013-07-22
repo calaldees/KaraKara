@@ -393,3 +393,4 @@ def test_event_end(app, tracks):
     response = app.put('/settings', {
         'karakara.event.end':' -> datetime',
     })
+    clear_queue(app)

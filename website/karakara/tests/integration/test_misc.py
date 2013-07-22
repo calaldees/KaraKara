@@ -82,7 +82,7 @@ def test_settings(app):
     response = app.get('/settings')
     assert 'setting' in response.text
 
-def test_readonly_mode(app):
+def test_readonly_mode(app, tracks):
     response = app.get('/track/t1')
     assert "form action='/queue" in response.text
     

@@ -45,6 +45,9 @@ def app(request, settings):
     #print('setup WebApp')
     app = TestApp(karakara_main({}, **settings))
     
+    from karakara.model.init_data import init_data
+    init_data()
+    
     def finalizer():
         #print('tearDown WebApp')
         pass
@@ -60,8 +63,6 @@ def DBSession(request, app):
     we can import the session safly knowing it has been setup
     """
     from karakara.model import DBSession
-    from karakara.model.init_data import init_data
-    init_data()
     return DBSession
 
 @pytest.fixture(scope="session")
