@@ -13,8 +13,8 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, host: 6543, guest: 6543
   config.vm.network :forwarded_port, host: 9873, guest: 9873
 
-  config.vm.network :private_network, ip: "10.0.0.1"
-  config.vm.synced_folder ".", "/vagrant", :nfs => true
+  #config.vm.network :private_network, ip: "10.0.0.1"
+  #config.vm.synced_folder ".", "/vagrant", :nfs => true
   
   #config.vm.network :hostonly, "33.33.33.10"
   #config.vm.share_folder "v-root", "/vagrant", ".", :nfs => true

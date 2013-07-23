@@ -18,6 +18,7 @@ else
     apt-get install -y git make
 #fi
 
+# The user still seems to be root even after this
 su vagrant
 
 # Checkout (if needed)
@@ -36,10 +37,14 @@ fi
 cd $HOME/KaraKara/website
 make setup
 make test
+make ini_production
 
 # Setup nginx and PostgreSQL
 cd $HOME/KaraKara/mediaserver
 make setup
+
+cd $HOME/KaraKara
+make init_random_production
 
 # Enable autorun of server on system startup
 #  - this is not the best way, ideally the server should start on startup
