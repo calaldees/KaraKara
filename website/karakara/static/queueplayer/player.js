@@ -19,10 +19,14 @@ function setup_remote() {
 	socket.onmessage = receive;
 }
 
+function get_video() {
+	return $('#player').get(0) || {};
+}
+
 var commands = {
 	'play': function(e) {
 		console.log('#play');
-		var video = $('#player').get(0);
+		var video = get_video();
 		video.loop = false;
 		video.volume = 1.0;
 		video.src = "/files/" + get_attachment(playlist[0].track, "video");
@@ -30,15 +34,23 @@ var commands = {
 		video.load();
 		video.play();
 	},
+	'pause': function(e) {
+		var video = get_video();
+		// get state
+		// if playing
+		//   video.pause()
+		// else
+		//   video.play()
+	},
 	'skip': function(e) {
 		console.log('#skip');
 		//e.preventDefault();
+		get_video().webkitExitFullScreen();
 		song_finished("skipped");
 	},
 	'ended': function(e) {
 		console.log('#player:ended');
-		var video = $('#player').get(0);
-		video.webkitExitFullScreen();
+		get_video().webkitExitFullScreen();
 		song_finished("played");
 	}
 };
@@ -159,7 +171,7 @@ function prepare_next_song() {
 			console.log("Preparing next song");
 			$('title').html(title);
 			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-			var video = $('#player').get(0);
+			var video = get_video();
 			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
 			video.loop = true;
 			video.volume = settings["karakara.player.video.preview_volume"];
