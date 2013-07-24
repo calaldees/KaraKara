@@ -105,3 +105,8 @@ ini_test:
 	env/bin/python3 karakara/scripts/make_ini.py test
 ini_production:
 	env/bin/python3 karakara/scripts/make_ini.py production
+
+start_webapp_daemon: ini_production
+	start-stop-daemon --start --pidfile webapp.pid --name karakara --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
+stop_webapp_daemon:
+	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid
