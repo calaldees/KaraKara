@@ -120,12 +120,20 @@
         <p>This track has already been queued. Are you sure you want to still request it?</p>
         % endif
         % if queue_status != 'THRESHOLD':
-            <form action='/queue' method='POST' data-ajax="false">
+            <form action='/queue' method='POST' data-ajax="false" onsubmit="store_performer_name();">
                 <input type='hidden' name='format'         value='redirect'      />
-                <input type='text'   name='performer_name' value=''              placeholder='${request.registry.settings.get('karakara.template.input.performer_name', 'Enter your name')}' required />
+                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='${request.registry.settings.get('karakara.template.input.performer_name', 'Enter your name')}' required />
                 <input type='hidden' name='track_id'       value='${track['id']}' />
                 <input type='submit' name='submit_'        value='Queue Track'   />
             </form>
+            <script>
+                function store_performer_name(args) {
+                    $.cookie('last_performer_name', {value:$("#input_performer_name").val()}, {path:'/'});
+                }
+                $(document).ready(function() {
+                    $('#input_performer_name').val($.cookie("last_performer_name").value || "");
+                });
+            </script>
         % endif
     % endif
 </div>
