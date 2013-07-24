@@ -43,8 +43,12 @@ make ini_production
 cd $HOME/KaraKara/mediaserver
 make setup
 
-cd $HOME/KaraKara
-make init_random_production
+# Symlink the nginx static file path with the hosts vagrant share
+ln -s /vagrant $HOME/KaraKara/mediaserver/www/files
+
+# On first run import all tracks from the host system
+cd $HOME/KaraKara/website
+make import_tracks_production
 
 # Enable autorun of server on system startup
 #  - this is not the best way, ideally the server should start on startup
