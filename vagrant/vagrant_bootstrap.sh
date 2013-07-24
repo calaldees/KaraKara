@@ -60,7 +60,7 @@ touch $HOME/setup
 fi
 
 cd $HOME/KaraKara/mediaserver
-make start
+make start_nginx
 cd $HOME/KaraKara/website
 make start_webapp_daemon
 cd $HOME
