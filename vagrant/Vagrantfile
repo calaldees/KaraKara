@@ -4,7 +4,7 @@
 Vagrant.configure("2") do |config|
 
   config.vm.box = "precise32"  
-  config.vm.box_url = "http://files.vagrantup.com/precise32.box"  
+  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
 
   config.vm.provision :shell, :path => "vagrant_bootstrap.sh"
 
@@ -13,18 +13,12 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, host: 6543, guest: 6543
   config.vm.network :forwarded_port, host: 9873, guest: 9873
 
-  #config.vm.network :private_network, ip: "10.0.0.1"
-  #config.vm.synced_folder ".", "/vagrant", :nfs => true
-  
-  #config.vm.network :hostonly, "33.33.33.10"
-  #config.vm.share_folder "v-root", "/vagrant", ".", :nfs => true
-  #config.vm.share_folder "v-db-dump", "/vagrant_db_dump", "~/dumps", :nfs => true
-  #Vagrant::Config.run do |config|
-  #  config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
-  #end
+  config.vm.network :private_network, ip: "10.0.0.1"
+  config.vm.synced_folder ".", "/vagrant", :nfs => true
   #sudo rm -rf /etc/exports
 
   config.vm.provider "virtualbox" do |v|
+    #v.gui = true  # Handy for when a box is stopped without graceful shutdown
     v.name = "karakara"
     v.customize ["modifyvm", :id, "--memory", "512"]
   end

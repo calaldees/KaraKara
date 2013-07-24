@@ -15,7 +15,7 @@ else
 #    echo prerequesits already installed
 #else
     apt-get update
-    apt-get install -y git make
+    apt-get install -y git make nfs-common portmap
 #fi
 
 # The user still seems to be root even after this
@@ -64,4 +64,3 @@ make start
 cd $HOME/KaraKara/website
 make start_webapp_daemon
 cd $HOME
-
