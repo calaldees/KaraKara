@@ -58,3 +58,10 @@ make init_random_production
 #---------------------------------------------------------
 touch $HOME/setup
 fi
+
+cd $HOME/KaraKara/mediaserver
+make start
+cd $HOME/KaraKara/website
+make start_webapp_daemon
+cd $HOME
+
