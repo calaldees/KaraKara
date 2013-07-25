@@ -15,9 +15,11 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 
 # The DB modules imported here will be created as part of the blank database.
+# If you add a new model ensure it ia added here
 from .model_tracks   import Track, Tag
 from .model_queue    import QueueItem
 from .model_feedback import Feedback
+from .model_token    import PriorityToken
 
 # db action import
 from .actions import get_tag
