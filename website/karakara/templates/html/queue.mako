@@ -93,6 +93,7 @@ import datetime
                     data: 'queue_item.id='+queue_item_id_source+'&queue_item.move.target_id='+queue_item_id_destination,
                     success: function(data) {
                         //console.log(queue_item_id_source, queue_item_id_destination);
+                        location.reload();
                     },
                     error: function(data) {
                         alert('error moving queue_item')
