@@ -35,17 +35,17 @@ var commands = {
 		video.play();
 	},
 	'pause': function(e) {
+		console.log('#pause');
 		var video = get_video();
-		// get state
-		// if playing
-		//   video.pause()
-		// else
-		//   video.play()
+		if (video.paused) {video.play();}
+		else              {video.pause();}
 	},
 	'skip': function(e) {
 		console.log('#skip');
 		//e.preventDefault();
-		get_video().webkitExitFullScreen();
+		var video = get_video();
+		video.load();
+		video.webkitExitFullScreen();
 		song_finished("skipped");
 	},
 	'ended': function(e) {
