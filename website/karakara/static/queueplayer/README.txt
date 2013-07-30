@@ -30,3 +30,7 @@ Player should be developed for compatability initially on one cross platform bro
 sim links:
  - lib.js
  - jquery.min.js
+ 
+ 
+ http://findicons.com/icon/552528/connect_icon
+ http://findicons.com/icon/552540/message_attention_icon

@@ -1,59 +1,131 @@
-var DEFAULT_PLAYLIST_UPDATE_TIME = 3; //Seconds to poll server
-var DEFAULT_VIDEO_BACKGROUND_VOLUME = 0.2;
 
+// Settings Management --------------------------------------------------------
 var settings = {};
-var playlist = [];
-var split_indexs = [];
-var socket;
-
-function setup_remote() {
-	var socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
-	socket.onopen = function(){ // Authenicate client with session key on socket connect
-		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key']
-	};
-	function receive(msg) {
-		var cmd = $.trim(msg.data);
-		console.log('remote control: '+cmd);
-		if (cmd in commands) {commands[cmd]();}
-	};
-	socket.onmessage = receive;
+var SETTINGS_DEFAULT = {
+	"karakara.player.video.preview_volume": 0.2,
+	"karakara.player.queue.update_time"   : 3 , //Seconds to poll server
+	"karakara.player.title"               : "KaraKara",
+	"karakara.websocket.port"             : null,
+}
+function init_settings(new_settings) {
+	if (!new_settings) {new_settings = {};}
+	for (setting_key in SETTINGS_DEFAULT) {
+		if (setting_key in new_settings) {settings[setting_key] = new_settings[setting_key];}
+		else                             {settings[setting_key] = SETTINGS_DEFAULT[setting_key];}
+	}
 }
 
-function get_video() {
-	return $('#player').get(0) || {};
+// Variables ------------------------------------------------------------------
+var playlist = [];
+var split_indexs = [];
+
+
+// Utils ----------------------------------------------------------------------
+
+function get_chrome_version() {
+	return parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+}
+
+
+// Websocket ------------------------------------------------------------------
+var socket;
+function setup_websocket() {
+	console.log("setup_websocket");
+	if (!settings['karakara.websocket.port']) {
+		console.error("Websocket port not specifyed - remote control disabled");
+		return;
+	}
+	socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
+	socket.onopen = function(){ // Authenicate client with session key on socket connect
+		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key']
+		$('body').removeClass('websocket_disconnected');
+		console.log("Websocket: Connected");
+	};
+	socket.onclose  = function() {
+		socket = null;
+		$('body').addClass('websocket_disconnected');
+		console.log("Websocket: Disconnected");
+	}
+	socket.onmessage = function(msg) {
+		var cmd = $.trim(msg.data);
+		console.log('Websocket: Remote command: '+cmd);
+		if (cmd in commands) {commands[cmd]();}
+	};
+}
+
+// Video ----------------------------------------------------------------------
+
+
+function get_video()         {return $('.screen_video video'  ).get(0) || {};}
+function get_video_preview() {return $('.screen_preview video').get(0) || {};}
+
+function video_preview(src) {
+	var video = get_video();
+	video.scr="";
+	video.load();
+	var video = get_video_preview();
+	video.src = "/files/" + src;
+	video.loop = true;
+	video.volume = settings["karakara.player.video.preview_volume"];
+	video.load();
+	fullscreen(false);
+	video.play();
+}
+function video_fullscreen(src) {
+	var video = get_video_preview();
+	video.scr="";
+	video.load();
+	var video = get_video();
+	video.loop = false;
+	video.volume = 1.0;
+	video.src = "/files/" + src;
+	video.load();
+	fullscreen(true);
+	video.play();
+}
+
+function fullscreen(fullscreen) {
+	if (fullscreen) {
+		//get_video().webkitRequestFullScreen();
+		$('body').addClass('video_fullscreen');
+	}
+	else {
+		//get_video().webkitExitFullScreen();
+		$('body').removeClass('video_fullscreen');
+	}
 }
 
 var commands = {
 	'play': function(e) {
-		console.log('#play');
-		var video = get_video();
-		video.loop = false;
-		video.volume = 1.0;
-		video.src = "/files/" + get_attachment(playlist[0].track, "video");
-		video.webkitRequestFullScreen();
-		video.load();
-		video.play();
+		console.log('play');
+		video_fullscreen(get_attachment(playlist[0].track, "video"));
 	},
 	'pause': function(e) {
-		console.log('#pause');
+		console.log('pause');
 		var video = get_video();
 		if (video.paused) {video.play();}
 		else              {video.pause();}
 	},
-	'skip': function(e) {
-		console.log('#skip');
-		//e.preventDefault();
+	'stop': function(e) {
+		console.log('stop');
+		video_preview(get_attachment(playlist[0].track, "preview"));
+	},
+	'seek': function(e) {
+		console.log('seek');
 		var video = get_video();
-		video.load();
-		video.webkitExitFullScreen();
+		video.currentTime = video.currentTime + 30000;
+	},
+	'skip': function(e) {
+		console.log('skip');
 		song_finished("skipped");
 	},
 	'ended': function(e) {
-		console.log('#player:ended');
-		get_video().webkitExitFullScreen();
+		console.log('ended');
 		song_finished("played");
 	}
 };
+
+// Playlist Managment ---------------------------------------------------------
 
 function get_attachment(track, type) {
 	for(var i=0; i<track.attachments.length; i++) {
@@ -100,8 +172,6 @@ function update_playlist() {
 		}
 	});
 }
-
-
 
 function render_playlist() {
 	console.log("render_playlist");
@@ -171,26 +241,45 @@ function prepare_next_song() {
 			console.log("Preparing next song");
 			$('title').html(title);
 			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-			var video = get_video();
-			video.src = "/files/" + get_attachment(playlist[0].track, "preview");
-			video.loop = true;
-			video.volume = settings["karakara.player.video.preview_volume"];
-			video.load();
-			video.play();
+			video_preview(get_attachment(playlist[0].track, "preview"));
 		}
 	}
 }
 
-$(document).ready(function() {
-	update_playlist();
-	
+// Init -----------------------------------------------------------------------
+
+function attach_events() {
 	$("#play").click(commands.play);
 	$("#skip").click(commands.skip);
-	$("#player").bind("ended", commands.ended);
+	//get_video().bind("ended", commands.ended); // This Errors! .. WTF!!!
+	// TODO: Bind "ESCAPE" to stop
+}
+
+function init() {
+	// Once settings Loaded & admin mode set -> setup final bits
 	
+	// Set update interval
+	settings['interval'] = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
+	console.log('update_interval='+settings["karakara.player.queue.update_time"]);
+	
+	$('h1').text(settings["karakara.player.title"]);
+	
+	setup_websocket();
+	
+	if (!get_chrome_version()) {
+		console.log('no chrome .. bah');
+	}
+}
+
+$(document).ready(function() {
+	// Refresh Queue
+	update_playlist();
+	attach_events();
+	
+	// Load settings from server
 	$.getJSON("/settings", {}, function(data) {
 		console.log("/settings");
-		settings = data.data.settings;
+		init_settings(data.data.settings);
 		
 		// Identify player.js as admin with admin cookie
 		if (!data.identity.admin) {
@@ -199,17 +288,10 @@ $(document).ready(function() {
 					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
 					alert("Unable to set Admin mode for player interface");
 				}
-			})
+			});
 		}
 		
-		// Set update interval
-		settings["karakara.player.queue.update_time"] = settings["karakara.player.queue.update_time"] || DEFAULT_PLAYLIST_UPDATE_TIME;
-		settings['interval'] = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
-		console.log('update_interval='+settings["karakara.player.queue.update_time"]);
-		
-		settings["karakara.player.video.preview_volume"] = settings["karakara.player.video.preview_volume"] || DEFAULT_VIDEO_BACKGROUND_VOLUME;
-		
-		setup_remote();
+		init();
 	});
 	
 });

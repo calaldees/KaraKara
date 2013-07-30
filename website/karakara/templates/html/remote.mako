@@ -27,6 +27,8 @@
     }
 </script>
 
-<a href='?cmd=play' data-role="button" onclick='return send("play");'>Play</a>
-<a href='?cmd=pause' data-role="button" onclick='return send("pause");'>Pause</a>
-<a href='?cmd=skip' data-role="button" onclick='return send("skip");'>Skip</a>
+<a href='?cmd=play' data-role="button" onclick='return send("play");'>Play Fullscreen</a>
+<a href='?cmd=pause' data-role="button" onclick='return send("pause");'>Pause (Toggle)</a>
+<a href='?cmd=seek' data-role="button" onclick='return send("seek");'>Seek (30sec)</a>
+<a href='?cmd=stop' data-role="button" onclick='return send("stop");'>Stop</a>
+<a href='?cmd=skip' data-role="button" onclick='return send("skip");'>Skip Track</a>

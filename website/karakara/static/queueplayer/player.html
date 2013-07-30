@@ -8,35 +8,44 @@
 		<link  href="player.css" rel="stylesheet" type="text/css" />
 	</head>
 	
-	<body>
-		<div id="headerHolder">
-			<h1>Big-Screen Interface</h1>
+	<body class="websocket_disconnected">
+		
+		<div class="screen screen_video">
+			<video width="100%" height="100%">
+				Your browser does not support the video tag.
+			</video>
 		</div>
 		
-		<div id="middle">
-			<div id="playerHolder">
-				<h2 id="title">Video Player</h2>
-				<div id="videoHolder">
-					<video width="100%" id="player" allowfullscreen> <!-- controls="controls" -->
-						Your browser does not support the video tag.
-					</video>
-				</div>
-				<br />
-				
+		<div class="screen screen_preview">
+			<div id="headerHolder">
+				<h1>Big-Screen Interface</h1>
 			</div>
 			
-			<div id="playlistHolder">
-				<div id="playlist"></div>
-				<div id="buttonHolder">
-					<button id="play">Play</button>
-					<button id="skip">Skip</button>
+			<div id="middle">
+				<div id="playerHolder">
+					<h2 id="title">Video Player</h2>
+					<div id="videoHolder">
+						<video width="100%"> <!-- controls="controls" -->
+							Your browser does not support the video tag.
+						</video>
+					</div>
+					<br />
+					
+				</div>
+				
+				<div id="playlistHolder">
+					<div id="playlist"></div>
+					<div id="buttonHolder">
+						<button id="play">Play</button>
+						<button id="skip">Skip</button>
+					</div>
 				</div>
 			</div>
-		</div>
-		
-		<div id="marqueeHolder">
-			<div id='upLater'></div>
-			<div id="playlist_obscured"></div>
+			
+			<div id="marqueeHolder">
+				<div id='upLater'></div>
+				<div id="playlist_obscured"></div>
+			</div>
 		</div>
 	</body>
 
