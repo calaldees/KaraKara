@@ -1,30 +1,39 @@
 #!/usr/bin/env bash
 
+set -e
+
+# Variables --------------------------------------------------------------------
+
 HOME="/home/vagrant"
 SHARE="/vagrant"
 GIT_REPO="https://github.com/calaldees/KaraKara.git"
+
+# Check if installation required
 
 if [ -f "$HOME/setup" ]
 then
 	echo "Install previously completed"
 else
 	echo "Installing packages"
-#--------------------------------------------------------
+
+# Root Setup -------------------------------------------------------------------
 
 #if dpkg -s git ; then
 #    echo prerequesits already installed
 #else
-    apt-get update
-    apt-get install -y git make nfs-common portmap
+apt-get update
+apt-get install -y git make nfs-common portmap
 #fi
 
-# The user still seems to be root even after this
-su vagrant
 
-# Checkout (if needed)
-#  - for windows machines where installing git is a rather cumbersom task,
-#    it is just nessisarry to distribute the Vagrantfile and checkout the
-#    codebase from within the vm.
+# User Setup -------------------------------------------------------------------
+
+sudo -u vagrant sh << EOF
+set -e
+
+# Vagrant does not update the HOME env when switching to normal 'vagrant' user
+HOME="/home/vagrant"
+
 cd $HOME
 if [ -f "KaraKara" ]
 then
@@ -39,32 +48,34 @@ make setup
 make test
 make ini_production
 
-# Setup nginx and PostgreSQL
+echo 'Setup nginx and PostgreSQL'
 cd $HOME/KaraKara/mediaserver
-make setup
+sudo make setup
 
-# Symlink the nginx static file path with the hosts vagrant share
+echo 'Symlink the nginx static file path with the hosts vagrant share'
 ln -s /vagrant $HOME/KaraKara/mediaserver/www/files
 
-# On first run import all tracks from the host system
+echo 'Import all track data from the host system'
 cd $HOME/KaraKara/website
 make import_tracks_production
 
-# Enable autorun of server on system startup
-#  - this is not the best way, ideally the server should start on startup
-#    and when user uses 'vagrant ssh' they are taken to the screen session
-#    of the running server
-# TODO: check that this is further
-#echo "cd KaraKara && sudo make run_production" >> $HOME/.profile
-# unable to put this in .profile as it runs on boot and blocks the vagrant from returning to terminal
-# need a way of running the python project as a process
-
-#---------------------------------------------------------
+echo 'Installation complete'
 touch $HOME/setup
+
+EOF
+
 fi
 
+
+# VM Startup -------------------------------------------------------------------
+
+echo 'Start nginx'
 cd $HOME/KaraKara/mediaserver
 make start_nginx
+
+echo 'Start KaraKara daemon'
+sudo -u vagrant sh << EOF
 cd $HOME/KaraKara/website
 make start_webapp_daemon
-cd $HOME
+
+EOF
