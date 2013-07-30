@@ -1,3 +1,11 @@
+KEYCODE = {
+	BACKSPACE: 8,
+	ENTER    :13,
+	ESCAPE   :27,
+	LEFT     :37,
+	RIGHT    :39,
+	SPACE    :32,
+};
 
 // Settings Management --------------------------------------------------------
 var settings = {};
@@ -6,6 +14,7 @@ var SETTINGS_DEFAULT = {
 	"karakara.player.queue.update_time"   : 3 , //Seconds to poll server
 	"karakara.player.title"               : "KaraKara",
 	"karakara.websocket.port"             : null,
+	"karakara.video.skip.seconds"         : 20,
 }
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
@@ -110,10 +119,26 @@ var commands = {
 		console.log('stop');
 		video_preview(get_attachment(playlist[0].track, "preview"));
 	},
-	'seek': function(e) {
-		console.log('seek');
+	'seek_forwards': function(e) {
+		console.log('seek_forwards');
 		var video = get_video();
-		video.currentTime = video.currentTime + 30000;
+		if (video.currentTime +  settings["karakara.video.skip.seconds"] < video.duration) {
+			video.currentTime += settings["karakara.video.skip.seconds"];
+		}
+		else {
+			commands.ended();
+		}
+	},
+	'seek_backwards': function(e) {
+		console.log('seek_backwards');
+		var video = get_video();
+		if (video.currentTime -  settings["karakara.video.skip.seconds"] >= 0) {
+			video.currentTime -= settings["karakara.video.skip.seconds"];
+		}
+		else {
+			video.currentTime = 0
+		}
+		
 	},
 	'skip': function(e) {
 		console.log('skip');
@@ -251,8 +276,17 @@ function prepare_next_song() {
 function attach_events() {
 	$("#play").click(commands.play);
 	$("#skip").click(commands.skip);
-	//get_video().bind("ended", commands.ended); // This Errors! .. WTF!!!
-	// TODO: Bind "ESCAPE" to stop
+	$(".screen_video video").bind("ended", commands.ended);
+	$(document).on('keydown', function(e) {
+		switch (e.which) {
+			case KEYCODE.BACKSPACE: commands.skip(); break;
+			case KEYCODE.ENTER    : commands.play(); break;
+			case KEYCODE.ESCAPE   : commands.stop(); break;
+			case KEYCODE.LEFT     : commands.seek_backwards();break;
+			case KEYCODE.RIGHT    : commands.seek_forwards(); break;
+			case KEYCODE.SPACE    : commands.pause(); break;
+		}
+	});
 }
 
 function init() {
