@@ -17,6 +17,7 @@ var SETTINGS_DEFAULT = {
 	"karakara.websocket.port"             : null,
 	"karakara.video.skip.seconds"         : 20,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
+	"karakara.interface.help.timeout"     :  3,
 }
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
@@ -29,7 +30,7 @@ function init_settings(new_settings) {
 // Variables ------------------------------------------------------------------
 var playlist = [];
 var split_indexs = [];
-
+var mousemove_timeout;
 
 // Utils ----------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ function setup_websocket() {
 	}
 	socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
 	socket.onopen = function(){ // Authenicate client with session key on socket connect
-		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key']
+		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key'] or server could just use the actual http-header
 		$('body').removeClass('websocket_disconnected');
 		console.log("Websocket: Connected");
 		if (socket_retry_interval) {
@@ -299,6 +300,14 @@ function attach_events() {
 			case KEYCODE.RIGHT    : commands.seek_forwards(); break;
 			case KEYCODE.SPACE    : commands.pause(); break;
 		}
+	});
+	$(document).on('mousemove', function(e) {
+		if (mousemove_timeout) {
+			clearTimeout(mousemove_timeout);
+			mousemove_timeout = null;
+		}
+		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.interface.help.timeout"]*1000);
+		$('body').addClass('show_help');
 	});
 }
 
