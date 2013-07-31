@@ -1,6 +1,23 @@
 @-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
 @-webkit-keyframes marquee {0%{}100%{}}
-@-webkit-keyframes fade_out {0%{opacity: 1;}100%{opacity: 0;}}
+@-webkit-keyframes fade_in {
+	  0% {opacity: 0; bottom: -300px;}
+	100% {opacity: 1; bottom: 0;}
+}
+@-webkit-keyframes fade_out {
+	  0% {opacity: 1; bottom: 0;}
+	100% {opacity: 0; bottom: -300px;}
+}
+
+html {
+	overflow: hidden;
+}
+
+h1, h2, h3, h4, h5 {
+	padding:0;
+	margin:0;
+}
+th {text-align:left;}
 
 body {
 	background: #eee;
@@ -33,10 +50,15 @@ a {
 /*---------------------------------------------------------------------------*/
 
 .show_help .help_area {
-	display: block;
+	/*display: block;*/
+	opacity: 1;
+	-webkit-animation-name: fade_in;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-duration: 1s;
 }
 .help_area {
-	display: none;
+	/*display: none;*/
+	opacity:0;
 	position: absolute;
 	bottom: 0;
 	right: 0;
@@ -44,6 +66,14 @@ a {
 	padding: 6px;
 	margin: 6px;
 	border-radius: 6px;
+	
+	-webkit-animation-name: fade_out;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-duration: 1s;
+}
+.help_area table th,
+.help_area table td {
+	padding-left: 1em;
 }
 
 /* Control Buttons */

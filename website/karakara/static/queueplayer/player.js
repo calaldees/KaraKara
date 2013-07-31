@@ -17,7 +17,7 @@ var SETTINGS_DEFAULT = {
 	"karakara.websocket.port"             : null,
 	"karakara.video.skip.seconds"         : 20,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
-	"karakara.interface.help.timeout"     :  3,
+	"karakara.interface.help.timeout"     :  2,
 }
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
