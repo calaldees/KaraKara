@@ -1,5 +1,6 @@
 @-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
 @-webkit-keyframes marquee {0%{}100%{}}
+@-webkit-keyframes fade_out {0%{opacity: 1;}100%{opacity: 0;}}
 
 body {
 	background: #eee;
@@ -9,6 +10,19 @@ a {
 	color: #fff;
 	text-decoration: none;
 }
+
+.notification_area {float: right;}
+.notification_area img {
+	background-color: white;
+	padding: 5px;
+	border-radius: 6px;
+	border: 2px solid red;
+}
+#icon_disconnected                         {display: none;}
+.websocket_disconnected #icon_disconnected {display: block;}
+#icon_attention                            {display: none;}
+.browser_unsupported    #icon_attention    {display: block;}
+
 
 #headerHolder {
 	background-color: #000;
@@ -52,20 +66,15 @@ a {
 	width: 78%;
 }
 
-
-.video_fullscreen .screen_preview {
-	display: none;
-}
-.screen_video {display: none;}
-.video_fullscreen .screen_video {
-	display: block;
+/* By default 'screen_preview' is visible and 'screen_fullscreen is hidden.
+ * When the class 'video_fullscreen' is applyed to the body, they flip visibility
+ */
+.video_fullscreen .screen_preview {display: none;}
+                  .screen_video   {display: none;}
+.video_fullscreen .screen_video   {display: block;
 	width: 100%;
 	height: 100%;
 	background-color: black;
-	/*
-	right: 0;
-	bottom: 0;
-	*/
 }
 
 #buttonHolder {
@@ -93,7 +102,7 @@ a {
 #playlist li:nth-child(1)  {
 	background-color: #ccc;
 	border: 1px solid #ccc;
-	-webkit-animation-name: pulse;	
+	-webkit-animation-name: pulse;
 	-webkit-animation-iteration-count: infinite;
 	-webkit-animation-timing-function: ease-in-out;
 	-webkit-animation-direction: alternate;

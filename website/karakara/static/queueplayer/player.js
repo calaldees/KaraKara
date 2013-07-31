@@ -1,3 +1,4 @@
+// Constants ------------------------------------------------------------------
 KEYCODE = {
 	BACKSPACE: 8,
 	ENTER    :13,
@@ -15,6 +16,7 @@ var SETTINGS_DEFAULT = {
 	"karakara.player.title"               : "KaraKara",
 	"karakara.websocket.port"             : null,
 	"karakara.video.skip.seconds"         : 20,
+	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
 }
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
@@ -32,12 +34,14 @@ var split_indexs = [];
 // Utils ----------------------------------------------------------------------
 
 function get_chrome_version() {
-	return parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+	try      {return parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);}
+	catch(e) {return 0;}
 }
 
 
 // Websocket ------------------------------------------------------------------
 var socket;
+var socket_retry_interval = null;
 function setup_websocket() {
 	console.log("setup_websocket");
 	if (!settings['karakara.websocket.port']) {
@@ -49,11 +53,18 @@ function setup_websocket() {
 		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key']
 		$('body').removeClass('websocket_disconnected');
 		console.log("Websocket: Connected");
+		if (socket_retry_interval) {
+			clearInterval(socket_retry_interval);
+			socket_retry_interval = null;
+		}
 	};
 	socket.onclose  = function() {
 		socket = null;
 		$('body').addClass('websocket_disconnected');
 		console.log("Websocket: Disconnected");
+		if (!socket_retry_interval) {
+			socket_retry_interval = setInterval(setup_websocket,settings["karakara.websocket.disconnected_retry_interval"]*1000);
+		}
 	}
 	socket.onmessage = function(msg) {
 		var cmd = $.trim(msg.data);
@@ -303,7 +314,10 @@ function init() {
 	setup_websocket();
 	
 	if (!get_chrome_version()) {
-		console.log('no chrome .. bah');
+		$('body').addClass('browser_unsupported');
+		var msg = "Browser is unsupported. This player is currently only designed and tested to work with Google Chrome. It may behave unexpectedly.";
+		console.warn(msg);
+		alert(msg);
 	}
 }
 
