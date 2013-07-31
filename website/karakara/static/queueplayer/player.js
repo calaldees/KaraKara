@@ -11,13 +11,13 @@ KEYCODE = {
 // Settings Management --------------------------------------------------------
 var settings = {};
 var SETTINGS_DEFAULT = {
-	"karakara.player.video.preview_volume": 0.2,
-	"karakara.player.queue.update_time"   : 3 , //Seconds to poll server
 	"karakara.player.title"               : "KaraKara",
+	"karakara.player.video.preview_volume":  0.2,
+	"karakara.player.video.skip.seconds"  : 20,
+	"karakara.player.queue.update_time"   :  3 , //Seconds to poll server
+	"karakara.player.help.timeout"        :  2,
 	"karakara.websocket.port"             : null,
-	"karakara.video.skip.seconds"         : 20,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
-	"karakara.interface.help.timeout"     :  2,
 }
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
@@ -134,8 +134,8 @@ var commands = {
 	'seek_forwards': function(e) {
 		console.log('seek_forwards');
 		var video = get_video();
-		if (video.currentTime +  settings["karakara.video.skip.seconds"] < video.duration) {
-			video.currentTime += settings["karakara.video.skip.seconds"];
+		if (video.currentTime +  settings["karakara.player.video.skip.seconds"] < video.duration) {
+			video.currentTime += settings["karakara.player.video.skip.seconds"];
 		}
 		else {
 			commands.ended();
@@ -144,8 +144,8 @@ var commands = {
 	'seek_backwards': function(e) {
 		console.log('seek_backwards');
 		var video = get_video();
-		if (video.currentTime -  settings["karakara.video.skip.seconds"] >= 0) {
-			video.currentTime -= settings["karakara.video.skip.seconds"];
+		if (video.currentTime -  settings["karakara.player.video.skip.seconds"] >= 0) {
+			video.currentTime -= settings["karakara.player.video.skip.seconds"];
 		}
 		else {
 			video.currentTime = 0
@@ -306,7 +306,7 @@ function attach_events() {
 			clearTimeout(mousemove_timeout);
 			mousemove_timeout = null;
 		}
-		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.interface.help.timeout"]*1000);
+		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.player.help.timeout"]*1000);
 		$('body').addClass('show_help');
 	});
 }
