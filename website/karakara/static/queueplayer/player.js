@@ -339,6 +339,14 @@ $(document).ready(function() {
 	$.getJSON("/random_images", {}, function(data) {
 		console.log("/random_images");
 		titlescreen_images = data.data.thumbnails;
+		//console.log(titlescreen_images);
+		for (i=0 ; i<titlescreen_images.length ; i++) {
+			var r = Math.round(Math.random()*4)+1
+			var s = Math.round(Math.random()*4)+1
+			var x = Math.round(Math.random()*1000);
+			var y = -Math.round(Math.random()*300);
+			$('.screen_title').append("<div style='postion: absolute; left:"+x+"px; top:"+y+"px;'><div class='sway sway_"+r+"'><img src='/files/"+titlescreen_images[i]+"' class='thumbnail fall fall_"+s+"'></div></div>");
+		}
 	});
 	
 	// Load settings from server

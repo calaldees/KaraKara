@@ -135,6 +135,114 @@ button:before {
 
 
 /*---------------------------------------------------------------------------*/
+/* Title Screen Animation */
+/*---------------------------------------------------------------------------*/
+
+.thumbnail {
+	position: absolute;
+}
+
+.fall_1 {
+	-webkit-animation-name: fall;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 5s;
+}
+.fall_2 {
+	-webkit-animation-name: fall;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 7s;
+	width: 80%;
+}
+.fall_2 {
+	-webkit-animation-name: fall;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 9s;
+	width: 60%;
+}
+.fall_3 {
+	-webkit-animation-name: fall;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 12s;
+	width: 40%;
+}
+.fall_4 {
+	-webkit-animation-name: fall;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 15s;
+	width: 30%;
+}
+.fall_5 {
+	-webkit-animation-name: fall;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+	-webkit-animation-duration: 18s;
+	width: 20%
+}
+
+
+.sway {
+	position: absolute;
+}
+.sway_1 {
+	-webkit-animation-name: sway_1;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-duration: 1s;
+}
+.sway_2 {
+	-webkit-animation-name: sway_2;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-duration: 2s;
+}
+.sway_3 {
+	-webkit-animation-name: sway_3;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-duration: 3s;
+}
+.sway_4 {
+	-webkit-animation-name: sway_3;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-duration: 4s;
+}
+.sway_5 {
+	-webkit-animation-name: sway_3;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-duration: 5s;
+}
+
+@-webkit-keyframes sway_1 {100% {left: 40px;}}
+@-webkit-keyframes sway_2 {100% {left: 80px;}}
+@-webkit-keyframes sway_3 {100% {left: 120px;}}
+@-webkit-keyframes sway_4 {100% {left: 160px;}}
+@-webkit-keyframes sway_5 {100% {left: 200px;}}
+
+
+@-webkit-keyframes fall {
+	  0% {
+		top:-300px;
+	}
+	100% {
+		top: 1000px;;
+	}
+}
+
+
+
+/*---------------------------------------------------------------------------*/
 /* Layout */
 /*---------------------------------------------------------------------------*/
 
