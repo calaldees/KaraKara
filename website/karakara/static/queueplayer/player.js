@@ -74,13 +74,21 @@ function setup_websocket() {
 	};
 }
 
+// Screen Managment -----------------------------------------------------------
+
+function show_screen(screen) {
+	$('.screen_active').removeClass('screen_active');
+	$('.screen.screen_'+screen).addClass('screen_active');
+}
+
+
 // Video ----------------------------------------------------------------------
 
 
 function get_video()         {return $('.screen_video video'  ).get(0) || {};}
 function get_video_preview() {return $('.screen_preview video').get(0) || {};}
 
-function video_preview(src) {
+function set_video_preview(src) {
 	var video = get_video();
 	video.scr="";
 	video.load();
@@ -89,10 +97,10 @@ function video_preview(src) {
 	video.loop = true;
 	video.volume = settings["karakara.player.video.preview_volume"];
 	video.load();
-	fullscreen(false);
+	show_screen('preview');
 	video.play();
 }
-function video_fullscreen(src) {
+function set_video_fullscreen(src) {
 	var video = get_video_preview();
 	video.scr="";
 	video.load();
@@ -101,25 +109,14 @@ function video_fullscreen(src) {
 	video.volume = 1.0;
 	video.src = "/files/" + src;
 	video.load();
-	fullscreen(true);
+	show_screen('video');
 	video.play();
-}
-
-function fullscreen(fullscreen) {
-	if (fullscreen) {
-		//get_video().webkitRequestFullScreen();
-		$('body').addClass('video_fullscreen');
-	}
-	else {
-		//get_video().webkitExitFullScreen();
-		$('body').removeClass('video_fullscreen');
-	}
 }
 
 var commands = {
 	'play': function(e) {
 		console.log('play');
-		video_fullscreen(get_attachment(playlist[0].track, "video"));
+		set_video_fullscreen(get_attachment(playlist[0].track, "video"));
 	},
 	'pause': function(e) {
 		console.log('pause');
@@ -129,7 +126,7 @@ var commands = {
 	},
 	'stop': function(e) {
 		console.log('stop');
-		video_preview(get_attachment(playlist[0].track, "preview"));
+		set_video_preview(get_attachment(playlist[0].track, "preview"));
 	},
 	'seek_forwards': function(e) {
 		console.log('seek_forwards');
@@ -280,7 +277,7 @@ function prepare_next_song() {
 			console.log("Preparing next song");
 			$('title').html(title);
 			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-			video_preview(get_attachment(playlist[0].track, "preview"));
+			set_video_preview(get_attachment(playlist[0].track, "preview"));
 		}
 	}
 }
@@ -288,9 +285,11 @@ function prepare_next_song() {
 // Init -----------------------------------------------------------------------
 
 function attach_events() {
+	// Button Events
 	$("#play").click(commands.play);
 	$("#skip").click(commands.skip);
 	$(".screen_video video").bind("ended", commands.ended);
+	// Keyboard Shortcuts
 	$(document).on('keydown', function(e) {
 		switch (e.which) {
 			case KEYCODE.BACKSPACE: commands.skip(); break;
@@ -301,6 +300,7 @@ function attach_events() {
 			case KEYCODE.SPACE    : commands.pause(); break;
 		}
 	});
+	// Help Popup
 	$(document).on('mousemove', function(e) {
 		if (mousemove_timeout) {
 			clearTimeout(mousemove_timeout);
@@ -314,7 +314,7 @@ function attach_events() {
 function init() {
 	// Once settings Loaded & admin mode set -> setup final bits
 	
-	// Set update interval
+	// Set queue poll update interval
 	settings['interval'] = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
 	console.log('update_interval='+settings["karakara.player.queue.update_time"]);
 	
@@ -331,9 +331,9 @@ function init() {
 }
 
 $(document).ready(function() {
-	// Refresh Queue
-	update_playlist();
+	show_screen('preview');
 	attach_events();
+	update_playlist();
 	
 	// Load settings from server
 	$.getJSON("/settings", {}, function(data) {

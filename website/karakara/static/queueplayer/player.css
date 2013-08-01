@@ -125,9 +125,9 @@ button:before {
 /* By default 'screen_preview' is visible and 'screen_fullscreen is hidden.
  * When the class 'video_fullscreen' is applyed to the body, they flip visibility
  */
-.video_fullscreen .screen_preview {display: none;}
-                  .screen_video   {display: none;}
-.video_fullscreen .screen_video   {display: block;
+.screen               {display:  none;}
+.screen.screen_active {display: block;}
+.screen.screen_active.screen_video {
 	width: 100%;
 	height: 100%;
 	background-color: black;
@@ -139,19 +139,6 @@ button:before {
 /*---------------------------------------------------------------------------*/
 
 
-#headerHolder {
-	background-color: #000;
-	border: 1px solid black;
-	border-radius: 15px;
-	height: 10%;
-}
-
-#headerHolder h1 {
-	color: #fff;
-	text-align: center;
-	margin-top: 1%;
-	text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
-}
 
 #middle {
 	height: 70%;

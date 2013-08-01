@@ -9,10 +9,14 @@
 	</head>
 	
 	<body class="websocket_disconnected">
-		
+		<!-- Notifications -->
 		<div class="notification_area">
 			<img id="icon_attention"    src="icon_attention.png"    alt="Browser unsupported"   >
 			<img id="icon_disconnected" src="icon_disconnected.png" alt="Websocket Disconnected">
+		</div>
+		
+		<div class="screen screen_title">
+			<h1>KaraKara</h1>
 		</div>
 		
 		<div class="screen screen_video">
@@ -22,9 +26,6 @@
 		</div>
 		
 		<div class="screen screen_preview">
-			<div id="headerHolder">
-				<h1>Big-Screen Interface</h1>
-			</div>
 			
 			<div id="middle">
 				<div id="playerHolder">
@@ -48,21 +49,25 @@
 				<div id="playlist_obscured"></div>
 			</div>
 			
-			<div class="help_area">
-				<h2>Keyboard shortcuts</h2>
-					<table>
-						<tr><th>ENTER    </th><td>Play</td></tr>
-						<tr><th>ESCAPE   </th><td>Stop</td></tr>
-						<tr><th>BACKSPACE</th><td>Skip</td></tr>
-						<tr><th>SPACE    </th><td>Pause</td></tr>
-						<tr><th>RIGHT    </th><td>Forward (x seconds)</td></tr>
-						<tr><th>LEFT     </th><td>Backwards (x seconds)</td></tr>
-					</table>
-				<h2>Controls</h2>
-					<button id="play">Play</button>
-					<button id="skip">Skip</button>
-			</div>
 		</div>
+		
+		<!-- Help -->
+		<div class="help_area">
+			<h1>KaraKara</h1>
+			<h2>Keyboard shortcuts</h2>
+				<table>
+					<tr><th>ENTER    </th><td>Play</td></tr>
+					<tr><th>ESCAPE   </th><td>Stop</td></tr>
+					<tr><th>BACKSPACE</th><td>Skip</td></tr>
+					<tr><th>SPACE    </th><td>Pause</td></tr>
+					<tr><th>RIGHT    </th><td>Forward (x seconds)</td></tr>
+					<tr><th>LEFT     </th><td>Backwards (x seconds)</td></tr>
+				</table>
+			<h2>Controls</h2>
+				<button id="play">Play</button>
+				<button id="skip">Skip</button>
+		</div>
+
 	</body>
 
 </html>
