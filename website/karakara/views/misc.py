@@ -72,3 +72,19 @@ def settings(request):
             }
         }
     )
+
+@view_config(route_name='random_images')
+@web
+def random_images(request):
+    """
+    The player interface titlescreen can be populated with random thumbnails from the system.
+    This is a nice showcase.
+    Not optimised as this is rarely called.
+    """
+    import random
+    from karakara.model              import DBSession
+    from karakara.model.model_tracks import Attachment, _attachment_types
+    thumbnails = DBSession.query(Attachment.location).filter(Attachment.type=='thumbnail').all()
+    random.shuffle(thumbnails)
+    thumbnails = [t[0] for t in thumbnails]
+    return action_ok(data={'thumbnails':thumbnails[0:request.params.get('count',100)]})

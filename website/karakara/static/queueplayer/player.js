@@ -31,6 +31,7 @@ function init_settings(new_settings) {
 var playlist = [];
 var split_indexs = [];
 var mousemove_timeout;
+var titlescreen_images = [];
 
 // Utils ----------------------------------------------------------------------
 
@@ -268,17 +269,16 @@ function render_playlist() {
 
 function prepare_next_song() {
 	if(playlist.length == 0) {
-		$('title').html("Waiting for Songs");
-		$('#title').html("Waiting for Songs");
+		console.log("Queue empty - returning to title screen");
+		set_video_preview(null);
+		show_screen('title');
 	}
 	else {
 		var title = playlist[0].track.title;
-		if($('title').html() != title) {
-			console.log("Preparing next song");
-			$('title').html(title);
-			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-			set_video_preview(get_attachment(playlist[0].track, "preview"));
-		}
+		console.log("Preparing next song - "+title);
+		$('title').html(title);
+		$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+		set_video_preview(get_attachment(playlist[0].track, "preview"));
 	}
 }
 
@@ -331,9 +331,15 @@ function init() {
 }
 
 $(document).ready(function() {
-	show_screen('preview');
+	show_screen('title');
 	attach_events();
 	update_playlist();
+	
+	// Load showcase images for titlescreen
+	$.getJSON("/random_images", {}, function(data) {
+		console.log("/random_images");
+		titlescreen_images = data.data.thumbnails;
+	});
 	
 	// Load settings from server
 	$.getJSON("/settings", {}, function(data) {
