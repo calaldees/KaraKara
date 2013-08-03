@@ -87,4 +87,4 @@ def random_images(request):
     thumbnails = DBSession.query(Attachment.location).filter(Attachment.type=='thumbnail').all()
     random.shuffle(thumbnails)
     thumbnails = [t[0] for t in thumbnails]
-    return action_ok(data={'thumbnails':thumbnails[0:request.params.get('count',100)]})
+    return action_ok(data={'thumbnails':thumbnails[0:int(request.params.get('count',0) or 100)]})

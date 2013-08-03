@@ -80,11 +80,14 @@ function setup_websocket() {
 
 function show_screen(screen) {
 	console.log('show_screen '+screen)
-	$('.screen_active').each(function() {
-		var element = $(this);
-		element.removeClass('screen_active');
-		screens.events.on_hide[element.attr('data-screen')](); // fire on_hide event
-	});
+	var element = $('.screen_active');
+	var screen_active = element.attr('data-screen');
+	if (screen_active == screen) {return;}
+	element.removeClass('screen_active');
+	if (screen_active in screens.events.on_hide) {
+		screens.events.on_hide[screen_active](); // fire on_hide event
+	}
+	
 	$('.screen.screen_'+screen).addClass('screen_active');
 	if (screen in screens.events.on_show) {
 		screens.events.on_show[screen](); // Fire on_show event
@@ -256,7 +259,7 @@ function update_playlist() {
 	}
 
 	$.getJSON("/queue", {}, function(data) {
-		//console.log("update_playlist getJSON response");
+		console.log("update_playlist getJSON response");
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			//console.log("update_playlist:updated");
 			playlist     = data.data.queue;
@@ -330,16 +333,14 @@ function render_playlist() {
 function init_titlescreen(titlescreen_images) {
 	console.log("init_titlescreen");
 	var frames_per_sec = 20;
-	var width  = document.width
-	var height = document.height;
-	var num_images = Math.floor(width/30);
+	var num_images = Math.floor(screen.width/30);
 	var max_image_size = 250;
 	var min_image_size =  50;
 	var max_speed = 6 / (frames_per_sec/10);
 	function addImage(image, x, y, size, rotation, speed) {
 		if (!image)    {image    = titlescreen_images[Math.floor(Math.random()*titlescreen_images.length)];}
-		if (!x)        {x        = Math.random()*width -max_image_size;}
-		if (!y)        {y        = Math.random()*height-max_image_size;}
+		if (!x)        {x        = Math.random()*screen.width -max_image_size;}
+		if (!y)        {y        = Math.random()*screen.height-max_image_size;}
 		if (!size)     {size     = Math.random()*(max_image_size-min_image_size)+min_image_size;}
 		if (!rotation) {rotation = Math.random()*Math.PI;}
 		if (!speed)    {speed    = Math.random()*max_speed;}
@@ -362,7 +363,7 @@ function init_titlescreen(titlescreen_images) {
 			var y        = get_css('top'              ,'px' );
 			var rotation = parseFloat(element.attr('data-rotation'));
 			var speed    = parseFloat(element.attr('data-speed'));
-			if (y > height) {element.remove(); addImage(null,null,-max_image_size);}
+			if (y > screen.height) {element.remove(); addImage(null,null,-max_image_size);}
 			set_css('left', x       , 'px');
 			set_css('top' , y+speed , 'px');
 			rotation += (speed - (max_speed/2))/300;
@@ -433,8 +434,8 @@ $(document).ready(function() {
 	update_playlist();
 	
 	// Load showcase images for titlescreen
-	$.getJSON("/random_images", {}, function(data) {
-		console.log("/random_images?count=200");
+	$.getJSON("/random_images.json?count=200", {}, function(data) {
+		console.log("/random_images");
 		init_titlescreen(data.data.thumbnails);
 	});
 	

@@ -32,7 +32,7 @@ a {
 /* Notification Area */
 /*---------------------------------------------------------------------------*/
 
-.notification_area {float: right;}
+.notification_area {position: absolute; right:0;}
 .notification_area img {
 	background-color: white;
 	padding: 6px;
