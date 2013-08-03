@@ -179,13 +179,13 @@ var commands = {
 	},
 	'skip': function(e) {
 		console.log('skip');
-		commands.stop();
 		song_finished("skipped");
+		commands.stop();
 	},
 	'ended': function(e) {
 		console.log('ended');
-		commands.stop();
 		song_finished("played");
+		commands.stop();
 	}
 };
 
