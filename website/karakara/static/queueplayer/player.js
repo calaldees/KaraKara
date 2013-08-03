@@ -31,7 +31,8 @@ function init_settings(new_settings) {
 var playlist = [];
 var split_indexs = [];
 var mousemove_timeout;
-var titlescreen_images = [];
+var interval_animation_titlescreen;
+var interval_queue_refresh;
 
 // Utils ----------------------------------------------------------------------
 
@@ -78,10 +79,23 @@ function setup_websocket() {
 // Screen Managment -----------------------------------------------------------
 
 function show_screen(screen) {
-	$('.screen_active').removeClass('screen_active');
+	console.log('show_screen '+screen)
+	$('.screen_active').each(function() {
+		var element = $(this);
+		element.removeClass('screen_active');
+		screens.events.on_hide[element.attr('data-screen')](); // fire on_hide event
+	});
 	$('.screen.screen_'+screen).addClass('screen_active');
+	if (screen in screens.events.on_show) {
+		screens.events.on_show[screen](); // Fire on_show event
+	}
 }
-
+var screens = {
+	events: {
+		on_show: {},
+		on_hide: {},
+	}
+}
 
 // Video ----------------------------------------------------------------------
 
@@ -89,28 +103,36 @@ function show_screen(screen) {
 function get_video()         {return $('.screen_video video'  ).get(0) || {};}
 function get_video_preview() {return $('.screen_preview video').get(0) || {};}
 
-function set_video_preview(src) {
+screens.events.on_show['video'] = function() {
+	if (interval_queue_refresh) {
+		clearInterval(interval_queue_refresh);
+		interval_queue_refresh = null;
+	}
+}
+
+screens.events.on_hide['video'] = function() {
+	console.log("on_hide video");
 	var video = get_video();
 	video.scr="";
 	video.load();
+}
+
+
+function set_video_preview(src) {
 	var video = get_video_preview();
 	video.src = "/files/" + src;
 	video.loop = true;
 	video.volume = settings["karakara.player.video.preview_volume"];
 	video.load();
-	show_screen('preview');
+	//show_screen('preview');
 	video.play();
 }
 function set_video_fullscreen(src) {
-	var video = get_video_preview();
-	video.scr="";
-	video.load();
 	var video = get_video();
 	video.loop = false;
 	video.volume = 1.0;
 	video.src = "/files/" + src;
 	video.load();
-	show_screen('video');
 	video.play();
 }
 
@@ -118,6 +140,7 @@ var commands = {
 	'play': function(e) {
 		console.log('play');
 		set_video_fullscreen(get_attachment(playlist[0].track, "video"));
+		show_screen('video');
 	},
 	'pause': function(e) {
 		console.log('pause');
@@ -128,6 +151,7 @@ var commands = {
 	'stop': function(e) {
 		console.log('stop');
 		set_video_preview(get_attachment(playlist[0].track, "preview"));
+		show_screen('preview')
 	},
 	'seek_forwards': function(e) {
 		console.log('seek_forwards');
@@ -161,6 +185,39 @@ var commands = {
 		song_finished("played");
 	}
 };
+
+// Preview Screen ------------------------------------------------------------
+
+screens.events.on_show['preview'] = function() {
+	console.log("on_show preview");
+	
+	// Set queue poll update interval
+	if (!interval_queue_refresh) {
+		interval_queue_refresh = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
+		console.log('update_interval='+settings["karakara.player.queue.update_time"]);
+	}
+	
+	if(playlist.length == 0) {
+		console.log("Queue empty - returning to title screen");
+		set_video_preview(null);
+		show_screen('title');
+	}
+	else {
+		var title = playlist[0].track.title;
+		console.log("Preparing next song - "+title);
+		$('title').html(title);
+		$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+		set_video_preview(get_attachment(playlist[0].track, "preview"));
+	}
+}
+
+screens.events.on_hide['preview'] = function() {
+	console.log("on_hide preview");
+	var video = get_video_preview();
+	video.scr="";
+	video.load();
+}
+
 
 // Playlist Managment ---------------------------------------------------------
 
@@ -205,7 +262,7 @@ function update_playlist() {
 			playlist     = data.data.queue;
 			split_indexs = data.data.queue_split_indexs;
 			render_playlist();
-			prepare_next_song();
+			show_screen('preview');
 		}
 	});
 }
@@ -267,19 +324,61 @@ function render_playlist() {
 }
 
 
-function prepare_next_song() {
-	if(playlist.length == 0) {
-		console.log("Queue empty - returning to title screen");
-		set_video_preview(null);
-		show_screen('title');
+
+// Title screen (logic and animation) -----------------------------------------
+
+function init_titlescreen(titlescreen_images) {
+	console.log("init_titlescreen");
+	var frames_per_sec = 20;
+	var width  = document.width
+	var height = document.height;
+	var num_images = Math.floor(width/30);
+	var max_image_size = 250;
+	var min_image_size =  50;
+	var max_speed = 6 / (frames_per_sec/10);
+	function addImage(image, x, y, size, rotation, speed) {
+		if (!image)    {image    = titlescreen_images[Math.floor(Math.random()*titlescreen_images.length)];}
+		if (!x)        {x        = Math.random()*width -max_image_size;}
+		if (!y)        {y        = Math.random()*height-max_image_size;}
+		if (!size)     {size     = Math.random()*(max_image_size-min_image_size)+min_image_size;}
+		if (!rotation) {rotation = Math.random()*Math.PI;}
+		if (!speed)    {speed    = Math.random()*max_speed;}
+		$('.screen_title').append("<img src='/files/"+image+"' style='left: "+x+"px; top:"+y+"px; width: "+size+"px; -webkit-transform: rotate("+rotation+"rad);' data-speed='"+(speed+1)+"' data-rotation='"+rotation+"'>");
 	}
-	else {
-		var title = playlist[0].track.title;
-		console.log("Preparing next song - "+title);
-		$('title').html(title);
-		$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-		set_video_preview(get_attachment(playlist[0].track, "preview"));
+	// Init images
+	for (i=0 ; i<num_images ; i++) {addImage();}
+	// Animation 'Thumbnail Rain'
+	function animate_titlescreen() {
+		//console.log("animate");
+		$('.screen_title img').each(function(){
+			element = $(this);
+			function get_css(property_name, unit) {
+				return parseFloat(element.css(property_name));
+			};
+			function set_css(property_name, value, unit) {
+				element.css(property_name, ""+value+unit);
+			}
+			var x        = get_css('left'             ,'px' );
+			var y        = get_css('top'              ,'px' );
+			var rotation = parseFloat(element.attr('data-rotation'));
+			var speed    = parseFloat(element.attr('data-speed'));
+			if (y > height) {element.remove(); addImage(null,null,-max_image_size);}
+			set_css('left', x       , 'px');
+			set_css('top' , y+speed , 'px');
+			rotation += (speed - (max_speed/2))/300;
+			element.css('-webkit-transform', "rotate("+rotation+"rad)"); element.attr("data-rotation",""+rotation);
+		});
 	}
+	screens.events.on_show.title = function() {
+		console.log("on_show title");
+		interval_animation_titlescreen = setInterval(animate_titlescreen, 1000/frames_per_sec);
+	};
+	screens.events.on_hide.title = function() {
+		console.log("on_hide title");
+		clearInterval(interval_animation_titlescreen);
+	};
+
+	show_screen('preview');
 }
 
 // Init -----------------------------------------------------------------------
@@ -314,9 +413,6 @@ function attach_events() {
 function init() {
 	// Once settings Loaded & admin mode set -> setup final bits
 	
-	// Set queue poll update interval
-	settings['interval'] = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
-	console.log('update_interval='+settings["karakara.player.queue.update_time"]);
 	
 	$('h1').text(settings["karakara.player.title"]);
 	
@@ -328,25 +424,18 @@ function init() {
 		console.warn(msg);
 		alert(msg);
 	}
+	
+	show_screen('preview');
 }
 
 $(document).ready(function() {
-	show_screen('title');
 	attach_events();
 	update_playlist();
 	
 	// Load showcase images for titlescreen
 	$.getJSON("/random_images", {}, function(data) {
-		console.log("/random_images");
-		titlescreen_images = data.data.thumbnails;
-		//console.log(titlescreen_images);
-		for (i=0 ; i<titlescreen_images.length ; i++) {
-			var r = Math.round(Math.random()*4)+1
-			var s = Math.round(Math.random()*4)+1
-			var x = Math.round(Math.random()*1000);
-			var y = -Math.round(Math.random()*300);
-			$('.screen_title').append("<div style='postion: absolute; left:"+x+"px; top:"+y+"px;'><div class='sway sway_"+r+"'><img src='/files/"+titlescreen_images[i]+"' class='thumbnail fall fall_"+s+"'></div></div>");
-		}
+		console.log("/random_images?count=200");
+		init_titlescreen(data.data.thumbnails);
 	});
 	
 	// Load settings from server
