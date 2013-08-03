@@ -235,10 +235,12 @@ function get_attachment(track, type) {
 
 function song_finished(status) {
 	console.log("song_finished");
+	var id = playlist[0].id;
+	playlist.shift();
 	$.getJSON(
 		"/queue", {
 			"method": "put",
-			"queue_item.id": playlist[0].id,
+			"queue_item.id": id,
 			"status": status,
 			"uncache": new Date().getTime()
 		},
@@ -430,6 +432,7 @@ function init() {
 }
 
 $(document).ready(function() {
+	init_settings({}); // TODO: fix better!! ..Prevents bug where initial update time is undefined .... preview screen is shown before settings are loaded ...
 	attach_events();
 	update_playlist();
 	
@@ -440,10 +443,9 @@ $(document).ready(function() {
 	});
 	
 	// Load settings from server
-	$.getJSON("/settings", {}, function(data) {
+	$.getJSON("/settings.json", {}, function(data) {
 		console.log("/settings");
 		init_settings(data.data.settings);
-		
 		// Identify player.js as admin with admin cookie
 		if (!data.identity.admin) {
 			$.getJSON("/admin", {}, function(data) {
