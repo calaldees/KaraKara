@@ -138,6 +138,22 @@ button:before {
 	height: 100%;
 	background-color: black;
 }
+.screen_video #seekbar {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+}
+input[type="range"]{
+	-webkit-appearance:none !important;
+	height: 0;
+}
+input[type="range"]::-webkit-slider-thumb{
+	-webkit-appearance:none !important;
+	background-color: yellow;
+	height:10px;
+	width :10px;
+	border: 1px solid black;
+}
 
 
 /*---------------------------------------------------------------------------*/

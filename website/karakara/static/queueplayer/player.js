@@ -425,6 +425,11 @@ function attach_events() {
 		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.player.help.timeout"]*1000);
 		$('body').addClass('show_help');
 	});
+	// Progress Bar
+	get_video().addEventListener("timeupdate", function() {
+		var video = get_video();
+		$('#seekbar').val((video.currentTime / video.duration) * 100);
+	});
 }
 
 function init() {
