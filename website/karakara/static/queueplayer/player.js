@@ -69,6 +69,11 @@ function setup_websocket() {
 			clearInterval(socket_retry_interval);
 			socket_retry_interval = null;
 		}
+		if (screens.current == 'video') {
+			console.log("auto play video on websocket reconnection");
+			get_video().play();
+			// TODO: play is not quite perfect as the video resets
+		}
 	};
 	socket.onclose  = function() {
 		socket = null;
