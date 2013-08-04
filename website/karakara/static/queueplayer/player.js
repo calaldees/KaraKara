@@ -41,6 +41,15 @@ function get_chrome_version() {
 	catch(e) {return 0;}
 }
 
+function get_attachment(track, type) {
+	for(var i=0; i<track.attachments.length; i++) {
+		if(track.attachments[i].type == type) {
+			return track.attachments[i].location;
+		}
+	}
+	return "";
+}
+
 
 // Websocket ------------------------------------------------------------------
 var socket;
@@ -79,15 +88,19 @@ function setup_websocket() {
 // Screen Managment -----------------------------------------------------------
 
 function show_screen(screen) {
+	if (screen == screens.current) {return;}  // Abort if no screen change required
 	console.log('show_screen '+screen)
+	
+	// Remove 'screen_active' from existing active screen
 	var element = $('.screen_active');
 	var screen_active = element.attr('data-screen');
-	if (screen_active == screen) {return;}
 	element.removeClass('screen_active');
 	if (screen_active in screens.events.on_hide) {
 		screens.events.on_hide[screen_active](); // fire on_hide event
 	}
 	
+	// Set 'screen_active' on screen
+	screens.current = screen;
 	$('.screen.screen_'+screen).addClass('screen_active');
 	if (screen in screens.events.on_show) {
 		screens.events.on_show[screen](); // Fire on_show event
@@ -97,7 +110,8 @@ var screens = {
 	events: {
 		on_show: {},
 		on_hide: {},
-	}
+	},
+	current: null,
 }
 
 // Video ----------------------------------------------------------------------
@@ -107,10 +121,12 @@ function get_video()         {return $('.screen_video video'  ).get(0) || {};}
 function get_video_preview() {return $('.screen_preview video').get(0) || {};}
 
 screens.events.on_show['video'] = function() {
+	// Prevent Queue updates while playing a video
 	if (interval_queue_refresh) {
 		clearInterval(interval_queue_refresh);
 		interval_queue_refresh = null;
 	}
+	set_video_fullscreen(get_attachment(playlist[0].track, "video"));
 }
 
 screens.events.on_hide['video'] = function() {
@@ -142,7 +158,6 @@ function set_video_fullscreen(src) {
 var commands = {
 	'play': function(e) {
 		console.log('play');
-		set_video_fullscreen(get_attachment(playlist[0].track, "video"));
 		show_screen('video');
 	},
 	'pause': function(e) {
@@ -153,7 +168,6 @@ var commands = {
 	},
 	'stop': function(e) {
 		console.log('stop');
-		set_video_preview(get_attachment(playlist[0].track, "preview"));
 		show_screen('preview')
 	},
 	'seek_forwards': function(e) {
@@ -161,6 +175,7 @@ var commands = {
 		var video = get_video();
 		if (video.currentTime +  settings["karakara.player.video.skip.seconds"] < video.duration) {
 			video.currentTime += settings["karakara.player.video.skip.seconds"];
+			console.log(video.currentTime, video.duration);
 		}
 		else {
 			commands.ended();
@@ -171,6 +186,7 @@ var commands = {
 		var video = get_video();
 		if (video.currentTime -  settings["karakara.player.video.skip.seconds"] >= 0) {
 			video.currentTime -= settings["karakara.player.video.skip.seconds"];
+			console.log(video.currentTime, video.duration);
 		}
 		else {
 			video.currentTime = 0
@@ -202,7 +218,6 @@ screens.events.on_show['preview'] = function() {
 	
 	if(playlist.length == 0) {
 		console.log("Queue empty - returning to title screen");
-		set_video_preview(null);
 		show_screen('title');
 	}
 	else {
@@ -224,19 +239,12 @@ screens.events.on_hide['preview'] = function() {
 
 // Playlist Managment ---------------------------------------------------------
 
-function get_attachment(track, type) {
-	for(var i=0; i<track.attachments.length; i++) {
-		if(track.attachments[i].type == type) {
-			return track.attachments[i].location;
-		}
-	}
-	return "";
-}
 
 function song_finished(status) {
 	console.log("song_finished");
 	var id = playlist[0].id;
 	playlist.shift();
+	render_playlist()
 	$.getJSON(
 		"/queue", {
 			"method": "put",
@@ -245,7 +253,7 @@ function song_finished(status) {
 			"uncache": new Date().getTime()
 		},
 		function(data) {
-			update_playlist();
+			update_playlist();  // On operation complete
 		}
 	);
 }
@@ -255,7 +263,8 @@ function update_playlist() {
 	function _sig(list) {
 		var sig = "";
 		for(var i=0; i<list.length; i++) {
-			sig = sig + list[i].time_touched;
+			var t = list[i];
+			sig = sig + t.time_touched;
 		}
 		return sig;
 	}
@@ -263,7 +272,7 @@ function update_playlist() {
 	$.getJSON("/queue", {}, function(data) {
 		console.log("update_playlist getJSON response");
 		if(_sig(playlist) != _sig(data.data.queue)) {
-			//console.log("update_playlist:updated");
+			console.log("update_playlist:updated");
 			playlist     = data.data.queue;
 			split_indexs = data.data.queue_split_indexs;
 			render_playlist();

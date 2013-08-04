@@ -22,6 +22,8 @@ th {text-align:left;}
 body {
 	background: #eee;
 	font-family: Arial, Helvetica;
+	margin: 0;
+	padding: 0;
 }
 a {
 	color: #fff;
@@ -32,7 +34,11 @@ a {
 /* Notification Area */
 /*---------------------------------------------------------------------------*/
 
-.notification_area {position: absolute; right:0;}
+.notification_area {
+	position: absolute;
+	right:0;
+	padding: 6px;
+}
 .notification_area img {
 	background-color: white;
 	padding: 6px;
