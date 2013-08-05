@@ -27,8 +27,17 @@
     }
 </script>
 
-<a href='?cmd=play' data-role="button" onclick='return send("play");'>Play Fullscreen</a>
-<a href='?cmd=pause' data-role="button" onclick='return send("pause");'>Pause (Toggle)</a>
-<a href='?cmd=seek_forwards' data-role="button" onclick='return send("seek_forwards");'>Seek (20sec)</a>
-<a href='?cmd=stop' data-role="button" onclick='return send("stop");'>Stop</a>
-<a href='?cmd=skip' data-role="button" onclick='return send("skip");'>Skip Track</a>
+<%
+    skip_sec = request.registry.settings['karakara.player.video.skip.seconds']
+    buttons = (
+        ('play'          , 'Play Fullscreen'                ),
+        ('pause'         , 'Pause (toggle)'                 ),
+        ('seek_forwards' , 'Seek (+{0}sec)'.format(skip_sec)),
+        ('seek_backwards', 'Seek (-{0}sec)'.format(skip_sec)),
+        ('stop'          , 'Stop'                           ),
+        ('skip'          , 'Skip Track'                     ),
+    )
+%>
+% for cmd, title in buttons:
+    <a href='?cmd=${cmd}' data-role="button" onclick='return send("${cmd}");'>${title}</a>
+% endfor
