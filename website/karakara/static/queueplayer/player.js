@@ -93,7 +93,7 @@ function setup_websocket() {
 // Screen Managment -----------------------------------------------------------
 
 function show_screen(screen) {
-	if (screen == screens.current) {return;}  // Abort if no screen change required
+	if (screen == screens.current) {return false;}  // Abort if no screen change required
 	console.log('show_screen '+screen)
 	
 	// Remove 'screen_active' from existing active screen
@@ -110,6 +110,8 @@ function show_screen(screen) {
 	if (screen in screens.events.on_show) {
 		screens.events.on_show[screen](); // Fire on_show event
 	}
+	
+	return true;
 }
 var screens = {
 	events: {
@@ -126,6 +128,10 @@ function get_video()         {return $('.screen_video video'  ).get(0) || {};}
 function get_video_preview() {return $('.screen_preview video').get(0) || {};}
 
 screens.events.on_show['video'] = function() {
+	if (playlist.length == 0) {
+		show_screen('preview');
+		return;
+	}
 	// Prevent Queue updates while playing a video
 	if (interval_queue_refresh) {
 		clearInterval(interval_queue_refresh);
@@ -144,6 +150,7 @@ screens.events.on_hide['video'] = function() {
 
 function set_video_preview(src) {
 	var video = get_video_preview();
+	video.__original_src = src;
 	video.src = "/files/" + src;
 	video.loop = true;
 	video.volume = settings["karakara.player.video.preview_volume"];
@@ -201,12 +208,10 @@ var commands = {
 	'skip': function(e) {
 		console.log('skip');
 		song_finished("skipped");
-		commands.stop();
 	},
 	'ended': function(e) {
 		console.log('ended');
 		song_finished("played");
-		commands.stop();
 	}
 };
 
@@ -226,11 +231,15 @@ screens.events.on_show['preview'] = function() {
 		show_screen('title');
 	}
 	else {
-		var title = playlist[0].track.title;
-		console.log("Preparing next song - "+title);
-		$('title').html(title);
-		$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-		set_video_preview(get_attachment(playlist[0].track, "preview"));
+		// Update preview video src if next preview is differnt
+		var preview_src = get_attachment(playlist[0].track, "preview");
+		if (preview_src != get_video_preview().__original_src) {
+			var title = playlist[0].track.title;
+			console.log("Preparing next song - "+title);
+			$('title').html(title);
+			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+			set_video_preview(preview_src);
+		}
 	}
 }
 
@@ -238,6 +247,7 @@ screens.events.on_hide['preview'] = function() {
 	console.log("on_hide preview");
 	var video = get_video_preview();
 	video.scr="";
+	video.__original_src=null;
 	video.load();
 }
 
@@ -248,11 +258,6 @@ screens.events.on_hide['preview'] = function() {
 function song_finished(status) {
 	console.log("song_finished");
 	var id = playlist[0].id;
-	
-	// Update playlist and manually call preview update - !DONT LIKE THIS!
-	playlist.shift();
-	render_playlist();
-	screens.events.on_show.preview();
 	
 	$.getJSON(
 		"/queue", {
@@ -285,7 +290,12 @@ function update_playlist() {
 			playlist     = data.data.queue;
 			split_indexs = data.data.queue_split_indexs;
 			render_playlist();
-			show_screen('preview');
+			if (!show_screen('preview')){
+				// if we didnt need to swich screens because we are already on 'preview'
+				// run the on_show method anyway -
+				// this will setup the correct video preview or show titlescreen if needed
+				screens.events.on_show.preview(); 
+			}
 		}
 	});
 }
