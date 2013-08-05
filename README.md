@@ -19,7 +19,7 @@ Setup
    5. view <http://localhost:6543/> and <http://localhost:6543/player/player.html/>
 * Option 2 - Linux/Mac (native with sqllite dev db)
    1. navigate to data folder
-   2. `git clone https://github.com/calaldees/KaraKara.git && ln -s . /KaraKara/mediaserver/www/files && cd KaraKara/website && make setup && make test && make import_tracks_dev && make run`
+   2. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make setup && make test && make import_tracks_dev && make run`
    3. view <http://localhost:6543/> and <http://localhost:6543/player/player.html/>
 
 
