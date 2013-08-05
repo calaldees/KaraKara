@@ -248,8 +248,12 @@ screens.events.on_hide['preview'] = function() {
 function song_finished(status) {
 	console.log("song_finished");
 	var id = playlist[0].id;
+	
+	// Update playlist and manually call preview update - !DONT LIKE THIS!
 	playlist.shift();
-	render_playlist()
+	render_playlist();
+	screens.events.on_show.preview();
+	
 	$.getJSON(
 		"/queue", {
 			"method": "put",
@@ -415,6 +419,9 @@ function attach_events() {
 			case KEYCODE.RIGHT    : commands.seek_forwards(); break;
 			case KEYCODE.SPACE    : commands.pause(); break;
 		}
+		if (e.which in KEYCODE) {
+			e.preventDefault();
+		}
 	});
 	// Help Popup
 	$(document).on('mousemove', function(e) {
@@ -467,7 +474,7 @@ $(document).ready(function() {
 		init_settings(data.data.settings);
 		// Identify player.js as admin with admin cookie
 		if (!data.identity.admin) {
-			$.getJSON("/admin", {}, function(data) {
+			$.getJSON("/admin", {"uncache": new Date().getTime()}, function(data) {
 				if (!data.identity.admin) {
 					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
 					alert("Unable to set Admin mode for player interface");
