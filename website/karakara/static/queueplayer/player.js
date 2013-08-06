@@ -236,7 +236,11 @@ var commands = {
 		song_finished("played");
 	},
 	'queue_updated': function(e) {
-		update_playlist();
+		// Only update the quque when a video is not playing.
+		// At the end of the playing video the quque will be updated anyway.
+		if (screens.current!='video') {
+			update_playlist();
+		}
 	}
 };
 
