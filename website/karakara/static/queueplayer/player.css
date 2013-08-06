@@ -133,10 +133,12 @@ button:before {
  */
 .screen               {display:  none;}
 .screen.screen_active {display: block;}
-.screen.screen_active.screen_video {
+.screen.screen_video {
+	background-color: black;
+}
+.screen_video video {
 	width: 100%;
 	height: 100%;
-	background-color: black;
 }
 .screen_video #seekbar {
 	position: absolute;
@@ -176,6 +178,10 @@ input[type="range"]::-webkit-slider-thumb{
 
 
 
+.screen_preview video {
+	width: 100%;
+}
+
 #middle {
 	height: 70%;
 }
@@ -194,7 +200,7 @@ input[type="range"]::-webkit-slider-thumb{
 	text-align: center;
 }
 
-#videoHolder {
+#videoPreviewHolder {
 	position: relative;
 	top: -65px;
 	z-index: -1;

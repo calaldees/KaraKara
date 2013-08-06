@@ -141,8 +141,18 @@ var screens = {
 // Video ----------------------------------------------------------------------
 
 
-function get_video()         {return $('.screen_video video'  ).get(0) || {};}
-function get_video_preview() {return $('.screen_preview video').get(0) || {};}
+function get_video(create, selector_holder) {
+	if (!selector_holder) {selector_holder = '.screen_video';}
+	var selector_video = selector_holder+' video';
+	var video = $(selector_video).get(0);
+	if (!video && create) {
+		//$(selector_video).remove();
+		$(selector_holder).append('<video></video>');
+		video = $(selector_video).get(0);
+	}
+	return video || {};
+}
+function get_video_preview(create) {return get_video(create, '#previewVideoHolder');}
 
 screens.events.on_show['video'] = function() {
 	if (playlist.length == 0) {
@@ -155,32 +165,42 @@ screens.events.on_show['video'] = function() {
 
 screens.events.on_hide['video'] = function() {
 	console.log("on_hide video");
-	var video = get_video();
-	video.scr = null;
-	video.load();
-	console.warn("Bloody thing is broken, failed to set video.src to null", video);
-	console.log(video);
+	set_video_fullscreen(null);
 }
 
 
 function set_video_preview(src) {
 	console.log("set_video_preview", src);
-	var video = get_video_preview();
-	video.__original_src = src;
-	video.src = "/files/" + src;
-	video.loop = true;
-	video.volume = settings["karakara.player.video.preview_volume"];
-	video.load();
-	video.play();
+	$('.screen_preview video').remove();
+	if (src) {
+		var video = get_video_preview(true);
+		video.__original_src = src;
+		video.src = "/files/" + src;
+		video.loop = true;
+		video.volume = settings["karakara.player.video.preview_volume"];
+		video.load();
+		video.play();
+	}
 }
 function set_video_fullscreen(src) {
 	console.log("set_video_fullscreen", src);
-	var video = get_video();
-	video.loop = false;
-	video.volume = 1.0;
-	video.src = "/files/" + src;
-	video.load();
-	video.play();
+	$('.screen_video video').remove();
+	if (src) {
+		var video = get_video(true);
+		
+		//video.bind("ended", commands.ended);
+		video.addEventListener("ended", commands.ended);
+		video.addEventListener("timeupdate", function() {
+			var video = get_video();
+			$('#seekbar').val((video.currentTime / video.duration) * 100);
+		});
+		
+		video.loop = false;
+		video.volume = 1.0;
+		video.src = "/files/" + src;
+		video.load();
+		video.play();
+	}
 }
 
 var commands = {
@@ -201,9 +221,7 @@ var commands = {
 	'seek_forwards': function(e) {
 		console.log('seek_forwards');
 		var video = get_video();
-		if (!video.src || video.src=="") {
-			return;
-		}
+		if (!video.src) {return;}
 		if (video.currentTime +  settings["karakara.player.video.skip.seconds"] < video.duration) {
 			video.currentTime += settings["karakara.player.video.skip.seconds"];
 			console.log(video.currentTime, video.duration);
@@ -215,9 +233,7 @@ var commands = {
 	'seek_backwards': function(e) {
 		console.log('seek_backwards');
 		var video = get_video();
-		if (!video.src || video.src=="") {
-			return;
-		}
+		if (!video.src) {return;}
 		if (video.currentTime -  settings["karakara.player.video.skip.seconds"] >= 0) {
 			video.currentTime -= settings["karakara.player.video.skip.seconds"];
 			console.log(video.currentTime, video.duration);
@@ -272,10 +288,7 @@ screens.events.on_show['preview'] = function() {
 
 screens.events.on_hide['preview'] = function() {
 	console.log("on_hide preview");
-	var video = get_video_preview();
-	video.scr = null;
-	video.__original_src=null;
-	video.load();
+	set_video_preview(null);
 }
 
 
@@ -445,7 +458,7 @@ function attach_events() {
 	// Button Events
 	$("#play").click(commands.play);
 	$("#skip").click(commands.skip);
-	$(".screen_video video").bind("ended", commands.ended);
+	
 	// Keyboard Shortcuts
 	$(document).on('keydown', function(e) {
 		switch (e.which) {
@@ -468,11 +481,6 @@ function attach_events() {
 		}
 		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.player.help.timeout"]*1000);
 		$('body').addClass('show_help');
-	});
-	// Progress Bar
-	get_video().addEventListener("timeupdate", function() {
-		var video = get_video();
-		$('#seekbar').val((video.currentTime / video.duration) * 100);
 	});
 }
 
