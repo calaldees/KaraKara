@@ -404,13 +404,13 @@ function init_titlescreen(titlescreen_images) {
 	console.log("init_titlescreen");
 	var frames_per_sec = 20;
 	var num_images = Math.floor(screen.width/30);
-	var max_image_size = 250;
-	var min_image_size =  50;
+	var max_image_size = screen.width/5;
+	var min_image_size = screen.width/20;
 	var max_speed = 6 / (frames_per_sec/10);
 	function addImage(image, x, y, size, rotation, speed) {
 		if (!image)    {image    = titlescreen_images[Math.floor(Math.random()*titlescreen_images.length)];}
-		if (!x)        {x        = Math.random()*screen.width -max_image_size;}
-		if (!y)        {y        = Math.random()*screen.height;}
+		if (!x)        {x        = Math.random()*screen.width -(max_image_size/2);}
+		if (!y)        {y        = Math.random()*screen.height-max_image_size;}
 		if (!size)     {size     = Math.random()*(max_image_size-min_image_size)+min_image_size;}
 		if (!rotation) {rotation = Math.random()*Math.PI;}
 		if (!speed)    {speed    = Math.random()*max_speed;}
