@@ -410,7 +410,7 @@ function init_titlescreen(titlescreen_images) {
 	function addImage(image, x, y, size, rotation, speed) {
 		if (!image)    {image    = titlescreen_images[Math.floor(Math.random()*titlescreen_images.length)];}
 		if (!x)        {x        = Math.random()*screen.width -max_image_size;}
-		if (!y)        {y        = Math.random()*screen.height-max_image_size;}
+		if (!y)        {y        = Math.random()*screen.height;}
 		if (!size)     {size     = Math.random()*(max_image_size-min_image_size)+min_image_size;}
 		if (!rotation) {rotation = Math.random()*Math.PI;}
 		if (!speed)    {speed    = Math.random()*max_speed;}
@@ -433,7 +433,7 @@ function init_titlescreen(titlescreen_images) {
 			var y        = get_css('top'              ,'px' );
 			var rotation = parseFloat(element.attr('data-rotation'));
 			var speed    = parseFloat(element.attr('data-speed'));
-			if (y > screen.height) {element.remove(); addImage(null,null,-max_image_size);}
+			if (y > screen.height + max_image_size) {element.remove(); addImage(null,null,-max_image_size);}
 			set_css('left', x       , 'px');
 			set_css('top' , y+speed , 'px');
 			rotation += (speed - (max_speed/2))/300;
@@ -486,7 +486,6 @@ function attach_events() {
 
 function init() {
 	// Once settings Loaded & admin mode set -> setup final bits
-	
 	
 	$('h1').text(settings["karakara.player.title"]);
 	
