@@ -50,6 +50,20 @@ function get_attachment(track, type) {
 	return "";
 }
 
+// Queue Updating
+
+function start_queue_poll() {
+	if (!interval_queue_refresh) {
+		interval_queue_refresh = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
+		console.log('queue poll time = '+settings["karakara.player.queue.update_time"]);
+	}
+}
+function stop_queue_poll() {
+	if (interval_queue_refresh) {
+		clearInterval(interval_queue_refresh);
+		interval_queue_refresh = null;
+	}
+}
 
 // Websocket ------------------------------------------------------------------
 var socket;
@@ -69,11 +83,13 @@ function setup_websocket() {
 			clearInterval(socket_retry_interval);
 			socket_retry_interval = null;
 		}
+		stop_queue_poll();
 		if (screens.current == 'video') {
 			console.log("auto play video on websocket reconnection");
 			get_video().play();
 			// TODO: play is not quite perfect as the video resets
 		}
+		
 	};
 	socket.onclose  = function() {
 		socket = null;
@@ -82,6 +98,7 @@ function setup_websocket() {
 		if (!socket_retry_interval) {
 			socket_retry_interval = setInterval(setup_websocket,settings["karakara.websocket.disconnected_retry_interval"]*1000);
 		}
+		start_queue_poll();
 	}
 	socket.onmessage = function(msg) {
 		var cmd = $.trim(msg.data);
@@ -132,33 +149,32 @@ screens.events.on_show['video'] = function() {
 		show_screen('preview');
 		return;
 	}
-	// Prevent Queue updates while playing a video
-	if (interval_queue_refresh) {
-		clearInterval(interval_queue_refresh);
-		interval_queue_refresh = null;
-	}
+	stop_queue_poll();  // Prevent Queue updates while playing a video
 	set_video_fullscreen(get_attachment(playlist[0].track, "video"));
 }
 
 screens.events.on_hide['video'] = function() {
 	console.log("on_hide video");
 	var video = get_video();
-	video.scr="";
+	video.scr = null;
 	video.load();
+	console.warn("Bloody thing is broken, failed to set video.src to null", video);
+	console.log(video);
 }
 
 
 function set_video_preview(src) {
+	console.log("set_video_preview", src);
 	var video = get_video_preview();
 	video.__original_src = src;
 	video.src = "/files/" + src;
 	video.loop = true;
 	video.volume = settings["karakara.player.video.preview_volume"];
 	video.load();
-	//show_screen('preview');
 	video.play();
 }
 function set_video_fullscreen(src) {
+	console.log("set_video_fullscreen", src);
 	var video = get_video();
 	video.loop = false;
 	video.volume = 1.0;
@@ -185,6 +201,9 @@ var commands = {
 	'seek_forwards': function(e) {
 		console.log('seek_forwards');
 		var video = get_video();
+		if (!video.src || video.src=="") {
+			return;
+		}
 		if (video.currentTime +  settings["karakara.player.video.skip.seconds"] < video.duration) {
 			video.currentTime += settings["karakara.player.video.skip.seconds"];
 			console.log(video.currentTime, video.duration);
@@ -196,6 +215,9 @@ var commands = {
 	'seek_backwards': function(e) {
 		console.log('seek_backwards');
 		var video = get_video();
+		if (!video.src || video.src=="") {
+			return;
+		}
 		if (video.currentTime -  settings["karakara.player.video.skip.seconds"] >= 0) {
 			video.currentTime -= settings["karakara.player.video.skip.seconds"];
 			console.log(video.currentTime, video.duration);
@@ -212,6 +234,9 @@ var commands = {
 	'ended': function(e) {
 		console.log('ended');
 		song_finished("played");
+	},
+	'queue_updated': function(e) {
+		update_playlist();
 	}
 };
 
@@ -220,10 +245,8 @@ var commands = {
 screens.events.on_show['preview'] = function() {
 	console.log("on_show preview");
 	
-	// Set queue poll update interval
-	if (!interval_queue_refresh) {
-		interval_queue_refresh = setInterval(update_playlist, settings["karakara.player.queue.update_time"] * 1000);
-		console.log('update_interval='+settings["karakara.player.queue.update_time"]);
+	if (!socket) {
+		start_queue_poll(); // Set queue poll update interval
 	}
 	
 	if(playlist.length == 0) {
@@ -246,7 +269,7 @@ screens.events.on_show['preview'] = function() {
 screens.events.on_hide['preview'] = function() {
 	console.log("on_hide preview");
 	var video = get_video_preview();
-	video.scr="";
+	video.scr = null;
 	video.__original_src=null;
 	video.load();
 }

@@ -24,7 +24,7 @@ class AuthEchoServerManager(ServerManager):
             pass
         log.info('connection %s disconnected' % client.id)
     def recv(self, data, source=None):
-        if source not in self.clients_authenticated:
+        if source and source not in self.clients_authenticated:
             key = str(data,'utf8')
             log.debug('authenticating {0}'.format(key))
             if self.authenticator(key):

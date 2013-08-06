@@ -29,12 +29,15 @@ log = logging.getLogger(__name__)
 QUEUE_CACHE_KEY = 'queue'
 
 queue_version = random.randint(0,65535)
-def invalidate_queue():
+def invalidate_queue(request=None):
     commit() # Before invalidating any cache data, ensure the new data is persisted
     global queue_version
     queue_version += 1
     cache.delete(QUEUE_CACHE_KEY)
-invalidate_queue()
+    if request:
+        request.registry['socket_manager'].recv('queue_updated'.encode('utf-8'))
+
+#invalidate_queue()
 def generate_cache_key_queue(request):
     global queue_version
     return '-'.join([generate_cache_key(request), str(queue_version)])
@@ -176,7 +179,7 @@ def queue_add(request):
     DBSession.add(queue_item)
     log.info('%s adding to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     
-    invalidate_queue() # Invalidate Cache
+    invalidate_queue(request) # Invalidate Cache
     invalidate_track(track_id)
     
     return action_ok(message='track queued', data={'queue_item.id':''}, code=201) #TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
@@ -207,7 +210,7 @@ def queue_del(request):
     log.info('%s removing from queue' % (queue_item.track_id))
     queue_item_track_id = queue_item.track_id
     
-    invalidate_queue() # Invalidate Cache
+    invalidate_queue(request) # Invalidate Cache
     invalidate_track(queue_item_track_id)
     
     return action_ok(message='queue_item status changed')
@@ -262,7 +265,7 @@ def queue_update(request):
     log.info('%s updating' % (queue_item.track_id))
     queue_item_track_id = queue_item.track_id
 
-    invalidate_queue() # Invalidate Cache
+    invalidate_queue(request) # Invalidate Cache
     invalidate_track(queue_item_track_id)
 
     return action_ok(message='queue_item updated')
