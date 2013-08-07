@@ -75,6 +75,8 @@ def queue_item_for_track(request, DBSession, track_id):
 
 
 def issue_priority_token(request, DBSession):
+    priority_window = request.registry.settings.get('karakara.queue.add.limit.priority_window')
+    
     # Aquire most recent priority token - if most recent token in past, set recent token to now
     try:
         latest_token = DBSession.query(PriorityToken).filter(PriorityToken.used==False).order_by(PriorityToken.valid_end.desc()).limit(1).one()
@@ -82,7 +84,8 @@ def issue_priority_token(request, DBSession):
     except NoResultFound:
         latest_token_end = None
     if not latest_token_end or latest_token_end < now():
-        latest_token_end = now() + get_queue_duration(request)
+        # When issueing the first priority token
+        latest_token_end = now() + priority_window  #get_queue_duration(request) # Adding entire queue here was unnessisary.
     
     # Do not issue tokens past the end of the event
     event_end = request.registry.settings.get('karakara.event.end')
@@ -107,8 +110,7 @@ def issue_priority_token(request, DBSession):
     except NoResultFound:
         pass
     
-    priority_window = request.registry.settings.get('karakara.queue.add.limit.priority_window')
-    
+    # Issue the new token
     priority_token = PriorityToken()
     priority_token.session_owner = request.session['id']
     priority_token.valid_start = latest_token_end
