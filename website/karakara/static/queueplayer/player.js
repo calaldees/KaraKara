@@ -138,21 +138,7 @@ var screens = {
 	current: null,
 }
 
-// Video ----------------------------------------------------------------------
-
-
-function get_video(create, selector_holder) {
-	if (!selector_holder) {selector_holder = '.screen_video';}
-	var selector_video = selector_holder+' video';
-	var video = $(selector_video).get(0);
-	if (!video && create) {
-		//$(selector_video).remove();
-		$(selector_holder).append('<video></video>');
-		video = $(selector_video).get(0);
-	}
-	return video || {};
-}
-function get_video_preview(create) {return get_video(create, '#previewVideoHolder');}
+// Fullscreen Video -----------------------------------------------------------
 
 screens.events.on_show['video'] = function() {
 	if (playlist.length == 0) {
@@ -168,6 +154,53 @@ screens.events.on_hide['video'] = function() {
 	set_video_fullscreen(null);
 }
 
+
+// Preview Screen ------------------------------------------------------------
+
+screens.events.on_show['preview'] = function() {
+	console.log("on_show preview");
+	
+	if (!socket) {
+		start_queue_poll(); // Set queue poll update interval
+	}
+	
+	if(playlist.length == 0) {
+		console.log("Queue empty - returning to title screen");
+		show_screen('title');
+	}
+	else {
+		// Update preview video src if next preview is differnt
+		var preview_src = get_attachment(playlist[0].track, "preview");
+		if (preview_src != get_video_preview().__original_src) {
+			var title = playlist[0].track.title;
+			console.log("Preparing next song - "+title);
+			$('title').html(title);
+			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+			set_video_preview(preview_src);
+		}
+	}
+}
+
+screens.events.on_hide['preview'] = function() {
+	console.log("on_hide preview");
+	set_video_preview(null);
+}
+
+
+// Video Management -----------------------------------------------------------
+
+function get_video(create, selector_holder) {
+	if (!selector_holder) {selector_holder = '.screen_video';}
+	var selector_video = selector_holder+' video';
+	var video = $(selector_video).get(0);
+	if (!video && create) {
+		//$(selector_video).remove();
+		$(selector_holder).append('<video></video>');
+		video = $(selector_video).get(0);
+	}
+	return video || {};
+}
+function get_video_preview(create) {return get_video(create, '#previewVideoHolder');}
 
 function set_video_preview(src) {
 	console.log("set_video_preview", src);
@@ -202,6 +235,9 @@ function set_video_fullscreen(src) {
 		video.play();
 	}
 }
+
+
+// Commands -------------------------------------------------------------------
 
 var commands = {
 	'play': function(e) {
@@ -259,37 +295,6 @@ var commands = {
 		}
 	}
 };
-
-// Preview Screen ------------------------------------------------------------
-
-screens.events.on_show['preview'] = function() {
-	console.log("on_show preview");
-	
-	if (!socket) {
-		start_queue_poll(); // Set queue poll update interval
-	}
-	
-	if(playlist.length == 0) {
-		console.log("Queue empty - returning to title screen");
-		show_screen('title');
-	}
-	else {
-		// Update preview video src if next preview is differnt
-		var preview_src = get_attachment(playlist[0].track, "preview");
-		if (preview_src != get_video_preview().__original_src) {
-			var title = playlist[0].track.title;
-			console.log("Preparing next song - "+title);
-			$('title').html(title);
-			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
-			set_video_preview(preview_src);
-		}
-	}
-}
-
-screens.events.on_hide['preview'] = function() {
-	console.log("on_hide preview");
-	set_video_preview(null);
-}
 
 
 // Playlist Managment ---------------------------------------------------------

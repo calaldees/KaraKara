@@ -1,13 +1,6 @@
-@-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
-@-webkit-keyframes marquee {0%{}100%{}}
-@-webkit-keyframes fade_in {
-	  0% {opacity: 0; bottom: -300px;}
-	100% {opacity: 1; bottom: 0;}
-}
-@-webkit-keyframes fade_out {
-	  0% {opacity: 1; bottom: 0;}
-	100% {opacity: 0; bottom: -300px;}
-}
+/*---------------------------------------------------------------------------*/
+/* Base Elements */
+/*---------------------------------------------------------------------------*/
 
 html {
 	overflow: hidden;
@@ -29,6 +22,23 @@ a {
 	color: #fff;
 	text-decoration: none;
 }
+
+
+/*---------------------------------------------------------------------------*/
+/* Animations */
+/*---------------------------------------------------------------------------*/
+
+@-webkit-keyframes pulse {0%{opacity: 0.5;}100%{opacity: 1;}}
+@-webkit-keyframes marquee {0%{}100%{}}
+@-webkit-keyframes fade_in {
+	  0% {opacity: 0; bottom: -300px;}
+	100% {opacity: 1; bottom: 0;}
+}
+@-webkit-keyframes fade_out {
+	  0% {opacity: 1; bottom: 0;}
+	100% {opacity: 0; bottom: -300px;}
+}
+
 
 /*---------------------------------------------------------------------------*/
 /* Notification Area */
@@ -128,11 +138,14 @@ button:before {
 /* Fullscreen Management */
 /*---------------------------------------------------------------------------*/
 
-/* By default 'screen_preview' is visible and 'screen_fullscreen is hidden.
- * When the class 'video_fullscreen' is applyed to the body, they flip visibility
- */
 .screen               {display:  none;}
 .screen.screen_active {display: block;}
+
+
+/*---------------------------------------------------------------------------*/
+/* Fullscreen Video */
+/*---------------------------------------------------------------------------*/
+
 .screen.screen_video {
 	background-color: black;
 }
@@ -194,9 +207,8 @@ input[type="range"]::-webkit-slider-thumb{
 
 
 /*---------------------------------------------------------------------------*/
-/* Layout */
+/* Preview Video and Queue */
 /*---------------------------------------------------------------------------*/
-
 
 
 .screen_preview video {
