@@ -6,7 +6,7 @@ html {
 	overflow: hidden;
 }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, ul, ol, li {
 	padding:0;
 	margin:0;
 }
@@ -211,9 +211,50 @@ input[type="range"]::-webkit-slider-thumb{
 /*---------------------------------------------------------------------------*/
 
 
+.screen_preview .preview_holder {
+	position: absolute;
+	right: 0;
+	width: 40%;
+	height: 40%;
+}
 .screen_preview video {
 	width: 100%;
 }
+
+
+#playlist {
+	
+}
+
+#playlist li {
+	width: 50%;
+	height: 10%;
+	margin: 1em;
+	overflow: hidden;
+	border: 1px solid black;
+	border-radius: 1em;
+}
+#playlist li:nth-child(1)  {
+	width: 60%;
+	height: 20%;
+}
+
+#playlist li:nth-child(2)  {
+	width: 55%;
+	height: 15%;
+}
+
+
+#playlist_obscured {
+	position: absolute;
+	width: 40%;
+	top: 50%;
+	bottom: 0;
+	right: 0;
+}
+
+
+/**
 
 #middle {
 	height: 70%;
@@ -283,7 +324,7 @@ input[type="range"]::-webkit-slider-thumb{
 	content: "Ready to Start";
 }
 
-/* song next */
+
 #playlist li:nth-child(2) {background-color: #777;}
 #playlist li:nth-child(2):after {
 	font-weight: bold;
@@ -349,3 +390,4 @@ input[type="range"]::-webkit-slider-thumb{
 	white-space: nowrap;
 	overflow-x: hidden;
 }
+*/

@@ -61,7 +61,7 @@ function get_chrome_version() {
 function get_attachment(track, type) {
 	for(var i=0; i<track.attachments.length; i++) {
 		if(track.attachments[i].type == type) {
-			return track.attachments[i].location;
+			return "/files/"+track.attachments[i].location;
 		}
 	}
 	return "";
@@ -190,9 +190,9 @@ screens.events.on_show['preview'] = function() {
 		var preview_src = get_attachment(playlist[0].track, "preview");
 		if (preview_src != get_video_preview().__original_src) {
 			var title = playlist[0].track.title;
-			console.log("Preparing next song - "+title);
-			$('title').html(title);
-			$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+			//console.log("Preparing next song - "+title);
+			//$('title').html(title);
+			//$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
 			set_video_preview(preview_src);
 		}
 	}
@@ -225,7 +225,7 @@ function set_video_preview(src) {
 	if (src) {
 		var video = get_video_preview(true);
 		video.__original_src = src;
-		video.src = "/files/" + src;
+		video.src = src;
 		video.loop = true;
 		video.volume = settings["karakara.player.video.preview_volume"];
 		video.load();
@@ -247,7 +247,7 @@ function set_video_fullscreen(src) {
 		
 		video.loop = false;
 		video.volume = 1.0;
-		video.src = "/files/" + src;
+		video.src = src;
 		video.load();
 		video.play();
 	}
@@ -379,6 +379,11 @@ function render_playlist() {
 		playlist_obscured = [];
 	}
 	
+	//var track_current = playlist_ordered.shift();
+	//$('#track_current *').remove();
+	//$track_current = $('#track_current');
+	//$track_current.append("<p>"+track_current.performer_name+"</p>");
+	
 	// Render queue_item scaffold
 	function render_queue_items(queue, renderer_queue_item) {
 		var output_buffer = "";
@@ -389,31 +394,34 @@ function render_playlist() {
 				if (tag in this) {return this[tag];}
 				return ""
 			};
-			output_buffer += "<li>\n"+renderer_queue_item(queue_item, track)+"</li>\n";
+			output_buffer += renderer_queue_item(queue_item, track);
 		}
 		return output_buffer;
 	}
 	
 	// Render Playlist Ordered
 	var queue_html = render_queue_items(playlist_ordered, function(queue_item, track) {
-		return "" +
+		//
+		return "<li style='background:transparent url(\""+get_attachment(track,'thumbnail')+"\") no-repeat 100% 0;'>" +
 			"<p class='title'>"     + track.tags.get("title")   + "</p>\n" +
 			"<p class='from'>"      + track.tags.get("from")    + "</p>\n" +
 			"<p class='performer'>" + queue_item.performer_name + "</p>\n" +
-			"<p class='time'> "     + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
+			"<p class='time'>"      + timedelta_str(queue_item.total_duration*1000) + "</p>\n" +
+			"</li>\n";
 	});
 	$('#playlist').html("<ol>"+queue_html+"</ol>\n");
 	
 	// Render Playlist Obscured
-	if (playlist_obscured.length) {
-		$('#upLater').html('<h2>Later On</h2>');
-	}
+	//if (playlist_obscured.length) {
+	//	$('#upLater').html('<h2>Later On</h2>');
+	//}
 	var queue_html = render_queue_items(playlist_obscured, function(queue_item, track) {
-		var buffer = "";
-		buffer += track.tags.get("title");
-		track.tags.get("from") ? buffer += " ("+track.tags.get("from")+")" : null;
-		buffer += " - "+queue_item.performer_name+"\n";
-		return buffer;
+		//var buffer = "";
+		//buffer += track.tags.get("title");
+		//track.tags.get("from") ? buffer += " ("+track.tags.get("from")+")" : null;
+		//buffer += " - "+queue_item.performer_name+"\n";
+		//return buffer;
+		return "<li>"+queue_item.performer_name+"</li>";
 	});
 	$('#playlist_obscured').html("<ul>"+queue_html+"</ul>");
 }
