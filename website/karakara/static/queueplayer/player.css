@@ -172,19 +172,24 @@ input[type="range"]::-webkit-slider-thumb{
 }
 
 .screen_title .info {
-	position: absolute;
-	-webkit-transform: rotate(-0.2rad);
-	top: 100px;
-	left: 100px;
+	position: fixed;
+	/*-webkit-transform: rotate(-0.2rad);*/
+	top: 20%;
+	left: 25%;
+	width: 50%;
+	z-index: 100;
+}
+.screen_title .info > div {
 	background-color: white;
 	border-radius: 8px;
 	padding: 2em;
 	font-size: 150%;
-	z-index: 100;
 	opacity: 0.9;
 }
+
 .screen_title .info h1 {
 	opacity: 1.0;
+	text-align: center;
 }
 
 

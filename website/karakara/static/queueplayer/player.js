@@ -410,7 +410,7 @@ function init_titlescreen(titlescreen_images) {
 	function addImage(image, x, y, size, rotation, speed) {
 		if (!image)    {image    = titlescreen_images[Math.floor(Math.random()*titlescreen_images.length)];}
 		if (!x)        {x        = Math.random()*screen.width -(max_image_size/2);}
-		if (!y)        {y        = Math.random()*screen.height-max_image_size;}
+		if (!y)        {y        = (Math.random()*(screen.height+max_image_size))-max_image_size;}
 		if (!size)     {size     = Math.random()*(max_image_size-min_image_size)+min_image_size;}
 		if (!rotation) {rotation = Math.random()*Math.PI;}
 		if (!speed)    {speed    = Math.random()*max_speed;}
