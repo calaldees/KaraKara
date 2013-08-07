@@ -1,15 +1,10 @@
-// Constants ------------------------------------------------------------------
-KEYCODE = {
-	BACKSPACE: 8,
-	ENTER    :13,
-	ESCAPE   :27,
-	LEFT     :37,
-	RIGHT    :39,
-	SPACE    :32,
-};
-
-// Settings Management --------------------------------------------------------
-var settings = {};
+/**
+ *
+ * KaraKara Player Interface
+ *
+ *
+ *
+ */
 var SETTINGS_DEFAULT = {
 	"karakara.player.title"               : "KaraKara",
 	"karakara.player.video.preview_volume":  0.2,
@@ -19,6 +14,33 @@ var SETTINGS_DEFAULT = {
 	"karakara.websocket.port"             : null,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
 }
+
+
+// Constants ------------------------------------------------------------------
+
+KEYCODE = {
+	BACKSPACE: 8,
+	ENTER    :13,
+	ESCAPE   :27,
+	LEFT     :37,
+	RIGHT    :39,
+	SPACE    :32,
+};
+
+
+// Variables ------------------------------------------------------------------
+
+// Data
+var playlist = [];
+var split_indexs = [];
+
+// Timers
+var mousemove_timeout;
+var interval_animation_titlescreen;
+var interval_queue_refresh;
+
+// Settings Management --------------------------------------------------------
+var settings = {};
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
 	for (setting_key in SETTINGS_DEFAULT) {
@@ -26,13 +48,8 @@ function init_settings(new_settings) {
 		else                             {settings[setting_key] = SETTINGS_DEFAULT[setting_key];}
 	}
 }
+init_settings({});
 
-// Variables ------------------------------------------------------------------
-var playlist = [];
-var split_indexs = [];
-var mousemove_timeout;
-var interval_animation_titlescreen;
-var interval_queue_refresh;
 
 // Utils ----------------------------------------------------------------------
 
@@ -454,7 +471,6 @@ function init_titlescreen(titlescreen_images) {
 		clearInterval(interval_animation_titlescreen);
 	};
 
-	show_screen('preview');
 }
 
 // Init -----------------------------------------------------------------------
@@ -503,19 +519,17 @@ function init() {
 		alert(msg);
 	}
 	
-	show_screen('preview');
-}
-
-$(document).ready(function() {
-	init_settings({}); // TODO: fix better!! ..Prevents bug where initial update time is undefined .... preview screen is shown before settings are loaded ...
-	attach_events();
-	update_playlist();
-	
 	// Load showcase images for titlescreen
 	$.getJSON("/random_images.json?count=200", {}, function(data) {
 		console.log("/random_images");
 		init_titlescreen(data.data.thumbnails);
+		show_screen('preview');
 	});
+}
+
+$(document).ready(function() {
+	attach_events();
+	update_playlist();
 	
 	// Load settings from server
 	$.getJSON("/settings.json", {}, function(data) {
