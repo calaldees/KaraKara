@@ -6,6 +6,9 @@ function timedelta_str(timedelta) {
     if (minutes>=1) {
         return minutes+"min";
     }
+    if (seconds==0) {
+        return "Now";
+    }
     return seconds+"sec";
 }
 

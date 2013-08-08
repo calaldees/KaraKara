@@ -394,20 +394,20 @@ function render_playlist() {
 				if (tag in this) {return this[tag];}
 				return ""
 			};
-			output_buffer += renderer_queue_item(queue_item, track);
+			output_buffer += "<li>"+renderer_queue_item(queue_item, track)+"</li>";
 		}
 		return output_buffer;
 	}
 	
 	// Render Playlist Ordered
 	var queue_html = render_queue_items(playlist_ordered, function(queue_item, track) {
-		//
-		return "<li style='background:transparent url(\""+get_attachment(track,'thumbnail')+"\") no-repeat 100% 0;'>" +
+		//style='background:transparent url(\""+get_attachment(track,'thumbnail')+"\") no-repeat 100% 0;'
+		return "" +
+			"<img src='"+get_attachment(track,'thumbnail')+"'>\n" +
 			"<p class='title'>"     + track.tags.get("title")   + "</p>\n" +
 			"<p class='from'>"      + track.tags.get("from")    + "</p>\n" +
 			"<p class='performer'>" + queue_item.performer_name + "</p>\n" +
-			"<p class='time'>"      + timedelta_str(queue_item.total_duration*1000) + "</p>\n" +
-			"</li>\n";
+			"<p class='time'>"      + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
 	});
 	$('#playlist').html("<ol>"+queue_html+"</ol>\n");
 	
@@ -421,7 +421,7 @@ function render_playlist() {
 		//track.tags.get("from") ? buffer += " ("+track.tags.get("from")+")" : null;
 		//buffer += " - "+queue_item.performer_name+"\n";
 		//return buffer;
-		return "<li>"+queue_item.performer_name+"</li>";
+		return queue_item.performer_name;
 	});
 	$('#playlist_obscured').html("<ul>"+queue_html+"</ul>");
 }

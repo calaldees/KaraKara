@@ -6,7 +6,7 @@ html {
 	overflow: hidden;
 }
 
-h1, h2, h3, h4, h5, ul, ol, li {
+h1, h2, h3, h4, h5, ul, ol, li, p {
 	padding:0;
 	margin:0;
 }
@@ -227,21 +227,65 @@ input[type="range"]::-webkit-slider-thumb{
 }
 
 #playlist li {
+	position: relative;
 	width: 50%;
-	height: 10%;
+	height: 4em;
 	margin: 1em;
 	overflow: hidden;
-	border: 1px solid black;
+	border: 0.1em solid black;
 	border-radius: 1em;
 }
+#playlist li img {
+	position: absolute;
+	top:-4em;
+	left:0;
+	opacity: 0.3;
+	width: 100%;
+	z-index: -1;
+}
+#playlist li p {
+	position: absolute;
+}
+#playlist li .performer {
+	font-size: 200%;
+	top:25%;
+	left:1em;
+	width: 40%;
+	overflow: hidden;
+}
+#playlist li .time {
+	right: 1em;
+	top: 25%;
+	bottom: 25%;
+	border: 3px solid black;
+	background-color: white;
+	width: 4em;
+	text-align: center;
+	border-radius: 4em;
+}
+#playlist li .title {
+	top: 1em;
+	left: 45%;
+}
+#playlist li .from {
+	bottom: 1em;
+	left: 45%;
+}
+
 #playlist li:nth-child(1)  {
 	width: 60%;
-	height: 20%;
+	height: 7em;
+}
+#playlist li:nth-child(1) .title {font-size: 150%;}
+#playlist li:nth-child(1) .from  {font-size: 150%;}
+#playlist li:nth-child(1) .time {
+	border-color: red;
+	font-weight: bold;
 }
 
 #playlist li:nth-child(2)  {
 	width: 55%;
-	height: 15%;
+	height: 5em;
 }
 
 
