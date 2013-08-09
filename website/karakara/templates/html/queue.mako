@@ -81,7 +81,8 @@ import datetime
     % if identity.get('admin'):
     <script src="${h.static_url('jquery/jquery.sortable.js')}"></script>
     <script>
-        $(function() {
+        //$(function() {
+        $(document).ready(function() {
             $('.queue-list').sortable().bind('sortupdate', function(e, ui) {
                 $('.ui-li-aside').html('');
                 var queue_item_id_source      = ui.item.attr('data-queue-item-id');
@@ -100,6 +101,31 @@ import datetime
                     }
                 });
             });
+
+            // Connect to websocket to subscribe to queue_updated events to reload page
+            ## No need to authenticate websocket because we are just reading the stream
+            ## It may be possible to have this funcationality for all users - just being cautions for now, don't want to overload the websocket server
+            ## You get some funky behaviour where the websocket refreshes before the first format=redirect happens, so the success message appears on the queue screen.
+            try {
+                var currently_dragging = false;
+                var socket;
+                socket = new WebSocket("ws://" + location.hostname + ":" + ${request.registry.settings['karakara.websocket.port']} + "/");
+                socket.onmessage = function(msg) {
+                    var cmd = $.trim(msg.data);
+                    if (currently_dragging==false && cmd=='queue_updated') {
+                        console.log('queue_updated: reloading page');
+                        location.reload();
+                    }
+                };
+                // When dragging ensure update events are disabled - after the drag we will reload anyway
+                $('html'       ).bind('mousedown', function() {currently_dragging=true; });
+                $('html'       ).bind('mouseup'  , function() {currently_dragging=false;});
+                $('.queue-list').bind('drop'     , function() {currently_dragging=false;});
+                console.info("websocket queue_updated listener setup");
+            }
+            catch(e) {
+                console.warn('unable to setup websocket queue_updated listener');
+            }
         });
     </script>
     % endif

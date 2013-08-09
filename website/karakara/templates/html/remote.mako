@@ -5,10 +5,9 @@
 <script>
     var socket = null;
     $(document).ready(function() {
-        var host = location.hostname;
         var port = ${request.registry.settings['karakara.websocket.port']};
         try {
-            socket = new WebSocket("ws://" + host + ":" + port + "/");
+            socket = new WebSocket("ws://" + location.hostname + ":" + port + "/");
             socket.onopen = function(){  //Authenicate client with session key on socket connect
                 socket.send(document.cookie.match(/${request.registry.settings['session.key']}=(.+?)(\;|\b)/)[1]);
             };
