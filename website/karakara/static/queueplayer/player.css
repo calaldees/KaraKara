@@ -46,6 +46,7 @@ a {
 
 .notification_area {
 	position: absolute;
+	top: 0;
 	right:0;
 	padding: 6px;
 }
@@ -261,6 +262,7 @@ input[type="range"]::-webkit-slider-thumb{
 	background-color: white;
 	width: 4em;
 	text-align: center;
+	vertical-align: middle;
 	border-radius: 4em;
 }
 #playlist li .title {
