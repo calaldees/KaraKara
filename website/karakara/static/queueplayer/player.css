@@ -304,11 +304,28 @@ input[type="range"]::-webkit-slider-thumb{
 
 #playlist_obscured {
 	position: absolute;
+	overflow: auto;
 	width: 40%;
 	top: 50%;
 	bottom: 0;
 	right: 0;
+	overflow: wrap;
 }
+#playlist_obscured ul {
+	
+}
+#playlist_obscured ul li {
+	display: inline-block;
+	list-style-type: none;
+	font-size: 1.4rem;
+	background-color: #cccccc;
+	border: 0.1em solid #888888;
+	padding: 0.25em;
+	margin: 0.25em;
+	border-radius: 0.5em;
+	text-transform: capitalize;
+}
+
 
 
 /**
