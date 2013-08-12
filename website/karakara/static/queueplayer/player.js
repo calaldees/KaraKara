@@ -105,6 +105,9 @@ function setup_websocket() {
 			get_video().play();
 			// TODO: play is not quite perfect as the video resets
 		}
+		else {
+			update_playlist();
+		}
 		
 	};
 	socket.onclose  = function() {
