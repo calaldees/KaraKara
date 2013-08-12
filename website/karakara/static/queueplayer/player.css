@@ -233,7 +233,7 @@ input[type="range"]::-webkit-slider-thumb{
 	height: 4em;
 	margin: 1em;
 	overflow: hidden;
-	border: 0.1em solid black;
+	border: 0.15em solid black;
 	border-radius: 1em;
 }
 #playlist li img {
@@ -248,47 +248,44 @@ input[type="range"]::-webkit-slider-thumb{
 	position: absolute;
 }
 #playlist li .performer {
-	font-size: 200%;
-	top:25%;
-	left:1em;
+	font-size: 2em;
+	top:0.5em;
+	left:0.5em;
 	width: 40%;
 	overflow: hidden;
+	text-transform: capitalize;
 }
 #playlist li .time {
 	right: 1em;
-	top: 25%;
-	bottom: 25%;
-	border: 3px solid black;
+	top: 1em;
+	bottom: 1em;
+	border: 0.25em solid black;
 	background-color: white;
-	width: 4em;
+	width: 2em;
 	text-align: center;
 	vertical-align: middle;
 	border-radius: 4em;
 }
 #playlist li .title {
-	top: 1em;
+	top: 0.5em;
 	left: 45%;
+	text-transform: capitalize;
 }
 #playlist li .from {
-	bottom: 1em;
+	bottom: 0.5em;
 	left: 45%;
+	text-transform: capitalize;
 }
 
-#playlist li:nth-child(1)  {
-	width: 60%;
-	height: 7em;
-}
-#playlist li:nth-child(1) .title {font-size: 150%;}
-#playlist li:nth-child(1) .from  {font-size: 150%;}
+#playlist li:nth-child(1) {width: 60%; height: 7em;}
+#playlist li:nth-child(1) .title {font-size: 1.4em;}
+#playlist li:nth-child(1) .from  {font-size: 1.4em;}
 #playlist li:nth-child(1) .time {
 	border-color: red;
 	font-weight: bold;
 }
 
-#playlist li:nth-child(2)  {
-	width: 55%;
-	height: 5em;
-}
+#playlist li:nth-child(2)  {width: 55%; height: 5em;}
 
 
 #playlist_obscured {

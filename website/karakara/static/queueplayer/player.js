@@ -36,7 +36,6 @@ var split_indexs = [];
 
 // Timers
 var mousemove_timeout;
-var interval_animation_titlescreen;
 var interval_queue_refresh;
 
 // Settings Management --------------------------------------------------------
@@ -429,25 +428,37 @@ function render_playlist() {
 
 
 // Title screen (logic and animation) -----------------------------------------
-
 function init_titlescreen(titlescreen_images) {
 	console.log("init_titlescreen");
-	var frames_per_sec = 20;
-	var num_images = Math.floor(screen.width/30);
-	var max_image_size = screen.width/5;
-	var min_image_size = screen.width/20;
-	var max_speed = 6 / (frames_per_sec/10);
+	var titlescreen = {
+		images: titlescreen_images,
+		frames_per_sec: 20,
+		num_images: 25, // num images should be constant, the size is changing, Math.floor(window.innerWidth/30);
+		max_image_scale_factor: 5,
+		min_image_scale_factor: 20
+	};
+	titlescreen.max_speed = 6 / (titlescreen.frames_per_sec/10);
+	// Resize events - adjust image sizes
+	function resize(e) {
+		titlescreen.max_image_size = window.innerWidth / titlescreen.max_image_scale_factor;
+		titlescreen.min_image_size = window.innerWidth / titlescreen.min_image_scale_factor;
+		titlescreen.width = window.innerWidth;
+		titlescreen.height = window.innerHeight;
+	}
+	$(window).on('resize', resize);
+	resize();
+	
 	function addImage(image, x, y, size, rotation, speed) {
-		if (!image)    {image    = titlescreen_images[Math.floor(Math.random()*titlescreen_images.length)];}
-		if (!x)        {x        = Math.random()*screen.width -(max_image_size/2);}
-		if (!y)        {y        = (Math.random()*(screen.height+max_image_size))-max_image_size;}
-		if (!size)     {size     = Math.random()*(max_image_size-min_image_size)+min_image_size;}
+		if (!image)    {image    = titlescreen.images[Math.floor(Math.random()*titlescreen.images.length)];}
+		if (!x)        {x        = Math.random()*titlescreen.width -(titlescreen.max_image_size/2);}
+		if (!y)        {y        = (Math.random()*(titlescreen.height+titlescreen.max_image_size))-titlescreen.max_image_size;}
+		if (!size)     {size     = Math.random()*(titlescreen.max_image_size-titlescreen.min_image_size)+titlescreen.min_image_size;}
 		if (!rotation) {rotation = Math.random()*Math.PI;}
-		if (!speed)    {speed    = Math.random()*max_speed;}
+		if (!speed)    {speed    = Math.random()*titlescreen.max_speed;}
 		$('.screen_title').append("<img src='/files/"+image+"' style='left: "+x+"px; top:"+y+"px; width: "+size+"px; -webkit-transform: rotate("+rotation+"rad);' data-speed='"+(speed+1)+"' data-rotation='"+rotation+"'>");
 	}
 	// Init images
-	for (i=0 ; i<num_images ; i++) {addImage();}
+	for (i=0 ; i<titlescreen.num_images ; i++) {addImage();}
 	// Animation 'Thumbnail Rain'
 	function animate_titlescreen() {
 		//console.log("animate");
@@ -463,20 +474,20 @@ function init_titlescreen(titlescreen_images) {
 			var y        = get_css('top'              ,'px' );
 			var rotation = parseFloat(element.attr('data-rotation'));
 			var speed    = parseFloat(element.attr('data-speed'));
-			if (y > screen.height + max_image_size) {element.remove(); addImage(null,null,-max_image_size);}
+			if (y > titlescreen.height + titlescreen.max_image_size) {element.remove(); addImage(null,null,-titlescreen.max_image_size);}
 			set_css('left', x       , 'px');
 			set_css('top' , y+speed , 'px');
-			rotation += (speed - (max_speed/2))/300;
+			rotation += (speed - (titlescreen.max_speed/2))/300;
 			element.css('-webkit-transform', "rotate("+rotation+"rad)"); element.attr("data-rotation",""+rotation);
 		});
-	}
+	};
 	screens.events.on_show.title = function() {
 		console.log("on_show title");
-		interval_animation_titlescreen = setInterval(animate_titlescreen, 1000/frames_per_sec);
+		titlescreen.interval_animation = setInterval(animate_titlescreen, 1000/titlescreen.frames_per_sec);
 	};
 	screens.events.on_hide.title = function() {
 		console.log("on_hide title");
-		clearInterval(interval_animation_titlescreen);
+		clearInterval(titlescreen.interval_animation);
 	};
 
 }
@@ -511,6 +522,13 @@ function attach_events() {
 		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.player.help.timeout"]*1000);
 		$('body').addClass('show_help');
 	});
+	// Resize events - ajust master font size
+	function resize(e) {
+		var font_size = window.innerHeight / 40.0;
+		$('body').css('font-size',''+font_size+'px');
+	}
+	$(window).on('resize', resize);
+	resize();
 }
 
 function init() {
