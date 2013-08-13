@@ -566,16 +566,17 @@ $(document).ready(function() {
 		console.log("/settings");
 		init_settings(data.data.settings);
 		// Identify player.js as admin with admin cookie
-		if (!data.identity.admin) {
+		if (data.identity.admin) {init();}
+		else {
+			console.log('upgrading to admin mode')
 			$.getJSON("/admin", {"uncache": new Date().getTime()}, function(data) {
-				if (!data.identity.admin) {
+				if (data.identity.admin) {init();}
+				else {
 					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
 					alert("Unable to set Admin mode for player interface");
 				}
 			});
 		}
-		
-		init();
 	});
 	
 });
