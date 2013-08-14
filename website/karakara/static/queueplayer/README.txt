@@ -31,6 +31,13 @@ sim links:
  - lib.js
  - jquery.min.js
  
- 
+
+acknolege source of images 
  http://findicons.com/icon/552528/connect_icon
  http://findicons.com/icon/552540/message_attention_icon
+ 
+ images encoded with
+import base64
+with open("icon_disconnected.png", "rb") as image_file:
+    encoded_string = base64.b64encode(image_file.read())
+    print(encoded_string)
