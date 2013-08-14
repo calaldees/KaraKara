@@ -248,13 +248,17 @@ def queue_update(request):
         if not is_admin(request):
             raise action_error(message='admin only action', code=403)
         # get next and previous queueitem weights
-        queue_item_target = DBSession.query(QueueItem).get(params.pop('queue_item.move.target_id'))
         try:
-            target_weight_next,  = DBSession.query(QueueItem.queue_weight).filter(QueueItem.queue_weight<queue_item_target.queue_weight).order_by(QueueItem.queue_weight.desc()).limit(1).one()
+            target_weight,  = DBSession.query(QueueItem.queue_weight).filter(QueueItem.id==params.pop('queue_item.move.target_id')).one()
+            try:
+                target_weight_next,  = DBSession.query(QueueItem.queue_weight).filter(QueueItem.queue_weight<target_weight).order_by(QueueItem.queue_weight.desc()).limit(1).one()
+            except NoResultFound:
+                target_weight_next = 0.0
+            # calculate weight inbetween and inject that weight into the form params for saving
+            params['queue_weight'] = (target_weight + target_weight_next) / 2.0
         except NoResultFound:
-            target_weight_next = 0.0
-        # calculate weight inbetween and inject that weight into the form params for saving
-        params['queue_weight'] = (queue_item_target.queue_weight + target_weight_next) / 2.0
+            log.debug('queue_item.move.target_id not found, assuming end of queue is the target')
+            params['queue_weight'] = QueueItem.new_weight(DBSession)
 
     # Update any params to the db
     for key,value in params.items():

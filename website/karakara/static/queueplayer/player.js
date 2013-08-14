@@ -437,16 +437,17 @@ function init_titlescreen(titlescreen_images) {
 		images: titlescreen_images,
 		frames_per_sec: 20,
 		num_images: 25, // num images should be constant, the size is changing, Math.floor(window.innerWidth/30);
-		max_image_scale_factor: 5,
-		min_image_scale_factor: 20
+		max_image_scale_factor: 3,
+		min_image_scale_factor: 10
 	};
-	titlescreen.max_speed = 6 / (titlescreen.frames_per_sec/10);
 	// Resize events - adjust image sizes
 	function resize(e) {
 		titlescreen.max_image_size = window.innerWidth / titlescreen.max_image_scale_factor;
 		titlescreen.min_image_size = window.innerWidth / titlescreen.min_image_scale_factor;
 		titlescreen.width = window.innerWidth;
 		titlescreen.height = window.innerHeight;
+		titlescreen.max_speed = (6 / (titlescreen.frames_per_sec/10)) * (window.innerHeight / 600);
+		console.log(titlescreen.width, titlescreen.height, titlescreen.max_image_size, titlescreen.min_image_size);
 	}
 	$(window).on('resize', resize);
 	resize();
@@ -528,7 +529,7 @@ function attach_events() {
 	// Resize events - ajust master font size
 	function resize(e) {
 		var font_size = window.innerHeight / 40.0;
-		$('body').css('font-size',''+font_size+'px');
+		$('html').css('font-size',''+font_size+'px');
 	}
 	$(window).on('resize', resize);
 	resize();
@@ -565,16 +566,17 @@ $(document).ready(function() {
 		console.log("/settings");
 		init_settings(data.data.settings);
 		// Identify player.js as admin with admin cookie
-		if (!data.identity.admin) {
+		if (data.identity.admin) {init();}
+		else {
+			console.log('upgrading to admin mode')
 			$.getJSON("/admin", {"uncache": new Date().getTime()}, function(data) {
-				if (!data.identity.admin) {
+				if (data.identity.admin) {init();}
+				else {
 					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
 					alert("Unable to set Admin mode for player interface");
 				}
 			});
 		}
-		
-		init();
 	});
 	
 });
