@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 QUEUE_CACHE_KEY = 'queue'
 
-queue_version = random.randint(0,65535)
+queue_version = random.randint(0,2000000000)
 def invalidate_queue(request=None):
     commit() # Before invalidating any cache data, ensure the new data is persisted
     global queue_version

@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 # Constants
 
-search_version = random.randint(0,65535)
+search_version = random.randint(0,2000000000)
 
 # A list of the sub tags allowed when browsing by specific tags
 # rather than overwelming the user with all possible tags, limit the browsing to a subset under known circumstances.
