@@ -23,7 +23,7 @@ def feedback_view(request):
         return action_ok()
     
     if not request.params.get('details'):
-        raise action_error('please provide feedback details', code=400)
+        raise action_error('Please provide feedback details', code=400)
     
     feedback = Feedback()
     for field, value in request.params.items():
@@ -32,4 +32,4 @@ def feedback_view(request):
     feedback.environ = strip_non_base_types(request.environ)
     DBSession.add(feedback)
     
-    return action_ok(message='feedback recived')
+    return action_ok(message='Feedback received, thank you!')
