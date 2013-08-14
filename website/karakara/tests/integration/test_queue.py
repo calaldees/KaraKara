@@ -212,10 +212,15 @@ def test_queue_reorder(app, tracks):
     queue = get_queue(app)
     assert ['xxx','t1','t2','t3'] == [q['track_id'] for q in queue]
     
-    # Move second track to back (or as back as we can)
-    response = app.put('/queue', {'queue_item.id':queue[1]['id'], 'queue_item.move.target_id':queue[3]['id']})
+    # Move second track to infont of last item
+    response = app.put('/queue', {'queue_item.id':queue[1]['id'], 'queue_item.move.target_id':queue[-1]['id']})
     queue = get_queue(app)
     assert ['xxx','t2','t1','t3'] == [q['track_id'] for q in queue]
+    
+    # Check moving to a destination id that does not exisit yeilds the end of the queue
+    response = app.put('/queue', {'queue_item.id':queue[1]['id'], 'queue_item.move.target_id':65535})
+    queue = get_queue(app)
+    assert ['xxx','t1','t3','t2'] == [q['track_id'] for q in queue]
     
     # Check normal users cannot change order
     response = app.get('/admin') # turn off admin
@@ -223,7 +228,7 @@ def test_queue_reorder(app, tracks):
     assert response.status_code==403
     assert 'admin only' in response.text
     queue = get_queue(app)
-    assert ['xxx','t2','t1','t3'] == [q['track_id'] for q in queue]
+    assert ['xxx','t1','t3','t2'] == [q['track_id'] for q in queue]
     
     # Tidy queue
     clear_queue(app)

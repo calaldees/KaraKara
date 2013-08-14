@@ -83,20 +83,27 @@ import datetime
     <script>
         //$(function() {
         $(document).ready(function() {
+            var socket;
+
             $('.queue-list').sortable().bind('sortupdate', function(e, ui) {
                 $('.ui-li-aside').html('');
                 var queue_item_id_source      = ui.item.attr('data-queue-item-id');
                 var queue_item_id_destination = ui.item.next().attr('data-queue-item-id');
+                if (typeof queue_item_id_destination == "undefined") {
+                    queue_item_id_destination = 65535;  // should be integer max
+                }
                 $.ajax({
                     type:'PUT',
                     url:'/queue.json',
                     dataType:'json',
                     data: 'queue_item.id='+queue_item_id_source+'&queue_item.move.target_id='+queue_item_id_destination,
                     success: function(data) {
-                        //console.log(queue_item_id_source, queue_item_id_destination);
-                        location.reload();
+                        if (!socket) {
+                            location.reload();  // only reload if websockets disabled
+                        }
                     },
                     error: function(data) {
+                        console.error(data);
                         alert('error moving queue_item')
                     }
                 });
@@ -108,7 +115,6 @@ import datetime
             ## You get some funky behaviour where the websocket refreshes before the first format=redirect happens, so the success message appears on the queue screen.
             try {
                 var currently_dragging = false;
-                var socket;
                 socket = new WebSocket("ws://" + location.hostname + ":" + ${request.registry.settings['karakara.websocket.port']} + "/");
                 socket.onmessage = function(msg) {
                     var cmd = $.trim(msg.data);
@@ -125,6 +131,7 @@ import datetime
             }
             catch(e) {
                 console.warn('unable to setup websocket queue_updated listener');
+                socket = null;
             }
         });
     </script>

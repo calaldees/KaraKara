@@ -74,6 +74,18 @@ class QueueItem(Base):
     })
     
     @staticmethod
+    def new_weight(DBSession):
+        """
+        Find the biggest queue weight possible and increment.
+        Used when creating new queue items or moving items in the list beyond the last element
+        """
+        try:
+            (max_weight,) = DBSession.query(QueueItem.queue_weight).order_by(QueueItem.queue_weight.desc()).limit(1).one()
+        except NoResultFound:
+            max_weight = 0.0
+        return max_weight + 1.0
+
+    @staticmethod
     def before_insert_listener(mapper, connection, target):
         """
         Event to set weight of queued item before first commit.
@@ -81,10 +93,6 @@ class QueueItem(Base):
         This queue item weight will be set to max_weight + 1.0
         """
         if not target.queue_weight:
-            try:
-                (max_weight,) = Session(bind=connection).query(QueueItem.queue_weight).order_by(QueueItem.queue_weight.desc()).limit(1).one()
-            except NoResultFound:
-                max_weight = 0.0
-            target.queue_weight = max_weight + 1.0
+            target.queue_weight = QueueItem.new_weight(Session(bind=connection))
 
 event.listen(QueueItem, 'before_insert', QueueItem.before_insert_listener)
