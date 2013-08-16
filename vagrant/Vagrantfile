@@ -8,8 +8,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :shell, :path => "vagrant_bootstrap.sh"
 
-  config.vm.network :forwarded_port, host:   25, guest: 25
-  config.vm.network :forwarded_port, host:   80, guest: 80
+  config.vm.network :forwarded_port, host:   25, guest:   25
+  config.vm.network :forwarded_port, host:   80, guest:   80
+  config.vm.network :forwarded_port, host: 8080, guest: 8080
   config.vm.network :forwarded_port, host: 6543, guest: 6543
   config.vm.network :forwarded_port, host: 9873, guest: 9873
 
