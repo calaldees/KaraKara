@@ -25,6 +25,7 @@ KEYCODE = {
 	LEFT     :37,
 	RIGHT    :39,
 	SPACE    :32,
+	S        :83,
 };
 
 
@@ -506,7 +507,7 @@ function attach_events() {
 	// Keyboard Shortcuts
 	$(document).on('keydown', function(e) {
 		switch (e.which) {
-			case KEYCODE.BACKSPACE: commands.skip(); break;
+			case KEYCODE.S        : commands.skip(); break;
 			case KEYCODE.ENTER    : commands.play(); break;
 			case KEYCODE.ESCAPE   : commands.stop(); break;
 			case KEYCODE.LEFT     : commands.seek_backwards();break;
