@@ -101,11 +101,11 @@ import datetime
                         if (!socket) {
                             location.reload();  // only reload if websockets disabled
                         }
-                    },
-                    error: function(data) {
-                        console.error(data);
-                        alert('error moving queue_item')
-                    }
+                    }//,
+                    //error: function(data) {
+                    //    console.error(data);
+                    //    alert('error moving queue_item')
+                    //}
                 });
             });
 
