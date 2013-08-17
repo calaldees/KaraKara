@@ -32,6 +32,7 @@ def _generate_cache_key_default(request):
     return "-".join([
         request.path_qs,
         normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime(), #if normalize_datetime returns None, this dies hard. Fix it!
+        # request.accept.header_value.split(',')[0]?
         # request.POST ??,
         # request.session_id ??,
     ])

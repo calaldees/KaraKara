@@ -324,8 +324,9 @@ function song_finished(status) {
 	console.log("song_finished");
 	var id = playlist[0].id;
 	
+	// TODO - make this a .ajax request similar to the form in queue.mako
 	$.getJSON(
-		"/queue", {
+		"/queue.json", {
 			"method": "put",
 			"queue_item.id": id,
 			"status": status,
@@ -348,7 +349,7 @@ function update_playlist() {
 		return sig;
 	}
 
-	$.getJSON("/queue", {}, function(data) {
+	$.getJSON("/queue.json", {}, function(data) {
 		console.log("update_playlist getJSON response");
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			console.log("update_playlist:updated");

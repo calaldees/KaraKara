@@ -94,7 +94,7 @@ import datetime
                 }
                 $.ajax({
                     type:'PUT',
-                    url:'/queue',
+                    url:'/queue.json',
                     dataType:'json',
                     data: 'queue_item.id='+queue_item_id_source+'&queue_item.move.target_id='+queue_item_id_destination,
                     success: function(data, textStatus, jqXHR) {
