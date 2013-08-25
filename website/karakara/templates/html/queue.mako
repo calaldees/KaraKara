@@ -97,15 +97,15 @@ import datetime
                     url:'/queue.json',
                     dataType:'json',
                     data: 'queue_item.id='+queue_item_id_source+'&queue_item.move.target_id='+queue_item_id_destination,
-                    success: function(data) {
+                    success: function(data, textStatus, jqXHR) {
                         if (!socket) {
                             location.reload();  // only reload if websockets disabled
                         }
-                    },
-                    error: function(data) {
-                        console.error(data);
-                        alert('error moving queue_item')
-                    }
+                    }//,
+                    //error: function(data) {
+                    //    console.error(data);
+                    //    alert('error moving queue_item')
+                    //}
                 });
             });
 

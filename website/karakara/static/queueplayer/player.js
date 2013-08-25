@@ -25,6 +25,7 @@ KEYCODE = {
 	LEFT     :37,
 	RIGHT    :39,
 	SPACE    :32,
+	S        :83,
 };
 
 
@@ -323,8 +324,9 @@ function song_finished(status) {
 	console.log("song_finished");
 	var id = playlist[0].id;
 	
+	// TODO - make this a .ajax request similar to the form in queue.mako
 	$.getJSON(
-		"/queue", {
+		"/queue.json", {
 			"method": "put",
 			"queue_item.id": id,
 			"status": status,
@@ -347,7 +349,7 @@ function update_playlist() {
 		return sig;
 	}
 
-	$.getJSON("/queue", {}, function(data) {
+	$.getJSON("/queue.json", {}, function(data) {
 		console.log("update_playlist getJSON response");
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			console.log("update_playlist:updated");
@@ -506,7 +508,7 @@ function attach_events() {
 	// Keyboard Shortcuts
 	$(document).on('keydown', function(e) {
 		switch (e.which) {
-			case KEYCODE.BACKSPACE: commands.skip(); break;
+			case KEYCODE.S        : commands.skip(); break;
 			case KEYCODE.ENTER    : commands.play(); break;
 			case KEYCODE.ESCAPE   : commands.stop(); break;
 			case KEYCODE.LEFT     : commands.seek_backwards();break;
