@@ -383,14 +383,9 @@ function render_playlist() {
 		playlist_obscured = [];
 	}
 	
-	//var track_current = playlist_ordered.shift();
-	//$('#track_current *').remove();
-	//$track_current = $('#track_current');
-	//$track_current.append("<p>"+track_current.performer_name+"</p>");
-	
 	// Render queue_item scaffold
-	function render_queue_items(queue, renderer_queue_item) {
-		var output_buffer = "";
+	function render_queue_items($element_destination, queue, renderer_queue_item) {
+		$element_destination.empty();
 		for(var i=0; i<queue.length; i++) {
 			var queue_item = queue[i];
 			var track = queue_item['track'];
@@ -398,14 +393,29 @@ function render_playlist() {
 				if (tag in this) {return this[tag];}
 				return ""
 			};
-			output_buffer += "<li>"+renderer_queue_item(queue_item, track)+"</li>";
+			var li_contents = renderer_queue_item(queue_item, track);
+			if (li_contents) {
+				$element_destination.append("<li>"+li_contents+"</li>");
+			}
 		}
-		return output_buffer;
 	}
 	
 	// Render Playlist Ordered
-	var queue_html = render_queue_items(playlist_ordered, function(queue_item, track) {
-		//style='background:transparent url(\""+get_attachment(track,'thumbnail')+"\") no-repeat 100% 0;'
+	var queue_html = render_queue_items($('#playlist ol'), playlist_ordered, function(queue_item, track) {
+		// If last element was off the bottom of the screen, add the element to the obscured list
+		var li_last_top    = 0;
+		var li_last_height = 0;
+		try {
+			var $last_element = $('#playlist ol li:last');
+			li_last_top    = $last_element.offset().top;
+			li_last_height = $last_element.height();
+			console.log($last_element, li_last_top);
+		} catch (e) {}
+		if (li_last_top && li_last_top > window.innerHeight - li_last_height) {
+			playlist_obscured.unshift(queue_item);
+			return null;
+		}
+		
 		return "" +
 			"<img src='"+get_attachment(track,'thumbnail')+"'>\n" +
 			"<p class='title'>"     + track.tags.get("title")   + "</p>\n" +
@@ -413,21 +423,10 @@ function render_playlist() {
 			"<p class='performer'>" + queue_item.performer_name + "</p>\n" +
 			"<p class='time'>"      + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
 	});
-	$('#playlist').html("<ol>"+queue_html+"</ol>\n");
 	
-	// Render Playlist Obscured
-	//if (playlist_obscured.length) {
-	//	$('#upLater').html('<h2>Later On</h2>');
-	//}
-	var queue_html = render_queue_items(playlist_obscured, function(queue_item, track) {
-		//var buffer = "";
-		//buffer += track.tags.get("title");
-		//track.tags.get("from") ? buffer += " ("+track.tags.get("from")+")" : null;
-		//buffer += " - "+queue_item.performer_name+"\n";
-		//return buffer;
+	var queue_html = render_queue_items($('#playlist_obscured ul'), playlist_obscured, function(queue_item, track) {
 		return queue_item.performer_name;
 	});
-	$('#playlist_obscured').html("<ul>"+queue_html+"</ul>");
 }
 
 
@@ -449,7 +448,7 @@ function init_titlescreen(titlescreen_images) {
 		titlescreen.width = window.innerWidth;
 		titlescreen.height = window.innerHeight;
 		titlescreen.max_speed = (6 / (titlescreen.frames_per_sec/10)) * (window.innerHeight / 600);
-		console.log(titlescreen.width, titlescreen.height, titlescreen.max_image_size, titlescreen.min_image_size);
+		//console.log(titlescreen.width, titlescreen.height, titlescreen.max_image_size, titlescreen.min_image_size);
 	}
 	$(window).on('resize', resize);
 	resize();
@@ -571,7 +570,7 @@ $(document).ready(function() {
 		if (data.identity.admin) {init();}
 		else {
 			console.log('upgrading to admin mode')
-			$.getJSON("/admin", {"uncache": new Date().getTime()}, function(data) {
+			$.getJSON("/admin.json", {"uncache": new Date().getTime()}, function(data) {
 				if (data.identity.admin) {init();}
 				else {
 					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
