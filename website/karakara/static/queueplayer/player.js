@@ -402,16 +402,30 @@ function render_playlist() {
 	
 	// Render Playlist Ordered
 	var queue_html = render_queue_items($('#playlist ol'), playlist_ordered, function(queue_item, track) {
+		/**
+		 * crap crap crap
+		 * Tried to rewrite the whole way items are adding to the queue to be able to detect when the
+		 * last li is rendered off the bottom of the screen so overflow could be rendered in the
+		 * obscured list.
+		 * Because the li elements are not made visible when when this code runs, we cant get the offsetHeight
+		 * Other options include checking when the page is visible, using data elements and additional class selectors
+		 * that is WAY to much effort.
+		 * Because the items height is scaled with the height we can just say
+		 * if there are > KNOWN_NUMBER add to other this.
+		 * Be warned this magic number will need updating when the styles are adjusted.
+		 * crap
 		// If last element was off the bottom of the screen, add the element to the obscured list
 		var li_last_top    = 0;
 		var li_last_height = 0;
 		try {
 			var $last_element = $('#playlist ol li:last');
-			li_last_top    = $last_element.offset().top;
+			li_last_top    = $last_element.get(0).offsetTop; //offset().top;
 			li_last_height = $last_element.height();
 			console.log($last_element, li_last_top);
 		} catch (e) {}
 		if (li_last_top && li_last_top > window.innerHeight - li_last_height) {
+		*/
+		if ($('#playlist ol li').size()>6) {
 			playlist_obscured.unshift(queue_item);
 			return null;
 		}
