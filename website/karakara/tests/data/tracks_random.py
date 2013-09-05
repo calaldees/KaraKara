@@ -14,7 +14,7 @@ import logging
 log = logging.getLogger(__name__)
 
 @pytest.fixture(scope="function")
-def random_tracks(request, DBSession, commit, num_tracks=100):
+def random_tracks(request, DBSession, commit, num_tracks=800):
     log.info('Generating {0} random tracks'.format(num_tracks))
 
     # Attachment generation ----------------------------------------------------

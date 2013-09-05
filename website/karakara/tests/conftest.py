@@ -11,13 +11,13 @@ from karakara.tests.data.tracks_random import *
 
 # Markers ----------------------------------------------------------------------
 
-#def pytest_addoption(parser):
-#    parser.addoption("--runslow", action="store_true", help="run slow tests")
+def pytest_addoption(parser):
+    parser.addoption("--runslow", action="store_true", help="run slow tests")
 def pytest_runtest_setup(item):
     if 'unimplemented' in item.keywords: #and not item.config.getoption("--runslow"):
-        pytest.skip('unimplemented functionality') #"need --runslow option to run"
+        pytest.skip('unimplemented functionality')
     if 'unfinished' in item.keywords:
-        pytest.skip('unfinished functionality') #"need --runslow option to run"
+        pytest.skip('unfinished functionality')
     try:
         runslow = item.config.getoption("--runslow")
     except ValueError:
@@ -33,9 +33,9 @@ slow          = pytest.mark.slow
 # Fixtures ---------------------------------------------------------------------
 
 @pytest.fixture(scope="session")
-def settings(request):
+def settings(request, ini_file=INI):
     from pyramid.paster import get_appsettings
-    return get_appsettings(INI)
+    return get_appsettings(ini_file)
 
 @pytest.fixture(scope="session")
 def app(request, settings):

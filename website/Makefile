@@ -101,6 +101,9 @@ test: ini_test
 	env/bin/py.test karakara -q --pdb
 	#--pdb --capture=sys
 
+test_crawl: ini_test
+	env/bin/py.test karakara --runslow -k crawl -s
+
 ini_test:
 	env/bin/python3 karakara/scripts/make_ini.py test
 ini_production:
