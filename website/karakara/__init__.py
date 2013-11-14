@@ -5,7 +5,7 @@ import pyramid.events
 
 
 # SQLAlchemy imports
-from .model import DBSession, init_DBSession
+from .model import init_DBSession
 
 # Beaker Sessions
 import pyramid_beaker
@@ -37,6 +37,9 @@ def main(global_config, **settings):
     
     # Pyramid Global Settings
     config = Configurator(settings=settings) #, autocommit=True
+
+    # Register Aditional Includes ---------------------------------------------
+    config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
     
     # Beaker Session Manager
     session_factory = pyramid_beaker.session_factory_from_settings(settings)
