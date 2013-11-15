@@ -2,8 +2,17 @@ import re
 import random
 import datetime
 import dateutil
+import os
+import json
+import zlib
+import hashlib
+import collections
 
 from pyramid.settings import asbool
+
+import logging
+log = logging.getLogger(__name__)
+
 
 # TODO - @property to get/set now?
 _now_override = None
@@ -26,6 +35,49 @@ def json_object_handler(obj):
     if isinstance(obj, datetime.timedelta):
         return obj.total_seconds()
     raise TypeError
+
+def read_json(filename):
+    with open(filename, 'r') as source:
+        #try:
+        if hasattr(source,'read'):
+            data = source.read()
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
+        return json.loads(data)
+        #except Exception as e:
+        #    log.warn('Failed to process %s' % source)
+
+FileScan = collections.namedtuple('FileScan',['folder', 'file', 'absolute','relative'])
+def file_scan(path, file_regex, ignore_regex=r'\.git'):
+    """
+    return (folder, file, folder+file, folder-path+file)
+    """
+    if isinstance(file_regex, str):
+        file_regex = re.compile(file_regex)
+    if isinstance(ignore_regex, str):
+        ignore_regex = re.compile(ignore_regex)
+
+    log.debug('Scanning files in {0}'.format(path))
+    file_list = []
+    for root, dirs, files in os.walk(path):
+        if ignore_regex.search(root):
+            continue
+        file_list += [FileScan(root, f, os.path.join(root, f), os.path.join(root.replace(path, ''),f).strip('/'))
+                      for f in files if file_regex.match(f)]
+    return file_list
+
+
+def hash_data(data):
+    hash = hashlib.sha1()
+    hash.update(str(data).encode())
+    return hash.hexdigest()
+    
+
+def hash_files(files):
+    """
+    adler32 is a good-enough checksum that's fast to compute.
+    """
+    return "%X" % abs(hash(frozenset(zlib.adler32(open(_file,'rb').read()) for _file in files)))
 
 
 def get_fileext(filename):
@@ -225,8 +277,11 @@ def convert_str(value, return_type):
     ['a', 'b', 'c']
     >>> convert_str('[true, yes, no, false]', 'bool')
     [True, True, False, False]
+    >>> convert_str('', 'None')
     
     """
+    if return_type=='None':
+        return None
     if not value or not isinstance(value, str) or not return_type:
         return value
     if value.startswith('[') and value.endswith(']'):
@@ -248,3 +303,32 @@ def convert_str(value, return_type):
     if return_type=='list' or return_type==list:
         return [v.strip() for v in value.split(',') if v.strip()]
     assert False, 'unable to convert {0} to {1}'.format(value, return_type)
+
+
+#http://stackoverflow.com/questions/4126348/how-do-i-rewrite-this-function-to-implement-ordereddict/4127426#4127426
+class OrderedDefaultdict(collections.OrderedDict):
+    def __init__(self, *args, **kwargs):
+        if not args:
+            self.default_factory = None
+        else:
+            if not (args[0] is None or callable(args[0])):
+                raise TypeError('first argument must be callable or None')
+            self.default_factory = args[0]
+            args = args[1:]
+        super(OrderedDefaultdict, self).__init__(*args, **kwargs)
+
+    def __missing__ (self, key):
+        if self.default_factory is None:
+            raise KeyError(key)
+        self[key] = default = self.default_factory()
+        return default
+
+    def __reduce__(self):  # optional, for pickle support
+        args = self.default_factory if self.default_factory else tuple()
+        return type(self), args, None, None, self.items()
+
+    def last(self):
+        return reversed(self).__next__()
+
+def defaultdict_recursive():
+    return collections.defaultdict(defaultdict_recursive)
