@@ -7,6 +7,7 @@ __all__ = [
     'base','overlay_identity','auto_format_output','web',
     'etag','etag_decorator', #'etag_generate'
     'method_delete_router', 'method_put_router',
+    'cache', 'cache_none',
 ]
 
 
