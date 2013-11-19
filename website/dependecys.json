@@ -33,16 +33,10 @@
         "version": "1.4.0-rc.1",
         "target": "jquery.mobile.min.css"
     },
-    "jquery_mobile_images": {
-        "source": "http://code.jquery.com/mobile/VERSION/images/",
+    "jquery_mobile_map": {
+        "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.map",
         "version": "1.4.0-rc.1",
-        "target": [
-            "images/ajax-loader.gif",
-            "images/icons-18-black.png",
-            "images/icons-18-white.png",
-            "images/icons-36-black.png",
-            "images/icons-36-white.png"
-        ]
+        "target": "jquery.mobile-VERSION.min.map"
     },
     
     "yui-reset": {

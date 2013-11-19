@@ -7,18 +7,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <!-- CSS Styles -->
-        <link   href="${h.static_url('styles/yui-3.5.0-cssreset-min.css')}"         rel="stylesheet" />
-        <link   href="${h.static_url('jquery.mobile/jquery.mobile-1.3.1.min.css')}" rel="stylesheet" />
-        <link   href="${h.static_url('styles/main.css')}"                           rel="stylesheet" />
+        <link   href="${h.static_url('ext/cssreset-min.css')}"     rel="stylesheet" />
+        <link   href="${h.static_url('ext/jquery.mobile.min.css')}" rel="stylesheet" />
+        <link   href="${h.static_url('css/main.css')}"          rel="stylesheet" />
         
         <!-- Scripts -->
-        <script src ="${h.static_url('scripts/modernizer.custom.js')}"></script>
-        <script src ="${h.static_url('jquery/jquery-1.9.1.min.js')}"></script>
-        <script src ="${h.static_url('scripts/jquery.mobile-extras.js')}"></script>
-        <script src ="${h.static_url('jquery.mobile/jquery.mobile-1.3.1.min.js')}"></script>
-        <script src ="${h.static_url('jquery/jquery.cookie.js')}"></script>
-        <script src ="${h.static_url('scripts/lib.js')}"></script>
-        <script src ="${h.static_url('scripts/karakara.js')}"></script>
+        <script src ="${h.static_url('js/modernizer.custom.js')}"></script>
+        <script src ="${h.static_url('ext/jquery.min.js')}"></script>
+        <script src ="${h.static_url('js/jquery.mobile-extras.js')}"></script>
+        <script src ="${h.static_url('ext/jquery.mobile.min.js')}"></script>
+        <script src ="${h.static_url('ext/jquery.cookie.js')}"></script>
+        <script src ="${h.static_url('js/lib.js')}"></script>
+        <script src ="${h.static_url('js/karakara.js')}"></script>
         
         <!-- Other -->
         <link   href="${h.static_url('favicon.ico')}" rel="shortcut icon" />

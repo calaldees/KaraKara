@@ -81,12 +81,13 @@ shell:
 	env/bin/pshell $(INI_DEV)
 
 clean:
-	rm env -rf
-	rm data -rf
-	rm *.egg-info -rf
-	rm *.db -f
-	rm $(INI_TEST) -f
-	rm $(INI_PROD) -f
+	rm -rf env
+	rm -rf data
+	rm -rf *.egg-info
+	rm -f *.db
+	rm -f $(INI_TEST)
+	rm -f $(INI_PROD)
+	rm -rf $(PROJECT)/static/ext
 
 insert_random_tracks:
 	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
