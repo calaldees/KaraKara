@@ -1,3 +1,6 @@
+PROJECT=karakara
+
+PATH_ASSETS=${PROJECT}/static/ext
 
 INI_DEV  = development.ini
 INI_TEST = test.ini
@@ -51,12 +54,17 @@ env:
 setup: env
 	env/bin/python setup.py develop
 
+externals:
+	env/bin/python $(PROJECT)/scripts/dependency_downloader.py --destination $(PATH_ASSETS)
+
 init_db:
-	env/bin/python -mkarakara.model.setup --config_uri $(INI_DEV) --init_func karakara.model.init_data:init_data
+	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
+install: env setup externals init_db test
+
 #init_db_test: init_db
-#	env/bin/python -mkarakara.model.setup --config_uri development.ini --init_func karakara.tests.init_data:init_random_data
+#	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
 run:
 	#$(MAKE) env_activate
@@ -67,7 +75,7 @@ run_production: ini_production
 	env/bin/pserve $(INI_PROD)
 
 run_socket_server:
-	env/bin/python3 -mkarakara.lib.socket_server
+	env/bin/python3 -m$(PROJECT).lib.socket_server
 
 shell:
 	env/bin/pshell $(INI_DEV)
@@ -76,20 +84,19 @@ clean:
 	rm env -rf
 	rm data -rf
 	rm *.egg-info -rf
-	rm KaraKara.db -f
-	rm KaraKara_test.db -f
+	rm *.db -f
 	rm $(INI_TEST) -f
 	rm $(INI_PROD) -f
 
 insert_random_tracks:
-	env/bin/python -mkarakara.scripts.insert_random_tracks 800 --config=$(INI_DEV)
+	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
 
 import_tracks_dev: init_db
-	env/bin/python -mkarakara.scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
+	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
 import_tracks_production: ini_production
-	env/bin/python -mkarakara.model.setup --config_uri $(INI_PROD) --init_func karakara.model.init_data:init_data
-	env/bin/python -mkarakara.scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
+	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
+	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 #import_tracks_local_mediaserver: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
@@ -98,18 +105,18 @@ import_tracks_production: ini_production
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test: ini_test
-	env/bin/py.test karakara -q --pdb
+	env/bin/py.test $(PROJECT) -q --pdb
 	#--pdb --capture=sys
 
 test_crawl: ini_test
-	env/bin/py.test karakara --runslow -k crawl -s
+	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
 ini_test:
-	env/bin/python3 karakara/scripts/make_ini.py test
+	env/bin/python3 $(PROJECT)/scripts/make_ini.py test
 ini_production:
-	env/bin/python3 karakara/scripts/make_ini.py production
+	env/bin/python3 $(PROJECT)/scripts/make_ini.py production
 
 start_webapp_daemon: ini_production
-	start-stop-daemon --start --pidfile webapp.pid --name karakara --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
+	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
 stop_webapp_daemon:
 	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid

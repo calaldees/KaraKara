@@ -1,0 +1,54 @@
+{
+    "jquery": {
+        "source": "http://code.jquery.com/jquery-VERSION.min.js",
+        "version": "1.10.2",
+        "target": "jquery.min.js"
+    },
+
+    "jquery_map": {
+        "source": "http://code.jquery.com/jquery-VERSION.min.map",
+        "version": "1.10.2",
+        "target": "jquery-VERSION.min.map"
+    },
+    
+    "jquery_cookie": {
+        "source": "http://raw.github.com/carhartl/jquery-cookie/vVERSION/jquery.cookie.js",
+        "version": "1.4.0",
+        "target": "jquery.cookie.js"
+    },
+
+    "jquery_sortable": {
+        "source": "http://raw.github.com/???/vVERSION/jquery.sortable.js",
+        "version": "0.0.0",
+        "target": "jquery.sortable.js"
+    },
+
+    "jquery_mobile": {
+        "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.js",
+        "version": "1.4.0-rc.1",
+        "target": "jquery.mobile.min.js"
+    },
+    "jquery_mobile_css": {
+        "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.css",
+        "version": "1.4.0-rc.1",
+        "target": "jquery.mobile.min.css"
+    },
+    "jquery_mobile_images": {
+        "source": "http://code.jquery.com/mobile/VERSION/images/",
+        "version": "1.4.0-rc.1",
+        "target": [
+            "images/ajax-loader.gif",
+            "images/icons-18-black.png",
+            "images/icons-18-white.png",
+            "images/icons-36-black.png",
+            "images/icons-36-white.png"
+        ]
+    },
+    
+    "yui-reset": {
+        "source": "http://yui-VERSION-cssreset-min.css",
+        "version": "3.5.0",
+        "target": "yui-cssreset-min.css"
+    }
+
+}
