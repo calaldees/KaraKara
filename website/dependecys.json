@@ -1,13 +1,13 @@
 {
     "jquery": {
         "source": "http://code.jquery.com/jquery-VERSION.min.js",
-        "version": "1.10.2",
+        "version": "2.0.3",
         "target": "jquery.min.js"
     },
 
     "jquery_map": {
         "source": "http://code.jquery.com/jquery-VERSION.min.map",
-        "version": "1.10.2",
+        "version": "2.0.3",
         "target": "jquery-VERSION.min.map"
     },
     
@@ -18,7 +18,7 @@
     },
 
     "jquery_sortable": {
-        "source": "http://raw.github.com/???/vVERSION/jquery.sortable.js",
+        "source": "https://raw.github.com/farhadi/html5sortable/master/jquery.sortable.js",
         "version": "0.0.0",
         "target": "jquery.sortable.js"
     },
@@ -46,9 +46,9 @@
     },
     
     "yui-reset": {
-        "source": "http://yui-VERSION-cssreset-min.css",
-        "version": "3.5.0",
-        "target": "yui-cssreset-min.css"
+        "source": "http://yui.yahooapis.com/VERSION/build/cssreset/cssreset-min.css",
+        "version": "3.13.0",
+        "target": "cssreset-min.css"
     }
 
 }

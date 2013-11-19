@@ -5,7 +5,7 @@ import os
 import json
 import urllib.request
 
-from flexi.lib.misc import hash_data
+from karakara.lib.misc import hash_data
 
 import logging
 log = logging.getLogger(__name__)
