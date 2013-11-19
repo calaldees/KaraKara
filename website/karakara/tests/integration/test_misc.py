@@ -6,7 +6,7 @@ def test_home(app):
     response = app.get('/')
     assert response.status_code == 200
     assert 'html' in response.content_type
-    for text in ['KaraKara', 'jquery-1.', 'jquery.mobile', 'Feedback', 'Explore']:
+    for text in ['KaraKara', 'jquery.mobile', 'Feedback', 'Explore']:
         assert text in response.text
         
 
