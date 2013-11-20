@@ -1,1 +1,1 @@
-../scripts/lib.js
+../js/lib.js
