@@ -7,9 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <!-- CSS Styles -->
-        <link   href="${h.static_url('ext/cssreset-min.css')}"     rel="stylesheet" />
+        <link   href="${h.static_url('ext/cssreset-min.css')}"      rel="stylesheet" />
         <link   href="${h.static_url('ext/jquery.mobile.min.css')}" rel="stylesheet" />
-        <link   href="${h.static_url('css/main.css')}"          rel="stylesheet" />
+        <link   href="${h.static_url('css/main.css')}"              rel="stylesheet" />
         
         <!-- Scripts -->
         <script src ="${h.static_url('js/modernizer.custom.js')}"></script>
@@ -24,26 +24,20 @@
         <link   href="${h.static_url('favicon.ico')}" rel="shortcut icon" />
     </head>
     
-    <body>
+    <% body_classs = 'admin' if identity and identity.get('admin',False) else '' %>
+    <body class="${body_classs}">
         
         <div data-role="page">
             
-            <div data-role="header" data-position="fixed" data-tap-toggle="false" \
-                
-                % if identity and identity.get('admin',False):
-                data-theme="e"
-                % endif
->
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <%def name="title()">${request.registry.settings.get('karakara.template.title') or 'KaraKara'}</%def>
                 <h1>${next.title()}</h1><span id="priority_countdown"></span>
                 
-                ## data-iconpos="notext"
-                ##<a href="/track_list" data-role="button" data-icon="home"   data-mini="true" data-inline="true">Tracks</a>
-                ##<a href="/queue"      data-role="button" data-icon="search" data-mini="true" class="ui-btn-right">Queue</a>
-                ##
                 % if request.path != '/':
-                <a href="#" data-role="button" data-icon="back" data-mini="true" class="ui-btn-left"  data-rel="back">Back</a>
-                <a href="/" data-role="button" data-icon="home" data-mini="true" class="ui-btn-right"                >Home</a>
+                ## data-add-back-btn="true" (Could be added to header to auto generate a back button)
+                ## ui-btn-icon-notext -> ui-btn-icon-right to get text
+                <a href="#" class="ui-btn-icon-notext ui-btn-left  ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-back" data-rel="back">Back</a>
+                <a href="/" class="ui-btn-icon-notext ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-home"                >Home</a>
                 % endif
                 
             </div><!-- /header -->

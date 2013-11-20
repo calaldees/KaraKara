@@ -27,10 +27,10 @@
 % endif
 
 % if identity.get('admin', False):
-    <a href="/player/player.html" data-role="button" data-theme="e">Player Interface</a>
-    <a href="/track_list" data-role="button" data-theme="e">List All Tracks</a>
-    <a href="/settings"   data-role="button" data-theme="e">Settings</a>
-    <a href="/admin_lock" data-role="button" data-theme="e">Admin Lock</a>
-    <a href="/remote"     data-role="button" data-theme="e">Remote Control</a>
-    <a href="/admin"      data-role="button" data-theme="e">Exit Admin Mode</a>
+    <a href="/player/player.html" data-role="button" class="admin">Player Interface</a>
+    <a href="/track_list"         data-role="button" class="admin">List All Tracks</a>
+    <a href="/settings"           data-role="button" class="admin">Settings</a>
+    <a href="/admin_lock"         data-role="button" class="admin">Admin Lock</a>
+    <a href="/remote"             data-role="button" class="admin">Remote Control</a>
+    <a href="/admin"              data-role="button" class="admin">Exit Admin Mode</a>
 % endif

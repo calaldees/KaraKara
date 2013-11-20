@@ -1,3 +1,16 @@
+/* Core */
+h1,h2,h3,h4,h5,h6 {font-weight: bold;}
+
+
+
+/* Admin */
+.admin .ui-header          {background: #ffff50; border-color: #c0c060;}
+.admin .ui-header .ui-btn,
+.admin .ui-btn.admin       {background: #ffffc0; border-color: #c0c060;}
+.admin .ui-header .ui-btn:hover,
+.admin .ui-btn.admin:hover {background: #e0e0a0; border-color: #c0c060;}
+
+
 
 /* Flash Message */
 .flash_message p             {float: left;}
@@ -10,6 +23,7 @@
     text-shadow: 0 1px 0 #FFFFFF;
 }
 
+/* Priority messaging - status always on screen*/
 #priority_countdown {
     position: absolute;
     right: 0em;
@@ -20,8 +34,8 @@
     padding: 0.25em;
 }
 
-h1,h2,h3,h4,h5,h6 {font-weight: bold;}
 
+/* Track */
 HTML.no-video .hide_if_no_html5_video {display: none;}
 HTML.video    .hide_if_html5_video    {display: none;}
 
@@ -36,6 +50,8 @@ HTML.video    .hide_if_html5_video    {display: none;}
 .track_tags {
 }
 
+
+/* Queue Drag&Drop reordering */
 .queue-list {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -51,6 +67,8 @@ HTML.video    .hide_if_html5_video    {display: none;}
 }
 .queue-list .ui-li-aside {width: 4em;} /* The 'aside' by default takes 50% of the space, for the time remaining we only need a small space */
 
+
+/* Queue order obfuscation */
 .queue-grid {margin: 15px -15px; margin-bottom: 0px;} /* jQuery Mobile has a margin of -15px on lists ... this is to put the content below in the corret place */
 .queue-grid li {
     float: left;
