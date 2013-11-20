@@ -6,7 +6,8 @@ h1,h2,h3,h4,h5,h6 {font-weight: bold;}
 /* Admin */
 .admin .ui-header          {background: #ffff50; border-color: #c0c060;}
 .admin .ui-header .ui-btn,
-.admin .ui-btn.admin       {background: #ffffc0; border-color: #c0c060;}
+.admin .ui-btn.admin,
+.flash_messages .status_ok .ui-btn {background: #ffffc0; border-color: #c0c060;}
 .admin .ui-header .ui-btn:hover,
 .admin .ui-btn.admin:hover {background: #e0e0a0; border-color: #c0c060;}
 
@@ -15,12 +16,22 @@ h1,h2,h3,h4,h5,h6 {font-weight: bold;}
 /* Flash Message */
 .flash_message p             {float: left;}
 .flash_message .flash_remove {float: right;}
-.flash_messages .status_error {
-    background: linear-gradient(#e89496, #e87b7e) repeat scroll 0 0 #e85a5d;
-    border: 1px solid #e83c40;
+.flash_messages {
     color: #333333;
     font-weight: bold;
-    text-shadow: 0 1px 0 #FFFFFF;
+}
+.flash_messages .status_ok {
+    background: #ffffc0;
+    border: 1px solid #c0c060;
+}
+.flash_messages .status_error {
+    background:  #e89496;
+    border: 1px solid #e83c40;
+    /* background: linear-gradient(#e89496, #e87b7e) repeat scroll 0 0 #e85a5d; */
+}
+.flash_messages .status_error .ui-btn {
+    background: #dd8866;
+    border-color: #dd5533;
 }
 
 /* Priority messaging - status always on screen*/

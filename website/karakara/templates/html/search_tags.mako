@@ -72,7 +72,7 @@
     %>
     <div data-role="collapsible-set">
     % for letter in string.ascii_lowercase:
-        <div data-role="collapsible" data-collapsed="True">
+        <div data-role="collapsible">
             <h3>${letter.upper()} (${len(grouped_tags.get(letter,[]))})</h3>
             <ul data-role="listview">
                 % for tag in grouped_tags.get(letter,[]):

@@ -1,19 +1,19 @@
 KaraKara README
-==================
+===============
 
 Installation
 ------------
 
-Linux - ubuntu 12.10
- git clone git://github.com/calaldees/KaraKara.git && cd KaraKara && make setup && make test
+Linux - ubuntu
+ git clone git://github.com/calaldees/KaraKara.git && cd KaraKara/website && make install
 
 
 Getting Started
 ---------------
 
+Linux
 git clone <git repo>
-make setup
-make test
+make install
 make run
 http://localhost:6543/
 
@@ -47,3 +47,4 @@ messaging/disabling individual devices
 way of recovering tracks that have been played/skipped (just in case of crash or problem)
 
 status_error message style dose not propergate to flash message with format='redirect'
+ - flash message from queue.py error (e.g. duplicate performer) is not styled as error but looks like success. feedback error is displayed appropriately. so what gives?!
