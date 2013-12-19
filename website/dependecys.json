@@ -25,17 +25,17 @@
 
     "jquery_mobile": {
         "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.js",
-        "version": "1.4.0-rc.1",
+        "version": "1.4.0",
         "target": "jquery.mobile.min.js"
     },
     "jquery_mobile_css": {
         "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.css",
-        "version": "1.4.0-rc.1",
+        "version": "1.4.0",
         "target": "jquery.mobile.min.css"
     },
     "jquery_mobile_map": {
         "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.map",
-        "version": "1.4.0-rc.1",
+        "version": "1.4.0",
         "target": "jquery.mobile-VERSION.min.map"
     },
     
