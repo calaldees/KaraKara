@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 import re
 
-from . import web, method_put_router, is_admin
+from . import web, method_put_router, is_admin, etag_decorator, generate_cache_key
 from ..lib.auto_format import action_ok, action_error
 from ..lib.misc import convert_str_with_type
 
@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 # Misc
 #-------------------------------------------------------------------------------
 @view_config(route_name='home')
+@etag_decorator(generate_cache_key)
 @web
 def home(request):
     #request.session.flash('Hello World')
