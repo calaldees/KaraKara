@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 # Misc
 #-------------------------------------------------------------------------------
 @view_config(route_name='home')
-@etag_decorator(generate_cache_key)
+#@etag_decorator(generate_cache_key)  # Todo - this key generatior needs to be customised to take into account settings:interface_enabled and faves (as this button chnages state based on users faves)
 @web
 def home(request):
     #request.session.flash('Hello World')
