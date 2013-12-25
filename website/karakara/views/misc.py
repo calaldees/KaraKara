@@ -12,14 +12,24 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 # Misc
 #-------------------------------------------------------------------------------
+
+def generate_cache_key_homepage(request):
+    """
+    Custom etag for homepage
+    The homepage template has a few if statements to display various buttons
+    The buttons can be disables in settings.
+    This custom etag takes all 'if' statements in the homepage template    
+    """
+    return '-'.join((
+        generate_cache_key(request),
+        str(request.registry.settings.get('karakara.template.menu.disable')),
+        str(bool(request.session.get('faves',[]))),
+    ))
+
 @view_config(route_name='home')
-#@etag_decorator(generate_cache_key)  # Todo - this key generatior needs to be customised to take into account settings:interface_enabled and faves (as this button chnages state based on users faves)
+@etag_decorator(generate_cache_key_homepage)
 @web
 def home(request):
-    #request.session.flash('Hello World')
-    #from ..model import DBSession
-    #from ._logic import issue_priority_token
-    #issue_priority_token(request, DBSession)
     return action_ok()
 
 @view_config(route_name='admin_lock')

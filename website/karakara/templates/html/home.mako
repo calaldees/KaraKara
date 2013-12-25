@@ -1,5 +1,10 @@
 <%inherit file="_base.mako"/>
 
+<%doc>
+  Developer Note:
+    If you add any 'if' statements to this template, ensure you update the etag generator for the homepage
+</%doc>
+
 ## Easter Egg for users who look at the code
 <!--
     Welcome iquisitive hax0r!
