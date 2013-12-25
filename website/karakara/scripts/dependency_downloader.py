@@ -10,6 +10,7 @@ from karakara.lib.misc import hash_data
 import logging
 log = logging.getLogger(__name__)
 
+# TODO - Should generate existing file hash and save it to dependencys_installed.json
 
 #-------------------------------------------------------------------------------
 # Constants

@@ -88,6 +88,7 @@ clean:
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
 	rm -rf $(PROJECT)/static/ext
+	rm -rf dependencys_installed.json
 
 insert_random_tracks:
 	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
