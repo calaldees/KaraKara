@@ -26,13 +26,14 @@ function update_priority_token_feedback() {
             clearInterval(interval_id);
             priority_token_cookie = null;
             $("#priority_countdown")[0].innerHTML = "";
+            $("body").removeClass("priority_mode")
             console.log("Deleted stale 'priority_token' cookie");
         }
         if (delta_start > 0) {
             $("#priority_countdown")[0].innerHTML = "Priority mode in "+timedelta_str(delta_start);
         }
         if (delta_start < 0 && delta_end > 0) {
-            $(".ui-header").removeClass("ui-bar-a").addClass("ui-bar-b");
+            $("body").addClass("priority_mode");
             $("#priority_countdown")[0].innerHTML = "Priority mode for "+timedelta_str(delta_end);
         }
     }

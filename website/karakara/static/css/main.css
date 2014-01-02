@@ -44,7 +44,7 @@ h1,h2,h3,h4,h5,h6 {font-weight: bold;}
     color: white;
     padding: 0.25em;
 }
-
+.priority_mode .ui-header {background: #497BAE; border-color: #5e8ddb;}
 
 /* Track */
 HTML.no-video .hide_if_no_html5_video {display: none;}
