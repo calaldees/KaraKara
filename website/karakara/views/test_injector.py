@@ -23,4 +23,8 @@ def test_injector(request):
     if not is_admin(request):
         raise action_error(message='Test injector for admin only', code=403)
     
-    return action_ok()
+    message = ''
+    if (request.params.get('cmd') == 'add_queue_item'):
+        message = 'added'
+    
+    return action_ok(message=message)
