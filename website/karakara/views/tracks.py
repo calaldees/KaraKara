@@ -33,7 +33,11 @@ def invalidate_track(id):
     track_version[id] += 1
 def generate_cache_key_track(request):
     global track_version
-    return '-'.join([generate_cache_key(request), str(track_version.get(request.matchdict['id'],-1))])
+    return '-'.join([
+        generate_cache_key(request),
+        str(track_version.get(request.matchdict['id'],-1)),
+        str(request.registry.settings.get('karakara.system.user.readonly')),
+    ])
 
 #-------------------------------------------------------------------------------
 # Track
