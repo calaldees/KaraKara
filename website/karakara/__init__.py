@@ -107,6 +107,7 @@ def main(global_config, **settings):
     config.add_route('feedback'      , append_format_pattern('/feedback')      )
     config.add_route('settings'      , append_format_pattern('/settings')      )
     config.add_route('random_images' , append_format_pattern('/random_images') )
+    config.add_route('test_injector' , append_format_pattern('/test_injector') )
     
     config.add_route('search_tags'   , '/search_tags/{tags:.*}')
     config.add_route('search_list'   , '/search_list/{tags:.*}')

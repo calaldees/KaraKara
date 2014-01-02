@@ -37,5 +37,6 @@
     <a href="/settings"           data-role="button" class="admin">Settings</a>
     <a href="/admin_lock"         data-role="button" class="admin">Admin Lock</a>
     <a href="/remote"             data-role="button" class="admin">Remote Control</a>
+    <a href="/test_injector"      data-role="button" class="admin">Test Injector</a>
     <a href="/admin"              data-role="button" class="admin">Exit Admin Mode</a>
 % endif
