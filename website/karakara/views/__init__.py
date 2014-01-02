@@ -111,6 +111,17 @@ def modification_action(target, *args, **kwargs):
     return target(*args, **kwargs)
 
 
+@decorator
+def admin_only(target, *args, **kwargs):
+    """
+    Decorator to restrict view callable to admin users only
+    """
+    request = request_from_args(args)
+    if not is_admin(request):
+        raise action_error(message='Administrators only', code=403)
+
+    return target(*args, **kwargs)
+
 
 #-------------------------------------------------------------------------------
 # Web - the decorators merged

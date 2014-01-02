@@ -175,7 +175,12 @@ def queue_add(request):
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
     
-    queue_item.session_owner  = request.session['id']
+    # Set session owner - if admin allow manual setting of session_owner via params
+    if is_admin(request) and queue_item.session_owner:
+        pass
+    else:
+        queue_item.session_owner = request.session['id']
+    
     DBSession.add(queue_item)
     log.info('%s adding to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     

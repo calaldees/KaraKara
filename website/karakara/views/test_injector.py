@@ -1,14 +1,16 @@
 from pyramid.view import view_config
+from pyramid.request import Request
 
-from . import web, is_admin
 
-from ..lib.auto_format    import action_ok, action_error
+from . import web, admin_only
 
-#from ..model              import DBSession
-#from ..model.model_tracks import Track
-#from ..model.model_queue  import QueueItem
+from ..lib.misc           import random_string
+from ..lib.auto_format    import action_ok
 
-import datetime
+from ..model              import DBSession
+from ..model.model_tracks import Track
+
+
 import random
 
 import logging
@@ -17,14 +19,23 @@ log = logging.getLogger(__name__)
 
 @view_config(route_name='test_injector')
 @web
+@admin_only
 def test_injector(request):
     """
+    When demoing the system to new people it was often an annoyance to manually
+    add multiple tracks to show the priority token system.
+    This is a nice way to quickly add test tracks.
     """
-    if not is_admin(request):
-        raise action_error(message='Test injector for admin only', code=403)
-    
     message = ''
     if (request.params.get('cmd') == 'add_queue_item'):
-        message = 'added'
+        (random_track_id, ) = random.choice(DBSession.query(Track.id).all())
+        random_performer_name = random.choice(('Bob','Jane','Sally','Brutus','Rasputin','Lisa','Ryu','Ken','Alec Baldwin','Ghengis Kahn','Kraken','Lucy'))
+        queue_track_request = Request.blank('/queue.json', POST={
+            'track_id': random_track_id,
+            'performer_name': random_performer_name,
+            'session_owner': random_string(),
+        })
+        response_json = request.invoke_subrequest(queue_track_request).json
+        message = response_json['messages'].pop()
     
     return action_ok(message=message)
