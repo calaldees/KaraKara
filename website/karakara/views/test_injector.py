@@ -17,10 +17,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
-@view_config(route_name='test_injector')
+@view_config(route_name='inject_testdata')
 @web
 @admin_only
-def test_injector(request):
+def inject_testdata(request):
     """
     When demoing the system to new people it was often an annoyance to manually
     add multiple tracks to show the priority token system.
