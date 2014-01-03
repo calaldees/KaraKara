@@ -10,3 +10,5 @@ karakara.queue.add.limit                 = 0:00:00 -> timedelta
 karakara.queue.add.duplicate.count_limit = 0       -> int
 
 server.etag.enabled = True -> bool
+
+karakara.tcp.port       = 9872 -> int

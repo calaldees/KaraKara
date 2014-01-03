@@ -15,6 +15,7 @@ class AuthEchoServerManager(ServerManager):
     def __init__(self, authenticator, **options):
         self.authenticator = authenticator
         super().__init__(**options)
+        log.info('{0} server setup'.format(__name__))
     def connect(self, client):
         log.info('connection %s connected'    % client.id)  # TODO - add logging of what type of client it was
     def disconnect(self, client):

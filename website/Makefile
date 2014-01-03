@@ -113,6 +113,10 @@ test: ini_test
 test_crawl: ini_test
 	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
+test_remote: ini_test
+	# just a nicity - this is to be removed when remote tests are complete
+	env/bin/py.test karakara -k remote -s
+
 ini_test:
 	env/bin/python3 $(PROJECT)/scripts/make_ini.py test
 ini_production:

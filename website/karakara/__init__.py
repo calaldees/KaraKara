@@ -59,6 +59,7 @@ def main(global_config, **settings):
     socket_manager = AuthEchoServerManager(
         authenticator=authenicator,
         websocket_port=config.registry.settings['karakara.websocket.port'],
+        tcp_port      =config.registry.settings.get('karakara.tcp.port'),
     )
     config.registry['socket_manager'] = socket_manager
     socket_manager.start()
