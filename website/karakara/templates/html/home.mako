@@ -33,7 +33,7 @@
 
 % if identity.get('admin', False):
     <a href="/player/player.html" data-role="button" class="admin">Player Interface</a>
-    <a href="/track_list"         data-role="button" class="admin">List All Tracks</a>
+    <a href="/track_list"         data-role="button" class="admin">Print Tracks</a>
     <a href="/settings"           data-role="button" class="admin">Settings</a>
     <a href="/admin_lock"         data-role="button" class="admin">Admin Lock</a>
     <a href="/remote"             data-role="button" class="admin">Remote Control</a>
