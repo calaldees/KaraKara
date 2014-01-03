@@ -2,8 +2,8 @@
 
 % if 'settings' in data:
     <table data-role="table" data-mode="columntoggle" id="my-table">
-        <th>setting</th><th>value</th>
-    % for key, value in data['settings'].items():
+        <th>Setting</th><th>Value</th>
+    % for key, value in sorted(data['settings'].items()):
         <tr><td>${key}</td><td>${value}</td></tr>
     % endfor
     </table>
@@ -23,15 +23,17 @@
     $('tr').each(function() {
         $row = $(this);
         var key = $($row.children()[0]).text();
+        var value = $($row.children()[1]).text();
         $row.bind("click", function(){
             console.log(key);
             $setting_input.attr('name' , key);
+            $setting_input.attr('value' , value);
             $setting_label.text(key);
         });
     });
     </script>
     
-    <div data-role="collapsible" data-content-theme="c">
+    <div data-role="collapsible">
         <h3>Quick Settings</h3>
         
         <%def name="quick_setting(title, key, value)">

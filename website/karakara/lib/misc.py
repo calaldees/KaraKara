@@ -252,7 +252,7 @@ def strip_non_base_types(d):
     return None
 
 
-def convert_str_with_type(value_string, value_split='->'):
+def convert_str_with_type(value_string, value_split='->', fallback_type=None):
     """
     >>> convert_str_with_type("5 -> int")
     5
@@ -263,7 +263,10 @@ def convert_str_with_type(value_string, value_split='->'):
         value, return_type = value_string.split(value_split)
         return convert_str(value.strip(), return_type.strip())
     except (ValueError, AttributeError) as e:
-        return value_string
+        if fallback_type:
+            return convert_str(value_string.strip(), fallback_type)
+        else:
+            return value_string
 
 def convert_str(value, return_type):
     """
@@ -282,7 +285,7 @@ def convert_str(value, return_type):
     """
     if return_type=='None':
         return None
-    if not value or not isinstance(value, str) or not return_type:
+    if not value or not isinstance(value, str) or not return_type or return_type==str or return_type=='str':
         return value
     if value.startswith('[') and value.endswith(']'):
         return [convert_str(v.strip(), return_type) for v in value[1:-1].split(',')]

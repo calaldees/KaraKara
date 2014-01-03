@@ -71,7 +71,10 @@ def settings(request):
             raise action_error(message='Settings modification for non admin users forbidden', code=403)
         
         for key, value in request.params.items():
-            request.registry.settings[key] = convert_str_with_type(value)
+            fallback_type = None
+            if request.registry.settings.get(key):
+                fallback_type = type(request.registry.settings.get(key))
+            request.registry.settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
     
     setting_regex = re.compile(request.registry.settings.get('api.settings.regex','TODOmatch_nothing_regex'))
     return action_ok(
@@ -79,7 +82,7 @@ def settings(request):
             'settings': {
                 setting_key:request.registry.settings.get(setting_key)
                 for setting_key in
-                [setting_key for setting_key in request.registry.settings.keys() if setting_regex.match(setting_key)]
+                [key for key in request.registry.settings.keys() if setting_regex.match(key)]
             }
         }
     )
@@ -94,7 +97,7 @@ def random_images(request):
     """
     import random
     from karakara.model              import DBSession
-    from karakara.model.model_tracks import Attachment, _attachment_types
+    from karakara.model.model_tracks import Attachment
     thumbnails = DBSession.query(Attachment.location).filter(Attachment.type=='thumbnail').all()
     random.shuffle(thumbnails)
     thumbnails = [t[0] for t in thumbnails]
