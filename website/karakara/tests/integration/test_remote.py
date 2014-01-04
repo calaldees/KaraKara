@@ -4,6 +4,28 @@ import re
 from bs4 import BeautifulSoup
 import socket, threading
 
+class SocketClientTest():
+    connected = True
+    last_message = ''
+
+    def __init__(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(("localhost", 9872))
+        thread = threading.Thread(target=self.connection, args=(sock,))
+        thread.daemon=True
+        thread.start()
+
+    def connection(self, sock):
+        print("connected: test")
+        while self.connected:
+            data_recv = sock.recv(4098)
+            if not data_recv:
+                break
+            print("message recived: {0}".format(data_recv))
+            self.last_message = data_recv
+        print("disconnected: thats all folks")
+        sock.close()
+
 
 @unfinished
 def test_remote_control(app):
@@ -13,30 +35,18 @@ def test_remote_control(app):
     Press remote buttons
     Assert socket receives the correct message
     """
-    connected = True
-    def conect_socket():
-        def connection(sock):
-            print("connected: test")
-            while connected:
-                data_recv = sock.recv(4098)
-                if not data_recv:
-                    break
-                print("message recived: {0}".format(data_recv))
-            print("disconnected: thats all folks")
-            sock.close()
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(("localhost", 9872))
-        thread = threading.Thread(target=connection, args=(sock,))
-        thread.daemon=True
-        thread.start()
+    client = SocketClientTest()
     
     def press_button(soup, button_text):
-        response = app.get(soup.find('a', text=re.compile(button_text, flags=re.IGNORECASE))['href'])
+        url = soup.find('a', text=re.compile(button_text, flags=re.IGNORECASE))['href']
+        print(url)
+        response = app.get('/remote{0}'.format(url))
         assert response.status_code==200
-        #assert socket recives the message
+        assert 'remote' in response.text.lower()
+        assert client.last_message == button_text
 
-    conect_socket()
     soup = BeautifulSoup(app.get('/remote').text)
     for button_name in ('play', 'pause', 'seek', 'stop', 'skip'):
         press_button(soup, button_name)
-    connected = False
+
+    client.connected = False

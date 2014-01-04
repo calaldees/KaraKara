@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 import re
 
-from . import web, method_put_router, is_admin, etag_decorator, generate_cache_key
+from . import web, method_put_router, is_admin, admin_only, etag_decorator, generate_cache_key
 from ..lib.auto_format import action_ok, action_error
 from ..lib.misc import convert_str_with_type
 
@@ -34,9 +34,9 @@ def home(request):
 
 @view_config(route_name='admin_lock')
 @web
+@admin_only
 def admin_lock(request):
-    if is_admin(request):
-        request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked',False)
+    request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked',False)
     return action_ok()
 
 @view_config(route_name='admin_toggle')
@@ -49,9 +49,10 @@ def admin_toggle(request):
 
 @view_config(route_name='remote')
 @web
+@admin_only
 def remote(request):
     cmd = request.params.get('cmd')
-    if is_admin(request) and cmd:
+    if cmd:
         log.debug("sending {0}".format(cmd))
         request.registry['socket_manager'].recv(cmd.encode('utf-8'))
     return action_ok()
