@@ -87,7 +87,7 @@ clean:
 	rm -f *.db
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
-	rm -rf $(PROJECT)/static/ext
+	rm -rf $(PATH_ASSETS)
 	rm -rf dependencys_installed.json
 
 insert_random_tracks:
