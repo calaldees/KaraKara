@@ -4,8 +4,7 @@ External dependencys do not be commited to the repo
 import os
 import json
 import urllib.request
-
-from karakara.lib.misc import hash_data
+import hashlib
 
 import logging
 log = logging.getLogger(__name__)
@@ -22,6 +21,16 @@ DEFAULT_DESTINATION = 'ext'
 DEFAULT_TRACKER = 'dependencys_installed.json'
 
 VERSION_IDENTIFYER = 'VERSION'
+
+#-------------------------------------------------------------------------------
+# Utils
+#-------------------------------------------------------------------------------
+
+def hash_data(data):
+    hash = hashlib.sha1()
+    hash.update(str(data).encode())
+    return hash.hexdigest()
+
 
 #-----
 
