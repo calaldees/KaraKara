@@ -1,6 +1,6 @@
 PROJECT=karakara
 
-PATH_ASSETS=${PROJECT}/static/ext
+PATH_EXTERNALS=externals/
 
 INI_DEV  = development.ini
 INI_TEST = test.ini
@@ -54,19 +54,22 @@ env:
 setup: env
 	env/bin/python setup.py develop
 
-externals:
-	env/bin/python $(PROJECT)/scripts/dependency_downloader.py --destination $(PATH_ASSETS)
+dependency_downloader.py:
+	curl https://raw.github.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
 
-init_db:
+externals:
+	env/bin/python $(PROJECT)/scripts/dependency_downloader.py --destination $(PATH_EXTERNALS)
+
+test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-install: env setup externals init_db test
+install: env setup dependency_downloader.py externals test.db test
 
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
-run:
+run: externals
 	#$(MAKE) env_activate
 	env/bin/pserve --reload $(INI_DEV)
 	#$(MAKE) env_deactivate
@@ -87,7 +90,7 @@ clean:
 	rm -f *.db
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
-	rm -rf $(PATH_ASSETS)
+	rm -rf $(PATH_EXTERNALS)
 	rm -rf dependencys_installed.json
 
 insert_random_tracks:

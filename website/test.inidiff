@@ -1,5 +1,5 @@
 [app:main]
-sqlalchemy.url = sqlite:///%(here)s/KaraKara_test.db
+##sqlalchemy.url = sqlite:///%(here)s/karakara.db
 ##sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 ##session.type    = ext:database
 ##session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara

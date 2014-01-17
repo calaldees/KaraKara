@@ -43,6 +43,23 @@
         "source": "http://yui.yahooapis.com/VERSION/build/cssreset/cssreset-min.css",
         "version": "3.13.0",
         "target": "cssreset-min.css"
-    }
+    },
 
+    "python_lib": {
+        "source": "https://raw.github.com/calaldees/libs/master/python3/",
+        "version": "0.0.0",
+        "target": [
+            "lib/__init__.py",
+            "lib/misc.py",
+            "lib/xml.py",
+            "lib/make_ini.py",
+            "lib/pyramid/__init__.py",
+            "lib/pyramid/auto_format.py",
+            "lib/pyramid/etag.py",
+            "lib/pyramid/session_identity.py",
+            "lib/socket/__init__.py",
+            "lib/socket/multisocket_server.py",
+            "lib/socket/auth_echo_server.py"
+        ]
+    }
 }
