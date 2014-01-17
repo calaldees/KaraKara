@@ -78,7 +78,7 @@ run_production: ini_production
 	env/bin/pserve $(INI_PROD)
 
 run_socket_server:
-	env/bin/python3 -m$(PROJECT).lib.socket_server
+	env/bin/python3 -m$(PATH_EXTERNALS).socket.multisocket_server
 
 shell:
 	env/bin/pshell $(INI_DEV)
@@ -91,6 +91,7 @@ clean:
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
 	rm -rf $(PATH_EXTERNALS)
+    rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json
 
 insert_random_tracks:

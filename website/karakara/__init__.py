@@ -14,10 +14,10 @@ import pyramid_beaker
 import re
 
 # Package Imports
-from .lib.misc import convert_str_with_type
-from .lib.auto_format import registered_formats
+from externals.lib.misc import convert_str_with_type
+from externals.pyramid.auto_format import registered_formats
 from .templates import helpers as template_helpers
-from .socket.auth_echo_server import AuthEchoServerManager
+from externals.socket.auth_echo_server import AuthEchoServerManager
 
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
@@ -44,7 +44,6 @@ def main(global_config, **settings):
     # Beaker Session Manager
     session_factory = pyramid_beaker.session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
-    #import pdb ; pdb.set_trace()
     
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
