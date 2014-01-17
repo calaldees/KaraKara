@@ -117,9 +117,9 @@ test_crawl: ini_test
 	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
 ini_test:
-	env/bin/python3 $(PROJECT)/scripts/make_ini.py test
+	env/bin/python3 $(PATH_EXTERNALS)lib/make_ini.py test
 ini_production:
-	env/bin/python3 $(PROJECT)/scripts/make_ini.py production
+	env/bin/python3 $(PATH_EXTERNALS)lib/make_ini.py production
 
 start_webapp_daemon: ini_production
 	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
