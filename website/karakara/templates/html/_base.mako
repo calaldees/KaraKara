@@ -7,9 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <!-- CSS Styles -->
-        <link   href="${h.extneral_url('cssreset-min.css')}"      rel="stylesheet" />
+        <link   href="${h.extneral_url('cssreset-min.css')}" rel="stylesheet" />
         <link   href="${h.extneral_url('jquery.mobile.min.css')}" rel="stylesheet" />
-        <link   href="${h.static_url('css/main.css')}"              rel="stylesheet" />
+        <link   href="${h.static_url('css/main.css')}" rel="stylesheet" />
         
         <!-- Scripts -->
         ## TODO: Consider moving js to bottom of page - this may require some refactoring of inline js

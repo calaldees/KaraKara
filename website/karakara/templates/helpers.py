@@ -24,6 +24,9 @@ video_fileext_to_mime_types = {
     'flv':'x-flv',
 }
 
+# TODO: replace url methods with constant PATH
+#  templates could then use h.path.external etc
+
 def extneral_url(file):
     #return request.static_url('karakara:static/%s' % file)
     return "/ext/"+file
