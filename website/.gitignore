@@ -2,8 +2,9 @@
 *.db-journal
 *.egg-info
 /env/
+/externals/
 /data/
 /test.ini
 /production.ini
+dependency_downloader.py
 dependencys_installed.json
-ext/

@@ -24,6 +24,10 @@ video_fileext_to_mime_types = {
     'flv':'x-flv',
 }
 
+def extneral_url(file):
+    #return request.static_url('karakara:static/%s' % file)
+    return "/ext/"+file
+
 def static_url(file):
     #return request.static_url('karakara:static/%s' % file)
     return "/static/"+file

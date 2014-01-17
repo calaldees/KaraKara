@@ -79,7 +79,7 @@ import datetime
     % endif
 
     % if identity.get('admin'):
-    <script src="${h.static_url('ext/jquery.sortable.js')}"></script>
+    <script src="${h.extneral_url('jquery.sortable.js')}"></script>
     <script>
         //$(function() {
         $(document).ready(function() {

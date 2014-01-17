@@ -7,16 +7,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <!-- CSS Styles -->
-        <link   href="${h.static_url('ext/cssreset-min.css')}"      rel="stylesheet" />
-        <link   href="${h.static_url('ext/jquery.mobile.min.css')}" rel="stylesheet" />
+        <link   href="${h.extneral_url('cssreset-min.css')}"      rel="stylesheet" />
+        <link   href="${h.extneral_url('jquery.mobile.min.css')}" rel="stylesheet" />
         <link   href="${h.static_url('css/main.css')}"              rel="stylesheet" />
         
         <!-- Scripts -->
+        ## TODO: Consider moving js to bottom of page - this may require some refactoring of inline js
         <script src ="${h.static_url('js/modernizer.custom.js')}"></script>
-        <script src ="${h.static_url('ext/jquery.min.js')}"></script>
+        <script src ="${h.extneral_url('jquery.min.js')}"></script>
         <script src ="${h.static_url('js/jquery.mobile-extras.js')}"></script>
-        <script src ="${h.static_url('ext/jquery.mobile.min.js')}"></script>
-        <script src ="${h.static_url('ext/jquery.cookie.js')}"></script>
+        <script src ="${h.extneral_url('jquery.mobile.min.js')}"></script>
+        <script src ="${h.extneral_url('jquery.cookie.js')}"></script>
         <script src ="${h.static_url('js/lib.js')}"></script>
         <script src ="${h.static_url('js/karakara.js')}"></script>
         
