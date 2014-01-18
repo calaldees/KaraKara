@@ -1,8 +1,7 @@
 from pyramid.view import view_config
 
-from . import web
-from ..lib.auto_format    import action_ok, action_error
-from ..lib.misc           import strip_non_base_types
+from externals.lib.misc import strip_non_base_types
+from . import web, action_ok, action_error
 
 from ..model                import DBSession
 from ..model.model_feedback import Feedback

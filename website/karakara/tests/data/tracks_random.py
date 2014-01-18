@@ -4,7 +4,7 @@ import random
 from sqlalchemy.orm import aliased, joinedload
 
 #from ..model import DBSession, commit
-from karakara.lib.misc import random_string
+from externals.lib.misc import random_string
 
 from karakara.model.actions import get_tag
 from karakara.model.model_tracks import Track, Tag, Attachment

@@ -10,7 +10,7 @@ import json
 from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
 
-from karakara.lib.misc import now, json_object_handler
+from externals.lib.misc import now, json_object_handler
 from karakara.model.model_queue import QueueItem
 from karakara.model.model_token import PriorityToken
 
@@ -117,6 +117,7 @@ def issue_priority_token(request, DBSession):
     priority_token.valid_end   = latest_token_end + priority_window
     DBSession.add(priority_token)
 
+    # TODO: replace with new one in lib
     #request.response.set_cookie('priority_token', json_cookie);  # WebOb.set_cookie mangles the cookie with m.serialize() - so I rolled my own set_cookie
     json_cookie = json.dumps(priority_token.to_dict(), default=json_object_handler)
     request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))

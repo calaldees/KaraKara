@@ -3,7 +3,7 @@ Template helpers
 These will be accessible as 'h.' in all mako templates
 """
 
-from ..lib.misc import get_fileext, substring_in
+from externals.lib.misc import get_fileext, substring_in
 
 
 import random

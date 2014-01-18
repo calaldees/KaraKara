@@ -2,11 +2,11 @@
 
 import pytest
 
-from karakara.lib.misc import random_string, random
+from externals.lib.misc import random_string, random
 
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
-from karakara.model.model_tracks import Track, Tag, Attachment, Lyrics
+from karakara.model.model_tracks import Track, Attachment, Lyrics # Tag,
 
 
 @pytest.fixture(scope="session")

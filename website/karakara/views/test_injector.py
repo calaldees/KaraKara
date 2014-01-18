@@ -1,17 +1,15 @@
+import random
+
 from pyramid.view import view_config
 from pyramid.request import Request
 
+from externals.lib.misc           import random_string
 
-from . import web, admin_only
-
-from ..lib.misc           import random_string
-from ..lib.auto_format    import action_ok
+from . import web, action_ok, admin_only
 
 from ..model              import DBSession
 from ..model.model_tracks import Track
 
-
-import random
 
 import logging
 log = logging.getLogger(__name__)

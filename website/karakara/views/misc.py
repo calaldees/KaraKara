@@ -1,10 +1,11 @@
-from pyramid.view import view_config
-
 import re
 
-from . import web, method_put_router, is_admin, admin_only, etag_decorator, generate_cache_key
-from ..lib.auto_format import action_ok, action_error
-from ..lib.misc import convert_str_with_type
+from pyramid.view import view_config
+
+from externals.lib.misc import convert_str_with_type
+
+from . import web, action_ok, action_error, method_put_router, is_admin, admin_only, etag_decorator, generate_cache_key
+
 
 import logging
 log = logging.getLogger(__name__)

@@ -91,7 +91,7 @@ clean:
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
 	rm -rf $(PATH_EXTERNALS)
-    rm -rf dependency_downloader.py
+	rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json
 
 insert_random_tracks:

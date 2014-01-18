@@ -1,11 +1,11 @@
 from karakara.tests.conftest import unimplemented, unfinished, xfail
 
+import datetime
 import json
 import re
 from bs4 import BeautifulSoup
 
-import datetime
-from karakara.lib.misc import now
+from externals.lib.misc import now
 
 # Utils ------------------------------------------------------------------------
 

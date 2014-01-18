@@ -6,7 +6,7 @@ import re
 from bs4 import BeautifulSoup
 import traceback
 
-from ..lib.misc import get_fileext, random_string
+from externals.lib.misc import get_fileext, random_string
 
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
 

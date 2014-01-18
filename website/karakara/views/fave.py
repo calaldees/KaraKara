@@ -1,8 +1,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from .                    import web, method_delete_router
-from ..lib.auto_format    import action_ok
+from .                    import web, method_delete_router, action_ok
 from ..templates.helpers  import search_url
 
 #-------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ __all__ = [
 
 import copy
 
-from karakara.lib.misc import now
+from externals.lib.misc import now
 
 
 
