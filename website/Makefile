@@ -58,7 +58,7 @@ dependency_downloader.py:
 	curl https://raw.github.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
 
 externals:
-	env/bin/python $(PROJECT)/scripts/dependency_downloader.py --destination $(PATH_EXTERNALS)
+	env/bin/python dependency_downloader.py --destination $(PATH_EXTERNALS)
 
 test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
