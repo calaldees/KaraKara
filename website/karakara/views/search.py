@@ -1,6 +1,7 @@
 import re
 import copy
 import random
+import collections
 
 from sqlalchemy     import func
 #from sqlalchemy.sql import null
@@ -40,7 +41,9 @@ tag_cats = {
 
 # Utils ------------------------------------------------------------------------
 
-def search_params(request):
+SearchParams = collections.namedtuple('SearchParams',['tags', 'keywords', 'trackids', 'tags_silent_forced', 'tags_silent_hidden'])
+
+def get_search_params(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
     url  = re.sub('|'.join(['\.'+f for f in registered_formats()]),'',request.matchdict['tags'])
     
@@ -51,16 +54,19 @@ def search_params(request):
     try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
     except: trackids = []
 
-    return tags, keywords, trackids
+    tags_silent_forced = [tag.strip() for tag in request.registry.settings.get('karakara.search.tag.silent_forced','').split(',')]
+    tags_silent_hidden = [tag.strip() for tag in request.registry.settings.get('karakara.search.tag.silent_hidden','').split(',')]
 
-def search_cache_key(tags, keywords, trackids):
-    return "{0}-{1}-{2}".format(tags, keywords, trackids)
+    return SearchParams(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)
+
+def search_cache_key(search_params):
+    return "{tags}-{keywords}-{trackids}-{tags_silent_forced}-{tags_silent_hidden}".format(**search_params._asdict())
 
 
 #-------------------------------------------------------------------------------
 
 @cache.cache_on_arguments()
-def search(tags, keywords, trackids):
+def search(search_params):
     """
     The base call for API methods 'list' and 'tags'
     
@@ -76,26 +82,34 @@ def search(tags, keywords, trackids):
             sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
         }
     """
-    log.debug('cache gen - search {0}'.format(search_cache_key(tags, keywords, trackids)))
+    tags, keywords, trackids, tags_silent_forced, tags_silent_hidden = search_params
+    log.debug('cache gen - search {0}'.format(search_cache_key(search_params)))
     
     # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
     #  any tags that dont match are added as keywords
-    tag_objs = []
-    for tag in tags:
-        tag_obj = get_tag(tag)
-        if tag_obj:
-            tag_objs.append(tag_obj)
-        elif tag:
-            keywords.append(tag)
-    tags = tag_objs
+    def tag_strings_to_tag_objs(tags):
+        tag_objs = []
+        for tag in tags:
+            tag_obj = get_tag(tag)
+            if tag_obj:
+                tag_objs.append(tag_obj)
+            elif tag:
+                keywords.append(tag)
+        return tag_objs
+    tags_silent_forced = tag_strings_to_tag_objs(tags_silent_forced)
+    tags_silent_hidden = tag_strings_to_tag_objs(tags_silent_hidden)
+    tags               = tag_strings_to_tag_objs(tags              )
     
     # If trackids not manually given in request - Get trackids for all tracks that match the tags and keywords
     if not trackids:
         trackids = DBSession.query(Track.id)
-        for tag in tags:
+        for tag in tags_silent_forced + tags:
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
         for keyword in keywords:
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
+        #for tag in tags_silent_hidden:
+        #    trackids = trackids.filter   ( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
+        
         trackids = [trackid[0] for trackid in trackids.all()]
     
     # Limit sub tag categorys for last tag selected
@@ -129,11 +143,11 @@ def tags(request):
     
     return search dict + sub_tags( a list of all tags with counts )
     """
-    tags, keywords, trackids = search_params(request)
-    cache_key = "search_tags_{0}:{1}".format(search_version, search_cache_key(tags, keywords, trackids))
+    search_params = get_search_params(request)
+    cache_key = "search_tags_{0}:{1}".format(search_version, search_cache_key(search_params))
     etag(request, cache_key)  # Abort if 'etag' match
     
-    action_return = search(tags, keywords, trackids)
+    action_return = search(search_params)
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
@@ -189,12 +203,12 @@ def list(request):
     
     return search dict (see above) + tracks (a list of tracks with basic details)
     """
-    tags, keywords, trackids = search_params(request)
-    cache_key = "search_list_{0}:{1}".format(search_version, search_cache_key(tags, keywords, trackids))
+    search_params = get_search_params(request)
+    cache_key = "search_list_{0}:{1}".format(search_version, search_cache_key(search_params))
     etag(request, cache_key)  # Abort if 'etag' match
     
     def get_list():
-        action_return = search(tags, keywords, trackids)
+        action_return = search(search_params)
         log.debug('cache gen get_list')
         
         _trackids = action_return['data']['trackids']

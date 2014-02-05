@@ -12,7 +12,7 @@ the 'karakara.search.tag.restrict' setting.
 
 from . import setting
 
-@setting(key='karakara.search.tag.restrict', value='category:anime')
-def test_search_tags_restrict(app, tracks, tracks_volume): #, search_tags, expected_tag_set
+@setting(key='karakara.search.tag.silent_forced', value='category:anime')
+def test_search_tags_restrict(app, tracks, tracks_volume):
     #assert False
     pass
