@@ -860,7 +860,7 @@ class MediaSources(JSONFile):
 			self[name] = source.metadata
 
 	def dir_path(self):
-		return parent.element_path('source')
+		return self.parent.element_path('source')
 	
 	def index_files(self):
 		self.load()
