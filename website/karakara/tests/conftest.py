@@ -25,6 +25,8 @@ def pytest_runtest_setup(item):
     if 'slow' in item.keywords and not runslow:
         pytest.skip("need --runslow option to run")
 
+    logging.basicConfig(level=logging.DEBUG)
+
 unimplemented = pytest.mark.unimplemented # Server dose not support the functionlity this test is asserting yet
 unfinished    = pytest.mark.unfinished    # The test is unfinished and currently is know to fail
 xfail         = pytest.mark.xfail

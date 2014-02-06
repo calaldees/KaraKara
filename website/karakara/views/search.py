@@ -107,8 +107,8 @@ def search(search_params):
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
         for keyword in keywords:
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
-        #for tag in tags_silent_hidden:
-        #    trackids = trackids.filter   ( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
+        for tag in tags_silent_hidden:
+            trackids = trackids.filter(Track.id.notin_(DBSession.query(Track.id).join(Track.tags).filter(Tag.id == tag.id )))
         
         trackids = [trackid[0] for trackid in trackids.all()]
     

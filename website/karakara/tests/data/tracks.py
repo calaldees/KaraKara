@@ -8,6 +8,8 @@ from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
 from karakara.model.model_tracks import Track, Attachment, Lyrics # Tag,
 
+from karakara.views import cache
+
 
 @pytest.fixture(scope="session")
 def tags(request): #, DBSession, commit
@@ -159,6 +161,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
     request.addfinalizer(finalizer)
     
     commit()
+    cache.invalidate()
     return tracks
 
 @pytest.fixture(scope="function")
@@ -173,6 +176,7 @@ def tracks_volume(request):
     request.addfinalizer(finalizer)
     
     commit()
+    cache.invalidate()
     return tracks
     
 
