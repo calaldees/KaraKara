@@ -23,7 +23,7 @@ def test_search_tags_silent_forced(app, tracks, tracks_volume):
     # Test silent_forced - restrict down to 'category:anime' tracks
     #  - t1 and t2 are the only two tracks tags as anime
     with temporary_setting(app, 'karakara.search.tag.silent_forced', '[category:anime]'):
-        assert get_settings(app)['karakara.search.tag.silent_forced'] == 'category:anime'
+        assert get_settings(app)['karakara.search.tag.silent_forced'] == ['category:anime']
         data = app.get('/search_list/.json').json['data']
         assert len(data['trackids']) == 2
         assert 't1' in data['trackids']
@@ -31,7 +31,7 @@ def test_search_tags_silent_forced(app, tracks, tracks_volume):
     # Test silent_hidden - hide tracks with tag 'category:anime'
     #  - t1 and t2 are the only two tracks tags as anime they should be hidden in the response
     with temporary_setting(app, 'karakara.search.tag.silent_hidden', '[category:anime]'):
-        assert get_settings(app)['karakara.search.tag.silent_hidden'] == 'category:anime'
+        assert get_settings(app)['karakara.search.tag.silent_hidden'] == ['category:anime']
         data = app.get('/search_list/.json').json['data']
         assert len(data['trackids']) == 17
         assert 't1' not in data['trackids']
