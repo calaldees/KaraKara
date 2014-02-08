@@ -63,6 +63,40 @@ def search_cache_key(search_params):
     return "{tags}-{keywords}-{trackids}-{tags_silent_forced}-{tags_silent_hidden}".format(**search_params._asdict())
 
 
+def _tag_strings_to_tag_objs(tags):
+    """
+    Transform tag strings into tag objects
+    This involkes a query for each tag ... a small overhead
+    any tags that dont match are added as keywords
+    """
+    tag_objs = []
+    tag_unknown = []
+    for tag in tags:
+        tag_obj = get_tag(tag)
+        if tag_obj:
+            tag_objs.append(tag_obj)
+        elif tag:
+            tag_unknown.append(tag)
+    return tag_objs, tag_unknown
+
+def restrict_search(request, query):
+    return _restrict_search(
+        query,
+        request.registry.settings.get('karakara.search.tag.silent_forced',[]),
+        request.registry.settings.get('karakara.search.tag.silent_hidden',[]),
+    )
+
+def _restrict_search(query, tags_silent_forced, tags_silent_hidden):
+    tags_silent_forced, _ = _tag_strings_to_tag_objs(tags_silent_forced)
+    tags_silent_hidden, _ = _tag_strings_to_tag_objs(tags_silent_hidden)
+
+    for tag in tags_silent_forced:
+        query = query.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.id==tag.id))
+    for tag in tags_silent_hidden:
+        query = query.filter(Track.id.notin_(DBSession.query(Track.id).join(Track.tags).filter(Tag.id==tag.id)))
+
+    return query
+
 #-------------------------------------------------------------------------------
 
 @cache.cache_on_arguments()
@@ -85,30 +119,17 @@ def search(search_params):
     tags, keywords, trackids, tags_silent_forced, tags_silent_hidden = search_params
     log.debug('cache gen - search {0}'.format(search_cache_key(search_params)))
     
-    # Transform tag strings into tag objects # This involkes a query for each tag ... a small overhead
-    #  any tags that dont match are added as keywords
-    def tag_strings_to_tag_objs(tags):
-        tag_objs = []
-        for tag in tags:
-            tag_obj = get_tag(tag)
-            if tag_obj:
-                tag_objs.append(tag_obj)
-            elif tag:
-                keywords.append(tag)
-        return tag_objs
-    tags_silent_forced = tag_strings_to_tag_objs(tags_silent_forced)
-    tags_silent_hidden = tag_strings_to_tag_objs(tags_silent_hidden)
-    tags               = tag_strings_to_tag_objs(tags              )
+    tags, tag_unknown = _tag_strings_to_tag_objs(tags)
+    keywords += tag_unknown
     
     # If trackids not manually given in request - Get trackids for all tracks that match the tags and keywords
     if not trackids:
         trackids = DBSession.query(Track.id)
-        for tag in tags_silent_forced + tags:
+        trackids = _restrict_search(trackids, tags_silent_forced, tags_silent_hidden)
+        for tag in tags:
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
         for keyword in keywords:
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
-        for tag in tags_silent_hidden:
-            trackids = trackids.filter(Track.id.notin_(DBSession.query(Track.id).join(Track.tags).filter(Tag.id == tag.id )))
         
         trackids = [trackid[0] for trackid in trackids.all()]
     

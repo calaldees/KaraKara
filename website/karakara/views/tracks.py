@@ -6,6 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key
 from ._logic import queue_item_for_track
+from .search import restrict_search
 
 from ..model              import DBSession
 from ..model.model_tracks import Track
@@ -123,5 +124,6 @@ def track_list_all(request):
                     joinedload(Track.tags),\
                     joinedload('tags.parent')\
                 )
+    #tracks = restrict_search(request, tracks) # Failed attempt to ensure printed track list follows restricted tag settings, needs further investigation. Works when Track.id is replaced with Track.
     return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in tracks]})
 
