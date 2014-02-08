@@ -54,8 +54,8 @@ def get_search_params(request):
     try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
     except: trackids = []
 
-    tags_silent_forced = [tag.strip() for tag in request.registry.settings.get('karakara.search.tag.silent_forced','').split(',')]
-    tags_silent_hidden = [tag.strip() for tag in request.registry.settings.get('karakara.search.tag.silent_hidden','').split(',')]
+    tags_silent_forced = request.registry.settings.get('karakara.search.tag.silent_forced',[])
+    tags_silent_hidden = request.registry.settings.get('karakara.search.tag.silent_hidden',[])
 
     return SearchParams(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)
 

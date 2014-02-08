@@ -111,6 +111,7 @@ import_tracks_production: ini_production
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test: ini_test
+	env/bin/py.test $(PATH_EXTERNALS) -q --pdb
 	env/bin/py.test $(PROJECT) -q --pdb
 	#--pdb --capture=sys
 

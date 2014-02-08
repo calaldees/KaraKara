@@ -13,5 +13,3 @@ server.etag.enabled = True -> bool
 
 karakara.tcp.port       = 9872 -> int
 
-karakara.search.tag.silent_forced = 
-karakara.search.tag.silent_hidden = 
