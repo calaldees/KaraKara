@@ -21,6 +21,7 @@ class temporary_setting:
         return None
     
     def __exit__(self, type, value, traceback):
+        self.original_value = str(self.original_value) # HACK - OH GOD!! .. was used to force passing [] as '[]' so it could be converted again. Passing [] does not update the setting. Needs more looking into
         self.app.put('/settings.json', {self.key: self.original_value})
         log.debug('Temporay setting {0} reverted to {1}'.format(self.key, self.original_value))
 
