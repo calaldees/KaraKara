@@ -2,6 +2,8 @@
 
 import pytest
 
+from . import admin_rights
+
 @pytest.mark.parametrize(('track_id', 'expected_response', 'text_list',), [
     ('t1', 200, ['Test Track 1'   , 'series X', 'anime', 'ここ', 'test/image1.jpg'  ]),
     ('t2', 200, ['Test Track 2'   , 'series X', 'anime', 'äöü', 'test/preview2.flv']),
@@ -38,8 +40,10 @@ def test_track_list_all(app, tracks):
         assert text in response.text
 
 def test_track_list_all_api(app, tracks):
-    data = app.get('/track_list?format=json').json['data']
-    assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
+    assert app.get('/track_list.json', expect_errors = True).status_code == 403
+    with admin_rights(app):
+        data = app.get('/track_list?format=json').json['data']
+        assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
 
 def test_track_list_all(app):
     """

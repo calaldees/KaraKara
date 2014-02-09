@@ -26,6 +26,27 @@ class temporary_setting:
         log.debug('Temporay setting {0} reverted to {1}'.format(self.key, self.original_value))
 
 
+class admin_rights:
+    def __init__(self, app):
+        self.app = app
+
+    def __enter__(self):
+        admin_state = self.app.get('/admin.json').json['identity']['admin']
+        self.original_value = not admin_state
+        if admin_state:
+            log.debug('Set admin mode')
+        else:
+            # We altered the admin state inadvertenty from enabled to disabled, ensure it's enabled
+            assert self.app.get('/admin.json').json['identity']['admin']
+        return None
+    
+    def __exit__(self, type, value, traceback):
+        # If admin mode was not enabled at the beggining, ensure it is revolked again
+        if not self.original_value:
+            assert not self.app.get('/admin.json').json['identity']['admin']
+            log.debug('Revolked admin right')
+
+
 def apply_setting(method=None, key='', value=''):
     """
     GAH!! this is broken .. wtf!?

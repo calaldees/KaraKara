@@ -4,7 +4,7 @@ from pyramid.view import view_config
 
 from sqlalchemy.orm import joinedload
 
-from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key
+from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
 from ._logic import queue_item_for_track
 from .search import restrict_search
 
@@ -115,6 +115,7 @@ def track_view(request):
 
 @view_config(route_name='track_list')
 @web
+@admin_only
 def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
