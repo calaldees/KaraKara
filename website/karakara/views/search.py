@@ -79,21 +79,26 @@ def _tag_strings_to_tag_objs(tags):
             tag_unknown.append(tag)
     return tag_objs, tag_unknown
 
-def restrict_search(request, query):
+def restrict_search(request, query, obj_intersect=Track):
     return _restrict_search(
         query,
         request.registry.settings.get('karakara.search.tag.silent_forced',[]),
         request.registry.settings.get('karakara.search.tag.silent_hidden',[]),
+        obj_intersect = obj_intersect,
     )
 
-def _restrict_search(query, tags_silent_forced, tags_silent_hidden):
+def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersect=Track.id):
+    """
+    Attempted to extract out track restriction but ended up with a mess.
+    passing differnt obj_intersects is messy and unclear. Poo!
+    """
     tags_silent_forced, _ = _tag_strings_to_tag_objs(tags_silent_forced)
     tags_silent_hidden, _ = _tag_strings_to_tag_objs(tags_silent_hidden)
 
     for tag in tags_silent_forced:
-        query = query.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.id==tag.id))
+        query = query.intersect(DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id==tag.id))
     for tag in tags_silent_hidden:
-        query = query.filter(Track.id.notin_(DBSession.query(Track.id).join(Track.tags).filter(Tag.id==tag.id)))
+        query = query.filter(Track.id.notin_(DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id==tag.id)))
 
     return query
 

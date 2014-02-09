@@ -9,6 +9,7 @@ e.g
 We can restrict tracks returned to a subset of tracks by enforcing
 the 'karakara.search.tag.restrict' setting.
 """
+from bs4 import BeautifulSoup
 
 from . import get_settings, temporary_setting
 
@@ -38,3 +39,19 @@ def test_search_tags_silent_forced(app, tracks, tracks_volume):
 
     assert not get_settings(app)['karakara.search.tag.silent_forced']
     assert not get_settings(app)['karakara.search.tag.silent_hidden']
+
+
+def test_track_list_all(app, tracks):
+    assert get_settings(app)['karakara.search.tag.silent_forced'] == []
+    
+    soup = BeautifulSoup(app.get('/track_list').text)
+    data_rows = soup.find_all('td', class_='col_id')
+    assert len(data_rows) == 4
+    
+    with temporary_setting(app, 'karakara.search.tag.silent_forced', '[category:anime]'):
+        soup = BeautifulSoup(app.get('/track_list').text)
+        data_rows = soup.find_all('td', class_='col_id')
+        assert len(data_rows) == 2
+        assert 't1' in soup.text
+        assert 't2' in soup.text
+        assert 't3' not in soup.text

@@ -124,6 +124,6 @@ def track_list_all(request):
                     joinedload(Track.tags),\
                     joinedload('tags.parent')\
                 )
-    #tracks = restrict_search(request, tracks) # Failed attempt to ensure printed track list follows restricted tag settings, needs further investigation. Works when Track.id is replaced with Track.
+    tracks = restrict_search(request, tracks)
     return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in tracks]})
 
