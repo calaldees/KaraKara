@@ -67,12 +67,12 @@ Trial Setup
    1. Install VirtualBox: <http://www.virtualbox.org/>
    2. Install Vagrant: <http://www.vagrantup.com/>
    3. Navigate to data folder
-   4. Download Vagrantfile and Bootstrap: (Linux/Mac can use `curl -O https://raw.github.com/calaldees/KaraKara/master/vagrant/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/vagrant/vagrant_bootstrap.sh`) (Windows just download the files)
+   4. Download Vagrantfile and Bootstrap: (Linux/Mac can use `curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/vagrant/Vagrantfile_.sh`) (Windows just download the files)
    5. `vagrant up`
    6. view <http://localhost:6543/> and <http://localhost:6543/player/player.html>
 * Option 2 - Linux/Mac (native with sqllite dev db)
    1. navigate to data folder
-   2. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make setup && make test && make import_tracks_dev && make run`
+   2. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run`
    3. view <http://localhost:6543/> and <http://localhost:6543/player/player.html>
 
 

@@ -16,10 +16,8 @@ STATIC_FILE_PATH = ../mediaserver/www/files
 
 help:
 	# Usage: make <target>, where target is
-	# setup          -- setup python egg & install dependencys/env if needed
+	# install        -- run after clean checkout to pull dependecys and setup
 	# test           -- run all nosetests
-	# init_db        -- create a blank database
-	# init_db_test   -- create test db
 	# run            -- run the site in development mode
 	# run_production -- run in production mode
 	# clean          -- reset the folder to clean git checkout (removes virtual python env)
@@ -51,7 +49,7 @@ env:
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid
 
-setup: env
+KaraKara.egg-info: env
 	env/bin/python setup.py develop
 
 dependency_downloader.py:
@@ -64,15 +62,13 @@ test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-install: env setup dependency_downloader.py externals test.db test
+install: env KaraKara.egg-info dependency_downloader.py externals test.db
 
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
-run: externals
-	#$(MAKE) env_activate
+run: install
 	env/bin/pserve --reload $(INI_DEV)
-	#$(MAKE) env_deactivate
 
 run_production: ini_production
 	env/bin/pserve $(INI_PROD)
@@ -110,12 +106,12 @@ import_tracks_production: ini_production
 #import_tracks_test: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
-test: ini_test
+test: install ini_test
 	env/bin/py.test $(PATH_EXTERNALS) -q --pdb
 	env/bin/py.test $(PROJECT) -q --pdb
 	#--pdb --capture=sys
 
-test_crawl: ini_test
+test_crawl: install ini_test
 	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
 ini_test:

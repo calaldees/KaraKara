@@ -44,7 +44,7 @@ fi
 
 # Setup Website Python Project
 cd $HOME/KaraKara/website
-make setup
+make install
 make test
 make ini_production
 
@@ -77,5 +77,3 @@ echo 'Start KaraKara daemon'
 sudo -u vagrant sh << EOF
 cd $HOME/KaraKara/website
 make start_webapp_daemon
-
-EOF
