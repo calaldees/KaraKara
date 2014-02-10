@@ -112,7 +112,7 @@ test: install ini_test
 	#--pdb --capture=sys
 
 test_crawl: install ini_test
-	env/bin/py.test $(PROJECT) --runslow -k crawl -s
+	env/bin/py.test $(PROJECT) --runslow -k crawl
 
 ini_test:
 	env/bin/python3 $(PATH_EXTERNALS)lib/make_ini.py test
