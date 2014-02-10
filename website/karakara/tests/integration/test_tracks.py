@@ -35,9 +35,10 @@ def test_track_list_all(app, tracks):
     Track list displays all tracks in one giant document
     Used for printing
     """
-    response = app.get('/track_list')
-    for text in ['track 1', 'track 2', 'track 3', 'wildcard']:
-        assert text in response.text
+    with admin_rights(app):
+        response = app.get('/track_list')
+        for text in ['track 1', 'track 2', 'track 3', 'wildcard']:
+            assert text in response.text
 
 def test_track_list_all_api(app, tracks):
     assert app.get('/track_list.json', expect_errors = True).status_code == 403
@@ -45,7 +46,7 @@ def test_track_list_all_api(app, tracks):
         data = app.get('/track_list?format=json').json['data']
         assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
 
-def test_track_list_all(app):
+def test_track_unknown(app):
     """
     Uknown track
     """

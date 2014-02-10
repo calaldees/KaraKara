@@ -24,7 +24,7 @@ def generate_cache_key_homepage(request):
     return '-'.join((
         generate_cache_key(request),
         str(request.registry.settings.get('karakara.template.menu.disable')),
-        str(bool(request.session.get('faves',[]))),
+        str(bool(request.session.get('faves',[])) and request.registry.settings.get('karakara.faves.enabled')),
     ))
 
 @view_config(route_name='home')

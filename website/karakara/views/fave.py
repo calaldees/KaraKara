@@ -1,8 +1,22 @@
+from decorator import decorator
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from .                    import web, method_delete_router, action_ok
+from .                    import web, method_delete_router, action_ok, action_error, request_from_args
 from ..templates.helpers  import search_url
+
+# Utils ------------------------------------------------------------------------
+
+@decorator
+def faves_enabled(target, *args, **kwargs):
+    """
+    """
+    request = request_from_args(args)
+    if not request.registry.settings.get('karakara.faves.enabled'):
+        raise action_error(message='faves disabled', code=400)
+    return target(*args, **kwargs)
+
 
 #-------------------------------------------------------------------------------
 # Faves
@@ -10,6 +24,7 @@ from ..templates.helpers  import search_url
 
 @view_config(route_name='fave', request_method='GET')
 @web
+@faves_enabled
 def fave_view(request):
     """
     view current faves
@@ -27,6 +42,7 @@ def fave_view(request):
 
 @view_config(route_name='fave', request_method='POST')
 @web
+@faves_enabled
 def fave_add(request):
     """
     Add item to faves in session
@@ -38,6 +54,7 @@ def fave_add(request):
 
 @view_config(route_name='fave', custom_predicates=(method_delete_router, lambda info,request: request.params.get('id'))) #request_method='DELETE'
 @web
+@faves_enabled
 def fave_del(request):
     """
     Remove fave from session
