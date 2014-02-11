@@ -22,7 +22,7 @@ else
 #    echo prerequesits already installed
 #else
 apt-get update
-apt-get install -y git make nfs-common portmap
+apt-get install -y git make curl nfs-common portmap
 #fi
 
 

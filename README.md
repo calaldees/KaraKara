@@ -62,14 +62,16 @@ Admins can walk around the room, remoting controlling when tracks are played ful
 Trial Setup
 -----------
 
+`curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile_.sh && vagrant up --provision && python -m webbrowser -t "http://localhost:8080/admin" `
+
 * Copy video dataset OR Process video dataset from avi/mpg/srt/png/mp3 files with processmedia
 * Option 1 - Vagrant (Linux/Mac/Windows)
    1. Install VirtualBox: <http://www.virtualbox.org/>
    2. Install Vagrant: <http://www.vagrantup.com/>
    3. Navigate to data folder
-   4. Download Vagrantfile and Bootstrap: (Linux/Mac can use `curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/vagrant/Vagrantfile_.sh`) (Windows just download the files)
-   5. `vagrant up`
-   6. view <http://localhost:6543/> and <http://localhost:6543/player/player.html>
+   4. Download Vagrantfile and Bootstrap: (Linux/Mac can use `curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile_.sh`) (Windows just download the files)
+   5. `vagrant up --provision`
+   6. view <http://localhost:8080/> and <http://localhost:8080/player/player.html> (bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly)
 * Option 2 - Linux/Mac (native with sqllite dev db)
    1. navigate to data folder
    2. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run`

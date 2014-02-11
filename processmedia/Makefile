@@ -1,7 +1,7 @@
 #Notes
 # http://sub.wordnerd.de/linux-subs.html
 #  sudo add-apt-repository ppa:motumedia/libav-daily
-# apt-get install libavcodec-extra-53 sox mencoder
+# apt-get install libav-tools libavcodec-extra-53 sox mencoder
 
 help:
 	# Makefile placeholder
