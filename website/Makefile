@@ -56,6 +56,7 @@ dependency_downloader.py:
 	curl https://raw.github.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
 
 externals:
+	mkdir externals || touch externals/__init__.py
 	env/bin/python dependency_downloader.py --destination $(PATH_EXTERNALS)
 
 test.db:
