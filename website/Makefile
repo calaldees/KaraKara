@@ -1,7 +1,5 @@
 PROJECT=karakara
 
-PATH_EXTERNALS=externals/
-
 INI_DEV  = development.ini
 INI_TEST = test.ini
 INI_PROD = production.ini
@@ -57,7 +55,7 @@ dependency_downloader.py:
 
 externals:
 	mkdir externals && touch externals/__init__.py
-	env/bin/python dependency_downloader.py --destination $(PATH_EXTERNALS)
+	env/bin/python dependency_downloader.py --destination externals
 
 test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
@@ -75,7 +73,7 @@ run_production: ini_production
 	env/bin/pserve $(INI_PROD)
 
 run_socket_server:
-	env/bin/python3 -m$(PATH_EXTERNALS).socket.multisocket_server
+	env/bin/python3 -mexternals.lib.socket.multisocket_server
 
 shell:
 	env/bin/pshell $(INI_DEV)
@@ -87,7 +85,7 @@ clean:
 	rm -f *.db
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
-	rm -rf $(PATH_EXTERNALS)
+	rm -rf externals
 	rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json
 
@@ -108,7 +106,7 @@ import_tracks_production: ini_production
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test: install ini_test
-	env/bin/py.test $(PATH_EXTERNALS) -q --pdb
+	env/bin/py.test externals -q --pdb
 	env/bin/py.test $(PROJECT) -q --pdb
 	#--pdb --capture=sys
 
@@ -116,9 +114,9 @@ test_crawl: install ini_test
 	env/bin/py.test $(PROJECT) --runslow -k crawl
 
 ini_test:
-	env/bin/python3 $(PATH_EXTERNALS)lib/make_ini.py test
+	env/bin/python3 externals/lib/make_ini.py test
 ini_production:
-	env/bin/python3 $(PATH_EXTERNALS)lib/make_ini.py production
+	env/bin/python3 externals/lib/make_ini.py production
 
 start_webapp_daemon: ini_production
 	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
