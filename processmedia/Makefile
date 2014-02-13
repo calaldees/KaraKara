@@ -1,25 +1,24 @@
-#Notes
+# Tools Required:
+#    libav (with x264 support)
+#    qt-faststart (found in the tools/ directory of libav sources)
+#    mencoder (with x264, freetype2, and ass subtitle support)
+#    sox
+#
+# Guides:
 # http://sub.wordnerd.de/linux-subs.html
-#  sudo add-apt-repository ppa:motumedia/libav-daily
-# apt-get install libav-tools libavcodec-extra-53 sox mencoder
+
 
 help:
-	# Makefile placeholder
-	#   install
+	# processmedia
+	#    install
+	#    
 
-install: build/libav build/qt-faststart build/mencoder build/sox
-
-build:
-	mkdir build
-
-build/libav: build
-	# libav (with x264 support)
-
-build/libav/tools/qt-faststart: build/libav
-	# qt-faststart (found in the tools/ directory of libav sources)
-
-build/mencoder: build
-	# mencoder (with x264, freetype2, and ass subtitle support)
-
-build/sox: build
-	# sox
+install: 
+	if dpkg -s libav-tools ; then \
+		echo libav already installed; \
+	else \
+		echo installing libav; \
+		sudo add-apt-repository ppa:motumedia/libav-daily
+		sudo apt-get update
+		sudo apt-get install -y libav-tools libavcodec-extra-53 sox mencoder ; \
+	fi
