@@ -92,7 +92,7 @@ clean:
 insert_random_tracks:
 	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
 
-import_tracks_dev: init_db
+import_tracks_dev: test.db
 	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
 import_tracks_production: ini_production
