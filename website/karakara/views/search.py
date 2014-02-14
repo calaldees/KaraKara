@@ -36,6 +36,7 @@ tag_cats = {
     'category:anime' : ['from'],
     'category:jdrama': ['from'],
     'category:game'  : ['from'],
+    'category:cartoon': ['from'],
     'category:jpop'  : ['artist','from'],
 }
 
