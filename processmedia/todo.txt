@@ -9,6 +9,7 @@ process
     - Non ascii characters in srt files should be handled gracefully
   - preview
     -16khz audio for preview is inefficent and poor quality. To my knowlege 44khz with the same bitrate would yeild better results wit the same space (some tracks previews are significantly distorted)
+  - flac/m4a audio support
 
 Refactor Considerations
 -----------------------
