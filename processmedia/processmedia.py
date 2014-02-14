@@ -58,7 +58,7 @@ def video_file_re():
 	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv|cdg)$', re.IGNORECASE)
 
 def audio_file_re():
-	return re.compile(r'^.*\.(aac|mp3|ogg|wav)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(aac|mp3|ogg|wav|flac|m4a)$', re.IGNORECASE)
 
 def image_file_re():
 	return re.compile(r'^.*\.(bmp|png|jpg|jpeg)$', re.IGNORECASE)
