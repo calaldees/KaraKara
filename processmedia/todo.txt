@@ -1,0 +1,24 @@
+Known Bugs
+----------
+prepare
+ - sanitise input filenames to remove harful characters
+   - convert unicode characters to a format windows/fat32/linux/mac are consistent with (for syncing)
+process
+  - subtitles
+    - sizing inconsistent
+    - Non ascii characters in srt files should be handled gracefully
+  - preview
+    -16khz audio for preview is inefficent and poor quality. To my knowlege 44khz with the same bitrate would yeild better results wit the same space (some tracks previews are significantly distorted)
+
+Refactor Considerations
+-----------------------
+
+argparse
+modules
+python3 (for consistency - nicity and not not required)
+
+
+Features
+--------
+
+Multiple images cycling
