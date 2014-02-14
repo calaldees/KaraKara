@@ -29,7 +29,7 @@
 
 <!-- html5 - video -->
 <div class="html5_video_embed" style="display: none;">
-    <video class="video_placeholder" poster="${h.thumbnail_location_from_track(track)}" durationHint="${track['duration']}" controls>
+    <video class="video_placeholder" preload="none" poster="${h.thumbnail_location_from_track(track)}" durationHint="${track['duration']}" controls>
         % for preview, url in previews(track):
             <source src="${url}" type="video/${h.video_mime_type(preview)}" />
             ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
