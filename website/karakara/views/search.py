@@ -182,7 +182,7 @@ def tags(request):
             # TODO if the hostname has a port, the port is stripped ... WTF?!
             raise HTTPFound(location=track_url(trackids[0]))
         # If there is only a small list, we might as well just show them all
-        if len(trackids)< 15:
+        if len(trackids) < request.registry.settings['karakara.search.list.threshold']:
             raise HTTPFound(location=search_url(tags=tags,keywords=keywords,route='search_list'))
     
     def get_action_return_with_sub_tags():
