@@ -48,6 +48,11 @@ def main(global_config, **settings):
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
         config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
+
+    # Search Config ------------------------------------------------------------
+    
+    import karakara.views.search
+    karakara.views.search.search_config = config.registry.settings['karakara.search.view.config']
     
     # WebSocket ----------------------------------------------------------------
     

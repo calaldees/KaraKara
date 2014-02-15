@@ -31,14 +31,7 @@ search_version = random.randint(0,2000000000)
 
 # A list of the sub tags allowed when browsing by specific tags
 # rather than overwelming the user with all possible tags, limit the browsing to a subset under known circumstances.
-tag_cats = {
-    'root'           : ['category','vocalstyle','vocaltrack','lang'],
-    'category:anime' : ['from'],
-    'category:jdrama': ['from'],
-    'category:game'  : ['from'],
-    'category:cartoon': ['from'],
-    'category:jpop'  : ['artist','from'],
-}
+search_config = {}
 
 # Utils ------------------------------------------------------------------------
 
@@ -138,11 +131,11 @@ def search(search_params):
             trackids = trackids.intersect( DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
         
         trackids = [trackid[0] for trackid in trackids.all()]
-    
+
     # Limit sub tag categorys for last tag selected
     #    and remove any selection of previous tags with the same parent
-    try   : sub_tags_allowed = copy.copy(tag_cats[str(tags[-1])])
-    except: sub_tags_allowed = copy.copy(tag_cats['root'])
+    try   : sub_tags_allowed = copy.copy(search_config[str(tags[-1])])
+    except: sub_tags_allowed = copy.copy(search_config['root'])
     for tag in tags:
         try   : sub_tags_allowed.remove(tag.parent.name)
         except: pass
