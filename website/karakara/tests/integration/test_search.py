@@ -2,6 +2,7 @@
 
 import pytest
 
+from . import with_setting
 
 @pytest.mark.parametrize(('url', 'expected_text', 'not_expected_text'), [
     ('/search_list/'                 , ['wildcard', 'track 1', 'track 2', 'track 3'], []),
@@ -53,6 +54,7 @@ def test_track_search_sub_tags_allowed(app, tracks, search_tags, in_sub_tags_all
     for tag in not_in_sub_tags_allowed:
         assert tag not in tags_allowed
 
+#@with_setting(key='karakara.search.list.threshold', value='15 -> int')
 @pytest.mark.parametrize(('search_tags', 'redirect_expected', 'expected_location'), [
     (['en']  , True , 'search_list'),  # 2 Tracks returned, that is less than threshold, redirect to list
     (['jp']  , True , 'track/t1'),  # Only one track should be returned, so redirect to single track view

@@ -24,6 +24,8 @@ class temporary_setting:
         self.original_value = str(self.original_value) # HACK - OH GOD!! .. was used to force passing [] as '[]' so it could be converted again. Passing [] does not update the setting. Needs more looking into
         self.app.put('/settings.json', {self.key: self.original_value})
         log.debug('Temporay setting {0} reverted to {1}'.format(self.key, self.original_value))
+        # Next line can be removed for perfomance once this test method is verifyed as working under all conditions
+        assert self.app.get('/settings.json').json['data']['settings'][self.key] == self.original_value, 'The setting {0} should have been reverted to its original state of {1}. It is still {2}'.format(self.key, self.original_value, self.value)
 
 
 class admin_rights:
@@ -47,15 +49,13 @@ class admin_rights:
             log.debug('Revolked admin right')
 
 
-def apply_setting(method=None, key='', value=''):
+def with_setting(method=None, key='', value=''):
     """
-    GAH!! this is broken .. wtf!?
-    
     Decorator to set setting for tests and revert them post test
     first arg must be 'app'
     """
     if method is None:
-        return functools.partial(apply_setting, key=key, value=value)
+        return functools.partial(with_setting, key=key, value=value)
     @functools.wraps(method)
     def f(*args, **kwargs):
         with temporary_setting(kwargs['app'], key, value):
