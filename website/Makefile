@@ -55,13 +55,16 @@ dependency_downloader.py:
 
 externals:
 	mkdir externals && touch externals/__init__.py
+
+dependency_download: dependency_downloader.py externals
+	# Trigger dependency check on every startup
 	env/bin/python dependency_downloader.py --destination externals
 
 test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-install: env KaraKara.egg-info dependency_downloader.py externals test.db
+install: env KaraKara.egg-info dependency_downloader.py externals dependency_download test.db
 
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
@@ -105,12 +108,12 @@ import_tracks_production: ini_production
 #import_tracks_test: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
-test: install ini_test
+test: ini_test
 	env/bin/py.test externals -q --pdb
 	env/bin/py.test $(PROJECT) -q --pdb
 	#--pdb --capture=sys
 
-test_crawl: install ini_test
+test_crawl: ini_test
 	env/bin/py.test $(PROJECT) --runslow -k crawl
 
 ini_test:
