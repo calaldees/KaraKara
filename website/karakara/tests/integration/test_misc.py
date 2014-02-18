@@ -1,3 +1,4 @@
+from . import get_settings, admin_rights
 
 def test_home(app):
     """
@@ -74,9 +75,24 @@ def test_admin_lock(app):
     assert not app.get('/?format=json').json['identity']['admin']
 
 def test_settings(app):
+    key = 'karakara.test_setting'
+
     # Settings API
-    settings = app.get('/settings.json').json['data']['settings']
+    settings = get_settings(app)
     assert settings
+    assert key not in settings
+    
+    # Settings permissions
+    # This is difficult to test as settings endpoint in test mode does not throw a 403
+    #response = app.put('/settings.json', {key: 'bob'}, expect_errors=True)
+    #assert response.status_code == 403
+    #with admin_rights(app):    
+    app.put('/settings.json', {key: 'bob'})
+    assert get_settings(app)[key] == 'bob'
+    app.put('/settings.json', {key: '666 -> int'})
+    assert get_settings(app)[key] == 666
+    app.put('/settings.json', {key: '[]'})
+    assert get_settings(app)[key] == []
     
     # Settings Template
     response = app.get('/settings')

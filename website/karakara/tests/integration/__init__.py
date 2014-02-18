@@ -21,7 +21,12 @@ class temporary_setting:
         return None
     
     def __exit__(self, type, value, traceback):
-        self.app.put('/settings.json', {self.key: self.original_value})
+        def empty_list_hack(value):
+            # Hack to fix reverting to empty list
+            if value == []:  
+                return '[]'
+            return value
+        self.app.put('/settings.json', {self.key: empty_list_hack(self.original_value)})
         log.debug('Temporay setting {0} reverted to {1}'.format(self.key, self.original_value))
         # TODO: Research needed; Consider correct handling of exceptions as they propergate up
         # Next line can be removed for perfomance once this test method is verifyed as working under all conditions
