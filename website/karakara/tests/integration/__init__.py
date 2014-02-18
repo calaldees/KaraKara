@@ -21,11 +21,12 @@ class temporary_setting:
         return None
     
     def __exit__(self, type, value, traceback):
-        self.original_value = str(self.original_value) # HACK - OH GOD!! .. was used to force passing [] as '[]' so it could be converted again. Passing [] does not update the setting. Needs more looking into
         self.app.put('/settings.json', {self.key: self.original_value})
         log.debug('Temporay setting {0} reverted to {1}'.format(self.key, self.original_value))
+        # TODO: Research needed; Consider correct handling of exceptions as they propergate up
         # Next line can be removed for perfomance once this test method is verifyed as working under all conditions
-        assert self.app.get('/settings.json').json['data']['settings'][self.key] == self.original_value, 'The setting {0} should have been reverted to its original state of {1}. It is still {2}'.format(self.key, self.original_value, self.value)
+        #current_setting = get_settings(self.app)[self.key]
+        #assert current_setting == self.original_value, 'The setting {0} should have been reverted to its original state of {1}. It is still {2}'.format(self.key, self.original_value, current_setting)
 
 
 class admin_rights:

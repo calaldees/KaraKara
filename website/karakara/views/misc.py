@@ -74,7 +74,7 @@ def settings(request):
         
         for key, value in request.params.items():
             fallback_type = None
-            if request.registry.settings.get(key):
+            if request.registry.settings.get(key) != None:
                 fallback_type = type(request.registry.settings.get(key))
             request.registry.settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
     
