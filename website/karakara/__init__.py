@@ -12,10 +12,9 @@ import pyramid_beaker
 
 # Other imports
 import re
-import os
 
 # Package Imports
-from externals.lib.misc import convert_str_with_type
+from externals.lib.misc import convert_str_with_type, read_json
 from externals.lib.pyramid.auto_format import registered_formats
 from .templates import helpers as template_helpers
 from externals.lib.socket.auth_echo_server import AuthEchoServerManager
@@ -49,14 +48,10 @@ def main(global_config, **settings):
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
         config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
-        
-    # Project Path -------------------------------------------------------------
-    #  because the project can be run from a varity of paths, we need a way of storing this rather than using cwd (which may be incorrect)
-    config.registry.settings['project.path'] = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 
     # Search Config ------------------------------------------------------------
     import karakara.views.search
-    karakara.views.search.search_config = config.registry.settings['karakara.search.view.config']
+    karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
     
     # WebSocket ----------------------------------------------------------------
     
