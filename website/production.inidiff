@@ -16,11 +16,13 @@ karakara.queue.add.duplicate.performer_limit = 1       -> int
 karakara.template.input.performer_name = Enter your badge name
 karakara.template.title = KaraKara
 
+karakara.search.tag.silent_forced = []
 
 
 sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 
 server.etag.enabled = True -> bool
+
 
 session.type    = ext:database
 session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara

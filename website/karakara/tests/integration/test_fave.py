@@ -15,8 +15,8 @@ def test_fave_cycle(app, tracks):
         response = app.get('/fave')
         assert response.status_code == 302
         response = response.follow()
-        assert 'track 2'     in response.text
-        assert 'track 1' not in response.text
+        assert 'track 2'     in response.text.lower()
+        assert 'track 1' not in response.text.lower()
         # Check that the correct add/remove fave buttons are on the track pages
         response = app.get('/track/t1')
         assert 'Add to faves' in response.text
@@ -32,4 +32,4 @@ def test_fave_disbaled(app, tracks):
         response = app.post('/fave?format=json', {'id':'t1'}, expect_errors=True)
         assert response.status_code == 400, 'faves should be disabled'
         response = app.get('/track/t1')
-        assert 'faves' not in response.text
+        assert 'faves' not in response.text.lower()

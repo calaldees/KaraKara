@@ -40,18 +40,18 @@
 
 <!-- sub tags -->
 % for parent_tag in data.get('sub_tags_allowed',[]):
-<h2>${parent_tag}</h2>
+<h2>${parent_tag.capitalize()}</h2>
     <%
         tags = [tag for tag in data.get('sub_tags',[]) if tag.get('parent')==parent_tag]  # AllanC - humm .. inefficent filtering in a template .. could be improved
         
-        try   : renderer = jquerymobile_accordian if tags[-1]['parent'] in ['from','artist'] and len(tags)>40 else jquerymobile_list
-        except: renderer =                                                                                         jquerymobile_list
+        try   : renderer = jquerymobile_accordian if tags[-1]['parent'] in request.registry.settings['karakara.search.list.alphabetical.tags'] and len(tags)>request.registry.settings['karakara.search.list.alphabetical.threshold'] else jquerymobile_list
+        except: renderer = jquerymobile_list
     %>
     ${renderer(tags)}
 % endfor
 
 <%def name="tag_li(tag)">
-        <li><a href="${search_url(data['tags'] + [tag['full']])}">${tag['name']} <span class="ui-li-count">${tag['count']}</span></a></li>
+        <li><a href="${search_url(data['tags'] + [tag['full']])}">${tag['name'].title()} <span class="ui-li-count">${tag['count']}</span></a></li>
 </%def>
 
 <%def name="jquerymobile_list(tags)">
