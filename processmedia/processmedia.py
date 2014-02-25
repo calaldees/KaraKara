@@ -52,7 +52,7 @@ def hidden_file_re():
 	return re.compile(r'^\..*$')
 
 def media_file_re():
-	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|srt|bmp|png|jpg|jpeg|cdg)$', re.IGNORECASE)
+	return re.compile(r'^.*\.(avi|aac|mp3|mp4|mpg|mpeg|mkv|ogg|ogm|rm|wav|wmv|ass|ssa|srt|bmp|png|jpg|jpeg|cdg|flac|m4a)$', re.IGNORECASE)
 
 def video_file_re():
 	return re.compile(r'^.*\.(avi|mp4|mpg|mpeg|mkv|rm|ogm|wmv|cdg)$', re.IGNORECASE)
