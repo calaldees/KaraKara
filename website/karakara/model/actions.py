@@ -8,6 +8,8 @@ from .model_tracks import Tag
 import logging
 log = logging.getLogger(__name__)
 
+def count_tags():
+    return DBSession.query(Tag).count()
 
 def get_tag(tag, parent=None, create_if_missing=False):
     if not tag:

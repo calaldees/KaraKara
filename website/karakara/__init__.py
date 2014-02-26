@@ -49,6 +49,12 @@ def main(global_config, **settings):
     for key in config.registry.settings.keys():
         config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
 
+    # Cachebust etags ----------------------------------------------------------
+    #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate
+    if not config.registry.settings['server.etag.cache_buster']:
+        from .model.actions import count_tags
+        config.registry.settings['server.etag.cache_buster'] = str(count_tags)
+
     # Search Config ------------------------------------------------------------
     import karakara.views.search
     karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
