@@ -9,20 +9,18 @@ karakara.queue.track.padding       = 0:00:60 -> timedelta
 
 karakara.queue.add.limit                     = 0:30:00 -> timedelta
 karakara.queue.add.limit.priority_token      = 0:45:00 -> timedelta
-karakara.queue.add.limit.priority_window     = 0:05:00 -> timedelta
+karakara.queue.add.limit.priority_window     = 0:03:00 -> timedelta
 karakara.queue.add.duplicate.count_limit     = 1       -> int
 karakara.queue.add.duplicate.performer_limit = 1       -> int
 
 karakara.template.input.performer_name = Enter your badge name
-karakara.template.title = KaraKara
+karakara.template.title = KaraKara (Beta)
 
-karakara.search.tag.silent_forced = []
-
-
-sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+karakara.search.tag.silent_forced = [retro]
 
 server.etag.enabled = True -> bool
 
+sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 
 session.type    = ext:database
 session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara

@@ -34,7 +34,8 @@
 </form>
 
 <% total_tracks = len(data.get('trackids',[])) %>
-% if data['tags'] or data['keywords'] or total_tracks < request.registry.settings['karakara.search.template.button.list_tracks.threshold']:
+## data['tags'] or data['keywords'] or ## original logic for displaying "list all" button
+% if total_tracks < request.registry.settings['karakara.search.template.button.list_tracks.threshold']:
 <a href="${search_url(route='search_list')}" data-role="button" data-icon="arrow-r">List ${total_tracks} Tracks</a>
 % endif
 
