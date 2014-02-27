@@ -86,6 +86,7 @@ clean:
 	rm -rf data
 	rm -rf *.egg-info
 	rm -f *.db
+	rm -f *.log
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
 	rm -rf externals
@@ -114,7 +115,7 @@ test: ini_test
 	#--pdb --capture=sys
 
 test_crawl: ini_test
-	env/bin/py.test $(PROJECT) --runslow -k crawl
+	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
 ini_test:
 	env/bin/python3 externals/lib/make_ini.py test

@@ -14,6 +14,10 @@ from externals.lib.misc import now, json_object_handler
 from karakara.model.model_queue import QueueItem
 from karakara.model.model_token import PriorityToken
 
+import logging
+log = logging.getLogger(__name__)
+
+
 __all__ = [
     'queue_item_for_track', 'QUEUE_DUPLICATE',
     'issue_priority_token',
@@ -91,11 +95,13 @@ def issue_priority_token(request, DBSession):
     event_end = request.registry.settings.get('karakara.event.end')
     if event_end and latest_token_end > event_end:
         # Unable to issue token as event end
+        log.debug('priority_token rejected - event end')
         return TOKEN_ISSUE_ERROR.EVENT_END
     
     priority_token_limit = request.registry.settings.get('karakara.queue.add.limit.priority_token')
     if priority_token_limit and latest_token_end > now()+priority_token_limit:
         # Unable to issue token as priority tokens are time limited
+        log.debug('priority_token rejected - token limit')
         return TOKEN_ISSUE_ERROR.TOKEN_LIMIT
     
     # Do not issue another priority_token if current user alrady has a priority_token
@@ -106,6 +112,7 @@ def issue_priority_token(request, DBSession):
                             .filter(PriorityToken.valid_end>now()) \
                             .one()
         if priority_token:
+            log.debug('priority_token rejected - existing token')
             return TOKEN_ISSUE_ERROR.TOKEN_ISSUED
     except NoResultFound:
         pass
@@ -122,6 +129,7 @@ def issue_priority_token(request, DBSession):
     json_cookie = json.dumps(priority_token.to_dict(), default=json_object_handler)
     request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))
     
+    log.debug('priority_token issued')
     return priority_token
 
 def consume_priority_token(request, DBSession):
@@ -133,6 +141,7 @@ def consume_priority_token(request, DBSession):
             .one()
         token.used = True
         request.response.delete_cookie('priority_token')
+        log.debug('priority_token consumed')
         return True
     except NoResultFound:
         return False

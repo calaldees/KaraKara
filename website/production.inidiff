@@ -16,7 +16,7 @@ karakara.queue.add.duplicate.performer_limit = 1       -> int
 karakara.template.input.performer_name = Enter your badge name
 karakara.template.title = KaraKara (Beta)
 
-karakara.search.tag.silent_forced = [retro]
+karakara.search.tag.silent_forced = []
 
 server.etag.enabled = True -> bool
 
@@ -27,7 +27,11 @@ session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 
 
 [logger_root]
-level = WARN
+level = INFO
+handlers = logfile
 
 [logger_karakara]
-level = WARN
+level = DEBUG
+
+[handler_logfile]
+args = ('production.log',)

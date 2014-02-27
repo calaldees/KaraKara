@@ -229,7 +229,7 @@ def list(request):
     
     def get_list():
         action_return = search(search_params)
-        log.debug('cache gen get_list')
+        log.debug('cache gen - get_list')
         
         _trackids = action_return['data']['trackids']
         

@@ -140,11 +140,13 @@ def queue_add(request):
         if performer_limit:
             performer_name_count = _logic.queue_item_base_query(request, DBSession).filter(QueueItem.performer_name==request.params.get('performer_name')).count()
             if performer_name_count >= performer_limit:
+                log.debug('duplicate performer restricted - {0}'.format(request.params.get('performer_name')))
                 raise action_error(message='unable to queue track. duplicate "performer_name" limit reached', code=400)
         
         # Duplicate Addition Restrictions
         track_queued = _logic.queue_item_for_track(request, DBSession, track.id)
         if track_queued['status']==_logic.QUEUE_DUPLICATE.THRESHOLD:
+            log.debug('duplicate track restricted - {0}'.format(track.id))
             raise action_error(message='unable to queue track. duplicate "track in queue" limit reached', code=400)
         
         # Max queue length restrictions
@@ -153,6 +155,7 @@ def queue_add(request):
         # Event end time
         event_end = request.registry.settings.get('karakara.event.end')
         if event_end and now()+queue_duration > event_end:
+            log.debug('event end restricted')
             raise action_error(message='Event will be ending soon and all the time has been alocated', code=400)
         
         # Queue time limit
@@ -183,7 +186,7 @@ def queue_add(request):
         queue_item.session_owner = request.session['id']
     
     DBSession.add(queue_item)
-    log.info('%s adding to queue by %s' % (queue_item.track_id, queue_item.performer_name))
+    log.info('add - %s to queue by %s' % (queue_item.track_id, queue_item.performer_name))
     
     invalidate_queue(request) # Invalidate Cache
     invalidate_track(track_id)
@@ -213,7 +216,7 @@ def queue_del(request):
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status','removed')
     
-    log.info('%s removing from queue' % (queue_item.track_id))
+    log.info('remove - %s from queue' % (queue_item.track_id))
     queue_item_track_id = queue_item.track_id
     
     invalidate_queue(request) # Invalidate Cache
@@ -272,7 +275,7 @@ def queue_update(request):
             setattr(queue_item, key, value)
     queue_item.time_touched = datetime.datetime.now() # Update touched timestamp
 
-    log.info('%s updating' % (queue_item.track_id))
+    log.info('update - %s' % (queue_item.track_id))
     queue_item_track_id = queue_item.track_id
 
     invalidate_queue(request) # Invalidate Cache

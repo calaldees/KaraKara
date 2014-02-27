@@ -38,6 +38,7 @@ def home(request):
 @admin_only
 def admin_lock(request):
     request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked',False)
+    log.debug('admin locked - {0}'.format(request.registry.settings['admin_locked']))
     return action_ok()
 
 @view_config(route_name='admin_toggle')
@@ -46,6 +47,7 @@ def admin_toggle(request):
     if request.registry.settings.get('admin_locked'):
         raise action_error(message='additional admin users have been prohibited', code=403)
     request.session['admin'] = not request.session.get('admin',False)
+    log.debug('admin - {0} - {1}'.format(request.session['id'], request.session['admin']))
     return action_ok()
 
 @view_config(route_name='remote')
@@ -54,7 +56,7 @@ def admin_toggle(request):
 def remote(request):
     cmd = request.params.get('cmd')
     if cmd:
-        log.debug("sending {0}".format(cmd))
+        log.debug("remote command - {0}".format(cmd))
         request.registry['socket_manager'].recv(cmd.encode('utf-8'))
     return action_ok()
 
@@ -65,6 +67,8 @@ def settings(request):
     Surface settings as an API.
     This allows clients to qurey server settup rather than having to hard code bits into the clients
     """
+    if not is_admin(request):
+        log.debug('settings requested by non admin')  # I'm curious if anyone will find this. would be fun to search logs after an event for this string
     
     if method_put_router(None, request):
         # with PUT requests, update settings
