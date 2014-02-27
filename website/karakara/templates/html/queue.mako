@@ -33,8 +33,8 @@ import datetime
             % if img_src:
             <img src='${img_src}' />
             % endif
-            <h3>${queue_item['track']['title']}</h3>
-            <p>${queue_item['performer_name']}</p>
+            <h3>${queue_item['track']['title'].title()}</h3>
+            <p>${queue_item['performer_name'].capitalize()}</p>
             <p class="ui-li-aside">${h.duration_str(queue_item['total_duration'])}</p>
         </a>
 
