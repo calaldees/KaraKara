@@ -56,6 +56,8 @@ def queue_view(request):
     """
     
     def get_queue_dict():
+        log.debug('cache gen - queue {0}'.format(queue_version))
+        
         # Get queue order
         queue_dicts = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
         queue_dicts = [queue_item.to_dict('full') for queue_item in queue_dicts]
