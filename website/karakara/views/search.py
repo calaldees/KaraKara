@@ -13,7 +13,7 @@ from pyramid.httpexceptions import HTTPFound
 from externals.lib.misc import update_dict
 from externals.lib.pyramid.auto_format import registered_formats
 
-from . import web, cache, etag, action_ok   # generate_cache_key,
+from . import web, cache, etag, action_ok, max_age   # generate_cache_key,
 
 from ..model              import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -34,6 +34,9 @@ search_version = random.randint(0,2000000000)
 search_config = {}
 
 # Utils ------------------------------------------------------------------------
+
+# cache control from settings
+search_max_age = lambda request: request.registry.settings.get('api.search.max_age')
 
 SearchParams = collections.namedtuple('SearchParams',['tags', 'keywords', 'trackids', 'tags_silent_forced', 'tags_silent_hidden'])
 
@@ -151,6 +154,7 @@ def search(search_params):
     
 
 @view_config(route_name='search_tags')
+@max_age(search_max_age)
 @web
 def tags(request):
     """
@@ -214,6 +218,7 @@ def tags(request):
 
 
 @view_config(route_name='search_list')
+@max_age(search_max_age)
 @web
 def list(request):
     """

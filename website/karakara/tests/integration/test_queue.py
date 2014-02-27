@@ -60,18 +60,18 @@ def test_queue_view_simple_add_delete_cycle(app, tracks):
     
     # Check no tracks in queue
     response = app.get('/queue')
-    assert 'track 1' not in response.text
+    assert 'track 1' not in response.text.lower()
     
     # Queue 'Track 1'
     response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     
     # Check track is in queue list
     response = app.get('/queue')
-    assert 'track 1' in response.text
-    assert 'testperformer' in response.text
+    assert 'track 1' in response.text.lower()
+    assert 'testperformer' in response.text.lower()
     # Check queue in track description
     response = app.get('/track/t1')
-    assert 'testperformer' in response.text
+    assert 'testperformer' in response.text.lower()
     
     queue_item_id = get_queue(app)[0]['id']
     
