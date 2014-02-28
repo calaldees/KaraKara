@@ -6,7 +6,7 @@
 
 <!-- tracks -->
 <h2>Tracks</h2>
-<ul data-role="listview" data-inset="true">
+<ul data-role="listview" data-inset="true" class="title">
 % for track in data['tracks']:
     <li>
         <a href="${request.route_path('track', id=track['id'], spacer='', format='')}">
@@ -19,7 +19,7 @@
             % if img_url:
             <img src="${img_url}" />
             % endif
-            ${h.track_title(track['tags'], exclude_tags=data['tags']).title()}
+            ${h.track_title(track['tags'], exclude_tags=data['tags'])}
         </a>
     </li>
 % endfor

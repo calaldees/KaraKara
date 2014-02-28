@@ -8,7 +8,7 @@
         return ''
 %>
 
-<h1 class="track_title">${h.track_title_only(track).title()}</h1>
+<h1 class="track_title">${h.track_title_only(track)}</h1>
 
 <table class="track_tags">
 % for key,values in track['tags'].items():

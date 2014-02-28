@@ -52,11 +52,11 @@
 % endfor
 
 <%def name="tag_li(tag)">
-        <li><a href="${search_url(data['tags'] + [tag['full']])}">${tag['name'].title()} <span class="ui-li-count">${tag['count']}</span></a></li>
+        <li><a href="${search_url(data['tags'] + [tag['full']])}">${tag['name']} <span class="ui-li-count">${tag['count']}</span></a></li>
 </%def>
 
 <%def name="jquerymobile_list(tags)">
-    <ul data-role="listview" data-inset="true">
+    <ul data-role="listview" data-inset="true" class="title">
     % for tag in tags:
         ${tag_li(tag)}
     % endfor
