@@ -7,6 +7,7 @@
     <ul>
     % for feedback in data['feedback']:
         <li>
+            ${feedback['timestamp']}
             ${feedback['contact']}
             ${feedback['details']}
         </li>

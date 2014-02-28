@@ -1,9 +1,11 @@
 from . import Base, JSONEncodedDict
 
 from sqlalchemy     import Column, Enum
-from sqlalchemy     import String, Unicode, UnicodeText, Integer, Float
+from sqlalchemy     import Unicode, UnicodeText, Integer, DateTime
 
 import copy
+import datetime
+now = lambda: datetime.datetime.now()
 
 __all__ = [
     "Feedback", "_feedback_types",
@@ -22,6 +24,7 @@ class Feedback(Base):
     contact         = Column(Unicode()    , nullable=True)
     details         = Column(UnicodeText(), nullable=False, default="")
     environ         = Column(JSONEncodedDict(), nullable=False, default={}) #mutable=True
+    timestamp       = Column(DateTime(),  nullable=False, default=now)
     
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
@@ -30,6 +33,7 @@ class Feedback(Base):
             #'type'         : None ,
             'contact'     : None ,
             'details'     : None ,
+            'timestamp'   : None ,
         },
     })
     
