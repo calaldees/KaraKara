@@ -2,13 +2,20 @@ from bs4 import BeautifulSoup
 
 from externals.lib.misc import substring_in
 
+from . import admin_rights
 
 def test_static(app):
-    # Extract list of externals from homepage
-    soup = BeautifulSoup(app.get('/').text)
-    scripts = [script['src']  for script in soup.find_all('script')]
-    links   = [link  ['href'] for link   in soup.find_all('link')  ]
-    static_files = scripts + links
+    
+    def external_links(path):
+        """ Extract list of externals from page """    
+        soup = BeautifulSoup(app.get(path).text)
+        scripts = {script['src']  for script in soup.find_all('script')}
+        links   = {link  ['href'] for link   in soup.find_all('link')  }
+        return scripts | links
+    static_files = set()
+    with admin_rights(app):
+        for path in ('/','/track_list'):
+            static_files |= external_links(path)
     
     # Request each external (no 404's should be found)
     for static_file in static_files:
@@ -27,6 +34,7 @@ def test_static(app):
         'lib.js',
         'karakara.js',
         'favicon.ico',
+        'print_list.css',
     )
     for external in expected_externals:
         assert substring_in(external, static_files)

@@ -1,8 +1,8 @@
 <html>
     <head>
         <title>Tracks All</title>
-        <link href="${h.static_url('styles/yui-3.5.0-cssreset-min.css')}" rel="stylesheet" media="all"/>
-        <link href="${h.static_url('styles/print_list.css')}"             rel="stylesheet" media="all"/>
+        <link href="${h.extneral_url('cssreset-min.css')}" rel="stylesheet" media="all"/>
+        <link href="${h.static_url('css/print_list.css')}" rel="stylesheet" media="all"/>
     </head>
     
     <body>
