@@ -114,6 +114,7 @@ def track_view(request):
 
 
 @view_config(route_name='track_list')
+#@etag_decorator()
 @web
 @admin_only
 def track_list_all(request):
@@ -127,8 +128,12 @@ def track_list_all(request):
                 )
     tracks = restrict_search(request, tracks)
     track_list = [track.to_dict(include_fields='tags') for track in tracks]
-    # todo - key sort the track list based on
-    #  request.registry.settings.get('karakara.print_tracks.fields',[])
-    #  track.get(field,'') or ", ".join(track['tags'].get(field,[]))
-    track_list
+    
+    # Sort track list
+    #  this needs to be handled at the python layer because the tag logic is fairly compicated
+    fields = request.registry.settings.get('karakara.print_tracks.fields',[])
+    def key_track(track):
+        return " ".join([track.get(field,'') or ", ".join(track['tags'].get(field,[])) for field in fields])
+    track_list = sorted(track_list, key=key_track)
+
     return action_ok(data={'list':track_list})

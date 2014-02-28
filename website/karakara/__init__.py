@@ -52,8 +52,8 @@ def main(global_config, **settings):
     # Cachebust etags ----------------------------------------------------------
     #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate
     if not config.registry.settings['server.etag.cache_buster']:
-        from .model.actions import count_tags
-        config.registry.settings['server.etag.cache_buster'] = str(count_tags)
+        from .model.actions import rough_db_hash
+        config.registry.settings['server.etag.cache_buster'] = rough_db_hash()
 
     # Search Config ------------------------------------------------------------
     import karakara.views.search
