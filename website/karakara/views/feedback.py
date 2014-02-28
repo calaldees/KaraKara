@@ -18,6 +18,7 @@ def feedback_view(request):
     """
     if request.method == 'GET':
         if request.session.get('admin'):
+            log.info('admin viewed feedback')
             return action_ok(data={'feedback': [feedback.to_dict() for feedback in DBSession.query(Feedback)]})
         return action_ok()
     
@@ -31,4 +32,5 @@ def feedback_view(request):
     feedback.environ = strip_non_base_types(request.environ)
     DBSession.add(feedback)
     
+    log.info('feedback - {0}'.format(request.params.get('details')))
     return action_ok(message='Feedback received, thank you!')
