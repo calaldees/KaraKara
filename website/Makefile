@@ -5,6 +5,8 @@ INI_TEST = test.ini
 INI_PROD = production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
 
+LOG_LINES=5
+
 #APTGET_EXTRAS = 
 #TTY=$(shell tty)
 #ifndef TTY
@@ -121,6 +123,11 @@ ini_test:
 	env/bin/python3 externals/lib/make_ini.py test
 ini_production:
 	env/bin/python3 externals/lib/make_ini.py production
+
+log_production:
+	tail -n$(LOG_LINES) production.log
+	tail -n$(LOG_LINES) ../mediaserver/log/access.log
+	tail -n$(LOG_LINES) ../mediaserver/log/error.log
 
 start_webapp_daemon: ini_production
 	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
