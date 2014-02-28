@@ -126,5 +126,9 @@ def track_list_all(request):
                     joinedload('tags.parent')\
                 )
     tracks = restrict_search(request, tracks)
-    return action_ok(data={'list':[track.to_dict(include_fields='tags') for track in tracks]})
-
+    track_list = [track.to_dict(include_fields='tags') for track in tracks]
+    # todo - key sort the track list based on
+    #  request.registry.settings.get('karakara.print_tracks.fields',[])
+    #  track.get(field,'') or ", ".join(track['tags'].get(field,[]))
+    track_list
+    return action_ok(data={'list':track_list})
