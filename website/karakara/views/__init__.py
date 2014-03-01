@@ -2,7 +2,7 @@ from decorator import decorator
 
 from externals.lib.misc import decorator_combine
 
-from externals.lib.pyramid import request_from_args, mark_external_request, method_delete_router, method_put_router, max_age
+from externals.lib.pyramid import request_from_args, mark_external_request, method_delete_router, method_put_router, max_age, gzip
 from externals.lib.pyramid.etag import etag, etag_decorator, _generate_cache_key_default
 from externals.lib.pyramid.auto_format import auto_format_output, action_ok, action_error
 from externals.lib.pyramid.session_identity import overlay_session_identity
@@ -29,6 +29,7 @@ cache = make_region().configure(
 
 
 web = decorator_combine(
+    gzip,
     auto_format_output,
     overlay_session_identity(('id','admin','faves')),
     mark_external_request

@@ -20,6 +20,7 @@ karakara.search.tag.silent_forced = []
 
 api.search.max_age = 3600 -> int
 
+server.gzip         = True -> bool
 server.etag.enabled = True -> bool
 
 sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
