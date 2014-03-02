@@ -4,6 +4,8 @@ pyramid.debug_templates     = false
 
 karakara.server.mode = production
 
+karakara.player.title = KaraKara (Beta)
+
 karakara.queue.group.split_markers = [0:15:00, 0:30:00] -> timedelta
 karakara.queue.track.padding       = 0:00:60 -> timedelta
 

@@ -119,6 +119,7 @@ def main(global_config, **settings):
     config.add_route('settings'      , append_format_pattern('/settings')      )
     config.add_route('random_images' , append_format_pattern('/random_images') )
     config.add_route('inject_testdata' , append_format_pattern('/inject_testdata') )
+    config.add_route('stats'         , append_format_pattern('/stats')         )
     
     config.add_route('search_tags'   , '/search_tags/{tags:.*}')
     config.add_route('search_list'   , '/search_list/{tags:.*}')

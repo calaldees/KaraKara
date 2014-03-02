@@ -33,6 +33,11 @@ def generate_cache_key_homepage(request):
 def home(request):
     return action_ok()
 
+@view_config(route_name='stats')
+@web
+def stats(request):
+    return action_ok()
+
 @view_config(route_name='admin_lock')
 @web
 @admin_only
