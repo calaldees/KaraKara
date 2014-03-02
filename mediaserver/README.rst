@@ -25,3 +25,34 @@ Running the server
 ~~~~~~~~~~~~~~~~~~
 - `make run` to run the server
 - Ctrl-C to stop it
+
+
+
+Router Setup
+~~~~~~~~~~~~
+
+Netgear routers
+ 172.20.1.1
+  channel 1
+  points to 172.20.1.2 for dhcp
+  172.20.1.2 reserved for ethernet mac address
+  subnet mask of 255.255.0.0
+ 172.20.12.1 -
+
+Wireless
+ SSID: Karakara
+ b & g
+ no encryption
+ primary dns: 172.20.1.2
+LAN
+ DCHP off
+ subnet 255.255.0.0
+ set range dchp range to off but include 172.20.x.3 > 254
+
+Ubuntu ethernet setup
+ do not automaticall connect
+ Manual 172.20.1.2 subnet 255.255.0.0 gateway 0.0.0.0
+ Require ipv4 to complete + route + use this connetion for resorces on this network only
+
+Old satilte laptop
+172.20.1.2	ALLAN-SATELLITE-PRO-L300D	00:1E:33:C0:4C:D2
