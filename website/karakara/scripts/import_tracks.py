@@ -2,6 +2,7 @@ import os
 import json
 import urllib
 import re
+import hashlib
 
 from bs4 import BeautifulSoup
 import traceback
@@ -12,7 +13,6 @@ from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_typ
 
 from ..model         import init_DBSession, DBSession, commit
 from ..model.actions import get_tag
-
 
 import logging
 log = logging.getLogger(__name__)
@@ -77,39 +77,54 @@ def import_json_data(source, location=''):
     """
     
     def gen_id_for_track(track):
+        """
+        TODO: This method is a hecky peice of crap ... I feel dirty just looking at it.
+        The hash generation is particulaly horrible.
+        I would suggest some tidying
+        """
         id = ''
         
         # Gen 3 letter ID from category,from,title
-        def get_tag_name(tags,parent):
-            for tag in tags:
-                if tag.parent and tag.parent.name == parent:
-                    return tag.name
-            return ''
-        def get_first_alpha_char(s):
-            for char in s:
-                if re.match('[a-zA-Z]',char):
-                    return char
-            return ''
-        for tag_name in [get_tag_name(track.tags,tag_type) for tag_type in ['category','from','title']]:
-            id += get_first_alpha_char(tag_name)
+        def get_chars(s, num=2):
+            try:
+                return re.search(r'(\w{%s})'% num, s.replace(' ','')).group(1)
+            except:
+                return ''
+
+        # sprinkle on a little bit of 'title' hashy goodness in the hope that we wont get colisions
+        exclude_tags = ('status:', '#')
+        identifyer_string = "-".join(filter(lambda tag: not any((exclude_tag in tag for exclude_tag in exclude_tags  )) ,sorted(tag.full for tag in track.tags)))
+        try:
+            title_hash = re.search(r'([1-9][abcdef123456789])', hashlib.sha1(identifyer_string.encode('utf-8')).hexdigest().lower()).group(1) #hex(hash(
+        except Exception:
+            title_hash = ''
+        
+        _get_chars = lambda parent, num: get_chars(track.get_tag(parent), num)
+        id = "".join((
+            _get_chars('category', 1),
+            _get_chars('from', 2) or _get_chars('artist', 2) ,
+            _get_chars('title', 2),
+            title_hash,
+        ))
         
         # If the tags were not present; then split the title string and get the first 3 characters
         if not id:
-            s = [f.strip() for f in track.title.split(" ") if '-' not in f]
-            try:
-                id = "".join([get_first_alpha_char(s[0]), get_first_alpha_char(s[1]), get_first_alpha_char(s[2])])
-            except Exception as e:
-                id = random_string()
+            log.error('unable to aquire id from tags - uing random id')
+            id = random_string(length=5)
         
-        # Normaize to uppercase
+        # Normaize case
         id = id.lower()
         
         # Check for colistions and make unique number
         def get_id_number(id):
             count = 0
-            while DBSession.query(Track).filter_by(id=id+str(count)).count():
+            def get_count():
+                return str(count) if count else ''
+            while DBSession.query(Track).filter_by(id=id+get_count()).count():
                 count += 1
-            return str(count)
+                log.warn('track.id colision - this is unexpected and could lead to inconsistencys with track naming for printed lists in the future {0}, press c to continue'.format(id))
+                import pdb ; pdb.set_trace()
+            return get_count()
         id += get_id_number(id)
         
         return id

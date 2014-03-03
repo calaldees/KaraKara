@@ -78,6 +78,10 @@ title_tags_for_category = {
     'meme'   :['title','from'],
 }
 def track_title(tags, exclude_tags=[]):
+    """
+    look at it below! it's a mess!
+    Maybe this should be in the model? ... hummm .. this works at the API level .. hummm
+    """
     exclude_tags = [tag.split(':')[0] for tag in exclude_tags]
     if substring_in(tags.get('title'),tags.get('from')):
         exclude_tags.append('title')

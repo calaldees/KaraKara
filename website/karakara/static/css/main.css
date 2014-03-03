@@ -60,6 +60,13 @@ HTML.video    .hide_if_html5_video    {display: none;}
     text-transform: capitalize;
 }
 
+.track_code {
+    text-align: center;
+}
+.track_code span {
+    font-weight: bold;
+}
+
 .track_tags td, .track_tags th {
     text-transform: capitalize;
 }

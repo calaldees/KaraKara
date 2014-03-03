@@ -10,6 +10,8 @@
 
 <h1 class="track_title">${h.track_title_only(track)}</h1>
 
+<p class="track_code">Track Code: <span>${track['id']}</span></p>
+
 <table class="track_tags">
 % for key,values in track['tags'].items():
     % if values:

@@ -49,6 +49,13 @@ class Track(Base):
                 t[parent_name].append(tag_name)
         return t
 
+    def get_tag(self, parent):
+        tags_found = set()
+        for tag in self.tags:
+            if tag.parent and tag.parent.name == parent:
+                tags_found.add(tag.name)
+        return ' - '.join(sorted(tags_found))
+
     # TODO - Event to activate before save to DB to render the title from tags
     
     @property
@@ -109,6 +116,10 @@ class Tag(Base):
     
     parent        = relationship('Tag',  backref=backref('children'), remote_side='tag.c.id')
 
+    @property
+    def full(self):
+        return '{0}:{1}'.format(self.parent.name, self.name) if self.parent else self.name
+
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
@@ -122,7 +133,7 @@ class Tag(Base):
     __to_dict__['full'].update({
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
             'parent' : lambda track: track.parent.name ,
-            'full'   : lambda track: '%s:%s' % (track.parent.name, track.name) if track.parent else track.name,
+            'full'   : None,
     })
 
 
