@@ -121,6 +121,8 @@ def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
     """
+    log.info('track_list')
+    
     tracks = DBSession.query(Track).\
                 options(\
                     joinedload(Track.tags),\

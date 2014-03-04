@@ -22,7 +22,7 @@
         % for track in data.get('list',[]):
 <tr>\
                 % for field in fields:
-<td class="col_${field}">${track.get(field,'') or ", ".join(track['tags'].get(field,[])) }</td>\
+<td class="col_${field}">${track.get(field,'') or h.tag_hireachy(track['tags'], field) }</td>\
                 % endfor
 </tr>
         % endfor

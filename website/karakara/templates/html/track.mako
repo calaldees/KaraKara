@@ -8,7 +8,7 @@
         return ''
 %>
 
-<h1 class="track_title">${h.track_title_only(track)}</h1>
+<h1 class="track_title">${h.track_title_only(track['tags'])}</h1>
 
 <p class="track_code">Track Code: <span>${track['id']}</span></p>
 

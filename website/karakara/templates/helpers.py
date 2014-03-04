@@ -72,6 +72,26 @@ def thumbnail_location_from_track(track, index=0):
 def video_mime_type(attachment):
     return video_fileext_to_mime_types.get(get_fileext(attachment['location']),'mp4')
 
+
+# Titles from tags -------------------------------------------------------------
+
+_test_tags = {'title':['dynamite explosion','キ'], 'from':['macross'], 'macross':['dynamite'], 'category':['anime','jpop'], 'use':['opening','op1'], 'artist':['firebomber']}
+
+def tag_hireachy(tags, tag):
+    """
+    >>> tag_hireachy(_test_tags, 'from')
+    'macross: dynamite'
+    >>> tag_hireachy(_test_tags, 'category')
+    'anime, jpop'
+    """
+    if tag not in tags:
+        return ''
+    tag_value = ', '.join(tags[tag])
+    subtag_value = tag_hireachy(tags, tag_value)
+    if tag_value and subtag_value:
+        return '{0}: {1}'.format(tag_value, subtag_value)
+    return tag_value
+
 title_tags_for_category = {
     'DEFAULT':['from','use','title','length','lang'],
     'jpop'   :['artist','title'],
@@ -79,21 +99,30 @@ title_tags_for_category = {
 }
 def track_title(tags, exclude_tags=[]):
     """
-    look at it below! it's a mess!
-    Maybe this should be in the model? ... hummm .. this works at the API level .. hummm
+    >>> track_title(_test_tags)
+    'Macross: Dynamite - Opening, Op1 - Dynamite Explosion, キ'
+    >>> import copy
+    >>> _test_tags_artist = copy.copy(_test_tags)
+    >>> _test_tags_artist['category'] = ['jpop','anime']
+    >>> track_title(_test_tags_artist)
+    'Firebomber - Dynamite Explosion, キ'
     """
-    exclude_tags = [tag.split(':')[0] for tag in exclude_tags]
-    if substring_in(tags.get('title'),tags.get('from')):
+    exclude_tags = [tag.split(':')[0] for tag in exclude_tags]  # setup initial exclude tags from passed args
+    if substring_in(tags.get('title'),tags.get('from')):  # if 'title' is in 'from' - exclude title as it is a duplicate
         exclude_tags.append('title')
-    title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT')[0], title_tags_for_category['DEFAULT'])
-    tags_to_use  = [tag for tag in title_tags if tag not in exclude_tags]
-    return " - ".join([t for t in [", ".join(tags.get(tag_to_use,[])) for tag_to_use in tags_to_use] if t])
+    title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT')[0], title_tags_for_category['DEFAULT'])  # get tags to use in the constuction of this category
+    tags_to_use  = [tag for tag in title_tags if tag not in exclude_tags]  # remove exclude tags from tag list
+    return " - ".join(filter(None, (tag_hireachy(tags, tag) for tag in tags_to_use))).title()
 
-def track_title_only(track):
-    title = track.get('title')
+def track_title_only(tags):
+    """
+    >>> track_title_only(_test_tags)
+    'Dynamite Explosion, キ'
+    """
+    #title = track.get('title')
+    title = ''
     for tag in ['title','from','artist']:
-        try:
-            title = track['tags'][tag][0]
+        title = tag_hireachy(tags, tag) #track['tags'][tag][0]
+        if title:
             break
-        except: pass
-    return title.capitalize()
+    return title.title()
