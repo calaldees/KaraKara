@@ -72,7 +72,7 @@
                 grouped_tags[i] = []
             grouped_tags[i].append(tag)
     %>
-    <div data-role="collapsible-set">
+    <div data-role="collapsible-set" class="title">
     % for letter in string.ascii_lowercase:
         <div data-role="collapsible">
             <h3>${letter.upper()} (${len(grouped_tags.get(letter,[]))})</h3>
