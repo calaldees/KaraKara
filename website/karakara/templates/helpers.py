@@ -93,7 +93,7 @@ def tag_hireachy(tags, tag):
     return tag_value
 
 title_tags_for_category = {
-    'DEFAULT':['from','use','title','length','lang'],
+    'DEFAULT':['from','use','title','length'],
     'jpop'   :['artist','title'],
     'meme'   :['title','from'],
 }
