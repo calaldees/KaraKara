@@ -12,6 +12,8 @@ from ..model              import DBSession
 from ..model.model_tracks import Track
 #from ..model.model_queue  import QueueItem
 
+from ..templates.helpers import tag_hireachy
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -135,7 +137,7 @@ def track_list_all(request):
     #  this needs to be handled at the python layer because the tag logic is fairly compicated
     fields = request.registry.settings.get('karakara.print_tracks.fields',[])
     def key_track(track):
-        return " ".join([track.get(field,'') or ", ".join(track['tags'].get(field,[])) for field in fields])
+        return " ".join([tag_hireachy(track['tags'], field) for field in fields])
     track_list = sorted(track_list, key=key_track)
 
     return action_ok(data={'list':track_list})
