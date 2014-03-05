@@ -99,19 +99,23 @@ title_tags_for_category = {
 }
 def track_title(tags, exclude_tags=[]):
     """
+    >>> import copy
     >>> track_title(_test_tags)
     'Macross: Dynamite - Opening, Op1 - Dynamite Explosion, キ'
-    >>> import copy
+    >>> track_title(_test_tags, exclude_tags=['from:macross'])
+    'Dynamite - Opening, Op1 - Dynamite Explosion, キ'
     >>> _test_tags_artist = copy.copy(_test_tags)
     >>> _test_tags_artist['category'] = ['jpop','anime']
     >>> track_title(_test_tags_artist)
     'Firebomber - Dynamite Explosion, キ'
     """
+    from_exclude = list(filter(lambda t: t.startswith('from:'), exclude_tags))
+    from_include = [from_exclude.pop().split(':').pop().strip()] if from_exclude else []
     exclude_tags = [tag.split(':')[0] for tag in exclude_tags]  # setup initial exclude tags from passed args
     if substring_in(tags.get('title'),tags.get('from')):  # if 'title' is in 'from' - exclude title as it is a duplicate
         exclude_tags.append('title')
     title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT')[0], title_tags_for_category['DEFAULT'])  # get tags to use in the constuction of this category
-    tags_to_use  = [tag for tag in title_tags if tag not in exclude_tags]  # remove exclude tags from tag list
+    tags_to_use  = from_include + list(filter(lambda t: t not in exclude_tags, title_tags))  # remove exclude tags from tag list
     return " - ".join(filter(None, (tag_hireachy(tags, tag) for tag in tags_to_use))).title()
 
 def track_title_only(tags):
