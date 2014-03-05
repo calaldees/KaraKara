@@ -119,6 +119,10 @@ test: ini_test
 test_crawl: ini_test
 	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
+test_crawl_production: init_test ini_production
+	echo "unimplemented ... yet"
+	#env/bin/py.test $(PROJECT) --runslow -k crawl_production -s
+
 ini_test:
 	env/bin/python3 externals/lib/make_ini.py test
 ini_production:
