@@ -40,4 +40,4 @@ handlers = logfile
 level = DEBUG
 
 [handler_logfile]
-args = ('production.log',)
+args = ('%(here)s/production.log',)

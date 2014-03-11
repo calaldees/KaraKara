@@ -78,3 +78,4 @@ echo 'Start KaraKara daemon'
 sudo -u vagrant sh << EOF
 cd $HOME/KaraKara/website
 make start_webapp_daemon
+EOF
