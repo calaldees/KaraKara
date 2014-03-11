@@ -14,6 +14,8 @@ help:
 	# stop_nginx     -- stop nginx and dns server
 	# start          -- start nginx and dnsserver
 	# stop -         -- stop nginx and dnsserver
+	# captive_portal_enable - shortcut to toggle captive portal settings in nginx.conf
+	# captive_portal_disable - 
 	#
 	# data_backup    -- utility to compress tag/data from www/files/
 	# data_restore   --
@@ -26,7 +28,10 @@ help:
 	#
 	# Typical first use should be: sudo make setup, sudo make run
 
-start_nginx: setup tmp log www/files stop_nginx
+nginx.conf:
+	cp nginx.conf.default nginx.conf
+
+start_nginx: nginx.conf setup tmp log www/files stop_nginx
 	echo "user `whoami`;" > nginx_user.conf
 	sudo nginx -p `pwd`/ -c nginx.conf -g "${NGINX_CFG_OVERRIDES}"
 
@@ -53,6 +58,11 @@ start: start_dns_server start_nginx
 stop: stop_dns_server stop_nginx
 	echo "stopping nginx and dnsmasq"
 
+captive_portal_enable:
+	sed "s/[#\\s]*.*\(rewrite.*int\.karakara\.local.*\)/\1/" <nginx.conf >nginx.conf.new && rm -f nginx.conf && mv nginx.conf.new nginx.conf
+captive_portal_disable:
+	sed "s/\(rewrite.*int\.karakara\.local.*\)/# \1/" <nginx.conf >nginx.conf.new && rm -f nginx.conf && mv nginx.conf.new nginx.conf
+
 tmp:
 	mkdir tmp
 
@@ -66,7 +76,7 @@ www/files:
 clean:
 	rm -rf tmp log setup
 
-setup:
+setup: nginx.conf
 	if dpkg -s nginx ; then \
 		echo ; \
 	else \

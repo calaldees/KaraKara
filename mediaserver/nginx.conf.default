@@ -130,10 +130,6 @@ http {
 	gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 	#gzip_proxied no-etag;
 
-	#server {
-	#	rewrite ^ http://int.karakara.local/ redirect;  # Only to be used with dnsmasque and a correct network setup
-	#}
-
 	server {
 		listen 80 default;
 		listen 8080;
@@ -146,7 +142,7 @@ http {
 		server_name int.karakara.local;
 
 		if ($host !~* int.karakara.local){
-			rewrite ^(.*)$ http://int.karakara.local/ redirect;
+			#rewrite ^(.*)$ http://int.karakara.local/ redirect;
 		}
 
 		error_page 404 /404.html;

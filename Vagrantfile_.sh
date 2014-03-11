@@ -51,6 +51,7 @@ make ini_production
 echo 'Setup nginx and PostgreSQL'
 cd $HOME/KaraKara/mediaserver
 sudo make setup
+make captive_portal_disable
 
 echo 'Symlink the nginx static file path with the hosts vagrant share'
 ln -s /vagrant $HOME/KaraKara/mediaserver/www/files
