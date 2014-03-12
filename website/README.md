@@ -6,7 +6,7 @@ Installation
 
 Linux - ubuntu
 
-git clone git://github.com/calaldees/KaraKara.git && cd KaraKara/website && make test && make run && python -m webbrowser -t "http://localhost:8080/admin"
+git clone git://github.com/calaldees/KaraKara.git && cd KaraKara/website && make test && make run
 
 
 Getting Started
@@ -23,34 +23,47 @@ Features
 --------
 
 API
-  User
-    Browse
-    Que(+/-)
-    Fave(+/-)
-    QueView
-    TrackView(id)
-    QueItemTouch(queid)
-    TracksPrintable()
-  Admin
-    QueItemMove(queid,?)
 
-queue track order + admin change + list obscure
 
-todo
+Todo
 ----
 
-log.info access to files for profiling
-munin graphs
-print css
+* player
+  * prevent popup each change of track
+  * rickroll button
+* mobile interface
+  * message language
+    * duplicate performer explanation
+    * duplicate track explantion and exirey
+    * more detail in rejection messages
+  * responsive
+    * Responsive layout for tablets and landscape displays for track list.
+  * individual devices
+    * messaging
+    * disabling/rickrolling
+  * admin:
+    * alerts for feedback messages
+    * when remove track - prompt for optional message to user
+    * way of recovering tracks that have been played/skipped (just in case of crash or problem)
+  * search
+    * search id first then tags?
+* server
+ * multiple queues
+ * per phone limit?
+ * request limit of assets?
+ * session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
+ * disbale device on mac address
+   * lock mac address to ip address
+ * queue
+   * validate + limit to badge name
+* comunity
+  * tag editor (per track importing)
+  * encode queue + feedback
+
 
 flash message:
   query session+queid 'refresh required'
   you're up in 'xx' min (client cookie)
-per phone limit?
-session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
-messaging/disabling individual devices
-way of recovering tracks that have been played/skipped (just in case of crash or problem)
-Responsive layout for tablets and landscape displays for track list.
 
 
 Bugs
