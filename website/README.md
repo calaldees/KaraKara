@@ -29,9 +29,12 @@ Todo
 ----
 
 * player
-  * prevent popup each change of track
   * rickroll button
+  * general design
+  * display event endtime
+  * option for high/low video res mode
 * mobile interface
+  * fix message/token layout issue
   * message language
     * duplicate performer explanation
     * duplicate track explantion and exirey
@@ -39,26 +42,48 @@ Todo
   * responsive
     * Responsive layout for tablets and landscape displays for track list.
   * individual devices
-    * messaging
+    * messaging - save to cookie, notifications in top tray
     * disabling/rickrolling
   * admin:
     * alerts for feedback messages
     * when remove track - prompt for optional message to user
     * way of recovering tracks that have been played/skipped (just in case of crash or problem)
+    * rejected messages (duplicate performer limit, etc)
+    * priority token assignment
   * search
-    * search id first then tags?
+    * search id first then tags? (if starts with any non word/diget/space character)
+  * settings
+    * layout enhancements
 * server
- * multiple queues
- * per phone limit?
- * request limit of assets?
- * session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
- * disbale device on mac address
-   * lock mac address to ip address
- * queue
-   * validate + limit to badge name
+  * multiple queues
+    * mode (single/multi)
+    * landing page selection (+new if superuser)
+    * create (if superuser)(private/public queue)
+    * destroy (if owning superuser)
+  * per phone limit?
+  * request limit of assets?
+  * session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
+  * disbale device on mac address
+    * lock mac address to ip address
+  * queue
+    * validate + limit to badge name
+  * year tag and year range
+  * items other than videos in queue (text annoncements, images)
+  * archive songs played for reference later
+  * import
+    * import new tracks without destroying whole dataset (utilise video hashs to detect renames?)
+    * pass down parent folder name to prevent need to sync folder name and json
+  * settings
+    * some settings need to be renamed/grouped
+    * api to return string datatype for simpler user operation
 * comunity
+  * social login + user activation
   * tag editor (per track importing)
-  * encode queue + feedback
+    * tag warning if missing list
+    * video qa checked
+    * known isues list, unchecked list
+  * encode queue + progress feedback
+  * delete/rename track
 
 
 flash message:
@@ -68,6 +93,9 @@ flash message:
 
 Bugs
 ----
+
+* player
+  * Chrome - if you have the mouse over the video - the help text will trigger when the playstate changes. park the mouse over the body content and  it will disapear when in presentation mode. (shift+cmf+f)
 
 status_error message style dose not propergate to flash message with format='redirect'
  - flash message from queue.py error (e.g. duplicate performer) is not styled as error but looks like success. feedback error is displayed appropriately. so what gives?!
