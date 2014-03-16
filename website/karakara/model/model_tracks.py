@@ -35,6 +35,7 @@ class Track(Base):
     #description     = Column(Unicode(),     nullable=False, default="")
     duration        = Column(Float(),       nullable=False, default=0, doc="Duration in seconds")
     source_filename = Column(Unicode(),     nullable=True)
+    source_hash     = Column(Unicode(),     nullable=True)
     
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)

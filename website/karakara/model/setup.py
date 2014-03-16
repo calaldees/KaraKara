@@ -1,4 +1,4 @@
-from . import DBSession, init_DBSession
+from . import DBSession, init_DBSession, init_db
 
 # AllanC - can anyone help move this into model.__init__
 #          I want all generic stuff to be in __init__.py so the rest of the files in the model relate specificly to the project
@@ -24,7 +24,7 @@ def get_args():
     )
     parser.add_argument('--version'   , action='version', version=version)
     parser.add_argument('--config_uri', default='development.ini', help='config .ini uri')
-    parser.add_argument('--init_func' , help='e.g. myapp.model.init_data:init_data')
+    parser.add_argument('--init_func' , default='', help='e.g. myapp.model.init_data:init_data')
 
     return parser.parse_args()
 
@@ -39,16 +39,19 @@ def main():
     # Setup DB
     init_DBSession(settings) # Connect to DBSession
 
-    def my_import(name):
-        mod = __import__(name)
-        components = name.split('.')
-        for comp in components[1:]:
-            mod = getattr(mod, comp)
-        return mod
-    module_name, func_name = tuple(args.init_func.split(':'))
-    init_func = getattr(my_import(module_name), func_name)
-    #from .init_data import init_data as init_func
-    init_func()
+    if not args.init_func:
+        init_db()
+    else:
+        def my_import(name):
+            mod = __import__(name)
+            components = name.split('.')
+            for comp in components[1:]:
+                mod = getattr(mod, comp)
+            return mod
+        module_name, func_name = tuple(args.init_func.split(':'))
+        init_func = getattr(my_import(module_name), func_name)
+        #from .init_data import init_data as init_func
+        init_func()
     
 if __name__ == "__main__":
-    main()    
+    main()

@@ -30,7 +30,6 @@ def get_tag(tag, parent=None, create_if_missing=False):
         if len(tag_string_split) == 2:
             parent, tag = tuple(tag_string_split)
         elif len(tag_string_split) > 2:
-            log.warn('multi parent tags need fully implementing for - %s' % tag)
             tag    = tag_string_split.pop()
             parent = tag_string_split.pop()
     except: pass

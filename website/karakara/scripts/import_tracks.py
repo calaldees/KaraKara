@@ -7,6 +7,10 @@ import hashlib
 from bs4 import BeautifulSoup
 import traceback
 
+from sqlalchemy import or_
+from sqlalchemy.orm.exc import NoResultFound
+
+
 from externals.lib.misc import get_fileext, random_string
 
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
@@ -75,6 +79,13 @@ def import_json_data(source, location=''):
     source should be a filetype object for a json file to import
     it shouldnt be relevent that it is local or remote
     """
+    
+    def get_or_create_track(source_filename, source_hash):
+        try:
+            return Track()
+            return DBSession.query(Track).filter(or_(Track.source_filename==source_filename, Track.source_hash==source_hash)).one()
+        except NoResultFound:
+            return Track()
     
     def gen_id_for_track(track):
         """
@@ -153,12 +164,17 @@ def import_json_data(source, location=''):
     
     if 'description.json' in location:
         try:
-            folder = location.split('/')[-2]
-            log.info('Importing %s' % folder)
+            source_filename = location.split('/')[-2]
+            log.info('Importing %s' % source_filename)
+            source_hash = ','.join([video.get('encode-hash') for video in data.get('videos',[])])
             
-            track = Track()
+            # Find exisiting track to overlay data - or create a new one
+            track = get_or_create_track(source_filename, source_hash)
+            
+            track.source_filename = source_filename
+            track.source_hash = source_hash
+            
             #track.id       = get_id_from_foldername(folder)#data['videos'][0]['encode-hash']
-            track.source   = ''
             track.duration = data['videos'][0]['length']
             #track.title    = data['name']
             
@@ -167,7 +183,7 @@ def import_json_data(source, location=''):
                 for attachment_data in data.get("%ss"%attachment_type,[]):
                     attachment = Attachment()
                     attachment.type     = attachment_type
-                    attachment.location = os.path.join(folder,  attachment_data.get('url'))
+                    attachment.location = os.path.join(source_filename,  attachment_data.get('url'))
                     
                     extra_fields = {}
                     for key,value in attachment_data.items():
