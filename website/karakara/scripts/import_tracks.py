@@ -153,7 +153,7 @@ def import_json_data(source, location=''):
     
     if 'description.json' in location:
         try:
-            folder = data['name']
+            folder = location.split('/')[-2]
             log.info('Importing %s' % folder)
             
             track = Track()
