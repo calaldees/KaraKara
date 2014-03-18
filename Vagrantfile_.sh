@@ -59,7 +59,6 @@ ln -s /vagrant $HOME/KaraKara/mediaserver/www/files
 echo 'Import all track data from the host system'
 cd $HOME/KaraKara/website
 make init_db_production
-make import_tracks_production
 
 echo 'Installation complete'
 touch $HOME/setup
@@ -78,5 +77,7 @@ make start_nginx
 echo 'Start KaraKara daemon'
 sudo -u vagrant sh << EOF
 cd $HOME/KaraKara/website
+make import_tracks_production
 make start_webapp_daemon
+
 EOF
