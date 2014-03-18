@@ -39,7 +39,7 @@ class Track(Base):
     
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
-    lyrics          = relationship("Lyrics")
+    lyrics          = relationship("Lyrics", cascade="all, delete-orphan")
     
     def tags_with_parents_dict(self):
         t = {None:[tag.name for tag in self.tags if not tag.parent]}

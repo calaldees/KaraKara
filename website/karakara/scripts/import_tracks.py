@@ -11,7 +11,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound
 
 
-from externals.lib.misc import get_fileext, random_string
+from externals.lib.misc import get_fileext, random_string, hash_files as hash_files_local
 
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
 
@@ -24,6 +24,9 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 # Constants
 #-------------------------------------------------------------------------------
+
+FILE_DESCRIPTION = 'description.json'
+FILE_TAGS = 'tags.txt'
 
 version = "0.0"
 
@@ -72,6 +75,21 @@ def walk_local(uri):
 
 
 #-------------------------------------------------------------------------------
+# Hash datafiles
+#-------------------------------------------------------------------------------
+def hash_files(files):
+    """
+    Theoretically we need to assertain if the datafiles have changed,
+    with remote files we can check just the last modifyed time as this should be good enough
+    with local files we can actually compute a fast hash
+    With the track itself being identifyable by name or hash, swiching storage methods
+    should be possible if the dataset is truely identical in filenames as all the hashs will update
+    
+    For now only local is supported, but it is dream to have the data files truly remote at somepoint
+    """
+    return hash_files_local(files)
+
+#-------------------------------------------------------------------------------
 # Process JSON leaf
 #-------------------------------------------------------------------------------
 def import_json_data(source, location=''):
@@ -82,7 +100,7 @@ def import_json_data(source, location=''):
     
     def get_or_create_track(source_filename, source_hash):
         try:
-            return Track()
+            #return Track()
             return DBSession.query(Track).filter(or_(Track.source_filename==source_filename, Track.source_hash==source_hash)).one()
         except NoResultFound:
             return Track()
@@ -152,24 +170,38 @@ def import_json_data(source, location=''):
             log.warn('Failed to process %s' % location)
             traceback.print_exc()
     
-    data = get_data()
-    if not data:
-        return
-    
     # AllanC - useful code to skip to a particular track in processing - i've needed it a couple if times so just leaving it here.
     #global skippy
     #if skippy:
     #    if skippy not in location: return
     #    skippy = False
     
-    if 'description.json' in location:
+    if FILE_DESCRIPTION in location:
         try:
             source_filename = location.split('/')[-2]
-            log.info('Importing %s' % source_filename)
-            source_hash = ','.join([video.get('encode-hash') for video in data.get('videos',[])])
+            source_hash = hash_files((location, location.replace(FILE_DESCRIPTION, FILE_TAGS)))  #','.join([video.get('encode-hash') for video in data.get('videos',[])])
             
             # Find exisiting track to overlay data - or create a new one
             track = get_or_create_track(source_filename, source_hash)
+            
+            # If exisiting track exisits - check if track data has changed
+            if track.id and track.source_hash == source_hash:
+                # Update name if folder is renamed
+                if (track.source_filename != source_filename):
+                    log.info('Renamed {0} -> {1}'.format(track.source_filename, source_filename))
+                    track.source_filename = source_filename
+                    commit()
+                return
+            
+            if not track.id:
+                log.info('Importing {0}'.format(source_filename))
+            else:
+                log.info('Updating {0}'.format(source_filename))
+            
+            data = get_data()
+            if not data:
+                log.warn('  Aborting - no data {0}'.format(source_filename))
+                return
             
             track.source_filename = source_filename
             track.source_hash = source_hash
@@ -179,6 +211,7 @@ def import_json_data(source, location=''):
             #track.title    = data['name']
             
             # Add Attachments
+            track.attachments.clear()
             for attachment_type in _attachment_types.enums:
                 for attachment_data in data.get("%ss"%attachment_type,[]):
                     attachment = Attachment()
@@ -195,6 +228,7 @@ def import_json_data(source, location=''):
                     track.attachments.append(attachment)
             
             # Add Lyrics
+            track.lyrics.clear()
             for subtitle in data.get('subtitles',[]):
                 lyrics = Lyrics()
                 lyrics.language = subtitle.get('language','eng')
@@ -202,8 +236,9 @@ def import_json_data(source, location=''):
                 track.lyrics.append(lyrics)
             
             # Import tags.txt
+            track.tags.clear()
             try:
-                with open(os.path.join(os.path.dirname(location),'tags.txt'), 'r') as tag_file:
+                with open(os.path.join(os.path.dirname(location), FILE_TAGS), 'r') as tag_file:
                     for tag_string in tag_file:
                         tag_string = tag_string.strip()
                         tag = get_tag(tag_string, create_if_missing=True) 
@@ -223,13 +258,15 @@ def import_json_data(source, location=''):
             # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
             
             # Finally, use the tags to make a unique id for this track
-            track.id = gen_id_for_track(track)
+            if not track.id:
+                track.id = gen_id_for_track(track)
+                DBSession.add(track)  # if it has an 'id' then it must already be in the session
             
-            DBSession.add(track)
             commit()
         except Exception as e:
-            log.warn('Unable to process %s because %s' % (location, e))
+            log.warn('Error to process %s because %s' % (location, e))
             traceback.print_exc()
+            #import pdb ; pdb.set_trace()
             #exit()
 
 

@@ -58,6 +58,7 @@ ln -s /vagrant $HOME/KaraKara/mediaserver/www/files
 
 echo 'Import all track data from the host system'
 cd $HOME/KaraKara/website
+make init_db_production
 make import_tracks_production
 
 echo 'Installation complete'

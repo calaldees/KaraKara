@@ -69,8 +69,7 @@ test.db:
 install: env KaraKara.egg-info dependency_downloader.py externals dependency_download test.db
 
 init_db_production:
-	env/bin/python -m$(PROJECT).model.setup --config_uri production.ini --init_func $(PROJECT).model.init_data:init_data
-
+	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
@@ -107,8 +106,7 @@ insert_random_tracks:
 import_tracks_dev: test.db
 	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
-import_tracks_production: ini_production
-	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
+import_tracks_production: ini_production  #init_db_production
 	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 #import_tracks_local_mediaserver: init_db
