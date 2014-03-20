@@ -46,4 +46,5 @@
     <a href="/inject_testdata"    data-role="button" class="admin">Inject Test Data</a>
     <a href="/stats"              data-role="button" class="admin">Server Stats</a>
     <a href="/admin"              data-role="button" class="admin">Exit Admin Mode</a>
+    <a href="/comunity"           data-role="button" class="admin">Comunity</a>
 % endif
