@@ -103,6 +103,7 @@ class Track(Base):
             'tags'        : lambda track: track.tags_with_parents_dict(),
             'lyrics'      : lambda track: [lyrics.to_dict() for lyrics in track.lyrics] ,
             'image'       : None ,
+            'source_filename': None ,
     })
 
 
