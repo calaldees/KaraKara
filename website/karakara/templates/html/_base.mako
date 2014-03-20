@@ -4,7 +4,7 @@
         <%def name="title()"></%def>
         <title>${self.title()}</title>
         
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
         
         <!-- CSS Styles -->
         <link   href="${h.extneral_url('cssreset-min.css')}" rel="stylesheet" />
