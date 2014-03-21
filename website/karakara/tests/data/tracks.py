@@ -114,6 +114,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             ],
             'attachments': ['image1','preview1'],
             'lyrics': lyrics[0],
+            'source_filename': 'track1',
         },
         {
             'id'      :"t2",
@@ -125,6 +126,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             ],
             'attachments': ['image2','preview2'],
             'lyrics':lyrics[1],
+            'source_filename': 'track2',
         },
         {
             'id'      :"t3",
@@ -135,6 +137,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 'ending','female','en','jpop', 'series Y',
             ],
             'attachments': ['image3','preview3'],
+            'source_filename': 'track3',
         },
         {
             'id'      :"xxx",
@@ -144,6 +147,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 'fr',
             ],
             'attachments': [],
+            'source_filename': 'wildcard',
         },
     ]
     
@@ -180,7 +184,7 @@ def tracks_volume(request):
     return tracks
     
 
-def create_test_track(id=None, duration=None, tags=[], attachments=[], lyrics=None):
+def create_test_track(id=None, duration=None, tags=[], attachments=[], lyrics=None, source_filename=None):
     def _get_tag(tag):
         return get_tag(tag, create_if_missing=True)    
     def _get_attachment(filename):
@@ -193,4 +197,5 @@ def create_test_track(id=None, duration=None, tags=[], attachments=[], lyrics=No
     [track.attachments.append(_get_attachment(a)) for a in attachments]
     if lyrics:
         track.lyrics.append(lyrics)
+    track.source_filename = source_filename
     return track

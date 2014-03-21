@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 LIST_CACHE_KEY = 'comunity_list'
 
 list_version = random.randint(0,2000000000)
-def invalidate_cache(request=None):
+def invalidate_list_cache(request=None):
     global list_version
     list_version += 1
     cache.delete(LIST_CACHE_KEY)
@@ -51,7 +51,8 @@ def comunity_login(request):
 def comunity_list(request):
 
     def get_all_tracks_dict():
-        return [
+        # Get tracks from db
+        tracks = [
             track.to_dict('full', exclude_fields=('lyrics','attachments','image')) \
             for track in DBSession.query(Track) \
                 .order_by(Track.source_filename) \
@@ -62,14 +63,24 @@ def comunity_list(request):
                     #joinedload('lyrics'), \
                 )
         ]
+        
+        # Get track folders from media source
+        media_path = request.registry.settings['static.media']
+        media_folders = set((folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder))))
+        
+        # Compare folder sets to identify unimported/renamed files
+        track_folders = set((track['source_filename'] for track in tracks))
+        not_imported = media_folders.difference(track_folders)
+        missing_source = track_folders.difference(media_folders)
+        
+        return {
+            'tracks': tracks,
+            'not_imported': sorted(not_imported),
+            'missing_source': sorted(missing_source),
+        }
 
-    tracks = cache.get_or_create(LIST_CACHE_KEY, get_all_tracks_dict)
-    
-    #path = request.registry.settings['static.media']
-    return action_ok(data={
-        #'folders': [folder for folder in os.listdir(path) if os.path.isdir(os.path.join(path,folder))],
-        'tracks': tracks
-    })
+    data_tracks = cache.get_or_create(LIST_CACHE_KEY, get_all_tracks_dict)
+    return action_ok(data=data_tracks)
 
 
 @view_config(route_name='comunity_track')
