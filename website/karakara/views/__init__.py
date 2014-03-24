@@ -31,7 +31,7 @@ cache = make_region().configure(
 web = decorator_combine(
     gzip,
     auto_format_output,
-    overlay_session_identity(('id','admin','faves')),
+    overlay_session_identity(('id','admin','faves','comunity')),
     mark_external_request
 )
 
