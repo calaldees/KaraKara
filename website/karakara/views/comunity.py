@@ -134,7 +134,7 @@ def comunity_login(request):
         request.session['comunity'] = {
             'username': user.name,
             'provider': 'facebook',  # couple of hard coded facebook params here, if we support more providers this can be tidyed
-            'avatar'  : facebook.facebook_avatar_url.format(user.user_data.get('id')),
+            'avatar'  : facebook.endpoints['avatar'].format(user.user_data.get('id')),
             'approved': user.approved,
         }
     except NoResultFound:
