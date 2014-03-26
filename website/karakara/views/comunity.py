@@ -15,8 +15,9 @@ from ..model              import DBSession, commit
 from ..model.model_tracks import Track
 from ..model.model_comunity import ComunityUser, SocialToken
 
-from . import web, action_ok, action_error, cache, generate_cache_key
+from . import web, action_ok, action_error, cache, generate_cache_key, comunity_only
 
+from ..templates import helpers as h
 
 import logging
 log = logging.getLogger(__name__)
@@ -47,8 +48,24 @@ def _generate_cache_key(request):
 @view_config(route_name='comunity')
 @web
 def comunity(request):
+    
+    return action_ok()
+
+
+@view_config(route_name='comunity_login')
+@web
+def comunity_login(request):
     user = None
     provider_token = None
+
+    # Auto login if no service keys are provided
+    if not request.registry.settings.get('facebook.secret'):
+        request.session['comunity'] = {
+            'username': 'developer',
+            'avatar'  : h.static_url('dev_avatar.png'),
+            'approved': True,
+        }
+        return action_ok()
 
     # Step 1 - Direct user to 3rd party login dialog ---------------------------
     if not request.session.get('comunity') and not request.params.get('code'):
@@ -124,13 +141,8 @@ def comunity(request):
     return action_ok()
 
 
-@view_config(route_name='comunity_login')
-@web
-def comunity_login(request):
-    return action_ok()
-
-
 @view_config(route_name='comunity_list')
+@comunity_only
 @web
 def comunity_list(request):
 
@@ -168,6 +180,7 @@ def comunity_list(request):
 
 
 @view_config(route_name='comunity_track')
+@comunity_only
 @web
 def comunity_track(request):
     return action_ok()

@@ -44,15 +44,30 @@ web = decorator_combine(
 def is_admin(request):
     return request.session.get('admin',False)  # request.session['admin']
 
+def is_comunity(request):
+    return request.session.get('comunity',{}).get('approved', False)
 
 @decorator
 def admin_only(target, *args, **kwargs):
     """
     Decorator to restrict view callable to admin users only
+    todo - use pyramid's security framework
     """
     request = request_from_args(args)
     if not is_admin(request):
         raise action_error(message='Administrators only', code=403)
+
+    return target(*args, **kwargs)
+
+@decorator
+def comunity_only(target, *args, **kwargs):
+    """
+    Decorator to restrict view callable to approved comunity users only
+    todo - use pyramid's security framework
+    """
+    request = request_from_args(args)
+    if not is_comunity(request):
+        raise action_error(message='Approved comunity users only', code=403)
 
     return target(*args, **kwargs)
 
