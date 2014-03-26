@@ -49,6 +49,9 @@ env:
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid
 
+development.ini:
+	cp development.ini.dist development.ini
+
 KaraKara.egg-info: env
 	env/bin/python setup.py develop
 
@@ -66,7 +69,7 @@ test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-install: env KaraKara.egg-info dependency_downloader.py externals dependency_download test.db
+install: env development.ini KaraKara.egg-info dependency_downloader.py externals dependency_download test.db
 
 init_db_production:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
@@ -127,7 +130,7 @@ test_crawl_production: init_test ini_production
 	echo "unimplemented ... yet"
 	#env/bin/py.test $(PROJECT) --runslow -k crawl_production -s
 
-ini_test:
+ini_test: development.ini
 	env/bin/python3 externals/lib/make_ini.py test
 ini_production:
 	env/bin/python3 externals/lib/make_ini.py production

@@ -7,5 +7,6 @@
 /data/
 /test.ini
 /production.ini
+/development.ini
 dependency_downloader.py
 dependencys_installed.json
