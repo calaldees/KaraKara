@@ -59,7 +59,8 @@
             "lib/pyramid/session_identity.py",
             "lib/socket/__init__.py",
             "lib/socket/multisocket_server.py",
-            "lib/socket/auth_echo_server.py"
+            "lib/socket/auth_echo_server.py",
+            "lib/social/facebook.py"
         ]
     }
 }
