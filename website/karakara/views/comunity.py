@@ -51,6 +51,11 @@ def comunity(request):
     
     return action_ok()
 
+@view_config(route_name='comunity_logout')
+@web
+def comunity_logout(request):
+    request.session['comunity'] = {}
+    return action_ok()
 
 @view_config(route_name='comunity_login')
 @web
@@ -142,8 +147,8 @@ def comunity_login(request):
 
 
 @view_config(route_name='comunity_list')
-@comunity_only
 @web
+@comunity_only
 def comunity_list(request):
 
     def _comnunity_list():
@@ -180,7 +185,7 @@ def comunity_list(request):
 
 
 @view_config(route_name='comunity_track')
-@comunity_only
 @web
+@comunity_only
 def comunity_track(request):
     return action_ok()

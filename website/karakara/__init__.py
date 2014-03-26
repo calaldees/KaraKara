@@ -122,6 +122,7 @@ def main(global_config, **settings):
     config.add_route('stats'         , append_format_pattern('/stats')         )
     config.add_route('comunity'      , append_format_pattern('/comunity')      )
     config.add_route('comunity_login', append_format_pattern('/comunity/login'))
+    config.add_route('comunity_logout', append_format_pattern('/comunity/logout'))
     config.add_route('comunity_list' , append_format_pattern('/comunity/list') )
     config.add_route('comunity_track', append_format_pattern('/comunity/track/{id}'))
     

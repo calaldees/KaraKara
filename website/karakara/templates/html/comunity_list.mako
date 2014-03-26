@@ -12,10 +12,10 @@
     </ul>
     % endif
     
-    <% missing_source = set(data.get('missing_source')) %>
+    <% missing_source = set(data.get('missing_source',[])) %>
     <h2>tracks</h2>
     <ul>
-    % for track in data.get('tracks'):
+    % for track in data.get('tracks', []):
         % if track['source_filename'] in missing_source:
         <li class="missing">${track['source_filename']}</li>
         % else:
