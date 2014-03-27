@@ -19,7 +19,7 @@
         % if track['source_filename'] in missing_source:
         <li class="missing">${track['source_filename']}</li>
         % else:
-        <li><a href="/track/${track['id']}">${track['source_filename']}</a></li>
+        <li><a href="/track/${track['id']}">mobile</a> <a href="/comunity/track/${track['id']}">${track['source_filename']}</a></li>
         % endif
     % endfor
     <ul>

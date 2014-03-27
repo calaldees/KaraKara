@@ -4,6 +4,8 @@ import os
 import random
 import hashlib
 import time
+import re
+import json
 from collections import namedtuple
 
 from sqlalchemy.orm import joinedload
@@ -62,9 +64,9 @@ def comunity_logout(request):
 def comunity_login(request):
     user = None
     provider_token = None
-
+    
     # Auto login if no service keys are provided
-    if not request.registry.settings.get('facebook.secret'):
+    if request.registry.settings.get('karakara.server.mode') == 'development' and not request.registry.settings.get('facebook.secret'):
         request.session['comunity'] = {
             'username': 'developer',
             'avatar'  : h.static_url('dev_avatar.png'),
@@ -188,4 +190,30 @@ def comunity_list(request):
 @web
 @comunity_only
 def comunity_track(request):
-    return action_ok()
+    id = request.matchdict['id']
+
+    # Get Track
+    track = DBSession.query(Track) \
+        .options( \
+            joinedload(Track.tags), \
+            joinedload(Track.attachments), \
+            joinedload('tags.parent'), \
+            joinedload('lyrics'), \
+        ) \
+        .get(id).to_dict('full')
+    
+    track_path = os.path.join(request.registry.settings['static.media'], track['source_filename'])
+    source_data_filename = os.path.join(track_path, 'sources.json')
+    with open(source_data_filename ,'r') as source_data_filehandle:
+        source_data = json.load(source_data_filehandle)
+    subtitle_filenames = [k for k in source_data.keys() if re.match(r'^.*\.(ssa|srt)$', k)]
+    def subtitles_read(subtitle_filename):
+        with open(os.path.join(track_path, 'source', subtitle_filename) ,'r') as subtitle_filehandle:
+            return subtitle_filehandle.read()
+    subtitles = dict(((subtitle_filename, subtitles_read(subtitle_filename)) for subtitle_filename in subtitle_filenames))
+    
+    return action_ok(data={
+        'track': track,
+        'tag_matrix': {},
+        'subtitles': subtitles
+    })
