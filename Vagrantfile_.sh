@@ -23,6 +23,7 @@ else
 #else
 apt-get update
 apt-get install -y git make curl nfs-common portmap
+locale-gen en_US.UTF-8
 #fi
 
 
