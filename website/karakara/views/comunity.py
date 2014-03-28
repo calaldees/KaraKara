@@ -203,6 +203,13 @@ def comunity_track(request):
         .get(id).to_dict('full')
     
     track_path = os.path.join(request.registry.settings['static.media'], track['source_filename'])
+    
+    # Tag Data
+    tag_data_filename = os.path.join(track_path, 'tags.txt')
+    with open(tag_data_filename ,'r') as tag_data_filehandle:
+        tag_data = tag_data_filehandle.read()
+    
+    # Subtitle Data
     source_data_filename = os.path.join(track_path, 'sources.json')
     with open(source_data_filename ,'r') as source_data_filehandle:
         source_data = json.load(source_data_filehandle)
@@ -215,5 +222,6 @@ def comunity_track(request):
     return action_ok(data={
         'track': track,
         'tag_matrix': {},
-        'subtitles': subtitles
+        'tag_data': tag_data,
+        'subtitles': subtitles,
     })

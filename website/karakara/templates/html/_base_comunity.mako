@@ -1,6 +1,8 @@
 <html>
     <head>
         <title>Comunity</title>
+        
+        <link href="${h.static_url('css/comunity.css')}" rel="stylesheet" />
     </head>
     
     <body>
@@ -14,5 +16,7 @@
         % endif
         
         ${next.body()}
+        
+        <script src ="${h.extneral_url('jquery.min.js')}"></script>
     </body>
 </html>
