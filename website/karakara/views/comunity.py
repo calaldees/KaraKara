@@ -186,7 +186,7 @@ def comunity_list(request):
     return action_ok(data=data_tracks)
 
 
-@view_config(route_name='comunity_track')
+@view_config(route_name='comunity_track', request_method='GET')
 @web
 @comunity_only
 def comunity_track(request):
@@ -225,3 +225,11 @@ def comunity_track(request):
         'tag_data': tag_data,
         'subtitles': subtitles,
     })
+
+@view_config(route_name='comunity_track', request_method='POST')
+@web
+@comunity_only
+def comunity_track_update(request):
+    # if differnt save
+    # backup existing file
+    return action_ok()
