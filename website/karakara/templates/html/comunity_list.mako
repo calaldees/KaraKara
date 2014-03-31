@@ -19,8 +19,13 @@
         % if track['source_filename'] in missing_source:
         <li class="missing">${track['source_filename']}</li>
         % else:
-        <li><a href="/track/${track['id']}">mobile</a> <a href="/comunity/track/${track['id']}">${track['source_filename']}</a></li>
+        <li><a href="/track/${track['id']}">mobile</a> <a href="/comunity/track/${track['id']}" class="track_popup">${track['source_filename']}</a></li>
         % endif
     % endfor
     <ul>
+    
+    <div id="popup" class="hidden">
+        <a href="" onclick="$(this).parent().addClass('hidden'); false;">close</a>
+        <div class="content"></div>
+    </div>
 </%def>

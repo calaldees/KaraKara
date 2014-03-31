@@ -1,4 +1,4 @@
-<%inherit file="_base_comunity.mako"/>
+##<%inherit file="_base_comunity.mako"/>
 
 <%def name="body()">
     <h1>Comunity Track</h1>
@@ -15,9 +15,11 @@
         <input type="submit" name="submit" value="submit"/>
     </form>
     
+    <%doc>
     <script type="text/javascript">
         ##$(document).ready(function() {
         document.addEventListener("DOMContentLoaded", function() {
+            
         
             // Intercept onsubmit event and ajax submit the form
             
@@ -26,10 +28,13 @@
                 var $form = $(this);
                 var track_id = $form.data().id;
                 
+                // Disable the submit button to prevent unwanted multiple submits
+                $form.find("input[type='submit']").attr('disabled', true);
+                
                 // Only post the changed fields by disbaling the unchanged fields
                 $.each($form.find('textarea'), function(index, textarea) {
                     $textarea = $(textarea);
-                    console.log($textarea.val(), $textarea.data('inital'));
+                    ##console.log($textarea.val(), $textarea.data('inital'));
                     if ($textarea.val() == $textarea.data('inital')) {
                         $textarea.attr('disabled', true);
                     }
@@ -43,9 +48,11 @@
                     success: function(data, text, jqXHR) {
                         var response = jqXHR.responseJSON
                         console.log(response);
+                        $form.find("input[type='submit']").removeAttr('disabled');
                     },
                     error: function(jqXHR) {
                         console.error(jqXHR);
+                        $form.find("input[type='submit']").removeAttr('disabled');
                     }
                 });
                 return false;
@@ -53,4 +60,5 @@
             
         });
     </script>
+    </%doc>
 </%def>

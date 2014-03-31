@@ -1,1 +1,14 @@
 /* */
+
+.hidden {
+    display: none;
+}
+
+#popup {
+    position: absolute;
+    top: 2em;
+    botton: 2em;
+    right: 2em;
+    left: 2em;
+    border: 1px dashed red;
+}

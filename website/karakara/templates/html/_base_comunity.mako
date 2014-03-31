@@ -18,5 +18,6 @@
         ${next.body()}
         
         <script src ="${h.extneral_url('jquery.min.js')}"></script>
+        <script src ="${h.static_url('js/comunity.js')}"></script>
     </body>
 </html>
