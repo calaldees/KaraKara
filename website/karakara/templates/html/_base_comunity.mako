@@ -1,3 +1,6 @@
+% if format == 'html_template':
+    ${next.body()} <% return %>
+% endif
 <html>
     <head>
         <title>Comunity</title>
@@ -21,3 +24,4 @@
         <script src ="${h.static_url('js/comunity.js')}"></script>
     </body>
 </html>
+

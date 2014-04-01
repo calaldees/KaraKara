@@ -13,7 +13,7 @@ function popup_hide() {
 $('a.track_popup').on('click', function() {
     $popup_link = $(this);
     popup_show("<p>Loading...</p>");
-    $.ajax($popup_link.attr('href'), {
+    $.ajax($popup_link.attr('href')+".html_template", {
         type: "GET",
         success: function(data, text, jqXHR) {
             //console.log(data, text, jqXHR);

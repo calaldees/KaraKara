@@ -1,4 +1,4 @@
-##<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_comunity.mako"/>
 
 <%def name="body()">
     <h2>${data['track']['source_filename']}</h2>
@@ -14,5 +14,4 @@
         
         <input type="submit" name="submit" value="submit"/>
     </form>
-    
 </%def>
