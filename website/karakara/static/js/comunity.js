@@ -1,19 +1,4 @@
-$('a.track_popup').on('click', function() {
-    $popup_link = $(this);
-    $.ajax($popup_link.attr('href'), {
-        type: "GET",
-        success: function(data, text, jqXHR) {
-            //console.log(data, text, jqXHR);
-            popup_show(data);
-            attach_form_track('#form_track');
-        },
-        error: function(jqXHR) {
-            console.error(jqXHR);
-        }
-    });
-    return false;
-});
-
+// Popup contols
 function popup_show(data) {
     $("#popup .content").html(data);
     $("#popup").removeClass('hidden');    
@@ -24,6 +9,26 @@ function popup_hide() {
     $("#popup").addClass('hidden');
 }
 
+// Attach click event to track_popup links
+$('a.track_popup').on('click', function() {
+    $popup_link = $(this);
+    popup_show("<p>Loading...</p>");
+    $.ajax($popup_link.attr('href'), {
+        type: "GET",
+        success: function(data, text, jqXHR) {
+            //console.log(data, text, jqXHR);
+            popup_show(data);
+            attach_form_track('#form_track');
+        },
+        error: function(jqXHR) {
+            console.error(jqXHR);
+            popup_show("<p>Error</p>");
+        }
+    });
+    return false;
+});
+
+// Popup submit
 function attach_form_track(form_selector) {
     $(form_selector).on("submit", function() {
         var $form = $(this);

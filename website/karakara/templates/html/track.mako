@@ -22,17 +22,11 @@
 
 ## Video Preview ---------------------------------------------------------------
 
-<%
-    def previews(track):
-        previews = [attachment for attachment in track['attachments'] if attachment['type']=='preview']
-        previews = [(preview, h.media_url(preview['location'])) for preview in previews]
-        return previews
-%>
 
 <!-- html5 - video -->
 <div class="html5_video_embed" style="display: none;">
     <video class="video_placeholder" preload="none" poster="${h.thumbnail_location_from_track(track)}" durationHint="${track['duration']}" controls>
-        % for preview, url in previews(track):
+        % for preview, url in h.previews(track):
             <source src="${url}" type="video/${h.video_mime_type(preview)}" />
             ##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
         % endfor
@@ -84,7 +78,7 @@
         });
     </script>
     
-    % for preview, url in previews(track):
+    % for preview, url in h.previews(track):
     <a href="${url}" data-role="button" rel=external target="_blank">Preview Video</a>
     ## ${preview['extra_fields'].get('target','unknown')}
     % endfor

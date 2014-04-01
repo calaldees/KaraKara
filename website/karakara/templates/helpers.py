@@ -73,6 +73,14 @@ def video_mime_type(attachment):
     return video_fileext_to_mime_types.get(get_fileext(attachment['location']),'mp4')
 
 
+# Track Previews ---------------------------------------------------------------
+
+def previews(track):
+    previews = [attachment for attachment in track['attachments'] if attachment['type']=='preview']
+    previews = [(preview, media_url(preview['location'])) for preview in previews]
+    return previews
+
+
 # Titles from tags -------------------------------------------------------------
 
 _test_tags = {'title':['dynamite explosion','キ'], 'from':['macross'], 'macross':['dynamite'], 'category':['anime','jpop'], 'use':['opening','op1'], 'artist':['firebomber']}
