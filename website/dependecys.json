@@ -74,6 +74,7 @@
             "lib/socket/__init__.py",
             "lib/socket/multisocket_server.py",
             "lib/socket/auth_echo_server.py",
+            "lib/social/__init__.py",
             "lib/social/facebook.py"
         ]
     }
