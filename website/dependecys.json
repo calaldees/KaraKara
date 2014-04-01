@@ -45,6 +45,20 @@
         "target": "static/cssreset-min.css"
     },
 
+    "bootstrap": {
+        "source": "http://raw.github.com/twbs/bootstrap/vVERSION/dist/",
+        "version": "3.1.1",
+        "target": [
+            "js/bootstrap.min.js",
+            "css/bootstrap-theme.min.css",
+            "css/bootstrap.min.css",
+            "fonts/glyphicons-halflings-regular.woff",
+            "fonts/glyphicons-halflings-regular.ttf",
+            "fonts/glyphicons-halflings-regular.eot",
+            "fonts/glyphicons-halflings-regular.svg"
+        ]
+    },
+    
     "python_lib": {
         "source": "https://raw.github.com/calaldees/libs/master/python3/",
         "version": "0.0.0",

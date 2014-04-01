@@ -1,0 +1,43 @@
+[app:main]
+pyramid.reload_templates    = false
+pyramid.debug_templates     = false
+
+karakara.server.mode = production
+
+karakara.player.title = KaraKara (Beta)
+
+karakara.queue.group.split_markers = [0:15:00, 0:30:00] -> timedelta
+karakara.queue.track.padding       = 0:00:60 -> timedelta
+
+karakara.queue.add.limit                     = 0:25:00 -> timedelta
+karakara.queue.add.limit.priority_token      = 0:45:00 -> timedelta
+karakara.queue.add.limit.priority_window     = 0:03:00 -> timedelta
+karakara.queue.add.duplicate.count_limit     = 1       -> int
+karakara.queue.add.duplicate.performer_limit = 1       -> int
+
+karakara.template.input.performer_name = Enter your badge name
+karakara.template.title = KaraKara (Beta)
+
+karakara.search.tag.silent_forced = []
+karakara.search.tag.silent_hidden = []
+
+api.search.max_age = 3600 -> int
+
+server.gzip         = True -> bool
+server.etag.enabled = True -> bool
+
+sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+
+session.type    = ext:database
+session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+
+
+[logger_root]
+level = INFO
+handlers = logfile
+
+[logger_karakara]
+level = DEBUG
+
+[handler_logfile]
+args = ('%(here)s/production.log',)
