@@ -25,7 +25,7 @@
     <ul>
     
     <div id="popup" class="hidden">
-        <a href="" onclick="$(this).parent().addClass('hidden'); false;">close</a>
+        <a href="" onclick="$(this).parent().addClass('hidden'); return false;">close</a>
         <div class="content"></div>
     </div>
 </%def>
