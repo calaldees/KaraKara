@@ -32,7 +32,8 @@ $('a.track_popup').on('click', function() {
 function attach_form_track(form_selector) {
     $(form_selector).on("submit", function() {
         var $form = $(this);
-        var track_id = $form.data().id;
+        var track_id = $form.data().track_id;
+        console.log("fucknuts", track_id, $form.data());
         
         // Disable the submit button to prevent unwanted multiple submits
         $form.find("input[type='submit']").attr('disabled', true);

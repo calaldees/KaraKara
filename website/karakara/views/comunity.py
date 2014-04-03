@@ -49,6 +49,7 @@ def _generate_cache_key(request):
 
 class ComunityTrack():
     def __init__(self, request, track_id):
+        assert track_id and track_id != 'undefined', 'track_id required'
         self.media_path = request.registry.settings['static.media']
         self.track_id = track_id
         self._track_dict = None

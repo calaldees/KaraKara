@@ -2,7 +2,7 @@
 
 <%def name="body()">
     <h2>${data['track']['source_filename']}</h2>
-    <form id="form_track" action="" data-track-id="${data['track']['id']}">
+    <form id="form_track" action="" data-track_id="${data['track']['id']}">
         ## onsubmit="track.submit_track(); return false;"
         <lable for="tag_data">Tag Data</lable>
         <textarea name="tag_data" data-inital="${data.get('tag_data','').replace('"','\"')}">${data.get('tag_data')}</textarea>
