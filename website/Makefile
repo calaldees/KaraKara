@@ -74,7 +74,7 @@ test.db:
 
 install: env development.ini production.inidiff KaraKara.egg-info dependency_downloader.py externals dependency_download test.db
 
-init_db_production:
+init_db_production: ini_production
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data

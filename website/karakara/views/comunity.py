@@ -11,6 +11,7 @@ from collections import namedtuple
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
+from externals.lib.misc import backup
 from externals.lib.social import facebook
 
 from ..model              import DBSession, commit
@@ -42,6 +43,60 @@ def _generate_cache_key(request):
     global list_version
     return '-'.join([generate_cache_key(request), str(list_version)])
 
+#-------------------------------------------------------------------------------
+# Community Utils
+#-------------------------------------------------------------------------------
+
+class ComunityTrack():
+    def __init__(self, request, track_id):
+        self.media_path = request.registry.settings['static.media']
+        self.track_id = track_id
+        self._track_dict = None
+    
+    @property
+    def track(self):
+        if not self._track_dict:
+            self._track_dict = DBSession.query(Track) \
+                .options( \
+                    joinedload(Track.tags), \
+                    joinedload(Track.attachments), \
+                    joinedload('tags.parent'), \
+                    joinedload('lyrics'), \
+                ) \
+                .get(self.track_id).to_dict('full')
+        return self._track_dict
+    
+    @property
+    def path(self):
+        return os.path.join(self.media_path, self.track['source_filename'])
+    @property
+    def tag_data_filename(self):
+        return os.path.join(self.path, 'tags.txt')
+    @property
+    def tag_data_raw(self):
+        with open(self.tag_data_filename ,'r') as tag_data_filehandle:
+            return tag_data_filehandle.read()
+    @property
+    def tag_data(self):
+        return {tuple(line.split(':')) for line in self.tag_data_raw.split('\n')}
+    @property
+    def source_data_filename(self):
+        return os.path.join(self.path, 'sources.json')
+    @property
+    def source_data(self):
+        with open(self.source_data_filename ,'r') as source_data_filehandle:
+            return json.load(source_data_filehandle)
+    @property
+    def subtitle_filenames(self):
+        return [k for k in self.source_data.keys() if re.match(r'^.*\.(ssa|srt)$', k)]
+    @property
+    def subtitle_data(self):
+        def subtitles_read(subtitle_filename):
+            with open(os.path.join(self.path, 'source', subtitle_filename) ,'r') as subtitle_filehandle:
+                return subtitle_filehandle.read()
+        return dict(((subtitle_filename, subtitles_read(subtitle_filename)) for subtitle_filename in self.subtitle_filenames))
+
+
 
 #-------------------------------------------------------------------------------
 # Community Views
@@ -50,7 +105,6 @@ def _generate_cache_key(request):
 @view_config(route_name='comunity')
 @web
 def comunity(request):
-    
     return action_ok()
 
 @view_config(route_name='comunity_logout')
@@ -190,47 +244,21 @@ def comunity_list(request):
 @web
 @comunity_only
 def comunity_track(request):
-    id = request.matchdict['id']
-
-    # Get Track
-    track = DBSession.query(Track) \
-        .options( \
-            joinedload(Track.tags), \
-            joinedload(Track.attachments), \
-            joinedload('tags.parent'), \
-            joinedload('lyrics'), \
-        ) \
-        .get(id).to_dict('full')
-    
-    track_path = os.path.join(request.registry.settings['static.media'], track['source_filename'])
-    
-    # Tag Data
-    tag_data_filename = os.path.join(track_path, 'tags.txt')
-    with open(tag_data_filename ,'r') as tag_data_filehandle:
-        tag_data = tag_data_filehandle.read()
-    
-    # Subtitle Data
-    source_data_filename = os.path.join(track_path, 'sources.json')
-    with open(source_data_filename ,'r') as source_data_filehandle:
-        source_data = json.load(source_data_filehandle)
-    subtitle_filenames = [k for k in source_data.keys() if re.match(r'^.*\.(ssa|srt)$', k)]
-    def subtitles_read(subtitle_filename):
-        with open(os.path.join(track_path, 'source', subtitle_filename) ,'r') as subtitle_filehandle:
-            return subtitle_filehandle.read()
-    subtitles = dict(((subtitle_filename, subtitles_read(subtitle_filename)) for subtitle_filename in subtitle_filenames))
-    
+    ctrack = ComunityTrack(request, request.matchdict['id'])
     return action_ok(data={
-        'track': track,
+        'track': ctrack.track,
         'tag_matrix': {},
-        'tag_data': tag_data,
-        'subtitles': subtitles,
+        'tag_data': ctrack.tag_data_raw,
+        'subtitles': ctrack.subtitle_data,
     })
 
 @view_config(route_name='comunity_track', request_method='POST')
 @web
 @comunity_only
 def comunity_track_update(request):
-    # if differnt save
+    # Save tag data
+    if 'tag_data' in request.params:
+        backup()
     # backup existing file
     #import pdb ; pdb.set_trace()
     return action_ok()
