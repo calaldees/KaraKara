@@ -70,12 +70,20 @@ class ComunityTrack():
     def path(self):
         return os.path.join(self.media_path, self.track['source_filename'])
     @property
+    def path_backup(self):
+        return os.path.join(self.path, '_old_versions')
+    @property
     def tag_data_filename(self):
         return os.path.join(self.path, 'tags.txt')
     @property
     def tag_data_raw(self):
         with open(self.tag_data_filename ,'r') as tag_data_filehandle:
             return tag_data_filehandle.read()
+    @tag_data_raw.setter
+    def tag_data_raw(self, tag_data):
+        backup(self.tag_data_filename, self.path_backup)
+        with open(self.tag_data_filename ,'w') as tag_data_filehandle:
+            tag_data_filehandle.write(tag_data)
     @property
     def tag_data(self):
         return {tuple(line.split(':')) for line in self.tag_data_raw.split('\n')}
@@ -256,9 +264,10 @@ def comunity_track(request):
 @web
 @comunity_only
 def comunity_track_update(request):
+    ctrack = ComunityTrack(request, request.matchdict['id'])
     # Save tag data
     if 'tag_data' in request.params:
-        backup()
+        ctrack.tag_data_raw = request.params['tag_data']
     # backup existing file
     #import pdb ; pdb.set_trace()
     return action_ok()
