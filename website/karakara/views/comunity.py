@@ -74,6 +74,9 @@ class ComunityTrack():
     def path_backup(self):
         return os.path.join(self.path, '_old_versions')
     @property
+    def path_source(self):
+        return os.path.join(self.path, 'source')
+    @property
     def tag_data_filename(self):
         return os.path.join(self.path, 'tags.txt')
     @property
@@ -83,8 +86,8 @@ class ComunityTrack():
     @tag_data_raw.setter
     def tag_data_raw(self, tag_data):
         backup(self.tag_data_filename, self.path_backup)
-        with open(self.tag_data_filename ,'w') as tag_data_filehandle:
-            tag_data_filehandle.write(tag_data)
+        with open(self.tag_data_filename ,'w') as filehandle:
+            filehandle.write(tag_data)
     @property
     def tag_data(self):
         return {tuple(line.split(':')) for line in self.tag_data_raw.split('\n')}
@@ -101,10 +104,16 @@ class ComunityTrack():
     @property
     def subtitle_data(self):
         def subtitles_read(subtitle_filename):
-            with open(os.path.join(self.path, 'source', subtitle_filename) ,'r') as subtitle_filehandle:
+            with open(os.path.join(self.path_source, subtitle_filename) ,'r') as subtitle_filehandle:
                 return subtitle_filehandle.read()
         return dict(((subtitle_filename, subtitles_read(subtitle_filename)) for subtitle_filename in self.subtitle_filenames))
-
+    @subtitle_data.setter
+    def subtitle_data(self, subtitle_data):
+        for subtitle_filename, subtitle_data_raw in subtitle_data:
+            subtitle_path_filename = os.path.join(self.path_source, subtitle_filename)
+            backup(subtitle_path_filename, self.path_backup)
+            with open(subtitle_path_filename, 'w') as filehandle:
+                filehandle.write(subtitle_data_raw)
 
 
 #-------------------------------------------------------------------------------
@@ -269,6 +278,11 @@ def comunity_track_update(request):
     # Save tag data
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
-    # backup existing file
+    
+    # rebuild subtitle_data dict
+    subtitle_data = {(k.replace('subtitles_', ''), v) for k, v in request.params.items() if k.startswith('subtitles_')}
+    if subtitle_data:
+        ctrack.subtitle_data = subtitle_data
+    
     #import pdb ; pdb.set_trace()
     return action_ok()
