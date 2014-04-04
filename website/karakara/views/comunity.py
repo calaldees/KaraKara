@@ -23,6 +23,7 @@ from . import web, action_ok, action_error, cache, generate_cache_key, comunity_
 from ..templates import helpers as h
 
 from ..scripts.import_tracks import import_json_data as import_track
+from ..views.tracks import invalidate_track
 
 import logging
 log = logging.getLogger(__name__)
@@ -73,6 +74,7 @@ class ComunityTrack():
     def import_track(self):
         with open(self.path_description_filename, 'r') as filehandle:
             import_track(filehandle, self.path_description_filename)
+            invalidate_track(self.track_id)
     
     @property
     def path(self):
