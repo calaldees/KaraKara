@@ -22,6 +22,8 @@ from . import web, action_ok, action_error, cache, generate_cache_key, comunity_
 
 from ..templates import helpers as h
 
+from ..scripts.import_tracks import import_json_data as import_track
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -53,6 +55,7 @@ class ComunityTrack():
         self.media_path = request.registry.settings['static.media']
         self.track_id = track_id
         self._track_dict = None
+        self._import_required = False
     
     @property
     def track(self):
@@ -67,6 +70,10 @@ class ComunityTrack():
                 .get(self.track_id).to_dict('full')
         return self._track_dict
     
+    def import_track(self):
+        with open(self.path_description_filename, 'r') as filehandle:
+            import_track(filehandle, self.path_description_filename)
+    
     @property
     def path(self):
         return os.path.join(self.media_path, self.track['source_filename'])
@@ -76,6 +83,9 @@ class ComunityTrack():
     @property
     def path_source(self):
         return os.path.join(self.path, 'source')
+    @property
+    def path_description_filename(self):
+        return os.path.join(self.path, 'description.json')
     @property
     def tag_data_filename(self):
         return os.path.join(self.path, 'tags.txt')
@@ -88,6 +98,7 @@ class ComunityTrack():
         backup(self.tag_data_filename, self.path_backup)
         with open(self.tag_data_filename ,'w') as filehandle:
             filehandle.write(tag_data)
+            self._import_required = True
     @property
     def tag_data(self):
         return {tuple(line.split(':')) for line in self.tag_data_raw.split('\n')}
@@ -114,6 +125,7 @@ class ComunityTrack():
             backup(subtitle_path_filename, self.path_backup)
             with open(subtitle_path_filename, 'w') as filehandle:
                 filehandle.write(subtitle_data_raw)
+                self._import_required = True
 
 
 #-------------------------------------------------------------------------------
@@ -283,6 +295,9 @@ def comunity_track_update(request):
     subtitle_data = {(k.replace('subtitles_', ''), v) for k, v in request.params.items() if k.startswith('subtitles_')}
     if subtitle_data:
         ctrack.subtitle_data = subtitle_data
+    
+    if ctrack._import_required:
+        ctrack.import_track()
     
     #import pdb ; pdb.set_trace()
     return action_ok()

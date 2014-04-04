@@ -266,8 +266,10 @@ def import_json_data(source, location=''):
         except Exception as e:
             log.warn('Error to process %s because %s' % (location, e))
             traceback.print_exc()
+            return e
             #import pdb ; pdb.set_trace()
             #exit()
+        return True
 
 
 #-------------------------------------------------------------------------------
