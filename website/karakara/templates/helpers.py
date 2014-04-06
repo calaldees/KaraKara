@@ -26,7 +26,6 @@ video_fileext_to_mime_types = {
 
 # TODO: replace url methods with constant PATH
 #  templates could then use h.path.external etc
-
 def extneral_url(file):
     #return request.static_url('karakara:static/%s' % file)
     return "/ext/"+file
@@ -34,6 +33,12 @@ def extneral_url(file):
 def static_url(file):
     #return request.static_url('karakara:static/%s' % file)
     return "/static/"+file
+
+class Path(object):
+    external = '/ext/'
+    static   = '/static/'
+path = Path()
+
 
 def media_url(file):
     #return '/media/%s' % file

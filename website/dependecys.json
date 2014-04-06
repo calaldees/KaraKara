@@ -47,6 +47,7 @@
 
     "bootstrap": {
         "source": "http://raw.github.com/twbs/bootstrap/vVERSION/dist/",
+        "destination_subpath": "static",
         "version": "3.1.1",
         "target": [
             "js/bootstrap.min.js",

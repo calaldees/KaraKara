@@ -58,6 +58,10 @@ karakara.search.list.alphabetical.tags = [from, artist]
 
 karakara.print_tracks.fields = [category, from, use, title, artist]
 
+# Comunity settings ------------------------------------------------------------
+
+comunity.title = KaraKara.org.uk
+
 # API --------------------------------------------------------------------------
 api.settings.regex = karakara\..*
 api.format.default = html
