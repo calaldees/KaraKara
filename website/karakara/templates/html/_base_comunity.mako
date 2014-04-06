@@ -27,7 +27,7 @@
 		</div>
 		
 		<!-- Modal dialogs -->
-		##${modals()}
+		${modals()}
 		
 		<!-- Footer -->
 		${self.footer()}
@@ -120,26 +120,22 @@
 </%def>
 
 <%def name="modals()">
-	<!-- Modal - Progress Bar -->
-	<div class="modal fade" id="modalProgress" tabindex="-1" role="dialog" aria-labelledby="modalProgressLabel" aria-hidden="true">
+	<!-- Modal - Track -->
+	<div class="modal fade" id="modalTrack" tabindex="-1" role="dialog" aria-labelledby="modalProgressLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">Updating Offline Content</h4>
+				<h4 class="modal-title">Track</h4>
 				</div>
 				<div class="modal-body">
 					
-					<div class="progress">
-						<div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-							<span class="sr-only"></span>
-						</div>
-					</div>
+                    
 					
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					##<button type="button" class="btn btn-primary">Save changes</button>
+					<button type="button" class="btn btn-primary" onclick="$('#modalTrack .modal-body form').submit();">Save changes</button>
 				</div>
 			</div><!-- /.modal-content -->
 		</div><!-- /.modal-dialog -->

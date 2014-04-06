@@ -1,12 +1,12 @@
 // Popup contols
 function popup_show(data) {
-    $("#popup .content").html(data);
-    $("#popup").removeClass('hidden');    
+    $("#modalTrack .modal-body").html(data);
+    $('#modalTrack').modal('show');
 }
 
 function popup_hide() {
-    $("#popup .content").html("");
-    $("#popup").addClass('hidden');
+    $("#modalTrack .modal-body").html("");
+    $("#modalTrack").modal('hide');
 }
 
 // Attach click event to track_popup links
@@ -33,7 +33,6 @@ function attach_form_track(form_selector) {
     $(form_selector).on("submit", function() {
         var $form = $(this);
         var track_id = $form.data().track_id;
-        console.log("fucknuts", track_id, $form.data());
         
         // Disable the submit button to prevent unwanted multiple submits
         $form.find("input[type='submit']").attr('disabled', true);
