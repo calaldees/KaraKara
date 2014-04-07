@@ -1,8 +1,6 @@
 <%inherit file="_base_comunity.mako"/>
 
 <%def name="body()">
-	<h1>Comunity Lists</h1>
-	
 	% if data.get('not_imported'):
 	<h2>not imported</h2>
 	<ul>
@@ -20,9 +18,9 @@
 		<li class="missing">${track['source_filename']}</li>
 		% else:
 		<li>
-			<a href="/track/${track['id']}">m</a>
+			<a href="/track/${track['id']}"><span class="glyphicon glyphicon-phone"></a>
 			% for preview, url in h.previews(track):
-			<a href="${url}">v</a>
+			<a href="${url}"><span class="glyphicon glyphicon-film"></span></a>
 			% endfor
 			<a href="/comunity/track/${track['id']}" class="track_popup">${track['source_filename']}</a>
 		</li>

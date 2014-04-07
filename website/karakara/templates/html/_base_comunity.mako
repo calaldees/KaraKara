@@ -2,7 +2,7 @@
 
 <%def name="body()">
 % if format == 'html_template':
-    ${next.body()} <% return %>
+	${next.body()} <% return %>
 % endif
 <!DOCTYPE html>
 <html lang="en">
@@ -16,8 +16,8 @@
 		<a class="sr-only" href="#content">Skip navigation</a>
 		<!-- Navigation -->
 		${navbar()}
-        ${messagebar()}
-        
+		${messagebar()}
+		
 		<!-- Content -->
 		<div class="container body_container">
 			<div class="row">
@@ -39,52 +39,59 @@
 
 
 <%def name="navbar()">
-    <%doc>
-        % if identity.get('comunity'):
-        <% comunity = identity.get('comunity') %>
-        <p><img src="${comunity.get('avatar')}" alt="avatar" /> ${comunity.get('username')}</p>
-        % endif
-    </%doc>
-
-		<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
-			<div class="container">
-				<!-- Top Button -->
-				<a href="#top-ancor" class="visible-xs visible-sm fl-nav-goto-top"><span class="glyphicon glyphicon-eject"></span><span class="hidden">Top</span></a>
+	
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+	
+			<!-- Title + Home -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".bs-navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
 				
-				<!-- Title + Home -->
-				<div class="navbar-header">
-					<button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<!-- Brand Title -->
-					<a href="/comunity" class="navbar-brand">${request.registry.settings.get('comunity.title', 'KaraKara')}</a>
-                    <%doc>
-					<!-- Status Identifyers -->
-					<div id="navbar-status">
-						<span id="status-offline" class="hidden">                           <span class="glyphicon glyphicon-open" data-toggle="tooltip" placement="bottom" title="Offline mode"></span>       </span>
-						<span id="status-extra"                 ><span class="extra_toggle"><span class="glyphicon glyphicon-star" data-toggle="tooltip" placement="bottom" title="Extra content"></span></span></span>
-					</div>
-                    </%doc>
-				</div>
-				
-				<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
-					<ul class="nav navbar-nav">
-						##${self.navbar_elements()}
-                        <li>About</li>
-					</ul>
-				</nav>
-				
+				<!-- Brand Title -->
+				<a href="/comunity" class="navbar-brand">${request.registry.settings.get('comunity.title', 'KaraKara')}</a>
 			</div>
-		</header>
+			
+			<div class="collapse navbar-collapse bs-navbar-collapse">
+				<ul class="nav navbar-nav">
+					##${self.navbar_elements()}
+					<li><a href="/comunity/list">Tracks</a></li>
+					##<li class="active"><a href="#">Link</a></li>
+				</ul>
+				 
+				<ul class="nav navbar-nav navbar-right">
+				% if identity.get('comunity'):
+					% if not identity.get('comunity',{}).get('approved'):
+						<li class="navbar-text label label-warning"><span class="glyphicon glyphicon-warning-sign" data-toggle="tooltip" data-placement="left" title="Awaiting user approval from an admin"></span></li>
+					% endif
+					<li class="dropdown">
+						<% comunity = identity.get('comunity') %>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<img src="${comunity.get('avatar')}" alt="${comunity.get('username')}" class="avatar"/>
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="/comunity/logout">Logout</a></li>
+						</ul>
+					</li>
+				% else:
+					<li><a href="/comunity/login">Login</a></li>
+				% endif
+				</ul>
+			</div><!-- /.navbar-collapse -->
+			
+		</div><!-- /.container-fluid -->
+	</nav>
 </%def>
 
 <%def name="messagebar()">
-    % for message in messages:
-    <p>${message}</p>
-    % endfor
+	% for message in messages:
+	<div class="alert alert-warning">${message}</div>
+	% endfor
 </%def>
 
 <%def name="head()">
@@ -94,18 +101,18 @@
 		<meta name="author" content="">
 		
 		<!-- External CSS -->
-		<link href="${h.path.external}css/bootstrap.min.css"       rel="stylesheet">
+		<link href="${h.path.external}css/bootstrap.min.css"	   rel="stylesheet">
 		##<link href="${h.path.external}css/bootstrap-theme.min.css" rel="stylesheet">
 		
 		<!-- Site CSS -->
-        <link href="${h.path.static}css/comunity.css" rel="stylesheet" />
+		<link href="${h.path.static}css/comunity.css" rel="stylesheet" />
 		
 		<!-- Favicons -->
 		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="${h.path.static}ico/apple-touch-icon-144-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="${h.path.static}ico/apple-touch-icon-114-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" sizes="72x72"   href="${h.path.static}ico/apple-touch-icon-72-precomposed.png">
-		<link rel="apple-touch-icon-precomposed"                 href="${h.path.static}ico/apple-touch-icon-57-precomposed.png">
-		<link rel="shortcut icon"                                href="${h.path.static}ico/favicon.png">
+		<link rel="apple-touch-icon-precomposed"				 href="${h.path.static}ico/apple-touch-icon-57-precomposed.png">
+		<link rel="shortcut icon"								href="${h.path.static}ico/favicon.png">
 </%def>
 
 <%def name="footer()">
@@ -129,9 +136,6 @@
 				<h4 class="modal-title">Track</h4>
 				</div>
 				<div class="modal-body">
-					
-                    
-					
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -141,23 +145,3 @@
 		</div><!-- /.modal-dialog -->
 	</div><!-- /.modal -->
 </%def>
-
-
-
-<%doc>
-<html>
-    <head>
-        <title>Comunity</title>
-        
-        
-    </head>
-    
-    <body>
-        
-        ${next.body()}
-        
-        <script src ="${h.extneral_url('jquery.min.js')}"></script>
-        <script src ="${h.static_url('js/comunity.js')}"></script>
-    </body>
-</html>
-</%doc>

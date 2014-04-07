@@ -76,6 +76,7 @@ Todo
   * settings
     * some settings need to be renamed/grouped
     * api to return string datatype for simpler user operation
+  * message system to class messages (both comunity and mobile)
 * comunity
   * social login + user activation
   * tag editor (per track importing)

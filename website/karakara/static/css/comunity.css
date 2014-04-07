@@ -1,16 +1,11 @@
-/* */
+
+body { padding-top: 70px; } /* To support Navbar fixed */
+
 
 .hidden {
     display: none;
 }
 
-#popup {
-    position: fixed;
-    top: 2em;
-    botton: 2em;
-    right: 2em;
-    left: 2em;
-    border: 2px solid #ddd;
-    background-color: #eee;
-    border-radius: 0.5em;
+.avatar {
+    height: 100%;
 }

@@ -2,5 +2,4 @@
 
 <%def name="body()">
     <p>Logged out</p>
-    <a href="/comunity">Comunity portal</a>
 </%def>
