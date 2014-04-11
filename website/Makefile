@@ -43,7 +43,7 @@ env:
 		echo python 3 already installed; \
 	else \
 		echo installing python 3; \
-		sudo apt-get install python3-setuptools -y ; \
+		sudo apt-get install python3-setuptools python3-dev -y ; \
 	fi
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
