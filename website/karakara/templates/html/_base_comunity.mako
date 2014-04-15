@@ -101,7 +101,7 @@
 		<meta name="author" content="">
 		
 		<!-- External CSS -->
-		<link href="${h.path.external}css/bootstrap.min.css"	   rel="stylesheet">
+		<link href="${h.path.external}css/bootstrap.min.css" rel="stylesheet">
 		##<link href="${h.path.external}css/bootstrap-theme.min.css" rel="stylesheet">
 		
 		<!-- Site CSS -->
@@ -111,8 +111,8 @@
 		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="${h.path.static}ico/apple-touch-icon-144-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" sizes="114x114" href="${h.path.static}ico/apple-touch-icon-114-precomposed.png">
 		<link rel="apple-touch-icon-precomposed" sizes="72x72"   href="${h.path.static}ico/apple-touch-icon-72-precomposed.png">
-		<link rel="apple-touch-icon-precomposed"				 href="${h.path.static}ico/apple-touch-icon-57-precomposed.png">
-		<link rel="shortcut icon"								href="${h.path.static}ico/favicon.png">
+		<link rel="apple-touch-icon-precomposed"                 href="${h.path.static}ico/apple-touch-icon-57-precomposed.png">
+		<link rel="shortcut icon"                                href="${h.path.static}ico/favicon.png">
 </%def>
 
 <%def name="footer()">
@@ -123,6 +123,9 @@
 	<!-- Javascript -->
 	<script src="${h.path.external}jquery.min.js"></script>
 	<script src="${h.path.external}js/bootstrap.min.js"></script>
+	<script src="${h.path.external}js/vendor/jquery.ui.widget.js"></script>
+	<script src="${h.path.external}js/jquery.iframe-transport.js"></script>
+	<script src="${h.path.external}js/jquery.fileupload.js"></script>
 	<script src="${h.path.static  }js/comunity.js"></script>
 </%def>
 

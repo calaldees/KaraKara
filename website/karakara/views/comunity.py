@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload
 
 
 from externals.lib.misc import backup
+from externals.lib.pyramid.views.upload import Upload
 
 from ..model              import DBSession
 from ..model.model_tracks import Track

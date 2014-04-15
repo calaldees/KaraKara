@@ -60,6 +60,17 @@
         ]
     },
     
+    "jQuery-File-Upload": {
+        "source": "http://raw.github.com/blueimp/jQuery-File-Upload/VERSION/",
+        "destination_subpath": "static",
+        "version": "9.5.7",
+        "target": [
+            "js/jquery.fileupload.js",
+            "js/vendor/jquery.ui.widget.js",
+            "js/jquery.iframe-transport.js"
+        ]
+    },
+    
     "python_lib": {
         "source": "https://raw.github.com/calaldees/libs/master/python3/",
         "version": "0.0.0",
