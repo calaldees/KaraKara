@@ -79,7 +79,7 @@ init_db_production: ini_production
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
-run: install
+run:
 	env/bin/pserve --reload $(INI_DEV)
 
 run_production: ini_production

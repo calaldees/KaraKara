@@ -10,7 +10,6 @@ from sqlalchemy.orm import joinedload
 
 
 from externals.lib.misc import backup
-from externals.lib.pyramid.views.upload import Upload
 
 from ..model              import DBSession
 from ..model.model_tracks import Track
@@ -133,6 +132,11 @@ class ComunityTrack():
 @view_config(route_name='comunity')
 @web
 def comunity(request):
+    return action_ok()
+
+@view_config(route_name='comunity_upload')
+@web
+def comunity_upload(request):
     return action_ok()
 
 
