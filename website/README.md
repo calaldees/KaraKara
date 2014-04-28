@@ -77,6 +77,11 @@ Todo
     * some settings need to be renamed/grouped
     * api to return string datatype for simpler user operation
   * message system to class messages (both comunity and mobile)
+  * log statistics to db
+    * page views
+    * track requests
+    * number played
+    * user device history (could be interface with device messaging, disabling, live updating)
 * comunity
   * social login + user activation
   * tag editor (per track importing)
@@ -85,6 +90,8 @@ Todo
     * known isues list, unchecked list
   * encode queue + progress feedback
   * delete/rename track
+  * played tracks list
+    * score = (times actually played * 10) + (times requested * 5) + (page views * 1)
 
 
 flash message:
