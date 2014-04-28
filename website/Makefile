@@ -37,7 +37,7 @@ env:
 		echo virtualenv already installed; \
 	else \
 		echo installing virtualenv; \
-		sudo apt-get install python-virtualenv -y ; \
+		sudo apt-get install python-virtualenv curl -y ; \
 	fi
 	if dpkg -s python3-setuptools ; then \
 		echo python 3 already installed; \
@@ -59,7 +59,7 @@ KaraKara.egg-info: env
 	env/bin/python setup.py develop
 
 dependency_downloader.py:
-	curl https://raw.github.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
+	curl https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
 
 externals:
 	mkdir externals && touch externals/__init__.py
