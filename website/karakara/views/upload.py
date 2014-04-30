@@ -13,6 +13,9 @@ from pyramid.view import view_config, view_defaults
 import pyramid.response
 import os
 
+import logging
+log = logging.getLogger(__name__)
+
 
 @view_defaults(route_name='upload')
 class Upload():
@@ -41,19 +44,23 @@ class Upload():
 
     @view_config(request_method='OPTIONS')
     def options(self):
+        log.info('options')
         return pyramid.response.Response(body='')
 
     @view_config(request_method='HEAD')
     def head(self):
+        log.info('head')
         return pyramid.response.Response(body='')
 
     @view_config(request_method='GET', renderer="json")
     def get(self):
+        log.info('get')
         filename = self.request.matchdict.get('name')
         return [f for f in os.listdir(self.path_upload())]
 
     @view_config(request_method='DELETE', xhr=True, accept="application/json", renderer='json')
     def delete(self):
+        log.info('delete')
         filename = self.request.matchdict.get('name')
         try:
             os.remove()
@@ -63,6 +70,7 @@ class Upload():
     
     @view_config(request_method='POST', xhr=True, accept="application/json", renderer='json')
     def post(self):
+        log.info('post')
         if self.request.matchdict.get('_method') == "DELETE":
             return self.delete()
         results = []

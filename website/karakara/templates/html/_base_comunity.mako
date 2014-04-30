@@ -95,6 +95,11 @@
 </%def>
 
 <%def name="head()">
+		<!-- Force latest IE rendering engine or ChromeFrame if installed -->
+		<!--[if IE]>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<![endif]-->
+
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<meta name="description" content="">
@@ -127,7 +132,13 @@
 	<script src="${h.path.external}js/jquery.iframe-transport.js"></script>
 	<script src="${h.path.external}js/jquery.fileupload.js"></script>
 	<script src="${h.path.static  }js/comunity.js"></script>
+	
+	<!-- Javascript Inline -->
+	<script type="text/javascript">
+		${self.scripts_inline()}
+	</script>
 </%def>
+<%def name="scripts_inline()"></%def>
 
 <%def name="modals()">
 	<!-- Modal - Track -->
