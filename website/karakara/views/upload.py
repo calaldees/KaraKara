@@ -114,13 +114,13 @@ class Upload():
             if self._validate(result):
                 #with open( self.imagepath(result['name'] + '.type'), 'w') as f:
                 #    f.write(result['type'])
-                with open( self._path_upload(result['name']), 'w') as f:
+                with open( self._path_upload(result['name']), 'wb') as f:
                     shutil.copyfileobj( fieldStorage.file , f)
-                self.createthumbnail(result['name'])
+                #self.createthumbnail(result['name'])
 
                 result['delete_type'] = DELETEMETHOD
-                result['delete_url'] = self.request.route_url('imageupload',sep='',name='') + '/' + result['name']
-                result['url'] = self.request.route_url('imageview',name=result['name'])
+                result['delete_url'] = self.request.route_url('upload',sep='',name='') + '/' + result['name']
+                result['url'] = self.request.route_url('comunity',name=result['name'])
                 if DELETEMETHOD != 'DELETE':
                     result['delete_url'] += '&_method=DELETE'
                 #if (IMAGE_TYPES.match(result['type'])):
