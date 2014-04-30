@@ -11,3 +11,4 @@
 /development.ini
 dependency_downloader.py
 dependencys_installed.json
+/upload/
