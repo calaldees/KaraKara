@@ -119,8 +119,8 @@ class Upload():
                 #self.createthumbnail(result['name'])
 
                 result['delete_type'] = DELETEMETHOD
-                result['delete_url'] = self.request.route_url('upload',sep='',name='') + '/' + result['name']
-                result['url'] = self.request.route_url('comunity',name=result['name'])
+                result['delete_url'] = self.request.route_url('upload', spacer='.', name='', format='json') + '/' + result['name']
+                result['url'] = self.request.route_url('comunity', name=result['name'], spacer='.', format='json')
                 if DELETEMETHOD != 'DELETE':
                     result['delete_url'] += '&_method=DELETE'
                 #if (IMAGE_TYPES.match(result['type'])):
@@ -129,4 +129,6 @@ class Upload():
                 #    except: # Could not get an image serving url
                 #        pass
             results.append(result)
+        from pprint import pprint
+        pprint(results)
         return results
