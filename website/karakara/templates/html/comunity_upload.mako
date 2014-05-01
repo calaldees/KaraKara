@@ -103,7 +103,7 @@ $(function () {
 			progress + '%'
 		);
 	}).on('fileuploaddone', function (e, data) {
-		console.log("fileupload: done", data.result.files);
+		console.log("fileupload: done");
 		$.each(data.result.files, function (index, file) {
 			if (file.url) {
 				var link = $('<a>')

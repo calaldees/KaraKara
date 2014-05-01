@@ -129,6 +129,4 @@ class Upload():
                 #    except: # Could not get an image serving url
                 #        pass
             results.append(result)
-        from pprint import pprint
-        pprint(results)
-        return results
+        return {'files': results}
