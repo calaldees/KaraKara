@@ -37,15 +37,15 @@ env:
 		echo virtualenv already installed; \
 	else \
 		echo installing virtualenv; \
-		sudo apt-get install python-virtualenv curl -y ; \
+		sudo apt-get install -y python-virtualenv curl ; \
 	fi
 	if dpkg -s python3-setuptools ; then \
 		echo python 3 already installed; \
 	else \
 		echo installing python 3; \
-		sudo apt-get install python3-setuptools python3-dev -y ; \
+		sudo apt-get install -y python3-setuptools python3-dev curl ; \
 	fi
-	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.3-branch/narr/install.html
+	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid
 

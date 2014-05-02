@@ -1,3 +1,0 @@
-[submodule "website/libs"]
-	path = website/libs
-	url = https://github.com/calaldees/libs.git

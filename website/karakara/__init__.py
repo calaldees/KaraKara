@@ -126,16 +126,18 @@ def main(global_config, **settings):
     config.add_route('comunity_list' , append_format_pattern('/comunity/list') )
     config.add_route('comunity_track', append_format_pattern('/comunity/track/{id}'))
     config.add_route('comunity_upload', append_format_pattern('/comunity/upload'))
-    config.add_route('upload' , append_format_pattern('/upload') )
     
     config.add_route('search_tags'   , '/search_tags/{tags:.*}')
     config.add_route('search_list'   , '/search_list/{tags:.*}')
+    
+    config.add_route('upload', '/upload')
     
     # Events -------------------------------------------------------------------
     config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
     
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
+    config.scan('externals.lib.pyramid.views')
     return config.make_wsgi_app()
 
 

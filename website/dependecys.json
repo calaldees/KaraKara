@@ -83,6 +83,8 @@
             "lib/pyramid/auto_format.py",
             "lib/pyramid/etag.py",
             "lib/pyramid/session_identity.py",
+            "lib/pyramid/views/__init__.py",
+            "lib/pyramid/views/upload.py",
             "lib/socket/__init__.py",
             "lib/socket/multisocket_server.py",
             "lib/socket/auth_echo_server.py",
