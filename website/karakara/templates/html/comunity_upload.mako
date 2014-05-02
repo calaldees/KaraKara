@@ -102,6 +102,10 @@ $(function () {
 			'width',
 			progress + '%'
 		);
+	}).on('fileuploadprogress', function (e, data) {
+		// Log the current bitrate for this upload:  --- can this be put in 'fileuploadprogressall'?
+		// https://github.com/blueimp/jQuery-File-Upload/wiki/Extended-progress-information
+		console.log("fileuploadprogress", data.bitrate);
 	}).on('fileuploaddone', function (e, data) {
 		console.log("fileupload: done");
 		$.each(data.result.files, function (index, file) {
