@@ -61,7 +61,9 @@ $(function () {
 			.test(window.navigator.userAgent),
 		//previewMaxWidth: 100,
 		//previewMaxHeight: 100,
-		//previewCrop: true
+		//previewCrop: true,
+		maxChunkSize: 1 * 1000 * 1000 , // 1mb
+		multipart: false  // Do not use multipart form's with chucked uploads
 	}).on('fileuploadadd', function (e, data) {
 		console.log("fileupload: add");
 		data.context = $('<div/>').appendTo('#files');
