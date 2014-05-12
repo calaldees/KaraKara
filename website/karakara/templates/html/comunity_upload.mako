@@ -57,13 +57,23 @@ $(function () {
 		// Enable image resizing, except for Android and Opera,
 		// which actually support image resizing, but fail to
 		// send Blob objects via XHR requests:
-		disableImageResize: /Android(?!.*Chrome)|Opera/
-			.test(window.navigator.userAgent),
+		disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
 		//previewMaxWidth: 100,
 		//previewMaxHeight: 100,
 		//previewCrop: true,
+		
+		// Chucked upload parms
 		maxChunkSize: 1 * 1000 * 1000 , // 1mb
-		multipart: false  // Do not use multipart form's with chucked uploads
+		multipart: false,  // Do not use multipart form's with chucked uploads
+		add: function (e, data) {
+			var that = this;
+			$.getJSON(url, {file: data.files[0].name}, function (result) {
+				var file = result.file;
+				data.uploadedBytes = file && file.size;
+				$.blueimp.fileupload.prototype.options.add.call(that, e, data);
+			});
+		}
+
 	}).on('fileuploadadd', function (e, data) {
 		console.log("fileupload: add");
 		data.context = $('<div/>').appendTo('#files');
