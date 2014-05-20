@@ -69,7 +69,7 @@ Trial Setup
    2. Install Vagrant: <http://www.vagrantup.com/>
    3. Navigate to data folder
    4. Download Vagrantfile and Bootstrap
-      * Linux/Mac: `curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile_.sh`
+      * Linux/Mac: `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh`
       * Windows: Just download the files
    5. `vagrant up --provision`
    6. view <http://localhost:8080/> and <http://localhost:8080/player/player.html> (bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly)
