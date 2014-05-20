@@ -64,7 +64,7 @@ Trial Setup
 
 * Copy video dataset OR Process video dataset from avi/mpg/srt/png/mp3 files with processmedia
 * Option 1 - Vagrant (Linux/Mac/Windows)
-    `curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.github.com/calaldees/KaraKara/master/Vagrantfile_.sh && vagrant up --provision && python -m webbrowser -t "http://localhost:8080/admin" `
+    `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh && vagrant up --provision && python -m webbrowser -t "http://localhost:8080/admin" `
    1. Install VirtualBox: <http://www.virtualbox.org/>
    2. Install Vagrant: <http://www.vagrantup.com/>
    3. Navigate to data folder
