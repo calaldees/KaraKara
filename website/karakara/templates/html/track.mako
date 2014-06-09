@@ -102,7 +102,7 @@
 ## Actions ---------------------------------------------------------------------
 
 <!-- Queue -->
-<div data-role="collapsible">
+<div class='add-to-queue-box' data-role="collapsible">
     <h3>Queue Track</h3>
     % if not (identity and identity.get('admin',False)) and request.registry.settings.get('karakara.system.user.readonly'):
         <p>Queuing tracks has been disabled</p>

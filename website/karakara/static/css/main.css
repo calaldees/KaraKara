@@ -54,6 +54,18 @@ HTML.video    .hide_if_html5_video    {display: none;}
     width : 100%;
 }
 
+/* for wide screens, have the video and lyrics side-by-side instead of making the video HUGE */
+@media all and (min-width: 800px) {
+    .video_placeholder {
+        width: 50%;
+        float: right;
+        margin-left: 30px;
+    }
+    .add-to-queue-box {
+        width: 45%;
+    }
+}
+
 .track_title {
     text-align: center;
     font-size: 130%;
