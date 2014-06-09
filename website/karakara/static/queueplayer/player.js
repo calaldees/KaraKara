@@ -474,7 +474,13 @@ function init_titlescreen(titlescreen_images) {
 		if (!size)     {size     = Math.random()*(titlescreen.max_image_size-titlescreen.min_image_size)+titlescreen.min_image_size;}
 		if (!rotation) {rotation = Math.random()*Math.PI;}
 		if (!speed)    {speed    = Math.random()*titlescreen.max_speed;}
-		$('.screen_title').append("<img src='/files/"+image+"' style='left: "+x+"px; top:"+y+"px; width: "+size+"px; -webkit-transform: rotate("+rotation+"rad);' data-speed='"+(speed+1)+"' data-rotation='"+rotation+"'>");
+
+		var img = $("<img>");
+		img.attr("src", "/files/"+image);
+		img.attr("style", "left: "+x+"px; top:"+y+"px; width: "+size+"px; -webkit-transform: rotate("+rotation+"rad);");
+		img.attr("data-speed", speed+1);
+		img.attr("data-rotation", rotation);
+		$('.screen_title').append(img);
 	}
 	// Init images
 	for (i=0 ; i<titlescreen.num_images ; i++) {addImage();}
