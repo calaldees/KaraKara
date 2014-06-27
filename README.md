@@ -59,26 +59,35 @@ Admins can walk around the room, remoting controlling when tracks are played ful
         * Various formats and codecs (including RM, gah!)
 
 
-Trial Setup
------------
+Local Machine Setup
+-------------------
+
+*For a live event system a Linux server with a custom wifi network will be required*
 
 * Copy video dataset OR Process video dataset from avi/mpg/srt/png/mp3 files with processmedia
 * Option 1 - Vagrant (Linux/Mac/Windows)
     `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh && vagrant up --provision && python -m webbrowser -t "http://localhost:8080/admin" `
-   1. Install VirtualBox: <http://www.virtualbox.org/>
-   2. Install Vagrant: <http://www.vagrantup.com/>
-   3. Navigate to data folder
-   4. Download Vagrantfile and Bootstrap
-      * Linux/Mac: `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh`
-      * Windows: Just download the files
-   5. `vagrant up --provision`
-   6. view <http://localhost:8080/> and <http://localhost:8080/player/player.html> (bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly)
+	1. Prerequestits
+		* Install VirtualBox: <http://www.virtualbox.org/>
+		* Install Vagrant: <http://www.vagrantup.com/>
+	2. Navigate to your video data folder
+	3. Download Vagrantfile and Bootstrap
+		* Linux/Mac
+			* `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh`
+		* Windows (download these links to your video data folder)
+			* [Vagrantfile](https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile)
+			* [Vagrantfile_.sh](https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh)
+	4. `vagrant up --provision`
+	5. view <http://localhost:8080/> and <http://localhost:8080/player/player.html> 
+		* *bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly*
+   
 * Option 2 - Linux/Mac (native with sqllite dev db)
-    `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/admin" `
-   1. navigate to data folder
-   2. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run`
-   3. view <http://localhost:6543/> and <http://localhost:6543/player/player.html>
-
+	1. Prerequestits
+		* Linux: `apt-get install curl git python python3`
+		* Mac: install `brew`, `brew install git python python3`
+	2. Navigate to data folder
+	3. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/admin" `
+	4. View <http://localhost:6543/> and <http://localhost:6543/player/player.html>
 
 
 
@@ -106,6 +115,11 @@ Core components
     * Can be controled via hotkeys or repotely with websockets
     * Automatically updates track list when the queue is changed.
     * Queue order is obscured passed a configurable time
+  * Comunity interface
+    * a dynamic web app to facilitate the curation of track content
+      * upload videos
+      * tag videos
+      * view logs of past events
 * mediaserver
   * nginx webserver to proxy website(pyramid) and serve datafiles efficently
   * postgresql database for prouction.ini configuration
@@ -117,6 +131,10 @@ Additional components
 
 * taginput
   * lightweight python web interface to enable external contributors to edit tags
+  * __this is being replace with the community interface__
+
+
+[Additional Documentation](website/Tutorial.md)
 
 Todo
 ----
