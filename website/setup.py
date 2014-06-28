@@ -21,7 +21,8 @@ install_requires = [
     'py-postgresql', # any DB API should do, this one is pure python
     'python-dateutil',
     'dogpile.cache',
-    'pycrypto' # Considering this inclusion for encrypted cookies
+    'pycrypto', # Considering this inclusion for encrypted cookies
+    'python-magic', # File upload mime type detection (requires libmagic1 c lib)
 ]
 test_requires = [
     'pytest',
