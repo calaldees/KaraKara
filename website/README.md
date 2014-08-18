@@ -31,27 +31,27 @@ Todo
 * player
   * rickroll button
   * general design
-  * display event endtime
+  * display event endtime (!)
   * option for high/low video res mode
 * mobile interface
-  * fix message/token layout issue
+  * fix message/token layout issue (!)
   * message language
     * duplicate performer explanation
-    * duplicate track explantion and exirey
-    * more detail in rejection messages
+    * duplicate track explantion and exirey (!)
+    * more detail in rejection messages (!)
   * responsive
-    * Responsive layout for tablets and landscape displays for track list.
+    * Responsive layout for tablets and landscape displays for track list. (!)
   * individual devices
-    * messaging - save to cookie, notifications in top tray
+    * messaging - save to cookie, notifications in top tray (2)
     * disabling/rickrolling
   * admin:
     * alerts for feedback messages
-    * when remove track - prompt for optional message to user
+    * when remove track - prompt for optional message to user (2)
     * way of recovering tracks that have been played/skipped (just in case of crash or problem)
-    * rejected messages (duplicate performer limit, etc)
-    * priority token assignment
+    * rejected messages (duplicate performer limit, etc) (log 2)
+    * priority token assignment (log 2)
   * search
-    * search id first then tags? (if starts with any non word/diget/space character)
+    * search id first then tags? (if starts with any non word/diget/space character) (!)
   * settings
     * layout enhancements
 * server
@@ -66,23 +66,23 @@ Todo
   * disbale device on mac address
     * lock mac address to ip address
   * queue
-    * validate + limit to badge name
+    * validate + limit to badge name (!)
   * year tag and year range
   * items other than videos in queue (text annoncements, images)
-  * archive songs played for reference later
+  * archive songs played for reference later (log 2)
   * import
-    * import new tracks without destroying whole dataset (utilise video hashs to detect renames?)
-    * pass down parent folder name to prevent need to sync folder name and json
+    * import new tracks without destroying whole dataset (utilise video hashs to detect renames?) (! done?)
+    * pass down parent folder name to prevent need to sync folder name and json (! done?)
   * settings
     * some settings need to be renamed/grouped
     * api to return string datatype for simpler user operation
   * message system to class messages (both comunity and mobile)
-  * log statistics to db
+  * log statistics to db (2)
     * page views
     * track requests
     * number played
     * user device history (could be interface with device messaging, disabling, live updating)
-* comunity
+* comunity (!)
   * social login + user activation
   * tag editor (per track importing)
     * tag warning if missing list
