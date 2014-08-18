@@ -1,3 +1,5 @@
+OS = $(shell uname -s)
+
 PROJECT=karakara
 
 INI_DEV  = development.ini
@@ -27,12 +29,14 @@ help:
 	#
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
 
-env_activate:
-	source env/bin/activate
-env_deactivate:
-	deactivate
 
-env:
+python: $(OS)
+# OSX installation
+Darwin:
+	brew install python3
+	# python virtualenv?
+# Linux installation
+Linux:
 	if dpkg -s python-virtualenv ; then \
 		echo virtualenv already installed; \
 	else \
@@ -45,6 +49,8 @@ env:
 		echo installing python 3; \
 		sudo apt-get install -y python3-setuptools python3-dev curl ; \
 	fi
+
+env: python
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid
@@ -55,7 +61,7 @@ development.ini:
 production.inidiff:
 	cp production.inidiff.dist production.inidiff
 
-KaraKara.egg-info: env
+KaraKara.egg-info/: env/
 	env/bin/python setup.py develop
 
 dependency_downloader.py:
@@ -72,14 +78,14 @@ test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-install: env development.ini production.inidiff KaraKara.egg-info dependency_downloader.py externals dependency_download test.db
+install: env development.ini production.inidiff KaraKara.egg-info dependency_download test.db
 
 init_db_production: ini_production
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
-run:
+run: install
 	env/bin/pserve --reload $(INI_DEV)
 
 run_production: ini_production
