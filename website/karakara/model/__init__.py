@@ -130,14 +130,14 @@ def to_dict(self, list_type='default', include_fields=None, exclude_fields=None,
     # Import fields from include fields - if present ---------------------------
     try   : include_fields = [f.strip() for f in include_fields.split(',')]
     except: pass
-    if isinstance(include_fields, list):
+    if hasattr(include_fields, '__iter__'):
         for field in [field for field in include_fields if field in self.__to_dict__[master_list_name]]:
             fields[field] = self.__to_dict__[master_list_name][field]
 
     # Delete exlucded fields from return ---------------------------------------
     try   : exclude_fields = exclude_fields.split(',')
     except: pass
-    if isinstance(exclude_fields, list):
+    if hasattr(exclude_fields, '__iter__'):
         for field in [field for field in exclude_fields if field in fields]:
             del fields[field]
 
