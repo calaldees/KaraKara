@@ -30,13 +30,17 @@ help:
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
 
 
-python: $(OS)
+# Installation -----------------------------------------------------------------
+
+python: python_$(OS)
+
 # OSX installation
-Darwin:
+python_Darwin:
 	brew install python3
 	# python virtualenv?
+
 # Linux installation
-Linux:
+python_Linux:
 	if dpkg -s python-virtualenv ; then \
 		echo virtualenv already installed; \
 	else \
@@ -49,19 +53,14 @@ Linux:
 		echo installing python 3; \
 		sudo apt-get install -y python3-setuptools python3-dev curl ; \
 	fi
+	touch install_Linux
 
 env: python
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid
 
-development.ini:
-	cp development.ini.dist development.ini
-
-production.inidiff:
-	cp production.inidiff.dist production.inidiff
-
-KaraKara.egg-info/: env/
+KaraKara.egg-info: env
 	env/bin/python setup.py develop
 
 dependency_downloader.py:
@@ -74,18 +73,38 @@ dependency_download: dependency_downloader.py externals
 	# Trigger dependency check on every startup
 	env/bin/python dependency_downloader.py --destination externals
 
+install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db
+
+
+# Databases --------------------------------------------------------------------
+
 test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
-
-install: env development.ini production.inidiff KaraKara.egg-info dependency_download test.db
 
 init_db_production: ini_production
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
-run: install
+
+# Ini files --------------------------------------------------------------------
+
+development.ini:
+	cp development.ini.dist development.ini
+
+production.inidiff:
+	cp production.inidiff.dist production.inidiff
+
+ini_test: development.ini
+	env/bin/python3 externals/lib/make_ini.py test
+ini_production: production.inidiff
+	env/bin/python3 externals/lib/make_ini.py production
+
+
+# Run --------------------------------------------------------------------------
+
+run:
 	env/bin/pserve --reload $(INI_DEV)
 
 run_production: ini_production
@@ -100,26 +119,15 @@ shell:
 shell_production: ini_production
 	env/bin/pshell $(INI_PROD)
 
-clean:
-	rm -rf env
-	rm -rf data
-	rm -rf *.egg-info
-	rm -f *.db
-	rm -f *.log
-	rm -f $(INI_TEST)
-	rm -f $(INI_PROD)
-	rm -rf externals
-	rm -rf dependency_downloader.py
-	rm -rf dependencys_installed.json
+# Daemon -----------------------------------------------------------------------
 
-insert_random_tracks:
-	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
+start_webapp_daemon: ini_production
+	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
+stop_webapp_daemon:
+	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid
 
-import_tracks_dev: test.db
-	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
-import_tracks_production: ini_production  #init_db_production
-	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
+# Test -------------------------------------------------------------------------
 
 #import_tracks_local_mediaserver: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
@@ -139,17 +147,37 @@ test_crawl_production: init_test ini_production
 	echo "unimplemented ... yet"
 	#env/bin/py.test $(PROJECT) --runslow -k crawl_production -s
 
-ini_test: development.ini
-	env/bin/python3 externals/lib/make_ini.py test
-ini_production: production.inidiff
-	env/bin/python3 externals/lib/make_ini.py production
+
+# Data -------------------------------------------------------------------------
+
+insert_random_tracks:
+	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
+
+import_tracks_dev: test.db
+	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
+
+import_tracks_production: ini_production  #init_db_production
+	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
+
+
+# Logs -------------------------------------------------------------------------
 
 log_production:
 	tail -n$(LOG_LINES) production.log
 	tail -n$(LOG_LINES) ../mediaserver/log/access.log
 	tail -n$(LOG_LINES) ../mediaserver/log/error.log
 
-start_webapp_daemon: ini_production
-	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
-stop_webapp_daemon:
-	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid
+
+# Cleanup ----------------------------------------------------------------------
+
+clean:
+	rm -rf env
+	rm -rf data
+	rm -rf *.egg-info
+	rm -f *.db
+	rm -f *.log
+	rm -f $(INI_TEST)
+	rm -f $(INI_PROD)
+	rm -rf externals
+	rm -rf dependency_downloader.py
+	rm -rf dependencys_installed.json
