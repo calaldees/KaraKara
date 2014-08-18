@@ -1,13 +1,13 @@
 {
     "jquery": {
         "source": "http://code.jquery.com/jquery-VERSION.min.js",
-        "version": "2.0.3",
+        "version": "2.1.1",
         "target": "static/jquery.min.js"
     },
 
     "jquery_map": {
         "source": "http://code.jquery.com/jquery-VERSION.min.map",
-        "version": "2.0.3",
+        "version": "2.1.1",
         "target": "static/jquery-VERSION.min.map"
     },
     
@@ -48,7 +48,7 @@
     "bootstrap": {
         "source": "http://raw.github.com/twbs/bootstrap/vVERSION/dist/",
         "destination_subpath": "static",
-        "version": "3.1.1",
+        "version": "3.2.0",
         "target": [
             "js/bootstrap.min.js",
             "css/bootstrap-theme.min.css",
@@ -79,15 +79,16 @@
             "lib/misc.py",
             "lib/xml.py",
             "lib/make_ini.py",
-            "lib/pyramid_helpers/__init__.py",
-            "lib/pyramid_helpers/auto_format.py",
-            "lib/pyramid_helpers/etag.py",
-            "lib/pyramid_helpers/session_identity.py",
-            "lib/pyramid_helpers/views/__init__.py",
-            "lib/pyramid_helpers/views/upload.py",
-            "lib/multisocket/__init__.py",
-            "lib/multisocket/multisocket_server.py",
-            "lib/multisocket/auth_echo_server.py",
+            "lib/pyramid/__init__.py",
+            "lib/pyramid/auto_format.py",
+            "lib/pyramid/etag.py",
+            "lib/pyramid/session_identity.py",
+            "lib/pyramid/views/__init__.py",
+            "lib/pyramid/views/upload.py",
+            "lib/pyramid/events.py",
+            "lib/socket/__init__.py",
+            "lib/socket/multisocket_server.py",
+            "lib/socket/auth_echo_server.py",
             "lib/social/__init__.py",
             "lib/social/facebook.py"
         ]
