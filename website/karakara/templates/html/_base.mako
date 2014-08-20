@@ -8,22 +8,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
         
         <!-- CSS Styles -->
-        <link   href="${h.extneral_url('cssreset-min.css')}" rel="stylesheet" />
-        <link   href="${h.extneral_url('jquery.mobile.min.css')}" rel="stylesheet" />
-        <link   href="${h.static_url('css/main.css')}" rel="stylesheet" />
+        <link   href="${ h.path.external }cssreset-min.css" rel="stylesheet" />
+        <link   href="${ h.path.external }jquery.mobile.min.css" rel="stylesheet" />
+        <link   href="${ h.path.static   }css/main.css" rel="stylesheet" />
         
         <!-- Scripts -->
         ## TODO: Consider moving js to bottom of page - this may require some refactoring of inline js
-        <script src ="${h.static_url('js/modernizer.custom.js')}"></script>
-        <script src ="${h.extneral_url('jquery.min.js')}"></script>
-        <script src ="${h.static_url('js/jquery.mobile-extras.js')}"></script>
-        <script src ="${h.extneral_url('jquery.mobile.min.js')}"></script>
-        <script src ="${h.extneral_url('jquery.cookie.js')}"></script>
-        <script src ="${h.static_url('js/lib.js')}"></script>
-        <script src ="${h.static_url('js/karakara.js')}"></script>
+        <script src="${ h.path.static   }js/modernizer.custom.js"></script>
+        <script src="${ h.path.external }jquery.min.js"></script>
+        <script src="${ h.path.static   }js/jquery.mobile-extras.js"></script>
+        <script src="${ h.path.external }jquery.mobile.min.js"></script>
+        <script src="${ h.path.external }jquery.cookie.js"></script>
+        <script src="${ h.path.external }jquery.sortable.js"></script>
+        <script src="${ h.path.static   }js/lib.js"></script>
+        <script src="${ h.path.static   }js/karakara.js"></script>
         
         <!-- Other -->
-        <link   href="${h.static_url('favicon.ico')}" rel="shortcut icon" />
+        <link   href="${ h.path.static   }favicon.ico" rel="shortcut icon" />
     </head>
     
     <% body_classs = 'admin' if identity and identity.get('admin',False) else '' %>

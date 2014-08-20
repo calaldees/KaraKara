@@ -12,3 +12,4 @@
 dependency_downloader.py
 dependencys_installed.json
 /upload/
+.installed_*

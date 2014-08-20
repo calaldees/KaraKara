@@ -15,15 +15,15 @@ import re
 
 # Package Imports
 from externals.lib.misc import convert_str_with_type, read_json
-from externals.lib.pyramid_helpers.auto_format import registered_formats
+from externals.lib.pyramid.auto_format import registered_formats
 from .templates import helpers as template_helpers
-from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
+from externals.lib.socket.auth_echo_server import AuthEchoServerManager
 
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
-import mako.filters
-html_escape_mako = mako.filters.html_escape
-mako.filters.html_escape = lambda s: html_escape_mako(str(s) if not isinstance(s, str) else s)
+#import mako.filters
+#html_escape_mako = mako.filters.html_escape
+#mako.filters.html_escape = lambda s: html_escape_mako(str(s) if not isinstance(s, str) else s)
 
 
 def main(global_config, **settings):
@@ -138,7 +138,7 @@ def main(global_config, **settings):
     
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
-    config.scan('externals.lib.pyramid_helpers.views')
+    config.scan('externals.lib.pyramid.views')
     return config.make_wsgi_app()
 
 

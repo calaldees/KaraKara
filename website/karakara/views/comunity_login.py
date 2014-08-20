@@ -31,7 +31,7 @@ def comunity_login(request):
     if request.registry.settings.get('karakara.server.mode') == 'development' and not request.registry.settings.get('facebook.secret'):
         request.session['comunity'] = {
             'username': 'developer',
-            'avatar'  : h.static_url('dev_avatar.png'),
+            'avatar'  : '{0}{1}'.format(h.path.static, 'dev_avatar.png'),
             'approved': True,
         }
         return action_ok()

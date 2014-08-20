@@ -32,15 +32,17 @@ help:
 
 # Installation -----------------------------------------------------------------
 
-python: python_$(OS)
+.installed_python: .installed_python_$(OS)
+	touch .installed_python
 
 # OSX installation
-python_Darwin:
+.installed_python_Darwin:
 	brew install python3
 	# python virtualenv?
+	touch .installed_python_Darwin
 
 # Linux installation
-python_Linux:
+.installed_python_Linux:
 	if dpkg -s python-virtualenv ; then \
 		echo virtualenv already installed; \
 	else \
@@ -53,9 +55,9 @@ python_Linux:
 		echo installing python 3; \
 		sudo apt-get install -y python3-setuptools python3-dev curl ; \
 	fi
-	touch install_Linux
+	touch .installed_python_Linux
 
-env: python
+env: .installed_python
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid

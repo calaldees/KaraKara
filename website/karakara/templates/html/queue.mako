@@ -79,7 +79,6 @@ import datetime
     % endif
 
     % if identity.get('admin'):
-    <script src="${h.extneral_url('jquery.sortable.js')}"></script>
     <script>
         //$(function() {
         $(document).ready(function() {
