@@ -138,7 +138,7 @@ def main(global_config, **settings):
     
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
-    config.scan('externals.lib.pyramid.views')
+    config.scan('externals.lib.pyramid_helpers.views')
     return config.make_wsgi_app()
 
 

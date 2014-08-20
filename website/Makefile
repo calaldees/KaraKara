@@ -183,3 +183,4 @@ clean:
 	rm -rf externals
 	rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json
+	rm -rf .installed_*
