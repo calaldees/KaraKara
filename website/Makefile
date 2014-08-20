@@ -75,7 +75,7 @@ dependency_download: dependency_downloader.py externals
 	# Trigger dependency check on every startup
 	env/bin/python dependency_downloader.py --destination externals
 
-install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db
+install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths
 
 
 # Databases --------------------------------------------------------------------
@@ -103,6 +103,15 @@ ini_test: development.ini
 ini_production: production.inidiff
 	env/bin/python3 externals/lib/make_ini.py production
 
+# Upload paths -----------------------------------------------------------------
+
+upload_paths: data data/upload data/uploaded
+data:
+	mkdir data
+data/upload:
+	mkdir data/upload
+data/uploaded:
+	mkdir data/uploaded
 
 # Run --------------------------------------------------------------------------
 

@@ -130,8 +130,10 @@ def main(global_config, **settings):
     config.add_route('search_tags'   , '/search_tags/{tags:.*}')
     config.add_route('search_list'   , '/search_list/{tags:.*}')
     
+    # Upload extras -----
     config.add_route('upload', '/upload{sep:/?}{name:.*}')
-    config.add_route('uploaded', '/uploaded')
+    #config.add_route('uploaded', '/uploaded')
+    config.add_static_view(name=settings['upload.url.path.uploaded'], path=settings['upload.path'])
     
     # Events -------------------------------------------------------------------
     config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
