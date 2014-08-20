@@ -15,9 +15,9 @@ import re
 
 # Package Imports
 from externals.lib.misc import convert_str_with_type, read_json
-from externals.lib.pyramid.auto_format import registered_formats
+from externals.lib.pyramid_helpers.auto_format import registered_formats
 from .templates import helpers as template_helpers
-from externals.lib.socket.auth_echo_server import AuthEchoServerManager
+from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!

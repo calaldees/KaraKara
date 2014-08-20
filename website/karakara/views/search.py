@@ -11,7 +11,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
 from externals.lib.misc import update_dict
-from externals.lib.pyramid.auto_format import registered_formats
+from externals.lib.pyramid_helpers.auto_format import registered_formats
 
 from . import web, cache, etag, action_ok, max_age   # generate_cache_key,
 
