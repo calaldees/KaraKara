@@ -12,7 +12,7 @@
 	
 	<% missing_source = set(data.get('missing_source',[])) %>
 	<h2>tracks</h2>
-	<table class="table table-condensed">
+	<table class="table table-condensed table-hover">
 	% for track in data.get('tracks', []):
 		<%
 			def row_status(tags):
@@ -23,7 +23,7 @@
 			<td colspan="5">${track['source_filename']}</td>
 		% else:
 			<td>
-				<a href="/track/${track['id']}"><span class="glyphicon glyphicon-phone"></a>
+				<a href="/track/${track['id']}"><span class="glyphicon glyphicon-phone"></span></a>
 			</td>
 			<td>
 				% for preview, url in h.previews(track):
@@ -35,17 +35,19 @@
 			</td>
 			<%
 				tags_display = (
-					('title', None),
-					('artist', None),  # more relevent for some categorys
-					('category', None),
-					('lang', None),
+					('title', 'tag'),
+					('artist', 'user'),  # more relevent for some categorys
+					('category', 'th-list'),
+					('lang', 'comment'),
 					('from', None),  # only relevent for some categorys
-					('broken', None),
+					('broken', 'exclamation-sign'),
 				)
 			%>
 			% for tag, tag_icon in tags_display:
 			<td>
-				${track.get('tags',{}).get(tag)}
+				% if track.get('tags',{}).get(tag):
+				<span class="glyphicon glyphicon-${tag_icon}"></span>
+				% endif
 			</td>
 			% endfor
 		% endif
