@@ -4,7 +4,6 @@ import os
 import random
 import re
 import json
-from collections import namedtuple
 
 from sqlalchemy.orm import joinedload
 
@@ -23,8 +22,6 @@ from ..views.tracks import invalidate_track
 import logging
 log = logging.getLogger(__name__)
 
-
-ProviderToken = namedtuple('ProviderToken', ['provider', 'token'])
 
 #-------------------------------------------------------------------------------
 # Cache Management
