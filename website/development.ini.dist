@@ -112,6 +112,7 @@ server.etag.enabled = False -> bool
 server.etag.expire  = day
 server.etag.cache_buster = 
 server.max_age.default = 0 -> int
+server.url = 
 
 # Server -----------------------------------------------------------------------
 [server:main]

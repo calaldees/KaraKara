@@ -39,6 +39,7 @@ class ComunityUser(Base):
         'default': {
             'id'          : None ,
             'name'        : None ,
+            'email'       : None ,
             'timestamp'   : None ,
             'approved'    : None ,
         },
@@ -46,8 +47,6 @@ class ComunityUser(Base):
     
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-            'email'     : None ,
-            
     })
 
 
