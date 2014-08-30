@@ -62,6 +62,13 @@ env: .installed_python
 	virtualenv --no-site-packages -p python3 env
 	env/bin/easy_install pyramid
 
+# Experiments
+#env/bin/node: env
+#	env/bin/pip install nodeenv
+#	source env/bin/activate && nodeenv --python-virtualenv --prebuilt
+#env/lib/node_modules/bower: env/bin/node
+#	source env/bin/activate && npm install -g bower
+
 KaraKara.egg-info: env
 	env/bin/python setup.py develop
 
@@ -74,6 +81,7 @@ externals:
 dependency_download: dependency_downloader.py externals
 	# Trigger dependency check on every startup
 	env/bin/python dependency_downloader.py --destination externals
+	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
 install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths
 
