@@ -7,23 +7,16 @@ import pyramid.events
 # SQLAlchemy imports
 from .model import init_DBSession
 
-# Beaker Sessions
-import pyramid_beaker
-
 # Other imports
 import re
 
 # Package Imports
-from externals.lib.misc import convert_str_with_type, read_json
+from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys
 from externals.lib.pyramid_helpers.auto_format import registered_formats
 from .templates import helpers as template_helpers
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
-
-# HACK! - Monkeypatch Mako 0.8.1 - HACK!
-#import mako.filters
-#html_escape_mako = mako.filters.html_escape
-#mako.filters.html_escape = lambda s: html_escape_mako(str(s) if not isinstance(s, str) else s)
+from pyramid.session import SignedCookieSessionFactory
 
 
 def main(global_config, **settings):
@@ -41,13 +34,14 @@ def main(global_config, **settings):
     # Register Aditional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
     
-    # Beaker Session Manager
-    session_factory = pyramid_beaker.session_factory_from_settings(settings)
-    config.set_session_factory(session_factory)
-    
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
         config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
+
+    # Session Manager
+    session_settings = extract_subkeys(config.registry.settings, 'session.')
+    session_factory = SignedCookieSessionFactory(**session_settings)
+    config.set_session_factory(session_factory)
 
     # Cachebust etags ----------------------------------------------------------
     #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate

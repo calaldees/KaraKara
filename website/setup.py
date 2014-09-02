@@ -15,7 +15,6 @@ install_requires = [
     'pyramid_debugtoolbar',
     'zope.sqlalchemy',
     'waitress',
-    'pyramid_beaker', # Session/Cache framework - (looking at depricating this in favor of encrypted cookies)
     'decorator',
     'beautifulsoup4', # Inspecting html/xml (used in db import crawling)
     'py-postgresql', # any DB API should do, this one is pure python

@@ -29,8 +29,9 @@ server.url          = http://www.karakara.org.uk/
 
 sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 
-session.type    = ext:database
-session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+#session.type    = ext:database
+#session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+session.secret   = change_me
 
 
 [logger_root]

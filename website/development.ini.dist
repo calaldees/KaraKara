@@ -11,7 +11,6 @@ pyramid.debug_templates     = true
 pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_tm
-    pyramid_beaker
     #pyramid_debugtoolbar
 
 
@@ -81,20 +80,12 @@ static.media  = %(here)s/../mediaserver/www/files
 sqlalchemy.url = sqlite:///%(here)s/test.db
 
 # Sessions ---------------------------------------------------------------------
-session.cookie_expires      = true
-session.cookie_on_exception = true
-session.type                = file
-session.data_dir            = %(here)s/data/sessions/data
-session.lock_dir            = %(here)s/data/sessions/lock
-session.key                 = karakara_session
-session.secret              = cockNroll
-session.timeout             = 86400
-session.url                 = 
+session.cookie_name          = karakara_session
+session.secret               = cockNroll
+session.salt                 = pyramid.session.
+session.timeout              = 86400 -> int
+session.max_age              =
 
-# AllanC - can't enable encrypt_key because beaker goes loco! think it's a python 2to3 issue
-#session.encrypt_key  = 'somekarastring'
-#session.validate_key = 'somekarapassword'
-#session.type = cookie
 
 # Templates ---------------------------------------------------------------------
 mako.directories = karakara:templates
