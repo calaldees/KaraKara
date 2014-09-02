@@ -55,6 +55,7 @@ Todo
   * settings
     * layout enhancements
 * server
+  * encrypted cookies
   * multiple queues
     * mode (single/multi)
     * landing page selection (+new if superuser)

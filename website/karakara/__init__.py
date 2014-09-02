@@ -16,7 +16,7 @@ from externals.lib.pyramid_helpers.auto_format import registered_formats
 from .templates import helpers as template_helpers
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
-from pyramid.session import SignedCookieSessionFactory
+from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 
 
 def main(global_config, **settings):
