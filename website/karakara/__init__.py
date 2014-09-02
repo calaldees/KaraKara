@@ -11,7 +11,7 @@ from .model import init_DBSession
 import re
 
 # Package Imports
-from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys
+from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer
 from externals.lib.pyramid_helpers.auto_format import registered_formats
 from .templates import helpers as template_helpers
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
@@ -40,7 +40,7 @@ def main(global_config, **settings):
 
     # Session Manager
     session_settings = extract_subkeys(config.registry.settings, 'session.')
-    session_factory = SignedCookieSessionFactory(**session_settings)
+    session_factory = SignedCookieSessionFactory(serializer=json_serializer, **session_settings)
     config.set_session_factory(session_factory)
 
     # Cachebust etags ----------------------------------------------------------
@@ -57,7 +57,7 @@ def main(global_config, **settings):
     
     def authenicator(key):
         """Only admin authenticated keys can connect to the websocket"""
-        session_data = session_factory(Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.key'],key)}))
+        session_data = session_factory(Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)}))
         return session_data and session_data.get('admin')
     socket_manager = AuthEchoServerManager(
         authenticator=authenicator,

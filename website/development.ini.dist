@@ -84,7 +84,7 @@ session.cookie_name          = karakara_session
 session.secret               = cockNroll
 session.salt                 = pyramid.session.
 session.timeout              = 86400 -> int
-session.max_age              =
+#session.max_age              = 86400 -> int
 
 
 # Templates ---------------------------------------------------------------------

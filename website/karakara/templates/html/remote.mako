@@ -8,7 +8,7 @@
         try {
             socket = new WebSocket("ws://" + location.hostname + ":" + ${request.registry.settings['karakara.websocket.port']} + "/");
             socket.onopen = function(){  //Authenicate client with session key on socket connect
-                socket.send(document.cookie.match(/${request.registry.settings['session.key']}=(.+?)(\;|\b)/)[1]);
+                socket.send(document.cookie.match(/${request.registry.settings['session.cookie_name']}=(.+?)(\;|\b)/)[1]);
             };
         }
         catch(err) {
