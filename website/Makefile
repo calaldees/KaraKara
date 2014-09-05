@@ -155,8 +155,8 @@ stop_webapp_daemon:
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test: ini_test
-	env/bin/py.test externals -q --pdb
-	env/bin/py.test $(PROJECT) -q --pdb
+	env/bin/py.test externals --pdb
+	env/bin/py.test $(PROJECT) --pdb
 	#--pdb --capture=sys
 
 test_crawl: ini_test

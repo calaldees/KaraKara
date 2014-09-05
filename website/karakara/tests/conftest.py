@@ -34,28 +34,31 @@ slow          = pytest.mark.slow
 
 # Fixtures ---------------------------------------------------------------------
 
+
 @pytest.fixture(scope="session")
-def settings(request, ini_file=INI):
+def app_ini(request, ini_file=INI):
     from pyramid.paster import get_appsettings
     return get_appsettings(ini_file)
 
+
 @pytest.fixture(scope="session")
-def app(request, settings):
+def app(request, app_ini):
     from webtest import TestApp
     from karakara import main as karakara_main
-    
+
     #print('setup WebApp')
-    app = TestApp(karakara_main({}, **settings))
-    
+    app = TestApp(karakara_main({}, **app_ini))
+
     from karakara.model.init_data import init_data
     init_data()
-    
+
     def finalizer():
         #print('tearDown WebApp')
         pass
     request.addfinalizer(finalizer)
-    
+
     return app
+
 
 @pytest.fixture(scope="session")
 def DBSession(request, app):
@@ -67,7 +70,13 @@ def DBSession(request, app):
     from karakara.model import DBSession
     return DBSession
 
+
 @pytest.fixture(scope="session")
 def commit(request, DBSession):
     from karakara.model import commit
     return commit
+
+
+@pytest.fixture()
+def settings(request, app):
+    return app.app.registry.settings

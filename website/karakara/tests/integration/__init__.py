@@ -19,7 +19,7 @@ class temporary_setting:
         self.app.put('/settings.json', {self.key: self.value})
         log.debug('Temporay setting {0}:{1} -> {2}'.format(self.key, self.original_value, self.value))
         return None
-    
+
     def __exit__(self, type, value, traceback):
         def empty_list_hack(value):
             # Hack to fix reverting to empty list
@@ -47,7 +47,7 @@ class admin_rights:
             # We altered the admin state inadvertenty from enabled to disabled, ensure it's enabled
             assert self.app.get('/admin.json').json['identity']['admin']
         return None
-    
+
     def __exit__(self, type, value, traceback):
         # If admin mode was not enabled at the beggining, ensure it is revolked again
         if not self.original_value:
