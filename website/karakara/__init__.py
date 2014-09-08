@@ -18,6 +18,15 @@ from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 
+# HACK! - Monkeypatch Mako 0.8.1 - HACK!
+#import mako.filters
+#html_escape_mako = mako.filters.html_escape
+#mako.filters.html_escape = lambda s: html_escape_mako(str(s) if not isinstance(s, str) else s)
+
+# HACK! - Monkeypatch - SignedCookieSessionFactory
+import pyramid.session
+pyramid.session.manage_changed = lambda x: x
+
 
 def main(global_config, **settings):
     """
@@ -57,7 +66,8 @@ def main(global_config, **settings):
     
     def authenicator(key):
         """Only admin authenticated keys can connect to the websocket"""
-        session_data = session_factory(Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)}))
+        request = Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
+        session_data = session_factory(request)
         return session_data and session_data.get('admin')
     socket_manager = AuthEchoServerManager(
         authenticator=authenicator,

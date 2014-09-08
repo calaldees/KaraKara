@@ -93,7 +93,8 @@ function setup_websocket() {
 	}
 	socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
 	socket.onopen = function(){ // Authenicate client with session key on socket connect
-		socket.send(document.cookie.match(/karakara_session=(.+?)(\;|\b)/)[1]);  // TODO - replace with use of settings['session_key'] or server could just use the actual http-header
+		var session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];  // TODO - replace with use of settings['session_key'] or server could just use the actual http-header
+		socket.send(session_key);
 		$('body').removeClass('websocket_disconnected');
 		console.log("Websocket: Connected");
 		if (socket_retry_interval) {

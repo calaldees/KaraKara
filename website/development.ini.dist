@@ -85,7 +85,7 @@ session.secret               = cockNroll
 session.salt                 = pyramid.session.
 session.timeout              = 86400 -> int
 #session.max_age              = 86400 -> int
-
+session.reissue_time         = None -> None
 
 # Templates ---------------------------------------------------------------------
 mako.directories = karakara:templates
