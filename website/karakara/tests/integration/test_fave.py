@@ -9,9 +9,9 @@ def test_fave_cycle(app, settings, tracks):
     """
     # Add/remove test tracks
     with patch.dict(settings, {'karakara.faves.enabled': True}):
-        response = app.post('/fave?format=json', {'id':'t1'})
-        response = app.post('/fave?format=json', {'id':'t1', 'method':'delete'})
-        response = app.post('/fave?format=json', {'id':'t2'})
+        response = app.post('/fave', {'id': 't1'})
+        response = app.post('/fave', {'id': 't1', 'method': 'delete'})
+        response = app.post('/fave', {'id': 't2'})
         # Check the correct tracks are in the fave view
         response = app.get('/fave')
         assert response.status_code == 302
@@ -23,7 +23,9 @@ def test_fave_cycle(app, settings, tracks):
         assert 'Add to faves' in response.text
         response = app.get('/track/t2')
         assert 'Remove from faves' in response.text
-        response = app.post('/fave?format=json', {'id':'t2', 'method':'delete'})
+        response = app.post('/fave', {'id': 't2', 'method': 'delete'})
+        response = app.get('/track/t2')
+        assert 'Add to faves' in response.text
 
 
 def test_fave_disbaled(app, settings, tracks):
@@ -31,7 +33,7 @@ def test_fave_disbaled(app, settings, tracks):
     with patch.dict(settings, {'karakara.faves.enabled': False}):
         response = app.get('/fave', expect_errors=True)
         assert response.status_code == 400
-        response = app.post('/fave?format=json', {'id':'t1'}, expect_errors=True)
+        response = app.post('/fave?format=json', {'id': 't1'}, expect_errors=True)
         assert response.status_code == 400, 'faves should be disabled'
         response = app.get('/track/t1')
         assert 'faves' not in response.text.lower()

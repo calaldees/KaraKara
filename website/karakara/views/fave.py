@@ -30,7 +30,7 @@ def fave_view(request):
     view current faves
     
     not really needed as faves are also part of the identity dict
-    """    
+    """
     trackids = request.session['faves']
     
     if request.matchdict['format']=='html':
@@ -50,6 +50,7 @@ def fave_add(request):
     if 'faves' not in request.session:
         request.session['faves'] = []
     request.session['faves'].append(request.params['id'])
+    request.session.changed()
     return action_ok(message='added to faves')
 
 @view_config(route_name='fave', custom_predicates=(method_delete_router, lambda info,request: request.params.get('id'))) #request_method='DELETE'
@@ -60,4 +61,5 @@ def fave_del(request):
     Remove fave from session
     """
     request.session['faves'].remove(request.params['id'])
+    request.session.changed()
     return action_ok(message='removed from faves')
