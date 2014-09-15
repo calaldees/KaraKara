@@ -29,7 +29,7 @@ $(function () {
 	'use strict';
 	// Change this to the location of your server-side upload handler:
 	var url = '/upload',
-		uploadButton = $('<button/>')
+		$uploadButton = $('<button/>')
 			.addClass('btn btn-primary')
 			.prop('disabled', true)
 			.text('Processing...')
@@ -83,7 +83,7 @@ $(function () {
 			if (!index) {
 				node
 					.append('<br>')
-					.append(uploadButton.clone(true).data(data));
+					.append($uploadButton.clone(true).data(data));
 			}
 			node.appendTo(data.context);
 		});
@@ -135,7 +135,7 @@ $(function () {
 			}
 		});
 	}).on('fileuploadfail', function (e, data) {
-		console.log("fileupload: fail");
+		console.log("fileupload: fail", e.errorThrown);
 		$.each(data.files, function (index, file) {
 			var error = $('<span class="text-danger"/>').text('File upload failed.');
 			$(data.context.children()[index])
