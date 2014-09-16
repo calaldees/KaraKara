@@ -9,7 +9,7 @@
 
     % if 'redirect_url' in data:
         <script type="text/javascript">
-            window.location = "${data.get('redirect_url') | n}"";
+            window.location = "${data.get('redirect_url') | n}";
         </script>
         <a href="${data.get('redirect_url')}">Redirect</a>
     % endif
