@@ -18,6 +18,7 @@ from . import web, action_ok, action_error, cache, generate_cache_key, comunity_
 
 from ..scripts.import_tracks import import_json_data as import_track
 from ..views.tracks import invalidate_track
+from ..templates import helpers as h
 
 import logging
 log = logging.getLogger(__name__)
@@ -120,7 +121,9 @@ class ComunityTrack():
             with open(subtitle_path_filename, 'w') as filehandle:
                 filehandle.write(subtitle_data_raw)
                 self._import_required = True
-
+    @property
+    def video_previews(self):
+        return h.previews(self.track)
 
 #-------------------------------------------------------------------------------
 # Community Views
@@ -180,11 +183,13 @@ def comunity_list(request):
 @comunity_only
 def comunity_track(request):
     ctrack = ComunityTrack(request, request.matchdict['id'])
+    #import pdb ; pdb.set_trace()
     return action_ok(data={
         'track': ctrack.track,
         'tag_matrix': {},
         'tag_data': ctrack.tag_data_raw,
         'subtitles': ctrack.subtitle_data,
+        'previews': ctrack.video_previews,
     })
 
 @view_config(route_name='comunity_track', request_method='POST')
