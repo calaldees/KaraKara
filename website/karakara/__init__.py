@@ -14,7 +14,10 @@ import re
 from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer
 from externals.lib.pyramid_helpers.auto_format import registered_formats
 from .templates import helpers as template_helpers
+from externals.lib.social._login import NullLoginProvider, FacebookLogin, PersonaLogin
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
+
+from .auth import ComunityUserStore, NullComunityUserStore
 
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 
@@ -72,6 +75,27 @@ def main(global_config, **settings):
     )
     config.registry['socket_manager'] = socket_manager
     socket_manager.start()
+
+    # Login Providers ----------------------------------------------------------
+
+    from .views import comunity_login
+    comunity_login.user_store = ComunityUserStore()
+    # Facebook
+    if config.registry.settings.get('facebook.secret'):
+        comunity_login.login_provider = FacebookLogin(
+            appid=config.registry.settings.get('facebook.appid'),
+            secret=config.registry.settings.get('facebook.secret'),
+            permissions=config.registry.settings.get('facebook.permissions'),
+        )
+    # Firefox Persona
+    if config.registry.settings.get('persona.secret'):
+        comunity_login.login_provider = PersonaLogin()
+    # No login provider
+    elif config.registry.settings.get('karakara.server.mode') == 'development':
+        # Auto login if no service keys are provided
+        comunity_login.login_provider = NullLoginProvider()
+        comunity_login.user_store = NullComunityUserStore()
+
 
     # Renderers ----------------------------------------------------------------
 
