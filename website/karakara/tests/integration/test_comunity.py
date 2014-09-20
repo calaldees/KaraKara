@@ -1,3 +1,5 @@
+from karakara.tests.conftest import unfinished
+
 from unittest.mock import patch
 
 from externals.lib.social._login import ILoginProvider, ProviderToken
@@ -41,4 +43,13 @@ def test_list(app, users, tracks):
     for track in tracks:
         DBSession.add(track)
         assert track.title in response.text
+    logout(app)
+
+
+@unfinished
+def test_track(app):
+    login(app)
+    response = app.get('/comunity/track/t1')
+    assert 'Test Track 1' in response.text
+    assert 'track1_source' in response.text
     logout(app)
