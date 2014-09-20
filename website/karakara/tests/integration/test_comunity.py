@@ -29,6 +29,16 @@ def logout(app):
     assert 'login' in response.text.lower()
 
 
-def test_login_flow(app, users):
+def test_reject_unapproved(app):
+    response = app.get('/comunity/list', expect_errors=True)
+    assert response.status_code == 403
+    assert 'Approved comunity users only' in response.text
+
+
+def test_list(app, users, tracks):
     login(app)
+    response = app.get('/comunity/list')
+    for track in tracks:
+        DBSession.add(track)
+        assert track.title in response.text
     logout(app)
