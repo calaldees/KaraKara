@@ -37,7 +37,7 @@ class ComunityUserStore(IUserStore):
             'username': user.name,
             'email': user.email,
             #'provider'  : provider_token.provider,
-            'avatar_url': user.data.get('avatar_url'),
+            'avatar_url': user.tokens[0].data.get('avatar_url'),
             'approved': user.approved,
         }
 

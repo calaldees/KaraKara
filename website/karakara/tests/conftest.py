@@ -8,6 +8,7 @@ INI = 'test.ini'
 
 from karakara.tests.data.tracks import *
 from karakara.tests.data.tracks_random import *
+from karakara.tests.data.auth import *
 
 # Markers ----------------------------------------------------------------------
 

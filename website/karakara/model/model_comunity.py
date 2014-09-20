@@ -12,7 +12,7 @@ __all__ = [
     "ComunityUser",
 ]
 
-_provider_types = Enum('facebook', 'google', 'twitter', 'janrain', 'gigya', name='provider_types')
+_provider_types = Enum('facebook', 'google', 'twitter', 'janrain', 'gigya', 'test_provider', name='provider_types')
 
 
 class ComunityUser(Base):
