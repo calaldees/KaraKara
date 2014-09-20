@@ -44,13 +44,24 @@ def _generate_cache_key(request):
 #-------------------------------------------------------------------------------
 
 class ComunityTrack():
+    """
+    Tracks are more than just a db entry. They have static data files accociated
+    with them.
+    These static data files are used to import tracks into the db.
+    Rather than just changing our own local db, we need to update modify and manage
+    these external static files.
+
+    ComunityTrack is an object that wraps a Track with additional methods to
+    manipulate these files.
+    """
+
     def __init__(self, request, track_id):
         assert track_id and track_id != 'undefined', 'track_id required'
         self.media_path = request.registry.settings['static.media']
         self.track_id = track_id
         self._track_dict = None
         self._import_required = False
-    
+
     @property
     def track(self):
         if not self._track_dict:
@@ -63,12 +74,12 @@ class ComunityTrack():
                 ) \
                 .get(self.track_id).to_dict('full')
         return self._track_dict
-    
+
     def import_track(self):
         with open(self.path_description_filename, 'r') as filehandle:
             import_track(filehandle, self.path_description_filename)
             invalidate_track(self.track_id)
-    
+
     @property
     def path(self):
         return os.path.join(self.media_path, self.track['source_filename'])
@@ -158,16 +169,16 @@ def comunity_list(request):
                     #joinedload('lyrics'), \
                 )
         ]
-        
+
         # Get track folders from media source
         media_path = request.registry.settings['static.media']
         media_folders = set((folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder))))
-        
+
         # Compare folder sets to identify unimported/renamed files
         track_folders = set((track['source_filename'] for track in tracks))
         not_imported = media_folders.difference(track_folders)
         missing_source = track_folders.difference(media_folders)
-        
+
         return {
             'tracks': tracks,
             'not_imported': sorted(not_imported),
@@ -183,7 +194,6 @@ def comunity_list(request):
 @comunity_only
 def comunity_track(request):
     ctrack = ComunityTrack(request, request.matchdict['id'])
-    #import pdb ; pdb.set_trace()
     return action_ok(data={
         'track': ctrack.track,
         'tag_matrix': {},
@@ -200,14 +210,13 @@ def comunity_track_update(request):
     # Save tag data
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
-    
+
     # rebuild subtitle_data dict
     subtitle_data = {(k.replace('subtitles_', ''), v) for k, v in request.params.items() if k.startswith('subtitles_')}
     if subtitle_data:
         ctrack.subtitle_data = subtitle_data
-    
+
     if ctrack._import_required:
         ctrack.import_track()
-    
-    #import pdb ; pdb.set_trace()
+
     return action_ok()
