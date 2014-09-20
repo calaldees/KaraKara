@@ -3,7 +3,7 @@
 <%def name="body()">
     <h1>Comunity Login</h1>
 
-    % if identity.get('comunity'):
+    % if identity.get('user'):
         <% data['redirect_url'] = '/comunity' %>
     % endif
 

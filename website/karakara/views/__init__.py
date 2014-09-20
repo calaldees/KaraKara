@@ -31,7 +31,7 @@ cache = make_region().configure(
 web = decorator_combine(
     gzip,
     auto_format_output,
-    overlay_session_identity(('id','admin','faves','comunity')),
+    overlay_session_identity(('id', 'admin', 'faves', 'user')),
     mark_external_request
 )
 
@@ -45,7 +45,7 @@ def is_admin(request):
     return request.session.get('admin',False)  # request.session['admin']
 
 def is_comunity(request):
-    return request.session.get('comunity',{}).get('approved', False)
+    return request.session.get('user',{}).get('approved', False)
 
 @decorator
 def admin_only(target, *args, **kwargs):

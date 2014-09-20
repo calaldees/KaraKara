@@ -64,14 +64,14 @@
 				</ul>
 				 
 				<ul class="nav navbar-nav navbar-right">
-				% if identity.get('comunity'):
-					% if not identity.get('comunity',{}).get('approved'):
+				% if identity.get('user'):
+					% if not identity.get('user',{}).get('approved'):
 						<li class="navbar-text label label-warning"><span class="glyphicon glyphicon-warning-sign" data-toggle="tooltip" data-placement="left" title="Awaiting user approval from an admin"></span></li>
 					% endif
 					<li class="dropdown">
-						<% comunity = identity.get('comunity') %>
+						<% user = identity.get('user') %>
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<img src="${comunity.get('avatar_url')}" alt="${comunity.get('username')}" class="avatar"/>
+							<img src="${user.get('avatar_url')}" alt="${user.get('username')}" class="avatar"/>
 							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">

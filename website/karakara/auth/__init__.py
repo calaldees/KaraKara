@@ -44,7 +44,7 @@ class ComunityUserStore(IUserStore):
 
 class NullComunityUserStore(IUserStore):
     def get_user_from_token(self, provider_token):
-        True
+        return True
 
     def user_to_session_dict(self, user):
         return {
