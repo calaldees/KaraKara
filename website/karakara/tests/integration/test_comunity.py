@@ -1,8 +1,9 @@
 from karakara.tests.conftest import unfinished
 
-from unittest.mock import patch, mock_open
+from unittest.mock import patch
 
 from externals.lib.social._login import ILoginProvider, ProviderToken
+from externals.lib.test import MultiMockOpen
 
 from karakara.views.comunity import ComunityTrack
 from karakara.model import DBSession
@@ -32,6 +33,8 @@ def logout(app):
     assert 'login' in response.text.lower()
 
 
+# Tests ------------------------------------------------------------------------
+
 def test_reject_unapproved(app):
     response = app.get('/comunity/list', expect_errors=True)
     assert response.status_code == 403
@@ -48,10 +51,20 @@ def test_list(app, users, tracks):
 
 
 @unfinished
-def test_track(app):
+def test_track(app, users, tracks):
     login(app)
-    with patch(ComunityTrack._open, mock_open(read_data='bob')):
+
+    multi_mock_open = MultiMockOpen()
+    multi_mock_open.add_handler('tags.txt', """
+        title: test title
+        artist: test artist
+        category test category
+    """)
+
+    with patch.object(ComunityTrack, '_open', multi_mock_open.open):
         response = app.get('/comunity/track/t1')
+
     assert 'Test Track 1' in response.text
     assert 'track1_source' in response.text
+
     logout(app)
