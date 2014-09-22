@@ -56,10 +56,11 @@ class ComunityTrack():
     ComunityTrack is an object that wraps a Track with additional methods to
     manipulate these files.
     """
+    _open = open
 
     @classmethod
-    def factory(track_id, request):
-        return ComunityTrack(track_id, request.registry.settings['static.media'])
+    def factory(cls, track_id, request):
+        return ComunityTrack(track_id, request.registry.settings['static.media'], open=cls._open)
 
     def __init__(self, track_id, media_path, open=open):
         assert track_id and track_id != 'undefined', 'track_id required'

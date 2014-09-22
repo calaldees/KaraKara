@@ -1,9 +1,10 @@
 from karakara.tests.conftest import unfinished
 
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 
 from externals.lib.social._login import ILoginProvider, ProviderToken
 
+from karakara.views.comunity import ComunityTrack
 from karakara.model import DBSession
 from karakara.model.model_comunity import ComunityUser
 
@@ -49,7 +50,8 @@ def test_list(app, users, tracks):
 @unfinished
 def test_track(app):
     login(app)
-    response = app.get('/comunity/track/t1')
+    with patch(ComunityTrack._open, mock_open(read_data='bob')):
+        response = app.get('/comunity/track/t1')
     assert 'Test Track 1' in response.text
     assert 'track1_source' in response.text
     logout(app)
