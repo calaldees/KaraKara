@@ -57,9 +57,14 @@ class ComunityTrack():
     manipulate these files.
     """
 
-    def __init__(self, request, track_id, open=open):
+    @classmethod
+    def factory(track_id, request):
+        return ComunityTrack(track_id, request.registry.settings['static.media'])
+
+    def __init__(self, track_id, media_path, open=open):
         assert track_id and track_id != 'undefined', 'track_id required'
-        self.media_path = request.registry.settings['static.media']
+        assert media_path
+        self.media_path = media_path
         self.track_id = track_id
         self._track_dict = None
         self._import_required = False
@@ -209,7 +214,7 @@ def comunity_list(request):
 @web
 @comunity_only
 def comunity_track(request):
-    ctrack = ComunityTrack(request, request.matchdict['id'])
+    ctrack = ComunityTrack.factory(request.matchdict['id'], request)
     return action_ok(data={
         'track': ctrack.track,
         'tag_matrix': {},
@@ -224,7 +229,7 @@ def comunity_track(request):
 @web
 @comunity_only
 def comunity_track_update(request):
-    ctrack = ComunityTrack(request, request.matchdict['id'])
+    ctrack = ComunityTrack.factory(request.matchdict['id'], request)
     # Save tag data
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
