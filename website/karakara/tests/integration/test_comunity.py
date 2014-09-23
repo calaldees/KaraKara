@@ -1,5 +1,4 @@
-from karakara.tests.conftest import unfinished
-
+import json
 from unittest.mock import patch
 
 from externals.lib.social._login import ILoginProvider, ProviderToken
@@ -50,21 +49,40 @@ def test_list(app, users, tracks):
     logout(app)
 
 
-@unfinished
 def test_track(app, users, tracks):
     login(app)
 
     multi_mock_open = MultiMockOpen()
-    multi_mock_open.add_handler('tags.txt', """
-        title: test title
-        artist: test artist
-        category test category
-    """)
+    multi_mock_open.add_handler(
+        'tags.txt',
+        """
+            title: Test Track 1 - TITLE EXTENDED
+            artist: test artist
+            category test category
+        """
+    )
+    multi_mock_open.add_handler(
+        'sources.json',
+        json.dumps({
+            'test.avi': {},
+            'test.ssa': {},
+        })
+    )
+    multi_mock_open.add_handler(
+        'test.ssa',
+        """
+            subtitle content
+        """
+    )
 
     with patch.object(ComunityTrack, '_open', multi_mock_open.open):
         response = app.get('/comunity/track/t1')
 
-    assert 'Test Track 1' in response.text
-    assert 'track1_source' in response.text
+    for text in (
+        'Test Track 1 - TITLE EXTENDED',
+        'track1source',
+        'subtitle content',
+    ):
+        assert text in response.text
 
     logout(app)

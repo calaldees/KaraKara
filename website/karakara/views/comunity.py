@@ -131,7 +131,7 @@ class ComunityTrack():
     @property
     def source_data(self):
         with self._open(self.source_data_filename, 'r') as source_data_filehandle:
-            return json.load(source_data_filehandle)
+            return json.loads(source_data_filehandle.read())
 
     @property
     def subtitle_filenames(self):

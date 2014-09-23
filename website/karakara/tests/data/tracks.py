@@ -114,7 +114,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             ],
             'attachments': ['image1','preview1'],
             'lyrics': lyrics[0],
-            'source_filename': 'track1',
+            'source_filename': 'track1source',
         },
         {
             'id'      :"t2",
@@ -126,7 +126,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             ],
             'attachments': ['image2','preview2'],
             'lyrics':lyrics[1],
-            'source_filename': 'track2',
+            'source_filename': 'track2source',
         },
         {
             'id'      :"t3",
@@ -137,7 +137,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 'ending','female','en','jpop', 'series Y',
             ],
             'attachments': ['image3','preview3'],
-            'source_filename': 'track3',
+            'source_filename': 'track3source',
         },
         {
             'id'      :"xxx",
@@ -147,7 +147,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 'fr',
             ],
             'attachments': [],
-            'source_filename': 'wildcard',
+            'source_filename': 'wildcardsource',
         },
     ]
     
