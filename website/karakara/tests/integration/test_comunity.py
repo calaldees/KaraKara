@@ -44,14 +44,15 @@ def test_list(app, users, tracks):
     login(app)
     response = app.get('/comunity/list')
     for track in tracks:
-        DBSession.add(track)
-        assert track.title in response.text
+        DBSession.add(track)  # Hu? why does this need to be attached to the session again?
+        assert track.source_filename in response.text
     logout(app)
 
 
 def test_track(app, users, tracks):
     login(app)
 
+    # Static file data
     multi_mock_open = MultiMockOpen()
     multi_mock_open.add_handler(
         'tags.txt',
@@ -75,9 +76,11 @@ def test_track(app, users, tracks):
         """
     )
 
+    # Make web request
     with patch.object(ComunityTrack, '_open', multi_mock_open.open):
         response = app.get('/comunity/track/t1')
 
+    # Assert output
     for text in (
         'Test Track 1 - TITLE EXTENDED',
         'track1source',
