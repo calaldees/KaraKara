@@ -12,7 +12,8 @@
 			}
 			else {
 				cycleThumbnail();
-				interval_id = setInterval(cycleThumbnail, 3000); // Start the coursel for the staic images
+				if (typeof(cycle_interval_id) != "undefined") {clearInterval(cycle_interval_id);}
+				cycle_interval_id = setInterval(cycleThumbnail, 3000); // Start the coursel for the staic images
 			}
 		}
 		$(document).ready(function() {init_video();});
@@ -61,7 +62,6 @@
 		<script type="text/javascript">
 			var current_thumbnail = current_thumbnail || null;
 			function cycleThumbnail() {
-				
 				if (current_thumbnail) {
 					current_thumbnail.hide();
 					current_thumbnail = current_thumbnail.next();

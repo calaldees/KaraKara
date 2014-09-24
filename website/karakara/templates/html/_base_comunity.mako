@@ -126,6 +126,7 @@
 
 <%def name="scripts()">
 	<!-- Javascript -->
+	<script src="${h.path.static  }js/modernizer.custom.js"></script>
 	<script src="${h.path.external}jquery.min.js"></script>
 	<script src="${h.path.external}js/bootstrap.min.js"></script>
 	<script src="${h.path.external}jquery.cookie.js"></script>
@@ -133,7 +134,7 @@
 	<script src="${h.path.external}js/jquery.iframe-transport.js"></script>
 	<script src="${h.path.external}js/jquery.fileupload.js"></script>
 	<script src="${h.path.static  }js/comunity.js"></script>
-	<script src="https://login.persona.org/include.js"></script>
+	##<script src="https://login.persona.org/include.js"></script>
 	
 	<!-- Javascript Inline -->
 	<script type="text/javascript">
