@@ -1,11 +1,15 @@
 // Popup contols
 function popup_show(data) {
     $("#modalTrack .modal-body").html(data);
+    $("#modalTrack .modal-title").text(
+        $("#modalTrack .modal-body").find('h1,h2,h3:first').remove().text()
+    );
     $('#modalTrack').modal('show');
 }
 
 function popup_hide() {
     $("#modalTrack .modal-body").html("");
+    $("#modalTrack .modal-title").text("");
     $("#modalTrack").modal('hide');
 }
 
