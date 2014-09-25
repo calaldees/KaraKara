@@ -1,25 +1,25 @@
+import re
+import operator
+
 # Pyramid imports
+import pyramid.events
 from pyramid.config import Configurator
 from pyramid.request import Request
-import pyramid.events
+from pyramid.scripts.pserve import add_file_callback
+from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 
-
-# SQLAlchemy imports
-from .model import init_DBSession
-
-# Other imports
-import re
-
-# Package Imports
-from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer
+# External Imports
+from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
 from externals.lib.pyramid_helpers.auto_format import registered_formats
-from .templates import helpers as template_helpers
 from externals.lib.social._login import NullLoginProvider, FacebookLogin, PersonaLogin
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
+# Package Imports
+from .templates import helpers as template_helpers
 from .auth import ComunityUserStore, NullComunityUserStore
+# SQLAlchemy imports
+from .model import init_DBSession
 
-from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
 #import mako.filters
@@ -41,6 +41,10 @@ def main(global_config, **settings):
 
     # Register Aditional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
+
+    # Reload on template change
+    template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
+    add_file_callback(lambda: template_filenames)
 
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
