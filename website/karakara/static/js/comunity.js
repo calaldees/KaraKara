@@ -1,38 +1,39 @@
-// Popup contols
-function popup_show(data) {
+// Modal Track 
+function modal_track_show(data) {
     $("#modalTrack .modal-body").html(data);
+    // Set the title of the modal as the first heading in the body data. Ensure the heading is removed from the original doc
     $("#modalTrack .modal-title").text(
-        $("#modalTrack .modal-body").find('h1,h2,h3:first').remove().text()
+        $("#modalTrack .modal-body").find('h1,h2,h3').first().remove().text()
     );
     $('#modalTrack').modal('show');
 }
 
-function popup_hide() {
+function modal_track_hide() {
     $("#modalTrack .modal-body").html("");
     $("#modalTrack .modal-title").text("");
     $("#modalTrack").modal('hide');
 }
 
-// Attach click event to track_popup links
-$('a.track_popup').on('click', function() {
+// Modal Track - Links
+$('a.modal_track_link').on('click', function() {
     $popup_link = $(this);
-    popup_show("<p>Loading...</p>");
+    modal_track_show("<p>Loading...</p>");
     $.ajax($popup_link.attr('href')+".html_template", {
         type: "GET",
         success: function(data, text, jqXHR) {
             //console.log(data, text, jqXHR);
-            popup_show(data);
+            modal_track_show(data);
             init_track_popup('#form_track');
         },
         error: function(jqXHR) {
             console.error(jqXHR);
-            popup_show("<p>Error</p>");
+            modal_track_show("<p>Error</p>");
         }
     });
     return false;
 });
 
-// Popup submit
+// Modal Track - Setup Submit Handlers
 function init_track_popup(form_selector) {
     init_video();
     
@@ -61,7 +62,7 @@ function init_track_popup(form_selector) {
                 var response = jqXHR.responseJSON
                 console.log(response);
                 $form.find("input[type='submit']").removeAttr('disabled');
-                popup_hide();
+                modal_track_hide();
             },
             error: function(jqXHR) {
                 console.error(jqXHR);

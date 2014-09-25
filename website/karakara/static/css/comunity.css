@@ -9,3 +9,15 @@ body { padding-top: 70px; } /* To support Navbar fixed */
 .avatar {
     height: 100%;
 }
+
+/* Modal Track */
+
+#modalTrack .video_placeholder {
+    float: right;
+    width: 45%;
+}
+
+#modalTrack textarea {
+    width: 100%;
+}
+

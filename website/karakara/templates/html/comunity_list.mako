@@ -31,7 +31,7 @@
 				% endfor
 			</td>
 			<td>
-				<a href="/comunity/track/${track['id']}" class="track_popup">${track['source_filename']}</a>
+				<a href="/comunity/track/${track['id']}" class="modal_track_link">${track['source_filename']}</a>
 			</td>
 			<%
 				tags_display = (
