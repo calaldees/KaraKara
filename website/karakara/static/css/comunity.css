@@ -31,7 +31,11 @@ HTML.video    .hide_if_html5_video    {display: none;}
 #modalTrack .lable_subtitle_data {clear: both; display: block;}
 #modalTrack .input_subtitle_data {
     width: 100%;
-    height: 10em;
+    height: 16em;
+}
+
+#modalTrack #subtitle_accordian {
+    margin-top: 1em;
 }
 
 #modalTrack input[type="submit"] {

@@ -9,8 +9,9 @@ function modal_track_show(data) {
 }
 
 function modal_track_hide() {
-    $("#modalTrack .modal-body").html("");
     $("#modalTrack .modal-title").text("");
+    $("#modalTrack .modal-body").html("");
+    // TODO: stop video playing?
     $("#modalTrack").modal('hide');
 }
 
@@ -36,6 +37,7 @@ $('a.modal_track_link').on('click', function() {
 // Modal Track - Setup Submit Handlers
 function init_track_popup(form_selector) {
     init_video();
+    //$('#modalTrack .collapse').collapse();  // TODO: Manually init the collapse behaviour somehow.
     
     $(form_selector).on("submit", function() {
         var $form = $(this);

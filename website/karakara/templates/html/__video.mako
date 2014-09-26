@@ -6,7 +6,7 @@
 	## In the future this could be changed to use the plain css selectors, for now this is sufficent.
 	<script type="text/javascript">
 		function init_video() {
-			if (typeof(Modernizr) == "undefined" || (Modernizr.video.h264 && !isWebOS())) { //HACK for isWebOS, webos incorrectly responds with 'probably'
+			if (typeof(Modernizr) == "undefined" || Modernizr.video.h264) {
 				$('.html5_video_embed').show(); // Show html5 video element
 				$('.html5_video_link' ).hide(); // Hide the static video link
 			}
