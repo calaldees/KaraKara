@@ -21,8 +21,8 @@ def login(app, name='TestUser'):
             assert provider_token == self.provider_token
             return social_token.data
 
-    from karakara.views import comunity_login
-    with patch.object(comunity_login, 'login_provider', MockLoginProvider()):
+    from karakara.views.comunity_login import social_login
+    with patch.dict(social_login.login_providers, {'test_provider': MockLoginProvider()}):
         response = app.get('/comunity/login?token=token')
         assert name in response.text
 

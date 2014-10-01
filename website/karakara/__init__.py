@@ -82,23 +82,23 @@ def main(global_config, **settings):
 
     # Login Providers ----------------------------------------------------------
 
-    from .views import comunity_login
-    comunity_login.user_store = ComunityUserStore()
+    from .views.comunity_login import social_login
+    social_login.user_store = ComunityUserStore()
     # Facebook
     if config.registry.settings.get('facebook.secret'):
-        comunity_login.login_provider = FacebookLogin(
+        social_login.add_login_provider(FacebookLogin(
             appid=config.registry.settings.get('facebook.appid'),
             secret=config.registry.settings.get('facebook.secret'),
             permissions=config.registry.settings.get('facebook.permissions'),
-        )
+        ))
     # Firefox Persona
     if config.registry.settings.get('persona.secret'):
-        comunity_login.login_provider = PersonaLogin()
+        social_login.add_login_provider(PersonaLogin())
     # No login provider
     elif config.registry.settings.get('karakara.server.mode') == 'development':
         # Auto login if no service keys are provided
-        comunity_login.login_provider = NullLoginProvider()
-        comunity_login.user_store = NullComunityUserStore()
+        social_login.add_login_provider(NullLoginProvider())
+        social_login.user_store = NullComunityUserStore()
 
 
     # Renderers ----------------------------------------------------------------
