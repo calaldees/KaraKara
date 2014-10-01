@@ -14,6 +14,8 @@ def login(app, name='TestUser'):
 
     class MockLoginProvider(ILoginProvider):
         provider_token = ProviderToken(social_token.provider, token=social_token.token)  # this token should match tester@karakara.org.uk
+        def html_include(self):
+            return """<script>console.log('MockLoginProvider html_include');</script>"""
         def verify_cridentials(self, request):
             assert request.params.get('token') == 'token'
             return self.provider_token
@@ -25,6 +27,7 @@ def login(app, name='TestUser'):
     with patch.dict(social_login.login_providers, {'test_provider': MockLoginProvider()}):
         response = app.get('/comunity/login?token=token')
         assert name in response.text
+        #assert 'MockLoginProvider' in response.text
 
 
 def logout(app):
