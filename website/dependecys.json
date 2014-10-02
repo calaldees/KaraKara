@@ -41,7 +41,7 @@
     
     "yui-reset": {
         "source": "http://yui.yahooapis.com/VERSION/build/cssreset/cssreset-min.css",
-        "version": "3.13.0",
+        "version": "3.17.2",
         "target": "static/cssreset-min.css"
     },
 
