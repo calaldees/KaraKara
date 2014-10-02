@@ -61,8 +61,9 @@ karakara.print_tracks.fields = [category, from, use, title, artist]
 
 comunity.title = KaraKara.org.uk
 
-upload.url.path.uploaded = uploaded
+upload.route.uploaded = uploaded
 upload.path = %(here)s/data/upload/
+
 
 # API --------------------------------------------------------------------------
 api.settings.regex = karakara\..*

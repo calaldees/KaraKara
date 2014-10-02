@@ -123,7 +123,7 @@ data/uploaded:
 
 # Run --------------------------------------------------------------------------
 
-run:
+run: install
 	env/bin/pserve --reload $(INI_DEV)
 
 run_production: ini_production
