@@ -25,17 +25,17 @@
 
     "jquery_mobile": {
         "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.js",
-        "version": "1.4.3",
+        "version": "1.4.4",
         "target": "static/jquery.mobile.min.js"
     },
     "jquery_mobile_css": {
         "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.css",
-        "version": "1.4.3",
+        "version": "1.4.4",
         "target": "static/jquery.mobile.min.css"
     },
     "jquery_mobile_map": {
         "source": "http://code.jquery.com/mobile/VERSION/jquery.mobile-VERSION.min.map",
-        "version": "1.4.3",
+        "version": "1.4.4",
         "target": "static/jquery.mobile-VERSION.min.map"
     },
     
@@ -63,7 +63,7 @@
     "jQuery-File-Upload": {
         "source": "http://raw.github.com/blueimp/jQuery-File-Upload/VERSION/",
         "destination_subpath": "static",
-        "version": "9.7.0",
+        "version": "9.8.0",
         "target": [
             "js/jquery.fileupload.js",
             "js/vendor/jquery.ui.widget.js",
