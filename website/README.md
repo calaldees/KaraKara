@@ -34,12 +34,13 @@ Todo
   * display event endtime (!)
   * option for high/low video res mode
 * mobile interface
+  * general design
   * fix message/token layout issue (!)
   * message language
     * duplicate performer explanation
     * duplicate track explantion and exirey (!)
     * more detail in rejection messages (!)
-  * responsive
+  * responsive (tablet support)
     * Responsive layout for tablets and landscape displays for track list. (!)
   * individual devices
     * messaging - save to cookie, notifications in top tray (2)
@@ -55,7 +56,6 @@ Todo
   * settings
     * layout enhancements
 * server
-  * encrypted cookies
   * multiple queues
     * mode (single/multi)
     * landing page selection (+new if superuser)
@@ -78,11 +78,6 @@ Todo
     * some settings need to be renamed/grouped
     * api to return string datatype for simpler user operation
   * message system to class messages (both comunity and mobile)
-  * log statistics to db (2)
-    * page views
-    * track requests
-    * number played
-    * user device history (could be interface with device messaging, disabling, live updating)
 * comunity (!)
   * social login + user activation
   * tag editor (per track importing)
@@ -93,6 +88,20 @@ Todo
   * delete/rename track
   * played tracks list
     * score = (times actually played * 10) + (times requested * 5) + (page views * 1)
+* admin pannel
+  * log statistics to es (2)
+  * provides
+    * page views ranked
+    * track requests
+    * number played
+    * user device history (could be interface with device messaging, disabling, live updating)
+    * events (errors, messages)
+    * device disabling
+    * name devices
+* network
+  * dchp assign lese to mac address (for reliable ip to ban)
+  * dns to only return ip for server (nginx then redirect non int.karakara to int.karakara)
+
 
 
 flash message:
