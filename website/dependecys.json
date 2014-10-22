@@ -91,7 +91,8 @@
             "lib/multisocket/auth_echo_server.py",
             "lib/social/__init__.py",
             "lib/social/_login.py",
-            "lib/social/social_login.py"
+            "lib/social/social_login.py",
+            "lib/social/facebook.py"
         ]
     }
 }
