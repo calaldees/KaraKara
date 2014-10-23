@@ -79,6 +79,7 @@
             "lib/misc.py",
             "lib/xml.py",
             "lib/make_ini.py",
+            "lib/test.py",
             "lib/pyramid_helpers/__init__.py",
             "lib/pyramid_helpers/auto_format.py",
             "lib/pyramid_helpers/etag.py",
