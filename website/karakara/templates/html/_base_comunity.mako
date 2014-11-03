@@ -137,7 +137,12 @@
 	##<script src="https://login.persona.org/include.js"></script>
 
 	<!-- Javascript programatic inline -->
-	% for js_include in h.javascript_inline['comunity']:
+	<%
+		js_inlines = h.javascript_inline['comunity']
+		if callable(js_inlines):
+			js_inlines = js_inlines(request)
+	%>
+	% for js_include in js_inlines:
 		${js_include |n}
 	% endfor
 
