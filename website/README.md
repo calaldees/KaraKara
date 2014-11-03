@@ -86,7 +86,7 @@ Todo
     * known isues list, unchecked list
   * encode queue + progress feedback
   * delete/rename track
-  * played tracks list
+  * played tracks list (partof admin? or community?)
     * score = (times actually played * 10) + (times requested * 5) + (page views * 1)
 * admin pannel
   * log statistics to es (2)
@@ -98,6 +98,7 @@ Todo
     * events (errors, messages)
     * device disabling
     * name devices
+    * event summary (scoring system) (partof admin? or community?)
 * network
   * dchp assign lese to mac address (for reliable ip to ban)
   * dns to only return ip for server (nginx then redirect non int.karakara to int.karakara)

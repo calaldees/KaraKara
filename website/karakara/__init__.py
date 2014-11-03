@@ -99,7 +99,7 @@ def main(global_config, **settings):
         # Auto login if no service keys are provided
         social_login.add_login_provider(NullLoginProvider())
         social_login.user_store = NullComunityUserStore()
-
+    template_helpers.javascript_inline['comunity'] = social_login.html_includes
 
     # Renderers ----------------------------------------------------------------
 

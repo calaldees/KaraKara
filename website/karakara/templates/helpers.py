@@ -25,6 +25,10 @@ video_fileext_to_mime_types = {
 }
 
 
+# A container to hold buckets of inline js to be injected into page
+javascript_inline = {}
+
+
 # TODO: replace url methods with constant PATH
 #  templates could then use h.path.external etc
 #def extneral_url(file):

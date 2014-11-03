@@ -135,7 +135,12 @@
 	<script src="${h.path.external}js/jquery.fileupload.js"></script>
 	<script src="${h.path.static  }js/comunity.js"></script>
 	##<script src="https://login.persona.org/include.js"></script>
-	
+
+	<!-- Javascript programatic inline -->
+	% for js_include in h.javascript_inline['comunity']:
+		${js_include |n}
+	% endfor
+
 	<!-- Javascript Inline -->
 	<script type="text/javascript">
 		${self.scripts_inline()}
