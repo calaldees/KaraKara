@@ -13,10 +13,13 @@
         </script>
         <a href="${data.get('redirect_url')}">Redirect</a>
     % endif
+</%def>
 
+<%def name="scripts_inline()">
     % if 'run_js' in data:
-        <script type="text/javascript">
+        ##<script type="text/javascript">
             ${data.get('run_js') | n}
-        </script>
+        ##</script>
     % endif
+
 </%def>

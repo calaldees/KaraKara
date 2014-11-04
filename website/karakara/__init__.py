@@ -93,7 +93,7 @@ def main(global_config, **settings):
         ))
     # Firefox Persona
     if config.registry.settings.get('persona.secret'):
-        social_login.add_login_provider(PersonaLogin())
+        social_login.add_login_provider(PersonaLogin(site_url=config.registry.settings.get('server.url')))
     # No login provider
     elif config.registry.settings.get('karakara.server.mode') == 'development':
         # Auto login if no service keys are provided

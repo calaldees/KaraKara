@@ -1,3 +1,8 @@
+<%!
+	login_url = '/comunity/login'
+	logout_url = '/comunity/logout'
+%>
+
 <%def name="title()"></%def>
 
 <%def name="body()">
@@ -75,11 +80,11 @@
 							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">
-							<li><a href="/comunity/logout">Logout</a></li>
+							<li><a href="${logout_url}">Logout</a></li>
 						</ul>
 					</li>
 				% else:
-					<li><a href="/comunity/login">Login</a></li>
+					<li><a href="${login_url}">Login</a></li>
 				% endif
 				</ul>
 			</div><!-- /.navbar-collapse -->
@@ -134,7 +139,18 @@
 	<script src="${h.path.external}js/jquery.iframe-transport.js"></script>
 	<script src="${h.path.external}js/jquery.fileupload.js"></script>
 	<script src="${h.path.static  }js/comunity.js"></script>
-	##<script src="https://login.persona.org/include.js"></script>
+
+	<!-- Mozilla Persona -->
+	<script type="text/javascript">
+		var mozilla_persona = {
+			currentUserEmail: null,
+            login_url: "${login_url}",
+            logout_url: "${logout_url}"
+        };
+		% if identity.get('user'):
+		mozilla_persona.currentUserEmail = "${identity.get('user', {}).get('email', '')}";
+		% endif
+	</script>
 
 	<!-- Javascript programatic inline -->
 	<%
