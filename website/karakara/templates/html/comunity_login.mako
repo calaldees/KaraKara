@@ -7,19 +7,20 @@
         <% data['redirect_url'] = '/comunity' %>
     % endif
 
-    % if 'redirect_url' in data:
-        <script type="text/javascript">
-            window.location = "${data.get('redirect_url') | n}";
-        </script>
-        <a href="${data.get('redirect_url')}">Redirect</a>
-    % endif
+    % for login_provider_data in data.get('login_providers', {}).values():
+        % if 'redirect_url' in data:
+            <script type="text/javascript">
+                window.location = "${data.get('redirect_url') | n}";
+            </script>
+            <a href="${data.get('redirect_url')}">Redirect</a>
+        % endif
+    % endfor
 </%def>
 
 <%def name="scripts_inline()">
-    % if 'run_js' in data:
-        ##<script type="text/javascript">
-            ${data.get('run_js') | n}
-        ##</script>
-    % endif
-
+    % for login_provider_data in data.get('login_providers', {}).values():
+        % if 'run_js' in login_provider_data:
+            ${login_provider_data.get('run_js') | n}
+        % endif
+    % endfor
 </%def>

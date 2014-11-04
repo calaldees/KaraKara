@@ -164,7 +164,7 @@
 
 	<!-- Javascript Inline -->
 	<script type="text/javascript">
-		${self.scripts_inline()}
+		${next.scripts_inline()}
 	</script>
 </%def>
 <%def name="scripts_inline()"></%def>
