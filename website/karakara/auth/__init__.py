@@ -19,8 +19,10 @@ class ComunityUserStore(IUserStore):
         except NoResultFound:
             return None
 
-    def create_user(self, provider_token, user_data):
+    def create_user(self, provider_token, name=None, email=None, **user_data):
         user = ComunityUser()
+        user.name = name
+        user.email = email
 
         user.tokens.append(SocialToken(
             token=provider_token.token,

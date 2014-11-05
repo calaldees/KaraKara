@@ -13,7 +13,7 @@ def login(app, name='TestUser'):
     social_token = DBSession.query(ComunityUser).filter(ComunityUser.name == name).one().tokens[0]
 
     class MockLoginProvider(ILoginProvider):
-        provider_token = ProviderToken(social_token.provider, token=social_token.token)  # this token should match tester@karakara.org.uk
+        provider_token = ProviderToken(social_token.provider, token=social_token.token, response={})  # this token should match tester@karakara.org.uk
         @property
         def html_include(self):
             return """<script>console.log('MockLoginProvider html_include');</script>"""
