@@ -7,6 +7,6 @@
 <%def name="scripts_inline()">
     // Mozilla Persona Logout
     if (typeof(navigator) != "undefined") {
-        navigator.id.logout();
+        //navigator.id.logout();
     }
 </%def>

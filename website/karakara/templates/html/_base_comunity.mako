@@ -144,9 +144,9 @@
 	<script type="text/javascript">
 		var mozilla_persona = {
 			currentUserEmail: null,
-            login_url: "${login_url}",
-            logout_url: "${logout_url}"
-        };
+			login_url: "${login_url}",
+			logout_url: "${logout_url}"
+		};
 		% if identity.get('user'):
 		mozilla_persona.currentUserEmail = "${identity.get('user', {}).get('email', '')}";
 		% endif
