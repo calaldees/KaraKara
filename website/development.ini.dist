@@ -88,8 +88,12 @@ session.timeout              = 86400 -> int
 #session.max_age              = 86400 -> int
 session.reissue_time         = None -> None
 
-# Templates ---------------------------------------------------------------------
+# Templates --------------------------------------------------------------------
 mako.directories = karakara:templates
+
+# Login ------------------------------------------------------------------------
+
+login.automatically_activate_with_single_provider = False
 
 # Facebook ---------------------------------------------------------------------
 
