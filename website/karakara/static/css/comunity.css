@@ -11,8 +11,11 @@ HTML.no-video .hide_if_no_html5_video {display: none;}
 HTML.video    .hide_if_html5_video    {display: none;}
 
 
-.avatar {
-    height: 100%;
+.navbar .avatar {
+    /* What a hack :( .. it's only temp style */
+    position: absolute;
+    max-height: 2em;
+    margin-left: -2em;
 }
 
 /* Modal Track */
