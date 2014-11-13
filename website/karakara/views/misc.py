@@ -1,10 +1,11 @@
 import re
 
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPFound
 
 from externals.lib.misc import convert_str_with_type
 
-from . import web, action_ok, action_error, method_put_router, is_admin, admin_only, etag_decorator, generate_cache_key
+from . import web, action_ok, action_error, method_put_router, is_admin, is_comunity, admin_only, etag_decorator, generate_cache_key
 
 
 import logging
@@ -31,6 +32,10 @@ def generate_cache_key_homepage(request):
 @etag_decorator(generate_cache_key_homepage)
 @web
 def home(request):
+    # Short term hack. Do not allow normal root page in commuity mode - redirect to comunity
+    # Need to implement a proper pyramid authorize system when in comunity mode
+    if request.registry.settings['comunity.enabled']:
+        raise HTTPFound(location='/comunity')
     return action_ok()
 
 @view_config(route_name='stats')

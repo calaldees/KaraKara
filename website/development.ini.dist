@@ -59,6 +59,7 @@ karakara.print_tracks.fields = [category, from, use, title, artist]
 
 # Comunity settings ------------------------------------------------------------
 
+comunity.enabled = False -> bool
 comunity.title = KaraKara.org.uk
 
 upload.route.uploaded = uploaded
