@@ -92,7 +92,7 @@ test.db:
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
-init_db_production: ini_production
+init_db_production: ini
 	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
@@ -127,7 +127,7 @@ data/uploaded:
 run: install
 	env/bin/pserve --reload $(INI_DEV)
 
-run_production: ini_production
+run_production: ini
 	env/bin/pserve $(INI_PROD)
 
 run_socket_server:
@@ -136,12 +136,12 @@ run_socket_server:
 shell:
 	env/bin/pshell $(INI_DEV)
 
-shell_production: ini_production
+shell_production: ini
 	env/bin/pshell $(INI_PROD)
 
 # Daemon -----------------------------------------------------------------------
 
-start_webapp_daemon: ini_production
+start_webapp_daemon: ini
 	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
 stop_webapp_daemon:
 	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid
@@ -155,15 +155,15 @@ stop_webapp_daemon:
 #import_tracks_test: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
-test: ini_test
+test: ini
 	env/bin/py.test externals --pdb
 	env/bin/py.test $(PROJECT) --pdb
 	#--pdb --capture=sys
 
-test_crawl: ini_test
+test_crawl: ini
 	env/bin/py.test $(PROJECT) --runslow -k crawl -s
 
-test_crawl_production: init_test ini_production
+test_crawl_production: ini
 	echo "unimplemented ... yet"
 	#env/bin/py.test $(PROJECT) --runslow -k crawl_production -s
 
@@ -176,7 +176,7 @@ insert_random_tracks:
 import_tracks_dev: test.db
 	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
-import_tracks_production: ini_production  #init_db_production
+import_tracks_production: ini  #init_db_production
 	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 
