@@ -34,7 +34,7 @@ def generate_cache_key_homepage(request):
 def home(request):
     # Short term hack. Do not allow normal root page in commuity mode - redirect to comunity
     # Need to implement a proper pyramid authorize system when in comunity mode
-    if request.registry.settings['comunity.enabled']:
+    if request.registry.settings.get('karakara.server.mode') == 'comunity':
         raise HTTPFound(location='/comunity')
     return action_ok()
 
