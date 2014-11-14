@@ -93,7 +93,7 @@ mako.directories = karakara:templates
 
 # Login Providers --------------------------------------------------------------
 
-login.automatically_activate_with_single_provider = False
+login.automatically_activate_with_single_provider = False -> bool
 
 login.provider.facebook.enabled = False -> bool
 facebook.appid = 
