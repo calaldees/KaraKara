@@ -106,6 +106,7 @@ development.ini:
 production.inidiff:
 	cp production.inidiff.dist production.inidiff
 
+ini: clean_ini ini_test ini_production
 ini_test: development.ini
 	env/bin/python3 externals/lib/make_ini.py test
 ini_production: production.inidiff
@@ -189,14 +190,17 @@ log_production:
 
 # Cleanup ----------------------------------------------------------------------
 
-clean:
+clean_ini:
+	rm -f $(INI_DEV)
+	rm -f $(INI_TEST)
+	rm -f $(INI_PROD)
+
+clean: clean_ini
 	rm -rf env
 	rm -rf data
 	rm -rf *.egg-info
 	rm -f *.db
 	rm -f *.log
-	rm -f $(INI_TEST)
-	rm -f $(INI_PROD)
 	rm -rf externals
 	rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json

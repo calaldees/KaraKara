@@ -85,14 +85,14 @@ def main(global_config, **settings):
     from .views.comunity_login import social_login
     social_login.user_store = ComunityUserStore()
     # Facebook
-    if config.registry.settings.get('facebook.secret'):
+    if config.registry.settings.get('login.provider.facebook.enabled'):
         social_login.add_login_provider(FacebookLogin(
             appid=config.registry.settings.get('facebook.appid'),
             secret=config.registry.settings.get('facebook.secret'),
             permissions=config.registry.settings.get('facebook.permissions'),
         ))
     # Firefox Persona
-    if config.registry.settings.get('persona.secret'):
+    if config.registry.settings.get('login.provider.persona.enabled'):
         social_login.add_login_provider(PersonaLogin(site_url=config.registry.settings.get('server.url')))
     # No login provider
     elif config.registry.settings.get('karakara.server.mode') == 'development':

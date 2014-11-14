@@ -92,16 +92,16 @@ session.reissue_time         = None -> None
 # Templates --------------------------------------------------------------------
 mako.directories = karakara:templates
 
-# Login ------------------------------------------------------------------------
+# Login Providers --------------------------------------------------------------
 
 login.automatically_activate_with_single_provider = False
 
-# Facebook ---------------------------------------------------------------------
-
+login.provider.facebook.enabled = False -> bool
 facebook.appid = 
 facebook.secret = 
 facebook.permissions = basic_info
 
+login.provider.persona.enabled = False -> bool
 
 # Python Server ----------------------------------------------------------------
 server.gzip         = False -> bool
