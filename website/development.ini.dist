@@ -100,7 +100,8 @@ facebook.appid =
 facebook.secret = 
 facebook.permissions = basic_info
 
-login.provider.persona.enabled = False -> bool
+login.provider.enabled = []
+
 
 # Python Server ----------------------------------------------------------------
 server.gzip         = False -> bool
