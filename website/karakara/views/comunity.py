@@ -140,8 +140,14 @@ class ComunityTrack():
     @property
     def subtitle_data(self):
         def subtitles_read(subtitle_filename):
-            with self._open(os.path.join(self.path_source, subtitle_filename), 'r') as subtitle_filehandle:
-                return subtitle_filehandle.read()
+            subtitle_filename = os.path.join(self.path_source, subtitle_filename)
+            with self._open(subtitle_filename, 'r') as subtitle_filehandle:
+                try:
+                    return subtitle_filehandle.read()
+                except UnicodeDecodeError:
+                    # Temp fix - this needs to be resolved properly, this should perform it's 'best attempt' at decoding rather than crash
+                    log.error('UnicodeDecodeError: {}'.format(subtitle_filename))
+                    return 'UnicodeDecodeError'
         return dict(((subtitle_filename, subtitles_read(subtitle_filename)) for subtitle_filename in self.subtitle_filenames))
     @subtitle_data.setter
     def subtitle_data(self, subtitle_data):
