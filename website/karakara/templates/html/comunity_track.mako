@@ -14,15 +14,17 @@
         <textarea class="input_tag_data" name="tag_data" data-inital="${data.get('tag_data','').replace('"','\"')}">${data.get('tag_data')}</textarea>
 
         <!-- Subtiltes -->
-        <div class="panel-group" id="subtitle_accordian">
+        <div class="panel-group" id="subtitle_accordian" role="tablist" aria-multiselectable="true">
             % for subtitle_filename, subtitle_data in data.get('subtitles', dict()).items():
             <div class="panel panel-default">
-                <lable class="panel-heading lable_subtitle_data" for="subtitles_${subtitle_filename}">
-                    <a data-toggle="collapse" data-parent="#subtitle_accordian" href="#subtitle_${loop.index}">
-                        ${subtitle_filename}
-                    </a>
-                </lable>
-                <div id="#subtitle_${loop.index}" class="panel-collapse collapse">
+                <div id="subtitle_heading_${loop.index}" class="panel-heading lable_subtitle_data" role="tab">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#subtitle_accordian" href="#subtitle_${loop.index}" aria-expanded="true" aria-controls="subtitle_${loop.index}">
+                            ${subtitle_filename}
+                        </a>
+                    </h4>
+                </div>
+                <div id="subtitle_${loop.index}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="subtitle_heading_${loop.index}">
                     <div class="panel-body">
                         <textarea class="input_subtitle_data" name="subtitles_${subtitle_filename}" data-inital="${subtitle_data.replace('"','\"')}">${subtitle_data}</textarea>
                     </div>
