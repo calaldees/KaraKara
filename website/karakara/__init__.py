@@ -67,18 +67,30 @@ def main(global_config, **settings):
 
     # WebSocket ----------------------------------------------------------------
 
-    def authenicator(key):
-        """Only admin authenticated keys can connect to the websocket"""
-        request = Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
-        session_data = session_factory(request)
-        return session_data and session_data.get('admin')
-    socket_manager = AuthEchoServerManager(
-        authenticator=authenicator,
-        websocket_port=config.registry.settings['karakara.websocket.port'],
-        tcp_port      =config.registry.settings.get('karakara.tcp.port'),
-    )
+    class NullAuthEchoServerManager(object):
+        def recv(self, *args, **kwargs):
+            pass
+    socket_manager = NullAuthEchoServerManager()
+
+    # Do not activate websocket if in community mode
+    if config.registry.settings.get('karakara.server.mode') == 'comunity':
+        config.registry.settings['karakara.websocket.port'] = None
+
+    if config.registry.settings.get('karakara.websocket.port'):
+        def authenicator(key):
+            """Only admin authenticated keys can connect to the websocket"""
+            request = Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
+            session_data = session_factory(request)
+            return session_data and session_data.get('admin')
+        socket_manager = AuthEchoServerManager(
+            authenticator=authenicator,
+            websocket_port=config.registry.settings['karakara.websocket.port'],
+            tcp_port=config.registry.settings.get('karakara.tcp.port'),
+        )
+        socket_manager.start()
+
     config.registry['socket_manager'] = socket_manager
-    socket_manager.start()
+
 
     # Login Providers ----------------------------------------------------------
 
