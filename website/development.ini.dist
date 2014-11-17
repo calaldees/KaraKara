@@ -61,7 +61,7 @@ karakara.print_tracks.fields = [category, from, use, title, artist]
 
 comunity.title = KaraKara.org.uk
 
-upload.route.uploaded = uploaded
+upload.route.uploaded = /uploaded/
 upload.path = %(here)s/data/upload/
 
 
