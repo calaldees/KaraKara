@@ -1,6 +1,20 @@
 <%inherit file="_base_comunity.mako"/>
 
+<%!
+import os
+%>
+
 <%def name="body()">
+
+	% if data.get('uploaded'):
+	<h2>uploaded</h2>
+	<ul>
+	% for f in data.get('uploaded'):
+		<li><a href="${os.path.join(request.registry.settings['upload.route.uploaded'], f)}">${f}</a></li>
+	% endfor
+	</ul>
+	% endif
+
 	% if data.get('not_imported'):
 	<h2>not imported</h2>
 	<ul>

@@ -207,10 +207,14 @@ def comunity_list(request):
         not_imported = media_folders.difference(track_folders)
         missing_source = track_folders.difference(media_folders)
 
+        upload_path = request.registry.settings.get('upload.path')
+        uploaded = [f for f in os.listdir(upload_path) if os.path.isfile(os.path.join(upload_path, f))]
+
         return {
             'tracks': tracks,
             'not_imported': sorted(not_imported),
             'missing_source': sorted(missing_source),
+            'uploaded': sorted(uploaded),
         }
 
     data_tracks = cache.get_or_create(LIST_CACHE_KEY, _comnunity_list)

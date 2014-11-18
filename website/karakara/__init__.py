@@ -20,6 +20,9 @@ from .auth import ComunityUserStore, NullComunityUserStore
 # SQLAlchemy imports
 from .model import init_DBSession
 
+import logging
+log = logging.getLogger(__name__)
+
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
 #import mako.filters
@@ -82,12 +85,16 @@ def main(global_config, **settings):
             request = Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
             session_data = session_factory(request)
             return session_data and session_data.get('admin')
-        socket_manager = AuthEchoServerManager(
-            authenticator=authenicator,
-            websocket_port=config.registry.settings['karakara.websocket.port'],
-            tcp_port=config.registry.settings.get('karakara.tcp.port'),
-        )
-        socket_manager.start()
+        try:
+            _socket_manager = AuthEchoServerManager(
+                authenticator=authenicator,
+                websocket_port=config.registry.settings['karakara.websocket.port'],
+                tcp_port=config.registry.settings.get('karakara.tcp.port'),
+            )
+            _socket_manager.start()
+            socket_manager = _socket_manager
+        except OSError:
+            log.warn('Unable to setup websocket')
 
     config.registry['socket_manager'] = socket_manager
 
@@ -171,8 +178,8 @@ def main(global_config, **settings):
     config.add_route('search_list'   , '/search_list/{tags:.*}')
 
     # Upload extras -----
+    config.add_static_view(name=settings['upload.route.uploaded'], path=settings['upload.path'])  # the 'upload' route above always matchs first
     config.add_route('upload', '/upload{sep:/?}{name:.*}')
-    #config.add_static_view(name=settings['upload.route.uploaded'], path=settings['upload.path'])  # the 'upload' route above always matchs first
 
     # Events -------------------------------------------------------------------
     config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
