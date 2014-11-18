@@ -88,7 +88,7 @@ Local Machine Setup
 	2. Navigate to data folder
 	3. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/admin" `
 	4. View <http://localhost:6543/> and <http://localhost:6543/player/player.html>
-
+    5. __Optional local libs for dev__ git clone git@github.com:calaldees/libs.git && rm -rf KaraKara/website/externals/lib && ln -s ../../../libs/python3/lib/ KaraKara/website/externals/lib
 
 
 Core components
