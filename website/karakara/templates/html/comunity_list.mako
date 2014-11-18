@@ -5,6 +5,7 @@ import os
 %>
 
 <%def name="body()">
+	<a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a>
 
 	% if data.get('uploaded'):
 	<h2>uploaded</h2>
