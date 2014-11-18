@@ -95,7 +95,6 @@ mako.directories = karakara:templates
 
 login.automatically_activate_with_single_provider = False -> bool
 
-login.provider.facebook.enabled = False -> bool
 facebook.appid = 
 facebook.secret = 
 facebook.permissions = basic_info
