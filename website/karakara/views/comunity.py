@@ -14,7 +14,7 @@ from externals.lib.pyramid_helpers.views.upload import EventFileUploaded
 from ..model import DBSession
 from ..model.model_tracks import Track
 
-from . import web, action_ok, cache, etag, generate_cache_key, comunity_only  # action_error,
+from . import web, action_ok, cache, etag_decorator, generate_cache_key, comunity_only  # action_error,
 
 from ..scripts.import_tracks import import_json_data as import_track
 from ..views.tracks import invalidate_track
@@ -36,7 +36,7 @@ def invalidate_list_cache(request=None):
     cache.delete(LIST_CACHE_KEY)
 
 
-def _generate_cache_key(request):
+def _generate_cache_key_comunity_list(request):
     global list_version
     return '-'.join([generate_cache_key(request), str(list_version)])
 
@@ -189,6 +189,7 @@ def comunity_upload(request):
 
 
 @view_config(route_name='comunity_list')
+@etag_decorator(_generate_cache_key_comunity_list)
 @web
 @comunity_only
 def comunity_list(request):
@@ -226,7 +227,6 @@ def comunity_list(request):
             'uploaded': sorted(uploaded),
         }
 
-    etag(request, _generate_cache_key(request))  # Abort if 'etag' match
     data_tracks = cache.get_or_create(LIST_CACHE_KEY, _comnunity_list)
     return action_ok(data=data_tracks)
 
