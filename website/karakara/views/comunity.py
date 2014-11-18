@@ -235,7 +235,9 @@ def comunity_list(request):
 @web
 @comunity_only
 def comunity_track(request):
-    ctrack = ComunityTrack.factory(request.matchdict['id'], request)
+    id = request.matchdict['id']
+    log.debug('comunity_track {}'.format(id))
+    ctrack = ComunityTrack.factory(id, request)
     return action_ok(data={
         'track': ctrack.track,
         'tag_matrix': {},
