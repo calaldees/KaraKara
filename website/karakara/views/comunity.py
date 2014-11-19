@@ -224,10 +224,10 @@ def comunity_list(request):
 
         # Get track folders from media source
         media_path = request.registry.settings['static.media']
-        media_folders, media_files = set(), set()
+        media_folders, unprocessed_media_files = set(), set()
         if os.path.isdir(media_path):
-            media_folders = set((folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder))))
-            unprocessed_media_files = (f for f in os.listdir(media_path) if os.path.isfile(os.path.join(media_path, f)))
+            media_folders = set(folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder)))
+            unprocessed_media_files = set(f for f in os.listdir(media_path) if os.path.isfile(os.path.join(media_path, f)) and not f.startswith('.'))
 
         # Compare folder sets to identify unimported/renamed files
         track_folders = set((track['source_filename'] for track in tracks))

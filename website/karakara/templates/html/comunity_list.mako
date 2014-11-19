@@ -7,7 +7,7 @@ import os
 <%def name="body()">
 	<a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a>
 
-	% if data.get('unprocessed media files'):
+	% if data.get('unprocessed_media_files'):
 	<h2>unprocessed media files</h2>
 	<ul>
 	% for f in data.get('unprocessed_media_files'):
