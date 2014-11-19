@@ -2,6 +2,7 @@ import os
 import random
 import re
 import json
+import shutil
 
 from pyramid.view import view_config
 from pyramid.events import subscriber
@@ -9,12 +10,13 @@ from pyramid.events import subscriber
 from sqlalchemy.orm import joinedload
 
 from externals.lib.misc import backup
+from externals.lib.pyramid_helpers import get_setting
 from externals.lib.pyramid_helpers.views.upload import EventFileUploaded
 
 from ..model import DBSession
 from ..model.model_tracks import Track
 
-from . import web, action_ok, cache, etag_decorator, generate_cache_key, comunity_only  # action_error,
+from . import web, action_ok, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity  # action_error,
 
 from ..scripts.import_tracks import import_json_data as import_track
 from ..views.tracks import invalidate_track
@@ -38,7 +40,7 @@ def invalidate_list_cache(request=None):
 
 def _generate_cache_key_comunity_list(request):
     global list_version
-    return '-'.join([generate_cache_key(request), str(list_version)])
+    return '-'.join([generate_cache_key(request), str(list_version), str(is_comunity(request))])
 
 
 #-------------------------------------------------------------------------------
@@ -47,7 +49,19 @@ def _generate_cache_key_comunity_list(request):
 
 @subscriber(EventFileUploaded)
 def file_uploaded(event):
+    upload_path = get_setting('upload.path')
+    media_path = get_setting('static.media')
+
+    # Move uploaded files into media path
+    uploaded_files = (f for f in os.listdir(upload_path) if os.path.isfile(os.path.join(upload_path, f)))
+    for f in uploaded_files:
+        shutil.move(
+            os.path.join(upload_path, f),
+            os.path.join(media_path, f),
+        )
+
     invalidate_list_cache()
+
 
 
 #-------------------------------------------------------------------------------
@@ -210,21 +224,21 @@ def comunity_list(request):
 
         # Get track folders from media source
         media_path = request.registry.settings['static.media']
-        media_folders = set((folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder)))) if os.path.isdir(media_path) else set()
+        media_folders, media_files = set(), set()
+        if os.path.isdir(media_path):
+            media_folders = set((folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder))))
+            unprocessed_media_files = (f for f in os.listdir(media_path) if os.path.isfile(os.path.join(media_path, f)))
 
         # Compare folder sets to identify unimported/renamed files
         track_folders = set((track['source_filename'] for track in tracks))
         not_imported = media_folders.difference(track_folders)
         missing_source = track_folders.difference(media_folders)
 
-        upload_path = request.registry.settings.get('upload.path')
-        uploaded = [f for f in os.listdir(upload_path) if os.path.isfile(os.path.join(upload_path, f))]
-
         return {
             'tracks': tracks,
+            'unprocessed_media_files': sorted(unprocessed_media_files),
             'not_imported': sorted(not_imported),
             'missing_source': sorted(missing_source),
-            'uploaded': sorted(uploaded),
         }
 
     data_tracks = cache.get_or_create(LIST_CACHE_KEY, _comnunity_list)

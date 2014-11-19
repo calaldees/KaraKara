@@ -7,11 +7,11 @@ import os
 <%def name="body()">
 	<a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a>
 
-	% if data.get('uploaded'):
-	<h2>uploaded</h2>
+	% if data.get('unprocessed media files'):
+	<h2>unprocessed media files</h2>
 	<ul>
-	% for f in data.get('uploaded'):
-		<li><a href="${os.path.join(request.registry.settings['upload.route.uploaded'], f)}">${f}</a></li>
+	% for f in data.get('unprocessed_media_files'):
+		<li><a href="${h.media_url(f)}">${f}</a></li>
 	% endfor
 	</ul>
 	% endif

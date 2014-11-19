@@ -178,7 +178,7 @@ def main(global_config, **settings):
     config.add_route('search_list'   , '/search_list/{tags:.*}')
 
     # Upload extras -----
-    config.add_static_view(name=settings['upload.route.uploaded'], path=settings['upload.path'])  # the 'upload' route above always matchs first
+    #config.add_static_view(name=settings['upload.route.uploaded'], path=settings['upload.path'])  # the 'upload' route above always matchs first
     config.add_route('upload', '/upload{sep:/?}{name:.*}')
 
     # Events -------------------------------------------------------------------

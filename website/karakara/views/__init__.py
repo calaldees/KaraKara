@@ -90,4 +90,4 @@ def modification_action(target, *args, **kwargs):
 def generate_cache_key(request):
     if request.session.peek_flash():
         raise LookupError  # Response is not cacheable/indexable if there is a custom flash message
-    return '-'.join([_generate_cache_key_default(request), str(is_admin(request)), str(is_comunity(request))])
+    return '-'.join([_generate_cache_key_default(request), str(is_admin(request))])
