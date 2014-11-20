@@ -3,8 +3,9 @@ from decorator import decorator
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from .                    import web, method_delete_router, action_ok, action_error, request_from_args
-from ..templates.helpers  import search_url
+from . import web, method_delete_router, action_ok, action_error, request_from_args
+from ..templates.helpers import search_url
+
 
 # Utils ------------------------------------------------------------------------
 
@@ -28,17 +29,18 @@ def faves_enabled(target, *args, **kwargs):
 def fave_view(request):
     """
     view current faves
-    
+
     not really needed as faves are also part of the identity dict
     """
     trackids = request.session['faves']
-    
-    if request.matchdict['format']=='html':
-        raise HTTPFound(location=search_url(trackids=trackids,route='search_list'))
-    
+
+    if request.matchdict['format'] == 'html':
+        raise HTTPFound(location=search_url(trackids=trackids, route='search_list'))
+
     return action_ok(
-        data={'faves':trackids}
+        data={'faves': trackids}
     )
+
 
 @view_config(route_name='fave', request_method='POST')
 @web
@@ -53,7 +55,8 @@ def fave_add(request):
     request.session.changed()
     return action_ok(message='added to faves')
 
-@view_config(route_name='fave', custom_predicates=(method_delete_router, lambda info,request: request.params.get('id'))) #request_method='DELETE'
+
+@view_config(route_name='fave', custom_predicates=(method_delete_router, lambda info, request: request.params.get('id')))  # request_method='DELETE'
 @web
 @faves_enabled
 def fave_del(request):

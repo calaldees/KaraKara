@@ -5,11 +5,12 @@ from pyramid.httpexceptions import HTTPFound
 
 from externals.lib.misc import convert_str_with_type
 
-from . import web, action_ok, action_error, method_put_router, is_admin, is_comunity, admin_only, etag_decorator, generate_cache_key
+from . import web, action_ok, action_error, method_put_router, is_admin, admin_only, etag_decorator, generate_cache_key
 
 
 import logging
 log = logging.getLogger(__name__)
+
 
 #-------------------------------------------------------------------------------
 # Misc
@@ -25,8 +26,9 @@ def generate_cache_key_homepage(request):
     return '-'.join((
         generate_cache_key(request),
         str(request.registry.settings.get('karakara.template.menu.disable')),
-        str(bool(request.session.get('faves',[])) and request.registry.settings.get('karakara.faves.enabled')),
+        str(bool(request.session.get('faves', [])) and request.registry.settings.get('karakara.faves.enabled')),
     ))
+
 
 @view_config(route_name='home')
 @etag_decorator(generate_cache_key_homepage)
@@ -38,27 +40,31 @@ def home(request):
         raise HTTPFound(location='/comunity')
     return action_ok()
 
+
 @view_config(route_name='stats')
 @web
 def stats(request):
     return action_ok()
 
+
 @view_config(route_name='admin_lock')
 @web
 @admin_only
 def admin_lock(request):
-    request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked',False)
+    request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked', False)
     log.debug('admin locked - {0}'.format(request.registry.settings['admin_locked']))
     return action_ok()
+
 
 @view_config(route_name='admin_toggle')
 @web
 def admin_toggle(request):
     if request.registry.settings.get('admin_locked'):
         raise action_error(message='additional admin users have been prohibited', code=403)
-    request.session['admin'] = not request.session.get('admin',False)
+    request.session['admin'] = not request.session.get('admin', False)
     log.debug('admin - {0} - {1}'.format(request.session['id'], request.session['admin']))
     return action_ok()
+
 
 @view_config(route_name='remote')
 @web
@@ -70,6 +76,7 @@ def remote(request):
         request.registry['socket_manager'].recv(cmd.encode('utf-8'))
     return action_ok()
 
+
 @view_config(route_name='settings')
 @web
 def settings(request):
@@ -79,19 +86,19 @@ def settings(request):
     """
     if not is_admin(request):
         log.debug('settings requested by non admin')  # I'm curious if anyone will find this. would be fun to search logs after an event for this string
-    
+
     if method_put_router(None, request):
         # with PUT requests, update settings
         #  only changing in production is bit over zelious #request.registry.settings.get('karakara.server.mode')!='production'
-        if request.registry.settings.get('karakara.server.mode')!='test' and not is_admin(request):
+        if request.registry.settings.get('karakara.server.mode') != 'test' and not is_admin(request):
             raise action_error(message='Settings modification for non admin users forbidden', code=403)
-        
+
         for key, value in request.params.items():
             fallback_type = None
             if request.registry.settings.get(key) != None:
                 fallback_type = type(request.registry.settings.get(key))
             request.registry.settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
-    
+
     setting_regex = re.compile(request.registry.settings.get('api.settings.regex','TODOmatch_nothing_regex'))
     return action_ok(
         data={
@@ -103,6 +110,7 @@ def settings(request):
         }
     )
 
+
 @view_config(route_name='random_images')
 @web
 def random_images(request):
@@ -112,9 +120,9 @@ def random_images(request):
     Not optimised as this is rarely called.
     """
     import random
-    from karakara.model              import DBSession
+    from karakara.model import DBSession
     from karakara.model.model_tracks import Attachment
-    thumbnails = DBSession.query(Attachment.location).filter(Attachment.type=='thumbnail').all()
+    thumbnails = DBSession.query(Attachment.location).filter(Attachment.type == 'thumbnail').all()
     random.shuffle(thumbnails)
     thumbnails = [t[0] for t in thumbnails]
-    return action_ok(data={'thumbnails':thumbnails[0:int(request.params.get('count',0) or 100)]})
+    return action_ok(data={'thumbnails': thumbnails[0: int(request.params.get('count', 0) or 100)]})
