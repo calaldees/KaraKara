@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 LIST_CACHE_KEY = 'comunity_list'
 
-list_version = random.randint(0,2000000000)
+list_version = random.randint(0, 2000000000)
 def invalidate_list_cache(request=None):
     global list_version
     list_version += 1
@@ -61,7 +61,6 @@ def file_uploaded(event):
         )
 
     invalidate_list_cache()
-
 
 
 #-------------------------------------------------------------------------------
@@ -266,7 +265,9 @@ def comunity_track(request):
 @web
 @comunity_only
 def comunity_track_update(request):
-    ctrack = ComunityTrack.factory(request.matchdict['id'], request)
+    id = request.matchdict['id']
+    log.debug('comunity_track_update {}'.format(id))
+    ctrack = ComunityTrack.factory(id, request)
     # Save tag data
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
