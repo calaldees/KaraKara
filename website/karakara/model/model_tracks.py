@@ -1,8 +1,8 @@
 from . import Base, JSONEncodedDict
 
-from sqlalchemy     import event
-from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, UnicodeText, Integer, Float
+from sqlalchemy import event
+from sqlalchemy import Column, Enum, ForeignKey
+from sqlalchemy import String, Unicode, UnicodeText, Integer, Float
 from sqlalchemy.orm import relationship, backref
 
 import copy
@@ -11,7 +11,7 @@ __all__ = [
     "Track", "Tag", "Attachment", "_attachment_types",
 ]
 
-_attachment_types = Enum("video","preview","thumbnail","subtitle", name="attachment_types")
+_attachment_types = Enum("video", "preview", "thumbnail", "subtitle", name="attachment_types")
 
 
 TAGS_REQUIRED = ('category',)
@@ -23,6 +23,7 @@ class TrackTagMapping(Base):
     track_id      = Column(String(),     ForeignKey('track.id')     , nullable=False, primary_key=True)
     tag_id        = Column(Integer(),    ForeignKey('tag.id')       , nullable=False, primary_key=True)
 
+
 class TrackAttachmentMapping(Base):
     __tablename__ = "map_track_to_attachment"
     track_id      = Column(String(),     ForeignKey('track.id')     , nullable=False, primary_key=True)
@@ -32,7 +33,7 @@ class TrackAttachmentMapping(Base):
 class Track(Base):
     """
     """
-    __tablename__   = "track"
+    __tablename__ = "track"
 
     id              = Column(String(),      primary_key=True)
     #title           = Column(Unicode(),     nullable=False, default="Untitled")
@@ -40,14 +41,14 @@ class Track(Base):
     duration        = Column(Float(),       nullable=False, default=0, doc="Duration in seconds")
     source_filename = Column(Unicode(),     nullable=True)
     source_hash     = Column(Unicode(),     nullable=True)
-    
+
     tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     lyrics          = relationship("Lyrics", cascade="all, delete-orphan")
-    
+
     def tags_with_parents_dict(self):
-        t = {None:[tag.name for tag in self.tags if not tag.parent]}
-        for parent_name,tag_name in [(tag.parent.name,tag.name) for tag in self.tags if tag.parent]:
+        t = {None: [tag.name for tag in self.tags if not tag.parent]}
+        for parent_name, tag_name in [(tag.parent.name, tag.name) for tag in self.tags if tag.parent]:
             if not t.get(parent_name):
                 t[parent_name] = [tag_name]
             else:
@@ -62,7 +63,7 @@ class Track(Base):
         return ' - '.join(sorted(tags_found))
 
     # TODO - Event to activate before save to DB to render the title from tags
-    
+
     @property
     def title(self):
         """
@@ -80,8 +81,8 @@ class Track(Base):
     #    self._x = value
     #@title.deleter
     #def title(self):
-    #    #del self._x    
-    
+    #    #del self._x
+
     @property
     def image(self):
         for attachment in self.attachments:
@@ -110,7 +111,7 @@ class Track(Base):
             'duration'     : None ,
         },
     })
-    
+
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
@@ -126,12 +127,12 @@ class Track(Base):
 class Tag(Base):
     """
     """
-    __tablename__   = "tag"
-    
+    __tablename__ = "tag"
+
     id            = Column(Integer(),  primary_key=True)
     name          = Column(Unicode(),  nullable=False, index=True)
     parent_id     = Column(Integer(),  ForeignKey('tag.id'), nullable=True, index=True)
-    
+
     parent        = relationship('Tag',  backref=backref('children'), remote_side='tag.c.id')
 
     @property
@@ -146,7 +147,7 @@ class Tag(Base):
             'name'         : None , #lambda tag: str(tag)
         },
     })
-    
+
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
     #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
@@ -177,10 +178,11 @@ class Tag(Base):
 
 event.listen(Tag, 'before_insert', Tag.before_insert_listener)
 
+
 class Attachment(Base):
     """
     """
-    __tablename__   = "attachment"
+    __tablename__ = "attachment"
 
     id              = Column(Integer(),         primary_key=True)
     location        = Column(Unicode(),         nullable=False)
@@ -204,13 +206,13 @@ class Attachment(Base):
 class Lyrics(Base):
     """
     """
-    __tablename__   = "lyrics"
+    __tablename__ = "lyrics"
 
     id              = Column(Integer()    , primary_key=True)
     track_id        = Column(String(),      ForeignKey('track.id'), nullable=False)
     language        = Column(String(4)    , nullable=False, default='eng')
     content         = Column(UnicodeText())
-    
+
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
