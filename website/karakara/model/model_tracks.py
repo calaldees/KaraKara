@@ -14,6 +14,10 @@ __all__ = [
 _attachment_types = Enum("video","preview","thumbnail","subtitle", name="attachment_types")
 
 
+TAGS_REQUIRED = ('category',)
+TAGS_RECOMENDED = ('artist',)
+
+
 class TrackTagMapping(Base):
     __tablename__ = "map_track_to_tag"
     track_id      = Column(String(),     ForeignKey('track.id')     , nullable=False, primary_key=True)
@@ -84,7 +88,19 @@ class Track(Base):
             if attachment.type == 'thumbnail':
                 return attachment.location
         return ''
-    
+
+    @staticmethod
+    def _status(tags, tags_recomended=TAGS_RECOMENDED, tags_required=TAGS_REQUIRED):
+        """
+        Traffic light status system.
+        returns a dict of status and reasons
+        """
+        return {}
+
+    @property
+    def status(self):
+        return self._status(self.tags)
+
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
