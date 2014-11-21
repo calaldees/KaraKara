@@ -38,7 +38,7 @@ class Track(Base):
     source_filename = Column(Unicode(),     nullable=True)
     source_hash     = Column(Unicode(),     nullable=True)
 
-    tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)
+    tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)  # , lazy="joined"
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     lyrics          = relationship("Lyrics", cascade="all, delete-orphan")
 
@@ -117,7 +117,7 @@ class Tag(Base):
     name          = Column(Unicode(),  nullable=False, index=True)
     parent_id     = Column(Integer(),  ForeignKey('tag.id'), nullable=True, index=True)
 
-    parent        = relationship('Tag',  backref=backref('children'), remote_side='tag.c.id')
+    parent        = relationship('Tag',  backref=backref('children'), remote_side='tag.c.id')  #  , lazy="joined", join_depth=3
 
     @property
     def full(self):

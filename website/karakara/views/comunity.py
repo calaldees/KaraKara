@@ -34,7 +34,7 @@ TAGS_REQUIRED = ('category', 'title')
 TAGS_RECOMENDED = ('artist', 'lang')
 TAGS_YELLOW = ('yellow', 'caution', 'warning', 'problem')
 TAGS_RED = ('red', 'broken', 'critical')
-
+TAGS_BLACK = ('delete', 'remove', 'depricated')
 
 #-------------------------------------------------------------------------------
 # Cache Management
@@ -91,18 +91,25 @@ class ComunityTrack():
     _open = open
 
     @classmethod
-    def factory(cls, track_id, request):
-        return ComunityTrack(track_id, request.registry.settings['static.media'], open=cls._open)
+    def factory(cls, track, request):
+        return ComunityTrack(track, request.registry.settings['static.media'], open=cls._open)
 
-    def __init__(self, track_id, media_path, open=open):
+    def __init__(self, track, media_path, open=open):
         """
         Not to be called directly - use factory() instead
         """
-        assert track_id and track_id != 'undefined', 'track_id required'
         assert media_path
         self.media_path = media_path
-        self.track_id = track_id
-        self._track_dict = None
+
+        assert track, 'track required'
+        if isinstance(track, str):
+            assert track != 'undefined'
+            self.track_id = track
+            self._track_dict = None
+        if isinstance(track, dict):
+            self.track_id = track['id']
+            self._track_dict = track
+
         self._import_required = False
         self._open = open  # Allow mockable open() for testing
 
@@ -198,7 +205,7 @@ class ComunityTrack():
         return h.previews(self.track)
 
     @staticmethod
-    def track_status(track_dict, func_is_file=lambda f: True, tags_recomended=TAGS_RECOMENDED, tags_required=TAGS_REQUIRED, tags_red=TAGS_RED, tags_yellow=TAGS_YELLOW):
+    def track_status(track_dict, func_is_file=lambda f: True, tags_recomended=TAGS_RECOMENDED, tags_required=TAGS_REQUIRED, tags_black=TAGS_BLACK, tags_red=TAGS_RED, tags_yellow=TAGS_YELLOW):
         """
         Traffic light status system.
         returns a dict of status and reasons
@@ -224,6 +231,7 @@ class ComunityTrack():
                 message = track_dict['tags'].get(t)
                 if message:
                     status[status_key].append(message)
+        flag_tags(tags_black, 'black')
         flag_tags(tags_red, 'red')
         flag_tags(tags_yellow, 'yellow')
 
@@ -273,16 +281,26 @@ def comunity_upload(request):
 def comunity_list(request):
 
     def _comnunity_list():
+
+        def track_dict_to_status(track_dict):
+            ctrack = ComunityTrack.factory(track_dict, request)
+            track_dict.update(ctrack.status)
+            del track_dict['tags']
+            del track_dict['attachments']
+            del track_dict['lyrics']
+            return track_dict
+
         # Get tracks from db
         tracks = [
-            track.to_dict('full', exclude_fields=('lyrics','attachments','image')) \
+            # , exclude_fields=('lyrics','attachments','image')
+            track_dict_to_status(track.to_dict('full')) \
             for track in DBSession.query(Track) \
                 .order_by(Track.source_filename) \
                 .options( \
                     joinedload(Track.tags), \
-                    #joinedload(Track.attachments), \
+                    joinedload(Track.attachments), \
                     joinedload('tags.parent'), \
-                    #joinedload('lyrics'), \
+                    joinedload('lyrics'), \
                 )
         ]
 

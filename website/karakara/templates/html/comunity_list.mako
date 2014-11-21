@@ -48,23 +48,19 @@ import os
 			<td>
 				<a href="/comunity/track/${track['id']}" class="modal_track_link">${track['source_filename']}</a>
 			</td>
-			<%
-				tags_display = (
-					('title', 'tag'),
-					('artist', 'user'),  # more relevent for some categorys
-					('category', 'th-list'),
-					('lang', 'comment'),
-					('from', None),  # only relevent for some categorys
-					('broken', 'exclamation-sign'),
-				)
-			%>
-			% for tag, tag_icon in tags_display:
 			<td>
-				% if track.get('tags',{}).get(tag):
-				<span class="glyphicon glyphicon-${tag_icon}"></span>
-				% endif
+				% for status_key in {'yellow', 'red'} & track.keys():
+				<div class="popover bottom" style="background-color: ${status_key};" data-toggle="popover">
+					<div class="arrow"></div>
+					<h3 class="popover-title">${status_key}</>
+					<div class="popover-content"><ul>
+						% for message in track[status_key]:
+						<li>${message}</li>
+						% endfor
+					</ul></div>
+				</div>
+				% endfor
 			</td>
-			% endfor
 		% endif
 		</tr>
 	% endfor
