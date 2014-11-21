@@ -3,6 +3,7 @@ import random
 import re
 import json
 import shutil
+from collections import defaultdict
 
 from pyramid.view import view_config
 from pyramid.events import subscriber
@@ -24,6 +25,15 @@ from ..templates import helpers as h
 
 import logging
 log = logging.getLogger(__name__)
+
+#-------------------------------------------------------------------------------
+# Constants
+#-------------------------------------------------------------------------------
+
+TAGS_REQUIRED = ('category', 'title')
+TAGS_RECOMENDED = ('artist', 'lang')
+TAGS_YELLOW = ('yellow', 'caution', 'warning', 'problem')
+TAGS_RED = ('red', 'broken', 'critical')
 
 
 #-------------------------------------------------------------------------------
@@ -85,6 +95,9 @@ class ComunityTrack():
         return ComunityTrack(track_id, request.registry.settings['static.media'], open=cls._open)
 
     def __init__(self, track_id, media_path, open=open):
+        """
+        Not to be called directly - use factory() instead
+        """
         assert track_id and track_id != 'undefined', 'track_id required'
         assert media_path
         self.media_path = media_path
@@ -183,6 +196,58 @@ class ComunityTrack():
     @property
     def video_previews(self):
         return h.previews(self.track)
+
+    @staticmethod
+    def track_status(track_dict, func_is_file=lambda f: True, tags_recomended=TAGS_RECOMENDED, tags_required=TAGS_REQUIRED, tags_red=TAGS_RED, tags_yellow=TAGS_YELLOW):
+        """
+        Traffic light status system.
+        returns a dict of status and reasons
+        This just asserts based on 
+        """
+        status = defaultdict(list)
+
+        #func_is_folder(track_dict['source_filename'])
+        if track_dict.get('duration', 0) <= 0:
+            status['red'].append('invalid duration')
+
+        # Tags
+        # todo - how do we get requireg tags based on category? dont we have this info in 'search' somewhere?
+        def check_tags(tag_list, status_key, message):
+            for t in tag_list:
+                if t not in track_dict['tags']:
+                    status[status_key].append(message.format(t))
+        check_tags(tags_recomended, 'yellow', 'tag {0} suggested')
+        check_tags(tags_required, 'red', 'tag {0} missing')
+
+        def flag_tags(tag_list, status_key):
+            for t in tags_red:
+                message = track_dict['tags'].get(t)
+                if message:
+                    status[status_key].append(message)
+        flag_tags(tags_red, 'red')
+        flag_tags(tags_yellow, 'yellow')
+
+        # Attachments
+        attachment_locations = [a.get('location') for a in track_dict.get('attachments', [])]
+        if not attachment_locations:
+            status['red'].append('no attachments')
+        for location in attachment_locations:
+            if not func_is_file(location):
+                status['red'].append('missing attachment {0}'.format(location))
+
+        # Lyrics
+        lyrics = track_dict.get('lyrics', [])
+        if not lyrics:
+            status['red'].append('no lyrics')
+        for lyric in lyrics:
+            if not lyric.get('content', '').strip():
+                status['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
+
+        return status
+
+    @property
+    def status(self):
+        return self.track_status(self.track, func_is_file=lambda f: os.path.isfile(os.path.join(self.media_path, f)))
 
 
 #-------------------------------------------------------------------------------

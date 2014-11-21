@@ -48,7 +48,7 @@ tag_extractors = {
 #-------------------------------------------------------------------------------
 # Import from URL
 #-------------------------------------------------------------------------------
-def walk_url(uri):
+def walk_url(uri, **kwargs):
     webpage = urllib.request.urlopen(uri)
     soup = BeautifulSoup(webpage.read())
     webpage.close()
@@ -58,20 +58,20 @@ def walk_url(uri):
         elif href.endswith('.json'):
             absolute_filename = uri + href #AllanC - todo - this is not absolute if dir's are crawled!
             with urllib.request.urlopen(absolute_filename) as file:
-                import_json_data(file, absolute_filename)
+                import_json_data(file, absolute_filename, **kwargs)
 
 
 #-------------------------------------------------------------------------------
 # Import from local filesystem
 #-------------------------------------------------------------------------------
-def walk_local(uri):
+def walk_local(uri, **kwargs):
     for root, dirs, files in os.walk(uri):
         for json_filename in [f for f in files if get_fileext(f)=='json']:
             absolute_filename = os.path.join(root         , json_filename)
             #relative_path = root.replace(uri,'')
             #relative_filename = os.path.join(relative_path, json_filename)
             with open(absolute_filename, 'r') as file:
-                import_json_data(file, absolute_filename)
+                import_json_data(file, absolute_filename, **kwargs)
 
 
 #-------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ def hash_files(files):
 #-------------------------------------------------------------------------------
 # Process JSON leaf
 #-------------------------------------------------------------------------------
-def import_json_data(source, location=''):
+def import_json_data(source, location='', **kwargs):
     """
     source should be a filetype object for a json file to import
     it shouldnt be relevent that it is local or remote
@@ -276,15 +276,15 @@ def import_json_data(source, location=''):
 # Import - URI crawl method selector
 #-------------------------------------------------------------------------------
 
-def import_media(uri):
+def import_media(uri, **kwargs):
     """
     Recursivly traverse uri location searching for .json files to import
     should be able to traverse local file system and urls
     """
     if (uri.startswith('http')):
-        walk_url(uri)
+        walk_url(uri, **kwargs)
     else:
-        walk_local(uri)
+        walk_local(uri, **kwargs)
 
 
 #-------------------------------------------------------------------------------
@@ -298,11 +298,13 @@ def get_args():
         description="""Import media to local Db""",
         epilog=""""""
     )
-    parser.add_argument('source_uri'  , help='uri of track media data')
+    parser.add_argument('source_uri', help='uri of track media data')
     parser.add_argument('--config_uri', help='config .ini file for logging configuration', default='development.ini')
+    parser.add_argument('--limit', help='limit the number of tracks to import')
     parser.add_argument('--version', action='version', version=version)
 
     return parser.parse_args()
+
 
 def main():
     args = get_args()
@@ -315,8 +317,8 @@ def main():
     init_DBSession(settings)
     
     log.info('Importing tracks from {0}'.format(args.source_uri))
-    import_media(args.source_uri)
-    
-    
+    import_media(args.source_uri, **vars(args))
+
+
 if __name__ == "__main__":
     main()
