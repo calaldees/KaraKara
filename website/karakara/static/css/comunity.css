@@ -44,3 +44,19 @@ HTML.video    .hide_if_html5_video    {display: none;}
 #modalTrack input[type="submit"] {
     display: none;
 }
+
+
+.traffic_light {
+    width: 4em;
+}
+.traffic_light       .traffic_light_content {
+    display: none;
+    position: absolute;
+    right: 3em;
+    margin-top:1em;
+    border: 1px dashed green;
+    width: auto;
+}
+.traffic_light:hover .traffic_light_content {
+    display: block;
+}

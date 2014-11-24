@@ -2,6 +2,27 @@
 
 <%!
 import os
+
+STATUS_LIGHT_ORDER = ('black', 'green', 'red', 'yellow')
+def get_overall_status(status_lights, status_light_order=STATUS_LIGHT_ORDER):
+	for light in status_light_order:
+		if light in status_lights:
+			return light
+
+STATUS_TO_BOOTSTRAP_CLASS_LOOKUP = {
+	'black': 'muted',
+	'red': 'danger',
+	'yellow': 'warning',
+	'green': 'success',
+}
+
+STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
+	'black': 'glyphicon-ban-circle',
+	'red': 'glyphicon-remove-sign',
+	'yellow': 'glyphicon-exclamation-sign',
+	'green': 'glyphicon-ok-sign',
+}
+
 %>
 
 <%def name="body()">
@@ -32,8 +53,11 @@ import os
 		<%
 			def row_status(tags):
 				return ''
+
+			traffic_light_status = get_overall_status(track.get('status', {}).keys())
+			traffic_light_class = STATUS_TO_BOOTSTRAP_CLASS_LOOKUP.get(traffic_light_status, '')
 		%>
-		<tr class="${row_status(track.get('tags',{}))}">
+		<tr class="${row_status(track.get('tags',{}))} bg-${traffic_light_class}">
 		% if track['source_filename'] in missing_source:
 			<td colspan="5">${track['source_filename']}</td>
 		% else:
@@ -49,17 +73,25 @@ import os
 				<a href="/comunity/track/${track['id']}" class="modal_track_link">${track['source_filename']}</a>
 			</td>
 			<td>
-				% for status_key in {'yellow', 'red'} & track.keys():
-				<div class="popover bottom" style="background-color: ${status_key};" data-toggle="popover">
-					<div class="arrow"></div>
-					<h3 class="popover-title">${status_key}</>
-					<div class="popover-content"><ul>
-						% for message in track[status_key]:
-						<li>${message}</li>
+				<%
+					status_dict = track.get('status', {})
+					num_status = len(status_dict)
+				%>
+				% if status_dict:
+				<div class="traffic_light text-${traffic_light_class}">
+					<span class="glyphicon ${STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP.get(traffic_light_status, '')}"></span>
+					% if num_status >= 2:
+					<span class="badge">${num_status}</span>
+					% endif
+					<ul class="traffic_light_content">
+					% for status_key, messages in status_dict.items():
+						% for message in messages:
+						<li class="alert alert-${STATUS_TO_BOOTSTRAP_CLASS_LOOKUP.get(status_key, '')}">${message}</li>
 						% endfor
-					</ul></div>
+					% endfor
+					</ul>
 				</div>
-				% endfor
+				% endif
 			</td>
 		% endif
 		</tr>

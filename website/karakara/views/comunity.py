@@ -30,11 +30,14 @@ log = logging.getLogger(__name__)
 # Constants
 #-------------------------------------------------------------------------------
 
-TAGS_REQUIRED = ('category', 'title')
-TAGS_RECOMENDED = ('artist', 'lang')
-TAGS_YELLOW = ('yellow', 'caution', 'warning', 'problem')
-TAGS_RED = ('red', 'broken', 'critical')
-TAGS_BLACK = ('delete', 'remove', 'depricated')
+STATUS_TAGS = {
+    'required': (),  # ('category', 'title'),
+    'recomended': (),  # ('artist', 'lang'),
+    'yellow': ('yellow', 'caution', 'warning', 'problem'),
+    'red': ('red', 'broken', 'critical'),
+    'black': ('black', 'delete', 'remove', 'depricated', 'broken'),
+    'green': ('green', 'ok', 'checked')
+}
 
 #-------------------------------------------------------------------------------
 # Cache Management
@@ -205,7 +208,7 @@ class ComunityTrack():
         return h.previews(self.track)
 
     @staticmethod
-    def track_status(track_dict, func_is_file=lambda f: True, tags_recomended=TAGS_RECOMENDED, tags_required=TAGS_REQUIRED, tags_black=TAGS_BLACK, tags_red=TAGS_RED, tags_yellow=TAGS_YELLOW):
+    def track_status(track_dict, func_is_file=lambda f: True, status_tags=STATUS_TAGS):
         """
         Traffic light status system.
         returns a dict of status and reasons
@@ -223,17 +226,19 @@ class ComunityTrack():
             for t in tag_list:
                 if t not in track_dict['tags']:
                     status[status_key].append(message.format(t))
-        check_tags(tags_recomended, 'yellow', 'tag {0} suggested')
-        check_tags(tags_required, 'red', 'tag {0} missing')
+        check_tags(status_tags['recomended'], 'yellow', 'tag {0} suggested')
+        check_tags(status_tags['required'], 'red', 'tag {0} missing')
 
         def flag_tags(tag_list, status_key):
-            for t in tags_red:
-                message = track_dict['tags'].get(t)
+            for t in tag_list:
+                tags = track_dict.get('tags', {})
+                message = tags.get(t) #or tags.get(None, {}).get(t)
                 if message:
                     status[status_key].append(message)
-        flag_tags(tags_black, 'black')
-        flag_tags(tags_red, 'red')
-        flag_tags(tags_yellow, 'yellow')
+        flag_tags(status_tags['black'], 'black')
+        flag_tags(status_tags['red'], 'red')
+        flag_tags(status_tags['yellow'], 'yellow')
+        flag_tags(status_tags['green'], 'green')
 
         # Attachments
         attachment_locations = [a.get('location') for a in track_dict.get('attachments', [])]
@@ -246,7 +251,7 @@ class ComunityTrack():
         # Lyrics
         lyrics = track_dict.get('lyrics', [])
         if not lyrics:
-            status['red'].append('no lyrics')
+            status['yellow'].append('no lyrics')
         for lyric in lyrics:
             if not lyric.get('content', '').strip():
                 status['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
@@ -283,8 +288,7 @@ def comunity_list(request):
     def _comnunity_list():
 
         def track_dict_to_status(track_dict):
-            ctrack = ComunityTrack.factory(track_dict, request)
-            track_dict.update(ctrack.status)
+            track_dict['status'] = ComunityTrack.factory(track_dict, request).status
             del track_dict['tags']
             del track_dict['attachments']
             del track_dict['lyrics']
@@ -336,6 +340,7 @@ def comunity_track(request):
     ctrack = ComunityTrack.factory(id, request)
     return action_ok(data={
         'track': ctrack.track,
+        'status': ctrack.status,
         'tag_matrix': {},
         'tag_data': ctrack.tag_data_raw,
         'subtitles': ctrack.subtitle_data,
