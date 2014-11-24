@@ -3,6 +3,7 @@ import json
 import urllib
 import re
 import hashlib
+import urllib.parse
 
 from bs4 import BeautifulSoup
 import traceback
@@ -216,7 +217,7 @@ def import_json_data(source, location='', **kwargs):
                 for attachment_data in data.get("%ss"%attachment_type,[]):
                     attachment = Attachment()
                     attachment.type     = attachment_type
-                    attachment.location = os.path.join(source_filename,  attachment_data.get('url'))
+                    attachment.location = os.path.join(source_filename,  urllib.parse.unquote(attachment_data.get('url')))
                     
                     extra_fields = {}
                     for key,value in attachment_data.items():
