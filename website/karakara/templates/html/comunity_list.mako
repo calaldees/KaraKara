@@ -3,12 +3,6 @@
 <%!
 import os
 
-STATUS_LIGHT_ORDER = ('black', 'green', 'red', 'yellow')
-def get_overall_status(status_lights, status_light_order=STATUS_LIGHT_ORDER):
-	for light in status_light_order:
-		if light in status_lights:
-			return light
-
 STATUS_TO_BOOTSTRAP_CLASS_LOOKUP = {
 	'black': 'muted',
 	'red': 'danger',
@@ -54,7 +48,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 			def row_status(tags):
 				return ''
 
-			traffic_light_status = get_overall_status(track.get('status', {}).keys())
+			traffic_light_status = track.get('status', {}).get('status', '')
 			traffic_light_class = STATUS_TO_BOOTSTRAP_CLASS_LOOKUP.get(traffic_light_status, '')
 		%>
 		<tr class="${row_status(track.get('tags',{}))} bg-${traffic_light_class}">
@@ -74,17 +68,17 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 			</td>
 			<td>
 				<%
-					status_dict = track.get('status', {})
-					num_status = len(status_dict)
+					status_details = track.get('status', {}).get('status_details', {})
+					num_status = len(status_details)
 				%>
-				% if status_dict:
+				% if status_details:
 				<div class="traffic_light text-${traffic_light_class}">
 					<span class="glyphicon ${STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP.get(traffic_light_status, '')}"></span>
 					% if num_status >= 2:
 					<span class="badge">${num_status}</span>
 					% endif
 					<ul class="traffic_light_content">
-					% for status_key, messages in status_dict.items():
+					% for status_key, messages in status_details.items():
 						% for message in messages:
 						<li class="alert alert-${STATUS_TO_BOOTSTRAP_CLASS_LOOKUP.get(status_key, '')}">${message}</li>
 						% endfor

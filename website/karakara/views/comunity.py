@@ -32,12 +32,21 @@ log = logging.getLogger(__name__)
 
 STATUS_TAGS = {
     'required': (),  # ('category', 'title'),
-    'recomended': (),  # ('artist', 'lang'),
+    'recomended': ('lang',),  # ('artist', ),
     'yellow': ('yellow', 'caution', 'warning', 'problem'),
     'red': ('red', 'broken', 'critical'),
     'black': ('black', 'delete', 'remove', 'depricated'),
     'green': ('green', 'ok', 'checked')
 }
+
+STATUS_LIGHT_ORDER = ('black', 'green', 'red', 'yellow')
+
+
+def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
+    for light in status_light_order:
+        if light in status_keys:
+            return light
+
 
 #-------------------------------------------------------------------------------
 # Cache Management
@@ -208,17 +217,17 @@ class ComunityTrack():
         return h.previews(self.track)
 
     @staticmethod
-    def track_status(track_dict, func_is_file=lambda f: True, status_tags=STATUS_TAGS):
+    def track_status(track_dict, status_tags=STATUS_TAGS, func_is_file=lambda f: True):
         """
         Traffic light status system.
         returns a dict of status and reasons
-        This just asserts based on 
+        This just asserts based on
         """
-        status = defaultdict(list)
+        status_details = defaultdict(list)
 
         #func_is_folder(track_dict['source_filename'])
         if track_dict.get('duration', 0) <= 0:
-            status['red'].append('invalid duration')
+            status_details['red'].append('invalid duration')
 
         # Tags
         # todo - how do we get requireg tags based on category? dont we have this info in 'search' somewhere?
@@ -226,7 +235,7 @@ class ComunityTrack():
         def check_tags(tag_list, status_key, message):
             for t in tag_list:
                 if t not in track_dict['tags']:
-                    status[status_key].append(message.format(t))
+                    status_details[status_key].append(message.format(t))
         check_tags(status_tags['recomended'], 'yellow', 'tag {0} suggested')
         check_tags(status_tags['required'], 'red', 'tag {0} missing')
 
@@ -235,7 +244,7 @@ class ComunityTrack():
             for t in tag_list:
                 message = ".\n".join(tags.get(t, [])) or (t in tags.get(None, []))
                 if message:
-                    status[status_key].append(message)
+                    status_details[status_key].append(message)
         flag_tags(status_tags['black'], 'black')
         flag_tags(status_tags['red'], 'red')
         flag_tags(status_tags['yellow'], 'yellow')
@@ -244,20 +253,23 @@ class ComunityTrack():
         # Attachments
         attachment_locations = [a.get('location') for a in track_dict.get('attachments', [])]
         if not attachment_locations:
-            status['red'].append('no attachments')
+            status_details['red'].append('no attachments')
         for location in attachment_locations:
             if not func_is_file(location):
-                status['red'].append('missing attachment {0}'.format(location))
+                status_details['red'].append('missing attachment {0}'.format(location))
 
         # Lyrics
         lyrics = track_dict.get('lyrics', [])
         if not lyrics:
-            status['yellow'].append('no lyrics')
+            status_details['yellow'].append('no lyrics')
         for lyric in lyrics:
             if not lyric.get('content', '').strip():
-                status['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
+                status_details['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
 
-        return status
+        return {
+            'status_details': status_details,
+            'status': get_overall_status(status_details.keys()),
+        }
 
     @property
     def status(self):
