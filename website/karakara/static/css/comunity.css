@@ -45,6 +45,10 @@ HTML.video    .hide_if_html5_video    {display: none;}
     display: none;
 }
 
+.bg-muted {
+    background-color: #aaa;
+    color: #555;
+}
 
 .traffic_light {
     width: 4em;

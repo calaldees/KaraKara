@@ -35,7 +35,7 @@ STATUS_TAGS = {
     'recomended': (),  # ('artist', 'lang'),
     'yellow': ('yellow', 'caution', 'warning', 'problem'),
     'red': ('red', 'broken', 'critical'),
-    'black': ('black', 'delete', 'remove', 'depricated', 'broken'),
+    'black': ('black', 'delete', 'remove', 'depricated'),
     'green': ('green', 'ok', 'checked')
 }
 
@@ -222,6 +222,7 @@ class ComunityTrack():
 
         # Tags
         # todo - how do we get requireg tags based on category? dont we have this info in 'search' somewhere?
+        #        these should be enforced
         def check_tags(tag_list, status_key, message):
             for t in tag_list:
                 if t not in track_dict['tags']:
@@ -230,9 +231,9 @@ class ComunityTrack():
         check_tags(status_tags['required'], 'red', 'tag {0} missing')
 
         def flag_tags(tag_list, status_key):
+            tags = track_dict.get('tags', {})
             for t in tag_list:
-                tags = track_dict.get('tags', {})
-                message = tags.get(t) #or tags.get(None, {}).get(t)
+                message = ".\n".join(tags.get(t, [])) or (t in tags.get(None, []))
                 if message:
                     status[status_key].append(message)
         flag_tags(status_tags['black'], 'black')
