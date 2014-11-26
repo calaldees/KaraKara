@@ -3,3 +3,4 @@
 *.vagrant
 mediasource/
 *~
+hash_cache.pickle
