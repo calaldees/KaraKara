@@ -17,7 +17,7 @@ from externals.lib.misc import get_fileext, random_string, hash_files as hash_fi
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
 
 from ..model         import init_DBSession, DBSession, commit
-from ..model.actions import get_tag
+from ..model.actions import get_tag, clear_all_tracks
 
 import logging
 log = logging.getLogger(__name__)
@@ -301,7 +301,8 @@ def get_args():
     )
     parser.add_argument('source_uri', help='uri of track media data')
     parser.add_argument('--config_uri', help='config .ini file for logging configuration', default='development.ini')
-    parser.add_argument('--limit', help='limit the number of tracks to import')
+    parser.add_argument('--limit', help='limit the number of tracks to import, handy for testing')
+    parser.add_argument('--reimport', action='store_true', default=False, help='Delete all existing tracks from db and reimport')
     parser.add_argument('--version', action='version', version=version)
 
     return parser.parse_args()
@@ -316,7 +317,11 @@ def main():
     logging.basicConfig(level=logging.INFO)
     settings = get_appsettings(args.config_uri)
     init_DBSession(settings)
-    
+
+    if args.reimport:
+        log.warn('Deleteing all existing tracks')
+        clear_all_tracks()
+
     log.info('Importing tracks from {0}'.format(args.source_uri))
     import_media(args.source_uri, **vars(args))
 
