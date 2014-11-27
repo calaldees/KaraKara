@@ -567,7 +567,10 @@ class MediaFile:
 		try:
 			raw_probe = subprocess.check_output(['avprobe', avlib_safe_path(self.path)], stderr=subprocess.STDOUT)
 		except subprocess.CalledProcessError:
+			log.warn('unable to call avprobe with {0}'.self.path)
 			return None
+		
+		raw_probe = raw_probe.replace('\x1b[0;39m','').replace('\x1b[0m','').replace('\x1b[0;33m','')  # AllanC - An abobnibal hack - the output was gubbed with shit, this strips it. WTF?!
 		
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_bitrate = re.search(r',\s*bitrate:\s*(\d+)\s*kb/s', raw_probe, re.IGNORECASE | re.MULTILINE)
