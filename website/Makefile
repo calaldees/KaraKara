@@ -167,6 +167,16 @@ test_crawl_production: ini
 	echo "unimplemented ... yet"
 	#env/bin/py.test $(PROJECT) --runslow -k crawl_production -s
 
+# I18N -------------------------------------------------------------------------
+
+i18n:
+	env/bin/python3 setup.py extract_messages
+	env/bin/python3 setup.py init_catalog -l en
+	#env/bin/python3 setup.py init_catalog -l fr
+	#env/bin/python3 setup.py init_catalog -l es
+	#env/bin/python3 setup.py init_catalog -l it
+	env/bin/python3 setup.py update_catalog
+	env/bin/python3 setup.py compile_catalog
 
 # Data -------------------------------------------------------------------------
 

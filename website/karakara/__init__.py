@@ -7,6 +7,7 @@ from pyramid.config import Configurator
 from pyramid.request import Request
 from pyramid.scripts.pserve import add_file_callback
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
+from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
 from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
@@ -23,6 +24,7 @@ from .model import init_DBSession
 import logging
 log = logging.getLogger(__name__)
 
+translation_string_factory = TranslationStringFactory('karakara')
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
 #import mako.filters
@@ -40,10 +42,13 @@ def main(global_config, **settings):
     init_DBSession(settings)
 
     # Pyramid Global Settings
-    config = Configurator(settings=settings) #, autocommit=True
+    config = Configurator(settings=settings)  # , autocommit=True
 
     # Register Aditional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
+
+    # i18n
+    #config.add_translation_dirs('karakara:locale')
 
     # Reload on template change
     template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
@@ -182,6 +187,8 @@ def main(global_config, **settings):
     config.add_route('upload', '/upload{sep:/?}{name:.*}')
 
     # Events -------------------------------------------------------------------
+    config.add_subscriber(add_localizer, pyramid.events.NewRequest)
+    config.add_subscriber(add_render_globals, pyramid.events.BeforeRender)
     config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
 
     # Return -------------------------------------------------------------------
@@ -190,5 +197,20 @@ def main(global_config, **settings):
     return config.make_wsgi_app()
 
 
+def add_localizer(event):
+    request = event.request
+    localizer = get_localizer(request)
+    def auto_translate(*args, **kwargs):
+        return localizer.translate(translation_string_factory(*args, **kwargs))
+    request.localizer = localizer
+    request.translate = auto_translate
+
+
 def add_template_helpers_to_event(event):
     event['h'] = template_helpers
+
+
+def add_render_globals(event):
+    request = event['request']
+    event['_'] = request.translate
+    event['localizer'] = request.localizer

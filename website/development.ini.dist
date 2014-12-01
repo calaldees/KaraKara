@@ -8,11 +8,14 @@ pyramid.debug_authorization = false
 pyramid.debug_notfound      = false
 pyramid.debug_routematch    = false
 pyramid.debug_templates     = true
-pyramid.default_locale_name = en
 pyramid.includes =
     pyramid_tm
     #pyramid_debugtoolbar
 
+
+# i18n -------------------------------------------------------------------------
+pyramid.default_locale_name = en
+i18n.available_languages = [en]
 
 # Karaoke settings -------------------------------------------------------------
 karakara.server.mode = development
