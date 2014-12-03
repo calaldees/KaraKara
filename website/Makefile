@@ -15,7 +15,6 @@ LOG_LINES=5
 #APTGET_EXTRAS+=-y
 #endif
 
-
 help:
 	# Usage: make <target>, where target is
 	# install        -- run after clean checkout to pull dependecys and setup
@@ -38,6 +37,7 @@ help:
 # OSX installation
 .installed_python_Darwin:
 	brew install python3 gettext
+	# cd ~/bin/ && ln -s /usr/local/opt/gettext/bin/msgmerge
 	# python virtualenv?
 	touch .installed_python_Darwin
 
