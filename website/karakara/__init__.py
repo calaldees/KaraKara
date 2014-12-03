@@ -48,7 +48,7 @@ def main(global_config, **settings):
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
 
     # i18n
-    #config.add_translation_dirs('karakara:locale')
+    config.add_translation_dirs('karakara:locale')
 
     # Reload on template change
     template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
@@ -187,9 +187,8 @@ def main(global_config, **settings):
     config.add_route('upload', '/upload{sep:/?}{name:.*}')
 
     # Events -------------------------------------------------------------------
-    config.add_subscriber(add_localizer, pyramid.events.NewRequest)
-    config.add_subscriber(add_render_globals, pyramid.events.BeforeRender)
-    config.add_subscriber(add_template_helpers_to_event, pyramid.events.BeforeRender)
+    config.add_subscriber(add_localizer_to_request, pyramid.events.NewRequest)
+    config.add_subscriber(add_render_globals_to_template, pyramid.events.BeforeRender)
 
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
@@ -197,7 +196,7 @@ def main(global_config, **settings):
     return config.make_wsgi_app()
 
 
-def add_localizer(event):
+def add_localizer_to_request(event):
     request = event.request
     localizer = get_localizer(request)
     def auto_translate(*args, **kwargs):
@@ -206,11 +205,8 @@ def add_localizer(event):
     request.translate = auto_translate
 
 
-def add_template_helpers_to_event(event):
-    event['h'] = template_helpers
-
-
-def add_render_globals(event):
+def add_render_globals_to_template(event):
     request = event['request']
     event['_'] = request.translate
     event['localizer'] = request.localizer
+    event['h'] = template_helpers

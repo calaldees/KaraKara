@@ -37,7 +37,7 @@ help:
 
 # OSX installation
 .installed_python_Darwin:
-	brew install python3
+	brew install python3 gettext
 	# python virtualenv?
 	touch .installed_python_Darwin
 
@@ -47,13 +47,13 @@ help:
 		echo virtualenv already installed; \
 	else \
 		echo installing virtualenv; \
-		sudo apt-get install -y python-virtualenv curl ; \
+		sudo apt-get install -y python-virtualenv curl gettext; \
 	fi
 	if dpkg -s python3-setuptools ; then \
 		echo python 3 already installed; \
 	else \
 		echo installing python 3; \
-		sudo apt-get install -y python3-setuptools python3-dev curl ; \
+		sudo apt-get install -y python3-setuptools python3-dev curl gettext; \
 	fi
 	touch .installed_python_Linux
 
@@ -83,7 +83,7 @@ dependency_download: dependency_downloader.py externals
 	env/bin/python dependency_downloader.py --destination externals
 	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
-install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths
+install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths i18n
 
 
 # Databases --------------------------------------------------------------------
@@ -169,13 +169,17 @@ test_crawl_production: ini
 
 # I18N -------------------------------------------------------------------------
 
-i18n:
+karakara/locale:
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py init_catalog -l en
-	#env/bin/python3 setup.py init_catalog -l fr
-	#env/bin/python3 setup.py init_catalog -l es
-	#env/bin/python3 setup.py init_catalog -l it
-	env/bin/python3 setup.py update_catalog
+	env/bin/python3 setup.py init_catalog -l fr
+	env/bin/python3 setup.py init_catalog -l es
+	env/bin/python3 setup.py init_catalog -l it
+
+i18n: karakara/locale
+	env/bin/python3 setup.py extract_messages
+	#env/bin/python3 setup.py update_catalog  # this is buggered. bable is throwing a bytes/str fit. Looks like msgmerge from the gettext lib works
+	cd karakara/locale && msgmerge --update en/LC_MESSAGES/KaraKara.po KaraKara.pot
 	env/bin/python3 setup.py compile_catalog
 
 # Data -------------------------------------------------------------------------

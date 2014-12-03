@@ -27,24 +27,24 @@
 % if not identity.get('admin', False) and disbaled_message:
     <p>${disbaled_message}</p>
 % else:
-    <a href="/search_tags/"   data-role="button">Explore tracks</a>
-    <a href="/queue"          data-role="button">Queued tracks </a>
+    <a href="/search_tags/"   data-role="button">${_('mobile.home.search_tags')}</a>
+    <a href="/queue"          data-role="button">${_('mobile.home.queue')}</a>
     
     % if identity.get('faves',[]):
-    <a href="/fave"           data-role="button">Favorites</a>
+    <a href="/fave"           data-role="button">${_('mobile.home.fave')}</a>
     % endif
     
-    <a href="/feedback"       data-role="button">Feedback</a>
+    <a href="/feedback"       data-role="button">${_('mobile.home.feedback')}</a>
 % endif
 
 % if identity.get('admin', False):
-    <a href="/player/player.html" data-role="button" class="admin">Player Interface</a>
-    <a href="/track_list"         data-role="button" class="admin">Print Tracks</a>
-    <a href="/settings"           data-role="button" class="admin">Settings</a>
-    <a href="/admin_lock"         data-role="button" class="admin">Admin Lock</a>
-    <a href="/remote"             data-role="button" class="admin">Remote Control</a>
-    <a href="/inject_testdata"    data-role="button" class="admin">Inject Test Data</a>
-    <a href="/stats"              data-role="button" class="admin">Server Stats</a>
-    <a href="/admin"              data-role="button" class="admin">Exit Admin Mode</a>
-    <a href="/comunity"           data-role="button" class="admin">Comunity</a>
+    <a href="/player/player.html" data-role="button" class="admin">${_('mobile.home.player')}</a>
+    <a href="/track_list"         data-role="button" class="admin">${_('mobile.home.track_list')}</a>
+    <a href="/settings"           data-role="button" class="admin">${_('mobile.home.settings')}</a>
+    <a href="/admin_lock"         data-role="button" class="admin">${_('mobile.home.admin_lock')}</a>
+    <a href="/remote"             data-role="button" class="admin">${_('mobile.home.remote')}</a>
+    <a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>
+    <a href="/stats"              data-role="button" class="admin">${_('mobile.home.stats')}</a>
+    <a href="/admin"              data-role="button" class="admin">${_('mobile.home.admin')}</a>
+    <a href="/comunity"           data-role="button" class="admin">${_('mobile.home.comunity')}</a>
 % endif
