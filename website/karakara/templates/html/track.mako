@@ -1,6 +1,6 @@
 <%inherit file="_base.mako"/>
 
-<%def name="title()">Track</%def>
+<%def name="title()">${_('mobile.track.title')}</%def>
 
 <%
     track = data.get('track')

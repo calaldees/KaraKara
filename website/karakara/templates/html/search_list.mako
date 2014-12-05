@@ -2,10 +2,10 @@
 
 <%namespace name="search_tags" file="search_tags.mako" import="search_url"/>
 
-<%def name="title()">Track List</%def>
+<%def name="title()">${_('mobile.search_list.title')}</%def>
 
 <!-- tracks -->
-<h2>Tracks</h2>
+<h2>${_('mobile.search_list.heading')}</h2>
 <ul data-role="listview" data-inset="true" class="title">
 % for track in data['tracks']:
     <li>
