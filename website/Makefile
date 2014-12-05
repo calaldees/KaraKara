@@ -169,7 +169,7 @@ test_crawl_production: ini
 
 # I18N -------------------------------------------------------------------------
 
-karakara/locale:
+locale:
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py init_catalog -l en
 	#env/bin/python3 setup.py init_catalog -l fr
@@ -186,7 +186,7 @@ env/lib/python3.4/site-packages/babel/messages/frontend.py.bak: env
 	# This just perform a ultra hack critical fix on bable
 	sed -i.bak "s/tmpname, 'w'/tmpname, 'wb'/g" env/lib/python3.4/site-packages/babel/messages/frontend.py
 
-i18n: karakara/locale env/lib/python3.4/site-packages/babel/messages/frontend.py.bak
+i18n: locale env/lib/python3.4/site-packages/babel/messages/frontend.py.bak
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py update_catalog
 	#Looks like msgmerge from the gettext lib works can work in place of update_catalog.

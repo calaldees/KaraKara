@@ -24,10 +24,7 @@ from .model import init_DBSession
 import logging
 log = logging.getLogger(__name__)
 
-# How and why does this have to be 'KaraKara' and not a string of my choosing?
-# I guess it's because of the name of the .pot file.
-# But why is the pot file named that?
-translation_string_factory = TranslationStringFactory('KaraKara')
+translation_string_factory = TranslationStringFactory('karakara')
 
 # HACK! - Monkeypatch Mako 0.8.1 - HACK!
 #import mako.filters

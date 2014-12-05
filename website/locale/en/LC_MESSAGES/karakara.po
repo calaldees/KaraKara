@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: karakara 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-05 18:23+0000\n"
+"POT-Creation-Date: 2014-12-05 18:45+0000\n"
 "PO-Revision-Date: 2014-12-02 19:11+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -119,5 +119,5 @@ msgstr "Explore tracks"
 
 #: karakara/templates/html/track.mako:3
 msgid "mobile.track.title"
-msgstr "Tracks"
+msgstr "Track"
 
