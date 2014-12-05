@@ -15,6 +15,7 @@ pyramid.includes =
 
 # i18n -------------------------------------------------------------------------
 pyramid.default_locale_name = en
+i18n.translation_dirs = karakara:locale
 i18n.available_languages = [en]
 
 # Karaoke settings -------------------------------------------------------------

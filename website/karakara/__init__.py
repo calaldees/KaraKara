@@ -50,9 +50,6 @@ def main(global_config, **settings):
     # Register Aditional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
 
-    # i18n
-    config.add_translation_dirs('karakara:locale')
-
     # Reload on template change
     template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
     add_file_callback(lambda: template_filenames)
@@ -60,6 +57,9 @@ def main(global_config, **settings):
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
         config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
+
+    # i18n
+    config.add_translation_dirs(config.registry.settings['i18n.translation_dirs'])
 
     # Session Manager
     session_settings = extract_subkeys(config.registry.settings, 'session.')
