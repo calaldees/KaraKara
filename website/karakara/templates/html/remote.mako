@@ -28,12 +28,12 @@
 <%
     skip_sec = request.registry.settings['karakara.player.video.skip.seconds']
     buttons = (
-        ('play'          , 'Play Fullscreen'                ),
-        ('pause'         , 'Pause (toggle)'                 ),
-        ('seek_forwards' , 'Seek (+{0}sec)'.format(skip_sec)),
-        ('seek_backwards', 'Seek (-{0}sec)'.format(skip_sec)),
-        ('stop'          , 'Stop'                           ),
-        ('skip'          , 'Skip Track'                     ),
+        ('play'          , _('mobile.remote.play')),
+        ('pause'         , _('mobile.remote.pause')),
+        ('seek_forwards' , _('mobile.remote.seek +${skip_sec}', mapping={'skip_sec': skip_sec})),
+        ('seek_backwards', _('mobile.remote.seek -${skip_sec}', mapping={'skip_sec': skip_sec})),
+        ('stop'          , _('mobile.remote.stop')),
+        ('skip'          , _('mobile.remote.skip')),
     )
 %>
 % for cmd, title in buttons:

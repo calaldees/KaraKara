@@ -39,8 +39,8 @@
                 % if request.path != '/':
                 ## data-add-back-btn="true" (Could be added to header to auto generate a back button)
                 ## ui-btn-icon-notext -> ui-btn-icon-right to get text
-                <a href="#" class="ui-btn-icon-notext ui-btn-left  ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-back" data-rel="back">Back</a>
-                <a href="/" class="ui-btn-icon-notext ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-home"                >Home</a>
+                <a href="#" class="ui-btn-icon-notext ui-btn-left  ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-back" data-rel="back">${_('mobile.base.back')}</a>
+                <a href="/" class="ui-btn-icon-notext ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-home"                >${_('mobile.base.home')}</a>
                 % endif
                 
             </div><!-- /header -->
@@ -50,7 +50,7 @@
             % for message in messages:
             <div class="flash_message ui-bar ui-bar-e status_${status}">
                 <p>${message}</p>
-                <a href="#" class="flash_remove" data-role="button" data-icon="delete" data-iconpos="notext" onclick="$(this).closest('.flash_message').slideUp(function(){$(this).remove()}); return false;">Remove</a>
+                <a href="#" class="flash_remove" data-role="button" data-icon="delete" data-iconpos="notext" onclick="$(this).closest('.flash_message').slideUp(function(){$(this).remove()}); return false;">${_('mobile.base.flash_remove')}</a>
             </div>
             % endfor
             </div>

@@ -172,9 +172,9 @@ test_crawl_production: ini
 karakara/locale:
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py init_catalog -l en
-	env/bin/python3 setup.py init_catalog -l fr
-	env/bin/python3 setup.py init_catalog -l es
-	env/bin/python3 setup.py init_catalog -l it
+	#env/bin/python3 setup.py init_catalog -l fr
+	#env/bin/python3 setup.py init_catalog -l es
+	#env/bin/python3 setup.py init_catalog -l it
 
 i18n: karakara/locale
 	env/bin/python3 setup.py extract_messages

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: karakara 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-03 08:06+0000\n"
+"POT-Creation-Date: 2014-12-05 08:03+0000\n"
 "PO-Revision-Date: 2014-12-02 19:11+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,6 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "Generated-By: Babel 1.3\n"
+
+#: karakara/templates/html/_base.mako:42
+msgid "mobile.base.back"
+msgstr "Back"
+
+#: karakara/templates/html/_base.mako:43
+msgid "mobile.base.home"
+msgstr "Home"
+
+#: karakara/templates/html/_base.mako:53
+msgid "mobile.base.flash_remove"
+msgstr "Remove"
 
 #: karakara/templates/html/home.mako:30
 msgid "mobile.home.search_tags"
@@ -70,3 +82,27 @@ msgstr "Exit Admin Mode"
 #: karakara/templates/html/home.mako:49
 msgid "mobile.home.comunity"
 msgstr "Comunity"
+
+#: karakara/templates/html/remote.mako:31
+msgid "mobile.remote.play"
+msgstr "Play Fullscreen"
+
+#: karakara/templates/html/remote.mako:32
+msgid "mobile.remote.pause"
+msgstr "Pause (toggle)"
+
+#: karakara/templates/html/remote.mako:33
+msgid "mobile.remote.seek +${skip_sec}"
+msgstr "Seek (+${skip_sec}sec)"
+
+#: karakara/templates/html/remote.mako:34
+msgid "mobile.remote.seek -${skip_sec}"
+msgstr "Seek (-${skip_sec}sec)"
+
+#: karakara/templates/html/remote.mako:35
+msgid "mobile.remote.stop"
+msgstr "Stop"
+
+#: karakara/templates/html/remote.mako:36
+msgid "mobile.remote.skip"
+msgstr "Skip Track"
