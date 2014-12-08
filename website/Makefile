@@ -43,17 +43,18 @@ help:
 
 # Linux installation
 .installed_python_Linux:
+	# apt-get install gettext
 	if dpkg -s python-virtualenv ; then \
 		echo virtualenv already installed; \
 	else \
 		echo installing virtualenv; \
-		sudo apt-get install -y python-virtualenv curl gettext; \
+		sudo apt-get install -y python-virtualenv curl; \
 	fi
 	if dpkg -s python3-setuptools ; then \
 		echo python 3 already installed; \
 	else \
 		echo installing python 3; \
-		sudo apt-get install -y python3-setuptools python3-dev curl gettext; \
+		sudo apt-get install -y python3-setuptools python3-dev curl; \
 	fi
 	touch .installed_python_Linux
 
@@ -178,7 +179,7 @@ locale:
 	#env/bin/pip3 install git+git://github.com/mitsuhiko/babel.git
 	
 
-env/lib/python3.4/site-packages/babel/messages/frontend.py.bak: env
+env/lib/python3.4/site-packages/babel/messages/frontend.py.bak: KaraKara.egg-info
 	# bable is shit and needs tweaking
 	# bable is throwing a bytes/str fit in python3
 	#  https://github.com/mitsuhiko/babel/issues/91
@@ -221,6 +222,7 @@ clean_ini:
 	rm -f $(INI_PROD)
 
 clean: clean_ini
+	rm development.ini
 	rm -rf env
 	rm -rf data
 	rm -rf *.egg-info
@@ -230,3 +232,5 @@ clean: clean_ini
 	rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json
 	rm -rf .installed_*
+	find ./locale -iname *.mo -delete
+	find ./locale -iname *.pot -delete
