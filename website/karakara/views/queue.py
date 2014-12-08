@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 QUEUE_CACHE_KEY = 'queue'
 
-queue_version = random.randint(0,2000000000)
+queue_version = random.randint(0, 2000000000)
 def invalidate_queue(request=None):
     commit() # Before invalidating any cache data, ensure the new data is persisted
     global queue_version
@@ -125,6 +125,7 @@ def queue_add(request):
     """
     Add items to end of queue
     """
+    _ = request.translate
     # Validation
     for field in ['track_id', 'performer_name']:
         if not request.params.get(field):
@@ -134,7 +135,7 @@ def queue_add(request):
         track = DBSession.query(Track).get(track_id)
         assert track
     except AssertionError:
-        raise action_error(message='track {0} does not exist'.format(track_id), code=400)
+        raise action_error(message=_('view.queue.add.error.track_id ${track_id}', mapping={'track_id': track_id}), code=400)
 
     # If not admin, check additional restrictions
     if not is_admin(request):
@@ -144,13 +145,13 @@ def queue_add(request):
             performer_name_count = _logic.queue_item_base_query(request, DBSession).filter(QueueItem.performer_name==request.params.get('performer_name')).count()
             if performer_name_count >= performer_limit:
                 log.debug('duplicate performer restricted - {0}'.format(request.params.get('performer_name')))
-                raise action_error(message='unable to queue track. duplicate "performer_name" limit reached', code=400)
+                raise action_error(message=_('view.queue.add.dupicate_performer_limit ${performer_name}', mapping={'perfomer_name': request.params.get('performer_name')}), code=400)
 
         # Duplicate Addition Restrictions
         track_queued = _logic.queue_item_for_track(request, DBSession, track.id)
         if track_queued['status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
             log.debug('duplicate track restricted - {0}'.format(track.id))
-            raise action_error(message='unable to queue track. duplicate "track in queue" limit reached', code=400)
+            raise action_error(message=_('view.queue.add.dupicate_track_limit ${track_id}', mapping={'track_id': track.id}), code=400)
 
         # Max queue length restrictions
         queue_duration = _logic.get_queue_duration(request)
@@ -159,7 +160,7 @@ def queue_add(request):
         event_end = request.registry.settings.get('karakara.event.end')
         if event_end and now()+queue_duration > event_end:
             log.debug('event end restricted')
-            raise action_error(message='Event will be ending soon and all the time has been alocated', code=400)
+            raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
 
         # Queue time limit
         queue_limit = request.registry.settings.get('karakara.queue.add.limit')
@@ -170,12 +171,12 @@ def queue_add(request):
                 # Issue a priority token
                 priority_token = _logic.issue_priority_token(request, DBSession)
                 if isinstance(priority_token, PriorityToken):
-                    raise action_error(message='Queue limit reached - You have been given a priority token and will have priority to queue a track in your priority timeslot', code=400)
+                    raise action_error(message=_('view.queue.add.priority_token_issued'), code=400)
                 if priority_token == _logic.TOKEN_ISSUE_ERROR.EVENT_END:
-                    raise action_error(message='Event will be ending soon and all the time has been alocated', code=400)
+                    raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
                 if priority_token == _logic.TOKEN_ISSUE_ERROR.TOKEN_ISSUED:
-                    raise action_error(message='You already have a priority token timeslot. Queue your track when your timeslot occurs', code=400)
-                raise action_error(message='Queue limit reached - try queing a track later', code=400)
+                    raise action_error(message=_('view.queue.add.priority_token_already_issued'), code=400)
+                raise action_error(message=_('view.queue.add.token_limit'), code=400)
 
     queue_item = QueueItem()
     for key, value in request.params.items():
