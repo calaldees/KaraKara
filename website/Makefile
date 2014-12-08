@@ -222,7 +222,6 @@ clean_ini:
 	rm -f $(INI_PROD)
 
 clean: clean_ini
-	rm development.ini
 	rm -rf env
 	rm -rf data
 	rm -rf *.egg-info
