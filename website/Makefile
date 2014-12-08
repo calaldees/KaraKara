@@ -36,7 +36,8 @@ help:
 
 # OSX installation
 .installed_python_Darwin:
-	brew install python3 gettext
+	brew install python3
+	# brew install gettext
 	# cd ~/bin/ && ln -s /usr/local/opt/gettext/bin/msgmerge
 	# python virtualenv?
 	touch .installed_python_Darwin
@@ -84,7 +85,7 @@ dependency_download: dependency_downloader.py externals
 	env/bin/python dependency_downloader.py --destination externals
 	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
-install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths i18n
+install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths locale/karakara.pot
 
 
 # Databases --------------------------------------------------------------------
@@ -177,17 +178,23 @@ locale:
 	#env/bin/python3 setup.py init_catalog -l es
 	#env/bin/python3 setup.py init_catalog -l it
 	#env/bin/pip3 install git+git://github.com/mitsuhiko/babel.git
-	
 
-env/lib/python3.4/site-packages/babel/messages/frontend.py.bak: KaraKara.egg-info
+env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak: KaraKara.egg-info
 	# bable is shit and needs tweaking
 	# bable is throwing a bytes/str fit in python3
 	#  https://github.com/mitsuhiko/babel/issues/91
 	# they have updated github/bable/master but not the pip package.
 	# This just perform a ultra hack critical fix on bable
-	sed -i.bak "s/tmpname, 'w'/tmpname, 'wb'/g" env/lib/python3.4/site-packages/babel/messages/frontend.py
+	sed -i.bak "s/tmpname, 'w'/tmpname, 'wb'/g" env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py
 
-i18n: locale env/lib/python3.4/site-packages/babel/messages/frontend.py.bak
+locale/karakara.pot: locale env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
+	env/bin/python3 setup.py extract_messages
+	env/bin/python3 setup.py update_catalog
+	#Looks like msgmerge from the gettext lib works can work in place of update_catalog.
+	#cd karakara/locale && msgmerge --update en/LC_MESSAGES/KaraKara.po KaraKara.pot
+	env/bin/python3 setup.py compile_catalog
+
+i18n:
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py update_catalog
 	#Looks like msgmerge from the gettext lib works can work in place of update_catalog.
