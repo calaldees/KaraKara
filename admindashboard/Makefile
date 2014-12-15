@@ -4,3 +4,6 @@ install_max:
 
 install_linux:
 	sudo apt-get install -y elasticsearch logstash
+
+import_events:
+	logstash -f logstash.conf
