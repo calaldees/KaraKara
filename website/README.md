@@ -120,3 +120,27 @@ status_error message style dose not propergate to flash message with format='red
  - flash message from queue.py error (e.g. duplicate performer) is not styled as error but looks like success. feedback error is displayed appropriately. so what gives?!
  
 Starting the player interface directly on the 'player.html' before visiting the normal mobile view fails. This is because the access to .html does not generate a session id and admin mode cannot be aquired
+
+
+Karakara Comunity
+=================
+
+Web interface for managing a closed community to curate the track dataset
+
+Improve dataset
+  * Tagging tracks for exploration
+    * Multiple titles (eng/jap names)
+    * Artists + extra data (where possible)
+  * Quality checking
+    * Timing
+    * Subtitle size/colour/readabilty
+    * Video quality (working state?)
+  * Upgrading quality of old source footage
+  * Adding alternate versions
+    * Instrumental (vocal off)
+    * Long/Short versions
+
+
+Flags
+ * Broken
+ * 

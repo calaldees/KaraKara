@@ -107,8 +107,9 @@ Core components
         videos and images extracted, lyrics (from the subtitle files)
 * website
   * jquerymobile web interface to search/preview/queue tracks
-    * Imports data into local db from output from processmedia
+    * Data importer for `processmedia` output into local db (sqllite/postgresql)
     * Produces printable hard copy track lists for use without mobile interface
+    * Populates elasticsearch events to be visulised with `admindashboard`
   * queueplayer - html5 event display player (currently only designed/tested in Chrome)
     * Looks at website/queue api
     * Streams final video from mediaserver in fullscreen mode.
@@ -116,22 +117,22 @@ Core components
     * Automatically updates track list when the queue is changed.
     * Queue order is obscured passed a configurable time
   * Comunity interface
-    * a dynamic web app to facilitate the curation of track content
+    * A dynamic web app to facilitate the curation of track content
       * upload videos
       * tag videos
-      * view logs of past events
 * mediaserver
   * nginx webserver to proxy website(pyramid) and serve datafiles efficently
   * postgresql database for prouction.ini configuration
   * dnsmasque for assisting in creating a captive portal
+* admindashboard
+  * Logstash data importer for json event logs from `website`
+  * HTML5/js app to visulise event data from elasticsearch
 
+Depricated Additional components
+--------------------------------
 
-Additional components
----------------------
-
-* taginput
+* taginput (replaced by `website/comunity`)
   * lightweight python web interface to enable external contributors to edit tags
-  * __this is being replace with the community interface__
 
 
 [Additional Documentation](website/Tutorial.md)

@@ -190,8 +190,6 @@ env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.b
 locale/karakara.pot: locale env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py update_catalog
-	#Looks like msgmerge from the gettext lib works can work in place of update_catalog.
-	#cd karakara/locale && msgmerge --update en/LC_MESSAGES/KaraKara.po KaraKara.pot
 	env/bin/python3 setup.py compile_catalog
 
 i18n:
