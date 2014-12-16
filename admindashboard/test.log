@@ -1,0 +1,4 @@
+{"name": "Test", "value":"test"}
+{"event": "ev", "value":"1", "value2": 2}
+{"event": "next", "timestamp": "2014-12-15T15:00:00"}
+{"event": "next", "timestamp": "2014-12-15T15:00:00"}
