@@ -4,6 +4,8 @@ from pyramid.view import view_config
 
 from sqlalchemy.orm import joinedload
 
+from externals.lib.log import log_event
+
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
 from ._logic import queue_item_for_track
 from .search import restrict_search
@@ -98,7 +100,9 @@ def track_view(request):
     track = cache.get_or_create(track_key(id), lambda: get_track_and_queued_dict(id))
     if not track:
         raise action_error(message='track {0} not found'.format(id), code=404)
-    
+
+    log_event(request, track_id=id)
+
     return action_ok(data={'track' : track})
 
 

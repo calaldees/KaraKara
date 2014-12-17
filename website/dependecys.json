@@ -73,13 +73,14 @@
     
     "python_lib": {
         "source": "https://raw.github.com/calaldees/libs/master/python3/",
-        "version": "0.0.0",
+        "version": "0.0.1",
         "target": [
             "lib/__init__.py",
             "lib/misc.py",
             "lib/xml.py",
             "lib/make_ini.py",
             "lib/test.py",
+            "lib/log.py",
             "lib/pyramid_helpers/__init__.py",
             "lib/pyramid_helpers/auto_format.py",
             "lib/pyramid_helpers/etag.py",
