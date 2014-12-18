@@ -2007,11 +2007,11 @@ def check_tools():
 		ok = ok and (aac and (h264 or libx264))
 		if not aac:
 			warn("error: avconv does not support aac codec for encoding")
-        if not (h264 or libx264):
-            warn("error: avconv does not support h264 or libx264 codec for encoding")
-        elif libx264:
-            global avconv_h264
-            avconv_h264 = 'libx264'
+		if not (h264 or libx264):
+			warn("error: avconv does not support h264 or libx264 codec for encoding")
+		elif libx264:
+			global avconv_h264
+			avconv_h264 = 'libx264'
 
 	# qt-faststart
 	result = test_program(['qt-faststart'], 'libav/tools')
