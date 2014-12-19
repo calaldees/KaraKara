@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 
 from externals.lib.misc import strip_non_base_types
+from externals.lib.log import log_event
 from . import web, action_ok, action_error
 
 from ..model import DBSession
@@ -33,4 +34,5 @@ def feedback_view(request):
     DBSession.add(feedback)
 
     log.info('feedback - {0}'.format(request.params.get('details')))
+    log_event(request, **request.params)
     return action_ok(message='Feedback received, thank you!')

@@ -61,7 +61,7 @@ karakara.search.list.alphabetical.tags = [from, artist]
 
 karakara.print_tracks.fields = [category, from, use, title, artist]
 
-# Comunity settings ------------------------------------------------------------
+# Comunity ---------------------------------------------------------------------
 
 comunity.title = KaraKara.org.uk
 
@@ -123,13 +123,15 @@ port = 6543
 # Logging -----------------------------------------------------------------------
 
 [loggers]
-keys = root, sqlalchemy, karakara, externals
+keys = root, sqlalchemy, karakara, externals, admindashboard
 
 [handlers]
-keys = console, logfile
+keys = console, logfile, admindashboard
 
 [formatters]
-keys = generic
+keys = generic, message_only
+
+# Loggers -------------------
 
 [logger_root]
 level = INFO
@@ -153,6 +155,8 @@ qualname = sqlalchemy.engine
 # "level = DEBUG" logs SQL queries and results.
 # "level = WARN" logs neither.  (Recommended for production systems.)
 
+# Log Handlers --------------
+
 [handler_console]
 class = StreamHandler
 args = (sys.stderr,)
@@ -167,3 +171,19 @@ formatter = generic
 
 [formatter_generic]
 format = %(asctime)s %(levelname)-5.5s [%(name)s][%(threadName)s] %(message)s
+
+[formatter_message_only]
+format = %(message)s
+
+# Admin Dashboard Logging -------------
+
+[logger_admindashboard]
+level = INFO
+handlers = admindashboard
+qualname = json_log_event
+
+[handler_admindashboard]
+class = FileHandler
+args = ('%(here)s/../admindashboard/events.log',)
+level = NOTSET
+formatter = message_only
