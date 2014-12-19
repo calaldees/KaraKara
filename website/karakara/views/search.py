@@ -11,6 +11,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
 from externals.lib.misc import update_dict
+from externals.lib.log import log_event
 from externals.lib.pyramid_helpers.auto_format import registered_formats
 
 from . import web, cache, etag, action_ok, max_age   # generate_cache_key,
@@ -177,6 +178,7 @@ def tags(request):
     return search dict + sub_tags( a list of all tags with counts )
     """
     search_params = get_search_params(request)
+    log_event(request, tags=search_params.tags, keywords=search_params.keywords)
     cache_key = "search_tags_{0}:{1}".format(search_version, search_cache_key(search_params))
     etag(request, cache_key)  # Abort if 'etag' match
 
@@ -186,6 +188,7 @@ def tags(request):
     keywords         = action_return['data']['keywords']
     sub_tags_allowed = action_return['data']['sub_tags_allowed']
     trackids         = action_return['data']['trackids']
+
 
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
     # TODO: I'm unsure if these 'raise' returns can be cached - right now this call always makes 2 hits to the cache search() and get_action_return_with_sub_tags()
@@ -238,6 +241,7 @@ def list(request):
     return search dict (see above) + tracks (a list of tracks with basic details)
     """
     search_params = get_search_params(request)
+    log_event(request, tags=search_params.tags, keywords=search_params.keywords)
     cache_key = "search_list_{0}:{1}".format(search_version, search_cache_key(search_params))
     etag(request, cache_key)  # Abort if 'etag' match
 
