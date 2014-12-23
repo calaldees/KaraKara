@@ -143,16 +143,22 @@ def queue_add(request):
         # Duplucate performer resrictions
         queue_item_performed_tracks = _logic.queue_item_for_performer(request, DBSession, request.params.get('performer_name'))
         if queue_item_performed_tracks['performer_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
-            log.debug('duplicate performer restricted - {0}'.format(request.params.get('performer_name')))
-            log_event(request, status='reject', reason='dupicate.performer')
-            raise action_error(message=_('view.queue.add.dupicate_performer_limit ${performer_name}', mapping={'perfomer_name': request.params.get('performer_name')}), code=400)
+            message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time}', mapping={
+                'perfomer_name': request.params.get('performer_name'),
+                'estimated_next_add_time': queue_item_performed_tracks['estimated_next_add_time'],
+            })
+            log_event(request, status='reject', reason='dupicate.performer', message=message)
+            raise action_error(message=message, code=400)
 
         # Duplicate Addition Restrictions
         queue_item_tracks_queued = _logic.queue_item_for_track(request, DBSession, track.id)
         if queue_item_tracks_queued['track_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
-            log.debug('duplicate track restricted - {0}'.format(track.id))
-            log_event(request, status='reject', reason='duplicate.track')
-            raise action_error(message=_('view.queue.add.dupicate_track_limit ${track_id}', mapping={'track_id': track.id}), code=400)
+            message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time}', mapping={
+                'track_id': track.id,
+                'estimated_next_add_time': queue_item_tracks_queued['estimated_next_add_time'],
+            })
+            log_event(request, status='reject', reason='duplicate.track', message=message)
+            raise action_error(message=message, code=400)
 
         # Max queue length restrictions
         queue_duration = _logic.get_queue_duration(request)

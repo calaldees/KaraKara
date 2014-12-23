@@ -7,6 +7,9 @@ Acess to settings does not belong in the model
 """
 import datetime
 import json
+import operator
+import itertools
+
 from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -43,7 +46,7 @@ class TOKEN_ISSUE_ERROR(object):
 
 # Methods -----------
 
-def queue_item_base_query(request, DBSession):
+def _queue_item_base_query(request, DBSession):
     time_limit = request.registry.settings.get('karakara.queue.add.duplicate.time_limit')
     return DBSession.query(QueueItem) \
         .filter(or_(
@@ -56,18 +59,19 @@ def queue_item_base_query(request, DBSession):
 def queue_item_for_performer(request, DBSession, performer_name):
     return _queue_item_for(
         request,
-        queue_item_base_query(request, DBSession).filter(QueueItem.performer_name == performer_name)
+        _queue_item_base_query(request, DBSession).filter(QueueItem.performer_name == performer_name)
     )
 
 
 def queue_item_for_track(request, DBSession, track_id):
     return _queue_item_for(
         request,
-        queue_item_base_query(request, DBSession).filter(QueueItem.track_id == track_id)
+        _queue_item_base_query(request, DBSession).filter(QueueItem.track_id == track_id)
     )
 
 
 def _queue_item_for(request, queue_items):
+    time_limit = request.registry.settings.get('karakara.queue.add.duplicate.time_limit')
     track_limit = request.registry.settings.get('karakara.queue.add.duplicate.track_limit')
     performer_limit = request.registry.settings.get('karakara.queue.add.duplicate.performer_limit')
 
@@ -87,6 +91,10 @@ def _queue_item_for(request, queue_items):
     if performer_limit and track_count >= performer_limit:
         performer_status = QUEUE_DUPLICATE.THRESHOLD
 
+    estimated_next_add_time = None
+    if time_limit and track_count:
+        estimated_next_add_time = time_limit - (now() - max(map(operator.attrgetter('time_touched'), itertools.chain(played, pending))))
+
     return {
         'played': played,
         'pending': pending,
@@ -94,6 +102,7 @@ def _queue_item_for(request, queue_items):
         'track_limit': track_limit,
         'performer_status': performer_status,
         'performer_limit': performer_limit,
+        'estimated_next_add_time': estimated_next_add_time,
     }
 
 
