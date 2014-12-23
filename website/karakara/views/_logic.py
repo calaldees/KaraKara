@@ -53,29 +53,48 @@ def queue_item_base_query(request, DBSession):
         .order_by(QueueItem.queue_weight)
 
 
+def queue_item_for_performer(request, DBSession, performer_name):
+    return _queue_item_for(
+        request,
+        queue_item_base_query(request, DBSession).filter(QueueItem.performer_name == performer_name)
+    )
+
+
 def queue_item_for_track(request, DBSession, track_id):
-    """
+    return _queue_item_for(
+        request,
+        queue_item_base_query(request, DBSession).filter(QueueItem.track_id == track_id)
+    )
 
-    Could be 2 DB querys, both involved in limit setting
-    """
-    count_limit = request.registry.settings.get('karakara.queue.add.duplicate.count_limit')
-    # If we are restricting duplicates then perform additional querys to enforce this.
 
-    queue_items = queue_item_base_query(request, DBSession) \
-        .filter(QueueItem.track_id == track_id) \
-        .all()
+def _queue_item_for(request, queue_items):
+    track_limit = request.registry.settings.get('karakara.queue.add.duplicate.track_limit')
+    performer_limit = request.registry.settings.get('karakara.queue.add.duplicate.performer_limit')
+
     played = [q for q in queue_items if q.status == 'played']
     pending = [q for q in queue_items if q.status == 'pending']
+    track_count = len(played+pending)
 
-    status = QUEUE_DUPLICATE.NONE
-    if count_limit and len(played+pending) >= count_limit:
-        status = QUEUE_DUPLICATE.THRESHOLD
+    track_status = QUEUE_DUPLICATE.NONE
+    if track_limit and track_count >= track_limit:
+        track_status = QUEUE_DUPLICATE.THRESHOLD
     elif pending:
-        status = QUEUE_DUPLICATE.PENDING
+        track_status = QUEUE_DUPLICATE.PENDING
     elif played:
-        status = QUEUE_DUPLICATE.PLAYED
+        track_status = QUEUE_DUPLICATE.PLAYED
 
-    return {'played': played, 'pending': pending, 'status': status}
+    performer_status = QUEUE_DUPLICATE.NONE
+    if performer_limit and track_count >= performer_limit:
+        performer_status = QUEUE_DUPLICATE.THRESHOLD
+
+    return {
+        'played': played,
+        'pending': pending,
+        'track_status': track_status,
+        'track_limit': track_limit,
+        'performer_status': performer_status,
+        'performer_limit': performer_limit,
+    }
 
 
 def issue_priority_token(request, DBSession):

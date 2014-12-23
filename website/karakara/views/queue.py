@@ -141,17 +141,15 @@ def queue_add(request):
     # If not admin, check additional restrictions
     if not is_admin(request):
         # Duplucate performer resrictions
-        performer_limit = request.registry.settings.get('karakara.queue.add.duplicate.performer_limit')
-        if performer_limit:
-            performer_name_count = _logic.queue_item_base_query(request, DBSession).filter(QueueItem.performer_name==request.params.get('performer_name')).count()
-            if performer_name_count >= performer_limit:
-                log.debug('duplicate performer restricted - {0}'.format(request.params.get('performer_name')))
-                log_event(request, status='reject', reason='dupicate.performer')
-                raise action_error(message=_('view.queue.add.dupicate_performer_limit ${performer_name}', mapping={'perfomer_name': request.params.get('performer_name')}), code=400)
+        queue_item_performed_tracks = _logic.queue_item_for_performer(request, DBSession, request.params.get('performer_name'))
+        if queue_item_performed_tracks['performer_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
+            log.debug('duplicate performer restricted - {0}'.format(request.params.get('performer_name')))
+            log_event(request, status='reject', reason='dupicate.performer')
+            raise action_error(message=_('view.queue.add.dupicate_performer_limit ${performer_name}', mapping={'perfomer_name': request.params.get('performer_name')}), code=400)
 
         # Duplicate Addition Restrictions
-        track_queued = _logic.queue_item_for_track(request, DBSession, track.id)
-        if track_queued['status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
+        queue_item_tracks_queued = _logic.queue_item_for_track(request, DBSession, track.id)
+        if queue_item_tracks_queued['track_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
             log.debug('duplicate track restricted - {0}'.format(track.id))
             log_event(request, status='reject', reason='duplicate.track')
             raise action_error(message=_('view.queue.add.dupicate_track_limit ${track_id}', mapping={'track_id': track.id}), code=400)

@@ -281,7 +281,7 @@ def test_queue_track_duplicate(app, tracks, DBSession, commit):
     Adding duplicate tracks should error (if appsetting is set)
     """
     assert get_queue(app) == []
-    response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'1 -> int',
+    response = app.put('/settings', {'karakara.queue.add.duplicate.track_limit':'1 -> int',
                                      'karakara.queue.add.duplicate.time_limit' :'1:00:00 -> timedelta'})
     
     # Duplicate also looks at 'played' tracks
@@ -295,7 +295,7 @@ def test_queue_track_duplicate(app, tracks, DBSession, commit):
     response = app.post('/queue', dict(track_id='t1', performer_name='bob2'), expect_errors=True)
     assert response.status_code==400
     
-    response = app.put('/settings', {'karakara.queue.add.duplicate.count_limit':'0 -> int'})
+    response = app.put('/settings', {'karakara.queue.add.duplicate.track_limit':'0 -> int'})
     clear_queue(app)
 
 

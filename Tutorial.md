@@ -103,11 +103,11 @@ System Operation
 		* Too long, means only a few priority tokens are issued and other attendees  find that if they keep franticly requesting tracks that they eventually get through in a gap.
 		* Too short, a huge number of priority tokens are issued and used, leading to the queue length swelling byond the maximum queue length.
 	* It is also worth noting that not all users actually follow through with using there priority token. This may be due to users not understanding the concept, seeing the long wait time and just wondering off. The priority_window should be set to consider this possibility and frequency.
-* `karakara.queue.add.duplicate.count_limit` (int)
+* `karakara.queue.add.duplicate.track_limit` (int)
 	* The number of duplicate tracks to allow in a time period (see below)
 * `karakara.queue.add.duplicate.time_limit` (timedelta)
 	* The time period to enforce the duplication count
-	* E.g count_limit = 2 and time_limit = 1:00:00 means 'Pokemon' can only be queued twice per hour.
+	* E.g track_limit = 2 and time_limit = 1:00:00 means 'Pokemon' can only be queued twice per hour.
 	* The calculation is done on the time since the tracks were last played
 	* E.g if Pokemon was queued at 7:00 and then again at 7:30, the next time the track could be added would be 8:00
 	* (Feature note: it is in the todo list to inform users of the time it will be addable again)
