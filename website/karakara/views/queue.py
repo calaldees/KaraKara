@@ -1,5 +1,6 @@
 import datetime
 import random
+from functools import partial
 
 from pyramid.view import view_config
 
@@ -128,6 +129,8 @@ def queue_add(request):
     Add items to end of queue
     """
     _ = request.translate
+    _log_event = partial(log_event, request, method='add')
+
     # Validation
     for field in ['track_id', 'performer_name']:
         if not request.params.get(field):
@@ -156,7 +159,7 @@ def queue_add(request):
                     'track_count',
                 })
             ))
-            log_event(request, status='reject', reason='dupicate.performer', message=message)
+            _log_event(status='reject', reason='dupicate.performer', message=message)
             raise action_error(message=message, code=400)
 
         # Duplicate Addition Restrictions
@@ -169,7 +172,7 @@ def queue_add(request):
                     'track_count',
                 })
             ))
-            log_event(request, status='reject', reason='duplicate.track', message=message)
+            _log_event(status='reject', reason='duplicate.track', message=message)
             raise action_error(message=message, code=400)
 
         # Max queue length restrictions
@@ -179,7 +182,7 @@ def queue_add(request):
         event_end = request.registry.settings.get('karakara.event.end')
         if event_end and now()+queue_duration > event_end:
             log.debug('event end restricted')
-            log_event(request, status='reject', reason='event_end')
+            _log_event(status='reject', reason='event_end')
             raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
 
         # Queue time limit
@@ -191,15 +194,15 @@ def queue_add(request):
                 # Issue a priority token
                 priority_token = _logic.issue_priority_token(request, DBSession)
                 if isinstance(priority_token, PriorityToken):
-                    log_event(request, status='reject', reason='token.issued')
+                    _log_event(status='reject', reason='token.issued')
                     raise action_error(message=_('view.queue.add.priority_token_issued'), code=400)
                 if priority_token == _logic.TOKEN_ISSUE_ERROR.EVENT_END:
-                    log_event(request, status='reject', reason='event_end')
+                    _log_event(status='reject', reason='event_end')
                     raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
                 if priority_token == _logic.TOKEN_ISSUE_ERROR.TOKEN_ISSUED:
-                    log_event(request, status='reject', reason='token.already_issued')
+                    _log_event(status='reject', reason='token.already_issued')
                     raise action_error(message=_('view.queue.add.priority_token_already_issued'), code=400)
-                log_event(request, status='reject', reason='token.limit')
+                _log_event(status='reject', reason='token.limit')
                 raise action_error(message=_('view.queue.add.token_limit'), code=400)
 
     queue_item = QueueItem()
@@ -214,7 +217,7 @@ def queue_add(request):
         queue_item.session_owner = request.session['id']
 
     DBSession.add(queue_item)
-    log_event(request, status='ok', track_id=queue_item.track_id)
+    _log_event(status='ok', track_id=queue_item.track_id)
     #log.info('add - %s to queue by %s' % (queue_item.track_id, queue_item.performer_name))
 
     invalidate_queue(request)  # Invalidate Cache
@@ -235,20 +238,22 @@ def queue_del(request):
 
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
+    _log_event = partial(log_event, request, method='del')
+
     queue_item_id = request.params['queue_item.id']
     queue_item = DBSession.query(QueueItem).get(queue_item_id)
 
     if not queue_item:
-        log_event(request, status='reject', reason='invalid.queue_item.id', queue_item_id=queue_item_id)
+        _log_event(status='reject', reason='invalid.queue_item.id', queue_item_id=queue_item_id)
         raise action_error(message='invalid queue_item.id', code=404)
     if not is_admin(request) and queue_item.session_owner != request.session['id']:
-        log_event(request, status='reject', reason='not_owner', track_id=queue_item.track_id)
+        _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
         raise action_error(message='you are not the owner of this queue_item', code=403)
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status', 'removed')
 
-    log_event(request, status='ok', track_id=queue_item.track_id)
+    _log_event(status='ok', track_id=queue_item.track_id)
     #log.info('remove - %s from queue' % (queue_item.track_id))
     queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
 
@@ -269,6 +274,8 @@ def queue_update(request):
 
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
+    _log_event = partial(log_event, request, method='update')
+
     params = dict(request.params)
 
     for field in [f for f in ['queue_item.id', 'queue_item.move.target_id'] if f in params]:
@@ -281,17 +288,17 @@ def queue_update(request):
     queue_item = DBSession.query(QueueItem).get(queue_item_id)
 
     if not queue_item:
-        log_event(request, status='reject', reason='invalid.queue_item.id', queue_item_id=queue_item_id)
+        _log_event(status='reject', reason='invalid.queue_item.id', queue_item_id=queue_item_id)
         raise action_error(message='invalid queue_item.id', code=404)
     if not is_admin(request) and queue_item.session_owner != request.session['id']:
-        log_event(request, status='reject', reason='not_owner', track_id=queue_item.track_id)
+        _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
         raise action_error(message='you are not the owner of this queue_item', code=403)
 
     # If moving, lookup new weighting from the target track id
     # The source is moved infront of the target_id
     if params.get('queue_item.move.target_id'):
         if not is_admin(request):
-            log_event(request, status='reject', reason='move.not_admin', queue_item_id=queue_item_id)
+            _log_event(status='reject', reason='move.not_admin', queue_item_id=queue_item_id)
             raise action_error(message='admin only action', code=403)
         # get next and previous queueitem weights
         try:
@@ -312,8 +319,8 @@ def queue_update(request):
             setattr(queue_item, key, value)
     queue_item.time_touched = datetime.datetime.now()  # Update touched timestamp
 
-    log.info('update - %s' % (queue_item.track_id))
-    log_event(request, status='ok', track_id=queue_item.track_id)
+    #log.info('update - %s' % (queue_item.track_id))
+    _log_event(status='ok', track_id=queue_item.track_id)
 
     queue_item_track_id = queue_item.track_id
 
