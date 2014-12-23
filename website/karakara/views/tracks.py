@@ -4,6 +4,7 @@ from pyramid.view import view_config
 
 from sqlalchemy.orm import joinedload
 
+from externals.lib.misc import subdict
 from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
@@ -87,9 +88,8 @@ def track_view(request):
         log.debug('cache gen - track_queue_dict for {0}'.format(id))
         def queue_item_list_to_dict(queue_items):
             return [queue_item.to_dict('full', exclude_fields='track_id,session_owner') for queue_item in queue_items]
-        track['queue'] = queue_item_for_track(request, DBSession, track['id'])
-        track['queue']['played'] = queue_item_list_to_dict(track['queue']['played'] )
-        track['queue']['pending'] = queue_item_list_to_dict(track['queue']['pending'])
+        queue_item_for_track_dict = subdict(queue_item_for_track(request, DBSession, track['id']), {'played', 'pending'})
+        track['queue'] = {k: queue_item_list_to_dict(v) for k, v in queue_item_for_track_dict.items()}
         return track
 
     # TODO: Put some thought into the idea that a malicious cock could deliberately

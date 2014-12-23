@@ -7,8 +7,6 @@ Acess to settings does not belong in the model
 """
 import datetime
 import json
-import operator
-import itertools
 
 from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
@@ -17,15 +15,16 @@ from externals.lib.misc import now, json_object_handler
 
 from karakara.model.model_queue import QueueItem
 from karakara.model.model_token import PriorityToken
-from karakara.model.actions import get_track
 
 import logging
 log = logging.getLogger(__name__)
 
 
 __all__ = [
+    'queue_item_for_performer',
     'queue_item_for_track',
     'QUEUE_DUPLICATE',
+    'TOKEN_ISSUE_ERROR',
     'issue_priority_token',
 ]
 
@@ -33,16 +32,17 @@ __all__ = [
 # Constants ----------
 
 class QUEUE_DUPLICATE():
-    NONE      = None
+    NONE = None
     THRESHOLD = 'THRESHOLD'
-    PLAYED    = 'PLAYED'
-    PENDING   = 'PENDING'
+    PLAYED = 'PLAYED'
+    PENDING = 'PENDING'
     PERFORMER = 'PERFORMER'
+
 
 class TOKEN_ISSUE_ERROR(object):
     NONE = None
-    EVENT_END    = 'EVENT_END'
-    TOKEN_LIMIT  = 'TOKEN_LIMIT'
+    EVENT_END = 'EVENT_END'
+    TOKEN_LIMIT = 'TOKEN_LIMIT'
     TOKEN_ISSUED = 'TOKEN_ISSUED'
 
 
@@ -72,18 +72,16 @@ def queue_item_for_track(request, DBSession, track_id):
     )
 
 
-def _queue_item_for(request, queue_items):
+def _queue_item_for(request, queue_items_query):
     time_limit = request.registry.settings.get('karakara.queue.add.duplicate.time_limit')
     track_limit = request.registry.settings.get('karakara.queue.add.duplicate.track_limit')
     performer_limit = request.registry.settings.get('karakara.queue.add.duplicate.performer_limit')
 
+    queue_items = queue_items_query.all()
     played = [q for q in queue_items if q.status == 'played']
     pending = [q for q in queue_items if q.status == 'pending']
     track_count = len(played+pending)
-    if track_count:
-        latest_queue_item = max(itertools.chain(played, pending), key=operator.attrgetter('time_touched'))
-    else:
-        latest_queue_item = None
+    latest_queue_item = queue_items[0] if len(queue_items) else None
 
     track_status = QUEUE_DUPLICATE.NONE
     if track_limit and track_count >= track_limit:
@@ -98,10 +96,11 @@ def _queue_item_for(request, queue_items):
         performer_status = QUEUE_DUPLICATE.THRESHOLD
 
     estimated_next_add_time = datetime.timedelta(0)
-    if time_limit and track_count:
-        estimated_next_add_time = time_limit - (now() - latest_queue_item.time_touched)
+    if time_limit and latest_queue_item:
+        estimated_next_add_time = time_limit - (now() - latest_queue_item.time_touched)  # time_touched is NOT an acceptable way of measuring this. We need to calculate the estimated track time, but that is really expensive
 
     return {
+        'queue_items': queue_items,
         'played': played,
         'pending': pending,
         'track_status': track_status,
@@ -110,7 +109,6 @@ def _queue_item_for(request, queue_items):
         'performer_limit': performer_limit,
         'estimated_next_add_time': estimated_next_add_time,
         'track_count': track_count,
-        'latest_queue_item_title': get_track(latest_queue_item.track_id).title if latest_queue_item else '',
     }
 
 

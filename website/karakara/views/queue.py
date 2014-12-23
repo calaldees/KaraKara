@@ -13,6 +13,7 @@ from ..model import DBSession, commit
 from ..model.model_queue import QueueItem
 from ..model.model_tracks import Track
 from ..model.model_token import PriorityToken
+from ..model.actions import get_track
 
 from ..templates.helpers import track_title
 
@@ -143,11 +144,15 @@ def queue_add(request):
         # Duplucate performer resrictions
         queue_item_performed_tracks = _logic.queue_item_for_performer(request, DBSession, request.params.get('performer_name'))
         if queue_item_performed_tracks['performer_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
-            message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${latest_queue_item_title} ${track_count}', mapping=dict(
+            try:
+                latest_track_title = get_track(queue_item_performed_tracks['queue_items'][0].track_id).title
+            except Exception:
+                latest_track_title = ''
+            message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${track_count} ${latest_queue_item_title}', mapping=dict(
                 perfomer_name=request.params.get('performer_name'),
+                latest_queue_item_title=latest_track_title,
                 **subdict(queue_item_performed_tracks, {
                     'estimated_next_add_time',
-                    'latest_queue_item_title',
                     'track_count',
                 })
             ))
@@ -157,11 +162,10 @@ def queue_add(request):
         # Duplicate Addition Restrictions
         queue_item_tracks_queued = _logic.queue_item_for_track(request, DBSession, track.id)
         if queue_item_tracks_queued['track_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
-            message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${latest_queue_item_title} ${track_count}', mapping=dict(
+            message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${track_count}', mapping=dict(
                 track_id=track.id,
                 **subdict(queue_item_performed_tracks, {
                     'estimated_next_add_time',
-                    'latest_queue_item_title',
                     'track_count',
                 })
             ))
