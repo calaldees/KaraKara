@@ -3,7 +3,7 @@ import random
 
 from pyramid.view import view_config
 
-from externals.lib.misc import now
+from externals.lib.misc import now, subdict
 from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, etag_decorator, cache, generate_cache_key, method_delete_router, method_put_router, is_admin, modification_action
@@ -143,20 +143,28 @@ def queue_add(request):
         # Duplucate performer resrictions
         queue_item_performed_tracks = _logic.queue_item_for_performer(request, DBSession, request.params.get('performer_name'))
         if queue_item_performed_tracks['performer_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
-            message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time}', mapping={
-                'perfomer_name': request.params.get('performer_name'),
-                'estimated_next_add_time': queue_item_performed_tracks['estimated_next_add_time'],
-            })
+            message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${latest_queue_item_title} ${track_count}', mapping=dict(
+                perfomer_name=request.params.get('performer_name'),
+                **subdict(queue_item_performed_tracks, {
+                    'estimated_next_add_time',
+                    'latest_queue_item_title',
+                    'track_count',
+                })
+            ))
             log_event(request, status='reject', reason='dupicate.performer', message=message)
             raise action_error(message=message, code=400)
 
         # Duplicate Addition Restrictions
         queue_item_tracks_queued = _logic.queue_item_for_track(request, DBSession, track.id)
         if queue_item_tracks_queued['track_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
-            message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time}', mapping={
-                'track_id': track.id,
-                'estimated_next_add_time': queue_item_tracks_queued['estimated_next_add_time'],
-            })
+            message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${latest_queue_item_title} ${track_count}', mapping=dict(
+                track_id=track.id,
+                **subdict(queue_item_performed_tracks, {
+                    'estimated_next_add_time',
+                    'latest_queue_item_title',
+                    'track_count',
+                })
+            ))
             log_event(request, status='reject', reason='duplicate.track', message=message)
             raise action_error(message=message, code=400)
 

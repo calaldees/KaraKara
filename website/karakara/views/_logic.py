@@ -14,8 +14,10 @@ from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
 
 from externals.lib.misc import now, json_object_handler
+
 from karakara.model.model_queue import QueueItem
 from karakara.model.model_token import PriorityToken
+from karakara.model.actions import get_track
 
 import logging
 log = logging.getLogger(__name__)
@@ -78,6 +80,10 @@ def _queue_item_for(request, queue_items):
     played = [q for q in queue_items if q.status == 'played']
     pending = [q for q in queue_items if q.status == 'pending']
     track_count = len(played+pending)
+    if track_count:
+        latest_queue_item = max(itertools.chain(played, pending), key=operator.attrgetter('time_touched'))
+    else:
+        latest_queue_item = None
 
     track_status = QUEUE_DUPLICATE.NONE
     if track_limit and track_count >= track_limit:
@@ -91,9 +97,9 @@ def _queue_item_for(request, queue_items):
     if performer_limit and track_count >= performer_limit:
         performer_status = QUEUE_DUPLICATE.THRESHOLD
 
-    estimated_next_add_time = None
+    estimated_next_add_time = datetime.timedelta(0)
     if time_limit and track_count:
-        estimated_next_add_time = time_limit - (now() - max(map(operator.attrgetter('time_touched'), itertools.chain(played, pending))))
+        estimated_next_add_time = time_limit - (now() - latest_queue_item.time_touched)
 
     return {
         'played': played,
@@ -103,6 +109,8 @@ def _queue_item_for(request, queue_items):
         'performer_status': performer_status,
         'performer_limit': performer_limit,
         'estimated_next_add_time': estimated_next_add_time,
+        'track_count': track_count,
+        'latest_queue_item_title': get_track(latest_queue_item.track_id).title if latest_queue_item else '',
     }
 
 

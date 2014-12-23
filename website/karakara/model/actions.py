@@ -16,6 +16,9 @@ def rough_db_hash():
     """
     return str(DBSession.query(Tag).count())
 
+def get_track(id):
+    return DBSession.query(Track).get(id)
+
 def get_tag(tag, parent=None, create_if_missing=False):
     if not tag:
         return None
