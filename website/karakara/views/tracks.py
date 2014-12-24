@@ -15,7 +15,7 @@ from ..model import DBSession
 from ..model.model_tracks import Track
 #from ..model.model_queue  import QueueItem
 
-from ..templates.helpers import tag_hireachy
+from ..templates.helpers import tag_hireachy, track_title
 
 import logging
 log = logging.getLogger(__name__)
@@ -72,12 +72,14 @@ def track_view(request):
     def get_track_dict(id):
         try:
             log.debug('cache gen - track_dict for {0}'.format(id))
-            return DBSession.query(Track).options(
+            track_dict = DBSession.query(Track).options(
                 joinedload(Track.tags),
                 joinedload(Track.attachments),
                 joinedload('tags.parent'),
                 joinedload('lyrics'),
             ).get(id).to_dict('full')
+            track_dict['title'] = track_title(track_dict['tags'])
+            return track_dict
         except AttributeError:
             return cache_none
 
@@ -100,7 +102,7 @@ def track_view(request):
     if not track:
         raise action_error(message='track {0} not found'.format(id), code=404)
 
-    log_event(request, track_id=id)
+    log_event(request, track_id=id, title=track['title'])
 
     return action_ok(data={'track': track})
 

@@ -68,7 +68,7 @@ class Track(Base):
         This just returns the first one matched
         """
         try:
-            return next(filter(lambda tag: tag.parent=='title', self.tags))
+            return next(filter(lambda tag: tag.parent.name == 'title' if tag.parent else False, self.tags)).name
         except StopIteration:
             return ''
 
