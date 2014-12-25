@@ -152,7 +152,7 @@ def queue_add(request):
             except Exception:
                 latest_track_title = ''
             message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${track_count} ${latest_queue_item_title}', mapping=dict(
-                perfomer_name=request.params.get('performer_name'),
+                performer_name=request.params.get('performer_name'),
                 latest_queue_item_title=latest_track_title,
                 **subdict(queue_item_performed_tracks, {
                     'estimated_next_add_time',
@@ -217,7 +217,7 @@ def queue_add(request):
         queue_item.session_owner = request.session['id']
 
     DBSession.add(queue_item)
-    _log_event(status='ok', track_id=queue_item.track_id)
+    _log_event(status='ok', track_id=queue_item.track_id, performer_name=queue_item.performer_name)
     #log.info('add - %s to queue by %s' % (queue_item.track_id, queue_item.performer_name))
 
     invalidate_queue(request)  # Invalidate Cache

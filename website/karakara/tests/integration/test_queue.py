@@ -314,11 +314,12 @@ def test_queue_performer_duplicate(app, tracks, DBSession, commit):
             DBSession.delete(queue_item)
         commit()
     clear_played()
-    
+
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
-    assert response.status_code==400
-    
+    assert response.status_code == 400
+    assert 'bob' in BeautifulSoup(response.text).find(**{'class': 'flash_message'}).text.lower()
+
     response = app.put('/settings', {
         'karakara.queue.add.duplicate.performer_limit':'0 -> int',
     })
@@ -330,7 +331,6 @@ def test_queue_performer_duplicate(app, tracks, DBSession, commit):
 
     clear_queue(app)
     clear_played()
-    
 
 
 def test_queue_limit(app, tracks):

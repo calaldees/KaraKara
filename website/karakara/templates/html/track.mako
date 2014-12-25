@@ -92,7 +92,7 @@ ${video(track)}
 
 % if track.get('queue',{}).get('played'):
 <h3>Played</h3>
-<ul>
+<ul class="list_played">
 % for queue_item in track['queue']['played']:
 <li>${queue_item['performer_name']}</li>
 % endfor
@@ -101,7 +101,7 @@ ${video(track)}
 
 % if track.get('queue',{}).get('pending'):
 <h3>Pending</h3>
-<ul>
+<ul class="list_pending">
 % for queue_item in track['queue']['pending']:
 <li>${queue_item['performer_name']}</li>
 % endfor
