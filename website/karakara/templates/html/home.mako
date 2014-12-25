@@ -44,6 +44,7 @@
     <a href="/admin_lock"         data-role="button" class="admin">${_('mobile.home.admin_lock')}</a>
     <a href="/remote"             data-role="button" class="admin">${_('mobile.home.remote')}</a>
     <a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>
+    <a href="/priority_tokens"    data-role="button" class="admin">${_('mobile.home.priority_tokens')}</a>
     <a href="/stats"              data-role="button" class="admin">${_('mobile.home.stats')}</a>
     <a href="/admin"              data-role="button" class="admin">${_('mobile.home.admin')}</a>
     <a href="/comunity"           data-role="button" class="admin">${_('mobile.home.comunity')}</a>

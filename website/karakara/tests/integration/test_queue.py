@@ -1,4 +1,4 @@
-from karakara.tests.conftest import unimplemented, unfinished, xfail
+#from karakara.tests.conftest import unimplemented, unfinished, xfail
 
 import datetime
 import json
@@ -6,6 +6,8 @@ import re
 from bs4 import BeautifulSoup
 
 from externals.lib.misc import now
+
+from . import admin_rights
 
 
 # Utils ------------------------------------------------------------------------
@@ -20,7 +22,7 @@ def del_queue(app, queue_item_id, expect_errors=False):
        may need a refactor this
     response = app.delete('/queue', {'queue_item.id':queue_item_id})
     """
-    return app.post('/queue', {'method':'delete', 'queue_item.id':queue_item_id}, expect_errors=expect_errors)
+    return app.post('/queue', {'method': 'delete', 'queue_item.id': queue_item_id}, expect_errors=expect_errors)
 
 
 def clear_queue(app):
@@ -47,7 +49,7 @@ def admin_play_next_track(app):
     """
     response = app.get('/admin')
     queue_item_id = get_queue(app)[0]['id']
-    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'})
+    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'})
     assert 'update' in response.json['messages'][0]
     response = app.get('/admin')
 
@@ -105,7 +107,7 @@ def test_queue_etag(app, tracks):
     response = app.get('/queue')
     etag_queue = response.etag
     response = app.get('/track/t1')
-    etag_track = response.etag    
+    etag_track = response.etag
 
     # Second request to same resource has same etag
     response = app.get('/queue')
@@ -173,7 +175,7 @@ def test_queue_played(app, tracks):
     # Try to set as 'played' as normal user - and get rejected
     app.cookiejar.clear()  # Loose the cookie so we are not identifyed as the creator of this queue item.
     queue_item_id = get_queue(app)[0]['id']
-    app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format':'json'}, expect_errors=True)
+    app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
 
     # As admin player mark track as played
     admin_play_next_track(app)
@@ -382,7 +384,7 @@ def test_queue_limit(app, tracks):
     # Tidyup after test
     now(datetime.datetime.now())
     response = app.put('/settings', {
-        'karakara.queue.add.limit'       :'0:00:00 -> timedelta'
+        'karakara.queue.add.limit': '0:00:00 -> timedelta'
     })
     clear_queue(app)
 
@@ -403,3 +405,9 @@ def test_event_end(app, tracks):
         'karakara.event.end': ' -> datetime',
     })
     clear_queue(app)
+
+
+@admin_rights
+def test_priority_tokens(app):
+    response = app.get('/priority_tokens')
+    assert response.status_code == 200

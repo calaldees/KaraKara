@@ -160,7 +160,11 @@ def issue_priority_token(request, DBSession):
 
     # TODO: replace with new one in lib
     #request.response.set_cookie('priority_token', json_cookie);  # WebOb.set_cookie mangles the cookie with m.serialize() - so I rolled my own set_cookie
-    json_cookie = json.dumps(priority_token.to_dict(), default=json_object_handler)
+    priority_token_dict = priority_token.to_dict()
+    priority_token_dict.update({
+        'server_datetime': now(),  # The client datetime and server datetime may be out. we need to return the server time so the client can calculate the difference
+    })
+    json_cookie = json.dumps(priority_token_dict, default=json_object_handler)
     request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))
 
     log.debug('priority_token issued')

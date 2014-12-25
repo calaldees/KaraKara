@@ -163,6 +163,7 @@ def main(global_config, **settings):
     config.add_route('track'         , append_format_pattern('/track/{id}')    )
     config.add_route('track_list'    , append_format_pattern('/track_list')    )
     config.add_route('queue'         , append_format_pattern('/queue')         )
+    config.add_route('priority_tokens', append_format_pattern('/priority_tokens'))
     config.add_route('fave'          , append_format_pattern('/fave')          )
     config.add_route('admin_toggle'  , append_format_pattern('/admin')         )
     config.add_route('admin_lock'    , append_format_pattern('/admin_lock')    )

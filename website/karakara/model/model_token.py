@@ -1,7 +1,7 @@
 from . import Base
 
-from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, Integer, DateTime, Float, Boolean
+from sqlalchemy import Column
+from sqlalchemy import Unicode, Integer, DateTime, Boolean
 
 __all__ = [
     "PriorityToken",
@@ -12,8 +12,6 @@ import copy
 from externals.lib.misc import now
 
 
-
-
 class PriorityToken(Base):
     """
     Client devices can be given priority tokens
@@ -22,7 +20,7 @@ class PriorityToken(Base):
     The server has to keep track of the tokens issued to validate when a
     priority request if made.
     """
-    __tablename__   = "priority_tokens"
+    __tablename__ = "priority_tokens"
 
     id              = Column(Integer() , primary_key=True)
     issued          = Column(DateTime(), nullable=False, default=now)
@@ -34,10 +32,16 @@ class PriorityToken(Base):
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
-            #'id'            : None ,
-            #'issued'        : None ,
-            'valid_start'   : None ,
-            'valid_end'     : None ,
-            'server_datetime': lambda token: now(),  # The client datetime and server datetime may be out. we need to return the server time so the client can calculate the difference
+            #'id'         : None,
+            #'issued'     : None,
+            'valid_start': None,
+            'valid_end'  : None,
         },
+    })
+    __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
+    __to_dict__['full'].update({
+        'id': None,
+        'issued': None,
+        'used': None,
+        'session_owner': None,
     })

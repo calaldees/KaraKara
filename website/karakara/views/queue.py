@@ -7,7 +7,7 @@ from pyramid.view import view_config
 from externals.lib.misc import now, subdict
 from externals.lib.log import log_event
 
-from . import web, action_ok, action_error, etag_decorator, cache, generate_cache_key, method_delete_router, method_put_router, is_admin, modification_action
+from . import web, action_ok, action_error, etag_decorator, cache, generate_cache_key, method_delete_router, method_put_router, is_admin, modification_action, admin_only
 from . import _logic
 
 from ..model import DBSession, commit
@@ -328,3 +328,15 @@ def queue_update(request):
     invalidate_track(queue_item_track_id)
 
     return action_ok(message='queue_item updated')
+
+
+@view_config(route_name='priority_tokens')
+@web
+@admin_only
+def priority_tokens(request):
+    priority_tokens = DBSession.query(PriorityToken)\
+        .filter(PriorityToken.valid_start >= now() - request.registry.settings.get('karakara.queue.add.duplicate.time_limit')) \
+        .order_by(PriorityToken.valid_start)
+    return action_ok(data={
+        'priority_tokens': (priority_token.to_dict('full') for priority_token in priority_tokens),
+    })
