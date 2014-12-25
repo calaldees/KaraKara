@@ -3,11 +3,11 @@ import random
 from pyramid.view import view_config
 from pyramid.request import Request
 
-from externals.lib.misc           import random_string
+from externals.lib.misc import random_string
 
 from . import web, action_ok, admin_only
 
-from ..model              import DBSession
+from ..model import DBSession
 from ..model.model_tracks import Track
 
 
@@ -27,7 +27,7 @@ def inject_testdata(request):
     message = ''
     if (request.params.get('cmd') == 'add_queue_item'):
         (random_track_id, ) = random.choice(DBSession.query(Track.id).all())
-        random_performer_name = random.choice(('Bob','Jane','Sally','Brutus','Rasputin','Lisa','Ryu','Ken','Alec Baldwin','Ghengis Kahn','Kraken','Lucy'))
+        random_performer_name = random.choice(('Bob', 'Jane', 'Sally', 'Brutus', 'Rasputin', 'Lisa', 'Ryu', 'Ken', 'Alec Baldwin', 'Ghengis Kahn', 'Kraken', 'Lucy'))
         queue_track_request = Request.blank('/queue.json', POST={
             'track_id': random_track_id,
             'performer_name': random_performer_name,
@@ -35,5 +35,5 @@ def inject_testdata(request):
         })
         response_json = request.invoke_subrequest(queue_track_request).json
         message = response_json['messages'].pop()
-    
+
     return action_ok(message=message)

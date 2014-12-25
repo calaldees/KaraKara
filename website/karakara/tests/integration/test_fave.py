@@ -16,7 +16,7 @@ def test_fave_cycle(app, settings, tracks):
         response = app.get('/fave')
         assert response.status_code == 302
         response = response.follow()
-        assert 'track 2'     in response.text.lower()
+        assert 'track 2' in response.text.lower()
         assert 'track 1' not in response.text.lower()
         # Check that the correct add/remove fave buttons are on the track pages
         response = app.get('/track/t1')

@@ -4,6 +4,7 @@ import pytest
 
 from . import admin_rights
 
+
 @pytest.mark.parametrize(('track_id', 'expected_response', 'text_list',), [
     ('t1', 200, ['Test Track 1'   , 'series X', 'anime', 'ここ', 'test/image1.jpg'  ]),
     ('t2', 200, ['Test Track 2'   , 'series X', 'anime', 'äöü', 'test/preview2.flv']),
@@ -21,6 +22,7 @@ def test_track_view(app, tracks, track_id, expected_response, text_list):
     for text in text_list:
         assert text.lower() in response.text.lower()
 
+
 def test_track_view_api(app, tracks):
     """
     Track's can be returned as structured JSON data
@@ -29,7 +31,8 @@ def test_track_view_api(app, tracks):
     data = app.get('/track/t1?format=json').json['data']
     assert data['track']['id'] == 't1'
     assert 'ここ' in data['track']['lyrics'][0]['content']
-    
+
+
 def test_track_list_all(app, tracks):
     """
     Track list displays all tracks in one giant document
@@ -40,11 +43,13 @@ def test_track_list_all(app, tracks):
         for text in ['track 1', 'track 2', 'track 3', 'wildcard']:
             assert text in response.text
 
+
 def test_track_list_all_api(app, tracks):
-    assert app.get('/track_list.json', expect_errors = True).status_code == 403
+    assert app.get('/track_list.json', expect_errors=True).status_code == 403
     with admin_rights(app):
         data = app.get('/track_list?format=json').json['data']
         assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
+
 
 def test_track_unknown(app):
     """

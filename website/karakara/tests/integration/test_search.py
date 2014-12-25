@@ -90,7 +90,7 @@ def test_search_tags_sub_tags(app, tracks, tracks_volume, search_tags, expected_
     """
     url = '/search_tags/{0}?format=json'.format('/'.join([tag for tag in search_tags]))
     data = app.get(url).json['data']
-    tag_set = set([(tag['full'],tag['count']) for tag in data['sub_tags']])
+    tag_set = set([(tag['full'], tag['count']) for tag in data['sub_tags']])
     assert expected_tag_set <= tag_set
 
 

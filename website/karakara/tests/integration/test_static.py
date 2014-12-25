@@ -4,23 +4,24 @@ from externals.lib.misc import substring_in
 
 from . import admin_rights
 
+
 def test_static(app):
-    
+
     def external_links(path):
-        """ Extract list of externals from page """    
+        """ Extract list of externals from page """
         soup = BeautifulSoup(app.get(path).text)
-        scripts = {script['src']  for script in soup.find_all('script')}
-        links   = {link  ['href'] for link   in soup.find_all('link')  }
+        scripts = {script['src'] for script in soup.find_all('script')}
+        links = {link['href'] for link in soup.find_all('link')}
         return scripts | links
     static_files = set()
     with admin_rights(app):
-        for path in ('/','/track_list'):
+        for path in ('/', '/track_list'):
             static_files |= external_links(path)
-    
+
     # Request each external (no 404's should be found)
     for static_file in static_files:
         app.get(static_file)
-    
+
     # Check we have all the known external files lists
     expected_externals = (
         'cssreset-min.css',

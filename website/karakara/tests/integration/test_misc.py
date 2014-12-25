@@ -1,15 +1,16 @@
-from . import get_settings, admin_rights
+from . import get_settings
+
 
 def test_home(app):
     """
-    Main Menu    
+    Main Menu
     """
     response = app.get('/')
     assert response.status_code == 200
     assert 'html' in response.content_type
     for text in ['KaraKara', 'jquery.mobile', 'Feedback', 'Explore']:
         assert text in response.text
-        
+
 
 def test_home_disabled(app):
     """
@@ -21,25 +22,24 @@ def test_home_disabled(app):
     This will inform most users and throttle most traffic.
     """
     response = app.put('/settings', {
-        'karakara.template.menu.disable':'test menu disbaled',
+        'karakara.template.menu.disable': 'test menu disbaled',
     })
 
     response = app.get('/')
     assert 'test menu disbaled' in response.text
-    
+
     response = app.get('/admin')
     response = app.get('/')
     assert 'test menu disbaled' not in response.text
     response = app.get('/admin')
 
     response = app.put('/settings', {
-        'karakara.template.menu.disable':'',
+        'karakara.template.menu.disable': '',
     })
 
     response = app.get('/')
     assert 'test menu disbaled' not in response.text
 
-    
 
 def test_admin_toggle(app):
     """
@@ -47,15 +47,16 @@ def test_admin_toggle(app):
     check main menu for admin options
     """
     assert not app.get('/?format=json').json['identity']['admin']
-    
+
     response = app.get('/admin')
     assert 'admin' in response.text
     response = app.get('/')
     for text in ['Exit Admin Mode']:
         assert text in response.text
     response = app.get('/admin')
-    
+
     assert not app.get('/?format=json').json['identity']['admin']
+
 
 def test_admin_lock(app):
     """
@@ -64,15 +65,16 @@ def test_admin_lock(app):
     This saves the need to dick about with passwords.
     """
     assert not app.get('/?format=json').json['identity']['admin']
-    
+
     response = app.get('/admin')
     response = app.get('/admin_lock')
     response = app.get('/admin', expect_errors=True)
     assert response.status_code == 403
     response = app.get('/admin_lock')
     response = app.get('/admin')
-    
+
     assert not app.get('/?format=json').json['identity']['admin']
+
 
 def test_settings(app):
     key = 'karakara.test_setting'
@@ -81,29 +83,30 @@ def test_settings(app):
     settings = get_settings(app)
     assert settings
     assert key not in settings
-    
+
     # Settings permissions
     # This is difficult to test as settings endpoint in test mode does not throw a 403
     #response = app.put('/settings.json', {key: 'bob'}, expect_errors=True)
     #assert response.status_code == 403
-    #with admin_rights(app):    
+    #with admin_rights(app):
     app.put('/settings.json', {key: 'bob'})
     assert get_settings(app)[key] == 'bob'
     app.put('/settings.json', {key: '666 -> int'})
     assert get_settings(app)[key] == 666
     app.put('/settings.json', {key: '[]'})
     assert get_settings(app)[key] == []
-    
+
     # Settings Template
     response = app.get('/settings')
     assert 'setting' in response.text.lower()
 
+
 def test_readonly_mode(app, tracks):
     response = app.get('/track/t1')
     assert "form action='/queue" in response.text
-    
+
     response = app.put('/settings', {
-        'karakara.system.user.readonly':'True -> bool',
+        'karakara.system.user.readonly': 'True -> bool',
     })
 
     # Normal users are restricted
@@ -111,9 +114,9 @@ def test_readonly_mode(app, tracks):
     assert "form action='/queue" not in response.text
 
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
-    assert response.status_code==403
+    assert response.status_code == 403
     assert 'readonly' in response.text
-    
+
     # Admin users function as normal
     response = app.get('/admin')
     response = app.get('/track/t1')
@@ -123,12 +126,9 @@ def test_readonly_mode(app, tracks):
     #response = app.post('/queue.json', dict(track_id='t1', performer_name='bob')).json['data']
     #assert False
     response = app.get('/admin')
-    
+
     # TODO - test 'update' and 'delete'? - for now testing the decoration once (above) is light enough
-    
+
     response = app.put('/settings', {
-        'karakara.system.user.readonly':'False -> bool',
+        'karakara.system.user.readonly': 'False -> bool',
     })
-    
-    
-    

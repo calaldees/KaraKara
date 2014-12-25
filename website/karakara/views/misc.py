@@ -105,7 +105,7 @@ def settings(request):
     return action_ok(
         data={
             'settings': {
-                setting_key:request.registry.settings.get(setting_key)
+                setting_key: request.registry.settings.get(setting_key)
                 for setting_key in
                 [key for key in request.registry.settings.keys() if setting_regex.match(key)]
             }

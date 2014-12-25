@@ -4,6 +4,7 @@ import socket
 
 from multiprocessing import Process, Queue
 
+
 def test_remote_control(app):
     """
     Connect to socketserver - unfortunately with a plain tcp socket rather than a websocket
@@ -14,7 +15,7 @@ def test_remote_control(app):
     # Non admins cannot use the remote control
     response = app.get('/remote', expect_errors=True)
     response.status_code == 403
-    
+
     # Attain admin privilages
     response_json = app.get('/admin.json').json
     assert response_json['identity']['admin']
@@ -32,7 +33,7 @@ def test_remote_control(app):
     client_listener_process = Process(target=connection, args=(sock, message_received_queue,))
     client_listener_process.daemon = True
     client_listener_process.start()
-    
+
     def press_button(soup, button_text):
         url = soup.find('a', text=re.compile(button_text, flags=re.IGNORECASE))['href']
         response = app.get('/remote{0}'.format(url))
@@ -46,7 +47,7 @@ def test_remote_control(app):
 
     client_listener_process.terminate()
     client_listener_process.join()
-    
+
     # Revolk admin privilages
     response_json = app.get('/admin.json').json
     assert not response_json['identity']['admin']
