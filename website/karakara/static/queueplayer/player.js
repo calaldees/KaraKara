@@ -314,6 +314,9 @@ var commands = {
 		if (screens.current!='video') {
 			update_playlist();
 		}
+	},
+	'settings': function(e) {
+		console.log('TODO: settings update requires implementing');
 	}
 };
 
