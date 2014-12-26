@@ -7,6 +7,8 @@ from externals.lib.pyramid_helpers.etag import etag, etag_decorator, _generate_c
 from externals.lib.pyramid_helpers.auto_format import auto_format_output, action_ok, action_error
 from externals.lib.pyramid_helpers.session_identity import overlay_session_identity
 
+from ._messages import overlay_messages
+
 __all__ = [
     'web', 'action_ok', 'action_error',  #'auto_format_output'
     'etag','etag_decorator', #'etag_generate'
@@ -32,6 +34,7 @@ web = decorator_combine(
     gzip,
     auto_format_output,
     overlay_session_identity(('id', 'admin', 'faves', 'user')),
+    overlay_messages(),
     mark_external_request
 )
 
