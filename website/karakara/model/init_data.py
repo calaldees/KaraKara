@@ -20,7 +20,7 @@ from .model_tracks   import Track, Tag
 from .model_queue    import QueueItem
 from .model_feedback import Feedback
 from .model_token    import PriorityToken
-from .model_messages import Message
+from .model_message  import Message
 from .model_comunity import ComunityUser
 
 # db action import

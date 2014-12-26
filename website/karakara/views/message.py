@@ -1,14 +1,20 @@
 from decorator import decorator
+from collections import defaultdict
 
 from pyramid.view import view_config
 
 from . import web, action_ok, action_error, request_from_args
 
-from ..model.model_messages import Message
+from ..model.model_message import Message
 
 
 import logging
 log = logging.getLogger(__name__)
+
+# Message Data Store -----------------------------------------------------------
+
+_messages = defaultdict(list)  # key = session_id_to
+
 
 # Decorator --------------------------------------------------------------------
 
@@ -42,4 +48,6 @@ def message_view(request):
 @view_config(route_name='message', request_method='POST')
 @web
 def message_add(request):
+    # Save message to persistant datastore
+    # Add message to transient storage
     return action_ok()

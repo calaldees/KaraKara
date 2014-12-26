@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: karakara 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-23 21:44+0000\n"
+"POT-Creation-Date: 2014-12-26 17:49+0000\n"
 "PO-Revision-Date: 2014-12-02 19:11+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -70,14 +70,18 @@ msgid "mobile.home.inject_testdata"
 msgstr "Inject Test Data"
 
 #: karakara/templates/html/home.mako:47
+msgid "mobile.home.priority_tokens"
+msgstr "Priority Tokens"
+
+#: karakara/templates/html/home.mako:48
 msgid "mobile.home.stats"
 msgstr "Server Stats"
 
-#: karakara/templates/html/home.mako:48
+#: karakara/templates/html/home.mako:49
 msgid "mobile.home.admin"
 msgstr "Exit Admin Mode"
 
-#: karakara/templates/html/home.mako:49
+#: karakara/templates/html/home.mako:50
 msgid "mobile.home.comunity"
 msgstr "Comunity"
 
@@ -121,41 +125,41 @@ msgstr "Explore tracks"
 msgid "mobile.track.title"
 msgstr "Track"
 
-#: karakara/views/queue.py:140
+#: karakara/views/queue.py:143
 msgid "view.queue.add.error.track_id ${track_id}"
 msgstr "track ${track_id} does not exist"
 
-#: karakara/views/queue.py:154
+#: karakara/views/queue.py:157
 #, fuzzy
 msgid ""
 "view.queue.add.dupicate_performer_limit ${performer_name} "
 "${estimated_next_add_time} ${track_count} ${latest_queue_item_title}"
 msgstr "unable to queue track. duplicate 'performer_name' limit reached"
 
-#: karakara/views/queue.py:167
+#: karakara/views/queue.py:170
 #, fuzzy
 msgid ""
 "view.queue.add.dupicate_track_limit ${track_id} "
 "${estimated_next_add_time} ${track_count}"
 msgstr "unable to queue track. duplicate 'track in queue' limit reached"
 
-#: karakara/views/queue.py:183 karakara/views/queue.py:198
+#: karakara/views/queue.py:186 karakara/views/queue.py:201
 msgid "view.queue.add.event_end ${event_end}"
 msgstr "Event will be ending soon and all the time has been alocated"
 
-#: karakara/views/queue.py:195
+#: karakara/views/queue.py:198
 msgid "view.queue.add.priority_token_issued"
 msgstr ""
 "Queue limit reached - You have been given a priority token and will have "
 "priority to queue a track in your priority timeslot"
 
-#: karakara/views/queue.py:201
+#: karakara/views/queue.py:204
 msgid "view.queue.add.priority_token_already_issued"
 msgstr ""
 "You already have a priority token timeslot. Queue your track when your "
 "timeslot occurs"
 
-#: karakara/views/queue.py:203
+#: karakara/views/queue.py:206
 msgid "view.queue.add.token_limit"
 msgstr "Queue limit reached - try queing a track later"
 

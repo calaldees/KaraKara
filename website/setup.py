@@ -24,6 +24,7 @@ install_requires = [
     'python-magic',  # File upload mime type detection (requires libmagic1 c lib)
     'requests',
     'Babel',
+    'httpagentparser',
 ]
 test_requires = [
     'pytest',
