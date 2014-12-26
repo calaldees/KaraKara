@@ -19,10 +19,6 @@ def settings(request):
     Surface settings as an API.
     This allows clients to qurey server settup rather than having to hard code bits into the clients
     """
-    if not is_admin(request):
-        log_event(request)
-        #log.debug('settings requested by non admin')  # I'm curious if anyone will find this. would be fun to search logs after an event for this string
-
     if method_put_router(None, request):
         # with PUT requests, update settings
         #  only changing in production is bit over zelious #request.registry.settings.get('karakara.server.mode')!='production'
@@ -34,9 +30,12 @@ def settings(request):
             if request.registry.settings.get(key) != None:
                 fallback_type = type(request.registry.settings.get(key))
             request.registry.settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
+        send_socket_message(request, 'settings')  # Ensure that the player interface is notifyed of an update
+        log_event(request, method='update', admin=is_admin(request))
+    else:
+        log_event(request, method='view', admin=is_admin(request))
 
     setting_regex = re.compile(request.registry.settings.get('api.settings.regex', 'TODOmatch_nothing_regex'))
-    send_socket_message(request, 'settings')
     return action_ok(
         data={
             'settings': {
