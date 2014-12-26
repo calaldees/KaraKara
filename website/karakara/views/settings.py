@@ -3,8 +3,10 @@ import re
 from pyramid.view import view_config
 
 from externals.lib.misc import convert_str_with_type
+from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, method_put_router, is_admin
+from .remote import send_socket_message
 
 import logging
 log = logging.getLogger(__name__)
@@ -18,7 +20,8 @@ def settings(request):
     This allows clients to qurey server settup rather than having to hard code bits into the clients
     """
     if not is_admin(request):
-        log.debug('settings requested by non admin')  # I'm curious if anyone will find this. would be fun to search logs after an event for this string
+        log_event(request)
+        #log.debug('settings requested by non admin')  # I'm curious if anyone will find this. would be fun to search logs after an event for this string
 
     if method_put_router(None, request):
         # with PUT requests, update settings
@@ -33,6 +36,7 @@ def settings(request):
             request.registry.settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
 
     setting_regex = re.compile(request.registry.settings.get('api.settings.regex', 'TODOmatch_nothing_regex'))
+    send_socket_message(request, 'settings')
     return action_ok(
         data={
             'settings': {

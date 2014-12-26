@@ -66,17 +66,6 @@ def admin_toggle(request):
     return action_ok()
 
 
-@view_config(route_name='remote')
-@web
-@admin_only
-def remote(request):
-    cmd = request.params.get('cmd')
-    if cmd:
-        log.debug("remote command - {0}".format(cmd))
-        request.registry['socket_manager'].recv(cmd.encode('utf-8'))
-    return action_ok()
-
-
 @view_config(route_name='random_images')
 @web
 def random_images(request):
