@@ -13,5 +13,5 @@ def session_created(event):
     """
     log_event(
         event.request,
-        device=httpagentparser.detect(event.request.environ['HTTP_USER_AGENT']),
+        device=httpagentparser.detect(event.request.environ.get('HTTP_USER_AGENT')),
     )
