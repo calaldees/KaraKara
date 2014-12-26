@@ -49,7 +49,13 @@ function init_settings(new_settings) {
 	}
 }
 init_settings({});
-
+function update_settings(on_updated) {
+	$.getJSON("/settings.json", {}, function(data) {
+		console.log("/settings");
+		init_settings(data.data.settings);
+		if (typeof(on_updated) == "function") {on_updated(data);}
+	});
+}
 
 // Utils ----------------------------------------------------------------------
 
@@ -316,7 +322,7 @@ var commands = {
 		}
 	},
 	'settings': function(e) {
-		console.log('TODO: settings update requires implementing');
+		update_settings();
 	}
 };
 
@@ -586,10 +592,7 @@ $(document).ready(function() {
 	attach_events();
 	update_playlist();
 	
-	// Load settings from server
-	$.getJSON("/settings.json", {}, function(data) {
-		console.log("/settings");
-		init_settings(data.data.settings);
+	update_settings(function(data) {
 		// Identify player.js as admin with admin cookie
 		if (data.identity.admin) {init();}
 		else {
