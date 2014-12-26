@@ -1,3 +1,7 @@
+"""
+Marked for potential deprication
+The new Message system could superceed this
+"""
 from . import Base, JSONEncodedDict
 
 from sqlalchemy     import Column, Enum

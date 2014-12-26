@@ -20,19 +20,22 @@ from .model_tracks   import Track, Tag
 from .model_queue    import QueueItem
 from .model_feedback import Feedback
 from .model_token    import PriorityToken
+from .model_messages import Message
+from .model_comunity import ComunityUser
 
 # db action import
 from .actions import get_tag
+
 
 #-------------------------------------------------------------------------------
 # Init Base Data
 #-------------------------------------------------------------------------------
 
 def init_data():
-    init_db() # Clear current DB and Create Blank Tables
-    
+    init_db()  # Clear current DB and Create Blank Tables
+
     log.info("Populating tables with base data")
-    
+
     base_tags = [
         'category:anime',
         'category:jdrama',
@@ -86,11 +89,9 @@ def init_data():
         'use:ed8',
         'use:ed9',
     ]
-    
+
     for tag in base_tags:
         get_tag(tag, create_if_missing=True)
-    
+
     #DBSession.add_all(tags)
     commit()  # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
-
-    
