@@ -326,6 +326,11 @@ input[type="range"]::-webkit-slider-thumb{
 	text-transform: capitalize;
 }
 
+#event_end {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
 
 
 /**

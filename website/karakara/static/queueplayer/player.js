@@ -13,6 +13,7 @@ var SETTINGS_DEFAULT = {
 	"karakara.player.help.timeout"        :  2,
 	"karakara.websocket.port"             : null,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
+	"karakara.event.end": null,
 }
 
 
@@ -43,10 +44,14 @@ var interval_queue_refresh;
 var settings = {};
 function init_settings(new_settings) {
 	if (!new_settings) {new_settings = {};}
+	// Copy relevent new settings into current 'settings' object
 	for (setting_key in SETTINGS_DEFAULT) {
 		if (setting_key in new_settings) {settings[setting_key] = new_settings[setting_key];}
 		else                             {settings[setting_key] = SETTINGS_DEFAULT[setting_key];}
 	}
+	// Update dom elements based on settings
+	$('h1').text(settings["karakara.player.title"]);
+	$('#event_end').text(settings["karakara.event.end"]);  // TODO: parse iso datetime correctly
 }
 init_settings({});
 function update_settings(on_updated) {
@@ -568,8 +573,6 @@ function attach_events() {
 
 function init() {
 	// Once settings Loaded & admin mode set -> setup final bits
-	
-	$('h1').text(settings["karakara.player.title"]);
 	
 	setup_websocket();
 	
