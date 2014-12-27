@@ -51,7 +51,8 @@ def stats(request):
 @admin_only
 def admin_lock(request):
     request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked', False)
-    log.debug('admin locked - {0}'.format(request.registry.settings['admin_locked']))
+    #log.debug('admin locked - {0}'.format(request.registry.settings['admin_locked']))
+    log_event(request, admin_locked=request.registry.settings['admin_locked'])
     return action_ok()
 
 
