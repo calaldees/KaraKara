@@ -25,6 +25,7 @@ install_requires = [
     'requests',
     'Babel',
     'httpagentparser',
+    'humanize',
 ]
 test_requires = [
     'pytest',

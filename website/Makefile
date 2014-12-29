@@ -74,6 +74,10 @@ env: .installed_python
 KaraKara.egg-info: env
 	env/bin/python setup.py develop
 
+# Force reexecution of setup.py dependenys (this must be done from the Makefile or make gets confused and repetedy runs the task)
+setup: KaraKara.egg-info
+	env/bin/python setup.py develop
+
 dependency_downloader.py:
 	curl https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
 
