@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   #config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
   config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box"
 
-  config.vm.provision :shell, :path => "Vagrantfile_.sh"
+  config.vm.provision :shell, :path => "Vagrantfile_.sh", run: "always"
 
   config.vm.network :forwarded_port, host:   25, guest:   25
   config.vm.network :forwarded_port, host:   80, guest:   80
@@ -23,7 +23,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |v|
     #v.gui = true  # Handy for when a box is stopped without graceful shutdown
     v.name = "karakara"
-    v.customize ["modifyvm", :id, "--memory", "512"]
+    v.customize ["modifyvm", :id, "--memory", "640"]
   end
 
 end

@@ -54,6 +54,11 @@ cd $HOME/KaraKara/mediaserver
 sudo make setup
 make captive_portal_disable
 
+echo 'Setup AdminDashboard requirements'
+cd $HOME/KaraKara/admindashboard
+make install_linux
+# TODO - In future need to start elastic search on startup and alias logstash
+
 echo 'Symlink the nginx static file path with the hosts vagrant share'
 ln -s /vagrant $HOME/KaraKara/mediaserver/www/files
 
