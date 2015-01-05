@@ -59,7 +59,7 @@ ${video(track)}
         % if queue_status != 'THRESHOLD':
             <form action='/queue' method='POST' data-ajax="false" onsubmit="store_performer_name();">
                 <input type='hidden' name='format'         value='redirect'      />
-                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='${request.registry.settings.get('karakara.template.input.performer_name', 'Enter your name')}' required />
+                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='${request.registry.settings.get('karakara.template.input.performer_name') or _('view.track.input.performer_name.default')}' required />
                 <input type='hidden' name='track_id'       value='${track['id']}' />
                 <input type='submit' name='submit_'        value='Queue Track'   />
             </form>
