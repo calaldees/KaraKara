@@ -339,6 +339,26 @@ def test_queue_performer_duplicate(app, tracks, DBSession, commit):
     clear_played()
 
 
+def test_queue_performer_restrict(app, tracks, DBSession, commit):
+    assert get_queue(app) == []
+
+    response = app.put('/settings', {
+        'karakara.queue.add.valid_performer_names': '[bob, jim, sally] -> list',
+    })
+
+    response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
+    #response = app.post('/queue', dict(track_id='t1', performer_name='Bob'))  # Valid performer names should be case insensetive
+    response = app.post('/queue', dict(track_id='t1', performer_name='jane'), expect_errors=True)
+    assert response.status_code == 400
+    assert 'jane' in BeautifulSoup(response.text).find(**{'class': 'flash_message'}).text.lower()
+
+    response = app.put('/settings', {
+        'karakara.queue.add.valid_performer_names': '[] -> list',
+    })
+
+    clear_queue(app)
+
+
 def test_queue_limit(app, tracks):
     """
     Users should not be able to queue over xx minuets of tracks (settable in config)

@@ -144,6 +144,15 @@ def queue_add(request):
 
     # If not admin, check additional restrictions
     if not is_admin(request):
+
+        # Valid performer name
+        valid_performer_names = request.registry.settings.get('karakara.queue.add.valid_performer_names')
+        if valid_performer_names and request.params.get('performer_name') not in valid_performer_names:
+            message = _('view.queue.add.invalid_performer_name ${performer_name}', mapping=dict(
+                performer_name=request.params.get('performer_name')
+            ))
+            raise action_error(message, code=400)
+
         # Duplucate performer resrictions
         queue_item_performed_tracks = _logic.queue_item_for_performer(request, DBSession, request.params.get('performer_name'))
         if queue_item_performed_tracks['performer_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:

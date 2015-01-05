@@ -43,6 +43,7 @@ karakara.queue.add.limit.priority_window     = 0:01:00 -> timedelta
 karakara.queue.add.duplicate.track_limit     = 2       -> int
 karakara.queue.add.duplicate.time_limit      = 2:00:00 -> timedelta
 karakara.queue.add.duplicate.performer_limit = 1       -> int
+karakara.queue.add.valid_performers = [] -> list
 
 karakara.template.input.performer_name = Performer name
 karakara.template.title                = KaraKara (dev)
