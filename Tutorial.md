@@ -114,6 +114,10 @@ System Operation
 * `karakara.queue.add.duplicate.performer_limit` (int)
 	* The number of times a perfomer can queue a track in the time_limit
 	* This is linked to badge name. If the admins have not setup a known 'known_performer_name_list' then users will just add names like 'MyName2' or even worse 'I can put whatever I like as my name and you cant stop me queing 1 million tracks bwarahahahahah'.
+* `karakara.queue.add.valid_performers` (list or filelist)
+	* A filename (filelist) or list of valid performer names for an event.
+	* If attendeeds have badge names to to identify themselfs. This prevents the users queuing tracks as 'bob' then just using 'bob2' and 'bob3' to queue as many tracks as they please.
+	* All validation is done case insensetivly.
 
 #### Mobile Interface ####
 * `karakara.system.user.readonly` (bool)

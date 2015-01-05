@@ -347,7 +347,7 @@ def test_queue_performer_restrict(app, tracks, DBSession, commit):
     })
 
     response = app.post('/queue', dict(track_id='t1', performer_name='bob'))
-    #response = app.post('/queue', dict(track_id='t1', performer_name='Bob'))  # Valid performer names should be case insensetive
+    response = app.post('/queue', dict(track_id='t1', performer_name='Bob'))  # Valid performer names should be case insensetive
     response = app.post('/queue', dict(track_id='t1', performer_name='jane'), expect_errors=True)
     assert response.status_code == 400
     assert 'jane' in BeautifulSoup(response.text).find(**{'class': 'flash_message'}).text.lower()

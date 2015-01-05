@@ -147,7 +147,7 @@ def queue_add(request):
 
         # Valid performer name
         valid_performer_names = request.registry.settings.get('karakara.queue.add.valid_performer_names')
-        if valid_performer_names and request.params.get('performer_name') not in valid_performer_names:
+        if valid_performer_names and request.params.get('performer_name').lower() not in map(lambda name: name.lower(), valid_performer_names):
             message = _('view.queue.add.invalid_performer_name ${performer_name}', mapping=dict(
                 performer_name=request.params.get('performer_name')
             ))
