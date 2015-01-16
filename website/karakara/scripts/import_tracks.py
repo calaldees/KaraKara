@@ -16,7 +16,7 @@ from externals.lib.misc import get_fileext, random_string, hash_files as hash_fi
 
 from ..model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
 
-from ..model         import init_DBSession, DBSession, commit
+from ..model import init_DBSession, DBSession, commit
 from ..model.actions import get_tag, clear_all_tracks
 
 import logging
@@ -39,12 +39,13 @@ def or_sep(*args):
     return r'|'.join(args)
 
 tag_extractors = {
-    'opening' : re.compile(or_sep('open','intro','opening','op'), re.IGNORECASE),
-    'ending'  : re.compile(or_sep('end' ,'outro','ending' ,'ed'), re.IGNORECASE),
-    'anime'   : re.compile(r'anime', re.IGNORECASE),
+    'opening': re.compile(or_sep('open','intro','opening','op'), re.IGNORECASE),
+    'ending': re.compile(or_sep('end' ,'outro','ending' ,'ed'), re.IGNORECASE),
+    'anime': re.compile(r'anime', re.IGNORECASE),
 }
 
 #skippy = 'string in filename to skip to'
+
 
 #-------------------------------------------------------------------------------
 # Import from URL
@@ -57,7 +58,7 @@ def walk_url(uri, **kwargs):
         if href.endswith('/'):
             log.warn("directory crawling from urls is not implmented yet: %s" % href)
         elif href.endswith('.json'):
-            absolute_filename = uri + href #AllanC - todo - this is not absolute if dir's are crawled!
+            absolute_filename = uri + href  # AllanC - todo - this is not absolute if dir's are crawled!
             with urllib.request.urlopen(absolute_filename) as file:
                 import_json_data(file, absolute_filename, **kwargs)
 
@@ -67,8 +68,8 @@ def walk_url(uri, **kwargs):
 #-------------------------------------------------------------------------------
 def walk_local(uri, **kwargs):
     for root, dirs, files in os.walk(uri):
-        for json_filename in [f for f in files if get_fileext(f)=='json']:
-            absolute_filename = os.path.join(root         , json_filename)
+        for json_filename in [f for f in files if get_fileext(f) == 'json']:
+            absolute_filename = os.path.join(root, json_filename)
             #relative_path = root.replace(uri,'')
             #relative_filename = os.path.join(relative_path, json_filename)
             with open(absolute_filename, 'r') as file:
@@ -85,10 +86,11 @@ def hash_files(files):
     with local files we can actually compute a fast hash
     With the track itself being identifyable by name or hash, swiching storage methods
     should be possible if the dataset is truely identical in filenames as all the hashs will update
-    
+
     For now only local is supported, but it is dream to have the data files truly remote at somepoint
     """
     return hash_files_local(files)
+
 
 #-------------------------------------------------------------------------------
 # Process JSON leaf
@@ -98,14 +100,14 @@ def import_json_data(source, location='', **kwargs):
     source should be a filetype object for a json file to import
     it shouldnt be relevent that it is local or remote
     """
-    
+
     def get_or_create_track(source_filename, source_hash):
         try:
             #return Track()
             return DBSession.query(Track).filter(or_(Track.source_filename==source_filename, Track.source_hash==source_hash)).one()
         except NoResultFound:
             return Track()
-    
+
     def gen_id_for_track(track):
         """
         TODO: This method is a hacky peice of crap ... I feel dirty just looking at it.
@@ -113,7 +115,7 @@ def import_json_data(source, location='', **kwargs):
         I would suggest some tidying
         """
         id = ''
-        
+
         # Gen 3 letter ID from category,from,title
         def get_chars(s, num=2):
             try:
@@ -121,6 +123,7 @@ def import_json_data(source, location='', **kwargs):
             except:
                 return ''
 
+        # Title is not sufficent as some tracks marked as :duplicate do not have title information, so the hash's are the same
         # sprinkle on a little bit of 'title' hashy goodness in the hope that we wont get colisions
         #exclude_tags = ('status:', '#')
         #identifyer_string = "-".join(filter(lambda tag: not any((exclude_tag in tag for exclude_tag in exclude_tags  )) ,sorted(tag.full for tag in track.tags)))
@@ -128,7 +131,7 @@ def import_json_data(source, location='', **kwargs):
         #    title_hash = re.search(r'([1-9][abcdef123456789])', hashlib.sha1(identifyer_string.encode('utf-8')).hexdigest().lower()).group(1) #hex(hash(
         #except Exception:
         #    title_hash = ''
-        
+
         _get_chars = lambda parent, num: get_chars(track.get_tag(parent), num)
         id = "".join((
             _get_chars('category', 1),
@@ -136,15 +139,15 @@ def import_json_data(source, location='', **kwargs):
             _get_chars('title', 2) or get_chars(source_filename, 2),
             track.source_hash[:3],
         ))
-        
+
         # If the tags were not present; then split the title string and get the first 3 characters
         if not id:
             log.error('unable to aquire id from tags - using random id')
             id = random_string(length=5)
-        
+
         # Normaize case
         id = id.lower()
-        
+
         # Check for colistions and make unique number
         def get_id_number(id):
             count = 0
@@ -156,35 +159,34 @@ def import_json_data(source, location='', **kwargs):
                 import pdb ; pdb.set_trace()
             return get_count()
         id += get_id_number(id)
-        
+
         return id
-    
-    
+
     def get_data():
         try:
-            if hasattr(source,'read'):
+            if hasattr(source, 'read'):
                 data = source.read()
             if isinstance(data, bytes):
                 data = data.decode('utf-8')
             return json.loads(data)
-        except Exception as e:
+        except Exception:
             log.warn('Failed to process %s' % location)
             traceback.print_exc()
-    
+
     # AllanC - useful code to skip to a particular track in processing - i've needed it a couple if times so just leaving it here.
     #global skippy
     #if skippy:
     #    if skippy not in location: return
     #    skippy = False
-    
+
     if FILE_DESCRIPTION in location:
         try:
             source_filename = location.split('/')[-2]
-            source_hash = hash_files((location, location.replace(FILE_DESCRIPTION, FILE_TAGS)))  #','.join([video.get('encode-hash') for video in data.get('videos',[])])
-            
+            source_hash = hash_files((location, location.replace(FILE_DESCRIPTION, FILE_TAGS)))  # ','.join([video.get('encode-hash') for video in data.get('videos',[])])
+
             # Find exisiting track to overlay data - or create a new one
             track = get_or_create_track(source_filename, source_hash)
-            
+
             # If exisiting track exisits - check if track data has changed
             if track.id and track.source_hash == source_hash:
                 # Update name if folder is renamed
@@ -193,49 +195,49 @@ def import_json_data(source, location='', **kwargs):
                     track.source_filename = source_filename
                     commit()
                 return
-            
+
             if not track.id:
                 log.info('Importing {0}'.format(source_filename))
             else:
                 log.info('Updating {0}'.format(source_filename))
-            
+
             data = get_data()
             if not data:
                 log.warn('  Aborting - no data {0}'.format(source_filename))
                 return
-            
+
             track.source_filename = source_filename
             track.source_hash = source_hash
-            
+
             #track.id       = get_id_from_foldername(folder)#data['videos'][0]['encode-hash']
             track.duration = data['videos'][0]['length']
             #track.title    = data['name']
-            
+
             # Add Attachments
             track.attachments.clear()
             for attachment_type in _attachment_types.enums:
-                for attachment_data in data.get("%ss"%attachment_type,[]):
+                for attachment_data in data.get("%ss" % attachment_type, []):
                     attachment = Attachment()
-                    attachment.type     = attachment_type
+                    attachment.type = attachment_type
                     attachment.location = os.path.join(source_filename,  urllib.parse.unquote(attachment_data.get('url')))
-                    
+
                     extra_fields = {}
-                    for key,value in attachment_data.items():
+                    for key, value in attachment_data.items():
                         if key in ['target','vcodec']:
                             #print ("%s %s" % (key,value))
                             extra_fields[key] = value
                     attachment.extra_fields = extra_fields
-                    
+
                     track.attachments.append(attachment)
-            
+
             # Add Lyrics
             track.lyrics.clear()
             for subtitle in data.get('subtitles',[]):
                 lyrics = Lyrics()
-                lyrics.language = subtitle.get('language','eng')
-                lyrics.content  = "\n".join(subtitle.get('lines',[]))
+                lyrics.language = subtitle.get('language', 'eng')
+                lyrics.content = "\n".join(subtitle.get('lines', []))
                 track.lyrics.append(lyrics)
-            
+
             # Import tags.txt
             track.tags.clear()
             try:
@@ -251,18 +253,18 @@ def import_json_data(source, location='', **kwargs):
                 log.warn('Unable to imports tags')
                 #traceback.print_exc()
                 #exit()
-            
+
             for duplicate_tag in [tag for tag in track.tags if track.tags.count(tag) > 1]:
-                log.warn('Unneeded duplicate tag found %s in %s' %(duplicate_tag, location))
+                log.warn('Unneeded duplicate tag found %s in %s' % (duplicate_tag, location))
                 track.tags.remove(duplicate_tag)
-            
+
             # AllanC TODO: if there is a duplicate track.id we may still want to re-add the attachments rather than fail the track entirely
-            
+
             # Finally, use the tags to make a unique id for this track
             if not track.id:
                 track.id = gen_id_for_track(track)
                 DBSession.add(track)  # if it has an 'id' then it must already be in the session
-            
+
             commit()
         except Exception as e:
             log.warn('Error to process %s because %s' % (location, e))
@@ -310,9 +312,9 @@ def get_args():
 
 def main():
     args = get_args()
-    
+
     # Setup Logging and Db from .ini
-    from pyramid.paster import get_appsettings, setup_logging
+    from pyramid.paster import get_appsettings  # , setup_logging
     #setup_logging(args.config_uri)
     logging.basicConfig(level=logging.INFO)
     settings = get_appsettings(args.config_uri)
