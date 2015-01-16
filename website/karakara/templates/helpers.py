@@ -13,15 +13,15 @@ log = logging.getLogger(__name__)
 
 
 video_fileext_to_mime_types = {
-    'mp4':'mp4' ,
-    'ogv':'ogg' ,
-    'mpg':'mpeg',
-    '3gp':'3gp' ,
-    '???':'webm',
-    'mov':'quicktime',
-    'mkv':'x-matroska',
-    'wmv':'x-ms-wmv',
-    'flv':'x-flv',
+    'mp4': 'mp4',
+    'ogv': 'ogg',
+    'mpg': 'mpeg',
+    '3gp': '3gp',
+    '???': 'webm',
+    'mov': 'quicktime',
+    'mkv': 'x-matroska',
+    'wmv': 'x-ms-wmv',
+    'flv': 'x-flv',
 }
 
 
@@ -41,22 +41,26 @@ javascript_inline = {}
 
 class Path(object):
     external = '/ext/'
-    static   = '/static/'
+    static = '/static/'
 path = Path()
 
 
 def media_url(file):
     #return '/media/%s' % file
-    return '/files/%s' % file
+    return
+    '/files/%s' % file
+
 
 def track_url(id):
     return '/track/%s' % id
 
-def search_url(tags=[],route='search_tags', **kwargs):
+
+def search_url(tags=[], route='search_tags', **kwargs):
     route_path = "/%s/%s" % (route, "/".join(tags))
     if kwargs:
-        route_path += '?' + '&'.join(["%s=%s"%(key,",".join(items)) for key, items in kwargs.items() if items])
+        route_path += '?' + '&'.join(["%s=%s" % (key, ",".join(items)) for key, items in kwargs.items() if items])
     return route_path
+
 
 def duration_str(duration):
     """
@@ -67,17 +71,20 @@ def duration_str(duration):
     except Exception:
         pass
     return "%d min" % (duration/60)
-    
+
+
 def attachment_locations_by_type(track, attachment_type):
-    return [media_url(attatchment['location']) for attatchment in track['attachments'] if attatchment['type']==attachment_type]
+    return [media_url(attatchment['location']) for attatchment in track['attachments'] if attatchment['type'] == attachment_type]
+
 
 def thumbnail_location_from_track(track, index=0):
-    thumbnails = attachment_locations_by_type(track,'thumbnail')
+    thumbnails = attachment_locations_by_type(track, 'thumbnail')
     if not thumbnails:
         return ''
-    if index=='random':
-        index = random.randint(0,thumbnails.length)
+    if index == 'random':
+        index = random.randint(0, thumbnails.length)
     return thumbnails[index]
+
 
 def video_mime_type(attachment):
     return video_fileext_to_mime_types.get(get_fileext(attachment['location']),'mp4')
@@ -86,7 +93,7 @@ def video_mime_type(attachment):
 # Track Previews ---------------------------------------------------------------
 
 def previews(track):
-    previews = [attachment for attachment in track.get('attachments',[]) if attachment['type']=='preview']
+    previews = [attachment for attachment in track.get('attachments', []) if attachment['type'] == 'preview']
     previews = [(preview, media_url(preview['location'])) for preview in previews]
     return previews
 
@@ -94,6 +101,7 @@ def previews(track):
 # Titles from tags -------------------------------------------------------------
 
 _test_tags = {'title':['dynamite explosion','キ'], 'from':['macross'], 'macross':['dynamite'], 'category':['anime','jpop'], 'use':['opening','op1'], 'artist':['firebomber']}
+
 
 def tag_hireachy(tags, tag):
     """
@@ -110,10 +118,11 @@ def tag_hireachy(tags, tag):
         return '{0}: {1}'.format(tag_value, subtag_value)
     return tag_value
 
+
 title_tags_for_category = {
-    'DEFAULT':['from','use','title','length'],
-    'jpop'   :['artist','title'],
-    'meme'   :['title','from'],
+    'DEFAULT': ['from', 'use', 'title', 'length'],
+    'jpop': ['artist', 'title'],
+    'meme': ['title', 'from'],
 }
 def track_title(tags, exclude_tags=[]):
     """
@@ -130,11 +139,12 @@ def track_title(tags, exclude_tags=[]):
     from_exclude = list(filter(lambda t: t.startswith('from:'), exclude_tags))
     from_include = [from_exclude.pop().split(':').pop().strip()] if from_exclude else []
     exclude_tags = [tag.split(':')[0] for tag in exclude_tags]  # setup initial exclude tags from passed args
-    if substring_in(tags.get('title'),tags.get('from')):  # if 'title' is in 'from' - exclude title as it is a duplicate
+    if substring_in(tags.get('title'), tags.get('from')):  # if 'title' is in 'from' - exclude title as it is a duplicate
         exclude_tags.append('title')
-    title_tags   = title_tags_for_category.get(tags.get('category','DEFAULT')[0], title_tags_for_category['DEFAULT'])  # get tags to use in the constuction of this category
-    tags_to_use  = from_include + list(filter(lambda t: t not in exclude_tags, title_tags))  # remove exclude tags from tag list
+    title_tags = title_tags_for_category.get(tags.get('category', 'DEFAULT')[0], title_tags_for_category['DEFAULT'])  # get tags to use in the constuction of this category
+    tags_to_use = from_include + list(filter(lambda t: t not in exclude_tags, title_tags))  # remove exclude tags from tag list
     return " - ".join(filter(None, (tag_hireachy(tags, tag) for tag in tags_to_use))).title()
+
 
 def track_title_only(tags):
     """
@@ -143,8 +153,8 @@ def track_title_only(tags):
     """
     #title = track.get('title')
     title = ''
-    for tag in ['title','from','artist']:
-        title = tag_hireachy(tags, tag) #track['tags'][tag][0]
+    for tag in ['title', 'from', 'artist']:
+        title = tag_hireachy(tags, tag)  # track['tags'][tag][0]
         if title:
             break
     return title.title()
