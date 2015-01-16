@@ -70,7 +70,7 @@ class Track(Base):
         try:
             return next(filter(lambda tag: tag.parent.name == 'title' if tag.parent else False, self.tags)).name
         except StopIteration:
-            return ''
+            return self.source_filename
 
     #@title.setter
     #def title(self, value):
