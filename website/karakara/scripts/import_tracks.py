@@ -108,7 +108,7 @@ def import_json_data(source, location='', **kwargs):
     
     def gen_id_for_track(track):
         """
-        TODO: This method is a hecky peice of crap ... I feel dirty just looking at it.
+        TODO: This method is a hacky peice of crap ... I feel dirty just looking at it.
         The hash generation is particulaly horrible.
         I would suggest some tidying
         """
@@ -122,24 +122,24 @@ def import_json_data(source, location='', **kwargs):
                 return ''
 
         # sprinkle on a little bit of 'title' hashy goodness in the hope that we wont get colisions
-        exclude_tags = ('status:', '#')
-        identifyer_string = "-".join(filter(lambda tag: not any((exclude_tag in tag for exclude_tag in exclude_tags  )) ,sorted(tag.full for tag in track.tags)))
-        try:
-            title_hash = re.search(r'([1-9][abcdef123456789])', hashlib.sha1(identifyer_string.encode('utf-8')).hexdigest().lower()).group(1) #hex(hash(
-        except Exception:
-            title_hash = ''
+        #exclude_tags = ('status:', '#')
+        #identifyer_string = "-".join(filter(lambda tag: not any((exclude_tag in tag for exclude_tag in exclude_tags  )) ,sorted(tag.full for tag in track.tags)))
+        #try:
+        #    title_hash = re.search(r'([1-9][abcdef123456789])', hashlib.sha1(identifyer_string.encode('utf-8')).hexdigest().lower()).group(1) #hex(hash(
+        #except Exception:
+        #    title_hash = ''
         
         _get_chars = lambda parent, num: get_chars(track.get_tag(parent), num)
         id = "".join((
             _get_chars('category', 1),
-            _get_chars('from', 2) or _get_chars('artist', 2) ,
-            _get_chars('title', 2),
-            title_hash,
+            _get_chars('from', 2) or _get_chars('artist', 2),
+            _get_chars('title', 2) or get_chars(source_filename, 2),
+            track.source_hash[:3],
         ))
         
         # If the tags were not present; then split the title string and get the first 3 characters
         if not id:
-            log.error('unable to aquire id from tags - uing random id')
+            log.error('unable to aquire id from tags - using random id')
             id = random_string(length=5)
         
         # Normaize case
@@ -150,7 +150,7 @@ def import_json_data(source, location='', **kwargs):
             count = 0
             def get_count():
                 return str(count) if count else ''
-            while DBSession.query(Track).filter_by(id=id+get_count()).count():
+            while DBSession.query(Track).filter_by(id=id+(get_count() or '')).count():
                 count += 1
                 log.warn('track.id colision - this is unexpected and could lead to inconsistencys with track naming for printed lists in the future {0}, press c to continue'.format(id))
                 import pdb ; pdb.set_trace()
