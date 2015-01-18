@@ -5,3 +5,6 @@
 mediasource/
 *~
 hash_cache.pickle
+.idea
+*.egg-info
+*_venv
