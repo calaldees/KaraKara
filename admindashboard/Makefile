@@ -15,6 +15,8 @@ linux_start_elasticsearch:
 
 import_events:
 	# Assuming elasticsearch is running
-	logstash -f logstash.conf -e "input {file {path=>'$(PWD)/events.log' codec=>'json'}}"
-	#start_position => 'beginning'
+	logstash -f logstash.conf -e "input {file {path=>'$(PWD)/events.log' codec=>'json' sincedb_path=>'$(PWD)' }}"
+	# http://stackoverflow.com/questions/19546900/how-to-force-logstash-to-reparse-a-file
+	# Logstash will keep the record in $HOME/.sincedb_* . You can delete all the .sincedb and restart logstash, Logstash will reparse the file. 
+	#start_position => 'beginning' sincedb_path=>'/dev/null'
 	#logstash -f logstash.conf -e "input {stdin { } }"
