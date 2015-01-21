@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import math, fcntl, os, re, string, sys, time
+import traceback, pdb
 import subprocess, urllib
 import hashlib
 import json
@@ -582,7 +583,7 @@ class MediaFile:
 			return None
 		
 		raw_probe = raw_probe.replace('\x1b[0;39m','').replace('\x1b[0m','').replace('\x1b[0;33m','')  # AllanC - An abobnibal hack - the output was gubbed with shit, this strips it. WTF?!
-		
+
 		raw_duration = re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_bitrate = re.search(r',\s*bitrate:\s*(\d+)\s*kb/s', raw_probe, re.IGNORECASE | re.MULTILINE)
 		raw_video = re.search(r'^\s*Stream\s*#\d+[:.]\d+(?:\[.*?\])?(?:\(.*?\))?:\s*Video:\s*(.*)', raw_probe, re.IGNORECASE | re.MULTILINE)
@@ -608,6 +609,7 @@ class MediaFile:
 			wxh = re.search(r'\s*(\d+)x(\d+)', data)
 			vbr = re.search(r'(\d+)\s*kb/s', data)
 			aspect = re.search(r'PAR\s*(\d+):(\d+)\s*DAR\s*(\d+):(\d+)', data)
+			fps = re.search(r'([\d.]+) fps', data)
 
 			metadata['vcodec'] = parts[0]
 			metadata['colourspace'] = parts[1]
@@ -624,6 +626,8 @@ class MediaFile:
 			elif wxh:
 				metadata['par'] = [1, 1]
 				metadata['dar'] = self.calculate_aspect(metadata['width'], metadata['height'])
+			if fps:
+				metadata['fps'] = float(fps.group(1))
 
 		if raw_video_lang:
 			metadata['vlang'] = raw_video_lang.group(1) 
@@ -1064,6 +1068,8 @@ class MediaEncoder:
 		self.base_width = 1024
 		self.base_height = 768
 
+		self.frame_rate = 24
+
 		self.temp_files = []
 
 	def valid_for_encode(self):
@@ -1124,6 +1130,8 @@ class MediaEncoder:
 				aspect = [ width, height ]
 
 			aspect = [ float(aspect[0]), float(aspect[1]) ]
+
+			self.frame_rate = v_metadata['fps']
 
 			self.original_sub_width = int(height * (aspect[0] / aspect[1]))
 			self.original_sub_height = height
@@ -1239,7 +1247,7 @@ class MediaEncoder:
 				'-loop', '1', 
 				'-i', self.image,
 				'-vf', 'scale={0}:{1}'.format(img_width, img_height) + ',pad={0}:{1}:(ow-iw)/2:(oh-ih)/2,setsar=1:1'.format(self.base_width, self.base_height),
-				'-r', '24',
+				'-r', str(self.frame_rate),
 				'-t', str(self.length),
 				'-bf', '0',
 				'-qmax', '2',
@@ -1259,6 +1267,7 @@ class MediaEncoder:
 			'mencoder',
 			'-quiet',
 			source,
+			'-fps', self.frame_rate,
 			'-ass',
 			'-nosound',
 			'-aspect', self.aspect_string(),
@@ -2172,5 +2181,11 @@ def main(args):
 		sys.exit(1)
 
 if __name__ == "__main__":
-        main(sys.argv[1:])
+	try:
+		main(sys.argv[1:])
+	except Exception as e:
+		traceback.print_exc()
+		if os.environ.get('KARAKARA_DEBUG', None):
+			type, value, tb = sys.exc_info()
+			pdb.post_mortem(tb)
 	sys.exit(0)
