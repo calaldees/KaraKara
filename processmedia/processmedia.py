@@ -616,7 +616,7 @@ class MediaFile:
 				metadata['par'] = [1, 1]
 				metadata['dar'] = self.calculate_aspect(metadata['width'], metadata['height'])
 			if fps:
-				metadata['fps'] = fps.group(1)
+				metadata['fps'] = float(fps.group(1))
 
 		if raw_video_lang:
 			metadata['vlang'] = raw_video_lang.group(1) 

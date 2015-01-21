@@ -140,6 +140,7 @@ The following example is given to elucidate all fields.
       'height'     : 768,                  -- in pixels
       'length'     : 190.2,                -- in seconds
       'size'       : 4292982,              -- in bytes
+      "fps"        : 23.98,                -- frames per second
       'language'   : 'eng',                -- of subtitles
       'encode-hash': '03972619348',        -- internal to encode stage
     }
@@ -162,6 +163,7 @@ are generated and maintained by the processing stages.
    'height'  : 768,      -- in pixels
    'aspect'  : '4:3',    -- to be defined later
    'length'  : 10.5,     -- in seconds
+   "fps"     : 23.98,    -- frames per second
    'md5'     : ...,      -- of data
    'mtime'   : 0,        -- of file (UTC Unix timestamp)
    'score'   : 1.0,      -- user modifiable, subjective score
