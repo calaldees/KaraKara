@@ -391,6 +391,17 @@ class SSAFile(SubFile):
 		self.data.insert(script_pos + 1, "PlayResX: {0}".format(res_x))
 		self.data.insert(script_pos + 2, "PlayResY: {0}".format(res_y))
 
+		# Bugfix - Calculate font size
+		#   The font size is ajusted to a ratio of the y size
+		#   Forgive the hack. Styalisticly keeping with the rest of this file
+		style_re = re.compile(r'^Style: (.*)', re.IGNORECASE)
+		for (n, line) in enumerate(self.data):
+			match = style_re.match(line)
+			if match:
+				style_data = match.group(1).split(',')
+				style_data[2] = str(res_y / 16)  # index 2 is the font size argument. python Integer division
+				self.data[n] = 'Style: {0}'.format(','.join(style_data))
+
 		return True
 	
 	def dedup_lines(self, src_lines):
@@ -1198,7 +1209,6 @@ class MediaEncoder:
 				if not subfile.save(subpath):
 					warn("unable to save rewritten subtitles to " + subpath + ", using original subtitles instead")
 					subpath = self.subtitles
-			
 		
 		filters = []
 		if sub_prescale:
