@@ -21,7 +21,9 @@ rsync_pull:
 	rsync calaldees@violet.shishnet.org:/data/media_upload/ ~/Applications/KaraKara/files/ -e ssh --archive --verbose --inplace --stats --progress --partial --stats
 
 rsync_push:
-	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/sites/karakara.org.uk/media_upload/ -e ssh --archive --verbose --inplace --stats --progress --partial --bwlimit=100 --update --copy-links
+	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/sites/karakara.org.uk/media_upload/ -e ssh --archive --verbose --inplace --stats --progress --partial --bwlimit=100 --update --copy-links
+	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/                       -e ssh --archive --verbose --stats --progress --bwlimit=100 --checksum --update
+	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/ -e ssh --archive --verbose --stats --progress --bwlimit=100  --checksum --update --copy-links
 
 hash_match:
 	website/env/bin/python3 website/karakara/scripts/hash_matcher.py --source_folder ~/temp/Convention\ Karaoke/ --destination_folder ~/Applications/KaraKara/files/ -v
