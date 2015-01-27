@@ -47,8 +47,7 @@ path = Path()
 
 def media_url(file):
     #return '/media/%s' % file
-    return
-    '/files/%s' % file
+    return '/files/%s' % file
 
 
 def track_url(id):
