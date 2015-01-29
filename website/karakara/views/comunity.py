@@ -259,12 +259,13 @@ class ComunityTrack():
                 status_details['red'].append('missing attachment {0}'.format(location))
 
         # Lyrics
-        lyrics = track_dict.get('lyrics', [])
-        if not lyrics:
-            status_details['yellow'].append('no lyrics')
-        for lyric in lyrics:
-            if not lyric.get('content', '').strip():
-                status_details['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
+        if ('nosubs' not in track_dict['tags']) and ('nosubs' not in track_dict['tags'].get(None, [])):  # Do not do lyric checks if explicity stated they are not required. Fugly code warning: (Unsure if both of these are needed for the nosubs check)
+            lyrics = track_dict.get('lyrics', [])
+            if not lyrics:
+                status_details['yellow'].append('no lyrics')
+            for lyric in lyrics:
+                if not lyric.get('content', '').strip():
+                    status_details['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
 
         return {
             'status_details': status_details,

@@ -13,6 +13,37 @@ STATUS_TAGS = {
 
 
 @pytest.mark.parametrize(('track_dict', 'expected_status', 'expected_statuss', 'expected_messages'), [
+    # Complete without warnings/errors
+    (
+        {
+            'tags': {
+                'title': ['test title'],
+                'artist': ['test artist'],
+            },
+            'lyrics': [
+                {'id': 1, 'lang': 'en', 'content': 'lyric test'}
+            ],
+            'duration': 100,
+            'attachments': [
+                {'location': '/test/test.jpg'}
+            ],
+        },
+        None,
+        (),
+        (),
+    ),
+
+    # Default recomendations/warnings
+    (
+        {
+            'tags': {
+            },
+        },
+        'red',
+        ('red', 'yellow'),
+        ('title', 'artist', 'attachments', 'duration'),
+    ),
+
     # Single green anonymous tag
     (
         {
@@ -49,17 +80,6 @@ STATUS_TAGS = {
         ('removal', 'death'),
     ),
 
-    # Default recomendations/warnings
-    (
-        {
-            'tags': {
-            },
-        },
-        'red',
-        ('red', 'yellow'),
-        ('title', 'artist'),
-    ),
-
     # Missing tags and explicit tags
     (
         {
@@ -70,12 +90,47 @@ STATUS_TAGS = {
         },
         'green',
         ('green', 'yellow'),
-        ('artist'),
+        ('artist',),
     ),
 
     # attachments
+    # TODO
+    #  currently func_is_file is not used. The default of 'True' is always present on the defaut implementation
 
-    # lyrics
+
+    # lyrics missing warning
+    (
+        {
+            'tags': {
+                'title': ['test title'],
+                'artist': ['test artist'],
+            },
+            'duration': 100,
+            'attachments': [
+                {'location': '/test/test.jpg'}
+            ],
+        },
+        'yellow',
+        ('yellow',),
+        ('lyrics',),
+    ),
+    # lyric - special case - remove lyric 'missing warning' if nosubs anaonimus tag is used
+    (
+        {
+            'tags': {
+                'title': ['test title'],
+                'artist': ['test artist'],
+                None: ['nosubs'],
+            },
+            'duration': 100,
+            'attachments': [
+                {'location': '/test/test.jpg'}
+            ],
+        },
+        None,
+        (),
+        (),
+    ),
 
 ])
 def test_track_status(track_dict, expected_status, expected_statuss, expected_messages, func_is_file=None):
