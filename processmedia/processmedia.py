@@ -993,7 +993,7 @@ class MediaEncoder:
 		PROFILE_IPHONE: [
 			#'-r',		'30000/1001',
 			'-vcodec',	avconv_h264,
-			'-pre:v',	'libx264-ipod320', # FIXME: check
+			#'-pre:v',	'libx264-default', # FIXME: check
 			'-acodec',	'aac',
 			'-ac',		'1',
 			'-ar',		'48000',
@@ -1014,7 +1014,7 @@ class MediaEncoder:
 		PROFILE_GENERIC: [
 			#'-r',		'30000/1001',
 			'-vcodec',	avconv_h264,
-			'-pre:v',	'libx264-ipod320', # FIXME: check
+			#'-pre:v',	'libx264-default', # FIXME: check
 			'-b',		'150k',
 			'-bt',		'240k',
 			'-acodec',	'aac',
