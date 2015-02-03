@@ -1949,13 +1949,14 @@ class MediaItem:
 			for (time, path) in results:
 				thumb_name = names[path]
 				thumb_media = MediaFile(path)
+				if not thumb_media.exists():
+					continue
 				metadata = thumb_media.probe()
 				metadata['url'] = "/".join(['thumbnail', urllib.quote(thumb_name.encode('utf-8'))])
 				metadata['name'] = thumb_name
 				metadata['src'] = video['name']
 				metadata['time-index'] = time
-				if thumb_media.exists():
-					self.descriptor.add_thumbnail(metadata)
+				self.descriptor.add_thumbnail(metadata)
 
 			self.descriptor.save()
 	
