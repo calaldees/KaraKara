@@ -524,9 +524,17 @@ class MediaFile:
 
 	def has_changed(self):
 		if self.metadata and self.metadata.has_key('mtime') and self.metadata.has_key('size'):
-			return (self.mtime() != self._mtime()) or (self.size() != self._size())
+			size_shanged = (self.size() != self._size())
+			time_changed = (self.mtime() != self._mtime())
+			# HACK - I think being on fat32 has damaged the timestamps of files
+			#  for now we can go based on size alone. This is not ideal.
+			#  I would consider having a full sha2 hash in the meta as a final check
+			#  if the full hash turns out to match, the mtime should be updated in the meta
+			#  This needs to be considered for python3 rework
+			has_changed = size_shanged  # or time_changed
 		else:
-			return True
+			has_changed = True
+		return has_changed
 
 	def calculate_aspect(self, width, height):
 		if width >= height:
@@ -579,7 +587,8 @@ class MediaFile:
 		try:
 			raw_probe = subprocess.check_output(['avprobe', avlib_safe_path(self.path)], stderr=subprocess.STDOUT)
 		except subprocess.CalledProcessError:
-			log.warn('unable to call avprobe with {0}'.self.path)
+			# TODO? - probably a mistake to call global log here
+			log('unable to call avprobe with {0}'.format(self.path))
 			return None
 		
 		raw_probe = raw_probe.replace('\x1b[0;39m','').replace('\x1b[0m','').replace('\x1b[0;33m','')  # AllanC - An abobnibal hack - the output was gubbed with shit, this strips it. WTF?!
