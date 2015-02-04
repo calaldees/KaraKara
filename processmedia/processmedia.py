@@ -1281,7 +1281,7 @@ class MediaEncoder:
 			'-nosound',
 			'-aspect', self.aspect_string(),
 			'-ovc', 'x264',
-			'-x264encopts', 'profile=main:preset=slow',
+			'-x264encopts', 'profile=main:preset=slow:threads=%s' % avconv_threads,
 			'-o', temp_video,
 			'-vf', ",".join(filters)
 		]
