@@ -9,6 +9,8 @@ import codecs
 
 from operator import itemgetter, attrgetter
 
+height_to_font_size_ratio = 14  # 16
+
 avconv_loglevel = 'warning'
 avconv_threads = '1'
 avconv_h264 = 'h264'
@@ -400,7 +402,7 @@ class SSAFile(SubFile):
 			match = style_re.match(line)
 			if match:
 				style_data = match.group(1).split(',')
-				style_data[2] = str(res_y / 16)  # index 2 is the font size argument. python Integer division
+				style_data[2] = str(res_y / height_to_font_size_ratio)  # index 2 is the font size argument. python Integer division
 				self.data[n] = 'Style: {0}'.format(','.join(style_data))
 
 		return True
