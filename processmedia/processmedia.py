@@ -620,7 +620,7 @@ class MediaFile:
 			wxh = re.search(r'\s*(\d+)x(\d+)', data)
 			vbr = re.search(r'(\d+)\s*kb/s', data)
 			aspect = re.search(r'PAR\s*(\d+):(\d+)\s*DAR\s*(\d+):(\d+)', data)
-			fps = re.search(r'([\d.]+) fps', data)
+			fps = re.search(r'([\d.]+) fps', data) or re.search(r'([\d.]+) tbr', data) or re.search(r'([\d.]+) tbn', data) or re.search(r'([\d.]+) tbc', data)  # HACK - Seen a video without an fps, but has tbc and tbn at 25? This is a guess
 
 			metadata['vcodec'] = parts[0]
 			metadata['colourspace'] = parts[1]
