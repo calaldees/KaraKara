@@ -17,13 +17,17 @@ vagrant:
 	fi
 	cd vagrant ; vagrant up
 
-rsync_pull:
-	rsync calaldees@violet.shishnet.org:/data/media_upload/ ~/Applications/KaraKara/files/ -e ssh --archive --verbose --inplace --stats --progress --partial --stats
+del_osx_cancer:
+	find ~/Applications/KaraKara/files/ -iname \.DS_Store -delete
 
-rsync_push:
+rsync_pull: del_osx_cancer
+	rsync calaldees@violet.shishnet.org:/data/media_upload/ ~/Applications/KaraKara/files/ -e ssh --archive --verbose --stats --progress --stats --checksum
+
+rsync_push: del_osx_cancer
 	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/sites/karakara.org.uk/media_upload/ -e ssh --archive --verbose --inplace --stats --progress --partial --bwlimit=100 --update --copy-links
 	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/                       -e ssh --archive --verbose --stats --progress --bwlimit=100 --checksum --update
-	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/ -e ssh --archive --verbose --stats --progress --bwlimit=100  --checksum --update --copy-links
+	#--checksum  --bwlimit=100
+	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/ -e ssh --archive --verbose --stats --progress --update --checksum --bwlimit=100
 
 hash_match:
 	website/env/bin/python3 website/karakara/scripts/hash_matcher.py --source_folder ~/temp/Convention\ Karaoke/ --destination_folder ~/Applications/KaraKara/files/ -v

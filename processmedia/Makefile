@@ -35,3 +35,6 @@ install_linux:
 		sudo apt-get update; \
 		sudo apt-get install -y libav-tools libavcodec-extra-53 sox mencoder ; \
 	fi
+
+encode:
+	KARAKARA_DEBUG=True python processmedia.py process ~/Applications/KaraKara/files/
