@@ -526,14 +526,15 @@ class MediaFile:
 
 	def has_changed(self):
 		if self.metadata and self.metadata.has_key('mtime') and self.metadata.has_key('size'):
-			size_shanged = (self.size() != self._size())
+			size_changed = (self.size() != self._size())
 			time_changed = (self.mtime() != self._mtime())
 			# HACK - I think being on fat32 has damaged the timestamps of files
 			#  for now we can go based on size alone. This is not ideal.
 			#  I would consider having a full sha2 hash in the meta as a final check
 			#  if the full hash turns out to match, the mtime should be updated in the meta
 			#  This needs to be considered for python3 rework
-			has_changed = size_shanged  # or time_changed
+			#has_changed = size_changed  # or time_changed
+			has_changed = False
 		else:
 			has_changed = True
 		return has_changed
@@ -973,10 +974,11 @@ class MediaEncoding(JSONFile):
 		for (name, old) in self.items():
 			if not files.has_key(name):
 				to_remove.append(name)
-				changed = True
+				#changed = True
 		for name in to_remove:
 			self.parent.log("remove encoding " + name)
-			del self[name]
+			import pdb ; pdb.set_trace()
+			#del self[name]
 
 		if changed:
 			self.save()
@@ -1525,6 +1527,9 @@ class MediaItem:
 				old_path = os.path.join(self.path, name)
 				new_path = os.path.join(self.source_path, name)
 				self.log("mv " + old_path + " => " + new_path)
+				if os.path.exists(new_path):
+					warn("cant move because source already exisits. original cruft left. Manual cleanup required ")
+					continue
 				os.rename(old_path, new_path)
 	
 	def create_directory(self, name):
