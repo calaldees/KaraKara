@@ -207,14 +207,33 @@ def tags(request):
         # Group them by tag name
         # only allow tags in the allowed list (there could be 100's of title's and from's), we just want the browsable ones
         alias_parent_tag = aliased(Tag)
-        sub_tags = DBSession.query(Tag  ,func.count(TrackTagMapping.tag_id)).\
-                            join(TrackTagMapping).\
-                            join(alias_parent_tag, Tag.parent).\
-                            filter(TrackTagMapping.track_id.in_(trackids)).\
-                            filter(alias_parent_tag.name.in_(sub_tags_allowed)).\
-                            group_by('tag_1.id',alias_parent_tag.name,Tag.id).\
-                            order_by(alias_parent_tag.name,Tag.name).\
-                            options(joinedload(Tag.parent))
+
+        # The SQL engine cannot cope with an 'IN' clause with over 1000 enties
+        # The solution is a convoluted way of batching the requests up into chunks
+        # of 1000 and merging the results
+
+        def get_sub_tags_batch(trackids):
+
+            def slice_batch(trackids, batch_size):
+                for batch_number in (0, (len(trackids)/batch_size)+1):
+                    yield trackids[batch_number * batch_size:(batch_number + 1) * batch_size]
+
+            for trackids_batch in slice_batch(trackids, 900):
+                return get_sub_tags(trackids_batch)
+
+        def get_sub_tags(trackids):
+            return DBSession.query(Tag,
+                func.count(TrackTagMapping.tag_id)).\
+                join(TrackTagMapping).\
+                join(alias_parent_tag, Tag.parent).\
+                filter(TrackTagMapping.track_id.in_(trackids)).\
+                filter(alias_parent_tag.name.in_(sub_tags_allowed)).\
+                group_by('tag_1.id', alias_parent_tag.name, Tag.id).\
+                order_by(alias_parent_tag.name, Tag.name).\
+                options(joinedload(Tag.parent)
+            )
+
+        sub_tags = get_sub_tags_batch(trackids) if request.registry.settings.get('sqlalchemy.url', '').startswith('sqlite') else get_sub_tags(trackids)
 
         # AllanC - RRRRRRRAAAAAAAAA!!!! Postgres creates an alias 'tag_1.id' under the hood, but wont actually return results unless it's in the group_by clause
         #          it works without the tag_1.id in sqllite. So right now, the SQLLite version is broken with 'tag_1' and postgres dies without it.
@@ -222,7 +241,7 @@ def tags(request):
         # tried alias's 'tag_1.id','tag_2.name'
 
         action_return['data'].update({
-            'sub_tags': [update_dict(tag.to_dict('full'),{'count':count}) for tag,count in sub_tags],
+            'sub_tags': [update_dict(tag.to_dict('full'), {'count': count}) for tag, count in sub_tags],
         })
         return action_return
 
