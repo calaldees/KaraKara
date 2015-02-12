@@ -215,11 +215,17 @@ def tags(request):
         def get_sub_tags_batch(trackids):
 
             def slice_batch(trackids, batch_size):
-                for batch_number in (0, (len(trackids)/batch_size)+1):
+                for batch_number in range(0, (len(trackids)//batch_size)+1):
                     yield trackids[batch_number * batch_size:(batch_number + 1) * batch_size]
 
+            tags = {}
             for trackids_batch in slice_batch(trackids, 900):
-                return get_sub_tags(trackids_batch)
+                for tag, count in get_sub_tags(trackids_batch):
+                    tag_dict = tag.to_dict('full')
+                    id = tag_dict['id']
+                    tags.setdefault(id, tag_dict).setdefault('count', 0)
+                    tags[id]['count'] += count
+            return tags.values()
 
         def get_sub_tags(trackids):
             return DBSession.query(Tag,
@@ -233,7 +239,12 @@ def tags(request):
                 options(joinedload(Tag.parent)
             )
 
-        sub_tags = get_sub_tags_batch(trackids) if request.registry.settings.get('sqlalchemy.url', '').startswith('sqlite') else get_sub_tags(trackids)
+        # This if branch con probably be removed - we don't want differnt behaviour for differnt db engines
+        #  TODO: need to check if postgres can actually handle this properly
+        if request.registry.settings.get('sqlalchemy.url', '').startswith('sqlite'):
+            sub_tags = [tag for tag in get_sub_tags_batch(trackids)]
+        else:
+            sub_tags = [update_dict(tag.to_dict('full'), {'count': count}) for tag, count in get_sub_tags(trackids)]
 
         # AllanC - RRRRRRRAAAAAAAAA!!!! Postgres creates an alias 'tag_1.id' under the hood, but wont actually return results unless it's in the group_by clause
         #          it works without the tag_1.id in sqllite. So right now, the SQLLite version is broken with 'tag_1' and postgres dies without it.
@@ -241,7 +252,7 @@ def tags(request):
         # tried alias's 'tag_1.id','tag_2.name'
 
         action_return['data'].update({
-            'sub_tags': [update_dict(tag.to_dict('full'), {'count': count}) for tag, count in sub_tags],
+            'sub_tags': sub_tags,
         })
         return action_return
 
