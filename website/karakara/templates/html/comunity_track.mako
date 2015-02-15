@@ -32,6 +32,10 @@
             </div>
             % endfor
         </div>
+
+        % for preview, url in h.previews(data['track'], video_type='video'):
+            <a href="${url}">${h.video_mime_type(preview)} ${preview['extra_fields'].get('vcodec','unknown')}</a>
+        % endfor
         
         <!-- Submit -->
         <input type="submit" name="submit" value="submit"/>

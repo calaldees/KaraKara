@@ -97,6 +97,7 @@ setup: nginx.conf
 
 data_backup:
 	find $(BACKUP_SELECTOR) -print0 | xargs -0 tar --gzip --create --file $(FILENAME_TAG_BACKUP)
+	#find /data/media_upload/ -name *.txt -print0 | xargs -0 tar --gzip --create --file ~/karakara_backup/tags.tar.gz
 
 data_restore:
 	tar --gzip --extract --file $(FILENAME_TAG_BACKUP)

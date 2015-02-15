@@ -90,8 +90,8 @@ def video_mime_type(attachment):
 
 # Track Previews ---------------------------------------------------------------
 
-def previews(track):
-    previews = [attachment for attachment in track.get('attachments', []) if attachment['type'] == 'preview']
+def previews(track, video_type='preview'):
+    previews = [attachment for attachment in track.get('attachments', []) if attachment['type'] == video_type]
     previews = [(preview, media_url(preview['location'])) for preview in previews]
     return previews
 
