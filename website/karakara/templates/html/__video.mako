@@ -24,7 +24,7 @@
 	<!-- html5 - video -->
 	<div class="html5_video_embed" style="display: none;">
 		<video class="video_placeholder" preload="none" poster="${h.thumbnail_location_from_track(track)}" durationHint="${track['duration']}" controls>
-			% for preview, url in h.previews(track):
+			% for preview, url in h.attachment_locations(track, 'preview'):
 				<source src="${url}" type="video/${h.video_mime_type(preview)}" />
 				##<p>${preview['extra_fields'].get('vcodec','unknown')}</p>
 			% endfor
@@ -41,7 +41,7 @@
 <%def name="video_non_html5(track)">
 	<!-- non html5 - video link & thumbnail carousel -->
 	<div class="html5_video_link">
-		<% previews = h.previews(track) %>
+		<% previews = h.attachment_locations(track, 'preview') %>
 		<!-- thumbnails -->
 		
 		% if previews:

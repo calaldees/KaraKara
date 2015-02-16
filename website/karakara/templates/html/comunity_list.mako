@@ -59,7 +59,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 				<a href="/track/${track['id']}"><span class="glyphicon glyphicon-phone"></span></a>
 			</td>
 			<td>
-				% for preview, url in h.previews(track):
+				% for preview, url in h.attachment_locations(track, 'preview'):
 				<a href="${url}"><span class="glyphicon glyphicon-film"></span></a>
 				% endfor
 			</td>

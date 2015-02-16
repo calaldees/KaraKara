@@ -71,8 +71,12 @@ def duration_str(duration):
     return "%d min" % (duration/60)
 
 
+def attachment_locations(track, attachment_type='preview'):
+    return [(attachment, media_url(attachment['location'])) for attachment in track.get('attachments', []) if attachment['type'] == attachment_type]
+
+
 def attachment_locations_by_type(track, attachment_type):
-    return [media_url(attatchment['location']) for attatchment in track['attachments'] if attatchment['type'] == attachment_type]
+    return [url for attachment, url in attachment_locations(track, attachment_type)]
 
 
 def thumbnail_location_from_track(track, index=0):
@@ -87,13 +91,6 @@ def thumbnail_location_from_track(track, index=0):
 def video_mime_type(attachment):
     return video_fileext_to_mime_types.get(get_fileext(attachment['location']),'mp4')
 
-
-# Track Previews ---------------------------------------------------------------
-
-def previews(track, video_type='preview'):
-    previews = [attachment for attachment in track.get('attachments', []) if attachment['type'] == video_type]
-    previews = [(preview, media_url(preview['location'])) for preview in previews]
-    return previews
 
 
 # Titles from tags -------------------------------------------------------------

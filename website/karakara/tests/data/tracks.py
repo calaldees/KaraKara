@@ -43,7 +43,7 @@ def attachments(request): #, DBSession, commit
     """
     attachments_data = [
         ('test/preview1.3gp' , 'preview'  ),
-        ('test/preview2.flv' , 'preview'  ),        
+        ('test/preview2.flv' , 'preview'  ),
         ('test/preview3.mp4' , 'preview'  ),
         ('test/image1.jpg'   , 'thumbnail'),
         ('test/image2.jpg'   , 'thumbnail'),
@@ -112,7 +112,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 #'description:Test track for the KaraKara system with キ',
                 'opening','male','jp','anime','jpop', 'series X',
             ],
-            'attachments': ['image1','preview1'],
+            'attachments': ['image1', 'preview1', 'processed'],
             'lyrics': lyrics[0],
             'source_filename': 'track1source',
         },

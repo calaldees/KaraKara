@@ -33,8 +33,8 @@
             % endfor
         </div>
 
-        % for preview, url in h.previews(data['track'], video_type='video'):
-            <a href="${url}">${h.video_mime_type(preview)} ${preview['extra_fields'].get('vcodec','unknown')}</a>
+        % for video_hires, url in h.attachment_locations(data['track'], 'video'):
+            <a href="${url}">${h.video_mime_type(video_hires)} ${video_hires['extra_fields'].get('vcodec','unknown')}</a>
         % endfor
         
         <!-- Submit -->

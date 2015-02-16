@@ -214,7 +214,7 @@ class ComunityTrack():
 
     @property
     def video_previews(self):
-        return h.previews(self.track)
+        return h.attachment_locations(self.track, 'preview')
 
     @staticmethod
     def track_status(track_dict, status_tags=STATUS_TAGS, func_is_file=lambda f: True):

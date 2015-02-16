@@ -89,6 +89,7 @@ def test_track(app, users, tracks):
         'Test Track 1 - TITLE EXTENDED',
         'track1source',
         'subtitle content',
+        'processed.mpg'  # Link to processed video is present
     ):
         assert text in response.text
 
