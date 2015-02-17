@@ -119,11 +119,18 @@ def track_view(request):
 #    #    track_list.append(track.id)
 #    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
 
+def track_list_cache_key(request):
+    '{0}-{1}-{2}'.format(
+        generate_cache_key(request),
+        request.registry.settings.get('karakara.search.tag.silent_forced', []),
+        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
+    )
+
 
 @view_config(route_name='track_list')
-#@etag_decorator()
+@etag_decorator(track_list_cache_key)
 @web
-@admin_only
+#@admin_only
 def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)

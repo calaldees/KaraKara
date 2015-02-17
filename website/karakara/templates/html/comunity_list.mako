@@ -20,7 +20,6 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 %>
 
 <%def name="body()">
-	<a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a>
 
 	% if data.get('unprocessed_media_files'):
 	<h2>unprocessed media files</h2>

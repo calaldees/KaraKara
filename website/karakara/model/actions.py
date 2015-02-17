@@ -14,7 +14,7 @@ def rough_db_hash():
     todo: Counting the tags is insufficent. A user might update a tag -> reimport -> tag count is the same
     suggestion: Could we get the last tag table update datetime?
     """
-    return str(DBSession.query(Tag).count())
+    return 'tag_count:{0}'.format(str(DBSession.query(Tag).count()))
 
 def get_track(id):
     return DBSession.query(Track).get(id)

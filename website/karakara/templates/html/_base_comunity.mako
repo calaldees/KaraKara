@@ -64,13 +64,19 @@
 			<div class="collapse navbar-collapse bs-navbar-collapse">
 				<ul class="nav navbar-nav">
 					##${self.navbar_elements()}
+					% if (identity.get('user') or {}).get('approved'):
 					<li><a href="/comunity/list">Tracks</a></li>
+					<li><a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a></li>
+					<li><a href="/search_tags/">MobileBrowse</a></li>
+					<li><a href="/track_list">PrintableList</a></li>
+					<li><a href="/settings">Settings</a></li>
+					% endif
 					##<li class="active"><a href="#">Link</a></li>
 				</ul>
 				 
 				<ul class="nav navbar-nav navbar-right">
 				% if identity.get('user'):
-					% if not identity.get('user',{}).get('approved'):
+					% if not identity['user'].get('approved'):
 						<li class="navbar-text label label-warning"><span class="glyphicon glyphicon-warning-sign" data-toggle="tooltip" data-placement="left" title="Awaiting user approval from an admin"></span></li>
 					% endif
 					<li class="dropdown">

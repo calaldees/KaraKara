@@ -383,3 +383,19 @@ def comunity_track_update(request):
         ctrack.import_track()
 
     return action_ok()
+
+
+# A temp hack to allow te updating of tags for searching to be visible in the comunity interface
+from .settings import update_settings
+COMUNITY_VISIBLE_SETTINGS = ('karakara.search.tag.silent_forced', 'karakara.search.tag.silent_hidden')
+@view_config(route_name='comunity_settings')
+@web
+@comunity_only
+def community_settings(request):
+
+    update_settings(request.registry.settings, {k: v for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS})
+
+    return action_ok(data={'settings': {
+        setting_key: request.registry.settings.get(setting_key)
+        for setting_key in COMUNITY_VISIBLE_SETTINGS
+    }})

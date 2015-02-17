@@ -12,6 +12,14 @@ import logging
 log = logging.getLogger(__name__)
 
 
+def update_settings(settings, params):
+    for key, value in params.items():
+        fallback_type = None
+        if settings.get(key) != None:
+            fallback_type = type(settings.get(key))
+        settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
+
+
 @view_config(route_name='settings')
 @web
 def settings(request):
@@ -25,11 +33,8 @@ def settings(request):
         if request.registry.settings.get('karakara.server.mode') != 'test' and not is_admin(request):
             raise action_error(message='Settings modification for non admin users forbidden', code=403)
 
-        for key, value in request.params.items():
-            fallback_type = None
-            if request.registry.settings.get(key) != None:
-                fallback_type = type(request.registry.settings.get(key))
-            request.registry.settings[key] = convert_str_with_type(value, fallback_type=fallback_type)
+        update_settings(request.registry.settings, request.params)
+
         send_socket_message(request, 'settings')  # Ensure that the player interface is notifyed of an update
         log_event(request, method='update', admin=is_admin(request))
     else:

@@ -180,6 +180,7 @@ def main(global_config, **settings):
     config.add_route('comunity_list' , append_format_pattern('/comunity/list') )
     config.add_route('comunity_track', append_format_pattern('/comunity/track/{id}'))
     config.add_route('comunity_upload', append_format_pattern('/comunity/upload'))
+    config.add_route('comunity_settings', append_format_pattern('/comunity/settings'))
 
     config.add_route('search_tags'   , '/search_tags/{tags:.*}')
     config.add_route('search_list'   , '/search_list/{tags:.*}')
