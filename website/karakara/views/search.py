@@ -100,7 +100,7 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
     for tag in tags_silent_forced:
         query = query.intersect(DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id))
     for tag in tags_silent_hidden:
-        query = query.filter(Track.id.notin_(DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id)))
+        query = query.filter(Track.id.notin_(DBSession.query(Track.id).join(Track.tags).filter(Tag.id == tag.id)))
 
     return query
 
