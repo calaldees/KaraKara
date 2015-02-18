@@ -4,7 +4,6 @@ import random
 import collections
 
 from sqlalchemy import func
-#from sqlalchemy.sql import null
 from sqlalchemy.orm import joinedload, aliased
 
 from pyramid.view import view_config
@@ -53,8 +52,8 @@ def get_search_params(request):
     try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
     except: trackids = []
 
-    tags_silent_forced = request.registry.settings.get('karakara.search.tag.silent_forced',[])
-    tags_silent_hidden = request.registry.settings.get('karakara.search.tag.silent_hidden',[])
+    tags_silent_forced = request.registry.settings.get('karakara.search.tag.silent_forced', [])
+    tags_silent_hidden = request.registry.settings.get('karakara.search.tag.silent_hidden', [])
 
     return SearchParams(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)
 
@@ -83,9 +82,9 @@ def _tag_strings_to_tag_objs(tags):
 def restrict_search(request, query, obj_intersect=Track):
     return _restrict_search(
         query,
-        request.registry.settings.get('karakara.search.tag.silent_forced',[]),
-        request.registry.settings.get('karakara.search.tag.silent_hidden',[]),
-        obj_intersect = obj_intersect,
+        request.registry.settings.get('karakara.search.tag.silent_forced', []),
+        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
+        obj_intersect=obj_intersect,
     )
 
 
@@ -135,7 +134,7 @@ def search(search_params):
         trackids = DBSession.query(Track.id)
         trackids = _restrict_search(trackids, tags_silent_forced, tags_silent_hidden)
         for tag in tags:
-            trackids = trackids.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.id                == tag.id  ) )
+            trackids = trackids.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.id == tag.id))
         for keyword in keywords:
             trackids = trackids.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
 
