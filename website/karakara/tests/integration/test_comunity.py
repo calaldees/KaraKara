@@ -115,6 +115,9 @@ def test_settings(app, tracks, users, settings):
             'karakara.search.tag.silent_forced': 'lang:fr',
         })
 
+        response = app.get('/comunity/settings')
+        assert 'lang:fr' in response.text
+
         response = app.get('/track_list')
         assert 't1' not in response.text.lower()
         assert 'wildcard' in response.text.lower()
