@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 # The DB modules imported here will be created as part of the blank database.
 # If you add a new model ensure it ia added here
+# Note: you may see pyflakes 'not used' errors here. This is nessisary! the import registers them with the model
 from .model_tracks   import Track, Tag
 from .model_queue    import QueueItem
 from .model_feedback import Feedback

@@ -28,16 +28,17 @@ def get_args():
 
     return parser.parse_args()
 
+
 def main():
     args = get_args()
-    
+
     # Setup Logging and import Settings
     from pyramid.paster import get_appsettings, setup_logging
     setup_logging(args.config_uri)
     settings = get_appsettings(args.config_uri)
-    
+
     # Setup DB
-    init_DBSession(settings) # Connect to DBSession
+    init_DBSession(settings)  # Connect to DBSession
 
     if not args.init_func:
         init_db()
@@ -52,6 +53,6 @@ def main():
         init_func = getattr(my_import(module_name), func_name)
         #from .init_data import init_data as init_func
         init_func()
-    
+
 if __name__ == "__main__":
     main()
