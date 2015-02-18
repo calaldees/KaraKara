@@ -393,7 +393,7 @@ COMUNITY_VISIBLE_SETTINGS = ('karakara.search.tag.silent_forced', 'karakara.sear
 @comunity_only
 def community_settings(request):
 
-    update_settings(request.registry.settings, {k: v for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS})
+    update_settings(request.registry.settings, {k: v for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS}, list)
 
     return action_ok(data={'settings': {
         setting_key: request.registry.settings.get(setting_key)

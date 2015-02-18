@@ -12,9 +12,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def update_settings(settings, params):
+def update_settings(settings, params, fallback_type=None):
     for key, value in params.items():
-        fallback_type = None
+        #fallback_type = None
         if settings.get(key) != None:
             fallback_type = type(settings.get(key))
         settings[key] = convert_str_with_type(value, fallback_type=fallback_type)

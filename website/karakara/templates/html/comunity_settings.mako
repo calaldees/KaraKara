@@ -3,7 +3,7 @@
 <%def name="body()">
     <h1>Settings</h1>
     
-    <form action="POST">
+    <form method="POST">
         <ul>
         % for k, v in data.get('settings', {}).items():
             <%
