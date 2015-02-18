@@ -156,7 +156,7 @@ def import_json_data(source, location='', **kwargs):
             while DBSession.query(Track).filter_by(id=id+(get_count() or '')).count():
                 count += 1
                 log.warn('track.id colision - this is unexpected and could lead to inconsistencys with track naming for printed lists in the future {0}, press c to continue'.format(id))
-                import pdb ; pdb.set_trace()
+                #import pdb ; pdb.set_trace()
             return get_count()
         id += get_id_number(id)
 
