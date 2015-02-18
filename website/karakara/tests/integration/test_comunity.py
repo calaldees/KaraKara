@@ -94,3 +94,32 @@ def test_track(app, users, tracks):
         assert text in response.text
 
     logout(app)
+
+
+def test_settings(app, tracks, users, settings):
+    """
+    """
+    response = app.get('/comunity/settings', expect_errors=True)
+    assert response.status_code == 403
+    login(app)
+
+    response = app.get('/comunity/settings')
+    assert 'karakara.search.tag.silent_forced' in response.text
+
+    with patch.dict(settings, {'karakara.search.tag.silent_forced': []}):
+        response = app.get('/track_list')
+        assert 't1' in response.text.lower()
+        assert 'wildcard' in response.text.lower()
+
+        response = app.post('/comunity/settings', {
+            'karakara.search.tag.silent_forced': 'lang:fr',
+        })
+
+        response = app.get('/track_list')
+        assert 't1' not in response.text.lower()
+        assert 'wildcard' in response.text.lower()
+
+        # TODO: Test only allowed setting updates are enfored
+        #  hash settings -> attempt update disallowed setting -> check hash settings
+
+    logout(app)

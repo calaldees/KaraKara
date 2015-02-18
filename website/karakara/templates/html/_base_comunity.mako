@@ -69,7 +69,7 @@
 					<li><a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a></li>
 					<li><a href="/search_tags/">MobileBrowse</a></li>
 					<li><a href="/track_list">PrintableList</a></li>
-					<li><a href="/settings">Settings</a></li>
+					<li><a href="/comunity/settings">Settings</a></li>
 					% endif
 					##<li class="active"><a href="#">Link</a></li>
 				</ul>

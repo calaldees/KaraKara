@@ -144,7 +144,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
             'duration': 300,  # 5min
             'tags': [
                 'title      :Wildcard',
-                'fr',
+                'lang:fr',
             ],
             'attachments': [],
             'source_filename': 'wildcardsource',
