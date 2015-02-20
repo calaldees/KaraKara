@@ -98,6 +98,7 @@ def test_track(app, users, tracks):
 
 def test_settings(app, tracks, users, settings):
     """
+    This is also testing tracks_all heavily in this flow
     """
     response = app.get('/comunity/settings', expect_errors=True)
     assert response.status_code == 403

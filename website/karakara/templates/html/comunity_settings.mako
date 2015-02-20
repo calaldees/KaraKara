@@ -5,8 +5,10 @@
     
     <form method="POST">
         <ul>
-        % for k, v in data.get('settings', {}).items():
+        ##% for k, v in data.get('settings', {}).items():
+        % for k in sorted(data.get('settings', {}).keys()):
             <%
+                v = data.get('settings', {}).get(k)
                 if isinstance(v, list):
                     v = ', '.join(v)
             %>

@@ -387,7 +387,7 @@ def comunity_track_update(request):
 
 # A temp hack to allow te updating of tags for searching to be visible in the comunity interface
 from .settings import update_settings
-COMUNITY_VISIBLE_SETTINGS = ('karakara.search.tag.silent_forced', 'karakara.search.tag.silent_hidden')
+COMUNITY_VISIBLE_SETTINGS = ('karakara.print_tracks.fields', 'karakara.search.tag.silent_forced', 'karakara.search.tag.silent_hidden')
 @view_config(route_name='comunity_settings')
 @web
 @comunity_only
