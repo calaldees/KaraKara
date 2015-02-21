@@ -139,10 +139,10 @@ http {
 
 		root ./www/;
 
-		server_name int.karakara.local;
+		server_name int.karakara.local2;
 
-		if ($host !~* int.karakara.local){
-			#rewrite ^(.*)$ http://int.karakara.local/ redirect;
+		if ($host !~* int.karakara.local2){
+			#rewrite ^(.*)$ http://int.karakara.local2/ redirect;
 		}
 
 		error_page 404 /404.html;

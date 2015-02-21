@@ -23,7 +23,7 @@ karakara.search.tag.silent_hidden = []
 
 api.search.max_age = 3600 -> int
 
-server.gzip         = True -> bool
+server.gzip         = False -> bool
 server.etag.enabled = True -> bool
 server.url          = http://www.karakara.org.uk/
 

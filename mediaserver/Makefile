@@ -1,9 +1,10 @@
 FILENAME_TAG_BACKUP = tags.tar.gz
 #BACKUP_SELECTOR = -iname '*.txt'
 BACKUP_SELECTOR = -iregex '.*\\\.\(txt\|json\)'
-LAN_IP = 172.20.1.2
-DCHP_MIN = 172.20.1.10
-DCHP_MAX = 172.20.200.254
+LAN_IP = 192.168.1.2
+#$(shell hostname -I)
+#DCHP_MIN = 172.20.1.10
+#DCHP_MAX = 172.20.200.254
 NGINX_CFG_OVERRIDES =
 
 
@@ -40,7 +41,8 @@ stop_nginx:
 	sudo pkill nginx || true
 
 start_dns_server: stop_dns_server
-	sudo dnsmasq --conf-file --bind-interfaces --except-interface=lo --listen-address=$(LAN_IP) --dhcp-range=$(DCHP_MIN),$(DCHP_MAX),24h --dhcp-option=option:router,$(LAN_IP) --address="/#/$(LAN_IP)"
+	#sudo dnsmasq --conf-file --bind-interfaces --except-interface=lo --listen-address=$(LAN_IP) --dhcp-range=$(DCHP_MIN),$(DCHP_MAX),24h --dhcp-option=option:router,$(LAN_IP) --address="/#/$(LAN_IP)"
+	sudo dnsmasq --conf-file --bind-interfaces --except-interface=lo --listen-address=$(LAN_IP) --address="/#/$(LAN_IP)"
 
 stop_dns_server:
 	sudo killall dnsmasq || true
@@ -59,9 +61,9 @@ stop: stop_dns_server stop_nginx
 	echo "stopping nginx and dnsmasq"
 
 captive_portal_enable:
-	sed "s/[#\\s]*.*\(rewrite.*int\.karakara\.local.*\)/\1/" <nginx.conf >nginx.conf.new && rm -f nginx.conf && mv nginx.conf.new nginx.conf
+	sed "s/[#\\s]*.*\(rewrite.*int\.karakara\.local2.*\)/\1/" <nginx.conf >nginx.conf.new && rm -f nginx.conf && mv nginx.conf.new nginx.conf
 captive_portal_disable:
-	sed "s/\(rewrite.*int\.karakara\.local.*\)/# \1/" <nginx.conf >nginx.conf.new && rm -f nginx.conf && mv nginx.conf.new nginx.conf
+	sed "s/\(rewrite.*int\.karakara\.local2.*\)/# \1/" <nginx.conf >nginx.conf.new && rm -f nginx.conf && mv nginx.conf.new nginx.conf
 
 tmp:
 	mkdir tmp
@@ -81,9 +83,12 @@ setup: nginx.conf
 		echo ; \
 	else \
 		echo installing nginx; \
+		sudo apt-add-repository ppa:nginx/development
+		sudo apt-get update
 		sudo apt-get install nginx -y ; \
 		sudo update-rc.d -f nginx disable; \
-		sudo echo "127.0.0.1 int.karakara.local" >> /etc/hosts; \
+		#sudo echo "127.0.0.1 int.karakara.local" >> /etc/hosts; \
+		#sudo sh -c 'echo "127.0.0.1 int.karakara.local" >> /etc/hosts'; \
 	fi
 	if dpkg -s postgresql ; then \
 		echo ; \
