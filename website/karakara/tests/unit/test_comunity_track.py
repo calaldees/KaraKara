@@ -114,13 +114,13 @@ STATUS_TAGS = {
         ('yellow',),
         ('lyrics',),
     ),
-    # lyric - special case - remove lyric 'missing warning' if nosubs anaonimus tag is used
+    # lyric - special case - remove lyric 'missing warning' if hardsubs anaonimus tag is used
     (
         {
             'tags': {
                 'title': ['test title'],
                 'artist': ['test artist'],
-                None: ['nosubs'],
+                None: ['hardsubs'],
             },
             'duration': 100,
             'attachments': [
