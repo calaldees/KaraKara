@@ -2,6 +2,7 @@ FILENAME_TAG_BACKUP = tags.tar.gz
 #BACKUP_SELECTOR = -iname '*.txt'
 BACKUP_SELECTOR = -iregex '.*\\\.\(txt\|json\)'
 LAN_IP = 192.168.1.2
+# Joe's get_ip contribution - ip -f inet addr show dev eth0 | sed -n 's/^ *inet *\([.0-9]*\).*/\1/p'
 #$(shell hostname -I)
 #DCHP_MIN = 172.20.1.10
 #DCHP_MAX = 172.20.200.254
