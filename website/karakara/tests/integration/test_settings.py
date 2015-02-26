@@ -1,3 +1,5 @@
+import tempfile
+
 from . import get_settings
 
 
@@ -20,6 +22,24 @@ def test_settings(app):
     assert get_settings(app)[key] == 666
     app.put('/settings.json', {key: '[]'})
     assert get_settings(app)[key] == []
+
+    with tempfile.NamedTemporaryFile(mode='w') as temp:
+        # Setup actual file on filesystem as a list
+        users = ('user1', 'user2', 'mysteryman')
+        for user in users:
+            temp.write('{0}\n'.format(user))
+        temp.flush()
+
+        # Assert the file can be read by ->listfile
+        app.put('/settings.json', {key: '{0} -> listfile'.format(temp.name)})
+        assert isinstance(get_settings(app)[key], list)
+        for user in users:
+            assert user in get_settings(app)[key]
+
+        # Just so that you know that I know.
+        # This settings feature could be a security hole
+        # Any file can be ready and put into settings
+        # But only admins can change settings ... so ... maybe not that problematic
 
     # Settings Template
     response = app.get('/settings')
