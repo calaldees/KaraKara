@@ -195,6 +195,8 @@ class ComunityTrack():
     def subtitle_data(self):
         def subtitles_read(subtitle_filename):
             subtitle_filename = os.path.join(self.path_source, subtitle_filename)
+            if not os.path.exists(subtitle_filename):
+                return '{0} does not exist'.format(subtitle_filename)
             with self._open(subtitle_filename, 'r') as subtitle_filehandle:
                 try:
                     return subtitle_filehandle.read()
