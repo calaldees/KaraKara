@@ -33,4 +33,4 @@ def check_tags():
 
 
 if __name__ == "__main__":
-    main()
+    check_tags()
