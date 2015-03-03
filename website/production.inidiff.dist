@@ -14,6 +14,7 @@ karakara.queue.add.limit.priority_token      = 0:45:00 -> timedelta
 karakara.queue.add.limit.priority_window     = 0:03:00 -> timedelta
 karakara.queue.add.duplicate.count_limit     = 1       -> int
 karakara.queue.add.duplicate.performer_limit = 1       -> int
+#karakara.queue.add.valid_performer_names     = badgenames.txt -> listfile
 
 karakara.template.input.performer_name = Enter your badge name
 karakara.template.title = KaraKara (Beta)
