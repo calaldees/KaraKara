@@ -71,6 +71,7 @@ def test_track(app, users, tracks):
         json.dumps({
             'test.avi': {},
             'test.ssa': {},
+            'test.srt': {},
         })
     )
     multi_mock_open.add_handler(
@@ -79,6 +80,11 @@ def test_track(app, users, tracks):
             subtitle content
         """
     )
+    multi_mock_open.add_handler(
+        'test.srt',
+        FileNotFoundError
+    )
+
 
     # Make web request
     with patch.object(ComunityTrack, '_open', multi_mock_open.open):
