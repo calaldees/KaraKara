@@ -145,11 +145,13 @@ def queue_add(request):
     # If not admin, check additional restrictions
     if not is_admin(request):
 
+        performer_name = request.params.get('performer_name').strip()  # TODO: It would be good to ensure this value is writen to the db. However we cant modify the request.param dict directly. See creation of queueitem below
+
         # Valid performer name
         valid_performer_names = request.registry.settings.get('karakara.queue.add.valid_performer_names')
-        if valid_performer_names and request.params.get('performer_name').lower() not in map(lambda name: name.lower(), valid_performer_names):
+        if valid_performer_names and performer_name.lower() not in map(lambda name: name.lower(), valid_performer_names):
             message = _('view.queue.add.invalid_performer_name ${performer_name}', mapping=dict(
-                performer_name=request.params.get('performer_name')
+                performer_name=performer_name
             ))
             raise action_error(message, code=400)
 
@@ -161,7 +163,7 @@ def queue_add(request):
             except Exception:
                 latest_track_title = ''
             message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${track_count} ${latest_queue_item_title}', mapping=dict(
-                performer_name=request.params.get('performer_name'),
+                performer_name=performer_name,
                 latest_queue_item_title=latest_track_title,
                 **subdict(queue_item_performed_tracks, {
                     'estimated_next_add_time',
