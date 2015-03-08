@@ -249,7 +249,7 @@ def queue_del(request):
     """
     _log_event = partial(log_event, request, method='del')
 
-    queue_item_id = request.params['queue_item.id']
+    queue_item_id = int(request.params['queue_item.id'])
     queue_item = DBSession.query(QueueItem).get(queue_item_id)
 
     if not queue_item:
@@ -293,7 +293,7 @@ def queue_update(request):
         except ValueError:
             raise action_error(message='invalid {0}'.format(field), code=404)
 
-    queue_item_id = params['queue_item.id']
+    queue_item_id = int(params['queue_item.id'])
     queue_item = DBSession.query(QueueItem).get(queue_item_id)
 
     if not queue_item:
