@@ -396,7 +396,9 @@ COMUNITY_VISIBLE_SETTINGS = ('karakara.print_tracks.fields', 'karakara.search.ta
 @comunity_only
 def community_settings(request):
 
-    update_settings(request.registry.settings, {k: v for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS}, list)
+    # '{0} -> list' is a hack. This assumes that all data types given to this method are lists
+    # This will have to be updated
+    update_settings(request.registry.settings, {k: '{0} -> list'.format(v) for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS})
 
     return action_ok(data={'settings': {
         setting_key: request.registry.settings.get(setting_key)

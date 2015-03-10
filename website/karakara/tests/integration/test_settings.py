@@ -20,6 +20,8 @@ def test_settings(app):
     assert get_settings(app)[key] == 'bob'
     app.put('/settings.json', {key: '666 -> int'})
     assert get_settings(app)[key] == 666
+    app.put('/settings.json', {key: '665'})
+    assert get_settings(app)[key] == 665
     app.put('/settings.json', {key: '[]'})
     assert get_settings(app)[key] == []
 

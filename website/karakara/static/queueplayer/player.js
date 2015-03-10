@@ -555,6 +555,7 @@ function attach_events() {
 	});
 	// Help Popup
 	$(document).on('mousemove', function(e) {
+		if (!settings["karakara.player.help.timeout"]) {return;}
 		if (mousemove_timeout) {
 			clearTimeout(mousemove_timeout);
 			mousemove_timeout = null;
