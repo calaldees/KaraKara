@@ -79,6 +79,7 @@ def random_images(request):
     from karakara.model import DBSession
     from karakara.model.model_tracks import Attachment
     thumbnails = DBSession.query(Attachment.location).filter(Attachment.type == 'thumbnail').all()
+    # TODO: use serach.restrict_trags to get the images for the current event
     random.shuffle(thumbnails)
     thumbnails = [t[0] for t in thumbnails]
     return action_ok(data={'thumbnails': thumbnails[0: int(request.params.get('count', 0) or 100)]})
