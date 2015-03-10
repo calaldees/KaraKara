@@ -106,3 +106,9 @@ def test_readonly_mode(app, tracks):
     response = app.put('/settings', {
         'karakara.system.user.readonly': 'False -> bool',
     })
+
+
+def test_random_images(app, tracks):
+    thumbnails = app.get('/random_images.json?count=200').json['data']['thumbnails']
+    for thumbnail in ('test/image1.jpg', 'test/image2.jpg', 'test/image3.png'):
+        assert thumbnail in thumbnails
