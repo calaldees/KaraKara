@@ -9,14 +9,14 @@ log = logging.getLogger(__name__)
 
 VERSION = '0.0'
 DEFAULT_CACHE_FILENAME = 'badgenames.cache.html'
-
+DEFAULT_BADGENAME_REGEX = re.compile(r'(?P<name>.*)\((?P<badge_name>.+)\)')
 
 # Processors -------------------------------------------------------------------
 
 def minami_processor(soup):
     """
     """
-    regex = re.compile(r'(?P<name>.*)\((?P<badge_name>.*)\)')
+    regex = DEFAULT_BADGENAME_REGEX
     return [regex.match(name_string).groupdict()['badge_name'] for name_string in (cell.string for cell in soup.find_all('td')) if regex.match(name_string)]
 minami_processor.url = "http://minamicon.org.uk/members.php"
 
@@ -24,8 +24,9 @@ minami_processor.url = "http://minamicon.org.uk/members.php"
 def ame_processor(soup):
     """
     """
-    import pdb ; pdb.set_trace()
-    return []
+    regex = DEFAULT_BADGENAME_REGEX
+    names = (cell.string for cell in soup.find(id='registration-section').find_all('td'))
+    return [regex.match(name_string).groupdict()['badge_name'] for name_string in names if regex.match(name_string)]
 ame_processor.url = "http://www.amecon.org.uk/registration/members"
 
 processors = {
