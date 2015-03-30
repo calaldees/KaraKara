@@ -215,7 +215,7 @@ import_tracks_production: ini  #init_db_production
 	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 badgenames.txt:
-	env/bin/python -mkarakara.scripts.badge_name_importer --source_url http://minamicon.org.uk/members.php > badgenames.txt
+	env/bin/python -mkarakara.scripts.badge_name_importer --source ame > badgenames.txt
 
 # Logs -------------------------------------------------------------------------
 
