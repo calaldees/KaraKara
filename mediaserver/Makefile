@@ -80,7 +80,7 @@ clean:
 	rm -rf tmp log setup
 
 setup: nginx.conf
-	if dpkg -s nginx ; then \
+	@if dpkg -s nginx >> /dev/null 2> /dev/null ; then \
 		echo ; \
 	else \
 		echo installing nginx; \
@@ -91,7 +91,7 @@ setup: nginx.conf
 		#sudo echo "127.0.0.1 int.karakara.local" >> /etc/hosts; \
 		#sudo sh -c 'echo "127.0.0.1 int.karakara.local" >> /etc/hosts'; \
 	fi
-	if dpkg -s postgresql ; then \
+	@if dpkg -s postgresql >> /dev/null 2> /dev/null ; then \
 		echo ; \
 	else \
 		echo installing postgresql; \

@@ -8,7 +8,7 @@ init_random_production:
 	cd website ; env/bin/python -mkarakara.scripts.insert_random_tracks 1200 --config=production.ini
 
 vagrant:
-	if dpkg -s vagrant ; then \
+	@if eval dpkg -s vagrant >> /dev/null 2> /dev/null ; then \
 		echo vagrant already installed; \
 	else \
 		echo installing vagrant ; \

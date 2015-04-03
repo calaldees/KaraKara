@@ -27,7 +27,7 @@ install_mac:
 	brew install libav sox mplayer ffmpeg --devel --with-libass --with-freetype --with-fdk-aac --with-libvo-aacenc --with-ffplay --with-frei0r --with-libbluray --with-libquvi --with-libvo-aacenc --with-libvpx --with-opencore-amr --with-openjpeg --with-openssl --with-opus --with-rtmpdump --with-schroedinger --with-speex --with-theora --with-tools --with-libcaca --with-flac --with-lame --with-libao --with-libsndfile --with-libvorbis --with-opencore-amr --with-gnutls
 
 install_linux:
-	if dpkg -s libav-tools ; then \
+	@if dpkg -s libav-tools >> /dev/null 2> /dev/null ; then \
 		echo libav already installed; \
 	else \
 		echo installing libav; \
