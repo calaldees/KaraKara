@@ -242,5 +242,6 @@ clean: clean_ini
 	rm -rf dependency_downloader.py
 	rm -rf dependencys_installed.json
 	rm -rf .installed_*
+	rm -rf badgenames.*
 	find ./locale -iname *.mo -delete
 	find ./locale -iname *.pot -delete
