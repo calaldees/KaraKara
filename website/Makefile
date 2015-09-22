@@ -191,7 +191,8 @@ env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.b
 	# This just perform a ultra hack critical fix on bable
 	sed -i.bak "s/tmpname, 'w'/tmpname, 'wb'/g" env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py
 
-locale/karakara.pot: locale env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
+locale/karakara.pot: locale
+    # removed dependecy - env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
 	env/bin/python3 setup.py extract_messages
 	env/bin/python3 setup.py update_catalog
 	env/bin/python3 setup.py compile_catalog

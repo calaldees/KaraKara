@@ -1,13 +1,13 @@
 {
     "jquery": {
         "source": "http://code.jquery.com/jquery-VERSION.min.js",
-        "version": "2.1.1",
+        "version": "2.1.4",
         "target": "static/jquery.min.js"
     },
 
     "jquery_map": {
         "source": "http://code.jquery.com/jquery-VERSION.min.map",
-        "version": "2.1.1",
+        "version": "2.1.4",
         "target": "static/jquery-VERSION.min.map"
     },
     
@@ -41,14 +41,14 @@
     
     "yui-reset": {
         "source": "http://yui.yahooapis.com/VERSION/build/cssreset/cssreset-min.css",
-        "version": "3.17.2",
+        "version": "3.18.1",
         "target": "static/cssreset-min.css"
     },
 
     "bootstrap": {
         "source": "http://raw.github.com/twbs/bootstrap/vVERSION/dist/",
         "destination_subpath": "static",
-        "version": "3.3.1",
+        "version": "3.3.5",
         "target": [
             "js/bootstrap.min.js",
             "css/bootstrap-theme.min.css",
