@@ -7,7 +7,7 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: $(OS) env
+install: $(OS) env dependencys
 
 # OSX installation
 .PHONY: Darwin has-brew
@@ -35,10 +35,22 @@ has-python3:
 env: has-python3
 	virtualenv --no-site-packages -p python3 env
 
+dependencys: libs/misc.py
+
+libs:
+	mkdir libs
+	touch libs/__init__.py
+libs/misc.py: libs
+	
+
+dependencys_link:
+	ln -s ../../../libs/python3/lib/misc.py ./libs/misc.py
+
 # Run --------------------------------------------------------------------------
 .PHONY: run run_production
 
 run:
+	env/bin/python3 processmedia.py
 
 run_production:
 
