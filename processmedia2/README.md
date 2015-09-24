@@ -9,7 +9,7 @@ The processing the original does is stable and does what we need. However; since
 Current Deficiencies
 --------------------
 
-* The souce files are intertwined with the processed media. This makes the entire dataset quite cumbersome. Most users require one or the other, but seldom booth.
+* The souce files are intertwined with the processed media. This makes the entire dataset quite cumbersome. Most users require one or the other, but seldom both.
 * It is difficult to rsync/share/distribute the data because the source files actually move between 3 places during the processing (root, folder, folder/source)
 * There is no hashing of source files. Often videos are reprocessed because the mtime has changed but the content has not. We also want the ability to move files based on hash (should they not be in the correct location in all remote places)
 * Processing was designed arond one single machine managing the encoding. What if multiple queues/machines/threads could process the data? Reprocessing 1500 videos could do with some muscule.
@@ -40,7 +40,7 @@ Proposed implementation
        * My Name.lock (containing timestamp processing was started) [maybe, still        considering simple tracking api to co-ordinate multiple external processors]
        * My Name.yml? (optional additional processing instuctions, maybe linking to another source video)
 * Derived meta
-    * will be stored as `My Name.json|yml` in a meta folder.
+    * Will be stored as `My Name.json` in a meta folder.
     * Structure
         * Source Files
             * name, mtime, size and hash of each file
