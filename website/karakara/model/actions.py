@@ -12,6 +12,7 @@ def rough_db_hash():
     A SUPER quick, SUPER rough method of detecting a db change
     todo: Counting the tags is insufficent. A user might update a tag -> reimport -> tag count is the same
     suggestion: Could we get the last tag table update datetime?
+    I've made a note in the model file - It should have one! Add this feature!
     """
     return 'tag_count:{0}'.format(str(DBSession.query(Tag).count()))
 

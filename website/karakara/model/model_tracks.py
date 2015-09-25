@@ -42,6 +42,8 @@ class Track(Base):
     attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     lyrics          = relationship("Lyrics", cascade="all, delete-orphan")
 
+    #TODO: time_updated    = Column(DateTime(),  nullable=False, default=now)  # Each time a tag is updated
+
     def tags_with_parents_dict(self):
         t = {None: [tag.name for tag in self.tags if not tag.parent]}
         for parent_name, tag_name in [(tag.parent.name, tag.name) for tag in self.tags if tag.parent]:
@@ -159,6 +161,8 @@ class Tag(Base):
         because all searches are normalized to lower case
         """
         target.name = target.name.lower()
+
+    # TODO: Hook for on updated/add/remove to update the time_updated on the track
 
 event.listen(Tag, 'before_insert', Tag.before_insert_listener)
 
