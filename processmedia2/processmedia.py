@@ -12,6 +12,38 @@ DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
 # Main -------------------------------------------------------------------------
 
+def main():
+    """
+    SCAN
+        -Update Meta-
+        Load meta
+        validate source meta files
+            check mtime (ok or->)
+            check hash
+            mark fail if needed
+        scan source
+            skip validated
+            scan hash in attempt to match failed
+        create meta stubs for new files
+        remove old failed bits of meta
+
+        -Process Meta-
+            update tags
+            extract lyrics
+            check source->destination hashs and add to job list
+
+    ENCODE (queue consumer)
+        listen to queue
+        -Encode-
+        Update meta destination hashs
+        -CLEANUP-
+        prune unneeded files from destination
+        trigger importer
+
+    IMPORTER
+        Identify tracks with updates and prompt for reimport (could just scan again for all meta with mtime passed last known update in db)
+        Identify tracks that do not have sources and remove from db
+    """
 
 # Arguments --------------------------------------------------------------------
 
