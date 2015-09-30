@@ -37,7 +37,9 @@ def main():
 
 
     """
-    meta = MetaManager(DEFAULT_PATH_META)
+    #meta = MetaManager(DEFAULT_PATH_META)
+    locate_primary_files(DEFAULT_PATH_SOURCE)
+
 
 # Arguments --------------------------------------------------------------------
 
@@ -72,4 +74,4 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args['log_level'])
 
-    file_manager.source_file_generator(args['path_source'])
+    file_manager.locate_primary_files(args['path_source'])
