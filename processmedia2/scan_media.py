@@ -1,4 +1,5 @@
 import processmedia_libs.file_manager as file_manager
+import processmedia_libs.meta_manager as MetaManager
 
 import logging
 log = logging.getLogger(__name__)
@@ -14,6 +15,8 @@ DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
 def main():
     """
+    part 1 of 3 of the encoding system
+
     SCAN
         -Update Meta-
         Load meta
@@ -27,23 +30,14 @@ def main():
         create meta stubs for new files
         remove old failed bits of meta
 
-        -Process Meta-
+        -Add jobs-
             update tags
             extract lyrics
             check source->destination hashs and add to job list
 
-    ENCODE (queue consumer)
-        listen to queue
-        -Encode-
-        Update meta destination hashs
-        -CLEANUP-
-        prune unneeded files from destination
-        trigger importer
 
-    IMPORTER
-        Identify tracks with updates and prompt for reimport (could just scan again for all meta with mtime passed last known update in db)
-        Identify tracks that do not have sources and remove from db
     """
+    meta = MetaManager(DEFAULT_PATH_META)
 
 # Arguments --------------------------------------------------------------------
 
