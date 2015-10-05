@@ -36,21 +36,25 @@ def _load_yaml(filename):
 # Scan -------------------------------------------------------------------------
 
 def scan(path):
+    """
+    1.) Locate primary files
+    2.) Group file collection (based on primary file)
+    """
     folder_structure = FolderStructure.factory(
         path,
         file_regex=file_extension_regex(ALL_EXTS),
         ignore_regex=DEFAULT_IGNORE_FILE_REGEX
     )
     primary_files = locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
-    for file_collection in location_file_collections(folder_structure, primary_files):
-        print(file_collection)
+    for primary_file in primary_files:
+        file_collection = get_file_collection(folder_structure, primary_file)
 
 
 # Scan sections ----------------------------------------------------------------
 
 def locate_primary_files(folder_structure, file_regex):
     """
-    locate stuff
+    Locate primary files
     """
     file_dict = {}
     for f in folder_structure.scan(file_regex=file_regex):
@@ -60,24 +64,28 @@ def locate_primary_files(folder_structure, file_regex):
     return file_dict.values()
 
 
-def location_file_collections(folder_structure, primary_files):
-    for primary_file in primary_files:
-        folder = folder_structure.get(primary_file.folder)
+def get_file_collection(folder_structure, primary_file):
+    """
+    Collect realated files
+    """
+    folder = folder_structure.get(primary_file.folder)
 
-        # File collection always contains the primary file
-        file_collection = {primary_file.absolute, }
+    # File collection always contains the primary file
+    file_collection = set()  # {primary_file, }  # This could be uneeded as the file is added below as well
 
-        # Data files contain pointers to additional files that may not be named the same
-        if primary_file.ext in DATA_EXTS:
-            file_collection += {os.path.join(primary_file.folder, data_filename) for data_filename in _load_yaml(primary_file.absolute)}
+    # Collect files the same name
+    file_collection |= {f for f in folder.files if f.file_no_ext == primary_file.file_no_ext}
 
-        # Get tags.txt from differnt folder if importing legacy files
-        if folder.name == 'source' and folder.parent and folder.parent.get('tags.txt'):
-            file_collection.add(folder.parent.get('tags.txt').absolute)
+    # Data files contain pointers to additional files that may not be named the same
+    # We need to lookup the FileScan item from the in memory file list
+    if primary_file.ext in DATA_EXTS:
+        file_collection |= {
+            folder_structure.get(os.path.join(primary_file.folder, data_filename))
+            for data_filename in _load_yaml(primary_file.absolute)
+        }
 
-        # Collect files the same name
-        for f in folder.files:
-            if f.file_no_ext == primary_file.file_no_ext:
-                file_collection.add(f.absolute)
+    # Get tags.txt from differnt folder if importing legacy files
+    if folder.name == 'source' and folder.parent and folder.parent.get('tags.txt'):
+        file_collection.add(folder.parent.get('tags.txt'))
 
-        yield file_collection
+    return file_collection
