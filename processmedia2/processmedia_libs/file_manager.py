@@ -23,7 +23,7 @@ ALL_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS + OTHER_EXTS
 PRIMARY_FILE_RANKED_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS
 
 # Protection for legacy processed files  (could be removed in once data fully migriated)
-DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4')
+DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak')
 
 
 # Utils ------------------------------------------------------------------------
@@ -48,6 +48,7 @@ def scan(path):
     primary_files = locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
     for primary_file in primary_files:
         file_collection = get_file_collection(folder_structure, primary_file)
+        print([f.file for f in file_collection])
 
 
 # Scan sections ----------------------------------------------------------------
