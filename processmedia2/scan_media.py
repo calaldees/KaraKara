@@ -1,7 +1,7 @@
 from libs.misc import postmortem
 
-import processmedia_libs.file_manager as file_manager
-import processmedia_libs.meta_manager as MetaManager
+from processmedia_libs.scan import scan_file_collections
+from processmedia_libs.meta_manager import MetaManager
 
 import logging
 log = logging.getLogger(__name__)
@@ -42,7 +42,9 @@ def main():
     #meta = MetaManager(DEFAULT_PATH_META)
     #locate_primary_files()
 
-    file_manager.scan(DEFAULT_PATH_SOURCE)  #args['path_source']
+    meta = MetaManager()
+    for name, file_collection in scan_file_collections(DEFAULT_PATH_SOURCE):  #args['path_source']
+        meta.get(name)
 
 
 # Arguments --------------------------------------------------------------------

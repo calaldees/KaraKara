@@ -23,19 +23,12 @@ ALL_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS + OTHER_EXTS
 PRIMARY_FILE_RANKED_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS
 
 # Protection for legacy processed files  (could be removed in once data fully migriated)
-DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak')
-
-
-# Utils ------------------------------------------------------------------------
-
-def _load_yaml(filename):
-    with open(filename, 'rb') as file_handle:
-        return yaml.load(file_handle)
+DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.')
 
 
 # Scan -------------------------------------------------------------------------
 
-def scan(path):
+def scan_file_collections(path):
     """
     1.) Locate primary files
     2.) Group file collection (based on primary file)
@@ -45,15 +38,15 @@ def scan(path):
         file_regex=file_extension_regex(ALL_EXTS),
         ignore_regex=DEFAULT_IGNORE_FILE_REGEX
     )
-    primary_files = locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
-    for primary_file in primary_files:
-        file_collection = get_file_collection(folder_structure, primary_file)
-        print([f.file for f in file_collection])
+    return {
+        f.file_no_ext: _get_file_collection(folder_structure, f)
+        for f in _locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
+    }
 
 
 # Scan sections ----------------------------------------------------------------
 
-def locate_primary_files(folder_structure, file_regex):
+def _locate_primary_files(folder_structure, file_regex):
     """
     Locate primary files
     """
@@ -65,7 +58,7 @@ def locate_primary_files(folder_structure, file_regex):
     return file_dict.values()
 
 
-def get_file_collection(folder_structure, primary_file):
+def _get_file_collection(folder_structure, primary_file):
     """
     Collect realated files
     """
@@ -90,3 +83,10 @@ def get_file_collection(folder_structure, primary_file):
         file_collection.add(folder.parent.get('tags.txt'))
 
     return file_collection
+
+
+# Utils ------------------------------------------------------------------------
+
+def _load_yaml(filename):
+    with open(filename, 'rb') as file_handle:
+        return yaml.load(file_handle)
