@@ -15,7 +15,7 @@ DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
 # Main -------------------------------------------------------------------------
 
-def main():
+def main(**kwargs):
     """
     part 1 of 3 of the encoding system
 
@@ -42,9 +42,9 @@ def main():
     #meta = MetaManager(DEFAULT_PATH_META)
     #locate_primary_files()
 
-    meta = MetaManager()
-    for name, file_collection in scan_file_collections(DEFAULT_PATH_SOURCE):  #args['path_source']
-        meta.get(name)
+    meta = MetaManager(kwargs['path_meta'])
+    for name, file_collection in scan_file_collections(kwargs['path_source']).items():
+        meta.load(name, file_collection)
 
 
 # Arguments --------------------------------------------------------------------
@@ -80,4 +80,4 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args['log_level'])
 
-    postmortem(main)
+    postmortem(main, **args)
