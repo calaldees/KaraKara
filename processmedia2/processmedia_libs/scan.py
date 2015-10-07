@@ -7,8 +7,11 @@ import os.path
 
 import yaml
 
-from libs.misc import file_extension_regex
+from libs.misc import file_extension_regex, duplicates
 from libs.file import FolderStructure
+
+import logging
+log = logging.getLogger(__name__)
 
 
 AUDIO_EXTS = ('mp2', 'ogg', 'mp3', 'flac')
@@ -23,7 +26,7 @@ ALL_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS + OTHER_EXTS
 PRIMARY_FILE_RANKED_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS
 
 # Protection for legacy processed files  (could be removed in once data fully migriated)
-DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.')
+DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.')
 
 
 # Scan -------------------------------------------------------------------------
@@ -50,11 +53,19 @@ def _locate_primary_files(folder_structure, file_regex):
     """
     Locate primary files
     """
+    ignore_files = set()
     file_dict = {}
     for f in folder_structure.scan(file_regex=file_regex):
+        if f.file_no_ext in ignore_files:
+            continue
         existing = file_dict.get(f.file_no_ext)
-        if PRIMARY_FILE_RANKED_EXTS.index(f.ext) > (PRIMARY_FILE_RANKED_EXTS.index(existing.ext) if existing else 0):
-            file_dict[f.file_no_ext] = f
+        if PRIMARY_FILE_RANKED_EXTS.index(f.ext) >= (PRIMARY_FILE_RANKED_EXTS.index(existing.ext) if existing else 0):
+            if existing and existing.file == f.file:
+                del file_dict[f.file_no_ext]
+                ignore_files.add(f.file_no_ext)
+                log.warn("Multiple primary files detected: Refusing to process %s %s", f.absolute, existing.absolute)
+            else:
+                file_dict[f.file_no_ext] = f
     return file_dict.values()
 
 
