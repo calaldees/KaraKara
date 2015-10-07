@@ -44,7 +44,9 @@ def main(**kwargs):
 
     meta = MetaManager(kwargs['path_meta'])
     for name, file_collection in scan_file_collections(kwargs['path_source']).items():
-        meta.load(name, file_collection)
+        meta.load(name)
+        meta.get(name).associate_file_collection(file_collection)
+        meta.save(name)
 
 
 # Arguments --------------------------------------------------------------------
