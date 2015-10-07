@@ -73,12 +73,11 @@ class MetaFile(object):
             mtime = int(f.stats.st_mtime)
             if current.get('mtime') == mtime:
                 continue
-            import pdb ; pdb.set_trace()
             current['mtime'] = mtime
-            hash = str(f.hash)
-            if current.get('hash') == hash:
+            filehash = str(f.hash)
+            if current.get('hash') == filehash:
                 continue
-            current['hash'] = hash
+            current['hash'] = filehash
             self.pending_actions.append(f.ext)
 
     def has_updated(self):
