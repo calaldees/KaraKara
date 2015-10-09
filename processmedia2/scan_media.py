@@ -64,10 +64,11 @@ def main(**kwargs):
         for f in primary_files
     }
 
+    meta.load_all()
     for name, file_collection in file_collections.items():
-        meta.load(name)
         meta.get(name).associate_file_collection(file_collection)
-        meta.save(name)
+
+    meta.save_all()
 
 
 # Arguments --------------------------------------------------------------------

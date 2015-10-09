@@ -51,10 +51,17 @@ class MetaManager(object):
         with open(self._filepath(name), 'w') as destination:
             json.dump(metafile.data, destination)
 
-    def get_unmatched_files(self):
+    def load_all(self):
         for f in fast_scan(self.path, file_regex=re.compile(r'.*\.json$')):
-            if f.file_no_ext not in self.meta:
-                yield f
+            self.load(f.file_no_ext)
+
+    def save_all(self):
+        for name in self.meta.keys():
+            self.save(name)
+
+    @property
+    def unmatched(self):
+        pass
 
 
 class MetaFile(object):
@@ -67,7 +74,10 @@ class MetaFile(object):
         self.pending_actions = self.data.setdefault('actions', [])
         self.data_hash = freeze(data).__hash__()
 
+        self.file_collection = None
+
     def associate_file_collection(self, file_collection):
+        self.file_collection = file_collection
         for f in file_collection:
             current = self.scan_data.setdefault(f.file, {})
             mtime = int(f.stats.st_mtime)
@@ -79,8 +89,14 @@ class MetaFile(object):
                 continue
             current['hash'] = filehash
             self.pending_actions.append(f.ext)
-        for unaccounted_file in (set(self.scan_data.keys()) - {f.file for f in file_collection}):
-            log.warn("unaccounted file %s %s", self.name, unaccounted_file)
 
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()
+
+    @property
+    def unacounted(self):
+        return {
+            key: self.scan_data[key]
+            for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
+        }
+        # log.warn("unaccounted file %s %s", self.name, unaccounted_file)
