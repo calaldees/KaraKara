@@ -8,7 +8,6 @@ import os.path
 import yaml
 
 from libs.misc import file_extension_regex, duplicates
-from libs.file import FolderStructure
 
 import logging
 log = logging.getLogger(__name__)
@@ -18,38 +17,16 @@ AUDIO_EXTS = ('mp2', 'ogg', 'mp3', 'flac')
 VIDEO_EXTS = ('avi', 'mpg', 'mkv', 'rm', 'ogm', 'mp4')
 DATA_EXTS = ('yml', 'yaml')
 OTHER_EXTS = ('srt', 'ssa', 'txt')
-
+#
 ALL_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS + OTHER_EXTS
-
 # Higher the index of the extension, the higher the file is ranked for processing.
 # The highest ranked file of a set of names in processed
 PRIMARY_FILE_RANKED_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS
 
-# Protection for legacy processed files  (could be removed in once data fully migriated)
-DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.')
-
-
-# Scan -------------------------------------------------------------------------
-
-def scan_file_collections(path):
-    """
-    1.) Locate primary files
-    2.) Group file collection (based on primary file)
-    """
-    folder_structure = FolderStructure.factory(
-        path,
-        file_regex=file_extension_regex(ALL_EXTS),
-        ignore_regex=DEFAULT_IGNORE_FILE_REGEX
-    )
-    return {
-        f.file_no_ext: _get_file_collection(folder_structure, f)
-        for f in _locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
-    }
-
 
 # Scan sections ----------------------------------------------------------------
 
-def _locate_primary_files(folder_structure, file_regex):
+def locate_primary_files(folder_structure, file_regex):
     """
     Locate primary files
     """
@@ -69,7 +46,7 @@ def _locate_primary_files(folder_structure, file_regex):
     return file_dict.values()
 
 
-def _get_file_collection(folder_structure, primary_file):
+def get_file_collection(folder_structure, primary_file):
     """
     Collect realated files
     """

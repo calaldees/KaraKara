@@ -79,6 +79,8 @@ class MetaFile(object):
                 continue
             current['hash'] = filehash
             self.pending_actions.append(f.ext)
+        for unaccounted_file in (set(self.scan_data.keys()) - {f.file for f in file_collection}):
+            log.warn("unaccounted file %s %s", self.name, unaccounted_file)
 
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()
