@@ -61,7 +61,11 @@ class MetaManager(object):
 
     @property
     def unmatched(self):
-        pass
+        return {k: m for k, m in self.meta.items() if not m.file_collection}
+
+    @property
+    def unaccounted(self):
+        return {k: m.unacounted for k, m in self.meta.items()}
 
 
 class MetaFile(object):
@@ -74,7 +78,7 @@ class MetaFile(object):
         self.pending_actions = self.data.setdefault('actions', [])
         self.data_hash = freeze(data).__hash__()
 
-        self.file_collection = None
+        self.file_collection = ()
 
     def associate_file_collection(self, file_collection):
         self.file_collection = file_collection
@@ -99,4 +103,3 @@ class MetaFile(object):
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
         }
-        # log.warn("unaccounted file %s %s", self.name, unaccounted_file)

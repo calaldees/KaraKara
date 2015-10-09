@@ -47,6 +47,7 @@ def main(**kwargs):
 
     """
     meta = MetaManager(kwargs['path_meta'])
+    meta.load_all()
 
     # 1.) Read file structure into memory
     folder_structure = FolderStructure.factory(
@@ -64,9 +65,11 @@ def main(**kwargs):
         for f in primary_files
     }
 
-    meta.load_all()
     for name, file_collection in file_collections.items():
         meta.get(name).associate_file_collection(file_collection)
+
+    unmatched_meta = meta.unmatched
+    unaccounted_files = meta.unaccounted
 
     meta.save_all()
 
