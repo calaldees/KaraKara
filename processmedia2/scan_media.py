@@ -19,6 +19,7 @@ DEFAULT_PATH_META = '../mediaserver/www/meta/'
 # Protection for legacy processed files  (could be removed in once data fully migriated)
 DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.')
 
+IGNORE_SEARCH_EXTS_REGEX = file_extension_regex(('txt', ))
 
 # Main -------------------------------------------------------------------------
 
@@ -65,21 +66,44 @@ def main(**kwargs):
         for f in primary_files
     }
 
+    # 4.) Associate file_collections with existing metadata objects
     for name, file_collection in file_collections.items():
         meta.get(name).associate_file_collection(file_collection)
 
-    #unmatched_entrys = meta.unmatched_entrys
-    for m in meta.meta_with_missing_files:
-        for filename, scan_data in m.missing_files.items():
-            mtime = scan_data['mtime']
-            for f in folder_structure.scan(lambda f: f.file == filename or f.stats.st_mtime == mtime):
-                if str(f.hash) == scan_data['hash']:
-                    log.info('Associating found missing file %s to %s', f.relative, m.name)
-                    m.associate_file(f)
-                    break
+    # 5.) Attempt to find associate unassociated files but finding them on the folder_structure in memory
+    for m in meta.meta_with_unassociated_files:
+        for filename, scan_data in m.unassociated_files.items():
 
-    import pdb ; pdb.set_trace()
-    #meta.save_all()
+            # 5a.) The unassociated file may not have been found in the inital collection scan,
+            # check it's original location and associate if it exists
+            f = folder_structure.get(scan_data.get('relative')) if scan_data.get('relative') else None
+            if f:
+                m.associate_file(f)
+                log.warn('Associating found missing file %s to %s - this should not be a regular occurance, move/rename this so it is grouped effectivly', f.relative, m.name)
+                continue
+
+            # 5b.) Search the whole folder_structure in memory for a matching hash
+            mtime = scan_data['mtime']
+            for f in folder_structure.scan(
+                lambda f:
+                    not IGNORE_SEARCH_EXTS_REGEX.search(f.file)
+                    and
+                    (f.file == filename or f.stats.st_mtime == mtime)
+                    and
+                    str(f.hash) == scan_data['hash']
+            ):
+                log.warn('Associating found missing file %s to %s - this should not be a regular occurance, move/rename this so it is grouped effectivly', f.relative, m.name)
+                m.associate_file(f)
+                break
+
+    # 6.) Remove unmatched meta entrys
+    # (If processed data already exisits, it will be relinked at the encode level)
+    for name in [m.name for m in meta.unmatched_entrys]:
+        log.info('Removing meta %s', m.name)
+        meta.delete(m.name)
+
+    #import pdb ; pdb.set_trace()
+    meta.save_all()
 
 
 # Arguments --------------------------------------------------------------------

@@ -51,6 +51,10 @@ class MetaManager(object):
         with open(self._filepath(name), 'w') as destination:
             json.dump(metafile.data, destination)
 
+    def delete(self, name):
+        os.remove(self._filepath(name))
+        del self.meta[name]
+
     def load_all(self):
         for f in fast_scan(self.path, file_regex=re.compile(r'.*\.json$')):
             self.load(f.file_no_ext)
@@ -60,6 +64,14 @@ class MetaManager(object):
             self.save(name)
 
     @property
+    def meta_with_unassociated_files(self):
+        """
+        These are meta items that have a filecollection matched,
+        but that file collection is incomplete, so we have some child files missing
+        """
+        return (m for m in self.meta.values() if m.unassociated_files)
+
+    @property
     def unmatched_entrys(self):
         """
         Meta datafiles that have no accociated file collection.
@@ -67,14 +79,6 @@ class MetaManager(object):
         A good course of action is to check for where they might have moved too
         """
         return (m for m in self.meta.values() if not m.file_collection)
-
-    @property
-    def meta_with_missing_files(self):
-        """
-        These are meta items that have a filecollection matched,
-        but that file collection is incomplete, so we have some child files missing
-        """
-        return (m for m in self.meta.values() if m.missing_files)
 
 
 class MetaFile(object):
@@ -124,7 +128,7 @@ class MetaFile(object):
         return self.data_hash != freeze(self.data).__hash__()
 
     @property
-    def missing_files(self):
+    def unassociated_files(self):
         return {
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
