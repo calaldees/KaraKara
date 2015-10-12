@@ -68,10 +68,18 @@ def main(**kwargs):
     for name, file_collection in file_collections.items():
         meta.get(name).associate_file_collection(file_collection)
 
-    unmatched_meta = meta.unmatched
-    unaccounted_files = meta.unaccounted
+    #unmatched_entrys = meta.unmatched_entrys
+    for m in meta.meta_with_missing_files:
+        for filename, scan_data in m.missing_files.items():
+            mtime = scan_data['mtime']
+            for f in folder_structure.scan(lambda f: f.file == filename or f.stats.st_mtime == mtime):
+                if str(f.hash) == scan_data['hash']:
+                    log.info('Associating found missing file %s to %s', f.relative, m.name)
+                    m.associate_file(f)
+                    break
 
-    meta.save_all()
+    import pdb ; pdb.set_trace()
+    #meta.save_all()
 
 
 # Arguments --------------------------------------------------------------------

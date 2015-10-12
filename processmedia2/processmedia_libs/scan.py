@@ -32,7 +32,7 @@ def locate_primary_files(folder_structure, file_regex):
     """
     ignore_files = set()
     file_dict = {}
-    for f in folder_structure.scan(file_regex=file_regex):
+    for f in folder_structure.scan(lambda f: file_regex.search(f.file)):
         if f.file_no_ext in ignore_files:
             continue
         existing = file_dict.get(f.file_no_ext)

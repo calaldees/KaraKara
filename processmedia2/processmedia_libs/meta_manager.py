@@ -60,12 +60,21 @@ class MetaManager(object):
             self.save(name)
 
     @property
-    def unmatched(self):
-        return {k: m for k, m in self.meta.items() if not m.file_collection}
+    def unmatched_entrys(self):
+        """
+        Meta datafiles that have no accociated file collection.
+        This could mean the source has been deleted, or renamed.
+        A good course of action is to check for where they might have moved too
+        """
+        return (m for m in self.meta.values() if not m.file_collection)
 
     @property
-    def unaccounted(self):
-        return {k: m.unacounted for k, m in self.meta.items()}
+    def meta_with_missing_files(self):
+        """
+        These are meta items that have a filecollection matched,
+        but that file collection is incomplete, so we have some child files missing
+        """
+        return (m for m in self.meta.values() if m.missing_files)
 
 
 class MetaFile(object):
@@ -83,22 +92,39 @@ class MetaFile(object):
     def associate_file_collection(self, file_collection):
         self.file_collection = file_collection
         for f in file_collection:
-            current = self.scan_data.setdefault(f.file, {})
-            mtime = int(f.stats.st_mtime)
-            if current.get('mtime') == mtime:
-                continue
-            current['mtime'] = mtime
-            filehash = str(f.hash)
-            if current.get('hash') == filehash:
-                continue
-            current['hash'] = filehash
-            self.pending_actions.append(f.ext)
+            self.associate_file(f)
+
+    def associate_file(self, f):
+        file_data = self.scan_data.setdefault(f.file, {})
+        mtime = int(f.stats.st_mtime)
+
+        if file_data.get('relative') == f.relative and file_data.get('mtime') == mtime:
+            return
+
+        if file_data.get('mtime') == mtime:
+            file_data['relative'] = f.relative
+            return
+
+        filehash = str(f.hash)
+        if file_data.get('hash') == filehash:
+            file_data['relative'] = f.relative
+            file_data['mtime'] = mtime
+            return
+
+        # Remove any existing entries for this filehash in our previous scan collection
+        for k in {k for k, v in self.scan_data.items() if v['hash'] == filehash}:
+            log.info('Removing entry for %s as this hash clashs with new entry %s', k, f.file)
+            del self.scan_data[k]
+        file_data['hash'] = filehash
+
+        self.pending_actions.append(f.ext)
+
 
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()
 
     @property
-    def unacounted(self):
+    def missing_files(self):
         return {
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
