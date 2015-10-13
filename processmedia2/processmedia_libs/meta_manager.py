@@ -25,8 +25,10 @@ class MetaManager(object):
 
     def load(self, name):
         assert name
-        filepath = self._filepath(name)
+        if self.meta.get(name):
+            return
 
+        filepath = self._filepath(name)
         data = {}
         if os.path.exists(filepath):
             try:

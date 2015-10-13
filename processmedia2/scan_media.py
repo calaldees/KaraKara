@@ -3,6 +3,7 @@ import re
 from libs.misc import postmortem, file_extension_regex
 from libs.file import FolderStructure
 
+from processmedia_libs import add_default_argparse_args
 from processmedia_libs.scan import locate_primary_files, get_file_collection, ALL_EXTS, PRIMARY_FILE_RANKED_EXTS
 from processmedia_libs.meta_manager import MetaManager
 
@@ -11,15 +12,13 @@ log = logging.getLogger(__name__)
 
 
 VERSION = '0.0.0'
-DEFAULT_PATH_SOURCE = '../mediaserver/www/files/'
-DEFAULT_PATH_PROCESSED = '../mediaserver/www/processed/'
-DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
 
 # Protection for legacy processed files  (could be removed in once data fully migriated)
 DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.|0_\d\.jpg')
 
 IGNORE_SEARCH_EXTS_REGEX = file_extension_regex(('txt', ))
+
 
 # Main -------------------------------------------------------------------------
 
@@ -120,14 +119,8 @@ def get_args():
         epilog="""
         """
     )
-    parser_input = parser
 
-    parser_input.add_argument('--path_source', action='store', help='', default=DEFAULT_PATH_SOURCE)
-    parser_input.add_argument('--path_processed', action='store', help='', default=DEFAULT_PATH_PROCESSED)
-    parser_input.add_argument('--path_meta', action='store', help='', default=DEFAULT_PATH_META)
-
-    parser.add_argument('--log_level', type=int, help='log level', default=logging.INFO)
-    parser.add_argument('--version', action='version', version=VERSION)
+    add_default_argparse_args(parser, version=VERSION)
 
     args = vars(parser.parse_args())
 
