@@ -17,7 +17,7 @@ DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
 
 # Protection for legacy processed files  (could be removed in once data fully migriated)
-DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.')
+DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.|0_\d\.jpg')
 
 IGNORE_SEARCH_EXTS_REGEX = file_extension_regex(('txt', ))
 
@@ -102,7 +102,6 @@ def main(**kwargs):
         log.info('Removing meta %s', m.name)
         meta.delete(m.name)
 
-    #import pdb ; pdb.set_trace()
     meta.save_all()
 
 

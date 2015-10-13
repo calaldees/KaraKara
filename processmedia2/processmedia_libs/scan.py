@@ -15,10 +15,11 @@ log = logging.getLogger(__name__)
 
 AUDIO_EXTS = ('mp2', 'ogg', 'mp3', 'flac')
 VIDEO_EXTS = ('avi', 'mpg', 'mkv', 'rm', 'ogm', 'mp4')
+IMAGE_EXTS = ('png', 'jpg')
 DATA_EXTS = ('yml', 'yaml')
 OTHER_EXTS = ('srt', 'ssa', 'txt')
 #
-ALL_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS + OTHER_EXTS
+ALL_EXTS = AUDIO_EXTS + VIDEO_EXTS + IMAGE_EXTS + DATA_EXTS + OTHER_EXTS
 # Higher the index of the extension, the higher the file is ranked for processing.
 # The highest ranked file of a set of names in processed
 PRIMARY_FILE_RANKED_EXTS = AUDIO_EXTS + VIDEO_EXTS + DATA_EXTS
