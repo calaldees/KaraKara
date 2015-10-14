@@ -3,7 +3,9 @@ import json
 import time
 import re
 
-from libs.misc import fast_scan, freeze
+from libs.misc import fast_scan, freeze, file_ext
+
+from . import EXTS
 
 import logging
 log = logging.getLogger(__name__)
@@ -91,6 +93,7 @@ class MetaFile(object):
 
         self.scan_data = self.data.setdefault('scan', {})
         self.pending_actions = self.data.setdefault('actions', [])
+        self.processed_data = self.data.setdefault('processed', {})
         self.data_hash = freeze(data).__hash__()
 
         self.file_collection = ()
@@ -125,7 +128,6 @@ class MetaFile(object):
 
         self.pending_actions = list(set(self.pending_actions) | {f.ext})
 
-
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()
 
@@ -135,3 +137,14 @@ class MetaFile(object):
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
         }
+
+    def get_files_for(self, file_type):
+        assert file_type in EXTS.keys(), 'file_type: {0} must be one of {1}'.format(file_type, EXTS.keys())
+        exts = EXTS[file_type]
+        def get_ext(v):
+            return file_ext(v['relative'])[1]
+        return sorted(
+            (v for v in self.scan_data.values() if get_ext(v) in exts),
+            key=lambda v: exts.index(get_ext(v)),
+            reverse=True
+        )

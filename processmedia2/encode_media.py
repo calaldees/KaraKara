@@ -13,6 +13,18 @@ VERSION = '0.0.0'
 
 
 def main(**kwargs):
+    meta = MetaManager(kwargs['path_meta'])
+    meta.load_all()
+
+    encoder = Encoder(meta, **kwargs)
+
+    # In the full system, encode will probably be driven from a rabitmq endpoint.
+    # For testing locally we are monitoring the 'pendings_actions' list
+    for name in (m.name for m in meta.meta.values() if m.pending_actions):
+        encoder.encode(name)
+
+
+class Encoder(object):
     """
         consume for
          - update tags
@@ -42,21 +54,9 @@ def main(**kwargs):
     gen thumbnail images
     extract subs
     """
-    meta = MetaManager(kwargs['path_meta'])
-    meta.load_all()
-
-    encoder = Encoder(meta, **kwargs)
-
-    # In the full system, encode will probably be driven from a rabitmq endpoint.
-    # For testing locally we are monitoring the 'pendings_actions' list
-    for name in (m.name for m in meta.meta.values() if m.pending_actions):
-        encoder.encode(name)
-
-
-class Encoder(object):
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
-        self.meta = meta_manager or MetaManager(path_meta)  # The Ability to pass meta manager helps performance by preventing multiple reloads of the same data
+        self.meta = meta_manager or MetaManager(path_meta)
         self.destination = FolderStructure.factory(path_processed)
 
     def _get_meta(self, name):
@@ -66,6 +66,8 @@ class Encoder(object):
     def encode(self, name):
         m = self._get_meta(name)
         print(m.name)
+        import pdb ; pdb.set_trace()
+        m.get_files_for('video')
 
 
 # Arguments --------------------------------------------------------------------

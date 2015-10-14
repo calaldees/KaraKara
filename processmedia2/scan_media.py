@@ -3,8 +3,8 @@ import re
 from libs.misc import postmortem, file_extension_regex
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args
-from processmedia_libs.scan import locate_primary_files, get_file_collection, ALL_EXTS, PRIMARY_FILE_RANKED_EXTS
+from processmedia_libs import add_default_argparse_args, ALL_EXTS
+from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
 from processmedia_libs.meta_manager import MetaManager
 
 import logging
