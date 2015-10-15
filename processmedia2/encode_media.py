@@ -1,6 +1,6 @@
 import tempfile
 
-from libs.misc import postmortem
+from libs.misc import postmortem, hashfile
 from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args
@@ -66,7 +66,6 @@ class Encoder(object):
 
     def encode(self, name):
         m = self._get_meta(name)
-        print(m.name)
 
         video_file = m.get_file_for('video')
         audio_file = m.get_file_for('audio')
@@ -75,24 +74,48 @@ class Encoder(object):
 
         # 1.) Assertain if encoding is actually needed by comparing input and output hashs
         source_hash = frozenset(f['hash'] for f in (video_file, audio_file, sub_file, image_file)).__hash__()
-        if source_hash == m.processed_data.get('source_hash'):
+        if m.processed_data.setdefault('main', {}).get('source_hash') == source_hash:
             log.info('Destination was created with the same input sources - no encoding required')
             return
+        else:
+            m.processed_data['main']['source_hash'] = source_hash  # This will not be saved to the meta until the end
 
-        # x.) Convert souce formats into appropriate formats for video encoding
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # x.a) Convert Image to Video
-            if image_file and not video_file:
-                log.warn('image to video conversion is not currently implemented')
-                video_file = None
-            # x.a) Convert srt to saa
-            if not sub_file.endswith('ssa'):
-                log.warn('convert subs to ssa no implemented yet')
-                sub_file = None
+        tempdir = tempfile.TemporaryDirectory()
+        # 2.) Convert souce formats into appropriate formats for video encoding
 
-        # x.) Normalize audio
+        # 2.a) Convert Image to Video
+        if image_file and not video_file:
+            log.warn('image to video conversion is not currently implemented')
+            video_file = None
+            return
 
-        m.processed_data['source_hash'] = source_hash
+        # 2.b) Convert srt to ssa
+        if not sub_file.endswith('ssa'):
+            log.warn('convert subs to ssa no implemented yet')
+            sub_file = None
+            return
+
+        # 3.) Render video (without audio)
+
+        # 4.) Decompress audio
+
+        # 5.) Normalize audio volume
+
+        # 6.) Offset audio
+
+        # 7.) Mux Video and Audio
+
+        # move_to_processed(filepath, 'main')
+
+        tempdir.cleanup()
+        #self.meta.save(name)
+
+    def encode_preview(self, name):
+        log.warn('preview encoding unimplemented')
+        # Generate low bitrate preview
+        # move_to_processed(filepath, 'preview')
+
+
 
 # Arguments --------------------------------------------------------------------
 
