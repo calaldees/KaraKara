@@ -3,7 +3,7 @@ import json
 import time
 import re
 
-from libs.misc import fast_scan, freeze, file_ext
+from libs.misc import fast_scan, freeze, file_ext, first
 
 from . import EXTS
 
@@ -137,6 +137,9 @@ class MetaFile(object):
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
         }
+
+    def get_file_for(self, file_type):
+        return first(self.get_files_for(file_type))
 
     def get_files_for(self, file_type):
         assert file_type in EXTS.keys(), 'file_type: {0} must be one of {1}'.format(file_type, EXTS.keys())
