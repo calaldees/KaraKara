@@ -2,8 +2,9 @@ import os
 import json
 import time
 import re
+from collections import ChainMap
 
-from libs.misc import fast_scan, freeze, file_ext, first
+from libs.misc import fast_scan, freeze, file_ext, first, file_ext
 
 from . import EXTS
 
@@ -150,4 +151,31 @@ class MetaFile(object):
             (v for v in self.scan_data.values() if get_ext(v) in exts),
             key=lambda v: exts.index(get_ext(v)),
             reverse=True
+        )
+
+
+class FileItemWrapper(object):
+    """
+    A file data tracked within the dict in MetaFile needs some supporting methods
+    Rather than blote the MetaFile object I opted for a separate wrapper for
+    this data dict.
+    Because this wrapper can alter the underlying dict in memory, there is no need
+    for any complex coupling or communication between the object types.
+    Some might call me crazy, but until anyone cares enough to assit with a
+    code review, this is the way it will stay.
+    """
+    def __init__(self, source_path):
+        self.source_path = source_path
+
+    def wrap(self, data):
+        if not data:
+            return {}
+        file_no_ext, ext = file_ext(data['relative'])
+        return ChainMap(
+            data,
+            dict(
+                absolute=os.path.abspath(os.path.join(self.source_path, data['relative'])),
+                ext=ext,
+                file_no_ext=file_no_ext,
+            )
         )

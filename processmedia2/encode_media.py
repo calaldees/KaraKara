@@ -5,7 +5,7 @@ from libs.misc import postmortem, hashfile
 from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args
-from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
 from processmedia_libs import external_tools
 
 import logging
@@ -58,9 +58,10 @@ class Encoder(object):
     extract subs
     """
 
-    def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
+    def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
         self.destination = FolderStructure.factory(path_processed)
+        self.fileitem_wrapper = FileItemWrapper(path_source)
 
     def _get_meta(self, name):
         self.meta.load(name)
@@ -69,10 +70,10 @@ class Encoder(object):
     def encode(self, name):
         m = self._get_meta(name)
 
-        video_file = m.get_file_for('video')
-        audio_file = m.get_file_for('audio')
-        sub_file = m.get_file_for('sub')
-        image_file = m.get_file_for('image')
+        video_file = self.fileitem_wrapper.wrap(m.get_file_for('video'))
+        audio_file = self.fileitem_wrapper.wrap(m.get_file_for('audio'))
+        sub_file = self.fileitem_wrapper.wrap(m.get_file_for('sub'))
+        image_file = self.fileitem_wrapper.wrap(m.get_file_for('image'))
 
         # 1.) Assertain if encoding is actually needed by comparing input and output hashs
         source_hash = frozenset(f['hash'] for f in (video_file, audio_file, sub_file, image_file) if f).__hash__()
@@ -92,14 +93,14 @@ class Encoder(object):
                 return
 
             # 2.b) Convert srt to ssa
-            if sub_file and not sub_file['relative'].endswith('ssa'):
+            if not sub_file.get('ext') == 'ssa':
                 log.warn('convert subs to ssa no implemented yet')
                 sub_file = None
                 return
 
             # 3.) Render video (without audio)
-            oo = external_tools.encode_video(video_file['relative'], os.path.join(tempdir, 'video'))
             import pdb ; pdb.set_trace()
+            oo = external_tools.encode_video(video_file['absolute'], os.path.join(tempdir, 'video'))
 
             # 4.) Decompress audio
 
