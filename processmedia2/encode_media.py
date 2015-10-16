@@ -1,3 +1,4 @@
+import os.path
 import tempfile
 
 from libs.misc import postmortem, hashfile
@@ -5,6 +6,7 @@ from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args
 from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs import external_tools
 
 import logging
 log = logging.getLogger(__name__)
@@ -73,41 +75,42 @@ class Encoder(object):
         image_file = m.get_file_for('image')
 
         # 1.) Assertain if encoding is actually needed by comparing input and output hashs
-        source_hash = frozenset(f['hash'] for f in (video_file, audio_file, sub_file, image_file)).__hash__()
+        source_hash = frozenset(f['hash'] for f in (video_file, audio_file, sub_file, image_file) if f).__hash__()
         if m.processed_data.setdefault('main', {}).get('source_hash') == source_hash:
             log.info('Destination was created with the same input sources - no encoding required')
             return
         else:
             m.processed_data['main']['source_hash'] = source_hash  # This will not be saved to the meta until the end
 
-        tempdir = tempfile.TemporaryDirectory()
-        # 2.) Convert souce formats into appropriate formats for video encoding
+        with tempfile.TemporaryDirectory() as tempdir:
+            # 2.) Convert souce formats into appropriate formats for video encoding
 
-        # 2.a) Convert Image to Video
-        if image_file and not video_file:
-            log.warn('image to video conversion is not currently implemented')
-            video_file = None
-            return
+            # 2.a) Convert Image to Video
+            if image_file and not video_file:
+                log.warn('image to video conversion is not currently implemented')
+                video_file = None
+                return
 
-        # 2.b) Convert srt to ssa
-        if not sub_file.endswith('ssa'):
-            log.warn('convert subs to ssa no implemented yet')
-            sub_file = None
-            return
+            # 2.b) Convert srt to ssa
+            if sub_file and not sub_file['relative'].endswith('ssa'):
+                log.warn('convert subs to ssa no implemented yet')
+                sub_file = None
+                return
 
-        # 3.) Render video (without audio)
+            # 3.) Render video (without audio)
+            oo = external_tools.encode_video(video_file['relative'], os.path.join(tempdir, 'video'))
+            import pdb ; pdb.set_trace()
 
-        # 4.) Decompress audio
+            # 4.) Decompress audio
 
-        # 5.) Normalize audio volume
+            # 5.) Normalize audio volume
 
-        # 6.) Offset audio
+            # 6.) Offset audio
 
-        # 7.) Mux Video and Audio
+            # 7.) Mux Video and Audio
 
-        # move_to_processed(filepath, 'main')
+            # move_to_processed(filepath, 'main')
 
-        tempdir.cleanup()
         #self.meta.save(name)
 
     def encode_preview(self, name):
