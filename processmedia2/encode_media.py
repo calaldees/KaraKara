@@ -93,15 +93,17 @@ class Encoder(object):
                 log.warn('convert subs to ssa no implemented yet')
                 return
 
-            # 3.) Render video (without audio)
-            import pdb ; pdb.set_trace()
-            oo = external_tools.encode_video(files['video']['absolute'], os.path.join(tempdir, 'video'))
+            # 3.) Render video with subtitles (without audio)
+            oo = external_tools.encode_video(
+                source=files['video']['absolute'],
+                destination=os.path.join(tempdir, 'video.avi'),
+                sub=files['sub'].get('absolute'),
+            )
 
-            # 4.) Decompress audio
-
-            # 5.) Normalize audio volume
-
-            # 6.) Offset audio
+            oo = external_tools.encode_audio(
+                source=files['audio'].get('absolute') or files['video'].get('absolute'),
+                destination=os.path.join(tempdir, 'audio.wav'),
+            )
 
             # 7.) Mux Video and Audio
 

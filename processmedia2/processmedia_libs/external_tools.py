@@ -3,9 +3,15 @@ import subprocess
 
 from libs.misc import cmd_args
 
-HALF_HOUR_IN_SECONDS = 30 * 60
+import logging
+log = logging.getLogger(__name__)
 
-avconv_threads = 1
+
+CONFIG = {
+    'threads': 1,
+    'audio_rate_khz': 44000,
+    'process_timeout_seconds': 30 * 60,
+}
 
 
 def check_tools():
@@ -16,7 +22,7 @@ def check_tools():
 
 
 def _run_tool(*args, **kwargs):
-    return subprocess.run(cmd_args(*args, **kwargs), stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=HALF_HOUR_IN_SECONDS)
+    return subprocess.run(cmd_args(*args, **kwargs), stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=CONFIG['process_timeout_seconds'])
 
 
 def encode_video(source, destination, **kwargs):
@@ -26,7 +32,18 @@ def encode_video(source, destination, **kwargs):
         nosound=None,
         ovc='x264',
         #aspect=
-        x264encopts='profile=main:preset=slow:threads=%s' % avconv_threads,
+        x264encopts='profile=main:preset=slow:threads=%s' % CONFIG['threads'],
     )
     kwargs['o'] = destination
+    if 'sub' in kwargs and kwargs['sub'] == None:
+        del kwargs['sub']
     return _run_tool('mencoder', source, **ChainMap(defaults, kwargs))
+
+
+def encode_audio(source, destination, **kwargs):
+    """
+        # 4.) Decompress audio
+        # 5.) Normalize audio volume
+        # 6.) Offset audio
+    """
+    pass
