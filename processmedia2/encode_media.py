@@ -76,7 +76,7 @@ class Encoder(object):
         source_hash = frozenset(f['hash'] for f in files.values() if f).__hash__()
         if m.processed_data.setdefault('main', {}).get('source_hash') == source_hash:
             log.info('Destination was created with the same input sources - no encoding required')
-            return
+            return True
         else:
             m.processed_data['main']['source_hash'] = source_hash  # This will not be saved to the meta until the end
 
@@ -86,27 +86,40 @@ class Encoder(object):
             # 2.a) Convert Image to Video
             if files['image'] and not files['video']:
                 log.warn('image to video conversion is not currently implemented')
-                return
+                return False
 
             # 2.b) Convert srt to ssa
             if not files['sub'].get('ext') == 'ssa':
                 log.warn('convert subs to ssa no implemented yet')
-                return
+                files['sub'] = {'absolute': None}
+                return False
 
-            # 3.) Render video with subtitles (without audio)
-            oo = external_tools.encode_video(
-                source=files['video']['absolute'],
-                destination=os.path.join(tempdir, 'video.avi'),
-                sub=files['sub'].get('absolute'),
+            encode_steps = (
+                # 3.) Render video with subtitles (without audio)
+                lambda: external_tools.encode_video(
+                    source=files['video']['absolute'],
+                    sub=files['sub'].get('absolute'),
+                    destination=os.path.join(tempdir, 'video.avi'),
+                ),
+
+                # 4.) Render audio and normalize
+                lambda: external_tools.encode_audio(
+                    source=files['audio'].get('absolute') or files['video'].get('absolute'),
+                    destination=os.path.join(tempdir, 'audio.wav'),
+                ),
+
+                # 5.) Mux Video and Audio
+                lambda: external_tools.mux(
+                    video=os.path.join(tempdir, 'video.avi'),
+                    audio=os.path.join(tempdir, 'audio.wav'),
+                    destination=os.path.join(tempdir, 'mux.mp4'),
+                )
             )
+            for encode_step in encode_steps:
+                if not encode_step():
+                    return False
 
-            oo = external_tools.encode_audio(
-                source=files['audio'].get('absolute') or files['video'].get('absolute'),
-                destination=os.path.join(tempdir, 'audio.wav'),
-            )
-
-            # 7.) Mux Video and Audio
-
+            # 6.) Moved procesed file
             # move_to_processed(filepath, 'main')
 
         #self.meta.save(name)
