@@ -70,13 +70,10 @@ class Encoder(object):
     def encode(self, name):
         m = self._get_meta(name)
 
-        video_file = self.fileitem_wrapper.wrap(m.get_file_for('video'))
-        audio_file = self.fileitem_wrapper.wrap(m.get_file_for('audio'))
-        sub_file = self.fileitem_wrapper.wrap(m.get_file_for('sub'))
-        image_file = self.fileitem_wrapper.wrap(m.get_file_for('image'))
+        files = self.fileitem_wrapper.wrap_scan_data(m)
 
         # 1.) Assertain if encoding is actually needed by comparing input and output hashs
-        source_hash = frozenset(f['hash'] for f in (video_file, audio_file, sub_file, image_file) if f).__hash__()
+        source_hash = frozenset(f['hash'] for f in files.values() if f).__hash__()
         if m.processed_data.setdefault('main', {}).get('source_hash') == source_hash:
             log.info('Destination was created with the same input sources - no encoding required')
             return
@@ -87,20 +84,18 @@ class Encoder(object):
             # 2.) Convert souce formats into appropriate formats for video encoding
 
             # 2.a) Convert Image to Video
-            if image_file and not video_file:
+            if files['image'] and not files['video']:
                 log.warn('image to video conversion is not currently implemented')
-                video_file = None
                 return
 
             # 2.b) Convert srt to ssa
-            if not sub_file.get('ext') == 'ssa':
+            if not files['sub'].get('ext') == 'ssa':
                 log.warn('convert subs to ssa no implemented yet')
-                sub_file = None
                 return
 
             # 3.) Render video (without audio)
             import pdb ; pdb.set_trace()
-            oo = external_tools.encode_video(video_file['absolute'], os.path.join(tempdir, 'video'))
+            oo = external_tools.encode_video(files['video']['absolute'], os.path.join(tempdir, 'video'))
 
             # 4.) Decompress audio
 
