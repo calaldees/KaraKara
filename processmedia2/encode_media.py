@@ -1,7 +1,7 @@
 import os.path
 import tempfile
 
-from libs.misc import postmortem, hashfile
+from libs.misc import postmortem, hashfile, freeze, first
 from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args
@@ -68,17 +68,25 @@ class Encoder(object):
         return self.meta.get(name)
 
     def encode(self, name):
+        """
+        Todo: save the meta on return ... maybe use a context manager
+        """
         m = self._get_meta(name)
 
         files = self.fileitem_wrapper.wrap_scan_data(m)
 
         # 1.) Assertain if encoding is actually needed by comparing input and output hashs
-        source_hash = frozenset(f['hash'] for f in files.values() if f).__hash__()
+        source_hash = str(frozenset(f['hash'] for f in files.values() if f).__hash__()).replace('-', 'x')
         if m.processed_data.setdefault('main', {}).get('source_hash') == source_hash:
-            log.info('Destination was created with the same input sources - no encoding required')
+            log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
         else:
             m.processed_data['main']['source_hash'] = source_hash  # This will not be saved to the meta until the end
+
+        if first(self.destination.scan(lambda file_item: file_item.file_no_ext == source_hash)):
+            log.info('Processed Destination already exisits - no encoding required - meta now links to destination')
+            # TODO: SAVE THE META
+            return True
 
         with tempfile.TemporaryDirectory() as tempdir:
             # 2.) Convert souce formats into appropriate formats for video encoding
@@ -94,21 +102,22 @@ class Encoder(object):
                 files['sub'] = {'absolute': None}
                 return False
 
+            # 3.) Encode
             encode_steps = (
-                # 3.) Render video with subtitles (without audio)
+                # 3.a) Render video with subtitles (without audio)
                 lambda: external_tools.encode_video(
                     source=files['video']['absolute'],
                     sub=files['sub'].get('absolute'),
                     destination=os.path.join(tempdir, 'video.avi'),
                 ),
 
-                # 4.) Render audio and normalize
+                # 3.b) Render audio and normalize
                 lambda: external_tools.encode_audio(
                     source=files['audio'].get('absolute') or files['video'].get('absolute'),
                     destination=os.path.join(tempdir, 'audio.wav'),
                 ),
 
-                # 5.) Mux Video and Audio
+                # 3.c) Mux Video and Audio
                 lambda: external_tools.mux(
                     video=os.path.join(tempdir, 'video.avi'),
                     audio=os.path.join(tempdir, 'audio.wav'),
@@ -116,10 +125,15 @@ class Encoder(object):
                 )
             )
             for encode_step in encode_steps:
-                if not encode_step():
+                encode_success, cmd_result = encode_step()
+                if not encode_success:
+                    import pdb ; pdb.set_trace()
                     return False
 
-            # 6.) Moved procesed file
+            import pdb ; pdb.set_trace()
+            print('Done')
+
+            # 4.) Moved procesed file
             # move_to_processed(filepath, 'main')
 
         #self.meta.save(name)

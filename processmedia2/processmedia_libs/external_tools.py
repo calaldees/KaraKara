@@ -1,3 +1,4 @@
+import os.path
 from collections import ChainMap
 import subprocess
 
@@ -34,14 +35,14 @@ def check_tools():
 def _run_tool(*args, **kwargs):
     cmd = cmd_args(*args, **kwargs)
     log.debug(cmd)
-    cmd_return = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=CONFIG['process_timeout_seconds'])
-    if cmd_return.returncode != 0:
-        log.error(cmd_return)
-    return cmd_return
+    cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=CONFIG['process_timeout_seconds'])
+    if cmd_result.returncode != 0:
+        log.error(cmd_result)
+    return cmd_result.returncode == 0, cmd_result
 
 
 def encode_video(source, sub, destination):
-    log.info('encode_video', source)
+    log.info('encode_video - %s', source)
     output_args = cmd_args(
         quiet=None,
         ass=None,
@@ -57,7 +58,7 @@ def encode_video(source, sub, destination):
         *sub_args,
         *output_args,
         '-o', destination,
-    ).returncode == 0
+    )
 
 
 def encode_audio(source, destination, **kwargs):
@@ -66,7 +67,7 @@ def encode_audio(source, destination, **kwargs):
         Normalize audio volume
         Offset audio
     """
-    log.info('encode_audio', source)
+    log.info('encode_audio - %s', source)
 
     path = os.path.dirname(destination)
     avconv_output_args = cmd_args(
@@ -84,7 +85,7 @@ def encode_audio(source, destination, **kwargs):
             os.path.join(path, 'audio_raw.wav'),
         ),
         lambda: _run_tool(
-            'sox'
+            'sox',
             os.path.join(path, 'audio_raw.wav'),
             #os.path.join(path, 'audio_norm.wav'),
             destination,
@@ -95,14 +96,16 @@ def encode_audio(source, destination, **kwargs):
     )
 
     for cmd in cmds:
-        if cmd().returncode != 0:
-            return False
+        cmd_success, cmd_result = cmd()
+        if not cmd_success:
+            return False, cmd_result
+    return True, None
 
 
 def mux(video, audio, destination):
     """
     """
-    log.info('mux', video, audio)
+    log.info('mux - %s - %s', video, audio)
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', video,
@@ -113,4 +116,4 @@ def mux(video, audio, destination):
             ab='224k',
         ),
         destination
-    ).returncode == 0
+    )
