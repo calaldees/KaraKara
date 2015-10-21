@@ -134,12 +134,14 @@ class Encoder(object):
             # 5.) Move the newly encoded file to the target path
             target_file.move(os.path.join(tempdir, 'mux.mp4'))
             m.processed_data['main']['hash'] = target_file.hash
-            import pdb ; pdb.set_trace()
-            return True
+        return True
 
     def _encode_preview_video_from_meta(self, m):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
-        source_file = self.processed_files_manager.factory((source_hash, ), 'mp4')
+        if not source_hash:
+            log.warn('Preview encode failed; No source data in meta')
+            return False
+        source_file = self.processed_files_manager.factory(source_hash, 'mp4')
         target_file = self.processed_files_manager.factory((source_hash, 'preview'), 'mp4')
 
         if not source_file.exists:
@@ -158,9 +160,11 @@ class Encoder(object):
                 destination=preview_file,
             )
             if not encode_success:
+                import pdb ; pdb.set_trace()
                 return False
             target_file.move(preview_file)
-            return True
+            m.processed_data['preview']['hash'] = target_file.hash
+        return True
 
 
 # Arguments --------------------------------------------------------------------

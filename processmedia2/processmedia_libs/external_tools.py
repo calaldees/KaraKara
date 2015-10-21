@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 
 
 CONFIG = {
-    'threads': 1,
-    'audio_rate_khz': 44000,
+    'threads': 2,
+    'audio_rate_khz': 44100,
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
     'avconv': {
@@ -24,6 +24,7 @@ AVCONV_COMMON_ARGS = cmd_args(
     threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
     y=None,
+    # strict='experimental',
 )
 
 
@@ -124,15 +125,19 @@ def mux(video, audio, destination):
 
 def encode_preview_video(source, destination):
     log.info('encode_preview_video - %s', source)
-    # width 320
-    # parameters += [ '-vf', "scale={0}:{1}".format(width, height) ]
-    # '-i', avlib_safe_path(self.video),
-    # '-strict', 'experimental',
-    # '-vcodec',	avconv_h264,
-    # #'-pre:v',	'libx264-default', # FIXME: check
-    # '-b',		'150k',
-    # '-bt',		'240k',
-    # '-acodec',	'aac',
-    # '-ac',		'1',
-    # '-ar',		'48000',
-    # '-ab',		'64k'
+    return _run_tool(
+        *AVCONV_COMMON_ARGS,
+        '-i', source,
+        *cmd_args(
+            strict='experimental',
+            vcodec=CONFIG['avconv']['h264_codec'],
+            b='150k',
+            bt='240k',
+            acodec='aac',
+            ac=1,
+            ar=44100,
+            ab='48k',
+        ),
+        '-vf', "scale=w='320:h=-1'",  # scale=w='min(500, iw*3/2):h=-1'
+        destination
+    )

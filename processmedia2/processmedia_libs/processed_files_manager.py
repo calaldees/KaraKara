@@ -29,7 +29,10 @@ class ProcessedFile(object):
         return os.path.exists(self.absolute)
 
     def gen_string_hash(self, hashs):
-        hash_str = str(frozenset(hashs).__hash__())
+        if isinstance(hashs, str):
+            hash_str = hashs
+        else:
+            hash_str = str(frozenset(hashs).__hash__())
         if hash_str.startswith('-'):
             hash_str = hash_str.strip('-')+'x'
         return hash_str
