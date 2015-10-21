@@ -13,6 +13,9 @@ CONFIG = {
     'audio_rate_khz': 44000,
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
+    'avconv': {
+        'h264_codec': 'h264',  # 'libx264'
+    }
 }
 
 
@@ -24,11 +27,11 @@ AVCONV_COMMON_ARGS = cmd_args(
 )
 
 
-
 def check_tools():
     """
     Assert exteranl dependeycs
     """
+    # check (h264 or libx264):
     pass
 
 
@@ -117,3 +120,19 @@ def mux(video, audio, destination):
         ),
         destination
     )
+
+
+def encode_preview_video(source, destination):
+    log.info('encode_preview_video - %s', source)
+    # width 320
+    # parameters += [ '-vf', "scale={0}:{1}".format(width, height) ]
+    # '-i', avlib_safe_path(self.video),
+    # '-strict', 'experimental',
+    # '-vcodec',	avconv_h264,
+    # #'-pre:v',	'libx264-default', # FIXME: check
+    # '-b',		'150k',
+    # '-bt',		'240k',
+    # '-acodec',	'aac',
+    # '-ac',		'1',
+    # '-ar',		'48000',
+    # '-ab',		'64k'

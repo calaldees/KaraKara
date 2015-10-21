@@ -74,10 +74,11 @@ class Encoder(object):
         Todo: save the meta on return ... maybe use a context manager
         """
         self.meta.load(name)
-        self._encode_video_from_meta(self.meta.get(name))
+        self._encode_primary_video_from_meta(self.meta.get(name))
+        self._encode_preview_video_from_meta(self.meta.get(name))
         self.meta.save(name)
 
-    def _encode_video_from_meta(self, m):
+    def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files and target files
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
         target_file = self.processed_files_manager.factory((f['hash'] for f in source_files.values() if f), 'mp4')
@@ -134,14 +135,32 @@ class Encoder(object):
             target_file.move(os.path.join(tempdir, 'mux.mp4'))
             m.processed_data['main']['hash'] = target_file.hash
             import pdb ; pdb.set_trace()
+            return True
 
-            print('Done')
+    def _encode_preview_video_from_meta(self, m):
+        source_hash = m.processed_data.setdefault('main', {}).get('hash')
+        source_file = self.processed_files_manager.factory((source_hash, ), 'mp4')
+        target_file = self.processed_files_manager.factory((source_hash, 'preview'), 'mp4')
 
-    def encode_preview(self, name):
-        log.warn('preview encoding unimplemented')
-        # Generate low bitrate preview
-        #target_file = self.processed_files_manager.factory((f['hash'] for f in source_files.values() if f), 'mp4')
+        if not source_file.exists:
+            log.warn('No source video to encode preview from')
+            return False
 
+        # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
+        if target_file.exists:
+            m.processed_data['preview']['hash'] = target_file.hash
+            return True
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            preview_file = os.path.join(tempdir, 'preview.mp4')
+            encode_success, cmd_result = external_tools.encode_preview_video(
+                source=source_file.absolute,
+                destination=preview_file,
+            )
+            if not encode_success:
+                return False
+            target_file.move(preview_file)
+            return True
 
 
 # Arguments --------------------------------------------------------------------
