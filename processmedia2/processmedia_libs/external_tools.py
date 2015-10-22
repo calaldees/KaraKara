@@ -1,6 +1,7 @@
+import re
 import os.path
-from collections import ChainMap
 import subprocess
+from collections import ChainMap, namedtuple
 
 from libs.misc import cmd_args
 
@@ -15,6 +16,7 @@ CONFIG = {
     'log_level': 'warning',
     'avconv': {
         'h264_codec': 'h264',  # 'libx264'
+        'scale': "scale=w='320:h=-1'",  # scale=w='min(500, iw*3/2):h=-1'
     }
 }
 
@@ -36,31 +38,41 @@ def check_tools():
     pass
 
 
+CommandResult = namedtuple('CommandResult', ('success', 'result'))
 def _run_tool(*args, **kwargs):
     cmd = cmd_args(*args, **kwargs)
     log.debug(cmd)
     cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=CONFIG['process_timeout_seconds'])
     if cmd_result.returncode != 0:
         log.error(cmd_result)
-    return cmd_result.returncode == 0, cmd_result
+    return CommandResult(cmd_result.returncode == 0, cmd_result)
+
+
+def probe_media(source):
+    cmd_success, cmd_result = _run_tool(
+        'avprobe',
+        source
+    )
+    #  re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
+    #  Duration: 00:04:14.54,
+    return {}
 
 
 def encode_video(source, sub, destination):
     log.info('encode_video - %s', source)
-    output_args = cmd_args(
-        quiet=None,
-        ass=None,
-        nosound=None,
-        ovc='x264',
-        #aspect=
-        x264encopts='profile=main:preset=slow:threads=%s' % CONFIG['threads'],
-    )
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',
         source,
         *sub_args,
-        *output_args,
+        *cmd_args(
+            quiet=None,
+            ass=None,
+            nosound=None,
+            ovc='x264',
+            #aspect=
+            x264encopts='profile=main:preset=slow:threads=%s' % CONFIG['threads'],
+        ),
         '-o', destination,
     )
 
@@ -119,7 +131,7 @@ def mux(video, audio, destination):
             vcodec='copy',
             ab='224k',
         ),
-        destination
+        destination,
     )
 
 
@@ -135,9 +147,33 @@ def encode_preview_video(source, destination):
             bt='240k',
             acodec='aac',
             ac=1,
-            ar=44100,
+            ar=CONFIG['audio_rate_khz'],
             ab='48k',
+            vf=CONFIG['scale'],
         ),
-        '-vf', "scale=w='320:h=-1'",  # scale=w='min(500, iw*3/2):h=-1'
-        destination
+        destination,
     )
+
+
+def extract_images(source, destination_path, num_images=4):
+    log.info('extract_images')
+    video_duration = probe_media(source).get('duration')
+    if not video_duration:
+        log.warn('unable to assertain video duration; unable to extact images')
+        return
+    times = (float("%.3f" % (video_duration * offset) for offset in (x/(num_images+1) for x in range(1, num_images))))
+    for index, time in enumerate(times):
+        destination = os.path.join(destination_path, '{}.jpg'.format(index))
+        encode_success, cmd_result = _run_tool(
+            *AVCONV_COMMON_ARGS,
+            '-i', source,
+            *cmd_args(
+                ss=str(time),
+                vframes=1,
+                an=None,
+                vf=CONFIG['scale'],
+            )
+            destination,
+        )
+        if encode_success:
+            yield destination

@@ -134,12 +134,13 @@ class Encoder(object):
             # 5.) Move the newly encoded file to the target path
             target_file.move(os.path.join(tempdir, 'mux.mp4'))
             m.processed_data['main']['hash'] = target_file.hash
+
         return True
 
     def _encode_preview_video_from_meta(self, m):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
         if not source_hash:
-            log.warn('Preview encode failed; No source data in meta')
+            log.warn('Preview encode impossible; No source data in meta')
             return False
         source_file = self.processed_files_manager.factory(source_hash, 'mp4')
         target_file = self.processed_files_manager.factory((source_hash, 'preview'), 'mp4')
@@ -148,7 +149,6 @@ class Encoder(object):
             log.warn('No source video to encode preview from')
             return False
 
-        # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
             m.processed_data['preview']['hash'] = target_file.hash
             return True
@@ -164,6 +164,7 @@ class Encoder(object):
                 return False
             target_file.move(preview_file)
             m.processed_data['preview']['hash'] = target_file.hash
+
         return True
 
 
