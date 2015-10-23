@@ -3,6 +3,8 @@ import os.path
 import subprocess
 from collections import ChainMap, namedtuple
 
+from dateutil import parser as dateparse
+
 from libs.misc import cmd_args
 
 import logging
@@ -53,9 +55,19 @@ def probe_media(source):
         'avprobe',
         source
     )
-    #  re.search(r'^\s*Duration:\s*(\d+):(\d+):(\d+)\.(\d+).*', raw_probe, re.IGNORECASE | re.MULTILINE)
-    #  Duration: 00:04:14.54,
-    return {}
+    result = (cmd_result.stdout + cmd_result.stderr).decode('utf-8')
+    data = {}
+    try:
+        raw_duration = re.search(r'Duration: (\d+):(\d+):(\d+)\.(\d+)', result)
+        hours = float(raw_duration.group(1)) * 60.0 * 60.0
+        minutes = float(raw_duration.group(2)) * 60.0
+        seconds = float(raw_duration.group(3))
+        fraction = raw_duration.group(4)
+        fraction = float(fraction) / (10**(len(fraction)))
+        data['duration'] = hours + minutes + seconds + fraction
+    except:
+        pass
+    return data
 
 
 def encode_video(source, sub, destination):
@@ -149,7 +161,7 @@ def encode_preview_video(source, destination):
             ac=1,
             ar=CONFIG['audio_rate_khz'],
             ab='48k',
-            vf=CONFIG['scale'],
+            vf=CONFIG['avconv']['scale'],
         ),
         destination,
     )
@@ -161,7 +173,7 @@ def extract_images(source, destination_path, num_images=4):
     if not video_duration:
         log.warn('unable to assertain video duration; unable to extact images')
         return
-    times = (float("%.3f" % (video_duration * offset) for offset in (x/(num_images+1) for x in range(1, num_images))))
+    times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images)))
     for index, time in enumerate(times):
         destination = os.path.join(destination_path, '{}.jpg'.format(index))
         encode_success, cmd_result = _run_tool(
@@ -171,8 +183,8 @@ def extract_images(source, destination_path, num_images=4):
                 ss=str(time),
                 vframes=1,
                 an=None,
-                vf=CONFIG['scale'],
-            )
+                vf=CONFIG['avconv']['scale'],
+            ),
             destination,
         )
         if encode_success:

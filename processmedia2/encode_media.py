@@ -24,7 +24,8 @@ def main(**kwargs):
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    for name in (m.name for m in meta.meta.values() if m.pending_actions):
+    for name in ('Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de', ):
+    #for name in (m.name for m in meta.meta.values() if m.pending_actions):
         encoder.encode(name)
 
 
@@ -73,9 +74,12 @@ class Encoder(object):
         """
         Todo: save the meta on return ... maybe use a context manager
         """
+        log.info('Encode: %s', name)
         self.meta.load(name)
-        self._encode_primary_video_from_meta(self.meta.get(name))
-        self._encode_preview_video_from_meta(self.meta.get(name))
+        m = self.meta.get(name)
+        self._encode_primary_video_from_meta(m)
+        self._encode_preview_video_from_meta(m)
+        self._encode_images_from_meta(m)
         self.meta.save(name)
 
     def _encode_primary_video_from_meta(self, m):
@@ -84,9 +88,9 @@ class Encoder(object):
         target_file = self.processed_files_manager.factory((f['hash'] for f in source_files.values() if f), 'mp4')
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
-        if m.processed_data.setdefault('main', {}).get('hash') == target_file.hash and target_file.exists:
+        if target_file.exists:
+            m.processed_data.setdefault('main', {})['hash'] = target_file.hash
             log.info('Processed Destination was created with the same input sources - no encoding required')
-            m.processed_data['main']['hash'] = target_file.hash
             return True
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -133,15 +137,15 @@ class Encoder(object):
 
             # 5.) Move the newly encoded file to the target path
             target_file.move(os.path.join(tempdir, 'mux.mp4'))
-            m.processed_data['main']['hash'] = target_file.hash
+            m.processed_data.setdefault('main', {})['hash'] = target_file.hash
 
         return True
 
     def _encode_preview_video_from_meta(self, m):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
-        if not source_hash:
-            log.warn('Preview encode impossible; No source data in meta')
-            return False
+        #if not source_hash:
+        #    log.warn('Preview encode impossible; No source data in meta')
+        #    return False
         source_file = self.processed_files_manager.factory(source_hash, 'mp4')
         target_file = self.processed_files_manager.factory((source_hash, 'preview'), 'mp4')
 
@@ -150,7 +154,8 @@ class Encoder(object):
             return False
 
         if target_file.exists:
-            m.processed_data['preview']['hash'] = target_file.hash
+            m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
+            log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -163,9 +168,25 @@ class Encoder(object):
                 import pdb ; pdb.set_trace()
                 return False
             target_file.move(preview_file)
-            m.processed_data['preview']['hash'] = target_file.hash
+            m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
 
         return True
+
+    def _encode_images_from_meta(self, m):
+        source_hash = m.processed_data.setdefault('main', {}).get('hash')
+        source_file = self.processed_files_manager.factory(source_hash, 'mp4')
+        image_hashs = m.processed_data.setdefault('image', {}).setdefault('hash', [])
+        image_hashs[:] = []
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            images = tuple(external_tools.extract_images(source_file.absolute, tempdir))
+            import pdb ; pdb.set_trace()
+            return True
+            #for index, generated_image_path in enumerate():
+            #    target_file = 
+            #    target_file.move(generated_image_path)
+            #     = target_file.hash
+
 
 
 # Arguments --------------------------------------------------------------------

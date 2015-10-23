@@ -1,5 +1,7 @@
 import os.path
 import shutil
+import hashlib
+
 
 class ProcessedFilesManager(object):
 
@@ -32,7 +34,7 @@ class ProcessedFile(object):
         if isinstance(hashs, str):
             hash_str = hashs
         else:
-            hash_str = str(frozenset(hashs).__hash__())
-        if hash_str.startswith('-'):
-            hash_str = hash_str.strip('-')+'x'
+            hasher = hashlib.sha256()
+            hasher.update(''.join(sorted(hashs)).encode('utf-8'))
+            hash_str = hasher.hexdigest()
         return hash_str
