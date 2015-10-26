@@ -17,8 +17,8 @@ CONFIG = {
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
     'avconv': {
-        'h264_codec': 'h264',  # 'libx264'
-        'scale': "scale=w='320:h=-1'",  # scale=w='min(500, iw*3/2):h=-1'
+        'h264_codec': 'libx264',  # 'h264',
+        'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
     }
 }
 
@@ -155,8 +155,7 @@ def encode_preview_video(source, destination):
         *cmd_args(
             strict='experimental',
             vcodec=CONFIG['avconv']['h264_codec'],
-            b='150k',
-            bt='240k',
+            crf=28,  # 0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
             acodec='aac',
             ac=1,
             ar=CONFIG['audio_rate_khz'],

@@ -24,8 +24,11 @@ def main(**kwargs):
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    for name in ('Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de', ):
-    #for name in (m.name for m in meta.meta.values() if m.pending_actions):
+    #for name in (
+    #    'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
+    #    'Gosick - ED2 - Unity (full length)',
+    #):
+    for name in (m.name for m in meta.meta.values() if m.pending_actions):
         encoder.encode(name)
 
 
