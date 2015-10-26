@@ -167,25 +167,16 @@ def encode_preview_video(source, destination):
     )
 
 
-def extract_images(source, destination_path, num_images=4):
-    log.info('extract_images')
-    video_duration = probe_media(source).get('duration')
-    if not video_duration:
-        log.warn('unable to assertain video duration; unable to extact images')
-        return
-    times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images)))
-    for index, time in enumerate(times):
-        destination = os.path.join(destination_path, '{}.jpg'.format(index))
-        encode_success, cmd_result = _run_tool(
-            *AVCONV_COMMON_ARGS,
-            '-i', source,
-            *cmd_args(
-                ss=str(time),
-                vframes=1,
-                an=None,
-                vf=CONFIG['avconv']['scale'],
-            ),
-            destination,
-        )
-        if encode_success:
-            yield destination
+def extract_image(source, destination, time=0.2):
+    log.info('extract_image')
+    return _run_tool(
+        *AVCONV_COMMON_ARGS,
+        '-i', source,
+        *cmd_args(
+            ss=str(time),
+            vframes=1,
+            an=None,
+            vf=CONFIG['avconv']['scale'],
+        ),
+        destination,
+    )

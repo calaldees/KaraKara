@@ -172,21 +172,35 @@ class Encoder(object):
 
         return True
 
-    def _encode_images_from_meta(self, m):
+    def _encode_images_from_meta(self, m, num_images=4):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
         source_file = self.processed_files_manager.factory(source_hash, 'mp4')
         image_hashs = m.processed_data.setdefault('image', {}).setdefault('hash', [])
         image_hashs[:] = []
 
-        with tempfile.TemporaryDirectory() as tempdir:
-            images = tuple(external_tools.extract_images(source_file.absolute, tempdir))
-            import pdb ; pdb.set_trace()
-            return True
-            #for index, generated_image_path in enumerate():
-            #    target_file = 
-            #    target_file.move(generated_image_path)
-            #     = target_file.hash
+        def target_image_file(index):
+            return self.processed_files_manager.factory((source_hash, 'image', str(index)), 'jpg')
 
+        target_files = tuple(target_image_file(index) for index in range(num_images))
+        if all(target_file.exists for target_file in target_files):
+            log.info('Processed Destination was created with the same input sources - no thumbnail gen required')
+            return True
+
+        video_duration = external_tools.probe_media(source_file.absolute).get('duration')
+        if not video_duration:
+            log.warn('unable to assertain video duration; unable to extact images')
+            return False
+        times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
+
+        for index, time in enumerate(times):
+            target_file = target_files[index]
+            encode_succes, cmd_result = external_tools.extract_image(source_file.absolute, target_file.absolute, time)
+            if not encode_succes:
+                import pdb ; pdb.set_trace()
+                return False
+            image_hashs.append(target_file.hash)
+
+        return True
 
 
 # Arguments --------------------------------------------------------------------
