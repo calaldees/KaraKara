@@ -151,7 +151,7 @@ class Encoder(object):
             return False
 
         if target_file.exists:
-            m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
+            #m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
@@ -165,7 +165,7 @@ class Encoder(object):
                 import pdb ; pdb.set_trace()
                 return False
             target_file.move(preview_file)
-            m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
+            #m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
 
         return True
 
