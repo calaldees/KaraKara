@@ -8,8 +8,17 @@ class ProcessedFilesManager(object):
     def __init__(self, path):
         self.path = path
 
-    def factory(self, hashs, ext):
+    def _factory(self, hashs, ext):
         return ProcessedFile(self.path, hashs, ext)
+
+    def get_image_file(self, source_hash, index):
+        return self._factory((source_hash, 'image', str(index)), 'jpg')
+
+    def get_video_file(self, source_hash):
+        return self._factory(source_hash, 'mp4')
+
+    def get_preview_file(self, source_hash):
+        return self._factory((source_hash, 'preview'), 'mp4')
 
     def prune_unnneded_files(self, hashset):
         pass

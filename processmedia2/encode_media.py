@@ -85,7 +85,7 @@ class Encoder(object):
     def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files and target files
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
-        target_file = self.processed_files_manager.factory((f['hash'] for f in source_files.values() if f), 'mp4')
+        target_file = self.processed_files_manager.get_video_file(f['hash'] for f in source_files.values() if f)
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
@@ -143,11 +143,8 @@ class Encoder(object):
 
     def _encode_preview_video_from_meta(self, m):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
-        #if not source_hash:
-        #    log.warn('Preview encode impossible; No source data in meta')
-        #    return False
-        source_file = self.processed_files_manager.factory(source_hash, 'mp4')
-        target_file = self.processed_files_manager.factory((source_hash, 'preview'), 'mp4')
+        source_file = self.processed_files_manager.get_video_file(source_hash)
+        target_file = self.processed_files_manager.get_preview_file(source_hash)
 
         if not source_file.exists:
             log.warn('No source video to encode preview from')
@@ -174,21 +171,21 @@ class Encoder(object):
 
     def _encode_images_from_meta(self, m, num_images=4):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
-        source_file = self.processed_files_manager.factory(source_hash, 'mp4')
+        source_file = self.processed_files_manager.get_video_file(source_hash)
         image_hashs = m.processed_data.setdefault('image', {}).setdefault('hash', [])
         image_hashs[:] = []
 
-        def target_image_file(index):
-            return self.processed_files_manager.factory((source_hash, 'image', str(index)), 'jpg')
-
-        target_files = tuple(target_image_file(index) for index in range(num_images))
+        target_files = tuple(
+            self.processed_files_manager.get_image_file(source_hash, index)
+            for index in range(num_images)
+        )
         if all(target_file.exists for target_file in target_files):
             log.info('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
         video_duration = external_tools.probe_media(source_file.absolute).get('duration')
         if not video_duration:
-            log.warn('unable to assertain video duration; unable to extact images')
+            log.warn('Unable to assertain video duration; unable to extact images')
             return False
         times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
 
