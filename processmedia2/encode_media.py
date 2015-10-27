@@ -116,7 +116,7 @@ class Encoder(object):
                 lambda: external_tools.encode_video(
                     source=source_files['video']['absolute'],
                     sub=source_files['sub'].get('absolute'),
-                    destination=os.path.join(tempdir, 'video.avi'),
+                    destination=os.path.join(tempdir, 'video.mp4'),
                 ),
 
                 # 4.b) Render audio and normalize
@@ -127,7 +127,7 @@ class Encoder(object):
 
                 # 4.c) Mux Video and Audio
                 lambda: external_tools.mux(
-                    video=os.path.join(tempdir, 'video.avi'),
+                    video=os.path.join(tempdir, 'video.mp4'),
                     audio=os.path.join(tempdir, 'audio.wav'),
                     destination=os.path.join(tempdir, 'mux.mp4'),
                 )

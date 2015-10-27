@@ -79,7 +79,7 @@ def probe_media(source):
 
 
 def encode_video(source, sub, destination):
-    log.info('encode_video - %s', source)
+    log.info('encode_video - %s - %s -%s', source, sub, destination)
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',
@@ -102,7 +102,7 @@ def encode_audio(source, destination, **kwargs):
         Normalize audio volume
         Offset audio
     """
-    log.info('encode_audio - %s', source)
+    log.info('encode_audio - %s - %s', source, destination)
 
     path = os.path.dirname(destination)
 
@@ -139,7 +139,7 @@ def encode_audio(source, destination, **kwargs):
 def mux(video, audio, destination):
     """
     """
-    log.info('mux - %s - %s', video, audio)
+    log.info('mux - %s - %s - %s', video, audio, destination)
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', video,
@@ -154,7 +154,7 @@ def mux(video, audio, destination):
 
 
 def encode_preview_video(source, destination):
-    log.info('encode_preview_video - %s', source)
+    log.info('encode_preview_video - %s - %s', source, destination)
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', source,
@@ -173,7 +173,7 @@ def encode_preview_video(source, destination):
 
 
 def extract_image(source, destination, time=0.2):
-    log.info('extract_image')
+    log.info('extract_image - %s - %s', source, destination)
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', source,
