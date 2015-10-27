@@ -24,11 +24,11 @@ def main(**kwargs):
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    #for name in (
-    #    'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
-    #    'Gosick - ED2 - Unity (full length)',
-    #):
-    for name in (m.name for m in meta.meta.values() if m.pending_actions):
+    for name in (
+        #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
+        #'Gosick - ED2 - Unity (full length)',
+        m.name for m in meta.meta.values() if m.pending_actions
+    ):
         encoder.encode(name)
 
 
@@ -146,6 +146,10 @@ class Encoder(object):
 
     def _encode_preview_video_from_meta(self, m):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
+        if not source_hash:
+            log.warn('No source to encode preview from')
+            return
+
         source_file = self.processed_files_manager.get_video_file(source_hash)
         target_file = self.processed_files_manager.get_preview_file(source_hash)
 
@@ -154,7 +158,6 @@ class Encoder(object):
             return False
 
         if target_file.exists:
-            #m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
@@ -168,15 +171,16 @@ class Encoder(object):
                 import pdb ; pdb.set_trace()
                 return False
             target_file.move(preview_file)
-            #m.processed_data.setdefault('preview', {})['hash'] = target_file.hash
 
         return True
 
     def _encode_images_from_meta(self, m, num_images=4):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
+        if not source_hash:
+            log.warn('No source to extract images from')
+            return
+
         source_file = self.processed_files_manager.get_video_file(source_hash)
-        image_hashs = m.processed_data.setdefault('image', {}).setdefault('hash', [])
-        image_hashs[:] = []
 
         target_files = tuple(
             self.processed_files_manager.get_image_file(source_hash, index)
@@ -192,13 +196,14 @@ class Encoder(object):
             return False
         times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
 
-        for index, time in enumerate(times):
-            target_file = target_files[index]
-            encode_succes, cmd_result = external_tools.extract_image(source_file.absolute, target_file.absolute, time)
-            if not encode_succes:
-                import pdb ; pdb.set_trace()
-                return False
-            image_hashs.append(target_file.hash)
+        with tempfile.TemporaryDirectory() as tempdir:
+            for index, time in enumerate(times):
+                image_file = os.path.join(tempdir, '{}.jpg'.format(index))
+                encode_succes, cmd_result = external_tools.extract_image(source_file.absolute, image_file, time)
+                if not encode_succes:
+                    import pdb ; pdb.set_trace()
+                    return False
+                target_files[index].move(image_file)
 
         return True
 
