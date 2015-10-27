@@ -18,8 +18,16 @@ CONFIG = {
     'log_level': 'warning',
     'avconv': {
         'h264_codec': 'libx264',  # 'h264',
+        # The width and height must be divisable by 2
+        # Using w=320:h-1 should auto set the height preserving aspect ratio
+        # Sometimes using this method the height is an odd number, which fails to encode
+        # From the avconv documentation we have some mathmatical functions and variables
+        # 'a' is the aspect ratio. floor() rounds down to nearest integer
+        # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
-    }
+        'preview_crf': 30,  # 0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
+        'preview_audio_bitrate': '32k',
+    },
 }
 
 
@@ -82,7 +90,6 @@ def encode_video(source, sub, destination):
             ass=None,
             nosound=None,
             ovc='x264',
-            #aspect=
             x264encopts='profile=main:preset=slow:threads=%s' % CONFIG['threads'],
         ),
         '-o', destination,
@@ -98,18 +105,17 @@ def encode_audio(source, destination, **kwargs):
     log.info('encode_audio - %s', source)
 
     path = os.path.dirname(destination)
-    avconv_output_args = cmd_args(
-        vcodec='none',
-        strict='experimental',
-        ac=2,
-        ar=CONFIG['audio_rate_khz'],
-    )
 
     cmds = (
         lambda: _run_tool(
             *AVCONV_COMMON_ARGS,
             '-i', source,
-            *avconv_output_args,
+            *cmd_args(
+                strict='experimental',
+                vcodec='none',
+                ac=2,
+                ar=CONFIG['audio_rate_khz'],
+            ),
             os.path.join(path, 'audio_raw.wav'),
         ),
         lambda: _run_tool(
@@ -155,11 +161,11 @@ def encode_preview_video(source, destination):
         *cmd_args(
             strict='experimental',
             vcodec=CONFIG['avconv']['h264_codec'],
-            crf=28,  # 0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
+            crf=CONFIG['avconv']['preview_crf'],
             acodec='aac',
             ac=1,
             ar=CONFIG['audio_rate_khz'],
-            ab='48k',
+            ab=CONFIG['avconv']['preview_audio_bitrate'],
             vf=CONFIG['avconv']['scale'],
         ),
         destination,
