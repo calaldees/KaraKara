@@ -25,7 +25,7 @@ CONFIG = {
         # 'a' is the aspect ratio. floor() rounds down to nearest integer
         # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
-        'preview_crf': 30,  # 0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
+        'preview_crf': 45,  # 0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
         'preview_audio_bitrate': '32k',
     },
 }
@@ -79,7 +79,10 @@ def probe_media(source):
 
 
 def encode_video(source, sub, destination):
-    log.info('encode_video - %s - %s -%s', source, sub, destination)
+    log.info('encode_video - %s', os.path.basename(source))
+    log.debug(source)
+    log.debug(sub)
+    log.debug(destination)
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',
@@ -102,7 +105,9 @@ def encode_audio(source, destination, **kwargs):
         Normalize audio volume
         Offset audio
     """
-    log.info('encode_audio - %s - %s', source, destination)
+    log.info('encode_audio - %s', os.path.basename(source))
+    log.debug(source)
+    log.debug(destination)
 
     path = os.path.dirname(destination)
 
@@ -139,7 +144,11 @@ def encode_audio(source, destination, **kwargs):
 def mux(video, audio, destination):
     """
     """
-    log.info('mux - %s - %s - %s', video, audio, destination)
+    log.info('mux - %s', os.path.basename(video))
+    log.debug(video)
+    log.debug(audio)
+    log.debug(destination)
+
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', video,
@@ -154,7 +163,10 @@ def mux(video, audio, destination):
 
 
 def encode_preview_video(source, destination):
-    log.info('encode_preview_video - %s - %s', source, destination)
+    log.info('encode_preview_video - %s', os.path.basename(source))
+    log.debug(source)
+    log.debug(destination)
+
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', source,
@@ -166,14 +178,17 @@ def encode_preview_video(source, destination):
             ac=1,
             ar=CONFIG['audio_rate_khz'],
             ab=CONFIG['avconv']['preview_audio_bitrate'],
-            vf=CONFIG['avconv']['scale'],
+            #vf=CONFIG['avconv']['scale'],
         ),
         destination,
     )
 
 
 def extract_image(source, destination, time=0.2):
-    log.info('extract_image - %s - %s', source, destination)
+    log.info('extract_image - %s', os.path.basename(source))
+    log.debug(source)
+    log.debug(destination)
+
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', source,
@@ -181,7 +196,7 @@ def extract_image(source, destination, time=0.2):
             ss=str(time),
             vframes=1,
             an=None,
-            vf=CONFIG['avconv']['scale'],
+            #vf=CONFIG['avconv']['scale'],
         ),
         destination,
     )

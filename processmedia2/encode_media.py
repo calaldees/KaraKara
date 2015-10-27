@@ -180,7 +180,8 @@ class Encoder(object):
             log.warn('No source to extract images from')
             return
 
-        source_file = self.processed_files_manager.get_video_file(source_hash)
+        #source_file_absolute = self.processed_files_manager.get_video_file(source_hash).absolute
+        source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video']['absolute']
 
         target_files = tuple(
             self.processed_files_manager.get_image_file(source_hash, index)
@@ -190,7 +191,7 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
-        video_duration = external_tools.probe_media(source_file.absolute).get('duration')
+        video_duration = external_tools.probe_media(source_file_absolute).get('duration')
         if not video_duration:
             log.warn('Unable to assertain video duration; unable to extact images')
             return False
@@ -199,7 +200,7 @@ class Encoder(object):
         with tempfile.TemporaryDirectory() as tempdir:
             for index, time in enumerate(times):
                 image_file = os.path.join(tempdir, '{}.jpg'.format(index))
-                encode_succes, cmd_result = external_tools.extract_image(source_file.absolute, image_file, time)
+                encode_succes, cmd_result = external_tools.extract_image(source_file_absolute, image_file, time)
                 if not encode_succes:
                     import pdb ; pdb.set_trace()
                     return False
