@@ -1,3 +1,4 @@
+import math
 import re
 import os.path
 import subprocess
@@ -10,6 +11,8 @@ from libs.misc import cmd_args
 import logging
 log = logging.getLogger(__name__)
 
+CRFFactorItem = namedtuple('CRFFactorItem', ['crf', 'pixels'])
+CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
 CONFIG = {
     'threads': 2,
@@ -25,9 +28,9 @@ CONFIG = {
         # 'a' is the aspect ratio. floor() rounds down to nearest integer
         # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
-        'preview_crf': 45,  # 0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
         'preview_audio_bitrate': '32k',
     },
+    'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720))))
 }
 
 
@@ -58,6 +61,19 @@ def _run_tool(*args, **kwargs):
     return CommandResult(cmd_result.returncode == 0, cmd_result)
 
 
+def crf_from_res(width=320, height=240, crf=CONFIG['crf_factor'], **kwargs):
+    """
+    0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
+
+    >>> crf_from_res(320, 200)
+    >>> 30
+    >>> crf_from_res(1280, 720)
+    >>> 45
+    """
+    factor=(math.sqrt(width*height) - crf.lower.pixels) / (crf.upper.pixels - crf.lower.pixels)
+    return int(((crf.upper.crf - crf.lower.crf) * factor) + crf.lower.crf)
+
+
 def probe_media(source):
     cmd_success, cmd_result = _run_tool(
         'avprobe',
@@ -75,14 +91,17 @@ def probe_media(source):
         data['duration'] = hours + minutes + seconds + fraction
     except:
         pass
+    try:
+        raw_res = re.search(r'Video:.*?(\d{3,4})x(\d{3,4}).*?', result)
+        data['width'] = int(raw_res.group(1))
+        data['height'] = int(raw_res.group(2))
+    except:
+        pass
     return data
 
 
 def encode_video(source, sub, destination):
     log.info('encode_video - %s', os.path.basename(source))
-    log.debug(source)
-    log.debug(sub)
-    log.debug(destination)
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',
@@ -106,8 +125,6 @@ def encode_audio(source, destination, **kwargs):
         Offset audio
     """
     log.info('encode_audio - %s', os.path.basename(source))
-    log.debug(source)
-    log.debug(destination)
 
     path = os.path.dirname(destination)
 
@@ -145,10 +162,6 @@ def mux(video, audio, destination):
     """
     """
     log.info('mux - %s', os.path.basename(video))
-    log.debug(video)
-    log.debug(audio)
-    log.debug(destination)
-
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', video,
@@ -164,8 +177,9 @@ def mux(video, audio, destination):
 
 def encode_preview_video(source, destination):
     log.info('encode_preview_video - %s', os.path.basename(source))
-    log.debug(source)
-    log.debug(destination)
+
+    crf = crf_from_res(**probe_media(source))
+    log.debug('crf: %s', crf)
 
     return _run_tool(
         *AVCONV_COMMON_ARGS,
@@ -173,7 +187,7 @@ def encode_preview_video(source, destination):
         *cmd_args(
             strict='experimental',
             vcodec=CONFIG['avconv']['h264_codec'],
-            crf=CONFIG['avconv']['preview_crf'],
+            crf=crf,
             acodec='aac',
             ac=1,
             ar=CONFIG['audio_rate_khz'],
@@ -186,8 +200,6 @@ def encode_preview_video(source, destination):
 
 def extract_image(source, destination, time=0.2):
     log.info('extract_image - %s', os.path.basename(source))
-    log.debug(source)
-    log.debug(destination)
 
     return _run_tool(
         *AVCONV_COMMON_ARGS,
