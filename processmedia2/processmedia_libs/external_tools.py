@@ -30,7 +30,10 @@ CONFIG = {
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
         'preview_audio_bitrate': '32k',
     },
-    'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720))))
+    'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
+    'jpegoptim': {
+        'target_size_k': 30
+    }
 }
 
 
@@ -201,14 +204,29 @@ def encode_preview_video(source, destination):
 def extract_image(source, destination, time=0.2):
     log.info('extract_image - %s', os.path.basename(source))
 
-    return _run_tool(
-        *AVCONV_COMMON_ARGS,
-        '-i', source,
-        *cmd_args(
-            ss=str(time),
-            vframes=1,
-            an=None,
-            #vf=CONFIG['avconv']['scale'],
+    cmds = (
+        lambda: _run_tool(
+            *AVCONV_COMMON_ARGS,
+            '-i', source,
+            *cmd_args(
+                ss=str(time),
+                vframes=1,
+                an=None,
+                #vf=CONFIG['avconv']['scale'],
+            ),
+            destination,
         ),
-        destination,
+        lambda: _run_tool(
+            'jpegoptim',
+            '--size={}'.format(CONFIG['jpegoptim']['target_size_k']),
+            '--strip-all',
+            '--overwrite',
+            destination,
+        )
     )
+
+    for cmd in cmds:
+        cmd_success, cmd_result = cmd()
+        if not cmd_success:
+            return False, cmd_result
+    return True, None
