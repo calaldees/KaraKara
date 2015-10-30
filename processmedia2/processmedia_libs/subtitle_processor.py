@@ -16,7 +16,7 @@ Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
 def _ssa_time(t):
     """
-    >>> _ssa_time(time(1, 23, 45, 671111))
+    >>> _ssa_time(time(1, 23, 45, 671000))
     '1:23:45.67'
     >>> _ssa_time(time(0, 0, 0, 0))
     '0:00:00.00'
@@ -29,17 +29,16 @@ def _ssa_time(t):
 def _parse_time(time_str):
     """
     >>> _parse_time('  1:23:45.6700  ')
-    datetime.time(1, 23, 45, 67000)
+    datetime.time(1, 23, 45, 670000)
     >>> _parse_time('1:23:45,67')
-    datetime.time(1, 23, 45, 67000)
+    datetime.time(1, 23, 45, 670000)
     >>> _parse_time('1:02:03.05')
     datetime.time(1, 2, 3, 50000)
     >>> _ssa_time(_parse_time('1:02:03.05'))
     '1:02:03.05'
     """
     time_dict = re_time.search(time_str).groupdict()
-    ms = time_dict['ms']
-    time_dict['ms'] = ms + '0'*(5-len(str(int(ms))))
+    time_dict['ms'] = '{:0<6}'.format(time_dict['ms'])
     return time(*(int(time_dict[k]) for k in ('hour', 'min', 'sec', 'ms')))
 
 
@@ -55,7 +54,7 @@ def _parse_srt(source):
     ... subete kanau
     ... '''
     >>> _parse_srt(srt)
-    [Subtitle(start=datetime.time(0, 0, 13, 50000), end=datetime.time(0, 0, 22, 34300), text='mugen ni ikitai mugen ni ikiraretara'), Subtitle(start=datetime.time(0, 0, 22, 34300), end=datetime.time(0, 0, 25, 79200), text='subete kanau')]
+    [Subtitle(start=datetime.time(0, 0, 13, 500000), end=datetime.time(0, 0, 22, 343000), text='mugen ni ikitai mugen ni ikiraretara'), Subtitle(start=datetime.time(0, 0, 22, 343000), end=datetime.time(0, 0, 25, 792000), text='subete kanau')]
     """
     def parse_line(line):
         return Subtitle(
@@ -77,7 +76,7 @@ def _parse_ssa(source):
     ... Dialogue: Marked=0,0:00:13.25,0:00:19.20,*Default,NTP,0000,0000,0000,!Effect,nokoshi kisetsu wa sugimasu\N{\c&HFFFFFF&}ame mo agari sora ni kumo
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 25000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 25000), end=datetime.time(0, 0, 19, 20000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 250000), end=datetime.time(0, 0, 19, 200000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
     """
     def clean_line(text):
         if '{\\a6}' in text:
@@ -125,9 +124,9 @@ def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
     Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,second
     <BLANKLINE>
 
+    >>> _parse_ssa(ssa)
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
 
-    #>>> _parse_ssa(ssa)
-    #[]
     """
     ssa_template = OrderedDict((
         ('Script Info', OrderedDict((
