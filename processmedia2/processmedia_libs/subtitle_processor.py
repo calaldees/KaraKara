@@ -1,13 +1,16 @@
 import re
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from datetime import time
 from itertools import zip_longest
+
+SSA_NEWLINE = '\\N'
+SSA_NEXT_COLOR = '{\\c&HFFFFFF&}'
 
 re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,4})')
 re_srt_line = re.compile(r'(?P<index>\d+)\s*(?P<start>.+)\s*-->\s*(?P<end>.+)\s*(?P<text>[\w ]*)(\n\n|$)', flags=re.MULTILINE)
 re_ssa_line = re.compile(r'Dialogue:(?P<marked>.*?),(?P<start>.+?),(?P<end>.+?),.*,(?P<text>.+)[\n$]')
 
-Subtitle = namedtuple('Subtitle', ['start', 'end', 'text'])
+Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
 
 def _parse(source):
@@ -82,5 +85,95 @@ def _parse_ssa(source):
     return lines
 
 
-def create_ssa(source):
-    return None
+SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
+
+
+def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
+    """
+    >>> ssa = create_ssa((
+    ...     Subtitle(time(0,0,0), time(0,1,0), 'first'),
+    ...     Subtitle(time(0,2,0), time(0,3,0), 'second'),
+    ... ))
+    >>> print(ssa)
+    [Script Info]
+    Title: <untitled>
+    Original Script: <unknown>
+    ScriptType: v4.00
+    <BLANKLINE>
+    [V4 Styles]
+    Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+    Style: Default,Arial,16,65535,16777215,16777215,0,-1,0,3,1,1,2,0,0,0,0,128
+    <BLANKLINE>
+    [Events]
+    Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+    Dialogue: Marked=0,00:00:00,00:01:00,*Default,NTP,0000,0000,0000,!Effect,first\\N{\\c&HFFFFFF&}second
+    Dialogue: Marked=0,00:02:00,00:03:00,*Default,NTP,0000,0000,0000,!Effect,second
+    <BLANKLINE>
+    """
+    ssa_template = OrderedDict((
+        ('Script Info', OrderedDict((
+            ('Title', '<untitled>'),
+            ('Original Script', '<unknown>'),
+            ('ScriptType', 'v4.00'),
+        ))),
+        (SSASection('V4 Styles', 'Style', ('Name', 'Fontname', 'Fontsize', 'PrimaryColour', 'SecondaryColour', 'TertiaryColour', 'BackColour', 'Bold', 'Italic', 'BorderStyle', 'Outline', 'Shadow', 'Alignment', 'MarginL', 'MarginR', 'MarginV', 'AlphaLevel', 'Encoding')), (
+            {
+                'Name': 'Default',
+                'Fontname': 'Arial',
+                'Fontsize': font_size,
+                'PrimaryColour': 65535,
+                'SecondaryColour': 16777215,
+                'TertiaryColour': 16777215,
+                'BackColour': 0,
+                'Bold': -1,
+                'Italic': 0,
+                'BorderStyle': 3,
+                'Outline': 1,
+                'Shadow': 1,
+                'Alignment': 2,
+                'MarginL': margin_h_size,
+                'MarginR': margin_h_size,
+                'MarginV': margin_v_size,
+                'AlphaLevel': 0,
+                'Encoding': 128,
+            },
+        )),
+        (SSASection('Events', 'Dialogue', ('Marked', 'Start', 'End', 'Style', 'Name', 'MarginL', 'MarginR', 'MarginV', 'Effect', 'Text')), (
+            {
+                'Marked': 'Marked=0',
+                'Start': subtitle.start,
+                'End': subtitle.end,
+                'Style': '*Default',
+                'Name': 'NTP',
+                'MarginL': '0000',
+                'MarginR': '0000',
+                'MarginV': '0000',
+                'Effect': '!Effect',
+                'Text': '{}{}{}{}'.format(subtitle.text, SSA_NEWLINE, SSA_NEXT_COLOR, subtitle_next.text) if subtitle_next else subtitle.text,
+            }
+            for subtitle, subtitle_next in zip_longest(subtitles, subtitles[1:])
+        )),
+    ))
+
+    o = []
+    for key, section_data in ssa_template.items():
+        if isinstance(key, SSASection):
+            section_name = key.name
+            section_meta = key
+        else:
+            section_name = key
+            section_meta = None
+
+        o.append('[{0}]'.format(section_name))
+
+        if section_meta is None:
+            for key, value in section_data.items():
+                o.append('{0}: {1}'.format(key, value))
+        if isinstance(section_meta, SSASection):
+            o.append('Format: {0}'.format(', '.join(section_meta.format_order)))
+            for item in section_data:
+                o.append('{0}: {1}'.format(section_meta.line, ','.join(str(item[col_name]) for col_name in section_meta.format_order)))
+
+        o.append('')
+
+    return '\n'.join(o)
