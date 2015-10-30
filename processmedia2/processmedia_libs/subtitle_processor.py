@@ -6,25 +6,37 @@ from itertools import zip_longest
 SSA_NEWLINE = '\\N'
 SSA_NEXT_COLOR = '{\\c&HFFFFFF&}'
 
-re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,4})')
+
+re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,5})')
 re_srt_line = re.compile(r'(?P<index>\d+)\s*(?P<start>.+)\s*-->\s*(?P<end>.+)\s*(?P<text>[\w ]*)(\n\n|$)', flags=re.MULTILINE)
 re_ssa_line = re.compile(r'Dialogue:(?P<marked>.*?),(?P<start>.+?),(?P<end>.+?),.*,(?P<text>.+)[\n$]')
 
 Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
 
-def _parse(source):
-    return None
+def _ssa_time(t):
+    """
+    >>> _ssa_time(time(1, 23, 45, 671111))
+    '1:23:45.67'
+    >>> _ssa_time(time(1, 2, 3, 50000))
+    '1:02:03.05'
+
+    """
+    return '{}:{:02d}:{:02d}.{:02d}'.format(t.hour, t.minute, t.second, int(t.microsecond/10000))
 
 
 def _parse_time(time_str):
     """
-    >>> _parse_time('  1:23:45.67  ')
-    datetime.time(1, 23, 45, 67)
+    >>> _parse_time('  1:23:45.6700  ')
+    datetime.time(1, 23, 45, 67000)
     >>> _parse_time('1:23:45,67')
-    datetime.time(1, 23, 45, 67)
+    datetime.time(1, 23, 45, 67000)
+    >>> _ssa_time(_parse_time('1:02:03.05'))
+    '1:02:03.05'
     """
     time_dict = re_time.search(time_str).groupdict()
+    ms = time_dict['ms']
+    time_dict['ms'] = ms + '0'*(5-len(ms))
     return time(*(int(time_dict[k]) for k in ('hour', 'min', 'sec', 'ms')))
 
 
@@ -40,7 +52,7 @@ def _parse_srt(source):
     ... subete kanau
     ... '''
     >>> _parse_srt(srt)
-    [Subtitle(start=datetime.time(0, 0, 13, 500), end=datetime.time(0, 0, 22, 343), text='mugen ni ikitai mugen ni ikiraretara'), Subtitle(start=datetime.time(0, 0, 22, 343), end=datetime.time(0, 0, 25, 792), text='subete kanau')]
+    [Subtitle(start=datetime.time(0, 0, 13, 50000), end=datetime.time(0, 0, 22, 34300), text='mugen ni ikitai mugen ni ikiraretara'), Subtitle(start=datetime.time(0, 0, 22, 34300), end=datetime.time(0, 0, 25, 79200), text='subete kanau')]
     """
     def parse_line(line):
         return Subtitle(
@@ -62,7 +74,7 @@ def _parse_ssa(source):
     ... Dialogue: Marked=0,0:00:13.25,0:00:19.20,*Default,NTP,0000,0000,0000,!Effect,nokoshi kisetsu wa sugimasu\N{\c&HFFFFFF&}ame mo agari sora ni kumo
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 25), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 25), end=datetime.time(0, 0, 19, 20), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 25000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 25000), end=datetime.time(0, 0, 19, 20000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
     """
     def clean_line(text):
         if '{\\a6}' in text:
@@ -91,8 +103,8 @@ SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
 def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
     """
     >>> ssa = create_ssa((
-    ...     Subtitle(time(0,0,0), time(0,1,0), 'first'),
-    ...     Subtitle(time(0,2,0), time(0,3,0), 'second'),
+    ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
+    ...     Subtitle(time(0,2,0,0), time(0,3,0,0), 'second'),
     ... ))
     >>> print(ssa)
     [Script Info]
@@ -106,9 +118,11 @@ def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
     <BLANKLINE>
     [Events]
     Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-    Dialogue: Marked=0,00:00:00,00:01:00,*Default,NTP,0000,0000,0000,!Effect,first\\N{\\c&HFFFFFF&}second
-    Dialogue: Marked=0,00:02:00,00:03:00,*Default,NTP,0000,0000,0000,!Effect,second
+    Dialogue: Marked=0,00:00:00.00,00:01:00.00,*Default,NTP,0000,0000,0000,!Effect,first\\N{\\c&HFFFFFF&}second
+    Dialogue: Marked=0,00:02:00.00,00:03:00.00,*Default,NTP,0000,0000,0000,!Effect,second
     <BLANKLINE>
+    >>> _parse_ssa(ssa)
+    []
     """
     ssa_template = OrderedDict((
         ('Script Info', OrderedDict((
