@@ -99,6 +99,32 @@ def _parse_ssa(source):
     return lines
 
 
+def parse_subtiles(data=None, filename=None, filehandle=None):
+    """
+    >>> srt = '''
+    ... 1
+    ... 00:00:00,000 --> 00:00:01,000
+    ... srt
+    ... '''
+    >>> ssa = '''
+    ... Dialogue: Marked=0,0:00:00.00,0:00:01.00,*Default,NTP,0000,0000,0000,!Effect,ssa
+    ... '''
+    >>> parse_subtiles(srt)
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='srt')]
+    >>> parse_subtiles(ssa)
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='ssa')]
+    >>> parse_subtiles('not real subtitles')
+    []
+    """
+    if filehandle:
+        data = filehandle.read()
+    if filename:
+        with open(filename, mode='r', encoding='utf-8') as filehandle:
+            data = filehandle.read()
+    assert isinstance(data, str), 'Subtitle data should be a string'
+    return _parse_srt(data) or _parse_ssa(data)
+
+
 SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
 
 

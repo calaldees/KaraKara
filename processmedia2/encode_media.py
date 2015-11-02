@@ -5,9 +5,11 @@ from libs.misc import postmortem, hashfile, freeze, first
 from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args
+from processmedia_libs import external_tools
 from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
-from processmedia_libs import external_tools
+from processmedia_libs.subtitle_processor import parse_subtiles, create_ssa
+
 
 import logging
 log = logging.getLogger(__name__)
@@ -104,11 +106,16 @@ class Encoder(object):
                 log.warn('image to video conversion is not currently implemented')
                 return False
 
-            # 3.b) Convert srt to ssa
-            if not source_files['sub'].get('ext') == 'ssa':
-                log.warn('convert subs to ssa no implemented yet')
-                source_files['sub'] = {'absolute': None}
-                return False
+            # 3.b) Normalize subtile files - Create our own managed ssa
+            if source_files['sub']:
+                subtitles = parse_subtiles(filename=source_files['sub']['absolute'])
+                if not subtitles:
+                    log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
+                    return False
+                temp_subtitle_file = os.path.join(tempdir, 'subs.ssa')
+                with open(temp_subtitle_file, 'w', encoding='utf-8') as subfile:
+                    subfile.write(create_ssa(subtitles))
+                source_files['sub']['absolute'] = temp_subtitle_file  # It is safe to set this key as it will never be persisted in the meta
 
             # 4.) Encode
             encode_steps = (
