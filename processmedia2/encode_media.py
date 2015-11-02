@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 
 VERSION = '0.0.0'
+DEFAULT_HEIGHT_TO_FONT_SIZE_RATIO = 14
 
 
 def main(**kwargs):
@@ -29,7 +30,8 @@ def main(**kwargs):
     for name in (
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
-        m.name for m in meta.meta.values() if m.pending_actions
+        'Ranma Half OP1 - Jajauma ni Sasenaide',
+        #m.name for m in meta.meta.values() if m.pending_actions
     ):
         encoder.encode(name)
 
@@ -98,6 +100,8 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
+        source_details = external_tools.probe_media(source_files['video']['absolute'])
+
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
 
@@ -112,9 +116,17 @@ class Encoder(object):
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
+                import pdb ; pdb.set_trace()
                 temp_subtitle_file = os.path.join(tempdir, 'subs.ssa')
                 with open(temp_subtitle_file, 'w', encoding='utf-8') as subfile:
-                    subfile.write(create_ssa(subtitles))
+                    subfile.write(
+                        create_ssa(
+                            subtitles,
+                            font_size=source_details['height'] / DEFAULT_HEIGHT_TO_FONT_SIZE_RATIO,
+                            PlayResX=source_details['width'],
+                            PlayResY=source_details['height'],
+                        )
+                    )
                 source_files['sub']['absolute'] = temp_subtitle_file  # It is safe to set this key as it will never be persisted in the meta
 
             # 4.) Encode

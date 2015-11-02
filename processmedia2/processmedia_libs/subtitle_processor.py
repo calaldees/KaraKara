@@ -128,7 +128,7 @@ def parse_subtiles(data=None, filename=None, filehandle=None):
 SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
 
 
-def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
+def create_ssa(subtitles, font_size=16, margin_h_size_multiplyer=1, margin_v_size_multiplyer=1, **kwargs):
     """
     >>> ssa = create_ssa((
     ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
@@ -142,7 +142,7 @@ def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
     <BLANKLINE>
     [V4 Styles]
     Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
-    Style: Default,Arial,16,65535,16777215,16777215,0,-1,0,3,1,1,2,0,0,0,0,128
+    Style: Default,Arial,16,65535,16777215,16777215,0,-1,0,3,1,1,2,16,16,16,0,128
     <BLANKLINE>
     [Events]
     Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -154,17 +154,19 @@ def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
 
     """
+    header = OrderedDict((
+        ('Title', '<untitled>'),
+        ('Original Script', '<unknown>'),
+        ('ScriptType', 'v4.00'),
+    ))
+    header.update(kwargs)
     ssa_template = OrderedDict((
-        ('Script Info', OrderedDict((
-            ('Title', '<untitled>'),
-            ('Original Script', '<unknown>'),
-            ('ScriptType', 'v4.00'),
-        ))),
+        ('Script Info', header),
         (SSASection('V4 Styles', 'Style', ('Name', 'Fontname', 'Fontsize', 'PrimaryColour', 'SecondaryColour', 'TertiaryColour', 'BackColour', 'Bold', 'Italic', 'BorderStyle', 'Outline', 'Shadow', 'Alignment', 'MarginL', 'MarginR', 'MarginV', 'AlphaLevel', 'Encoding')), (
             {
                 'Name': 'Default',
                 'Fontname': 'Arial',
-                'Fontsize': font_size,
+                'Fontsize': int(font_size),
                 'PrimaryColour': 65535,
                 'SecondaryColour': 16777215,
                 'TertiaryColour': 16777215,
@@ -175,9 +177,9 @@ def create_ssa(subtitles, font_size=16, margin_h_size=0, margin_v_size=0):
                 'Outline': 1,
                 'Shadow': 1,
                 'Alignment': 2,
-                'MarginL': margin_h_size,
-                'MarginR': margin_h_size,
-                'MarginV': margin_v_size,
+                'MarginL': int(margin_h_size_multiplyer * font_size),
+                'MarginR': int(margin_h_size_multiplyer * font_size),
+                'MarginV': int(margin_v_size_multiplyer * font_size),
                 'AlphaLevel': 0,
                 'Encoding': 128,
             },
