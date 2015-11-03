@@ -77,6 +77,11 @@ def _parse_ssa(source):
     ... '''
     >>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 250000), end=datetime.time(0, 0, 19, 200000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
+
+    TODO: Upcoming bug!
+        This only works for items with '!Effect,' (it's in the regex as a hack)
+        We should count the ',' and grab the text after that index
+    def (s, c): [s.index(c, index+1) for index in range(s.count(c))]
     """
     def clean_line(text):
         if '{\\a6}' in text:

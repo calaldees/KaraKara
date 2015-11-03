@@ -125,6 +125,9 @@ class MetaFile(object):
         for k in {k for k, v in self.scan_data.items() if v.get('hash') == filehash}:
             log.info('Removing entry for %s as this hash clashs with new entry %s', k, f.file)
             del self.scan_data[k]
+
+        file_data['relative'] = f.relative
+        file_data['mtime'] = mtime
         file_data['hash'] = filehash
 
         self.pending_actions = list(set(self.pending_actions) | {f.ext})

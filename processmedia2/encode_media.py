@@ -30,8 +30,8 @@ def main(**kwargs):
     for name in (
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
-        'Ranma Half OP1 - Jajauma ni Sasenaide',
-        #m.name for m in meta.meta.values() if m.pending_actions
+        #'Ranma Half OP1 - Jajauma ni Sasenaide',
+        m.name for m in meta.meta.values() if m.pending_actions
     ):
         encoder.encode(name)
 

@@ -67,7 +67,9 @@ def main(**kwargs):
 
     # 4.) Associate file_collections with existing metadata objects
     for name, file_collection in file_collections.items():
+        meta.load(name)
         meta.get(name).associate_file_collection(file_collection)
+        meta.save(name)
 
     # 5.) Attempt to find associate unassociated files but finding them on the folder_structure in memory
     for m in meta.meta_with_unassociated_files:
