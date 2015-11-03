@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 VERSION = '0.0.0'
-DEFAULT_HEIGHT_TO_FONT_SIZE_RATIO = 14
+
 
 
 def main(**kwargs):
@@ -116,16 +116,10 @@ class Encoder(object):
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
-                import pdb ; pdb.set_trace()
                 temp_subtitle_file = os.path.join(tempdir, 'subs.ssa')
                 with open(temp_subtitle_file, 'w', encoding='utf-8') as subfile:
                     subfile.write(
-                        create_ssa(
-                            subtitles,
-                            font_size=source_details['height'] / DEFAULT_HEIGHT_TO_FONT_SIZE_RATIO,
-                            PlayResX=source_details['width'],
-                            PlayResY=source_details['height'],
-                        )
+                        create_ssa(subtitles, width=source_details['width'], height=source_details['height'])
                     )
                 source_files['sub']['absolute'] = temp_subtitle_file  # It is safe to set this key as it will never be persisted in the meta
 

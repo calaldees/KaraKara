@@ -5,11 +5,11 @@ from itertools import zip_longest
 
 SSA_NEWLINE = '\\N'
 SSA_NEXT_COLOR = '{\\c&HFFFFFF&}'
-
+SSA_HEIGHT_TO_FONT_SIZE_RATIO = 14
 
 re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,5})')
 re_srt_line = re.compile(r'(?P<index>\d+)\s*(?P<start>.+)\s*-->\s*(?P<end>.+)\s*(?P<text>[\w ]*)(\n\n|$)', flags=re.MULTILINE)
-re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),.*,(?P<text>.+)[\n$]')
+re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),.*Effect,(?P<text>.+)[\n$]')  # the "Effect," is a hack! I cant COUNT the ',' in a regex and am assuming that all text has "!Effect,"
 
 Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
@@ -81,7 +81,8 @@ def _parse_ssa(source):
     def clean_line(text):
         if '{\\a6}' in text:
             return ''
-        return re.sub(r'{.*?}', '', text).replace('\\N', '\n')
+        text = re.sub(r'{.*?}', '', text)
+        return '\n'.join(l.strip() for l in text.split('\\N'))
     def parse_line(line):
         return Subtitle(
             _parse_time(line['start']),
@@ -94,7 +95,8 @@ def _parse_ssa(source):
             return line_current
         _current = line_current.text.split('\n')
         _next = line_next.text.split('\n')
-        return Subtitle(line_current.start, line_current.end, '\n'.join(line for line in _current if line not in _next))
+        deduped_text = '\n'.join(line for line in _current if line not in _next)
+        return Subtitle(line_current.start, line_current.end, deduped_text)
     lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
     return lines
 
@@ -128,7 +130,7 @@ def parse_subtiles(data=None, filename=None, filehandle=None):
 SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
 
 
-def create_ssa(subtitles, font_size=16, margin_h_size_multiplyer=1, margin_v_size_multiplyer=1, **kwargs):
+def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size_multiplyer=1, margin_v_size_multiplyer=1, font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO):
     """
     >>> ssa = create_ssa((
     ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
@@ -142,7 +144,7 @@ def create_ssa(subtitles, font_size=16, margin_h_size_multiplyer=1, margin_v_siz
     <BLANKLINE>
     [V4 Styles]
     Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
-    Style: Default,Arial,16,65535,16777215,16777215,0,-1,0,3,1,1,2,16,16,16,0,128
+    Style: Default,Arial,14,65535,16777215,16777215,0,-1,0,3,1,1,2,14,14,14,0,128
     <BLANKLINE>
     [Events]
     Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -154,12 +156,19 @@ def create_ssa(subtitles, font_size=16, margin_h_size_multiplyer=1, margin_v_siz
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
 
     """
+    if not font_size and height:
+        font_size = height / font_ratio
+    if not font_size:
+        font_size = font_ratio
     header = OrderedDict((
         ('Title', '<untitled>'),
         ('Original Script', '<unknown>'),
         ('ScriptType', 'v4.00'),
     ))
-    header.update(kwargs)
+    if width:
+        header['PlayResX'] = width
+    if height:
+        header['PlayResY'] = height
     ssa_template = OrderedDict((
         ('Script Info', header),
         (SSASection('V4 Styles', 'Style', ('Name', 'Fontname', 'Fontsize', 'PrimaryColour', 'SecondaryColour', 'TertiaryColour', 'BackColour', 'Bold', 'Italic', 'BorderStyle', 'Outline', 'Shadow', 'Alignment', 'MarginL', 'MarginR', 'MarginV', 'AlphaLevel', 'Encoding')), (

@@ -162,12 +162,14 @@ class FileItemWrapper(object):
             return {}
         file_no_ext, ext = file_ext(data['relative'])
         return ChainMap(
-            data,
             dict(
                 absolute=os.path.abspath(os.path.join(self.source_path, data['relative'])),
                 ext=ext,
                 file_no_ext=file_no_ext,
-            )
+            ),
+            # IMPORTANT! Any modification to a chainmap is ALWAYS made to the first dict.
+            # We DON'T want any changes to the underlying data from a wrapper
+            data,
         )
 
     def _get_file_for(self, file_type, wrapped_scan_data):
