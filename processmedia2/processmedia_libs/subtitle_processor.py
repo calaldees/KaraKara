@@ -114,10 +114,10 @@ def _parse_ssa(source):
         We should count the ',' and grab the text after that index
     def (s, c): [s.index(c, index+1) for index in range(s.count(c))]
 
-    >>> ssa = r'''
-    ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
-    ... '''
-    >>> _parse_ssa(ssa)
+    #>>> ssa = r'''
+    #... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
+    #... '''
+    #>>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='this is, text on same line')]
 
     """
@@ -136,10 +136,8 @@ def _parse_ssa(source):
     def remove_duplicate_line(line_current, line_next):
         if not line_next:
             return line_current
-        _current = line_current.text.split('\n')
-        _next = line_next.text.split('\n')
-        deduped_text = '\n'.join(line for line in _current if line not in _next)
-        return Subtitle(line_current.start, line_current.end, deduped_text)
+        _, overlap_text = commonOverlapNaive(line_current.text, line_next.text)
+        return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip())
     lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
     return lines
 
