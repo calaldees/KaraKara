@@ -14,6 +14,25 @@ re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),.*Effect,(?P
 Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
 
+TextOverlap = namedtuple('TextOverlap', ('index', 'text'))
+def commonOverlapNaive(text1, text2):
+    """
+    https://neil.fraser.name/news/2010/11/04/
+
+    >>> commonOverlapNaive('Fire at Will', 'William Riker is number one')
+    TextOverlap(index=4, text='Will')
+    >>> commonOverlapNaive('Have some CoCo and CoCo', 'CoCo and CoCo is here.')
+    TextOverlap(index=13, text='CoCo and CoCo')
+
+    """
+    index = min(len(text1), len(text2))
+    while index > 0:
+        if text1[-index:] == text2[:index]:
+            break
+        index -= 1
+    return TextOverlap(index, text2[:index])
+
+
 def _ssa_time(t):
     """
     >>> _ssa_time(time(1, 23, 45, 671000))
