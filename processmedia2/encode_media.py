@@ -32,8 +32,8 @@ def main(**kwargs):
         #'Gosick - ED2 - Unity (full length)',
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
         #'Tamako Market - OP - Dramatic Market Ride',
-        'Fullmetal Alchemist - OP1 - Melissa',
-        #m.name for m in meta.meta.values() #if m.pending_actions
+        #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing!
+        m.name for m in meta.meta.values() #if m.pending_actions
     ):
         encoder.encode(name)
 
@@ -115,7 +115,6 @@ class Encoder(object):
             # 3.b) Normalize subtile files - Create our own managed ssa
             if source_files['sub']:
                 subtitles = parse_subtiles(filename=source_files['sub']['absolute'])
-                import pdb ; pdb.set_trace()
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
@@ -190,7 +189,7 @@ class Encoder(object):
 
         return True
 
-    def _encode_images_from_meta(self, m, num_images=4):
+    def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
         source_hash = m.processed_data.setdefault('main', {}).get('hash')
         if not source_hash:
             log.warn('No source to extract images from')

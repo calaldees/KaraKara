@@ -4,6 +4,7 @@ import hashlib
 
 
 class ProcessedFilesManager(object):
+    DEFAULT_NUMBER_OF_IMAGES = 4
 
     def __init__(self, path):
         self.path = path
@@ -20,9 +21,15 @@ class ProcessedFilesManager(object):
     def get_preview_file(self, source_hash):
         return self._factory((source_hash, 'preview'), 'mp4')
 
-    def prune_unnneded_files(self, hashset):
-        pass
-
+    def get_all_processed_files_associated_with_meta(self, m):
+        source_hash = m.processed_data.get('main', {}).get('hash')
+        return (
+            self.get_video_file(source_hash),
+            self.get_preview_file(source_hash),
+        ) + (
+            self.get_image_file(source_hash, image_num)
+            for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES)
+        )
 
 class ProcessedFile(object):
     def __init__(self, path, hashs, ext):

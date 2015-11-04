@@ -29,7 +29,7 @@ CONFIG = {
         # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
         'preview_audio_bitrate': '48k',
-        'preview_crf': 30,
+        'preview_crf': 34,
     },
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
     'jpegoptim': {
