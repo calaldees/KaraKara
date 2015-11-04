@@ -68,6 +68,9 @@ def _parse_srt(source):
 def _parse_ssa(source):
     r"""
 
+    Ignore text on top of screen
+    Remove duplication
+
     >>> ssa = r'''
     ... [Events]
     ... Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -78,10 +81,26 @@ def _parse_ssa(source):
     >>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 250000), end=datetime.time(0, 0, 19, 200000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
 
+    Overlap of subtiles should be removed
+
+    >>> ssa = r'''
+    ... Dialogue: Marked=0,0:00:06.91,0:00:12.39,*Default,NTP,0000,0000,0000,!Effect,Tooi hi no kioku wo \N {\c&HFFFFFF&} Kanashimi no iki no ne wo
+    ... Dialogue: Marked=0,0:00:12.49,0:00:21.53,*Default,NTP,0000,0000,0000,!Effect,Kanashimi no iki no ne wo tometekure yo \N {\c&HFFFFFF&} Saa ai ni kogareta mune
+    ... '''
+    >>> _parse_ssa(ssa)
+    [Subtitle(start=datetime.time(0, 0, 6, 910000), end=datetime.time(0, 0, 12, 390000), text='Tooi hi no kioku wo'), Subtitle(start=datetime.time(0, 0, 12, 490000), end=datetime.time(0, 0, 21, 530000), text='Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune')]
+
     TODO: Upcoming bug!
         This only works for items with '!Effect,' (it's in the regex as a hack)
         We should count the ',' and grab the text after that index
     def (s, c): [s.index(c, index+1) for index in range(s.count(c))]
+
+    >>> ssa = r'''
+    ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
+    ... '''
+    >>> _parse_ssa(ssa)
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='this is, text on same line')]
+
     """
     def clean_line(text):
         if '{\\a6}' in text:

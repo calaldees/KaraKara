@@ -28,7 +28,8 @@ CONFIG = {
         # 'a' is the aspect ratio. floor() rounds down to nearest integer
         # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
-        'preview_audio_bitrate': '32k',
+        'preview_audio_bitrate': '48k',
+        'preview_crf': 30,
     },
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
     'jpegoptim': {
@@ -181,7 +182,8 @@ def mux(video, audio, destination):
 def encode_preview_video(source, destination):
     log.info('encode_preview_video - %s', os.path.basename(source))
 
-    crf = crf_from_res(**probe_media(source))
+    #crf = crf_from_res(**probe_media(source))
+    crf = CONFIG['avconv']['preview_crf']
     log.debug('crf: %s', crf)
 
     return _run_tool(
@@ -195,7 +197,7 @@ def encode_preview_video(source, destination):
             ac=1,
             ar=CONFIG['audio_rate_khz'],
             ab=CONFIG['avconv']['preview_audio_bitrate'],
-            #vf=CONFIG['avconv']['scale'],
+            vf=CONFIG['avconv']['scale'],
         ),
         destination,
     )

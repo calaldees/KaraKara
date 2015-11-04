@@ -31,7 +31,9 @@ def main(**kwargs):
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
-        m.name for m in meta.meta.values() if m.pending_actions
+        #'Tamako Market - OP - Dramatic Market Ride',
+        'Fullmetal Alchemist - OP1 - Melissa',
+        #m.name for m in meta.meta.values() #if m.pending_actions
     ):
         encoder.encode(name)
 
@@ -113,6 +115,7 @@ class Encoder(object):
             # 3.b) Normalize subtile files - Create our own managed ssa
             if source_files['sub']:
                 subtitles = parse_subtiles(filename=source_files['sub']['absolute'])
+                import pdb ; pdb.set_trace()
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
