@@ -26,7 +26,8 @@ def main(**kwargs):
     }
     unlinked_files = (f for f in processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in known_file_hashs)
 
-    print(unlinked_files)
+    from pprint import pprint
+    pprint(tuple(f.file for f in unlinked_files))
 
 
 # Arguments --------------------------------------------------------------------

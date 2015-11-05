@@ -7,8 +7,8 @@ from libs.file import FolderStructure
 from processmedia_libs import add_default_argparse_args
 from processmedia_libs import external_tools
 from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
-from processmedia_libs.processed_files_manager import ProcessedFilesManager
-from processmedia_libs.subtitle_processor import parse_subtiles, create_ssa
+from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
+from processmedia_libs import subtitle_processor
 
 
 import logging
@@ -94,7 +94,8 @@ class Encoder(object):
     def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files and target files
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
-        target_file = self.processed_files_manager.get_video_file(f['hash'] for f in source_files.values() if f)
+        source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
+        target_file = self.processed_files_manager.get_processed_file(source_hash, 'video')
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
@@ -114,19 +115,28 @@ class Encoder(object):
 
             # 3.b) Normalize subtile files - Create our own managed ssa
             if source_files['sub']:
-                subtitles = parse_subtiles(filename=source_files['sub']['absolute'])
+                # Parse subtitles
+                subtitles = subtitle_processor.parse_subtiles(filename=source_files['sub']['absolute'])
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
 
-                # Todo: output srt
-
-                temp_subtitle_file = os.path.join(tempdir, 'subs.ssa')
-                with open(temp_subtitle_file, 'w', encoding='utf-8') as subfile:
+                # Output srt
+                temp_srt_file = os.path.join(tempdir, 'subs.srt')
+                with open(temp_srt_file, 'w', encoding='utf-8') as subfile:
                     subfile.write(
-                        create_ssa(subtitles, width=source_details['width'], height=source_details['height'])
+                        subtitle_processor.create_srt(subtitles)
                     )
-                source_files['sub']['absolute'] = temp_subtitle_file  # It is safe to set this key as it will never be persisted in the meta
+                target_srt_file = self.processed_files_manager.get_processed_file(source_hash, 'srt')
+                target_srt_file.move(temp_srt_file)
+
+                # Output ssa
+                temp_ssa_file = os.path.join(tempdir, 'subs.ssa')
+                with open(temp_ssa_file, 'w', encoding='utf-8') as subfile:
+                    subfile.write(
+                        subtitle_processor.create_ssa(subtitles, width=source_details['width'], height=source_details['height'])
+                    )
+                source_files['sub']['absolute'] = temp_ssa_file  # It is safe to set this key as it will never be persisted in the meta
 
             # 4.) Encode
             encode_steps = (
@@ -168,8 +178,8 @@ class Encoder(object):
             log.warn('No source to encode preview from')
             return
 
-        source_file = self.processed_files_manager.get_video_file(source_hash)
-        target_file = self.processed_files_manager.get_preview_file(source_hash)
+        source_file = self.processed_files_manager.get_processed_file(source_hash, 'video')
+        target_file = self.processed_files_manager.get_processed_file(source_hash, 'preview')
 
         if not source_file.exists:
             log.warn('No source video to encode preview from')
@@ -198,11 +208,10 @@ class Encoder(object):
             log.warn('No source to extract images from')
             return
 
-        #source_file_absolute = self.processed_files_manager.get_video_file(source_hash).absolute
         source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video']['absolute']
 
         target_files = tuple(
-            self.processed_files_manager.get_image_file(source_hash, index)
+            self.processed_files_manager.get_processed_file(source_hash, 'image', index)
             for index in range(num_images)
         )
         if all(target_file.exists for target_file in target_files):
