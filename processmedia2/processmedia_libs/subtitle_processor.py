@@ -55,13 +55,13 @@ def _ssa_time(t):
 def _srt_time(t):
     """
     >>> _srt_time(time(1, 23, 45, 671000))
-    '1:23:45,671'
+    '01:23:45,671'
     >>> _srt_time(time(0, 0, 0, 0))
-    '0:00:00,000'
+    '00:00:00,000'
     >>> _srt_time(time(1, 2, 3, 50000))
-    '1:02:03,050'
+    '01:02:03,050'
     """
-    return '{}:{:02d}:{:02d},{:03d}'.format(t.hour, t.minute, t.second, int(t.microsecond/1000))
+    return '{:02d}:{:02d}:{:02d},{:03d}'.format(t.hour, t.minute, t.second, int(t.microsecond/1000))
 
 
 def _parse_time(time_str):
