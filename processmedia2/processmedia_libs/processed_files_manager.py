@@ -1,6 +1,8 @@
 import os.path
 import shutil
 import hashlib
+from collections import namedtuple
+from libs.misc import fast_scan
 
 
 class ProcessedFilesManager(object):
@@ -23,13 +25,19 @@ class ProcessedFilesManager(object):
 
     def get_all_processed_files_associated_with_meta(self, m):
         source_hash = m.processed_data.get('main', {}).get('hash')
+        if not source_hash:
+            return ()
         return (
             self.get_video_file(source_hash),
             self.get_preview_file(source_hash),
-        ) + (
+        ) + tuple(
             self.get_image_file(source_hash, image_num)
             for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES)
         )
+
+    @property
+    def scan(self):
+        return fast_scan(self.path)
 
 class ProcessedFile(object):
     def __init__(self, path, hashs, ext):

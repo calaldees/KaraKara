@@ -4,7 +4,7 @@ import time
 import re
 from collections import ChainMap
 
-from libs.misc import fast_scan, freeze, file_ext, first, file_ext
+from libs.misc import fast_scan, freeze, file_ext, first
 
 from . import EXTS
 
