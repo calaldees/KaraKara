@@ -118,6 +118,9 @@ class Encoder(object):
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
+
+                # Todo: output srt
+
                 temp_subtitle_file = os.path.join(tempdir, 'subs.ssa')
                 with open(temp_subtitle_file, 'w', encoding='utf-8') as subfile:
                     subfile.write(

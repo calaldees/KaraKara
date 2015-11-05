@@ -273,3 +273,24 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
         o.append('')
 
     return '\n'.join(o)
+
+
+def create_srt(subtitles):
+    """
+    >>> srt = create_srt((
+    ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
+    ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second'),
+    ... ))
+    >>> print(srt)
+    1
+    00:00:00,000 --> 00:01:00,000
+    first
+
+    2
+    00:02:00,000 --> 00:03:00,510
+    second
+
+    >>> _parse_srt(srt)
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
+    """
+    return ''
