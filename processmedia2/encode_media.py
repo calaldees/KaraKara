@@ -32,7 +32,8 @@ def main(**kwargs):
         #'Gosick - ED2 - Unity (full length)',
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
         #'Tamako Market - OP - Dramatic Market Ride',
-        #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing!
+        #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
+        #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
         m.name for m in meta.meta.values() #if m.pending_actions
     ):
         encoder.encode(name)

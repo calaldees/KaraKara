@@ -191,7 +191,7 @@ SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
 
 
 def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size_multiplyer=1, margin_v_size_multiplyer=1, font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO):
-    """
+    r"""
     >>> ssa = create_ssa((
     ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
     ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second'),
@@ -208,12 +208,18 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
     <BLANKLINE>
     [Events]
     Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-    Dialogue: Marked=0,0:00:00.00,0:01:00.00,*Default,NTP,0000,0000,0000,!Effect,first\\N{\\c&HFFFFFF&}second
+    Dialogue: Marked=0,0:00:00.00,0:01:00.00,*Default,NTP,0000,0000,0000,!Effect,first\N{\c&HFFFFFF&}second
     Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,second
     <BLANKLINE>
 
     >>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
+
+    >>> ssa = create_ssa((
+    ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'newline\ntest'),
+    ... ))
+    >>> 'newline\\Ntest' in ssa
+    True
 
     """
     if not font_size and height:
@@ -264,7 +270,7 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
                 'MarginR': '0000',
                 'MarginV': '0000',
                 'Effect': '!Effect',
-                'Text': '{}{}{}{}'.format(subtitle.text, SSA_NEWLINE, SSA_NEXT_COLOR, subtitle_next.text) if subtitle_next else subtitle.text,
+                'Text': ('{}{}{}{}'.format(subtitle.text, SSA_NEWLINE, SSA_NEXT_COLOR, subtitle_next.text) if subtitle_next else subtitle.text).replace('\n', SSA_NEWLINE),
             }
             for subtitle, subtitle_next in zip_longest(subtitles, subtitles[1:])
         )),
@@ -279,13 +285,18 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
             section_name = key
             section_meta = None
 
+        # Section Header
         o.append('[{0}]'.format(section_name))
 
+        # No field list - just print the dict
         if section_meta is None:
             for key, value in section_data.items():
                 o.append('{0}: {1}'.format(key, value))
+        # Specific field list required for this section
         if isinstance(section_meta, SSASection):
+            # Section field description
             o.append('Format: {0}'.format(', '.join(section_meta.format_order)))
+            # Add each row
             for item in section_data:
                 o.append('{0}: {1}'.format(section_meta.line, ','.join(str(item[col_name]) for col_name in section_meta.format_order)))
 
