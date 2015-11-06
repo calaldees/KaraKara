@@ -68,6 +68,7 @@ class Encoder(object):
     gen thumbnail images
     extract subs
     """
+    SOURCE_HASH_KEY = 'source_hash'
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
@@ -92,14 +93,14 @@ class Encoder(object):
         self.meta.save(name)
 
     def _encode_primary_video_from_meta(self, m):
-        # 1.) Calculate starting files and target files
+        # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
         source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
+        m.processed_data[self.SOURCE_HASH_KEY] = source_hash
         target_file = self.processed_files_manager.get_processed_file(source_hash, 'video')
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
-            m.processed_data.setdefault('main', {})['hash'] = target_file.hash
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
@@ -168,12 +169,11 @@ class Encoder(object):
 
             # 5.) Move the newly encoded file to the target path
             target_file.move(os.path.join(tempdir, 'mux.mp4'))
-            m.processed_data.setdefault('main', {})['hash'] = target_file.hash
 
         return True
 
     def _encode_preview_video_from_meta(self, m):
-        source_hash = m.processed_data.setdefault('main', {}).get('hash')
+        source_hash = m.processed_data.get(self.SOURCE_HASH_KEY)
         if not source_hash:
             log.warn('No source to encode preview from')
             return
@@ -203,7 +203,7 @@ class Encoder(object):
         return True
 
     def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
-        source_hash = m.processed_data.setdefault('main', {}).get('hash')
+        source_hash = m.processed_data.get(self.SOURCE_HASH_KEY)
         if not source_hash:
             log.warn('No source to extract images from')
             return
