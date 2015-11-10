@@ -16,6 +16,7 @@ class ProcessedFilesManager(object):
             ProcessedFileType('video', 'mp4', ''),
             ProcessedFileType('preview', 'mp4', ''),
             ProcessedFileType('srt', 'srt', ''),
+            ProcessedFileType('tags', 'txt', ''),
         )
     }
 
@@ -32,14 +33,14 @@ class ProcessedFilesManager(object):
             file_type.ext
         )
 
-    def get_all_processed_files_associated_with_meta(self, source_hash):
+    def get_all_processed_files_associated_with_source_hash(self, source_hash):
         if hasattr(source_hash, 'processed_data'):
             source_hash = source_hash.processed_data.get('main', {}).get('hash')
         if not source_hash:
             return ()
         return tuple(
             self.get_processed_file(source_hash, t)
-            for t in ('video', 'preview', 'srt')
+            for t in ('video', 'preview', 'srt', 'tags')
         ) + tuple(
             self.get_processed_file(source_hash, 'image', image_num)
             for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES)
@@ -63,6 +64,9 @@ class ProcessedFile(object):
         Always using move allows for this abstraction at a later date
         """
         shutil.move(source_file, self.absolute)
+
+    def copy(self, source_file):
+        shutil.copy2(source_file, self.absolute)
 
     @property
     def exists(self):

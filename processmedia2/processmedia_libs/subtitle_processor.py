@@ -22,13 +22,13 @@ Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
 
 TextOverlap = namedtuple('TextOverlap', ('index', 'text'))
-def commonOverlapNaive(text1, text2):
+def commonOverlap(text1, text2):
     """
     https://neil.fraser.name/news/2010/11/04/
 
-    >>> commonOverlapNaive('Fire at Will', 'William Riker is number one')
+    >>> commonOverlap('Fire at Will', 'William Riker is number one')
     TextOverlap(index=4, text='Will')
-    >>> commonOverlapNaive('Have some CoCo and CoCo', 'CoCo and CoCo is here.')
+    >>> commonOverlap('Have some CoCo and CoCo', 'CoCo and CoCo is here.')
     TextOverlap(index=13, text='CoCo and CoCo')
 
     """
@@ -155,7 +155,7 @@ def _parse_ssa(source):
     def remove_duplicate_line(line_current, line_next):
         if not line_next:
             return line_current
-        _, overlap_text = commonOverlapNaive(line_current.text, line_next.text)
+        _, overlap_text = commonOverlap(line_current.text, line_next.text)
         return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip())
     lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
     return lines

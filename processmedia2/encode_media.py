@@ -91,6 +91,7 @@ class Encoder(object):
         self._encode_primary_video_from_meta(m)
         self._encode_preview_video_from_meta(m)
         self._encode_images_from_meta(m)
+        self._process_tags_from_meta(m)
         self.meta.save(name)
 
     def _encode_primary_video_from_meta(self, m):
@@ -115,7 +116,7 @@ class Encoder(object):
                 log.warn('image to video conversion is not currently implemented')
                 return False
 
-            # 3.b) Normalize subtile files - Create our own managed ssa
+            # 3.b) Normalize subtile files - Create our own managed ssa/srt
             if source_files['sub']:
                 # Parse subtitles
                 subtitles = subtitle_processor.parse_subtiles(filename=source_files['sub']['absolute'])
@@ -235,6 +236,20 @@ class Encoder(object):
                 target_files[index].move(image_file)
 
         return True
+
+    def _process_tags_from_meta(self, m):
+        """
+        No processing ... this is just a copy
+        """
+        source_hash = m.processed_data.get(self.SOURCE_HASH_KEY)
+        if not source_hash:
+            log.warn('No source to aquire tags from')
+            return
+
+        source_files = self.fileitem_wrapper.wrap_scan_data(m)
+        target_file = self.processed_files_manager.get_processed_file(source_hash, 'tags')
+
+        target_file.copy(source_files['tag']['absolute'])
 
 
 # Arguments --------------------------------------------------------------------

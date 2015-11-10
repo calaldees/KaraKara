@@ -158,7 +158,7 @@ class FileItemWrapper(object):
 
     def wrap_scan_data(self, metafile):
         wrapped_scan_data = tuple(self._wrap_scan_data_item(d) for d in metafile.scan_data.values())
-        return {k: self._get_file_for(k, wrapped_scan_data) for k in ('video', 'audio', 'sub', 'image')}
+        return {k: self._get_file_for(k, wrapped_scan_data) for k in ('video', 'audio', 'sub', 'image', 'tag')}
 
     def _wrap_scan_data_item(self, data):
         if not data:
