@@ -5,6 +5,8 @@ from processmedia_libs import add_default_argparse_args
 import logging
 log = logging.getLogger(__name__)
 
+from model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
+
 
 # TODO: crazy pythonpath stuff tog et db access
 

@@ -47,12 +47,16 @@ dependencys_link:
 	ln -s ../../../libs/python3/lib/misc.py ./libs/misc.py
 
 # Run --------------------------------------------------------------------------
-.PHONY: run run_production
+.PHONY: scan encode import
 
-run:
-	env/bin/python3 processmedia.py
+scan:
+	env/bin/python3 scan_media.py
 
-run_production:
+encode:
+	env/bin/python3 encode_media.py
+
+import:
+	PYTHONPATH=../website/karakara ../website/env/bin/python3 import_media.py
 
 # Test -------------------------------------------------------------------------
 .PHONY: test
