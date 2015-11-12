@@ -34,15 +34,19 @@ has-python3:
 	which virtualenv
 env: has-python3
 	virtualenv --no-site-packages -p python3 env
+	./env/bin/pip3 install --upgrade pip
+	./env/bin/pip3 install -r pip-requirements.txt
 
+.PHONY: dependencys
 dependencys: libs/misc.py
 
 libs:
 	mkdir libs
 	touch libs/__init__.py
 libs/misc.py: libs
-	
+	curl 
 
+.PHONY: dependencys_link
 dependencys_link:
 	ln -s ../../../libs/python3/lib/misc.py ./libs/misc.py
 

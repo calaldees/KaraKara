@@ -2,13 +2,13 @@
 from libs.misc import postmortem
 from processmedia_libs import add_default_argparse_args
 
-import logging
-log = logging.getLogger(__name__)
+from processmedia_libs.meta_manager import MetaManager
 
 from model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
+from model.actions import last_update
 
-
-# TODO: crazy pythonpath stuff tog et db access
+import logging
+log = logging.getLogger(__name__)
 
 
 def main(**kwargs):
@@ -18,7 +18,13 @@ def main(**kwargs):
      - import tags
      - import subtiles
      - cleanup db - any sources we don't have the actual processed files for - prune and remove from db
+       - check this removes unnneeded attachments
     """
+    meta = MetaManager(kwargs['path_meta'])
+    meta.load_all()
+
+
+class Importer(object):
     pass
 
 

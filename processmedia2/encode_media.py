@@ -73,7 +73,7 @@ class Encoder(object):
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
-        self.destination = FolderStructure.factory(path_processed)
+        #self.destination = FolderStructure.factory(path_processed)
         self.fileitem_wrapper = FileItemWrapper(path_source)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
 

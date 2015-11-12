@@ -7,14 +7,8 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def rough_db_hash():
-    """
-    A SUPER quick, SUPER rough method of detecting a db change
-    todo: Counting the tags is insufficent. A user might update a tag -> reimport -> tag count is the same
-    suggestion: Could we get the last tag table update datetime?
-    I've made a note in the model file - It should have one! Add this feature!
-    """
-    return 'tag_count:{0}'.format(str(DBSession.query(Tag).count()))
+def last_update():
+    return DBSession.query(Track.time_updated).order_by(Track.time_updated.desc()).limit(1).one()
 
 
 def get_track(id):
