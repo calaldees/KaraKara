@@ -1,6 +1,6 @@
 import re
 
-from libs.misc import postmortem, file_extension_regex
+from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
 from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, ALL_EXTS
@@ -51,9 +51,11 @@ def main(**kwargs):
 
     # 1.) Read file structure into memory
     folder_structure = FolderStructure.factory(
-        kwargs['path_source'],
-        file_regex=file_extension_regex(ALL_EXTS),
-        ignore_regex=DEFAULT_IGNORE_FILE_REGEX
+        path=kwargs['path_source'],
+        search_filter=fast_scan_regex_filter(
+            file_regex=file_extension_regex(ALL_EXTS),
+            ignore_regex=DEFAULT_IGNORE_FILE_REGEX,
+        )
     )
 
     # 2.) Locate primary files
