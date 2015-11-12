@@ -60,8 +60,11 @@ class MetaManager(object):
         os.remove(self._filepath(name))
         del self.meta[name]
 
-    def load_all(self):
-        for f in fast_scan(self.path, file_regex=re.compile(r'.*\.json$')):
+    def load_all(self, mtime=None):
+        for f in fast_scan(
+            self.path,
+            search_filter=lambda f: f.name.endswith('.json') and (mtime == None or f.stat().st_mtime >= mtime)
+        ):
             self.load(f.file_no_ext)
 
     def save_all(self):

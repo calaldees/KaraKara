@@ -60,7 +60,7 @@ encode:
 	env/bin/python3 encode_media.py
 
 import:
-	PYTHONPATH=../website/karakara ../website/env/bin/python3 import_media.py
+	PYTHONPATH=../website/karakara ../website/env/bin/python3 import_media.py --config_uri ../website/development.ini
 
 # Test -------------------------------------------------------------------------
 .PHONY: test
