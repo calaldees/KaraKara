@@ -27,10 +27,17 @@ def main(**kwargs):
        - check this removes unnneeded attachments
     """
     meta = MetaManager(kwargs['path_meta'])
-    meta.load_all(mtime=epoc(last_update()))
+    importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
 
-    import pdb ; pdb.set_trace()
-    pass
+    meta.load_all()  # mtime=epoc(last_update())
+
+    processed_tracks = set(m.source_hash for m in meta.meta.values())
+
+    for name in meta.meta.keys():
+        importer.import_track(name)
+
+    for unneeded_track in importer.imported_tracks - processed_tracks:
+        log.warn('delete %s', unneeded_track)
 
 
 class TrackImporter(object):
@@ -38,43 +45,42 @@ class TrackImporter(object):
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
+        self.imported_tracks = set(t.id for t in DBSession.query(Track.id))
 
     def import_track(self, name):
-        log.info('Import: %s', name)
         self.meta.load(name)
         m = self.meta.get(name)
+        if not m.source_hash or m.source_hash in self.imported_tracks:
+            return
 
-        track = self.get_or_create_track(m.source_hash)
+        log.info('Import: %s', name)
+        track = Track()
+        track.id = m.source_hash
         track.source_filename = name
 
         track.duration = 0  # TODO
 
-    def add_attachments(self, track):
+        self._add_attachments(track)
+
+        DBSession.add(track)
+        commit()
+
+    def _add_attachments(self, track):
+        processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(track.id)
         track.attachments.clear()
-        for attachment_type in _attachment_types.enums:
-            # unfinished
-            for f in self.processed_files_manager.get_all_processed_files_associated_with_source_hash(track.id):
+        for attachment_type in processed_files.keys() & _attachment_types.enums:
+            for processed_file in processed_files[attachment_type]:
                 attachment = Attachment()
                 attachment.type = attachment_type
-                attachment.location = #os.path.join(source_filename,  urllib.parse.unquote(attachment_data.get('url')))
-
-                #extra_fields = {}
-                #for key, value in attachment_data.items():
-                #    if key in ['target','vcodec']:
-                #        #print ("%s %s" % (key,value))
-                #        extra_fields[key] = value
-                #attachment.extra_fields = extra_fields
+                attachment.location = processed_file.relative
 
                 track.attachments.append(attachment)
 
-
-    def get_or_create_track(self, source_hash):
+    def get_track(self, source_hash):
         try:
-            track = DBSession.query(Track).filter(Track.id == source_hash).one()
-            track.id = source_hash
+            return DBSession.query(Track).filter(Track.id == source_hash).one()
         except NoResultFound:
-            track = Track()
-        return track
+            return
 
 
 

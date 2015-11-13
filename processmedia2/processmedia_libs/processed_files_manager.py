@@ -1,7 +1,7 @@
 import os.path
 import shutil
 import hashlib
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from libs.misc import fast_scan
 
 ProcessedFileType = namedtuple('ProcessedFileType', ('type', 'ext', 'salt'))
@@ -38,17 +38,12 @@ class ProcessedFilesManager(object):
             source_hash = source_hash.processed_data.get('main', {}).get('hash')
         if not source_hash:
             return {}
-        return {
-            **{
-                t: self.get_processed_file(source_hash, t)
-                for t in ('video', 'preview', 'srt', 'tags')
-            },
-            **{
-                # TODO: need a multidict here
-                t: self.get_processed_file(source_hash, 'image', image_num)
-                for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES)
-            }
-        }
+        processed_files = defaultdict(list)
+        for t in ('video', 'preview', 'srt', 'tags'):
+            processed_files[t].append(self.get_processed_file(source_hash, t))
+        for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES):
+            processed_files['image'].append(self.get_processed_file(source_hash, 'image', image_num))
+        return processed_files
 
     @property
     def scan(self):

@@ -15,7 +15,7 @@ __all__ = [
     "Track", "Tag", "Attachment", "_attachment_types",
 ]
 
-_attachment_types = Enum("video", "preview", "thumbnail", "subtitle", name="attachment_types")
+_attachment_types = Enum('video', 'preview', 'srt', 'image', name="attachment_types")
 
 
 class TrackTagMapping(Base):
