@@ -333,4 +333,5 @@ def create_srt(subtitles):
             text=subtitle.text,
         )
         for index, subtitle in enumerate(subtitles)
+        #if subtitle.text
     )

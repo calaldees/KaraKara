@@ -9,7 +9,7 @@ from processmedia_libs import subtitle_processor
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from model.model_tracks import Track, Tag, Attachment, Lyrics, _attachment_types
+from model.model_tracks import Track, Tag, Attachment, _attachment_types
 from model import init_DBSession, DBSession, commit
 from model.actions import get_tag, clear_all_tracks, last_update
 
@@ -61,6 +61,7 @@ class TrackImporter(object):
         track.duration = 0  # TODO
 
         self._add_attachments(track)
+        self._add_lyrics(track)
 
         DBSession.add(track)
         commit()
@@ -76,12 +77,12 @@ class TrackImporter(object):
 
                 track.attachments.append(attachment)
 
-    def get_track(self, source_hash):
-        try:
-            return DBSession.query(Track).filter(Track.id == source_hash).one()
-        except NoResultFound:
-            return
-
+    def _add_lyrics(self, track):
+        subtitles = subtitle_processor.parse_subtiles(
+            filename=self.processed_files_manager.get_processed_file(track.id, 'srt').absolute
+        )
+        track.lyrics = "\n".join(subtitle.text for subtitle in subtitles)
+        import pdb ; pdb.set_trace()
 
 
 # Arguments --------------------------------------------------------------------

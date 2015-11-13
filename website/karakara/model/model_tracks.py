@@ -20,14 +20,14 @@ _attachment_types = Enum('video', 'preview', 'srt', 'image', name="attachment_ty
 
 class TrackTagMapping(Base):
     __tablename__ = "map_track_to_tag"
-    track_id      = Column(String(),     ForeignKey('track.id')     , nullable=False, primary_key=True)
-    tag_id        = Column(Integer(),    ForeignKey('tag.id')       , nullable=False, primary_key=True)
+    track_id = Column(String(), ForeignKey('track.id'), nullable=False, primary_key=True)
+    tag_id = Column(Integer(), ForeignKey('tag.id'), nullable=False, primary_key=True)
 
 
 class TrackAttachmentMapping(Base):
     __tablename__ = "map_track_to_attachment"
-    track_id      = Column(String(),     ForeignKey('track.id')     , nullable=False, primary_key=True)
-    attachment_id = Column(Integer(),    ForeignKey('attachment.id'), nullable=False, primary_key=True)
+    track_id = Column(String(), ForeignKey('track.id'), nullable=False, primary_key=True)
+    attachment_id = Column(Integer(), ForeignKey('attachment.id'), nullable=False, primary_key=True)
 
 
 class Track(Base):
@@ -37,9 +37,10 @@ class Track(Base):
     duration = Column(Float(), nullable=False, default=0, doc="Duration in seconds")
     source_filename = Column(Unicode(), nullable=True)
 
-    tags = relationship("Tag"       , secondary=TrackTagMapping.__table__)  # , lazy="joined"
+    tags = relationship("Tag", secondary=TrackTagMapping.__table__)  # , lazy="joined"
     attachments = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
-    lyrics = relationship("Lyrics", cascade="all, delete-orphan")
+    #lyrics = relationship("Lyrics", cascade="all, delete-orphan")
+    lyrics = Column(UnicodeText(), nullable=True)
 
     time_updated = Column(DateTime(), nullable=False, default=now)
 
@@ -203,25 +204,3 @@ class Attachment(Base):
     __to_dict__['full'].update({
     })
 
-
-class Lyrics(Base):
-    """
-    """
-    __tablename__ = "lyrics"
-
-    id              = Column(Integer()    , primary_key=True)
-    track_id        = Column(String(),      ForeignKey('track.id'), nullable=False)
-    language        = Column(String(4)    , nullable=False, default='eng')
-    content         = Column(UnicodeText())
-
-    __to_dict__ = copy.deepcopy(Base.__to_dict__)
-    __to_dict__.update({
-        'default': {
-            'id'           : None ,
-            'language'     : None ,
-            'content'      : None ,
-        },
-    })
-    __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
-    __to_dict__['full'].update({
-    })
