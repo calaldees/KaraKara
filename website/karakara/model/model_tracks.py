@@ -31,20 +31,17 @@ class TrackAttachmentMapping(Base):
 
 
 class Track(Base):
-    """
-    """
     __tablename__ = "track"
 
-    id              = Column(String(),      primary_key=True)
-    duration        = Column(Float(),       nullable=False, default=0, doc="Duration in seconds")
-    source_filename = Column(Unicode(),     nullable=True)
-    #source_hash     = Column(Unicode(),     nullable=True)  # source_hash is now the id
+    id = Column(String(), primary_key=True)
+    duration = Column(Float(), nullable=False, default=0, doc="Duration in seconds")
+    source_filename = Column(Unicode(), nullable=True)
 
-    tags            = relationship("Tag"       , secondary=TrackTagMapping.__table__)  # , lazy="joined"
-    attachments     = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
-    lyrics          = relationship("Lyrics", cascade="all, delete-orphan")
+    tags = relationship("Tag"       , secondary=TrackTagMapping.__table__)  # , lazy="joined"
+    attachments = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
+    lyrics = relationship("Lyrics", cascade="all, delete-orphan")
 
-    time_updated    = Column(DateTime(),  nullable=False, default=now)
+    time_updated = Column(DateTime(), nullable=False, default=now)
 
     def tags_with_parents_dict(self):
         t = {None: [tag.name for tag in self.tags if not tag.parent]}
@@ -62,14 +59,14 @@ class Track(Base):
                 tags_found.add(tag.name)
         return ' - '.join(sorted(tags_found))
 
-    # TODO - Event to activate before save to DB to render the title from tags
-
     @property
     def title(self):
         """
         'title' is a tag
         tracks COULD have more than one title (english name and japanise name)
         This just returns the first one matched
+
+        TODO - Event to activate before save to DB to render the title from tags
         """
         try:
             return next(filter(lambda tag: tag.parent.name == 'title' if tag.parent else False, self.tags)).name

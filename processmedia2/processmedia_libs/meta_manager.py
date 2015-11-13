@@ -91,6 +91,8 @@ class MetaManager(object):
 
 class MetaFile(object):
 
+    SOURCE_HASH_KEY = 'source_hash'
+
     def __init__(self, name, data):
         self.name = name
         self.data = data
@@ -144,6 +146,13 @@ class MetaFile(object):
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
         }
+
+    @property
+    def source_hash(self):
+        return self.processed_data.get(self.SOURCE_HASH_KEY)
+    @source_hash.setter
+    def source_hash(self, value):
+        self.processed_data[self.SOURCE_HASH_KEY] = value
 
 
 class FileItemWrapper(object):

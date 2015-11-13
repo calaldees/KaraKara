@@ -69,7 +69,6 @@ class Encoder(object):
     gen thumbnail images
     extract subs
     """
-    SOURCE_HASH_KEY = 'source_hash'
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
@@ -88,6 +87,11 @@ class Encoder(object):
         self.meta.load(name)
         m = self.meta.get(name)
         self._encode_primary_video_from_meta(m)
+
+        if not m.source_hash:
+            log.warn('No source_hash to extract additional media')
+            return
+
         self._encode_preview_video_from_meta(m)
         self._encode_images_from_meta(m)
         self._process_tags_from_meta(m)
@@ -97,8 +101,8 @@ class Encoder(object):
         # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
         source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
-        m.processed_data[self.SOURCE_HASH_KEY] = source_hash
-        target_file = self.processed_files_manager.get_processed_file(source_hash, 'video')
+        m.source_hash = source_hash
+        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
@@ -129,7 +133,7 @@ class Encoder(object):
                     subfile.write(
                         subtitle_processor.create_srt(subtitles)
                     )
-                target_srt_file = self.processed_files_manager.get_processed_file(source_hash, 'srt')
+                target_srt_file = self.processed_files_manager.get_processed_file(m.source_hash, 'srt')
                 target_srt_file.move(temp_srt_file)
 
                 # Output ssa
@@ -174,13 +178,8 @@ class Encoder(object):
         return True
 
     def _encode_preview_video_from_meta(self, m):
-        source_hash = m.processed_data.get(self.SOURCE_HASH_KEY)
-        if not source_hash:
-            log.warn('No source to encode preview from')
-            return
-
-        source_file = self.processed_files_manager.get_processed_file(source_hash, 'video')
-        target_file = self.processed_files_manager.get_processed_file(source_hash, 'preview')
+        source_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
+        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'preview')
 
         if not source_file.exists:
             log.warn('No source video to encode preview from')
@@ -204,15 +203,10 @@ class Encoder(object):
         return True
 
     def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
-        source_hash = m.processed_data.get(self.SOURCE_HASH_KEY)
-        if not source_hash:
-            log.warn('No source to extract images from')
-            return
-
         source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video']['absolute']
 
         target_files = tuple(
-            self.processed_files_manager.get_processed_file(source_hash, 'image', index)
+            self.processed_files_manager.get_processed_file(m.source_hash, 'image', index)
             for index in range(num_images)
         )
         if all(target_file.exists for target_file in target_files):
@@ -240,13 +234,8 @@ class Encoder(object):
         """
         No processing ... this is just a copy
         """
-        source_hash = m.processed_data.get(self.SOURCE_HASH_KEY)
-        if not source_hash:
-            log.warn('No source to aquire tags from')
-            return
-
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
-        target_file = self.processed_files_manager.get_processed_file(source_hash, 'tags')
+        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'tags')
 
         target_file.copy(source_files['tag']['absolute'])
 

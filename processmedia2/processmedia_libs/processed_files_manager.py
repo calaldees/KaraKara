@@ -37,14 +37,18 @@ class ProcessedFilesManager(object):
         if hasattr(source_hash, 'processed_data'):
             source_hash = source_hash.processed_data.get('main', {}).get('hash')
         if not source_hash:
-            return ()
-        return tuple(
-            self.get_processed_file(source_hash, t)
-            for t in ('video', 'preview', 'srt', 'tags')
-        ) + tuple(
-            self.get_processed_file(source_hash, 'image', image_num)
-            for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES)
-        )
+            return {}
+        return {
+            **{
+                t: self.get_processed_file(source_hash, t)
+                for t in ('video', 'preview', 'srt', 'tags')
+            },
+            **{
+                # TODO: need a multidict here
+                t: self.get_processed_file(source_hash, 'image', image_num)
+                for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES)
+            }
+        }
 
     @property
     def scan(self):
@@ -54,7 +58,8 @@ class ProcessedFilesManager(object):
 class ProcessedFile(object):
     def __init__(self, path, hashs, ext):
         self.hash = gen_string_hash(hashs)
-        self.absolute = os.path.abspath(os.path.join(path, '{}.{}'.format(self.hash, ext)))
+        self.relative = os.path.join(path, '{}.{}'.format(self.hash, ext))
+        self.absolute = os.path.abspath(self.relative)
 
     def move(self, source_file):
         """

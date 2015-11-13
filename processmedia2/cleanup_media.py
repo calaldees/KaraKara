@@ -22,7 +22,7 @@ def main(**kwargs):
     known_file_hashs = {
         processed_file.hash
         for m in meta.meta.values()
-        for processed_file in processed_files_manager.get_all_processed_files_associated_with_source_hash(m)
+        for processed_file in processed_files_manager.get_all_processed_files_associated_with_source_hash(m).values()
     }
     unlinked_files = (f for f in processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in known_file_hashs)
 
