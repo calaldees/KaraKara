@@ -1,5 +1,5 @@
 
-from libs.misc import postmortem, fast_scan, epoc
+from libs.misc import postmortem, fast_scan, epoc, first
 from processmedia_libs import add_default_argparse_args
 
 from processmedia_libs.meta_manager import MetaManager
@@ -52,37 +52,63 @@ class TrackImporter(object):
         m = self.meta.get(name)
         if not m.source_hash or m.source_hash in self.imported_tracks:
             return
+        processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash)
+        if not self._has_required_files(processed_files):
+            log.warn('%s does not have all required processde files', name)
+            return
 
         log.info('Import: %s', name)
         track = Track()
         track.id = m.source_hash
         track.source_filename = name
-
         track.duration = 0  # TODO
 
-        self._add_attachments(track)
-        self._add_lyrics(track)
+        self._add_attachments(track, processed_files)
+        self._add_lyrics(track, first(processed_files.get('srt')))
+        self._add_tags(track, first(processed_files.get('tags')))
 
         DBSession.add(track)
         commit()
 
-    def _add_attachments(self, track):
-        processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(track.id)
+    def _has_required_files(self, processed_files):
+        for k in ('video', 'preview', 'tags', 'image'):
+            for processed_file in processed_files[k]:
+                if not processed_file.exists:
+                    log.warn('Missing processed file %s', processed_file.absolute)
+                    return False
+        return True
+
+    def _add_attachments(self, track, processed_files):
         track.attachments.clear()
-        for attachment_type in processed_files.keys() & _attachment_types.enums:
+        for attachment_type in processed_files.keys() & set(_attachment_types.enums):
             for processed_file in processed_files[attachment_type]:
                 attachment = Attachment()
                 attachment.type = attachment_type
                 attachment.location = processed_file.relative
-
                 track.attachments.append(attachment)
 
-    def _add_lyrics(self, track):
-        subtitles = subtitle_processor.parse_subtiles(
-            filename=self.processed_files_manager.get_processed_file(track.id, 'srt').absolute
-        )
-        import pdb ; pdb.set_trace()
+    def _add_lyrics(self, track, processed_file_srt):
+        if not processed_file_srt or not processed_file_srt.exists:
+            log.warn('srt file missing unable to import lyrics')
+            return
+        subtitles = subtitle_processor.parse_subtitles(filename=processed_file_srt.absolute)
         track.lyrics = "\n".join(subtitle.text for subtitle in subtitles)
+
+    def _add_tags(self, track, processed_file_tags):
+        track.tags.clear()
+
+        with open(processed_file_tags.absolute, 'r') as tag_file:
+            for tag_string in tag_file:
+                tag_string = tag_string.strip()
+                tag = get_tag(tag_string, create_if_missing=True)
+                if tag:
+                    track.tags.append(tag)
+                elif tag_string:
+                    log.warn('null tag %s', tag_string)
+
+        for duplicate_tag in (tag for tag in track.tags if track.tags.count(tag) > 1):
+            log.warn('Unneeded duplicate tag found %s', duplicate_tag)
+            track.tags.remove(duplicate_tag)
 
 
 # Arguments --------------------------------------------------------------------

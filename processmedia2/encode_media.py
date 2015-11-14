@@ -122,7 +122,7 @@ class Encoder(object):
             # 3.b) Normalize subtile files - Create our own managed ssa/srt
             if source_files['sub']:
                 # Parse subtitles
-                subtitles = subtitle_processor.parse_subtiles(filename=source_files['sub']['absolute'])
+                subtitles = subtitle_processor.parse_subtitles(filename=source_files['sub']['absolute'])
                 if not subtitles:
                     log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
                     return False
