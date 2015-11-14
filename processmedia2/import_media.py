@@ -81,8 +81,8 @@ class TrackImporter(object):
         subtitles = subtitle_processor.parse_subtiles(
             filename=self.processed_files_manager.get_processed_file(track.id, 'srt').absolute
         )
-        track.lyrics = "\n".join(subtitle.text for subtitle in subtitles)
         import pdb ; pdb.set_trace()
+        track.lyrics = "\n".join(subtitle.text for subtitle in subtitles)
 
 
 # Arguments --------------------------------------------------------------------

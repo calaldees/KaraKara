@@ -1,3 +1,5 @@
+## -*- coding: utf-8 -*-
+
 import re
 from collections import namedtuple, OrderedDict
 from datetime import time
@@ -15,7 +17,7 @@ SRT_FORMAT = '''\
 '''
 
 re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,5})')
-re_srt_line = re.compile(r'(?P<index>\d+)\s*(?P<start>.+)\s*-->\s*(?P<end>.+)\s*(?P<text>[\w ]*)(\n\n|$)', flags=re.MULTILINE)
+re_srt_line = re.compile(r'(?P<index>\d+)\s*(?P<start>[\d:,]+)\s*-->\s*(?P<end>[\d:,]+)\s*(?P<text>.*)(\n\n|$)', flags=re.MULTILINE)
 re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),.*Effect,(?P<text>.+)[\n$]')  # the "Effect," is a hack! I cant COUNT the ',' in a regex and am assuming that all text has "!Effect,"
 
 Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
@@ -85,14 +87,19 @@ def _parse_srt(source):
     >>> srt = '''
     ... 1
     ... 00:00:13,500 --> 00:00:22,343
-    ... mugen ni ikitai mugen ni ikiraretara
+    ... test, it's, キ
     ...
     ... 2
     ... 00:00:22,343 --> 00:00:25,792
-    ... subete kanau
+    ... second
+    ...
+    ... 3
+    ... 00:00:30,000 --> 00:00:40,000
+    ...
+    ...
     ... '''
     >>> _parse_srt(srt)
-    [Subtitle(start=datetime.time(0, 0, 13, 500000), end=datetime.time(0, 0, 22, 343000), text='mugen ni ikitai mugen ni ikiraretara'), Subtitle(start=datetime.time(0, 0, 22, 343000), end=datetime.time(0, 0, 25, 792000), text='subete kanau')]
+    [Subtitle(start=datetime.time(0, 0, 13, 500000), end=datetime.time(0, 0, 22, 343000), text="test, it's, キ"), Subtitle(start=datetime.time(0, 0, 22, 343000), end=datetime.time(0, 0, 25, 792000), text='second')]
     """
     def parse_line(line):
         return Subtitle(
@@ -100,7 +107,8 @@ def _parse_srt(source):
             _parse_time(line['end']),
             line['text'],
         )
-    return [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
+    lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
+    return [line for line in lines if line.text]
 
 
 def _parse_ssa(source):
@@ -117,9 +125,9 @@ def _parse_ssa(source):
     ... Dialogue: Marked=0,0:00:13.25,0:00:19.20,*Default,NTP,0000,0000,0000,!Effect,nokoshi kisetsu wa sugimasu\N{\c&HFFFFFF&}ame mo agari sora ni kumo
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text=''), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 250000), end=datetime.time(0, 0, 19, 200000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
+    [Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 250000), end=datetime.time(0, 0, 19, 200000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
 
-    Overlap of subtiles should be removed
+    Overlap of subtitles should be removed
 
     >>> ssa = r'''
     ... Dialogue: Marked=0,0:00:06.91,0:00:12.39,*Default,NTP,0000,0000,0000,!Effect,Tooi hi no kioku wo \N {\c&HFFFFFF&} Kanashimi no iki no ne wo
@@ -158,10 +166,10 @@ def _parse_ssa(source):
         _, overlap_text = commonOverlap(line_current.text, line_next.text)
         return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip())
     lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
-    return lines
+    return [line for line in lines if line.text]
 
 
-def parse_subtiles(data=None, filename=None, filehandle=None):
+def parse_subtitles(data=None, filename=None, filehandle=None):
     """
     >>> srt = '''
     ... 1
@@ -171,11 +179,11 @@ def parse_subtiles(data=None, filename=None, filehandle=None):
     >>> ssa = '''
     ... Dialogue: Marked=0,0:00:00.00,0:00:01.00,*Default,NTP,0000,0000,0000,!Effect,ssa
     ... '''
-    >>> parse_subtiles(srt)
+    >>> parse_subtitles(srt)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='srt')]
-    >>> parse_subtiles(ssa)
+    >>> parse_subtitles(ssa)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='ssa')]
-    >>> parse_subtiles('not real subtitles')
+    >>> parse_subtitles('not real subtitles')
     []
     """
     if filehandle:
@@ -310,6 +318,7 @@ def create_srt(subtitles):
     >>> srt = create_srt((
     ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
     ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second'),
+    ...     Subtitle(time(0,4,0,0), time(0,5,0,0), ''),
     ... ))
     >>> print(srt)
     1
@@ -333,5 +342,5 @@ def create_srt(subtitles):
             text=subtitle.text,
         )
         for index, subtitle in enumerate(subtitles)
-        #if subtitle.text
+        if subtitle.text
     )
