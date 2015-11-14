@@ -17,7 +17,7 @@ SRT_FORMAT = '''\
 '''
 
 re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,5})')
-re_srt_line = re.compile(r'(?P<index>\d+)\s*(?P<start>[\d:,]+)\s*-->\s*(?P<end>[\d:,]+)\s*(?P<text>.*)(\n\n|$)', flags=re.MULTILINE)
+re_srt_line = re.compile(r'(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*)(\n\n|$)', flags=re.MULTILINE)
 re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),.*Effect,(?P<text>.+)[\n$]')  # the "Effect," is a hack! I cant COUNT the ',' in a regex and am assuming that all text has "!Effect,"
 
 Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
