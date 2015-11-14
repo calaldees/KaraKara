@@ -19,7 +19,6 @@ from ..model.model_tracks import Track
 
 from . import web, action_ok, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity  # action_error,
 
-from ..scripts.import_tracks import import_json_data as import_track
 from ..views.tracks import invalidate_track
 from ..templates import helpers as h
 
@@ -139,9 +138,11 @@ class ComunityTrack():
         return self._track_dict
 
     def import_track(self):
-        with self._open(self.path_description_filename, 'r') as filehandle:
-            import_track(filehandle, self.path_description_filename)
-            invalidate_track(self.track_id)
+        raise Exception('Re-importing implementation changed - investigate new flow')
+        # DEPRICATED
+        #with self._open(self.path_description_filename, 'r') as filehandle:
+        #    import_track(filehandle, self.path_description_filename)
+        #    invalidate_track(self.track_id)
 
     @property
     def path(self):
@@ -263,12 +264,9 @@ class ComunityTrack():
 
         # Lyrics
         if ('hardsubs' not in track_dict['tags']) and ('hardsubs' not in track_dict['tags'].get(None, [])):  # Do not do lyric checks if explicity stated they are not required. Fugly code warning: (Unsure if both of these are needed for the hardsubs check)
-            lyrics = track_dict.get('lyrics', [])
+            lyrics = track_dict.get('lyrics', '')
             if not lyrics:
-                status_details['yellow'].append('no lyrics')
-            for lyric in lyrics:
-                if not lyric.get('content', '').strip():
-                    status_details['red'].append('missing lyrics {0}'.format(lyric.get('language', '')))
+                status_details['red'].append('no lyrics')
 
         return {
             'status_details': status_details,

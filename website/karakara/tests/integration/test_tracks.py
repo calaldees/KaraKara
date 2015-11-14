@@ -30,7 +30,7 @@ def test_track_view_api(app, tracks):
     """
     data = app.get('/track/t1?format=json').json['data']
     assert data['track']['id'] == 't1'
-    assert 'ここ' in data['track']['lyrics'][0]['content']
+    assert 'ここ' in data['track']['lyrics']
 
 
 def test_track_list_all(app, tracks):

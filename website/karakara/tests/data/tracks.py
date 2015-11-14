@@ -6,7 +6,7 @@ from externals.lib.misc import random_string, random
 
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
-from karakara.model.model_tracks import Track, Attachment, Lyrics
+from karakara.model.model_tracks import Track, Attachment
 
 from karakara.views import cache
 
@@ -41,16 +41,16 @@ def tags(request):
 def attachments(request):
     """
     """
-    attachments_data = [
-        ('test/preview1.3gp' , 'preview'  ),
-        ('test/preview2.flv' , 'preview'  ),
-        ('test/preview3.mp4' , 'preview'  ),
-        ('test/image1.jpg'   , 'thumbnail'),
-        ('test/image2.jpg'   , 'thumbnail'),
-        ('test/image3.png'   , 'thumbnail'),
-        ('test/processed.mpg', 'video'    ),
-        ('test/subtitles.ssa', 'subtitle' ),
-    ]
+    attachments_data = (
+        ('test/preview1.3gp', 'preview'),
+        ('test/preview2.flv', 'preview'),
+        ('test/preview3.mp4', 'preview'),
+        ('test/image1.jpg', 'image'),
+        ('test/image2.jpg', 'image'),
+        ('test/image3.png', 'image'),
+        ('test/processed.mpg', 'video'),
+        ('test/subtitles.srt', 'srt'),
+    )
     attachments = []
     for attachment_location, attachment_type in attachments_data:
         attachment = Attachment()
@@ -71,38 +71,7 @@ def attachments(request):
 
 
 @pytest.fixture(scope="session")
-def lyrics(request):
-    lyrics_data = [
-        {
-            'language': 'jp',
-            'content': 'ここにいくつかのテキストです。',
-        },
-        {
-            'language': 'en',
-            'content': 'Line1\nLine2\nLine3\nLine4\näöü"',
-        },
-    ]
-    lyrics_list = []
-    for lyric_data in lyrics_data:
-        lyrics = Lyrics()
-        for k, v in lyric_data.items():
-            setattr(lyrics, k, v)
-        #DBSession.add(lyrics)
-        lyrics_list.append(lyrics)
-
-    def finalizer():
-        pass
-        #for lyrics in lyrics_list:
-        #    DBSession.delete(lyrics)
-        #commit()
-    request.addfinalizer(finalizer)
-
-    #commit()
-    return lyrics_list
-
-
-@pytest.fixture(scope="session")
-def tracks(request, DBSession, commit, tags, attachments, lyrics):
+def tracks(request, DBSession, commit, tags, attachments):
     tracks_data = [
         {
             'id': "t1",
@@ -113,7 +82,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 'opening', 'male', 'jp', 'anime', 'jpop', 'series X',
             ],
             'attachments': ['image1', 'preview1', 'processed'],
-            'lyrics': lyrics[0],
+            'lyrics': 'ここにいくつかのテキストです。',
             'source_filename': 'track1source',
         },
         {
@@ -125,7 +94,7 @@ def tracks(request, DBSession, commit, tags, attachments, lyrics):
                 'ending', 'female', 'en', 'anime', 'series X',
             ],
             'attachments': ['image2', 'preview2'],
-            'lyrics':lyrics[1],
+            'lyrics': 'Line1\nLine2\nLine3\nLine4\näöü"',
             'source_filename': 'track2source',
         },
         {
@@ -196,7 +165,6 @@ def create_test_track(id=None, duration=None, tags=[], attachments=[], lyrics=No
     track.duration    = duration if duration else random.randint(60,360)
     [track.tags       .append(_get_tag       (t)) for t in tags       ]
     [track.attachments.append(_get_attachment(a)) for a in attachments]
-    if lyrics:
-        track.lyrics.append(lyrics)
+    track.lyrics = lyrics or ''
     track.source_filename = source_filename
     return track

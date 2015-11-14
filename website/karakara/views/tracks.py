@@ -76,7 +76,6 @@ def track_view(request):
                 joinedload(Track.tags),
                 joinedload(Track.attachments),
                 joinedload('tags.parent'),
-                joinedload('lyrics'),
             ).get(id).to_dict('full')
             track_dict['title'] = track_title(track_dict['tags'])
             return track_dict
