@@ -76,7 +76,7 @@ def queue_view(request):
                                     joinedload(Track.tags),\
                                     joinedload(Track.attachments),\
                                     joinedload('tags.parent'),\
-                                    defer(Track.lyrics),\
+                                    #defer(Track.lyrics),\
                                 )
             tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
 

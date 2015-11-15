@@ -3,7 +3,7 @@ from . import Base, JSONEncodedDict
 from sqlalchemy import event
 from sqlalchemy import Column, Enum, ForeignKey
 from sqlalchemy import String, Unicode, UnicodeText, Integer, Float, DateTime
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, deferred
 
 import copy
 
@@ -40,7 +40,7 @@ class Track(Base):
     tags = relationship("Tag", secondary=TrackTagMapping.__table__)  # , lazy="joined"
     attachments = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     #lyrics = relationship("Lyrics", cascade="all, delete-orphan")
-    lyrics = Column(UnicodeText(), nullable=True)
+    lyrics = deferred(Column(UnicodeText(), nullable=True))
 
     time_updated = Column(DateTime(), nullable=False, default=now)
 

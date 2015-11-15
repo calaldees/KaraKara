@@ -8,7 +8,7 @@ from collections import defaultdict
 from pyramid.view import view_config
 from pyramid.events import subscriber
 
-from sqlalchemy.orm import joinedload, defer
+from sqlalchemy.orm import joinedload, undefer
 
 from externals.lib.misc import backup
 from externals.lib.pyramid_helpers import get_setting
@@ -320,7 +320,7 @@ def comunity_list(request):
                     joinedload(Track.tags), \
                     joinedload(Track.attachments), \
                     joinedload('tags.parent'), \
-                    #defer('lyrics'), \
+                    undefer('lyrics'), \
                 )
         ]
 

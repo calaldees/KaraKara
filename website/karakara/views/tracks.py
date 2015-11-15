@@ -2,7 +2,7 @@ import random
 
 from pyramid.view import view_config
 
-from sqlalchemy.orm import joinedload, defer
+from sqlalchemy.orm import joinedload, undefer
 
 from externals.lib.misc import subdict
 from externals.lib.log import log_event
@@ -76,6 +76,7 @@ def track_view(request):
                 joinedload(Track.tags),
                 joinedload(Track.attachments),
                 joinedload('tags.parent'),
+                undefer(Track.lyrics),
             ).get(id).to_dict('full')
             track_dict['title'] = track_title(track_dict['tags'])
             return track_dict
