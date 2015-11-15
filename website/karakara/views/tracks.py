@@ -139,7 +139,7 @@ def track_list_all(request):
     tracks = DBSession.query(Track).options(
         joinedload(Track.tags),
         joinedload('tags.parent'),
-        defer(Track.lyrics),
+        #defer(Track.lyrics),
     )
     tracks = restrict_search(request, tracks)
     track_list = [track.to_dict(include_fields='tags') for track in tracks]

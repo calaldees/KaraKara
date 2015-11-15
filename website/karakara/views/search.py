@@ -286,7 +286,7 @@ def list(request):
                                 joinedload(Track.tags),\
                                 joinedload(Track.attachments),\
                                 joinedload('tags.parent'),\
-                                defer(Track.lyrics),\
+                                #defer(Track.lyrics),\
                             )
 
         action_return['data'].update({
