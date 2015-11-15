@@ -263,7 +263,9 @@ class ComunityTrack():
                 status_details['red'].append('missing attachment {0}'.format(location))
 
         # Lyrics
-        if ('hardsubs' not in track_dict['tags']) and ('hardsubs' not in track_dict['tags'].get(None, [])):  # Do not do lyric checks if explicity stated they are not required. Fugly code warning: (Unsure if both of these are needed for the hardsubs check)
+        # Do not do lyric checks if explicity stated they are not required.
+        # Fugly code warning: (Unsure if both of these are needed for the hardsubs check)
+        if ('hardsubs' not in track_dict['tags']) and ('hardsubs' not in track_dict['tags'].get(None, [])):
             lyrics = track_dict.get('lyrics', '')
             if not lyrics:
                 status_details['red'].append('no lyrics')

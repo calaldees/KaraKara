@@ -21,11 +21,11 @@ def random_tracks(request, DBSession, commit, num_tracks=800):
     attachments_meta = [
         ('preview1.3gp', 'preview'),
         ('preview2.flv', 'preview'),
-        ('image1.jpg', 'thumbnail'),
-        ('image2.jpg', 'thumbnail'),
-        ('image3.png', 'thumbnail'),
+        ('image1.jpg', 'image'),
+        ('image2.jpg', 'image'),
+        ('image3.png', 'image'),
         ('processed.mpg', 'video'),
-        ('subtitles.srt', 'subtitle'),
+        ('subtitles.srt', 'srt'),
     ]
     attachments = []
     for location, type in attachments_meta:
