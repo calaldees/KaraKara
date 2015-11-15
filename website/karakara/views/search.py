@@ -4,7 +4,7 @@ import random
 import collections
 
 from sqlalchemy import func
-from sqlalchemy.orm import joinedload, aliased
+from sqlalchemy.orm import joinedload, aliased, defer
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -286,6 +286,7 @@ def list(request):
                                 joinedload(Track.tags),\
                                 joinedload(Track.attachments),\
                                 joinedload('tags.parent'),\
+                                defer(Track.lyrics),\
                             )
 
         action_return['data'].update({

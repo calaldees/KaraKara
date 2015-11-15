@@ -2,7 +2,7 @@ import random
 
 from pyramid.view import view_config
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, defer
 
 from externals.lib.misc import subdict
 from externals.lib.log import log_event
@@ -139,6 +139,7 @@ def track_list_all(request):
     tracks = DBSession.query(Track).options(
         joinedload(Track.tags),
         joinedload('tags.parent'),
+        defer(Track.lyrics),
     )
     tracks = restrict_search(request, tracks)
     track_list = [track.to_dict(include_fields='tags') for track in tracks]

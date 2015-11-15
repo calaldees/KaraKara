@@ -18,7 +18,7 @@ from ..model.actions import get_track
 
 from ..templates.helpers import track_title
 
-from sqlalchemy.orm import joinedload  # , joinedload_all
+from sqlalchemy.orm import joinedload, defer  # , joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
 from .tracks import invalidate_track
@@ -76,6 +76,7 @@ def queue_view(request):
                                     joinedload(Track.tags),\
                                     joinedload(Track.attachments),\
                                     joinedload('tags.parent'),\
+                                    defer(Track.lyrics),\
                                 )
             tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='lyrics') for track in tracks]}
 
