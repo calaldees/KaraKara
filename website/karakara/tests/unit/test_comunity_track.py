@@ -98,7 +98,7 @@ STATUS_TAGS = {
     #  currently func_is_file is not used. The default of 'True' is always present on the defaut implementation
 
 
-    # lyrics missing warning
+    # lyrics missing is an error
     (
         {
             'tags': {
@@ -110,8 +110,8 @@ STATUS_TAGS = {
                 {'location': '/test/test.jpg'}
             ],
         },
-        'yellow',
-        ('yellow',),
+        'red',  # Unless explicity stated. Missing lyrics is a BAD thing for a karaoke system
+        ('red',),
         ('lyrics',),
     ),
     # lyric - special case - remove lyric 'missing warning' if hardsubs anaonimus tag is used
