@@ -8,7 +8,7 @@ from collections import defaultdict
 from pyramid.view import view_config
 from pyramid.events import subscriber
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, defer
 
 from externals.lib.misc import backup
 from externals.lib.pyramid_helpers import get_setting
@@ -132,7 +132,6 @@ class ComunityTrack():
                     joinedload(Track.tags), \
                     joinedload(Track.attachments), \
                     joinedload('tags.parent'), \
-                    joinedload('lyrics'), \
                 ) \
                 .get(self.track_id).to_dict('full')
         return self._track_dict
@@ -321,7 +320,7 @@ def comunity_list(request):
                     joinedload(Track.tags), \
                     joinedload(Track.attachments), \
                     joinedload('tags.parent'), \
-                    joinedload('lyrics'), \
+                    #defer('lyrics'), \
                 )
         ]
 

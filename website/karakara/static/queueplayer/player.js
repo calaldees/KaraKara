@@ -587,7 +587,7 @@ function init() {
 	// Load showcase images for titlescreen
 	$.getJSON("/random_images.json?count=200", {}, function(data) {
 		console.log("/random_images");
-		init_titlescreen(data.data.thumbnails);
+		init_titlescreen(data.data.images);
 		show_screen('preview');
 	});
 }

@@ -49,8 +49,8 @@
 		% endif
 		
 		<div class="thumbnails">
-		% for thumbnail_url in h.attachment_locations_by_type(track,'thumbnail'):
-			<img src="${thumbnail_url}" class="video_placeholder" style="display: none;" />
+		% for image_url in h.attachment_locations_by_type(track,'image'):
+			<img src="${image_url}" class="video_placeholder" style="display: none;" />
 		% endfor
 		</div>
 		
