@@ -89,13 +89,15 @@ class Encoder(object):
         self._encode_primary_video_from_meta(m)
 
         if not m.source_hash:
-            log.warn('No source_hash to extract additional media')
+            log.warn('No source_hash to extract additional media %s', name)
             return
 
-        self._encode_preview_video_from_meta(m)
-        self._encode_images_from_meta(m)
-        self._process_tags_from_meta(m)
-        self.meta.save(name)
+        if all(
+                self._encode_preview_video_from_meta(m),
+                self._encode_images_from_meta(m),
+                self._process_tags_from_meta(m),
+        ):
+            self.meta.save(name)
 
     def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
@@ -109,7 +111,7 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
-        source_details = external_tools.probe_media(source_files['video']['absolute'])
+        m.source_details.update(external_tools.probe_media(source_files['video']['absolute']))
 
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
@@ -140,7 +142,7 @@ class Encoder(object):
                 temp_ssa_file = os.path.join(tempdir, 'subs.ssa')
                 with open(temp_ssa_file, 'w', encoding='utf-8') as subfile:
                     subfile.write(
-                        subtitle_processor.create_ssa(subtitles, width=source_details['width'], height=source_details['height'])
+                        subtitle_processor.create_ssa(subtitles, width=m.source_details['width'], height=m.source_details['height'])
                     )
                 source_files['sub']['absolute'] = temp_ssa_file  # It is safe to set this key as it will never be persisted in the meta
 
@@ -213,7 +215,7 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
-        video_duration = external_tools.probe_media(source_file_absolute).get('duration')
+        video_duration = m.source_details.get('duration')
         if not video_duration:
             log.warn('Unable to assertain video duration; unable to extact images')
             return False

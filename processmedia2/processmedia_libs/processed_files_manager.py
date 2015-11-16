@@ -34,8 +34,8 @@ class ProcessedFilesManager(object):
         )
 
     def get_all_processed_files_associated_with_source_hash(self, source_hash):
-        if hasattr(source_hash, 'processed_data'):
-            source_hash = source_hash.processed_data.get('main', {}).get('hash')
+        if hasattr(source_hash, 'source_hash'):
+            source_hash = source_hash.source_hash
         if not source_hash:
             return {}
         processed_files = defaultdict(list)

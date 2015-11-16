@@ -61,7 +61,7 @@ class TrackImporter(object):
         track = Track()
         track.id = m.source_hash
         track.source_filename = name
-        track.duration = 0  # TODO
+        track.duration = m.source_details.get('duration')
 
         self._add_attachments(track, processed_files)
         self._add_lyrics(track, first(processed_files.get('srt')))

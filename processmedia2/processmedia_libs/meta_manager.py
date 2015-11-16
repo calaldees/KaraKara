@@ -99,7 +99,7 @@ class MetaFile(object):
 
         self.scan_data = self.data.setdefault('scan', {})
         self.pending_actions = self.data.setdefault('actions', [])
-        self.processed_data = self.data.setdefault('processed', {})
+        self.source_details = self.data.setdefault('processed', {})
         self.data_hash = freeze(data).__hash__()
 
         self.file_collection = ()
@@ -149,10 +149,10 @@ class MetaFile(object):
 
     @property
     def source_hash(self):
-        return self.processed_data.get(self.SOURCE_HASH_KEY)
+        return self.source_details.get(self.SOURCE_HASH_KEY)
     @source_hash.setter
     def source_hash(self, value):
-        self.processed_data[self.SOURCE_HASH_KEY] = value
+        self.source_details[self.SOURCE_HASH_KEY] = value
 
 
 class FileItemWrapper(object):
