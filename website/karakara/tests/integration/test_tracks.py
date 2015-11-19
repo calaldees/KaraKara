@@ -21,6 +21,7 @@ def test_track_view(app, tracks, track_id, expected_response, text_list):
     assert response.status_code == expected_response
     for text in text_list:
         assert text.lower() in response.text.lower()
+    assert 'poster="/files/test/image' in response.text, 'html5 video poster with an image should be present'
 
 
 def test_track_view_api(app, tracks):

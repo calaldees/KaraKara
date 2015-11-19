@@ -80,7 +80,7 @@ def attachment_locations_by_type(track, attachment_type):
 
 
 def thumbnail_location_from_track(track, index=0):
-    thumbnails = attachment_locations_by_type(track, 'thumbnail')
+    thumbnails = attachment_locations_by_type(track, 'image')
     if not thumbnails:
         return ''
     if index == 'random':
