@@ -53,8 +53,9 @@ class ProcessedFilesManager(object):
 class ProcessedFile(object):
     def __init__(self, path, hashs, ext):
         self.hash = gen_string_hash(hashs)
-        self.relative = os.path.join(path, '{}.{}'.format(self.hash, ext))
-        self.absolute = os.path.abspath(self.relative)
+        self.relative = '{}.{}'.format(self.hash, ext)
+        self.relative_to_current_execution = os.path.join(path, self.relative)
+        self.absolute = os.path.abspath(self.relative_to_current_execution)
 
     def move(self, source_file):
         """

@@ -33,7 +33,7 @@ def test_track_view_api(app, tracks):
     assert 'ここ' in data['track']['lyrics']
 
 
-def test_track_list_all(app, tracks):
+def test_track_list_print_all(app, tracks):
     """
     Track list displays all tracks in one giant document
     Used for printing
@@ -44,7 +44,7 @@ def test_track_list_all(app, tracks):
             assert text in response.text
 
 
-def test_track_list_all_api(app, tracks):
+def test_track_list_print_all_api(app, tracks):
     # TODO: Security has been disbaled temporerally. This should be re-enabled ASAP
     #assert app.get('/track_list.json', expect_errors=True).status_code == 403
     with admin_rights(app):
@@ -58,3 +58,15 @@ def test_track_unknown(app):
     """
     response = app.get('/track/unknown_track_id', expect_errors=True)
     assert response.status_code == 404
+
+
+def test_track_list(app, tracks):
+    """
+    Because we have so few tracks in the test database - search_list should r
+    eturn ALL the tracks in an html list. The thumbnails should be present for each track
+    """
+    response = app.get('/search_list/')
+    for text in ('Test Track 1', 'Test Track 2', 'Test Track 3 キ', 'Wildcard', 'test/image1.jpg', 'test/image2.jpg'):
+        assert text in response.text
+    for text in ('test/preview1.3gp', ):
+        assert text not in response.text

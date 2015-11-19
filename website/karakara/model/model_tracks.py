@@ -84,7 +84,7 @@ class Track(Base):
     @property
     def image(self):
         for attachment in self.attachments:
-            if attachment.type == 'thumbnail':
+            if attachment.type == 'image':
                 return attachment.location
         return ''
 

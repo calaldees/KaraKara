@@ -78,7 +78,7 @@ api.search.max_age = 0 -> int
 # Static Assets ----------------------------------------------------------------
 static.assets = static
 static.player = static/queueplayer
-static.media  = %(here)s/../mediaserver/www/files
+static.media  = %(here)s/../mediaserver/www/processed
 #static.assets = http://staticserver.com/
 
 
