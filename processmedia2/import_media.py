@@ -36,8 +36,10 @@ def main(**kwargs):
     for name in meta.meta.keys():
         importer.import_track(name)
 
-    for unneeded_track in importer.imported_tracks - processed_tracks:
-        log.warn('delete %s', unneeded_track)
+    for unneeded_track_id in importer.imported_tracks - processed_tracks:
+        log.warn('Removing unnneded tracks: %s', unneeded_track_id)
+        DBSession.query(Track).filter(Track.id==unneeded_track_id).delete()
+    commit()
 
 
 class TrackImporter(object):
