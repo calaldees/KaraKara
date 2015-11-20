@@ -11,7 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from model.model_tracks import Track, Tag, Attachment, _attachment_types
 from model import init_DBSession, DBSession, commit
-from model.actions import get_tag, clear_all_tracks, last_update
+from model.actions import get_tag, clear_all_tracks, last_update, delete_track
 
 
 import logging
@@ -38,7 +38,7 @@ def main(**kwargs):
 
     for unneeded_track_id in importer.imported_tracks - processed_tracks:
         log.warn('Removing unnneded tracks: %s', unneeded_track_id)
-        DBSession.query(Track).filter(Track.id==unneeded_track_id).delete()
+        delete_track(unneeded_track_id)
     commit()
 
 

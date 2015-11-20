@@ -5,6 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from . import DBSession
 from .model_tracks import Tag, Track
+from .model_queue import QueueItem
 
 import logging
 log = logging.getLogger(__name__)
@@ -68,3 +69,18 @@ def get_tag(tag, parent=None, create_if_missing=False):
 
 def clear_all_tracks():
     DBSession.query(Track).delete()
+    DBSession.query(QueueItem).delete()
+
+
+def delete_track(track_id):
+    """
+    Because we don't define the relationship between tracks and queue_items in the orm
+    We need to manually handle the delete cascade
+    Maybe we should consider using the orm? There is note on the QueueItem with more info
+    However ... There may be a need to keep the queue separate ... for long
+    running system we may remove tracks but we may want to keep a log of that
+    were sang. There would be no track details, but currently the system will crash on html
+    rendering if these queue_item orphan records are left
+    """
+    DBSession.query(Track).filter(Track.id == track_id).delete()
+    DBSession.query(QueueItem).filter(QueueItem.track_id == track_id).delete()
