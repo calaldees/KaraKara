@@ -1,10 +1,11 @@
 import random
 
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPFound
 
 from sqlalchemy.orm import joinedload, undefer
 
-from externals.lib.misc import subdict
+from externals.lib.misc import subdict, first
 from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
@@ -15,7 +16,7 @@ from ..model import DBSession
 from ..model.model_tracks import Track
 #from ..model.model_queue  import QueueItem
 
-from ..templates.helpers import tag_hireachy, track_title
+from ..templates.helpers import tag_hireachy, track_title, track_url
 
 import logging
 log = logging.getLogger(__name__)
@@ -69,6 +70,13 @@ def track_view(request):
     """
     id = request.matchdict['id']
 
+    not_found_error = action_error(message='track {0} not found'.format(id), code=404)
+
+    # Search, find and redirect for shortened track id's
+    if len(id) != 64:
+        id = first(DBSession.query(Track.id).filter(Track.id.like('{0}%'.format(id))).first())
+        raise HTTPFound(location=track_url(id)) if id else not_found_error
+
     def get_track_dict(id):
         try:
             log.debug('cache gen - track_dict for {0}'.format(id))
@@ -95,12 +103,13 @@ def track_view(request):
         return track
 
     # TODO: Put some thought into the idea that a malicious cock could deliberately
-    #       perform repeated calls knowing a cache key could will be created and
+    #       perform repeated calls knowing a cache key could well be created and
     #       take the system down with an 'out of memory'. Then again, if they want to
-    #       attack this system with brains there is very little we can do.
+    #       attack this system with brains there is very little we can do to prevent
+    #       every attack vector.
     track = cache.get_or_create(track_key(id), lambda: get_track_and_queued_dict(id))
     if not track:
-        raise action_error(message='track {0} not found'.format(id), code=404)
+        raise not_found_error
 
     log_event(request, track_id=id, title=track['title'])
 
