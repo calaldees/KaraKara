@@ -145,6 +145,11 @@ def track_list_all(request):
     tracks = restrict_search(request, tracks)
     track_list = [track.to_dict(include_fields='tags') for track in tracks]
 
+    # The id is very long and not sutable for a printed list.
+    # We derive a truncated id specially for this printed list
+    for track in track_list:
+        track['id_short'] = track['id'][:6]
+
     # Sort track list
     #  this needs to be handled at the python layer because the tag logic is fairly compicated
     fields = request.registry.settings.get('karakara.print_tracks.fields',[])

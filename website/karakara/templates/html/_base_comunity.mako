@@ -82,7 +82,9 @@
 					<li class="dropdown">
 						<% user = identity.get('user') %>
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							% if user.get('avatar_url'):
 							<img src="${user.get('avatar_url')}" alt="${user.get('username')}" class="avatar"/>
+							% endif
 							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">

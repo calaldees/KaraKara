@@ -8,7 +8,7 @@
     <body>
         ##<h1>Tracks All</h1>
         <%
-            fields = ['id'] + request.registry.settings.get('karakara.print_tracks.fields',[])
+            fields = ['id_short'] + request.registry.settings.get('karakara.print_tracks.fields',[])
         %>
         <table>
             <thead>
