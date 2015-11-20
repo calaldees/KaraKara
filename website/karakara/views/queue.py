@@ -94,7 +94,7 @@ def queue_view(request):
 
         # Attach track to queue_item
         for queue_item in queue_dicts:
-            queue_item['track'] = tracks[queue_item['track_id']]
+            queue_item['track'] = tracks.get(queue_item['track_id'])
 
         # Calculate estimated track time
         # Overlay 'total_duration' on all tracks
@@ -110,6 +110,8 @@ def queue_view(request):
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
+            if not queue_item['track']:
+                continue
             queue_item['total_duration'] = total_duration
             total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
             if split_markers and total_duration > split_markers[0]:

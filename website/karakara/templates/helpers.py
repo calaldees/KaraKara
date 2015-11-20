@@ -72,6 +72,7 @@ def duration_str(duration):
 
 
 def attachment_locations(track, attachment_type='preview'):
+    track = track or {}
     return [(attachment, media_url(attachment['location'])) for attachment in track.get('attachments', []) if attachment['type'] == attachment_type]
 
 
