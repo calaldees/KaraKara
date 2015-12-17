@@ -111,6 +111,8 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
+        #m.source_details.update(external_tools.probe_media(source_files['audio']['absolute']))
+        #m.source_details.update(external_tools.probe_media(source_files['image']['absolute']))
         m.source_details.update(external_tools.probe_media(source_files['video']['absolute']))
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -118,8 +120,13 @@ class Encoder(object):
 
             # 3.a) Convert Image to Video
             if source_files['image'] and not source_files['video']:
-                log.warn('image to video conversion is not currently implemented')
-                return False
+                image_video_path = os.path.join(tempdir, 'image.mp4')
+                external_tools.encode_image_to_video(
+                    source=source_files['image']['absolute'],
+                    destination=image_video_path,
+                    **m.source_details
+                )
+                source_files['video']['absolute'] = image_video_path
 
             # 3.b) Normalize subtile files - Create our own managed ssa/srt
             if source_files['sub']:
