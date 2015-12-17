@@ -21,6 +21,6 @@ th {
     background: #dddddd;
     text-transform:capitalize;
 }
-td.col_id {
+td.col_id_short {
     text-transform:none;
 }

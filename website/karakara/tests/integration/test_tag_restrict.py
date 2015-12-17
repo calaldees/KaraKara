@@ -47,12 +47,12 @@ def test_track_list_all(app, settings, tracks):
         assert settings['karakara.search.tag.silent_forced'] == []
 
         soup = BeautifulSoup(app.get('/track_list').text)
-        data_rows = soup.find_all('td', class_='col_id')
+        data_rows = soup.find_all('td', class_='col_id_short')
         assert len(data_rows) == 4
 
         with patch.dict(settings, {'karakara.search.tag.silent_forced': ['category:anime']}):
             soup = BeautifulSoup(app.get('/track_list').text)
-            data_rows = soup.find_all('td', class_='col_id')
+            data_rows = soup.find_all('td', class_='col_id_short')
             assert len(data_rows) == 2
             assert 't1' in soup.text
             assert 't2' in soup.text
