@@ -82,6 +82,8 @@ def probe_media(source):
     """
     Todo: update for audio and images
     """
+    if not source:
+        return {}
     cmd_success, cmd_result = _run_tool(
         'avprobe',
         source
@@ -134,15 +136,21 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
             t=duration,
             bf=0,  # wha dis do?
             qmax=1,  # wha dis do?
-            loop=1,  # wha dis do?
-            vf='scale={width}:{height}'.format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+            #loop=1,  # wha dis do?
+            vf='scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+            vcodec=CONFIG['avconv']['h264_codec'],
         ),
         destination,
     )
 
 
 def encode_video(source, sub, destination):
+    if not source:
+        return
     log.info('encode_video - %s', os.path.basename(source))
+    if os.path.exists(destination):
+        log.debug('encode_video - destination already exists. Aborting encode. (image was processed beforehand?)')
+        return
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',

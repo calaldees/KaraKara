@@ -34,7 +34,9 @@ def main(**kwargs):
         #'Tamako Market - OP - Dramatic Market Ride',
         #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
         #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
-        m.name for m in meta.meta.values() #if m.pending_actions
+        'KAT-TUN Your side [Instrumental]',
+
+        #m.name for m in meta.meta.values() #if m.pending_actions
     ):
         encoder.encode(name)
 
@@ -111,22 +113,22 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no encoding required')
             return True
 
-        #m.source_details.update(external_tools.probe_media(source_files['audio']['absolute']))
-        #m.source_details.update(external_tools.probe_media(source_files['image']['absolute']))
-        m.source_details.update(external_tools.probe_media(source_files['video']['absolute']))
+        m.source_details.update({k:v for k, v in external_tools.probe_media(source_files['image'].get('absolute')).items() if k in ('width', 'height')})
+        m.source_details.update({k:v for k, v in external_tools.probe_media(source_files['audio'].get('absolute')).items() if k in ('duration',)})
+        m.source_details.update(external_tools.probe_media(source_files['video'].get('absolute')))
 
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
 
             # 3.a) Convert Image to Video
             if source_files['image'] and not source_files['video']:
-                image_video_path = os.path.join(tempdir, 'image.mp4')
+                image_video_path = os.path.join(tempdir, 'video.mp4')
                 external_tools.encode_image_to_video(
                     source=source_files['image']['absolute'],
                     destination=image_video_path,
                     **m.source_details
                 )
-                source_files['video']['absolute'] = image_video_path
+                #source_files['video']['absolute'] = image_video_path
 
             # 3.b) Normalize subtile files - Create our own managed ssa/srt
             if source_files['sub']:
@@ -157,7 +159,7 @@ class Encoder(object):
             encode_steps = (
                 # 4.a) Render video with subtitles (without audio)
                 lambda: external_tools.encode_video(
-                    source=source_files['video']['absolute'],
+                    source=source_files['video'].get('absolute'),
                     sub=source_files['sub'].get('absolute'),
                     destination=os.path.join(tempdir, 'video.mp4'),
                 ),
