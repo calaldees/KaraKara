@@ -94,11 +94,11 @@ class Encoder(object):
             log.warn('No source_hash to extract additional media %s', name)
             return
 
-        if all(
+        if all((
                 self._encode_preview_video_from_meta(m),
                 self._encode_images_from_meta(m),
                 self._process_tags_from_meta(m),
-        ):
+        )):
             self.meta.save(name)
 
     def _encode_primary_video_from_meta(self, m):
@@ -122,13 +122,13 @@ class Encoder(object):
 
             # 3.a) Convert Image to Video
             if source_files['image'] and not source_files['video']:
-                image_video_path = os.path.join(tempdir, 'video.mp4')
+                image_video_path = os.path.join(tempdir, 'image.mp4')
                 external_tools.encode_image_to_video(
                     source=source_files['image']['absolute'],
                     destination=image_video_path,
                     **m.source_details
                 )
-                #source_files['video']['absolute'] = image_video_path
+                source_files['video']['absolute'] = image_video_path
 
             # 3.b) Normalize subtile files - Create our own managed ssa/srt
             if source_files['sub']:

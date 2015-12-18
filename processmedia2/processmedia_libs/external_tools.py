@@ -110,47 +110,25 @@ def probe_media(source):
 
 
 def encode_image_to_video(source, destination, duration=10, width=320, height=240, **kwargs):
-    """
-        Notes:
-
-        # scale image input to appropriate size and pad
-        scale = float(self.base_width) / float(self.original_sub_width)
-        s = float(self.base_height) / float(self.original_sub_height)
-        if s < scale:
-            scale = s
-        img_width = int(math.floor(self.original_sub_width * scale))
-        img_width += img_width % 2
-        img_height = int(math.floor(self.original_sub_height * scale))
-        img_height += img_height % 2
-
-        '-vf', 'scale={0}:{1}'.format(img_width, img_height) + ',pad={0}:{1}:(ow-iw)/2:(oh-ih)/2,setsar=1:1'.format(self.base_width, self.base_height),
-
-    """
     log.info('encode_image_to_video - %s', os.path.basename(source))
     _run_tool(
         *AVCONV_COMMON_ARGS,
+        '-loop', '1',
         '-i', source,
         *cmd_args(
             strict='experimental',
-            r=1,  # 1 fps
+            r=5,  # 1 fps
             t=duration,
             bf=0,  # wha dis do?
             qmax=1,  # wha dis do?
-            #loop=1,  # wha dis do?
             vf='scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
-            vcodec=CONFIG['avconv']['h264_codec'],
         ),
         destination,
     )
 
 
 def encode_video(source, sub, destination):
-    if not source:
-        return
     log.info('encode_video - %s', os.path.basename(source))
-    if os.path.exists(destination):
-        log.debug('encode_video - destination already exists. Aborting encode. (image was processed beforehand?)')
-        return
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',
