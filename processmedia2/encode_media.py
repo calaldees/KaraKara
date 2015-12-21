@@ -197,7 +197,7 @@ class Encoder(object):
             return False
 
         if target_file.exists:
-            log.info('Processed Destination was created with the same input sources - no encoding required')
+            log.info('Processed preview was created with the same input sources - no encoding required')
             return True
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -214,6 +214,19 @@ class Encoder(object):
         return True
 
     def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
+        """
+        Logic to decide to:
+            - extract a sequence of images from a video
+            - or scale a single image input
+        """
+        source_video_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
+        source_image_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
+        if source_video_absolute:
+            return self._encode_images_from_video(m)
+        elif source_image_absolute:
+            return self._encode_image(m)
+
+    def _encode_images_from_video(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
         source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video']['absolute']
 
         target_files = tuple(
@@ -240,6 +253,26 @@ class Encoder(object):
                 target_files[index].move(image_file)
 
         return True
+
+    def _encode_image(self, m):
+        # Feels very heavy to scale a single image, but fits with the methodology of the other encoders
+        source_image_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image']['absolute']
+        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'image')
+
+        if target_file.exists:
+            return True
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            image_file = os.path.join(tempdir, 'scaled.jpg')
+            encode_succes, cmd_result = external_tools.scale_image(source_image_absolute, image_file)
+
+            if not encode_succes:
+                import pdb ; pdb.set_trace()
+                return False
+
+            target_file.move(image_file)
+            return True
+
 
     def _process_tags_from_meta(self, m):
         """

@@ -226,6 +226,24 @@ def encode_preview_video(source, destination):
     )
 
 
+def scale_image(source, destination):
+    """
+    Not the most elegant scaling system, but uses the tools we already have installed
+    """
+    log.info('scale_image - %s', source)
+    return _run_tool(
+        *AVCONV_COMMON_ARGS,
+        '-i', source,
+        *cmd_args(
+            ss=0,
+            vframes=1,
+            an=None,
+            vf=CONFIG['avconv']['scale'],
+        ),
+        destination,
+    )
+
+
 def extract_image(source, destination, time=0.2):
     log.info('extract_image - %s', os.path.basename(source))
 
