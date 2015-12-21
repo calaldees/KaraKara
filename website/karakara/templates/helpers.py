@@ -85,8 +85,8 @@ def thumbnail_location_from_track(track, index=0):
     if not thumbnails:
         return ''
     if index == 'random':
-        index = random.randint(0, thumbnails.length)
-    return thumbnails[index]
+        index = random.randint(0, len(thumbnails)-1)
+    return thumbnails[min(index, len(thumbnails)-1)]
 
 
 def video_mime_type(attachment):
