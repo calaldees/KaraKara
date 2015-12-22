@@ -1,3 +1,5 @@
+from collections import defaultdict
+from pprint import pprint
 
 from libs.misc import postmortem, fast_scan, epoc, first
 from processmedia_libs import add_default_argparse_args
@@ -18,6 +20,14 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class TrackNotProcesedException(Exception):
+    pass
+
+
+class TrackMissingProcessedFiles(Exception):
+    pass
+
+
 def main(**kwargs):
     """
      - hash and identify primary key for track
@@ -26,20 +36,41 @@ def main(**kwargs):
      - cleanup db - any sources we don't have the actual processed files for - prune and remove from db
        - check this removes unnneeded attachments
     """
+    stats = defaultdict(int)
+
     meta = MetaManager(kwargs['path_meta'])
     importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
 
     meta.load_all()  # mtime=epoc(last_update())
 
-    processed_tracks = set(m.source_hash for m in meta.meta.values())
+    processed_tracks = set(m.source_hash for m in meta.meta.values() if m.source_hash)
+    stats['processed'] = len(processed_tracks)
 
     for name in meta.meta.keys():
-        importer.import_track(name)
+        try:
+            if importer.import_track(name):
+                stats['imported'] += 1
+            else:
+                stats['before'] += 1
+        except TrackNotProcesedException:
+            log.debug('Unprocessed: %s', name)  # has no source_hash
+            stats['unprocessed'] += 1
+        except TrackMissingProcessedFiles:
+            log.warn('Missing: %s', name)  # does not have all required processde files
+            stats['missing'] += 1
 
-    for unneeded_track_id in importer.imported_tracks - processed_tracks:
+    unneeded_tracks = importer.imported_tracks - processed_tracks
+    for unneeded_track_id in unneeded_tracks:
         log.warn('Removing unnneded tracks: %s', unneeded_track_id)
         delete_track(unneeded_track_id)
     commit()
+
+    stats['deleted'] = len(unneeded_tracks)
+    assert stats['before'] == len(importer.imported_tracks), 'The counted skips tracks should match what the db said it had. Investigate.'
+    stats['total'] = stats['before'] + stats['imported']
+    assert stats['total'] == DBSession.query(Track.id).count(), 'Total tracks should == tracks in db before + imported tracks. Investigate.'
+
+    pprint(stats)
 
 
 class TrackImporter(object):
@@ -50,14 +81,18 @@ class TrackImporter(object):
         self.imported_tracks = set(t.id for t in DBSession.query(Track.id))
 
     def import_track(self, name):
+        log.debug('Attemping: %s', name)
+
         self.meta.load(name)
         m = self.meta.get(name)
-        if not m.source_hash or m.source_hash in self.imported_tracks:
+        if not m.source_hash:
+            raise TrackNotProcesedException()
+        if m.source_hash in self.imported_tracks:
+            log.debug('Exists: %s', name)
             return
         processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash)
-        if not self._has_required_files(processed_files):
-            log.warn('%s does not have all required processde files', name)
-            return
+        if self._missing_files(processed_files):
+            raise TrackMissingProcessedFiles()
 
         log.info('Import: %s', name)
         track = Track()
@@ -72,13 +107,18 @@ class TrackImporter(object):
         DBSession.add(track)
         commit()
 
-    def _has_required_files(self, processed_files):
-        for k in ('video', 'preview', 'tags', 'image'):
-            for processed_file in processed_files[k]:
-                if not processed_file.exists:
-                    log.warn('Missing processed file: %s - %s', k, processed_file.absolute)
-                    return False
         return True
+
+    def _missing_files(self, processed_files):
+        missing_processed_files = {
+            (k, processed_file)
+            for k in ('video', 'preview', 'tags', 'image')
+            for processed_file in processed_files[k]
+            if not processed_file.exists
+        }
+        for file_type, processed_file in missing_processed_files:
+            log.debug('Missing processed file: %s - %s', file_type, processed_file.absolute)
+        return missing_processed_files
 
     def _add_attachments(self, track, processed_files):
         track.attachments.clear()
