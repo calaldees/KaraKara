@@ -1,10 +1,10 @@
 import os.path
 import tempfile
 
-from libs.misc import postmortem, hashfile, freeze, first
+from libs.misc import postmortem, hashfile, freeze, first, file_ext
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args
+from processmedia_libs import add_default_argparse_args, EXTS
 from processmedia_libs import external_tools
 from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
 from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
@@ -33,7 +33,7 @@ def main(**kwargs):
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
         #'Tamako Market - OP - Dramatic Market Ride',
         #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
-        #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
+        'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
         'KAT-TUN Your side [Instrumental]',
 
         #m.name for m in meta.meta.values() #if m.pending_actions
@@ -104,8 +104,7 @@ class Encoder(object):
     def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
-        source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
-        m.source_hash = source_hash
+        m.source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
@@ -213,21 +212,11 @@ class Encoder(object):
 
         return True
 
-    def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
-        """
-        Logic to decide to:
-            - extract a sequence of images from a video
-            - or scale a single image input
-        """
-        source_video_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
-        source_image_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
-        if source_video_absolute:
-            return self._encode_images_from_video(m)
-        elif source_image_absolute:
-            return self._encode_image(m)
 
-    def _encode_images_from_video(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
-        source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video']['absolute']
+    def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
+        source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
+        if not source_file_absolute:  # If no video source, attempt to degrade to single image input
+            source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
 
         target_files = tuple(
             self.processed_files_manager.get_processed_file(m.source_hash, 'image', index)
@@ -237,11 +226,18 @@ class Encoder(object):
             log.info('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
-        video_duration = m.source_details.get('duration')
-        if not video_duration:
-            log.warn('Unable to assertain video duration; unable to extact images')
-            return False
-        times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
+        if file_ext(source_file_absolute).ext in EXTS['image']:
+            # If input is a single image, we use it as an imput video and take
+            # a frame 4 times from frame zero.
+            # This feels inefficent, but we need 4 images for the import check.
+            # Variable numbers of images would need more data in the meta
+            times = (0, ) * num_images
+        else:
+            video_duration = m.source_details.get('duration')
+            if not video_duration:
+                log.warn('Unable to assertain video duration; unable to extact images')
+                return False
+            times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
 
         with tempfile.TemporaryDirectory() as tempdir:
             for index, time in enumerate(times):
@@ -254,34 +250,21 @@ class Encoder(object):
 
         return True
 
-    def _encode_image(self, m):
-        # Feels very heavy to scale a single image, but fits with the methodology of the other encoders
-        source_image_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image']['absolute']
-        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'image')
-
-        if target_file.exists:
-            return True
-
-        with tempfile.TemporaryDirectory() as tempdir:
-            image_file = os.path.join(tempdir, 'scaled.jpg')
-            encode_succes, cmd_result = external_tools.scale_image(source_image_absolute, image_file)
-
-            if not encode_succes:
-                import pdb ; pdb.set_trace()
-                return False
-
-            target_file.move(image_file)
-            return True
-
 
     def _process_tags_from_meta(self, m):
         """
         No processing ... this is just a copy
         """
-        source_files = self.fileitem_wrapper.wrap_scan_data(m)
+        source_file = self.fileitem_wrapper.wrap_scan_data(m).get('tag', {}).get('absolute')
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'tags')
 
-        target_file.copy(source_files['tag']['absolute'])
+        if not os.path.exists(source_file):
+            log.warn('Source file tags does not exists? wtf! %s', source_file)
+            return False
+
+        target_file.copy(source_file)
+
+        return target_file.exists
 
 
 # Arguments --------------------------------------------------------------------

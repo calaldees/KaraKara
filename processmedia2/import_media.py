@@ -76,7 +76,7 @@ class TrackImporter(object):
         for k in ('video', 'preview', 'tags', 'image'):
             for processed_file in processed_files[k]:
                 if not processed_file.exists:
-                    log.warn('Missing processed file %s', processed_file.absolute)
+                    log.warn('Missing processed file: %s - %s', k, processed_file.absolute)
                     return False
         return True
 
