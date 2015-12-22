@@ -156,8 +156,9 @@ def track_list_all(request):
 
     # The id is very long and not sutable for a printed list.
     # We derive a truncated id specially for this printed list
+    short_id_length = request.registry.settings.get('karakara.print_tracks.short_id_length', 6)
     for track in track_list:
-        track['id_short'] = track['id'][:6]
+        track['id_short'] = track['id'][:short_id_length]
 
     # Sort track list
     #  this needs to be handled at the python layer because the tag logic is fairly compicated

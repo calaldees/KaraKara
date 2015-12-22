@@ -61,6 +61,7 @@ karakara.search.list.alphabetical.threshold = 90 -> int
 karakara.search.list.alphabetical.tags = [from, artist]
 
 karakara.print_tracks.fields = [category, from, use, title, artist]
+karakara.print_tracks.short_id_length = 4 -> int
 
 # Comunity ---------------------------------------------------------------------
 

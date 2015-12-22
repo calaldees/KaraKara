@@ -10,7 +10,7 @@
 
 <h1 class="track_title">${h.track_title_only(track['tags'])}</h1>
 
-<p class="track_code">Track Code: <span>${track['id']}</span></p>
+<p class="track_code">Track ID: <span>${track['id'][:request.registry.settings.get('karakara.print_tracks.short_id_length', 6)]}</span></p>
 
 <table class="track_tags">
 % for key,values in track['tags'].items():
