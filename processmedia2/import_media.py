@@ -2,7 +2,7 @@ from collections import defaultdict
 from pprint import pprint
 
 from libs.misc import postmortem, fast_scan, epoc, first
-from processmedia_libs import add_default_argparse_args
+from processmedia_libs import add_default_argparse_args, PENDING_ACTION
 
 from processmedia_libs.meta_manager import MetaManager
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
@@ -59,13 +59,12 @@ def main(**kwargs):
             log.warn('Missing: %s', name)  # does not have all required processde files
             stats['missing'] += 1
 
-    unneeded_tracks = importer.imported_tracks - processed_tracks
-    for unneeded_track_id in unneeded_tracks:
-        log.warn('Removing unnneded tracks: %s', unneeded_track_id)
+    for unneeded_track_id in importer.imported_tracks - processed_tracks:
+        log.warn('Remove: %s', unneeded_track_id)
         delete_track(unneeded_track_id)
+        stats['deleted'] += 1
     commit()
 
-    stats['deleted'] = len(unneeded_tracks)
     assert stats['before'] == len(importer.imported_tracks), 'The counted skips tracks should match what the db said it had. Investigate.'
     stats['total'] = stats['before'] + stats['imported']
     assert stats['total'] == DBSession.query(Track.id).count(), 'Total tracks should == tracks in db before + imported tracks. Investigate.'
@@ -92,6 +91,12 @@ class TrackImporter(object):
             return
         processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash)
         if self._missing_files(processed_files):
+            # If we are missing any files but we have a source hash,
+            # we may have some of the derived media missing.
+            # Explicity mark the item for reencoding
+            if PENDING_ACTION['encode'] not in m.pending_actions:  # Feels clunky to manage this as a list? maybe a set?
+                m.pending_actions.append(PENDING_ACTION['encode'])
+                self.meta.save(name)  # Feels clunky
             raise TrackMissingProcessedFiles()
 
         log.info('Import: %s', name)

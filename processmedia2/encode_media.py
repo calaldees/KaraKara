@@ -4,7 +4,7 @@ import tempfile
 from libs.misc import postmortem, hashfile, freeze, first, file_ext
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args, EXTS
+from processmedia_libs import add_default_argparse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
 from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
 from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
@@ -33,10 +33,11 @@ def main(**kwargs):
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
         #'Tamako Market - OP - Dramatic Market Ride',
         #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
-        'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
-        'KAT-TUN Your side [Instrumental]',
+        #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
+        #'KAT-TUN Your side [Instrumental]',
 
-        #m.name for m in meta.meta.values() #if m.pending_actions
+        m.name for m in meta.meta.values()
+        if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
     ):
         encoder.encode(name)
 
@@ -99,6 +100,10 @@ class Encoder(object):
                 self._encode_images_from_meta(m),
                 self._process_tags_from_meta(m),
         )):
+            try:
+                m.pending_actions.remove(PENDING_ACTION['encode'])
+            except ValueError:
+                pass
             self.meta.save(name)
 
     def _encode_primary_video_from_meta(self, m):

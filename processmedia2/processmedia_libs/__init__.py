@@ -16,6 +16,9 @@ DEFAULT_PATH_SOURCE = '../mediaserver/www/files/'
 DEFAULT_PATH_PROCESSED = '../mediaserver/www/processed/'
 DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
+PENDING_ACTION = dict(
+    encode='encode',
+)
 
 def add_default_argparse_args(parser, version=DEFAULT_VERSION):
     parser.add_argument('--path_source', action='store', help='', default=DEFAULT_PATH_SOURCE)

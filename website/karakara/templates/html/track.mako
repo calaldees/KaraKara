@@ -31,7 +31,7 @@ ${video(track)}
 <p>${track['description']}</p>
 
 
-% if 'lyrics' in track:
+% if track.get('lyrics'):
 <!-- Lyrics -->
 <h2>Lyrics</h2>
     % for line in track['lyrics'].split('\n'):
