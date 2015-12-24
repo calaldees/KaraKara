@@ -62,6 +62,12 @@ encode:
 import:
 	PYTHONPATH=../website/karakara ../website/env/bin/python3 import_media.py --config_uri ../website/development.ini
 
+cleanup:
+	env/bin/python3 cleanup_media.py
+	
+migrate:
+	env/bin/python3 migrate_media.py
+
 # Test -------------------------------------------------------------------------
 .PHONY: test
 

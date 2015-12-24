@@ -110,7 +110,7 @@ def probe_media(source):
 
 
 def encode_image_to_video(source, destination, duration=10, width=320, height=240, **kwargs):
-    log.info('encode_image_to_video - %s', os.path.basename(source))
+    log.debug('encode_image_to_video - %s', os.path.basename(source))
     _run_tool(
         *AVCONV_COMMON_ARGS,
         '-loop', '1',
@@ -128,7 +128,7 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
 
 
 def encode_video(source, sub, destination):
-    log.info('encode_video - %s', os.path.basename(source))
+    log.debug('encode_video - %s', os.path.basename(source))
     sub_args = cmd_args(sub=sub) if sub else ()
     return _run_tool(
         'mencoder',
@@ -151,7 +151,7 @@ def encode_audio(source, destination, **kwargs):
         Normalize audio volume
         Offset audio
     """
-    log.info('encode_audio - %s', os.path.basename(source))
+    log.debug('encode_audio - %s', os.path.basename(source))
 
     path = os.path.dirname(destination)
 
@@ -188,7 +188,7 @@ def encode_audio(source, destination, **kwargs):
 def mux(video, audio, destination):
     """
     """
-    log.info('mux - %s', os.path.basename(video))
+    log.debug('mux - %s', os.path.basename(video))
     return _run_tool(
         *AVCONV_COMMON_ARGS,
         '-i', video,
@@ -203,7 +203,7 @@ def mux(video, audio, destination):
 
 
 def encode_preview_video(source, destination):
-    log.info('encode_preview_video - %s', os.path.basename(source))
+    log.debug('encode_preview_video - %s', os.path.basename(source))
 
     #crf = crf_from_res(**probe_media(source))
     crf = CONFIG['avconv']['preview_crf']
@@ -227,7 +227,7 @@ def encode_preview_video(source, destination):
 
 
 def extract_image(source, destination, time=0.2):
-    log.info('extract_image - %s', os.path.basename(source))
+    log.debug('extract_image - %s', os.path.basename(source))
 
     cmds = (
         lambda: _run_tool(

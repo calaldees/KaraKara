@@ -178,9 +178,9 @@ def get_args():
 
     parser.add_argument('--config_uri', action='store', help='', default='development.ini')
 
-    args = vars(parser.parse_args())
+    args_dict = vars(parser.parse_args())
 
-    return args
+    return args_dict
 
 
 if __name__ == "__main__":

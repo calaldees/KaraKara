@@ -27,7 +27,7 @@ def main(**kwargs):
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    for name in (
+    for name in sorted(
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
@@ -139,7 +139,10 @@ class Encoder(object):
                 # Parse subtitles
                 subtitles = subtitle_processor.parse_subtitles(filename=source_files['sub']['absolute'])
                 if not subtitles:
-                    log.error('Subtitle file explicity given, but was unable to parse any subtitles from it. There may be an issue with parsing')
+                    log.error(
+                        'Subtitle file explicity given, but was unable to parse any subtitles from it.'
+                        'There may be an issue with parsing'
+                    )
                     return False
 
                 # Output srt
@@ -290,9 +293,9 @@ def get_args():
 
     add_default_argparse_args(parser)
 
-    args = vars(parser.parse_args())
+    args_dict = vars(parser.parse_args())
 
-    return args
+    return args_dict
 
 
 if __name__ == "__main__":
