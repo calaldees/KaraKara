@@ -45,13 +45,13 @@ help:
 # Linux installation
 .installed_python_Linux:
 	# apt-get install gettext
-	if dpkg -s python-virtualenv ; then \
+	@if dpkg -s python-virtualenv >> /dev/null 2> /dev/null ; then \
 		echo virtualenv already installed; \
 	else \
 		echo installing virtualenv; \
 		sudo apt-get install -y python-virtualenv curl; \
 	fi
-	if dpkg -s python3-setuptools ; then \
+	@if dpkg -s python3-setuptools >> /dev/null 2> /dev/null ; then \
 		echo python 3 already installed; \
 	else \
 		echo installing python 3; \
