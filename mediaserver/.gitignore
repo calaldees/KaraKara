@@ -4,5 +4,7 @@ log
 tmp
 www/files
 www/files_local
+www/meta
+www/processed
 setup
 *.tar.gz
