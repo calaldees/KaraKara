@@ -20,7 +20,7 @@ CONFIG = {
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
     'avconv': {
-        'h264_codec': 'libx264',  # 'h264',
+        'h264_codec': 'libx264', # 'libx264',  # 'h264',
         # The width and height must be divisable by 2
         # Using w=320:h-1 should auto set the height preserving aspect ratio
         # Sometimes using this method the height is an odd number, which fails to encode
@@ -130,6 +130,45 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
 def encode_video(source, sub, destination):
     log.debug('encode_video - %s', os.path.basename(source))
     sub_args = cmd_args(sub=sub) if sub else ()
+    #x264encopts = 'profile=main:fast_pskip=0:threads={threads}'.format(   #:bitrate={bitrate}:stats={statsfile}
+    #    threads=CONFIG['threads'],
+        #bitrate=3000,
+        #statsfile=os.path.join(os.path.dirname(destination), 'x264_2pass.log'),
+    #)
+    #import pdb ; pdb.set_trace()
+    #cmds = (
+    #    lambda:  _run_tool(
+    #        'mencoder',
+    #        source,
+    #        *sub_args,
+    #        *cmd_args(
+    #            quiet=None,
+    #            ass=None,
+    #            nosound=None,
+    #            ovc='x264',
+    #            x264encopts=x264encopts  # +':pass=1',
+    #        ),
+    #        '-o', destination,
+    #    ),
+        #lambda: _run_tool(
+        #    'mencoder',
+        #    source,
+        #    *sub_args,
+        #    *cmd_args(
+        #        quiet=None,
+        #        ass=None,
+        #        nosound=None,
+        #        ovc='x264',
+        #        x264encopts=x264encopts+':pass=2:preset=veryslow',
+        #    ),
+        #    '-o', destination,
+        #),
+    #)
+    #for cmd in cmds:
+    #    cmd_success, cmd_result = cmd()
+    #    if not cmd_success:
+    #        return False, cmd_result
+    #return True, None
     return _run_tool(
         'mencoder',
         source,
@@ -143,7 +182,6 @@ def encode_video(source, sub, destination):
         ),
         '-o', destination,
     )
-
 
 def encode_audio(source, destination, **kwargs):
     """
