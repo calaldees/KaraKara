@@ -1,4 +1,11 @@
 
+build_docker:
+	#docker run --rm -i -t karakara /bin/bash
+	docker build -t karakara --file karakara.Dockerfile .
+
+run_docker:
+	docker run -v "$(pwd):/karakara" --net=host appium
+
 run_production:
 	cd mediaserver ; make start_nginx
 	cd website ; make run_production

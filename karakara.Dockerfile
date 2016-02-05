@@ -1,16 +1,29 @@
-FROM debian:8.2
+FROM debian:8.3
 
-RUN apt-add-repository ppa:nginx/development
 RUN apt-get update && apt-get install -yq \
+        make \
+        software-properties-common \
         curl \
-        nginx \
-        postgresql \
         python-virtualenv \
         python3-setuptools \
         python3-dev \
+        nginx \
+        postgresql \
     && apt-get clean
+
+#RUN apt-add-repository ppa:nginx/development
 #RUN update-rc.d -f nginx disable
 
-RUN	sudo -u postgres psql -c "create user karakara with password 'karakara';" || true
-RUN sudo -u postgres psql -c "create database karakara with owner karakara encoding 'utf8' TEMPLATE=template0 LC_CTYPE='en_US.UTF-8' LC_COLLATE='en_US.UTF-8';" || true
+COPY karakara.Dockerfile.sql /tmp/
+RUN	service postgresql start && su postgres -c "psql -f /tmp/karakara.Dockerfile.sql"
 
+ENV PYTHON_ENV /python_env/
+ENV MAKE /usr/bin/make --directory /karakara/
+
+RUN ${MAKE}website install
+RUN ${MAKE}website test
+
+EXPOSE 6543
+EXPOSE 9873
+
+CMD service postgresql start && /usr/bin/make --directory /karakara/website/ run_production
