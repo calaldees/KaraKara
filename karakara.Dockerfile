@@ -1,6 +1,6 @@
 FROM debian:8.3
 
-RUN apt-get update && apt-get install -yq \
+RUN apt-get update && apt-get install -yq --fix-missing \
         make \
         software-properties-common \
         curl \
