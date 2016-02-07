@@ -36,5 +36,8 @@ rsync_push: del_osx_cancer
 	#--checksum  --bwlimit=100
 	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/ -e ssh --archive --verbose --stats --progress --update --bwlimit=100
 
+rsync_local_push:
+	rsync ~/Applications/KaraKara/files/ /media/karakara/UNTITLED/files2/ --archive --no-perms --no-owner --no-group --verbose --stats --progress --update --human-readable --delete-after
+
 hash_match:
 	website/env/bin/python3 website/karakara/scripts/hash_matcher.py --source_folder ~/temp/Convention\ Karaoke/ --destination_folder ~/Applications/KaraKara/files/ -v

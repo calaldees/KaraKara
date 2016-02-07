@@ -33,7 +33,8 @@ help:
 nginx.conf:
 	cp nginx.conf.default nginx.conf
 
-start_nginx: nginx.conf setup tmp log www/files stop_nginx
+start_nginx:
+       #nginx.conf setup tmp log www/files stop_nginx
 	echo "user `whoami`;" > nginx_user.conf
 	sudo nginx -p `pwd`/ -c nginx.conf -g "${NGINX_CFG_OVERRIDES}"
 

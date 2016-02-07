@@ -34,6 +34,7 @@ help:
 	# insert_random_tracks            -- insert random named tracks for dev/testing
 	#
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
+	# Dpendencies - make python3-setuptools python3-dev python-virtualenv curl
 
 
 # Installation -----------------------------------------------------------------
