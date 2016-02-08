@@ -16,6 +16,8 @@ STATIC_FILE_PATH = ../mediaserver/www/files
 
 LOG_LINES=5
 
+BADGENAME_SOURCE=minami
+
 #APTGET_EXTRAS = 
 #TTY=$(shell tty)
 #ifndef TTY
@@ -200,7 +202,7 @@ import_tracks_production: ini  #init_db_production
 	$(PYTHON) -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 badgenames.txt:
-	$(PYTHON) -mkarakara.scripts.badge_name_importer --source ame > badgenames.txt
+	$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) > badgenames.txt
 
 # Logs -------------------------------------------------------------------------
 
