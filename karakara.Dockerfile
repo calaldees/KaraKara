@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -yq --fix-missing \
 #RUN update-rc.d -f nginx disable
 
 COPY karakara.Dockerfile.sql /tmp/
-RUN	service postgresql start && su postgres -c "psql -f /tmp/karakara.Dockerfile.sql"
+RUN	systemctl start postgresql && su postgres -c "psql -f /tmp/karakara.Dockerfile.sql"
 
 ENV PYTHON_ENV /python_env/
 ENV MAKE /usr/bin/make --directory /karakara/
