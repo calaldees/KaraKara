@@ -1,0 +1,10 @@
+[Unit]
+Description=karakara
+
+[Service]
+WorkingDirectory=PWD/karakara
+ExecStart=/usr/bin/make run_production
+Restart=always
+
+[Install]
+WantedBy=default.target
