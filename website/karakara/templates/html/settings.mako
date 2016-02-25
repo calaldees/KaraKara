@@ -46,6 +46,7 @@
         
         ${quick_setting('Readonly Mobile Interface', 'karakara.system.user.readonly' , 'True -> bool')}
         ${quick_setting('Disable Mobile Interface' , 'karakara.template.menu.disable', 'Appolgies. The mobile interface has been disabled.')}
+        ${quick_setting('Reload Badgenames' , 'karakara.queue.add.valid_performer_names', 'badgenames.txt -> listfile')}
         
     </div>
 
