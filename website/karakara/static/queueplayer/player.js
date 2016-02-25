@@ -418,6 +418,8 @@ function render_playlist() {
 	// Render Playlist Ordered
 	var queue_html = render_queue_items($('#playlist ol'), playlist_ordered, function(queue_item, track) {
 		/**
+		 * TODO: Use Flexbox - When the comment below was written flexbox didnt exisit. Maybe it can solve this problem.
+		 *
 		 * crap crap crap
 		 * Tried to rewrite the whole way items are adding to the queue to be able to detect when the
 		 * last li is rendered off the bottom of the screen so overflow could be rendered in the
@@ -578,7 +580,7 @@ function init() {
 	setup_websocket();
 	
 	if (!get_chrome_version()) {
-		$('body').addClass('browser_unsupported');
+		//$('body').addClass('browser_unsupported');  // This is intrusive
 		var msg = "Browser is unsupported. This player is currently only designed and tested to work with Google Chrome. It may behave unexpectedly.";
 		console.warn(msg);
 		alert(msg);
