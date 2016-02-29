@@ -195,6 +195,9 @@ i18n:
 insert_random_tracks:
 	$(PYTHON) -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
 
+insert_band_tracks:
+	$(PYTHON) -m$(PROJECT).scripts.insert_band_tracks --config=$(INI_DEV)
+
 import_tracks_dev: test.db
 	$(PYTHON) -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
