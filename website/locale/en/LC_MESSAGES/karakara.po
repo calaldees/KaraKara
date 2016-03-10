@@ -1,21 +1,22 @@
-# English translations for karakara.
-# Copyright (C) 2014 ORGANIZATION
-# This file is distributed under the same license as the karakara project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+# English translations for KaraKara.
+# Copyright (C) 2016 ORGANIZATION
+# This file is distributed under the same license as the KaraKara project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: karakara 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-22 23:10+0100\n"
+"POT-Creation-Date: 2016-02-04 09:08+0000\n"
 "PO-Revision-Date: 2014-12-02 19:11+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.2.0\n"
 
 #: karakara/templates/html/_base.mako:42
 msgid "mobile.base.back"

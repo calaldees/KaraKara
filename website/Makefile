@@ -1,5 +1,12 @@
 OS = $(shell uname -s)
 
+ENV=_env
+PYTHON=$(ENV)/bin/python3
+PIP=$(ENV)/bin/pip3
+PSERVE=$(ENV)/bin/pserve
+PSHELL=$(ENV)/bin/pshell
+PYTEST=$(ENV)/bin/py.test
+
 PROJECT=karakara
 
 INI_DEV  = development.ini
@@ -9,6 +16,8 @@ STATIC_FILE_PATH = ../mediaserver/www/files
 
 LOG_LINES=5
 
+BADGENAME_SOURCE=minami
+
 #APTGET_EXTRAS = 
 #TTY=$(shell tty)
 #ifndef TTY
@@ -17,7 +26,7 @@ LOG_LINES=5
 
 help:
 	# Usage: make <target>, where target is
-	# install        -- run after clean checkout to pull dependecys and setup
+	# install        -- 
 	# test           -- run all nosetests
 	# run            -- run the site in development mode
 	# run_production -- run in production mode
@@ -27,42 +36,17 @@ help:
 	# insert_random_tracks            -- insert random named tracks for dev/testing
 	#
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
+	# Dpendencies - make python3-setuptools python3-dev python-virtualenv curl
 
 
 # Installation -----------------------------------------------------------------
 
-.installed_python: .installed_python_$(OS)
-	touch .installed_python
+#python-virtualenv python3-setuptools python3-dev curl
 
-# OSX installation
-.installed_python_Darwin:
-	brew install python3
-	# brew install gettext
-	# cd ~/bin/ && ln -s /usr/local/opt/gettext/bin/msgmerge
-	# python virtualenv?
-	touch .installed_python_Darwin
-
-# Linux installation
-.installed_python_Linux:
-	# apt-get install gettext
-	if dpkg -s python-virtualenv ; then \
-		echo virtualenv already installed; \
-	else \
-		echo installing virtualenv; \
-		sudo apt-get install -y python-virtualenv curl; \
-	fi
-	if dpkg -s python3-setuptools ; then \
-		echo python 3 already installed; \
-	else \
-		echo installing python 3; \
-		sudo apt-get install -y python3-setuptools python3-dev curl; \
-	fi
-	touch .installed_python_Linux
-
-env: .installed_python
+$(ENV):
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
-	virtualenv --no-site-packages -p python3 env
-	env/bin/easy_install pyramid
+	virtualenv --no-site-packages -p python3 $(ENV)
+	$(ENV)/bin/easy_install pyramid
 
 # Experiments
 #env/bin/node: env
@@ -71,12 +55,12 @@ env: .installed_python
 #env/lib/node_modules/bower: env/bin/node
 #	source env/bin/activate && npm install -g bower
 
-KaraKara.egg-info: env
-	env/bin/python setup.py develop
+KaraKara.egg-info: $(ENV)
+	$(PYTHON) setup.py develop
 
 # Force reexecution of setup.py dependenys (this must be done from the Makefile or make gets confused and repetedy runs the task)
 setup: KaraKara.egg-info
-	env/bin/python setup.py develop
+	$(PYTHON) setup.py develop
 
 dependency_downloader.py:
 	curl https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
@@ -84,9 +68,10 @@ dependency_downloader.py:
 externals:
 	mkdir externals && touch externals/__init__.py
 
+PHONY: dependency_download
 dependency_download: dependency_downloader.py externals
 	# Trigger dependency check on every startup
-	env/bin/python dependency_downloader.py --destination externals
+	$(PYTHON) dependency_downloader.py --destination externals
 	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
 install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths locale/karakara.pot
@@ -95,11 +80,11 @@ install: development.ini production.inidiff KaraKara.egg-info dependency_downloa
 # Databases --------------------------------------------------------------------
 
 test.db:
-	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
+	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
 init_db_production: ini
-	env/bin/python -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
+	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
@@ -114,12 +99,13 @@ production.inidiff:
 
 ini: clean_ini ini_test ini_production
 ini_test: development.ini
-	env/bin/python3 externals/lib/make_ini.py test
+	$(PYTHON) externals/lib/make_ini.py test
 ini_production: production.inidiff
-	env/bin/python3 externals/lib/make_ini.py production
+	$(PYTHON) externals/lib/make_ini.py production
 
 # Upload paths -----------------------------------------------------------------
 
+PHONY: upload_paths
 upload_paths: data data/upload data/uploaded
 data:
 	mkdir data
@@ -131,19 +117,19 @@ data/uploaded:
 # Run --------------------------------------------------------------------------
 
 run: install
-	env/bin/pserve --reload $(INI_DEV)
+	$(PSERVE) --reload $(INI_DEV)
 
 run_production: ini
-	env/bin/pserve $(INI_PROD)
+	$(PSERVE) $(INI_PROD)
 
 run_socket_server:
-	env/bin/python3 -mexternals.lib.socket.multisocket_server
+	$(PYTHON) -mexternals.lib.socket.multisocket_server
 
 shell:
-	env/bin/pshell $(INI_DEV)
+	$(PSHELL) $(INI_DEV)
 
 shell_production: ini
-	env/bin/pshell $(INI_PROD)
+	$(PSHELL) $(INI_PROD)
 
 # Daemon -----------------------------------------------------------------------
 
@@ -162,12 +148,12 @@ stop_webapp_daemon:
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
 
 test: ini
-	env/bin/py.test externals --pdb
-	env/bin/py.test $(PROJECT) --pdb
+	$(PYTEST) externals --pdb
+	$(PYTEST) $(PROJECT) --pdb
 	#--pdb --capture=sys
 
 test_crawl: ini
-	env/bin/py.test $(PROJECT) --runslow -k crawl -s
+	$(PYTEST) $(PROJECT) --runslow -k crawl -s
 
 test_crawl_production: ini
 	echo "unimplemented ... yet"
@@ -176,8 +162,8 @@ test_crawl_production: ini
 # I18N -------------------------------------------------------------------------
 
 locale:
-	env/bin/python3 setup.py extract_messages
-	env/bin/python3 setup.py init_catalog -l en
+	$(PYTHON) setup.py extract_messages
+	$(PYTHON) setup.py init_catalog -l en
 	#env/bin/python3 setup.py init_catalog -l fr
 	#env/bin/python3 setup.py init_catalog -l es
 	#env/bin/python3 setup.py init_catalog -l it
@@ -193,30 +179,33 @@ env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.b
 
 locale/karakara.pot: locale
     # removed dependecy - env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
-	env/bin/python3 setup.py extract_messages
-	env/bin/python3 setup.py update_catalog
-	env/bin/python3 setup.py compile_catalog
+	$(PYTHON) setup.py extract_messages
+	$(PYTHON) setup.py update_catalog
+	$(PYTHON) setup.py compile_catalog
 
 i18n:
-	env/bin/python3 setup.py extract_messages
-	env/bin/python3 setup.py update_catalog
+	$(PYTHON) setup.py extract_messages
+	$(PYTHON) setup.py update_catalog
 	#Looks like msgmerge from the gettext lib works can work in place of update_catalog.
 	#cd karakara/locale && msgmerge --update en/LC_MESSAGES/KaraKara.po KaraKara.pot
-	env/bin/python3 setup.py compile_catalog
+	$(PYTHON) setup.py compile_catalog
 
 # Data -------------------------------------------------------------------------
 
 insert_random_tracks:
-	env/bin/python -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
+	$(PYTHON) -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
+
+insert_band_tracks:
+	$(PYTHON) -m$(PROJECT).scripts.insert_band_tracks --config=$(INI_DEV)
 
 import_tracks_dev: test.db
-	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
+	$(PYTHON) -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
 
 import_tracks_production: ini  #init_db_production
-	env/bin/python -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
+	$(PYTHON) -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 badgenames.txt:
-	env/bin/python -mkarakara.scripts.badge_name_importer --source ame > badgenames.txt
+	$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) > badgenames.txt
 
 # Logs -------------------------------------------------------------------------
 
@@ -234,7 +223,7 @@ clean_ini:
 	rm -f $(INI_PROD)
 
 clean: clean_ini
-	rm -rf env
+	rm -rf $(ENV)
 	rm -rf data
 	rm -rf *.egg-info
 	rm -f *.db

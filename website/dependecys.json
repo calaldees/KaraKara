@@ -38,6 +38,11 @@
         "version": "1.4.5",
         "target": "static/jquery.mobile-VERSION.min.map"
     },
+    "jquery_mobile_spinner": {
+        "source": "http://code.jquery.com/mobile/VERSION/images/ajax-loader.gif",
+        "version": "1.4.5",
+        "target": "static/images/ajax-loader.gif"
+    },
     
     "yui-reset": {
         "source": "http://yui.yahooapis.com/VERSION/build/cssreset/cssreset-min.css",
