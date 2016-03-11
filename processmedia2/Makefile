@@ -147,7 +147,7 @@ migrate:
 .PHONY: test
 
 test:
-	$(PYTEST) test
+	$(PYTEST) tests
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
