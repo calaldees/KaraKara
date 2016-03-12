@@ -28,7 +28,7 @@ def main(**kwargs):
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
     for name in sorted(
-        #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
+        'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
         #'Tamako Market - OP - Dramatic Market Ride',
@@ -36,8 +36,8 @@ def main(**kwargs):
         #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
         #'KAT-TUN Your side [Instrumental]',
 
-        m.name for m in meta.meta.values()
-        if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
+        #m.name for m in meta.meta.values()
+        #if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
     ):
         encoder.encode(name)
 
