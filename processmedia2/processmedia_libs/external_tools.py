@@ -30,6 +30,7 @@ CONFIG = {
         'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
         'preview_audio_bitrate': '48k',
         'preview_crf': 34,
+        'strict': 'strict',
     },
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
     'jpegoptim': {
@@ -116,7 +117,7 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
         '-loop', '1',
         '-i', source,
         *cmd_args(
-            strict='experimental',
+            strict=CONFIG['avconv']['strict'],
             r=5,  # 1 fps
             t=duration,
             bf=0,  # wha dis do?
@@ -198,7 +199,7 @@ def encode_audio(source, destination, **kwargs):
             *AVCONV_COMMON_ARGS,
             '-i', source,
             *cmd_args(
-                strict='experimental',
+                strict=CONFIG['avconv']['strict'],
                 vcodec='none',
                 ac=2,
                 ar=CONFIG['audio_rate_khz'],
@@ -232,7 +233,7 @@ def mux(video, audio, destination):
         '-i', video,
         '-i', audio,
         *cmd_args(
-            strict='experimental',
+            strict=CONFIG['avconv']['strict'],
             vcodec='copy',
             ab='224k',
         ),
@@ -251,7 +252,7 @@ def encode_preview_video(source, destination):
         *AVCONV_COMMON_ARGS,
         '-i', source,
         *cmd_args(
-            strict='experimental',
+            strict=CONFIG['avconv']['strict'],
             vcodec=CONFIG['avconv']['h264_codec'],
             crf=crf,
             acodec='aac',
