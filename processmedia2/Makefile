@@ -155,3 +155,4 @@ test:
 clean:
 	rm -rf $(ENV)
 	rm -rf libs
+	cd tests/source && make clean
