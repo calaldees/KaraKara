@@ -43,8 +43,8 @@ AVCONV_COMMON_ARGS = cmd_args(
     'avconv',
     threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
+    strict=CONFIG['avconv']['strict'],
     y=None,
-    # strict='experimental',
 )
 
 
@@ -68,6 +68,8 @@ def _run_tool(*args, **kwargs):
 
 def crf_from_res(width=320, height=240, crf=CONFIG['crf_factor'], **kwargs):
     """
+    Attempt to keep the same (rough) filesize regardless of resolution.
+
     0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
 
     >>> crf_from_res(320, 200)
@@ -75,7 +77,7 @@ def crf_from_res(width=320, height=240, crf=CONFIG['crf_factor'], **kwargs):
     >>> crf_from_res(1280, 720)
     >>> 45
     """
-    factor=(math.sqrt(width*height) - crf.lower.pixels) / (crf.upper.pixels - crf.lower.pixels)
+    factor = (math.sqrt(width*height) - crf.lower.pixels) / (crf.upper.pixels - crf.lower.pixels)
     return int(((crf.upper.crf - crf.lower.crf) * factor) + crf.lower.crf)
 
 
