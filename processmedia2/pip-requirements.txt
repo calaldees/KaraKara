@@ -1,3 +1,5 @@
 pyyaml
-pytest
 dateutil
+
+pytest
+pillow
