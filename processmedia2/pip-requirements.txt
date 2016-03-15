@@ -1,5 +1,5 @@
 pyyaml
-dateutil
+dateutils
 
 pytest
 pillow
