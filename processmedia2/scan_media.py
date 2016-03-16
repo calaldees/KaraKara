@@ -59,6 +59,7 @@ def main(**kwargs):
     )
 
     # 2.) Locate primary files
+    # Note: Duplicate media is completely ignored/removed in this list
     primary_files = locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
 
     # 3.) Find associated files as a 'file collection' (based on the name of the primary file)
