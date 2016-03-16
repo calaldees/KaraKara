@@ -42,3 +42,7 @@ rsync_local_push:
 
 hash_match:
 	website/env/bin/python3 website/karakara/scripts/hash_matcher.py --source_folder ~/temp/Convention\ Karaoke/ --destination_folder ~/Applications/KaraKara/files/ -v
+
+move_mouse:
+	# Problems with screensaver. Move mouse every 5min
+	while true ; do echo 'loopity'; sleep 300; xte 'mousemove 1024 100' -x :0; sleep 300; xte 'mousemove 1024 760' -x :0; done
