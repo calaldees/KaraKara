@@ -46,4 +46,3 @@ def test_settings(app):
     # Settings Template
     response = app.get('/settings')
     assert 'setting' in response.text.lower()
-

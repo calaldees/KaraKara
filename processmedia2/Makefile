@@ -147,7 +147,7 @@ migrate:
 .PHONY: test
 
 test:
-	$(PYTEST) tests
+	PYTHONPATH=./ $(PYTEST) tests --doctest-modules --pdb --maxfail=3
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
