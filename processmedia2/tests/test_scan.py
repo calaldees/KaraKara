@@ -2,7 +2,6 @@ import pytest
 import os
 import tempfile
 import json
-from contextlib import contextmanager
 
 from scan_media import main as scan_media
 
@@ -13,34 +12,40 @@ TEST1_VIDEO_FILES = ('test1.avi', 'test1.srt', 'test1.txt')
 TEST2_AUDIO_FILES = ('test2.ogg',)
 
 
-# Fixtures ---------------------------------------------------------------------
-
-@contextmanager
-def temp_source_folder(files):
-    with tempfile.TemporaryDirectory() as tempdir:
-        for f in files:
-            os.link(
-                os.path.join(SOURCE_PATH, f),
-                os.path.join(tempdir, f)
-            )
-        yield tempdir
-
-
-@contextmanager
-def scan_meta(source_files):
-    with tempfile.TemporaryDirectory() as path_meta:
-        with temp_source_folder(source_files) as path_source:
-            yield ScanManager(path_source, path_meta)
+# Utils ------------------------------------------------------------------------
 
 
 class ScanManager(object):
 
-    def __init__(self, path_source, path_meta):
-        self.path_source = path_source
-        self.path_meta = path_meta
+    def __init__(self, source_files):
+        self.source_files = source_files
+
+    def _link_source_files(self):
+        for f in self.source_files:
+            os.link(
+                os.path.join(SOURCE_PATH, f),
+                os.path.join(self.path_source, f)
+            )
+
+    def __enter__(self):
+        self.temp_scan = tempfile.TemporaryDirectory()
+        self.temp_meta = tempfile.TemporaryDirectory()
+        self._link_source_files()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.temp_scan.cleanup()
+        self.temp_meta.cleanup()
 
     @property
-    def meta(self):
+    def path_source(self):
+        return self.temp_scan.name
+
+    @property
+    def path_meta(self):
+        return self.temp_meta.name
+
+    def scan_media(self):
         scan_media(path_source=self.path_source, path_meta=self.path_meta)
 
         meta = {}
@@ -53,7 +58,7 @@ class ScanManager(object):
 # Tests ------------------------------------------------------------------------
 
 def test_scan_grouping():
-    with scan_meta(TEST1_VIDEO_FILES + TEST2_AUDIO_FILES) as scan:
-        meta = scan.meta
+    with ScanManager(TEST1_VIDEO_FILES + TEST2_AUDIO_FILES) as scan:
+        meta = scan.scan_media()
         assert set(meta['test1.json']['scan'].keys()) == {'test1.avi', 'test1.srt', 'test1.txt'}
         assert set(meta['test2.json']['scan'].keys()) == {'test2.ogg'}
