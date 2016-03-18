@@ -104,10 +104,6 @@ class MetaFile(object):
 
         self.file_collection = set()
 
-    def associate_file_collection(self, file_collection):
-        for f in file_collection:
-            self.associate_file(f)
-
     def associate_file(self, f):
         self.file_collection.add(f)
         file_data = self.scan_data.setdefault(f.file, {})
