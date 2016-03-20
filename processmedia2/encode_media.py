@@ -19,7 +19,7 @@ VERSION = '0.0.0'
 
 
 
-def main(**kwargs):
+def encode_media(**kwargs):
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
 
@@ -302,4 +302,4 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args['log_level'])
 
-    postmortem(main, **args)
+    postmortem(encode_media, **args)

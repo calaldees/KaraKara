@@ -22,7 +22,7 @@ IGNORE_SEARCH_EXTS_REGEX = file_extension_regex(('txt', ))
 
 # Main -------------------------------------------------------------------------
 
-def main(**kwargs):
+def scan_media(**kwargs):
     """
     part 1 of 3 of the encoding system
 
@@ -138,4 +138,4 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args['log_level'])
 
-    postmortem(main, **args)
+    postmortem(scan_media, **args)
