@@ -8,7 +8,7 @@ from encode_media import encode_media
 
 SOURCE_PATH = 'tests/source/'
 
-TEST1_VIDEO_FILES = ('test1.avi', 'test1.srt', 'test1.txt')
+TEST1_VIDEO_FILES = ('test1.mp4', 'test1.srt', 'test1.txt')
 TEST2_AUDIO_FILES = ('test2.ogg',)
 
 
@@ -53,11 +53,13 @@ class ScanManager(object):
     def scan_media(self):
         scan_media(path_source=self.path_source, path_meta=self.path_meta)
 
+    def encode_media(self):
+        encode_media(path_source=self.path_source, path_meta=self.path_meta, path_processed=self.path_processed)
+
+    @property
+    def meta(self):
         meta = {}
         for f in os.listdir(self.path_meta):
             with open(os.path.join(self.path_meta, f), 'r') as meta_filehandle:
                 meta[f] = json.load(meta_filehandle)
         return meta
-
-    def encode_media(self):
-        return encode_media(path_source=self.path_source, path_meta=self.path_meta, path_processed=self.path_processed)

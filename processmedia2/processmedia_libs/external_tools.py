@@ -43,7 +43,7 @@ AVCONV_COMMON_ARGS = cmd_args(
     'avconv',
     threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
-    strict=CONFIG['avconv']['strict'],
+    #strict=CONFIG['avconv']['strict'],
     y=None,
 )
 
@@ -109,6 +109,11 @@ def probe_media(source):
         data['height'] = int(raw_res.group(2))
     except:
         pass
+    try:
+        raw_audio = re.search(r'Audio:\s*(?P<format>\w+), (?P<sample_rate>\d+) Hz, (?P<channels>\d) channels,.*, (?P<bitrate>\d+) kb', result)
+        data['audio'] = raw_audio.groupdict()
+    except:
+        pass
     return data
 
 
@@ -119,7 +124,7 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
         '-loop', '1',
         '-i', source,
         *cmd_args(
-            strict=CONFIG['avconv']['strict'],
+            #strict=CONFIG['avconv']['strict'],
             r=5,  # 1 fps
             t=duration,
             bf=0,  # wha dis do?
@@ -201,7 +206,7 @@ def encode_audio(source, destination, **kwargs):
             *AVCONV_COMMON_ARGS,
             '-i', source,
             *cmd_args(
-                strict=CONFIG['avconv']['strict'],
+                #strict=CONFIG['avconv']['strict'],
                 vcodec='none',
                 ac=2,
                 ar=CONFIG['audio_rate_khz'],
@@ -235,7 +240,7 @@ def mux(video, audio, destination):
         '-i', video,
         '-i', audio,
         *cmd_args(
-            strict=CONFIG['avconv']['strict'],
+            #strict=CONFIG['avconv']['strict'],
             vcodec='copy',
             ab='224k',
         ),
@@ -254,7 +259,7 @@ def encode_preview_video(source, destination):
         *AVCONV_COMMON_ARGS,
         '-i', source,
         *cmd_args(
-            strict=CONFIG['avconv']['strict'],
+            strict='experimental',  # CONFIG['avconv']['strict'],
             vcodec=CONFIG['avconv']['h264_codec'],
             crf=crf,
             acodec='aac',
