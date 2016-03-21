@@ -1,15 +1,24 @@
+import logging
+log = logging.getLogger(__name__)
+
 import math
 import re
 import os.path
-import subprocess
+import json
+import subprocess  # TODO: depricated
 from collections import ChainMap, namedtuple
+import subprocess
+from io import BytesIO
 
 from dateutil import parser as dateparse
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+    log.error('Unable to import PIL (Python image library) - try installing Pillow')
 
-from libs.misc import cmd_args
+from libs.misc import cmd_args, color_close
 
-import logging
-log = logging.getLogger(__name__)
 
 CRFFactorItem = namedtuple('CRFFactorItem', ['crf', 'pixels'])
 CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
@@ -73,9 +82,9 @@ def crf_from_res(width=320, height=240, crf=CONFIG['crf_factor'], **kwargs):
     0=lossless - 51=shit - default=23 - http://slhck.info/articles/crf
 
     >>> crf_from_res(320, 200)
-    >>> 30
+    34
     >>> crf_from_res(1280, 720)
-    >>> 45
+    45
     """
     factor = (math.sqrt(width*height) - crf.lower.pixels) / (crf.upper.pixels - crf.lower.pixels)
     return int(((crf.upper.crf - crf.lower.crf) * factor) + crf.lower.crf)
@@ -84,6 +93,10 @@ def crf_from_res(width=320, height=240, crf=CONFIG['crf_factor'], **kwargs):
 def probe_media(source):
     """
     Todo: update for audio and images
+
+    >>> json.dumps(probe_media('tests/source/test1.mp4'), sort_keys=True)
+    '{"audio": {"bitrate": "2", "format": "aac", "sample_rate": "44100"}, "duration": 30.02, "height": 240, "width": 320}'
+
     """
     if not source:
         return {}
@@ -110,7 +123,7 @@ def probe_media(source):
     except:
         pass
     try:
-        raw_audio = re.search(r'Audio:\s*(?P<format>\w+), (?P<sample_rate>\d+) Hz, (?P<channels>\d) channels,.*, (?P<bitrate>\d+) kb', result)
+        raw_audio = re.search(r'Audio:\s*(?P<format>\w+), (?P<sample_rate>\d+) Hz,.*, (?P<bitrate>\d+) kb', result)
         data['audio'] = raw_audio.groupdict()
     except:
         pass
@@ -301,3 +314,22 @@ def extract_image(source, destination, time=0.2):
         if not cmd_success:
             return False, cmd_result
     return True, None
+
+
+def get_frame_from_video(url, time="00:00:10"):
+    """
+    FFMpeg | pipe stdout -> PIL.Image (from stringbuffer)
+
+    time string format - hh:mm:ss[.xxx]
+
+    Gets Image progressivly - Largers times read linearly from the beggining of the file
+
+    >>> color_close((255, 0, 0), get_frame_from_video('tests/source/test1.mp4', 0).getpixel((0,0)))
+    True
+    >>> color_close((0, 255, 0), get_frame_from_video('tests/source/test1.mp4', '10').getpixel((0,0)))
+    True
+    >>> color_close((0, 0, 255), get_frame_from_video('tests/source/test1.mp4', '00:00:20').getpixel((0,0)))
+    True
+    """
+    cmd = """avconv -loglevel quiet -i "{url}" -ss {time} -vframes 1 -f image2 pipe: """.format(url=url, time=time)
+    return Image.open(BytesIO(subprocess.check_output(cmd, stderr=subprocess.PIPE, shell=True)))
