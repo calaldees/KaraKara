@@ -4,7 +4,8 @@ import json
 
 from scan_media import scan_media
 from encode_media import encode_media
-
+from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
 SOURCE_PATH = 'tests/source/'
 
@@ -31,12 +32,16 @@ class ScanManager(object):
         self._temp_meta = tempfile.TemporaryDirectory()
         self._temp_processed = tempfile.TemporaryDirectory()
         self._link_source_files()
+        self.meta_manager = MetaManager(self.path_meta)
+        self.processed_manager = ProcessedFilesManager(self.path_processed)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._temp_scan.cleanup()
         self._temp_meta.cleanup()
         self._temp_processed.cleanup()
+        self.meta_manager = None
+        self.processed_manager = None
 
     @property
     def path_source(self):
@@ -58,8 +63,17 @@ class ScanManager(object):
 
     @property
     def meta(self):
+        """
+        Dump of all the generated raw meta json files
+        """
         meta = {}
         for f in os.listdir(self.path_meta):
             with open(os.path.join(self.path_meta, f), 'r') as meta_filehandle:
                 meta[f] = json.load(meta_filehandle)
         return meta
+
+    def processed_files(self, name):
+        self.meta_manager._release_cache()
+        self.meta_manager.load(name)
+        source_hash = self.meta_manager.get(name).source_hash
+        return self.processed_manager.get_all_processed_files_associated_with_source_hash(source_hash)

@@ -95,7 +95,7 @@ def probe_media(source):
     Todo: update for audio and images
 
     >>> json.dumps(probe_media('tests/source/test1.mp4'), sort_keys=True)
-    '{"audio": {"bitrate": "2", "format": "aac", "sample_rate": "44100"}, "duration": 30.02, "height": 240, "width": 320}'
+    '{"audio": {"bitrate": "2", "format": "aac", "sample_rate": "44100"}, "duration": 30.02, "height": 768, "width": 1024}'
 
     """
     if not source:

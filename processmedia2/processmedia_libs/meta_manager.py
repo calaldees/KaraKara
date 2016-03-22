@@ -16,9 +16,12 @@ class MetaManager(object):
 
     def __init__(self, path):
         self.path = path
-        self.meta = {}
+        self._release_cache()
         self.timestamp = time.time()
         os.makedirs(os.path.abspath(path), exist_ok=True)
+
+    def _release_cache(self):
+        self.meta = {}
 
     def get(self, name):
         return self.meta.get(name)

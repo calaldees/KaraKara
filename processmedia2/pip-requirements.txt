@@ -3,3 +3,4 @@ dateutils
 
 pytest
 pillow
+pytesseract

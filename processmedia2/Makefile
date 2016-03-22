@@ -82,6 +82,7 @@ Darwin: has-brew
 		--with-sdl \
 		--with-speex \
 		--with-theora
+	brew install tesseract
 
 
 # Linux installation
