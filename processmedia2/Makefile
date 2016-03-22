@@ -6,6 +6,10 @@ PYTHON=$(ENV)/bin/python3
 PIP=$(ENV)/bin/pip3
 PYTEST=$(ENV)/bin/py.test
 
+WEB_PATH=../website
+WEB_WORKING=$(WEB_PATH)/karakara
+WEB_PYTHON=$(WEB_PATH)/$(PYTHON)
+WEB_PYTEST=$(WEB_PATH)/$(PYTEST)
 
 .PHONY: help
 help:
@@ -136,7 +140,7 @@ encode:
 	$(PYTHON) encode_media.py
 
 import:
-	PYTHONPATH=../website/karakara ../website/env/bin/python3 import_media.py --config_uri ../website/development.ini
+	PYTHONPATH=$(WEB_WORKING) $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini
 
 cleanup:
 	$(PYTHON) cleanup_media.py
@@ -148,7 +152,9 @@ migrate:
 .PHONY: test
 
 test:
-	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3
+	make all --directory tests/source
+	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
+	PYTHONPATH=$(WEB_WORKING) $(WEB_PYTEST) tests/test_import.py
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
