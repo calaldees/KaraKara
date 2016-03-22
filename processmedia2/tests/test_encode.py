@@ -1,11 +1,12 @@
-import os
-
 import pytesseract
-from PIL.ImageOps import invert
-from PIL.ImageDraw import floodfill
+from PIL import Image
 
+from libs.misc import color_distance
 from processmedia_libs.external_tools import get_frame_from_video
 from ._base import ScanManager, TEST1_VIDEO_FILES
+
+COLOR_SUBTITLE_CURRENT = (255, 255, 0)
+COLOR_SUBTITLE_NEXT = (255, 255, 255)
 
 
 def test_encode_simple():
@@ -15,32 +16,24 @@ def test_encode_simple():
         processed_files = scan.processed_files('test1')
         video_file = processed_files['video'][0].absolute
 
-        subtitles = read_subtitles(video_file, 5)
-        assert 'Red' in subtitles
-        assert 'Green' in subtitles
-        assert 'Blue' not in subtitles
+        assert 'Red' == read_subtitle_text(video_file, 5, COLOR_SUBTITLE_CURRENT)
+        assert 'Green' == read_subtitle_text(video_file, 5, COLOR_SUBTITLE_NEXT)
 
-        subtitles = read_subtitles(video_file, 15)
-        assert 'Red' not in subtitles
-        assert 'Green' in subtitles
-        assert 'Blue' in subtitles
+        assert 'Green' == read_subtitle_text(video_file, 15, COLOR_SUBTITLE_CURRENT)
+        assert 'Blue' == read_subtitle_text(video_file, 15, COLOR_SUBTITLE_NEXT)
 
-        #subtitles = read_subtitles(video_file, 25)
-        #assert 'Red' not in subtitles
-        #assert 'Green' not in subtitles
-        #assert 'Blue' in subtitles
+        assert 'Blue' == read_subtitle_text(video_file, 25, COLOR_SUBTITLE_CURRENT)
+        assert not read_subtitle_text(video_file, 25, COLOR_SUBTITLE_NEXT)
 
 
-def read_subtitles(video_file, time):
-    """
-    Tesseract is a very limited OCR system.
-    It relys on the background for text to be white (sigh)
-    So as our subtitles are on a black background if we:
-      - Invert our image colors they will be on a white background
-      - FloodFill the solid color background with white
-    We should be left with more or less the text on a white background.
-    """
-    image = get_frame_from_video(video_file, time)
-    image = invert(image)
-    floodfill(image, (100, 100), (255, 255, 255))
-    return pytesseract.image_to_string(image)
+def read_subtitle_text(video_file, time, color):
+    return pytesseract.image_to_string(extract_image_color(get_frame_from_video(video_file, time), color)).strip()
+
+
+def extract_image_color(source, color, threshold=50):
+    target = Image.new('L', source.size)
+    for x in range(source.size[0]):
+        for y in range(source.size[1]):
+            distance = color_distance(color, source.getpixel((x, y)), threshold=threshold)
+            target.putpixel((x, y), distance if distance is not None else 255)
+    return target
