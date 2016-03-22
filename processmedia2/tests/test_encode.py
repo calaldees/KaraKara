@@ -20,6 +20,8 @@ def test_encode_simple():
         scan.scan_media()
         scan.encode_media()
         processed_files = scan.processed_files('test1')
+
+        # Main Video - use OCR to read subtiles and check them
         video_file = processed_files['video'][0].absolute
 
         image = get_frame_from_video(video_file, 5)
@@ -36,6 +38,25 @@ def test_encode_simple():
         assert color_close(COLOR_BLUE, image.getpixel(SAMPLE_COORDINATE))
         assert 'Blue' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
         assert not read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
+
+        # Preview Video (can't check subtitles as the res is too small)
+        preview_file = processed_files['preview'][0].absolute
+
+        image = get_frame_from_video(preview_file, 5)
+        assert color_close(COLOR_RED, image.getpixel(SAMPLE_COORDINATE))
+
+        image = get_frame_from_video(preview_file, 15)
+        assert color_close(COLOR_GREEN, image.getpixel(SAMPLE_COORDINATE))
+
+        image = get_frame_from_video(preview_file, 25)
+        assert color_close(COLOR_BLUE, image.getpixel(SAMPLE_COORDINATE))
+
+        # Assert Thumbnail images
+        # We sample at '20% 40% 60% %80' - in out 30 second video that is 'RED, GREEN, GREEN, BLUE'
+        assert color_close(COLOR_RED, Image.open(processed_files['image'][0].absolute).getpixel(SAMPLE_COORDINATE))
+        assert color_close(COLOR_GREEN, Image.open(processed_files['image'][1].absolute).getpixel(SAMPLE_COORDINATE))
+        assert color_close(COLOR_GREEN, Image.open(processed_files['image'][2].absolute).getpixel(SAMPLE_COORDINATE))
+        assert color_close(COLOR_BLUE, Image.open(processed_files['image'][3].absolute).getpixel(SAMPLE_COORDINATE))
 
 
 def read_subtitle_text(image, color):
