@@ -153,8 +153,9 @@ migrate:
 
 test:
 	make all --directory tests/source
-	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
-	PYTHONPATH=$(WEB_WORKING) $(WEB_PYTEST) tests/test_import.py
+	#PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
+	make ini --directory $(WEB_PATH)
+	PYTHONPATH=$(WEB_WORKING) $(WEB_PYTEST) tests/test_import.py --pdb
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
@@ -162,4 +163,4 @@ test:
 clean:
 	rm -rf $(ENV)
 	rm -rf libs
-	cd tests/source && make clean
+	make clean --directory tests/source
