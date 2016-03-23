@@ -38,12 +38,18 @@ slow          = pytest.mark.slow
 
 @pytest.fixture(scope="session")
 def app_ini(request, ini_file=INI):
+    """
+    Settings object derived from .ini file required to start Pyramid app
+    """
     from pyramid.paster import get_appsettings
     return get_appsettings(ini_file)
 
 
 @pytest.fixture(scope="session")
 def app(request, app_ini):
+    """
+    Start KaraKara application
+    """
     from webtest import TestApp
     from karakara import main as karakara_main
 
@@ -74,10 +80,16 @@ def DBSession(request, app):
 
 @pytest.fixture(scope="session")
 def commit(request, DBSession):
+    """
+    Save data attached to DBSession
+    """
     from karakara.model import commit
     return commit
 
 
 @pytest.fixture()
 def settings(request, app):
+    """
+    Registry settings dictionary used in the running KaraKara app
+    """
     return app.app.registry.settings

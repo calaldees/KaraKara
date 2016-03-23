@@ -14,6 +14,7 @@ from karakara.views import cache
 @pytest.fixture(scope="session")
 def tags(request):
     """
+    Basic category tags for 3 test series
     """
     tags_data = [
         'from:series X',
@@ -40,6 +41,7 @@ def tags(request):
 @pytest.fixture(scope="session")
 def attachments(request):
     """
+    Mock attachments
     """
     attachments_data = (
         ('test/preview1.3gp', 'preview'),
@@ -72,6 +74,9 @@ def attachments(request):
 
 @pytest.fixture(scope="session")
 def tracks(request, DBSession, commit, tags, attachments):
+    """
+    4 test tracks with various unicode characters, lyrics, attachments, tags
+    """
     tracks_data = [
         {
             'id': "t1",
@@ -140,6 +145,9 @@ def tracks(request, DBSession, commit, tags, attachments):
 
 @pytest.fixture(scope="function")
 def tracks_volume(request):
+    """
+    Create 15 random tracks to assert larger list
+    """
     tracks = [create_test_track(tags=['test']) for track_num in range(15)]
     [DBSession.add(track) for track in tracks]
 
