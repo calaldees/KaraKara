@@ -1,3 +1,4 @@
-title: Test
-category: Test category
-artist: Test artist
+title: Test1
+category: anime
+artist: Artipie
+from: test series T

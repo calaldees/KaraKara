@@ -3,7 +3,7 @@ from PIL import Image
 
 from libs.misc import color_distance, color_close
 from processmedia_libs.external_tools import get_frame_from_video
-from ._base import ScanManager, TEST1_VIDEO_FILES
+from ._base import ScanManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 COLOR_SUBTITLE_CURRENT = (255, 255, 0)
 COLOR_SUBTITLE_NEXT = (255, 255, 255)
@@ -15,7 +15,7 @@ COLOR_BLUE = (0, 0, 255)
 SAMPLE_COORDINATE = (100, 100)
 
 
-def test_encode_simple():
+def test_encode_video_simple():
     with ScanManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
@@ -57,6 +57,17 @@ def test_encode_simple():
         assert color_close(COLOR_GREEN, Image.open(processed_files['image'][1].absolute).getpixel(SAMPLE_COORDINATE))
         assert color_close(COLOR_GREEN, Image.open(processed_files['image'][2].absolute).getpixel(SAMPLE_COORDINATE))
         assert color_close(COLOR_BLUE, Image.open(processed_files['image'][3].absolute).getpixel(SAMPLE_COORDINATE))
+
+
+def test_encode_audio_simple():
+    with ScanManager(TEST2_AUDIO_FILES) as scan:
+        scan.scan_media()
+        scan.encode_media()
+        processed_files = scan.processed_files('test2')
+
+        # Main Video
+        video_file = processed_files['video'][0].absolute
+        assert video_file
 
 
 def read_subtitle_text(image, color):

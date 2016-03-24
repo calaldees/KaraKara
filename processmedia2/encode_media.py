@@ -133,6 +133,10 @@ class Encoder(object):
                 )
                 source_files['video']['absolute'] = image_video_path
 
+            if not source_files['video']:
+                log.warn('Unable to encode as no video was provided or generated')
+                return False
+
             # 3.b) Normalize subtile files - Create our own managed ssa/srt
             if source_files['sub']:
                 # Parse subtitles
@@ -224,6 +228,9 @@ class Encoder(object):
         source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
         if not source_file_absolute:  # If no video source, attempt to degrade to single image input
             source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
+        if not source_file_absolute:
+            log.warn('No video or image input to extract thumbnail images')
+            return False
 
         target_files = tuple(
             self.processed_files_manager.get_processed_file(m.source_hash, 'image', index)
@@ -265,6 +272,9 @@ class Encoder(object):
         source_file = self.fileitem_wrapper.wrap_scan_data(m).get('tag', {}).get('absolute')
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'tags')
 
+        if not source_file:
+            log.warn('No tag file provided')
+            return False
         if not os.path.exists(source_file):
             log.warn('Source file tags does not exists? wtf! %s', source_file)
             return False

@@ -1,7 +1,10 @@
 import pytest
-from karakara.tests import conftest
 
-from model.model_tracks import Track, Tag, Attachment, _attachment_types
+from karakara.model.init_data import init_data
+from model.model_tracks import Track  #, Tag, Attachment, _attachment_types
+
+from import_media import import_media
+from ._base import ScanManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 import logging
 log = logging.getLogger(__name__)
@@ -9,26 +12,21 @@ log = logging.getLogger(__name__)
 INI = '../website/test.ini'
 
 
-
 @pytest.fixture(scope="session")
-def app_ini(request, ini_file=INI):
-    """
-    Settings object derived from .ini file
-    We are only interested in the database settings
-    """
-    from pyramid.paster import get_appsettings
-    return get_appsettings(ini_file)
-
-
-@pytest.fixture(scope="session")
-def DBSession(request, app_ini):
+def DBSession(request, ini_file=INI):
     """
     Aquire standalone DBSession for karakara webapp
     """
+    from pyramid.paster import get_appsettings
     from karakara.model import DBSession, init_DBSession
-    init_DBSession(app_ini)
+    init_DBSession(get_appsettings(ini_file))
+    #init_data()
     return DBSession
 
 
-def test_example(DBSession):
-    assert False
+def test_import_simple(DBSession):
+    with ScanManager(TEST1_VIDEO_FILES + TEST2_AUDIO_FILES) as scan:
+        scan.scan_media()
+        scan.encode_media()
+
+        import_media(path_meta=scan.path_meta, path_processed=scan.path_processed)

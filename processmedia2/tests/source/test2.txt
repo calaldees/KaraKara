@@ -1,0 +1,5 @@
+title: Test2
+category: anime
+artist: Mr Monkey
+from:gundam
+from:gundam:gundam seed

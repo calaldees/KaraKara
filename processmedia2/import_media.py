@@ -28,7 +28,7 @@ class TrackMissingProcessedFiles(Exception):
     pass
 
 
-def main(**kwargs):
+def import_media(**kwargs):
     """
      - hash and identify primary key for track
      - import tags
@@ -69,7 +69,8 @@ def main(**kwargs):
     stats['total'] = stats['before'] + stats['imported']
     assert stats['total'] == DBSession.query(Track.id).count(), 'Total tracks should == tracks in db before + imported tracks. Investigate.'
 
-    pprint(stats)
+    #pprint(stats)
+    return stats
 
 
 class TrackImporter(object):
@@ -191,4 +192,4 @@ if __name__ == "__main__":
     settings = get_appsettings(args['config_uri'])
     init_DBSession(settings)
 
-    postmortem(main, **args)
+    pprint(postmortem(import_media, **args))
