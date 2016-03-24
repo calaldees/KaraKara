@@ -94,11 +94,11 @@ class Encoder(object):
             log.warn('No source_hash to extract additional media %s', name)
             return
 
-        if all((
-                self._encode_preview_video_from_meta(m),
-                self._encode_images_from_meta(m),
-                self._process_tags_from_meta(m),
-        )):
+        def encode_steps(m):
+            yield self._encode_preview_video_from_meta(m)
+            yield self._encode_images_from_meta(m)
+            yield self._process_tags_from_meta(m)
+        if all(encode_steps(m)):
             try:
                 m.pending_actions.remove(PENDING_ACTION['encode'])
             except ValueError:

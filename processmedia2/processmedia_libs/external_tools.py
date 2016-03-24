@@ -23,6 +23,8 @@ from libs.misc import cmd_args, color_close
 CRFFactorItem = namedtuple('CRFFactorItem', ['crf', 'pixels'])
 CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
+PREVIEW_VIDEO_WIDTH = 320  # Wanted this as part of config but needed access to it for test assertions
+
 CONFIG = {
     'threads': 2,
     'audio_rate_khz': 44100,
@@ -36,7 +38,7 @@ CONFIG = {
         # From the avconv documentation we have some mathmatical functions and variables
         # 'a' is the aspect ratio. floor() rounds down to nearest integer
         # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
-        'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(320),  # scale=w='min(500, iw*3/2):h=-1'
+        'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(PREVIEW_VIDEO_WIDTH),  # scale=w='min(500, iw*3/2):h=-1'
         'preview_audio_bitrate': '48k',
         'preview_crf': 34,
         'strict': 'strict',

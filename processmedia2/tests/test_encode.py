@@ -2,7 +2,7 @@ import pytesseract
 from PIL import Image
 
 from libs.misc import color_distance, color_close
-from processmedia_libs.external_tools import get_frame_from_video
+from processmedia_libs.external_tools import get_frame_from_video, PREVIEW_VIDEO_WIDTH
 from ._base import ScanManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 COLOR_SUBTITLE_CURRENT = (255, 255, 0)
@@ -16,6 +16,10 @@ SAMPLE_COORDINATE = (100, 100)
 
 
 def test_encode_video_simple():
+    """
+    Test normal video + subtitles encode flow
+    Thubnail images and preview videos should be generated
+    """
     with ScanManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
@@ -25,6 +29,7 @@ def test_encode_video_simple():
         video_file = processed_files['video'][0].absolute
 
         image = get_frame_from_video(video_file, 5)
+        assert image.size[0] > PREVIEW_VIDEO_WIDTH, 'Main video should be greater than preview video size'
         assert color_close(COLOR_RED, image.getpixel(SAMPLE_COORDINATE))
         assert 'Red' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
         assert 'Green' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
@@ -43,6 +48,7 @@ def test_encode_video_simple():
         preview_file = processed_files['preview'][0].absolute
 
         image = get_frame_from_video(preview_file, 5)
+        assert image.size[0] == PREVIEW_VIDEO_WIDTH, 'Preview video should match expected output size'
         assert color_close(COLOR_RED, image.getpixel(SAMPLE_COORDINATE))
 
         image = get_frame_from_video(preview_file, 15)
@@ -59,7 +65,22 @@ def test_encode_video_simple():
         assert color_close(COLOR_BLUE, Image.open(processed_files['image'][3].absolute).getpixel(SAMPLE_COORDINATE))
 
 
+def test_encode_incomplete():
+    """
+    Incomplete source set cannot be processed
+    """
+    with ScanManager(TEST2_AUDIO_FILES - {'test2.png'}) as scan:
+        scan.scan_media()
+        scan.encode_media()
+        processed_files = scan.processed_files('test2')
+
+        assert not processed_files
+
+
 def test_encode_audio_simple():
+    """
+    Check audio + image encoding
+    """
     with ScanManager(TEST2_AUDIO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
@@ -68,6 +89,10 @@ def test_encode_audio_simple():
         # Main Video
         video_file = processed_files['video'][0].absolute
         assert video_file
+
+        assert 'One'
+        assert 'Two'
+        #assert length
 
 
 def read_subtitle_text(image, color):

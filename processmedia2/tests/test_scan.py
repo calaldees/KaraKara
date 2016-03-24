@@ -4,12 +4,12 @@ from ._base import ScanManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 
 def test_scan_grouping():
-    with ScanManager(TEST1_VIDEO_FILES + TEST2_AUDIO_FILES) as scan:
+    with ScanManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES - {'test2.txt'}) as scan:
         scan.scan_media()
         meta = scan.meta
         assert set(meta['test1.json']['scan'].keys()) == {'test1.mp4', 'test1.srt', 'test1.txt'}, \
             'test1 source files were not grouped effectivly'
-        assert set(meta['test2.json']['scan'].keys()) == {'test2.ogg'}, \
+        assert set(meta['test2.json']['scan'].keys()) == {'test2.ogg', 'test2.png', 'test2.ssa'}, \
             'test2 source files were not grouped effectivly'
 
         # If a file is renamed - it is searched and re-associated with the original group even if it's name does not match anymore
@@ -39,7 +39,7 @@ def test_scan_grouping():
         scan.scan_media()
         meta = scan.meta
         assert set(meta['test1.json']['scan'].keys()) == {'test1.mp4', 'testX.srt', 'test1.txt'}
-        assert set(meta['test2.json']['scan'].keys()) == {'test2.ogg', 'test2.txt'}, \
+        assert set(meta['test2.json']['scan'].keys()) == {'test2.ogg', 'test2.txt', 'test2.ssa', 'test2.png'}, \
             'test2.txt should have been grouped with test2'
 
 

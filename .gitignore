@@ -3,6 +3,7 @@
 *.pid
 *.pyc
 *.vagrant
+*.cache
 mediasource/
 *~
 hash_cache.pickle
