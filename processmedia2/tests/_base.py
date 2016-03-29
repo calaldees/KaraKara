@@ -1,6 +1,7 @@
 import os
 import tempfile
 import json
+from pathlib import Path
 
 from scan_media import scan_media
 from encode_media import encode_media
@@ -17,7 +18,7 @@ TEST2_AUDIO_FILES = set(('test2.ogg', 'test2.png', 'test2.ssa', 'test2.txt'))
 
 class ScanManager(object):
 
-    def __init__(self, source_files):
+    def __init__(self, source_files=set()):
         self.source_files = source_files
 
     def _link_source_files(self):
@@ -64,16 +65,29 @@ class ScanManager(object):
     @property
     def meta(self):
         """
-        Dump of all the generated raw meta json files
+        Dump of all the generated raw meta json files into python data structure
         """
         meta = {}
-        for f in os.listdir(self.path_meta):
-            with open(os.path.join(self.path_meta, f), 'r') as meta_filehandle:
-                meta[f] = json.load(meta_filehandle)
+        for filename in os.listdir(self.path_meta):
+            with open(os.path.join(self.path_meta, filename), 'r') as meta_filehandle:
+                meta[filename] = json.load(meta_filehandle)
         return meta
+    @meta.setter
+    def meta(self, data):
+        # TODO - clear all files on set
+        for filename, meta_data in data.items():
+            with open(os.path.join(self.path_meta, filename), 'w') as meta_filehandle:
+                json.dump(meta_filehandle, meta_data)
 
     def processed_files(self, name):
         self.meta_manager._release_cache()
         self.meta_manager.load(name)
         source_hash = self.meta_manager.get(name).source_hash
+        return self.get_all_processed_files_associated_with_source_hash(source_hash)
+
+    def get_all_processed_files_associated_with_source_hash(self, source_hash):
         return self.processed_manager.get_all_processed_files_associated_with_source_hash(source_hash)
+
+    def mock_processed_files(self, filenames):
+        for filename in filenames:
+            Path(os.path.join(self.path_processed, filename)).touch()
