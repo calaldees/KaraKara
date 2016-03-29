@@ -140,7 +140,7 @@ encode:
 	$(PYTHON) encode_media.py
 
 import:
-	PYTHONPATH=$(WEB_WORKING) $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini
+	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini
 
 cleanup:
 	$(PYTHON) cleanup_media.py
@@ -153,9 +153,10 @@ migrate:
 
 test:
 	make all --directory tests/source
-	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
+	#PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
 	#make ini --directory $(WEB_PATH)
-	#PYTHONPATH=$(WEB_WORKING) $(WEB_PYTEST) tests/test_import.py --pdb
+	PYTHONPATH="$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/" $(WEB_PYTEST) tests/test_import.py --pdb
+
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
