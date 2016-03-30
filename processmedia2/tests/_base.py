@@ -77,7 +77,7 @@ class ScanManager(object):
         # TODO - clear all files on set
         for filename, meta_data in data.items():
             with open(os.path.join(self.path_meta, filename), 'w') as meta_filehandle:
-                json.dump(meta_filehandle, meta_data)
+                json.dump(meta_data, meta_filehandle)
 
     def processed_files(self, name):
         self.meta_manager._release_cache()

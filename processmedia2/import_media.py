@@ -28,7 +28,7 @@ class TrackMissingProcessedFiles(Exception):
     pass
 
 
-def import_media(**kwargs):
+def import_media(DBSession, **kwargs):
     """
      - hash and identify primary key for track
      - import tags
@@ -39,7 +39,7 @@ def import_media(**kwargs):
     stats = defaultdict(int)
 
     meta = MetaManager(kwargs['path_meta'])
-    importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
+    importer = TrackImporter(DBSession, meta_manager=meta, path_processed=kwargs['path_processed'])
 
     meta.load_all()  # mtime=epoc(last_update())
 
@@ -75,10 +75,11 @@ def import_media(**kwargs):
 
 class TrackImporter(object):
 
-    def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
+    def __init__(self, DBSession, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
+        self.DBSession = DBSession
         self.meta = meta_manager or MetaManager(path_meta)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
-        self.imported_tracks = set(t.id for t in DBSession.query(Track.id))
+        self.imported_tracks = set(t.id for t in self.DBSession.query(Track.id))
 
     def import_track(self, name):
         log.debug('Attemping: %s', name)
@@ -110,7 +111,7 @@ class TrackImporter(object):
         self._add_lyrics(track, first(processed_files.get('srt')))
         self._add_tags(track, first(processed_files.get('tags')))
 
-        DBSession.add(track)
+        self.DBSession.add(track)
         commit()
 
         return True
@@ -192,4 +193,4 @@ if __name__ == "__main__":
     settings = get_appsettings(args['config_uri'])
     init_DBSession(settings)
 
-    pprint(postmortem(import_media, **args))
+    pprint(postmortem(import_media, DBSession, **args))

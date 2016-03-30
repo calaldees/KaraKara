@@ -94,10 +94,10 @@ def DBSession_base(request, ini_file=INI):
     return DBSession
 
 
-@pytest.fixture(scope="test")
+@pytest.fixture(scope="function")
 def DBSession(request, DBSession_base):
     init_data()
-    return DBSession
+    return DBSession_base
 
 
 def test_import_full(DBSession):
@@ -115,13 +115,15 @@ def test_basic_import(DBSession):
         scan.meta = MOCK_IMPORT_JSON
 
         # Create empty files for all expected processed files
-        scan.mock_processed_files(chain(
-            scan.get_all_processed_files_associated_with_source_hash(source_hash)
-            for source_hash in get_source_hashs(scan.meta)
-        ))
+        scan.mock_processed_files(
+            processed_file.absolute for processed_file in chain(*(chain(*(
+                scan.get_all_processed_files_associated_with_source_hash(source_hash).values()
+                for source_hash in get_source_hashs(scan.meta)
+            ))))
+        )
 
         # Attempt import
-        import_media(path_meta=scan.path_meta, path_processed=scan.path_processed)
+        import_media(DBSession, path_meta=scan.path_meta, path_processed=scan.path_processed)
 
         # Assert tracks are in DB
         assert DBSession.query(Track).count() == 2
