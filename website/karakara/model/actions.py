@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from . import DBSession
@@ -20,6 +20,18 @@ def last_update():
 
 def get_track(id):
     return DBSession.query(Track).get(id)
+
+
+def get_track_dict_full(id):
+    try:
+        return DBSession.query(Track).options(
+            joinedload(Track.tags),
+            joinedload(Track.attachments),
+            joinedload('tags.parent'),
+            undefer(Track.lyrics),
+        ).get(id).to_dict('full')
+    except AttributeError:
+        return None
 
 
 def get_tag(tag, parent=None, create_if_missing=False):

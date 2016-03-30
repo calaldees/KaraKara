@@ -3,7 +3,7 @@ import random
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload
 
 from externals.lib.misc import subdict, first
 from externals.lib.log import log_event
@@ -13,6 +13,7 @@ from ._logic import queue_item_for_track
 from .search import restrict_search
 
 from ..model import DBSession
+from ..model.actions import get_track_dict_full
 from ..model.model_tracks import Track
 #from ..model.model_queue  import QueueItem
 
@@ -80,15 +81,10 @@ def track_view(request):
     def get_track_dict(id):
         try:
             log.debug('cache gen - track_dict for {0}'.format(id))
-            track_dict = DBSession.query(Track).options(
-                joinedload(Track.tags),
-                joinedload(Track.attachments),
-                joinedload('tags.parent'),
-                undefer(Track.lyrics),
-            ).get(id).to_dict('full')
+            track_dict = get_track_dict_full(id)
             track_dict['title'] = track_title(track_dict['tags'])
             return track_dict
-        except AttributeError:
+        except (KeyError, TypeError):
             return cache_none
 
     def get_track_and_queued_dict(id):

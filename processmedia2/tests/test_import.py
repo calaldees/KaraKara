@@ -1,8 +1,11 @@
 import pytest
-from itertools import chain
+from collections import defaultdict
+
+from libs.misc import flatten, freeze
 
 from karakara.model.init_data import init_data
 from karakara.model.model_tracks import Track  #, Tag, Attachment, _attachment_types
+from karakara.model.actions import get_track_dict_full
 
 from import_media import import_media
 
@@ -13,12 +16,15 @@ log = logging.getLogger(__name__)
 
 INI = '../website/test.ini'
 
+EXPECTED_ATTACHMENT_COUNT = freeze(dict(image=4, preview=1, video=1, srt=1))
+
 MOCK_IMPORT_JSON = {
     "test2.json": {
         "actions": [],
         "processed": {
             "width": 640,
-            "source_hash": "88bd2fc97bc72851c72b7ca87b9ba815ec8f75519152a4f7dda5d929756a980b",
+            #"source_hash": "88bd2fc97bc72851c72b7ca87b9ba815ec8f75519152a4f7dda5d929756a980b",
+            "source_hash": "test2_hash",
             "duration": 15.0,
             "height": 400
         },
@@ -54,7 +60,8 @@ MOCK_IMPORT_JSON = {
                 "sample_rate": "44100",
                 "format": "aac"
             },
-            "source_hash": "68676f44efc5d0ebe4a1abece95685f25d6373decf9699cac0e19f2d17019eed",
+            #"source_hash": "68676f44efc5d0ebe4a1abece95685f25d6373decf9699cac0e19f2d17019eed",
+            "source_hash": "test1_hash",
             "duration": 30.02,
             "height": 480
         },
@@ -116,14 +123,25 @@ def test_basic_import(DBSession):
 
         # Create empty files for all expected processed files
         manager.mock_processed_files(
-            processed_file.absolute for processed_file in chain(*(chain(*(
+            processed_file.absolute for processed_file in flatten(
                 manager.get_all_processed_files_associated_with_source_hash(source_hash).values()
                 for source_hash in get_source_hashs(manager.meta)
-            ))))
+            )
         )
 
-        # Attempt import
-        import_media(DBSession, path_meta=manager.path_meta, path_processed=manager.path_processed)
+        stats = import_media(DBSession, path_meta=manager.path_meta, path_processed=manager.path_processed)
 
-        # Assert tracks are in DB
+        assert freeze(stats) == freeze(dict(total=2, imported=2, unprocessed=0, missing=0, deleted=0, before=0, processed=2))
         assert DBSession.query(Track).count() == 2
+
+        def count_attachments(track):
+            attachments = defaultdict(int)
+            for attachment in track['attachments']:
+                attachments[attachment['type']] += 1
+            return dict(attachments)
+
+        track1 = get_track_dict_full('test1_hash')
+        assert freeze(count_attachments(track1)) == EXPECTED_ATTACHMENT_COUNT
+
+        track2 = get_track_dict_full('test2_hash')
+        assert freeze(count_attachments(track2)) == EXPECTED_ATTACHMENT_COUNT

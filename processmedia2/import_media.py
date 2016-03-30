@@ -36,7 +36,7 @@ def import_media(DBSession, **kwargs):
      - cleanup db - any sources we don't have the actual processed files for - prune and remove from db
        - check this removes unnneeded attachments
     """
-    stats = defaultdict(int)
+    stats = dict(processed=0, imported=0, before=0, unprocessed=0, deleted=0, missing=0)
 
     meta = MetaManager(kwargs['path_meta'])
     importer = TrackImporter(DBSession, meta_manager=meta, path_processed=kwargs['path_processed'])
