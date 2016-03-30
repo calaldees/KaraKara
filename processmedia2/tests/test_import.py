@@ -19,12 +19,12 @@ INI = '../website/test.ini'
 EXPECTED_ATTACHMENT_COUNT = freeze(dict(image=4, preview=1, video=1, srt=1))
 
 MOCK_IMPORT_JSON = {
-    "test2.json": {
+    "test3.json": {
         "actions": [],
         "processed": {
             "width": 640,
             #"source_hash": "88bd2fc97bc72851c72b7ca87b9ba815ec8f75519152a4f7dda5d929756a980b",
-            "source_hash": "test2_hash",
+            "source_hash": "test3_hash",
             "duration": 15.0,
             "height": 400
         },
@@ -51,7 +51,7 @@ MOCK_IMPORT_JSON = {
             }
         }
     },
-    "test1.json": {
+    "test4.json": {
         "actions": [],
         "processed": {
             "width": 640,
@@ -61,7 +61,7 @@ MOCK_IMPORT_JSON = {
                 "format": "aac"
             },
             #"source_hash": "68676f44efc5d0ebe4a1abece95685f25d6373decf9699cac0e19f2d17019eed",
-            "source_hash": "test1_hash",
+            "source_hash": "test4_hash",
             "duration": 30.02,
             "height": 480
         },
@@ -110,9 +110,14 @@ def DBSession(request, DBSession_base):
 def test_import_full(DBSession):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
-        #manager.encode_media()
-        #import pdb ; pdb.set_trace()
-        #import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
+        manager.encode_media()
+        stats = import_media(DBSession, path_meta=manager.path_meta, path_processed=manager.path_processed)
+
+        assert freeze(stats) == freeze(dict(total=2, imported=2, unprocessed=0, missing=0, deleted=0, before=0, processed=2))
+
+        track1 = get_track_dict_full(manager.get_source_hash('test1'))
+        import pdb ; pdb.set_trace()
+        track2 = get_track_dict_full(manager.get_source_hash('test1'))
 
 
 def test_basic_import(DBSession):
@@ -140,8 +145,8 @@ def test_basic_import(DBSession):
                 attachments[attachment['type']] += 1
             return dict(attachments)
 
-        track1 = get_track_dict_full('test1_hash')
-        assert freeze(count_attachments(track1)) == EXPECTED_ATTACHMENT_COUNT
+        track3 = get_track_dict_full('test3_hash')
+        assert freeze(count_attachments(track3)) == EXPECTED_ATTACHMENT_COUNT
 
-        track2 = get_track_dict_full('test2_hash')
-        assert freeze(count_attachments(track2)) == EXPECTED_ATTACHMENT_COUNT
+        track4 = get_track_dict_full('test4_hash')
+        assert freeze(count_attachments(track4)) == EXPECTED_ATTACHMENT_COUNT

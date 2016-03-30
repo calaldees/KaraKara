@@ -79,14 +79,16 @@ class ProcessMediaTestManager(object):
             with open(os.path.join(self.path_meta, filename), 'w') as meta_filehandle:
                 json.dump(meta_data, meta_filehandle)
 
-    def processed_files(self, name):
+    def get_source_hash(self, name):
         self.meta_manager._release_cache()
         self.meta_manager.load(name)
-        source_hash = self.meta_manager.get(name).source_hash
-        return self.get_all_processed_files_associated_with_source_hash(source_hash)
+        return self.meta_manager.get(name).source_hash
 
     def get_all_processed_files_associated_with_source_hash(self, source_hash):
         return self.processed_manager.get_all_processed_files_associated_with_source_hash(source_hash)
+
+    def processed_files(self, name):
+        return self.get_all_processed_files_associated_with_source_hash(self.get_source_hash(name))
 
     def mock_processed_files(self, filenames):
         for filename in filenames:
