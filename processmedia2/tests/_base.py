@@ -16,7 +16,7 @@ TEST2_AUDIO_FILES = set(('test2.ogg', 'test2.png', 'test2.ssa', 'test2.txt'))
 
 # Utils ------------------------------------------------------------------------
 
-class ScanManager(object):
+class ProcessMediaTestManager(object):
 
     def __init__(self, source_files=set()):
         self.source_files = source_files

@@ -3,7 +3,7 @@ from PIL import Image
 
 from libs.misc import color_distance, color_close
 from processmedia_libs.external_tools import probe_media, get_frame_from_video, PREVIEW_VIDEO_WIDTH
-from ._base import ScanManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
+from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 COLOR_SUBTITLE_CURRENT = (255, 255, 0)
 COLOR_SUBTITLE_NEXT = (255, 255, 255)
@@ -21,7 +21,7 @@ def test_encode_video_simple():
     Test normal video + subtitles encode flow
     Thubnail images and preview videos should be generated
     """
-    with ScanManager(TEST1_VIDEO_FILES) as scan:
+    with ProcessMediaTestManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
         processed_files = scan.processed_files('test1')
@@ -72,7 +72,7 @@ def test_encode_incomplete():
     """
     Incomplete source set cannot be processed
     """
-    with ScanManager(TEST2_AUDIO_FILES - {'test2.png'}) as scan:
+    with ProcessMediaTestManager(TEST2_AUDIO_FILES - {'test2.png'}) as scan:
         scan.scan_media()
         scan.encode_media()
         processed_files = scan.processed_files('test2')
@@ -84,7 +84,7 @@ def test_encode_audio_simple():
     """
     Check audio + image encoding
     """
-    with ScanManager(TEST2_AUDIO_FILES) as scan:
+    with ProcessMediaTestManager(TEST2_AUDIO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
         processed_files = scan.processed_files('test2')

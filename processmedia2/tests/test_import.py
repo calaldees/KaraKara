@@ -6,7 +6,7 @@ from karakara.model.model_tracks import Track  #, Tag, Attachment, _attachment_t
 
 from import_media import import_media
 
-from ._base import ScanManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
+from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 import logging
 log = logging.getLogger(__name__)
@@ -101,29 +101,29 @@ def DBSession(request, DBSession_base):
 
 
 def test_import_full(DBSession):
-    with ScanManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as scan:
-        scan.scan_media()
-        #scan.encode_media()
+    with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
+        manager.scan_media()
+        #manager.encode_media()
         #import pdb ; pdb.set_trace()
-        #import_media(path_meta=scan.path_meta, path_processed=scan.path_processed)
+        #import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
 
 def test_basic_import(DBSession):
-    with ScanManager() as scan:
+    with ProcessMediaTestManager() as manager:
 
         # Create mock scan data (as if an encode had just been performed)
-        scan.meta = MOCK_IMPORT_JSON
+        manager.meta = MOCK_IMPORT_JSON
 
         # Create empty files for all expected processed files
-        scan.mock_processed_files(
+        manager.mock_processed_files(
             processed_file.absolute for processed_file in chain(*(chain(*(
-                scan.get_all_processed_files_associated_with_source_hash(source_hash).values()
-                for source_hash in get_source_hashs(scan.meta)
+                manager.get_all_processed_files_associated_with_source_hash(source_hash).values()
+                for source_hash in get_source_hashs(manager.meta)
             ))))
         )
 
         # Attempt import
-        import_media(DBSession, path_meta=scan.path_meta, path_processed=scan.path_processed)
+        import_media(DBSession, path_meta=manager.path_meta, path_processed=manager.path_processed)
 
         # Assert tracks are in DB
         assert DBSession.query(Track).count() == 2
