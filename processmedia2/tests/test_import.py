@@ -3,11 +3,12 @@ from collections import defaultdict
 
 from libs.misc import flatten, freeze
 
-from karakara.model.init_data import init_data
-from karakara.model.model_tracks import Track  #, Tag, Attachment, _attachment_types
+from import_media import import_media
+
+from karakara.model.model_tracks import Track # , Tag, Attachment, _attachment_types
 from karakara.model.actions import get_track_dict_full
 
-from import_media import import_media
+
 
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
@@ -15,6 +16,7 @@ import logging
 log = logging.getLogger(__name__)
 
 INI = '../website/test.ini'
+
 
 EXPECTED_ATTACHMENT_COUNT = freeze(dict(image=4, preview=1, video=1, srt=1))
 
@@ -96,13 +98,14 @@ def DBSession_base(request, ini_file=INI):
     Aquire standalone DBSession for karakara webapp
     """
     from pyramid.paster import get_appsettings
-    from karakara.model import DBSession, init_DBSession
+    from import_media import init_DBSession, DBSession
     init_DBSession(get_appsettings(ini_file))
     return DBSession
 
 
 @pytest.fixture(scope="function")
 def DBSession(request, DBSession_base):
+    from karakara.model.init_data import init_data
     init_data()
     return DBSession_base
 
@@ -111,7 +114,7 @@ def test_import_full(DBSession):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
         manager.encode_media()
-        stats = import_media(DBSession, path_meta=manager.path_meta, path_processed=manager.path_processed)
+        stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
         assert freeze(stats) == freeze(dict(total=2, imported=2, unprocessed=0, missing=0, deleted=0, before=0, processed=2))
 
@@ -134,7 +137,7 @@ def test_basic_import(DBSession):
             )
         )
 
-        stats = import_media(DBSession, path_meta=manager.path_meta, path_processed=manager.path_processed)
+        stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
         assert freeze(stats) == freeze(dict(total=2, imported=2, unprocessed=0, missing=0, deleted=0, before=0, processed=2))
         assert DBSession.query(Track).count() == 2

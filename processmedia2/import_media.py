@@ -11,9 +11,9 @@ from processmedia_libs import subtitle_processor
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from model.model_tracks import Track, Tag, Attachment, _attachment_types
-from model import init_DBSession, DBSession, commit
-from model.actions import get_tag, clear_all_tracks, last_update, delete_track
+from karakara.model.model_tracks import Track, Tag, Attachment, _attachment_types
+from karakara.model import init_DBSession, DBSession, commit
+from karakara.model.actions import get_tag, clear_all_tracks, last_update, delete_track
 
 
 import logging
@@ -28,7 +28,7 @@ class TrackMissingProcessedFiles(Exception):
     pass
 
 
-def import_media(DBSession, **kwargs):
+def import_media(**kwargs):
     """
      - hash and identify primary key for track
      - import tags
@@ -39,7 +39,7 @@ def import_media(DBSession, **kwargs):
     stats = dict(processed=0, imported=0, before=0, unprocessed=0, deleted=0, missing=0)
 
     meta = MetaManager(kwargs['path_meta'])
-    importer = TrackImporter(DBSession, meta_manager=meta, path_processed=kwargs['path_processed'])
+    importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
 
     meta.load_all()  # mtime=epoc(last_update())
 
@@ -75,11 +75,10 @@ def import_media(DBSession, **kwargs):
 
 class TrackImporter(object):
 
-    def __init__(self, DBSession, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
-        self.DBSession = DBSession
+    def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
-        self.imported_tracks = set(t.id for t in self.DBSession.query(Track.id))
+        self.imported_tracks = set(t.id for t in DBSession.query(Track.id))
 
     def import_track(self, name):
         log.debug('Attemping: %s', name)
@@ -111,7 +110,7 @@ class TrackImporter(object):
         self._add_lyrics(track, first(processed_files.get('srt')))
         self._add_tags(track, first(processed_files.get('tags')))
 
-        self.DBSession.add(track)
+        DBSession.add(track)
         commit()
 
         return True
@@ -193,4 +192,4 @@ if __name__ == "__main__":
     settings = get_appsettings(args['config_uri'])
     init_DBSession(settings)
 
-    pprint(postmortem(import_media, DBSession, **args))
+    pprint(postmortem(import_media, **args))
