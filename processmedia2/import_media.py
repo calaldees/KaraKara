@@ -35,6 +35,15 @@ def import_media(**kwargs):
      - import subtiles
      - cleanup db - any sources we don't have the actual processed files for - prune and remove from db
        - check this removes unnneeded attachments
+
+    stats description:
+        imported: number of tracks imported this session
+        processed: the total number of tracks in the processed meta dataset
+        before: the number of track in the db before this import operation was performed
+        unprocessed: meta exists, but the processed data has not been encoded yet
+        missing: some source files were missing, making it impossible to use
+        deleted: no matching processed meta paired with db entry at all
+        total: the total tracks in the db at the end of this import operation
     """
     stats = dict(processed=0, imported=0, before=0, unprocessed=0, deleted=0, missing=0)
 

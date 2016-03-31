@@ -120,7 +120,7 @@ def test_import_full(DBSession):
 
         track1 = get_track_dict_full(manager.get_source_hash('test1'))
         import pdb ; pdb.set_trace()
-        track2 = get_track_dict_full(manager.get_source_hash('test1'))
+        track2 = get_track_dict_full(manager.get_source_hash('test2'))
 
 
 def test_basic_import(DBSession):
@@ -153,3 +153,22 @@ def test_basic_import(DBSession):
 
         track4 = get_track_dict_full('test4_hash')
         assert freeze(count_attachments(track4)) == EXPECTED_ATTACHMENT_COUNT
+
+
+def test_import_side_effects():
+    """
+    If a source fileset is incomplete and exisits in db - it is removed from the db - missing
+    If a source fileset is missing and exists in db - it is removed - missing
+    If source fileset is incomplete and not exisit in db - it is never added - unprocessed?
+    If a file existed before the import began is has all source files it is kept - before
+    """
+
+    with ProcessMediaTestManager() as manager:
+        manager.meta = {
+            'test5.json': {
+                "processed": {
+                    "source_hash": "test5_hash",
+                    "duration": 15.0,
+                },
+            }
+        }
