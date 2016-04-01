@@ -12,6 +12,7 @@ class ProcessedFilesManager(object):
     FILE_TYPE_LOOKUP = {
         processed_file_type.type: processed_file_type
         for processed_file_type in (
+            # NOTE: These must match the attachment_types in the Track model
             ProcessedFileType('image', 'jpg', ''),
             ProcessedFileType('video', 'mp4', ''),
             ProcessedFileType('preview', 'mp4', ''),
