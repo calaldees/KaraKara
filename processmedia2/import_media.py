@@ -45,22 +45,23 @@ def import_media(**kwargs):
         deleted: no matching processed meta paired with db entry at all
         total: the total tracks in the db at the end of this import operation
     """
-    stats = dict(processed=0, imported=0, before=0, unprocessed=0, deleted=0, missing=0)
+    stats = dict(processed=0, imported=0, unprocessed=0, deleted=0, missing=0, existing=0, existing_=0)
 
     meta = MetaManager(kwargs['path_meta'])
     importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
+    stats['existing'] = len(importer.exisiting_track_ids)
 
     meta.load_all()  # mtime=epoc(last_update())
 
-    processed_tracks = set(m.source_hash for m in meta.meta.values() if m.source_hash)
-    stats['processed'] = len(processed_tracks)
+    processed_track_ids = set(m.source_hash for m in meta.meta.values() if m.source_hash)
+    stats['processed'] = len(processed_track_ids)
 
     for name in meta.meta.keys():
         try:
             if importer.import_track(name):
                 stats['imported'] += 1
             else:
-                stats['before'] += 1
+                stats['existing_'] += 1
         except TrackNotProcesedException:
             log.debug('Unprocessed: %s', name)  # has no source_hash
             stats['unprocessed'] += 1
@@ -68,14 +69,14 @@ def import_media(**kwargs):
             log.warn('Missing: %s', name)  # does not have all required processde files
             stats['missing'] += 1
 
-    for unneeded_track_id in importer.imported_tracks - processed_tracks:
+    for unneeded_track_id in importer.exisiting_track_ids - processed_track_ids:
         log.warn('Remove: %s', unneeded_track_id)
         delete_track(unneeded_track_id)
         stats['deleted'] += 1
     commit()
 
-    assert stats['before'] == len(importer.imported_tracks), 'The counted skips tracks should match what the db said it had. Investigate.'
-    stats['total'] = stats['before'] + stats['imported']
+    assert stats['existing'] == stats['existing_'] + stats['missing'], 'The counted db existing tracks should match value counted in import. Investigate.'
+    stats['total'] = stats['existing_'] + stats['imported']
     assert stats['total'] == DBSession.query(Track.id).count(), 'Total tracks should == tracks in db before + imported tracks. Investigate.'
 
     #pprint(stats)
@@ -87,7 +88,7 @@ class TrackImporter(object):
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
-        self.imported_tracks = set(t.id for t in DBSession.query(Track.id))
+        self.exisiting_track_ids = set(t.id for t in DBSession.query(Track.id))
 
     def import_track(self, name):
         log.debug('Attemping: %s', name)
@@ -96,9 +97,9 @@ class TrackImporter(object):
         m = self.meta.get(name)
         if not m.source_hash:
             raise TrackNotProcesedException()
-        if m.source_hash in self.imported_tracks:
+        if m.source_hash in self.exisiting_track_ids:
             log.debug('Exists: %s', name)
-            return
+            return False
         processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash)
         if self._missing_files(processed_files):
             # If we are missing any files but we have a source hash,

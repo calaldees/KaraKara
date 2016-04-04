@@ -77,7 +77,7 @@ def _est_import_full(DBSession):
         track2 = get_track_dict_full(manager.get_source_hash('test2'))
 
 
-def test_basic_import(DBSession):
+def _est_basic_import(DBSession):
     with ProcessMediaTestManager() as manager:
 
         # Create mock scan data (as if an encode had just been performed)
@@ -211,8 +211,9 @@ def test_import_side_effects(DBSession, commit):
             unprocessed=1,  # test6
             missing=1,  # test7
             deleted=1,  # test8
-            before=1,  # test5
-            processed=3  # test5, test9, test7
+            existing=3,  # test5, test7, test8
+            processed=3,  # test5, test9, test7
+            existing_=1,  # test5
         ))
         assert DBSession.query(Track).count() == 2
         assert DBSession.query(Track).get('test5')
