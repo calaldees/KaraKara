@@ -25,7 +25,9 @@ class TrackNotProcesedException(Exception):
 
 
 class TrackMissingProcessedFiles(Exception):
-    pass
+    def __init__(self, id, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self.id = id
 
 
 def import_media(**kwargs):
@@ -37,16 +39,16 @@ def import_media(**kwargs):
        - check this removes unnneeded attachments
 
     stats description:
-        imported: number of tracks imported this session
-        processed: the total number of tracks in the processed meta dataset
-        existing: the number of track in the db before this import operation was performed
-        unprocessed: meta exists, but the processed data has not been encoded yet
-        missing: some source files were missing, making it impossible to use
-        deleted: no matching processed meta paired with db entry at all
-        total: the total tracks in the db at the end of this import operation
+        : number of tracks imported this session
+        : the total number of tracks in the processed meta dataset
+        : the number of track in the db before this import operation was performed
+        : meta exists, but the processed data has not been encoded yet
+        : some source files were missing, making it impossible to use
+        : no matching processed meta paired with db entry at all
+        db_end: the total tracks in the db at the end of this import operation
         meta_hash_matched_db_hash: The number of meta tracks that matched existing hash in the db
     """
-    stats = dict(meta_set=set(), meta_imported=set(), meta_unprocessed=set(), db_removed=list(), missing_processed=set(), db_start=set(), meta_hash_matched_db_hash=set())
+    stats = dict(meta_set=set(), meta_imported=set(), meta_unprocessed=set(), db_removed=list(), missing_processed_deleted=set(), missing_processed_aborted=set(), db_start=set(), meta_hash_matched_db_hash=set())
 
     def get_db_track_names():
         return set(t.source_filename for t in DBSession.query(Track.source_filename))
@@ -59,7 +61,7 @@ def import_media(**kwargs):
 
     meta_processed_track_ids = set(m.source_hash for m in meta.meta.values() if m.source_hash)
     stats['meta_set'] = set(m.name for m in meta.meta.values() if m.source_hash)
-    #import pdb ; pdb.set_trace()
+
     for name in meta.meta.keys():
         try:
             if importer.import_track(name):
@@ -67,11 +69,16 @@ def import_media(**kwargs):
             else:
                 stats['meta_hash_matched_db_hash'].add(name)
         except TrackNotProcesedException:
-            log.debug('Unprocessed: %s', name)  # has no source_hash
+            log.debug('Unprocessed (no source_hash): %s', name)
             stats['meta_unprocessed'].add(name)
-        except TrackMissingProcessedFiles:
-            log.warn('Missing: %s', name)  # does not have all required processde files
-            stats['missing_processed'].add(name)
+        except TrackMissingProcessedFiles as ex:
+            if ex.id:
+                log.warn('Missing (processed files) delete existing: %s', name)
+                delete_track(ex.id)
+                stats['missing_processed_deleted'].add(name)
+            else:
+                log.warn('Missing (processed files) abort import: %s', name)
+                stats['missing_processed_aborted'].add(name)
 
     for unneeded_track_id in importer.exisiting_track_ids - meta_processed_track_ids:
         log.warn('Remove: %s', unneeded_track_id)
@@ -110,7 +117,7 @@ class TrackImporter(object):
             if PENDING_ACTION['encode'] not in m.pending_actions:  # Feels clunky to manage this as a list? maybe a set?
                 m.pending_actions.append(PENDING_ACTION['encode'])
                 self.meta.save(name)  # Feels clunky
-            raise TrackMissingProcessedFiles()
+            raise TrackMissingProcessedFiles(id=m.source_hash in self.exisiting_track_ids and m.source_hash)
 
         if m.source_hash in self.exisiting_track_ids:
             log.debug('Exists: %s', name)
@@ -134,7 +141,7 @@ class TrackImporter(object):
     def _missing_files(self, processed_files):
         missing_processed_files = {
             (k, processed_file)
-            for k in ('video', 'preview', 'tags', 'image')
+            for k in _attachment_types.enums
             for processed_file in processed_files[k]
             if not processed_file.exists
         }

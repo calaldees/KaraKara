@@ -64,20 +64,34 @@ def commit(request, DBSession_base):
 
 
 
-def _est_import_full(DBSession):
+def test_import_full(DBSession):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
         manager.encode_media()
         stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
-        assert freeze(stats) == freeze(dict(total=2, imported=2, unprocessed=0, missing=0, deleted=0, before=0, processed=2))
+        assert freeze(stats) == freeze(dict(
+            db_end={'test1', 'test2'},
+            meta_imported={'test1', 'test2'},
+            meta_unprocessed={},
+            missing_processed_deleted={},
+            missing_processed_aborted={},
+            db_removed=[],
+            db_start={},
+            meta_set={'test1', 'test2'},
+            meta_hash_matched_db_hash={},
+        ))
 
         track1 = get_track_dict_full(manager.get_source_hash('test1'))
-        import pdb ; pdb.set_trace()
+        assert track1
+
         track2 = get_track_dict_full(manager.get_source_hash('test2'))
+        assert track2
+
+        # TODO: assertions on db tracks
 
 
-def _est_basic_import(DBSession):
+def test_basic_import(DBSession):
     with ProcessMediaTestManager() as manager:
 
         # Create mock scan data (as if an encode had just been performed)
@@ -104,7 +118,17 @@ def _est_basic_import(DBSession):
 
         stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
-        assert freeze(stats) == freeze(dict(total=2, imported=2, unprocessed=0, missing=0, deleted=0, before=0, processed=2))
+        assert freeze(stats) == freeze(dict(
+            db_end={'test3', 'test4'},
+            meta_imported={'test3', 'test4'},
+            meta_unprocessed={},
+            missing_processed_deleted={},
+            missing_processed_aborted={},
+            db_removed=[],
+            db_start={},
+            meta_set={'test3', 'test4'},
+            meta_hash_matched_db_hash={},
+        ))
         assert DBSession.query(Track).count() == 2
 
         def count_attachments(track):
@@ -201,10 +225,23 @@ def test_import_side_effects(DBSession, commit):
                     "duration": 15.0,
                 }
             },
+            # test10 is processed but has incomplete processed files
+            "test10.json": {
+                "processed": {
+                    "source_hash": "test10_hash",
+                    "duration": 15.0,
+                }
+            },
+
         }
         manager.mock_processed_files(
             processed_file.relative for processed_file in flatten(
                 manager.get_all_processed_files_associated_with_source_hash('test9_hash').values()
+            )
+        )
+        manager.mock_processed_files(
+            processed_file.relative for processed_file in flatten(
+                tuple(manager.get_all_processed_files_associated_with_source_hash('test10_hash').values())[:len(_attachment_types.enums)-2]
             )
         )
 
@@ -214,12 +251,13 @@ def test_import_side_effects(DBSession, commit):
             db_end={'test5', 'test9'},
             meta_imported={'test9'},
             meta_unprocessed={'test6'},
-            missing_processed={'test7'},
+            missing_processed_deleted={'test7'},
+            missing_processed_aborted={'test10'},
             db_removed=['test8'],
             db_start={'test5', 'test7', 'test8'},
-            meta_set={'test5', 'test7', 'test9'},
+            meta_set={'test5', 'test7', 'test9', 'test10'},
             meta_hash_matched_db_hash={'test5'},
         ))
         assert DBSession.query(Track).count() == 2
-        assert DBSession.query(Track).get('test5')
-        assert DBSession.query(Track).get('test9')
+        assert DBSession.query(Track).get('test5_hash')
+        assert DBSession.query(Track).get('test9_hash')
