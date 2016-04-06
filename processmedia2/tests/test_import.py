@@ -28,7 +28,7 @@ def get_source_hashs_from_scan_meta(meta):
 
 
 def get_attachment_descriptions(processed_files):
-    return (
+    return tuple(
         AttachmentDescription(processed_file.relative, attachment_type)
         for attachment_type, processed_file_list in processed_files.items()
         for processed_file in processed_file_list
@@ -141,7 +141,7 @@ def test_import_side_effects(DBSession, commit):
             attachments=track5_attachments,
             tags=(),
             lyrics='',
-            source_filename='',
+            source_filename='test5',
         )
         manager.mock_processed_files(attachment_description.location for attachment_description in track5_attachments)
         commit()
@@ -153,7 +153,7 @@ def test_import_side_effects(DBSession, commit):
             attachments=track7_attachments,
             tags=(),
             lyrics='',
-            source_filename='',
+            source_filename='test7',
         )
         manager.mock_processed_files(a.location for a in track7_attachments if a.type != 'preview')
         commit()
@@ -165,13 +165,13 @@ def test_import_side_effects(DBSession, commit):
             attachments=track8_attachments,
             tags=(),
             lyrics='',
-            source_filename='',
+            source_filename='test8',
         )
-        manager.mock_processed_files(a.location for a in track8_attachments if a.type != 'preview')
+        manager.mock_processed_files(a.location for a in track8_attachments)
         commit()
 
         manager.meta = {
-            # Test5 should be fine
+            # Test5 should exist in db and match this meta. No op required
             "test5.json": {
                 "processed": {
                     "source_hash": "test5_hash",
@@ -194,7 +194,7 @@ def test_import_side_effects(DBSession, commit):
             },
             # Test 8 does not exist in meta
 
-            # Test9 is a completly new track
+            # Test9 is a completly new track and will be imported cleanly - Creation of mock processed files below
             "test9.json": {
                 "processed": {
                     "source_hash": "test9_hash",
@@ -202,18 +202,23 @@ def test_import_side_effects(DBSession, commit):
                 }
             },
         }
+        manager.mock_processed_files(
+            processed_file.relative for processed_file in flatten(
+                manager.get_all_processed_files_associated_with_source_hash('test9_hash').values()
+            )
+        )
 
         stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
         assert freeze(stats) == freeze(dict(
-            total=2,  # test5, test9
-            imported=1,  # test9
-            unprocessed=1,  # test6
-            missing=1,  # test7
-            deleted=1,  # test8
-            existing=3,  # test5, test7, test8
-            processed=3,  # test5, test9, test7
-            existing_=1,  # test5
+            db_end={'test5', 'test9'},
+            meta_imported={'test9'},
+            meta_unprocessed={'test6'},
+            missing_processed={'test7'},
+            db_removed=['test8'],
+            db_start={'test5', 'test7', 'test8'},
+            meta_set={'test5', 'test7', 'test9'},
+            meta_hash_matched_db_hash={'test5'},
         ))
         assert DBSession.query(Track).count() == 2
         assert DBSession.query(Track).get('test5')

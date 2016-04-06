@@ -39,47 +39,50 @@ def import_media(**kwargs):
     stats description:
         imported: number of tracks imported this session
         processed: the total number of tracks in the processed meta dataset
-        before: the number of track in the db before this import operation was performed
+        existing: the number of track in the db before this import operation was performed
         unprocessed: meta exists, but the processed data has not been encoded yet
         missing: some source files were missing, making it impossible to use
         deleted: no matching processed meta paired with db entry at all
         total: the total tracks in the db at the end of this import operation
+        meta_hash_matched_db_hash: The number of meta tracks that matched existing hash in the db
     """
-    stats = dict(processed=0, imported=0, unprocessed=0, deleted=0, missing=0, existing=0, existing_=0)
+    stats = dict(meta_set=set(), meta_imported=set(), meta_unprocessed=set(), db_removed=list(), missing_processed=set(), db_start=set(), meta_hash_matched_db_hash=set())
+
+    def get_db_track_names():
+        return set(t.source_filename for t in DBSession.query(Track.source_filename))
 
     meta = MetaManager(kwargs['path_meta'])
     importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
-    stats['existing'] = len(importer.exisiting_track_ids)
+    stats['db_start'] = get_db_track_names()
 
     meta.load_all()  # mtime=epoc(last_update())
 
-    processed_track_ids = set(m.source_hash for m in meta.meta.values() if m.source_hash)
-    stats['processed'] = len(processed_track_ids)
-
+    meta_processed_track_ids = set(m.source_hash for m in meta.meta.values() if m.source_hash)
+    stats['meta_set'] = set(m.name for m in meta.meta.values() if m.source_hash)
+    #import pdb ; pdb.set_trace()
     for name in meta.meta.keys():
         try:
             if importer.import_track(name):
-                stats['imported'] += 1
+                stats['meta_imported'].add(name)
             else:
-                stats['existing_'] += 1
+                stats['meta_hash_matched_db_hash'].add(name)
         except TrackNotProcesedException:
             log.debug('Unprocessed: %s', name)  # has no source_hash
-            stats['unprocessed'] += 1
+            stats['meta_unprocessed'].add(name)
         except TrackMissingProcessedFiles:
             log.warn('Missing: %s', name)  # does not have all required processde files
-            stats['missing'] += 1
+            stats['missing_processed'].add(name)
 
-    for unneeded_track_id in importer.exisiting_track_ids - processed_track_ids:
+    for unneeded_track_id in importer.exisiting_track_ids - meta_processed_track_ids:
         log.warn('Remove: %s', unneeded_track_id)
+        stats['db_removed'].append(DBSession.query(Track).get(unneeded_track_id).source_filename or unneeded_track_id)
         delete_track(unneeded_track_id)
-        stats['deleted'] += 1
     commit()
 
-    assert stats['existing'] == stats['existing_'] + stats['missing'], 'The counted db existing tracks should match value counted in import. Investigate.'
-    stats['total'] = stats['existing_'] + stats['imported']
-    assert stats['total'] == DBSession.query(Track.id).count(), 'Total tracks should == tracks in db before + imported tracks. Investigate.'
+    stats['db_end'] = get_db_track_names()
 
-    #pprint(stats)
+    assert stats['db_end'] == stats['meta_hash_matched_db_hash'] | stats['meta_imported']
+
     return stats
 
 
@@ -95,11 +98,10 @@ class TrackImporter(object):
 
         self.meta.load(name)
         m = self.meta.get(name)
+
         if not m.source_hash:
             raise TrackNotProcesedException()
-        if m.source_hash in self.exisiting_track_ids:
-            log.debug('Exists: %s', name)
-            return False
+
         processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash)
         if self._missing_files(processed_files):
             # If we are missing any files but we have a source hash,
@@ -109,6 +111,10 @@ class TrackImporter(object):
                 m.pending_actions.append(PENDING_ACTION['encode'])
                 self.meta.save(name)  # Feels clunky
             raise TrackMissingProcessedFiles()
+
+        if m.source_hash in self.exisiting_track_ids:
+            log.debug('Exists: %s', name)
+            return False
 
         log.info('Import: %s', name)
         track = Track()
