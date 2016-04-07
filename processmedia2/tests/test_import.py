@@ -23,10 +23,6 @@ INI = '../website/test.ini'
 EXPECTED_ATTACHMENT_COUNT = freeze(dict(image=4, preview=1, video=1, srt=1, tags=1))
 
 
-def get_source_hashs_from_scan_meta(meta):
-    return (data['processed']['source_hash'] for data in meta.values())
-
-
 def get_attachment_descriptions(processed_files):
     return tuple(
         AttachmentDescription(processed_file.relative, attachment_type)
@@ -65,6 +61,9 @@ def commit(request, DBSession_base):
 
 
 def test_import_full(DBSession):
+    """
+    Test the entire Scan, Encode, Import cycle with a video and audio item
+    """
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
         manager.encode_media()
@@ -92,6 +91,9 @@ def test_import_full(DBSession):
 
 
 def test_basic_import(DBSession):
+    """
+    Fake import cycle into db with mocked processed files for simple case
+    """
     with ProcessMediaTestManager() as manager:
 
         # Create mock scan data (as if an encode had just been performed)
@@ -112,7 +114,7 @@ def test_basic_import(DBSession):
         manager.mock_processed_files(
             processed_file.relative for processed_file in flatten(
                 manager.get_all_processed_files_associated_with_source_hash(source_hash).values()
-                for source_hash in get_source_hashs_from_scan_meta(manager.meta)
+                for source_hash in manager.meta_manager.source_hashs
             )
         )
 
@@ -146,10 +148,9 @@ def test_basic_import(DBSession):
 
 def test_import_side_effects(DBSession, commit):
     """
-    If a source fileset is incomplete and exisits in db - it is removed from the db - missing
-    If a source fileset is missing and exists in db - it is removed - missing
-    If source fileset is incomplete and not exisit in db - it is never added - unprocessed?
-    If a file existed before the import began is has all source files it is kept - before
+    Test mocked complex import cycle.
+    Exercising various existing tracks and meta/processed tracks
+    This should test all known common flows
     """
     with ProcessMediaTestManager() as manager:
 

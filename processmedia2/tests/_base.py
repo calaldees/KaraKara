@@ -78,6 +78,7 @@ class ProcessMediaTestManager(object):
         for filename, meta_data in data.items():
             with open(os.path.join(self.path_meta, filename), 'w') as meta_filehandle:
                 json.dump(meta_data, meta_filehandle)
+        self.meta_manager.load_all()
 
     def get_source_hash(self, name):
         self.meta_manager._release_cache()

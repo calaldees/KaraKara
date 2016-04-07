@@ -1,6 +1,6 @@
-from pprint import pprint
+import os
 
-from libs.misc import postmortem
+from libs.misc import postmortem, flatten
 
 from processmedia_libs import add_default_argparse_args
 from processmedia_libs.meta_manager import MetaManager
@@ -16,20 +16,23 @@ VERSION = '0.0.0'
 # Main -------------------------------------------------------------------------
 
 
-def main(**kwargs):
+def cleanup_media(**kwargs):
     processed_files_manager = ProcessedFilesManager(kwargs['path_processed'])
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
 
     known_file_hashs = {
         processed_file.hash
-        for m in meta.meta.values()
-        for processed_files in processed_files_manager.get_all_processed_files_associated_with_source_hash(m).values()
-        for processed_file in processed_files
+        for processed_file in flatten(
+            processed_files_manager.get_all_processed_files_associated_with_source_hash(source_hash).values()
+            for source_hash in meta.source_hashs
+        )
     }
     unlinked_files = (f for f in processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in known_file_hashs)
 
-    pprint(tuple(f.file for f in unlinked_files))
+    for unlinked_file in unlinked_files:
+        import pdb ; pdb.set_trace()
+        os.remove(unlinked_file)
 
 
 # Arguments --------------------------------------------------------------------
@@ -59,4 +62,4 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args['log_level'])
 
-    postmortem(main, **args)
+    postmortem(cleanup_media, **args)

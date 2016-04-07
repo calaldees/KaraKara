@@ -91,6 +91,10 @@ class MetaManager(object):
         """
         return (m for m in self.meta.values() if not m.file_collection)
 
+    @property
+    def source_hashs(self):
+        return filter(None, (m.source_details.get('source_hash') for m in self.meta.values()))
+
 
 class MetaFile(object):
 
