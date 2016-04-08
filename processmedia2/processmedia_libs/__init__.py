@@ -20,6 +20,7 @@ PENDING_ACTION = dict(
     encode='encode',
 )
 
+
 def add_default_argparse_args(parser, version=DEFAULT_VERSION):
     parser.add_argument('--path_source', action='store', help='', default=DEFAULT_PATH_SOURCE)
     parser.add_argument('--path_processed', action='store', help='', default=DEFAULT_PATH_PROCESSED)
