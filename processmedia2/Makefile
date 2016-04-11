@@ -146,7 +146,7 @@ cleanup:
 	$(PYTHON) cleanup_media.py
 	
 migrate:
-	$(PYTHON) migrate_media.py
+	$(PYTHON) migrate_media.py --log_level 0 --path_destination ~/temp/
 
 # Test -------------------------------------------------------------------------
 .PHONY: test

@@ -1,6 +1,8 @@
 import os
 
-from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter, flatten
+from functools import partial
+
+from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter, flatten, first
 from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, ALL_EXTS
@@ -13,11 +15,17 @@ log = logging.getLogger(__name__)
 
 VERSION = '0.0.0'
 
+# Utils ------------------------------------------------------------------------
+
+#move_func = os.rename
+def move_func_mock(src, dst):
+    log.debug('rename {0} -> {1}'.format(src, dst))
+
 
 # Main -------------------------------------------------------------------------
 
 
-def migrate_media(**kwargs):
+def migrate_media(move_func=move_func_mock, **kwargs):
     # Read file structure into memory
     folder_structure = FolderStructure.factory(
         path=kwargs['path_source'],
@@ -27,11 +35,20 @@ def migrate_media(**kwargs):
         )
     )
 
-    #import pdb ; pdb.set_trace()
-    #def ttt(fff):
-    #    import pdb ; pdb.set_trace()
-    #    return True
-    #ttt = tuple(folder_structure.scan(ttt))
+    join_destination = partial(os.path.join, kwargs['path_destination'])
+
+    for f in folder_structure.all_files:
+        parent_folder = first(os.path.split(f.folder))
+        if f.file == 'tags.txt':
+            move_func(
+                f.absolute,
+                join_destination('{0}.txt'.format(parent_folder)),
+            )
+        elif f.folder.endswith('/source'):
+            move_func(
+                f.absolute,
+                join_destination('{0}.{1}'.format(parent_folder, f.ext)),
+            )
 
 
 # Arguments --------------------------------------------------------------------
@@ -57,6 +74,8 @@ def get_args():
     )
 
     add_default_argparse_args(parser)
+
+    parser.add_argument('--path_destination', action='store', help='Destination for migrated files')
 
     args_dict = vars(parser.parse_args())
 
