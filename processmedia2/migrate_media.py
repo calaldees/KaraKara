@@ -17,15 +17,33 @@ VERSION = '0.0.0'
 
 # Utils ------------------------------------------------------------------------
 
+def move_func_mock(src, dest):
+    log.debug('rename {0} -> {1}'.format(src, dest))
+#move_func = os.symlink
 #move_func = os.rename
-def move_func_mock(src, dst):
-    log.debug('rename {0} -> {1}'.format(src, dst))
+#shutil.move
+
+
+auto_categorys = {
+    'Anime - ': 'Anime',
+    'Import - ': '',
+    'Cartoon - ': 'Cartoon',
+    'Game - ': 'Game',
+    'J-Pop - ': 'JPop',
+    'JPop - ': 'JPop',
+    'Jpop - ': 'JPop',
+}
+def auto_category(parent_folder):
+    for parent_folder_prefix, auto_category_folder in auto_categorys.items():
+        if parent_folder.startswith(parent_folder_prefix):
+            return parent_folder.replace(parent_folder_prefix, ''), auto_category_folder
+    return parent_folder, ''
 
 
 # Main -------------------------------------------------------------------------
 
 
-def migrate_media(move_func=move_func_mock, **kwargs):
+def migrate_media(move_func=os.symlink, **kwargs):
     # Read file structure into memory
     folder_structure = FolderStructure.factory(
         path=kwargs['path_source'],
@@ -35,20 +53,20 @@ def migrate_media(move_func=move_func_mock, **kwargs):
         )
     )
 
-    join_destination = partial(os.path.join, kwargs['path_destination'])
+    if move_func != move_func_mock:
+        for folder in auto_categorys.values():
+            os.makedirs(os.path.join(kwargs['path_destination'], folder), exist_ok=True)
 
     for f in folder_structure.all_files:
-        parent_folder = first(os.path.split(f.folder))
-        if f.file == 'tags.txt':
-            move_func(
-                f.absolute,
-                join_destination('{0}.txt'.format(parent_folder)),
+        if f.folder.endswith('/source') or f.file == 'tags.txt':
+            parent_folder, auto_category_folder = auto_category(first(os.path.split(f.folder)))
+            dest = os.path.join(
+                kwargs['path_destination'],
+                auto_category_folder,
+                '{0}.{1}'.format(parent_folder, f.ext)
             )
-        elif f.folder.endswith('/source'):
-            move_func(
-                f.absolute,
-                join_destination('{0}.{1}'.format(parent_folder, f.ext)),
-            )
+            if not os.path.exists(dest):
+                move_func(f.abspath, dest)  # abspath is a temp botch, We need to fix .absolute in misc.py
 
 
 # Arguments --------------------------------------------------------------------
@@ -86,5 +104,5 @@ if __name__ == "__main__":
     args = get_args()
     logging.basicConfig(level=args['log_level'])
 
-    #postmortem(migrate_media, **args)
-    migrate_media(**args)
+    postmortem(migrate_media, **args)
+    #migrate_media(**args)

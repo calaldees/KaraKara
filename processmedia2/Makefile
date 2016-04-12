@@ -131,7 +131,7 @@ libs:
 	
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import migrate
+.PHONY: scan encode import cleanup process
 
 scan:
 	$(PYTHON) scan_media.py
@@ -144,9 +144,17 @@ import:
 
 cleanup:
 	$(PYTHON) cleanup_media.py
-	
+
+process: scan encode import cleanup
+
+
+# Migrate --
+
+.PHONY: migrate
 migrate:
-	$(PYTHON) migrate_media.py --log_level 0 --path_destination ~/temp/
+	$(PYTHON) migrate_media.py --log_level 0 --path_destination ~/Applications/KaraKara/migrate
+
+
 
 # Test -------------------------------------------------------------------------
 .PHONY: test
