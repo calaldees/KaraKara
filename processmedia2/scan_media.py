@@ -2,6 +2,7 @@ import re
 
 from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
 from libs.file import FolderStructure
+from libs.progress import mill as terminal_mill
 
 from processmedia_libs import add_default_argparse_args, ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
@@ -49,7 +50,7 @@ def scan_media(**kwargs):
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
 
-    # 1.) Read file structure into memory
+    log.info('1.) Read file structure into memory')
     folder_structure = FolderStructure.factory(
         path=kwargs['path_source'],
         search_filter=fast_scan_regex_filter(
@@ -58,25 +59,25 @@ def scan_media(**kwargs):
         )
     )
 
-    # 2.) Locate primary files
+    log.info('2.) Locate primary files')
     # Note: Duplicate media is completely ignored/removed in this list
     primary_files = locate_primary_files(folder_structure, file_regex=file_extension_regex(PRIMARY_FILE_RANKED_EXTS))
 
-    # 3.) Find associated files as a 'file collection' (based on the name of the primary file)
+    log.info("3.) Find associated files as a 'file collection' (based on the name of the primary file)")
     file_collections = {
         f.file_no_ext: get_file_collection(folder_structure, f)
         for f in primary_files
     }
 
-    # 4.) Associate file_collections with existing metadata objects
-    for name, file_collection in file_collections.items():
+    log.info('4.) Associate file_collections with existing metadata objects')
+    for name, file_collection in terminal_mill(file_collections.items()):
         meta.load(name)
         m = meta.get(name)
         for f in file_collection:
             m.associate_file(f)
         meta.save(name)
 
-    # 5.) Attempt to find associate unassociated files but finding them on the folder_structure in memory
+    log.info('5.) Attempt to find associate unassociated files but finding them on the folder_structure in memory')
     for m in meta.meta_with_unassociated_files:
         for filename, scan_data in m.unassociated_files.items():
 
@@ -102,7 +103,7 @@ def scan_media(**kwargs):
                 m.associate_file(f)
                 break
 
-    # 6.) Remove unmatched meta entrys
+    log.info('6.) Remove unmatched meta entrys')
     # (If processed data already exisits, it will be relinked at the encode level)
     for name in [m.name for m in meta.unmatched_entrys]:
         log.info('Removing meta %s', m.name)

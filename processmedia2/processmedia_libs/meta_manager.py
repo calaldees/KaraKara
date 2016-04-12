@@ -17,11 +17,11 @@ class MetaManager(object):
     def __init__(self, path):
         self.path = path
         self._release_cache()
-        self.timestamp = time.time()
         os.makedirs(os.path.abspath(path), exist_ok=True)
 
     def _release_cache(self):
         self.meta = {}
+        self._meta_timestamps = {}
 
     def get(self, name):
         return self.meta.get(name)
@@ -40,6 +40,7 @@ class MetaManager(object):
             try:
                 with open(filepath, 'r') as source:
                     data = json.load(source)
+                self._meta_timestamps[name] = os.stat(filepath).st_mtime
             except json.decoder.JSONDecodeError:
                 log.error('Unable to load meta from %s', filepath)
         self.meta[name] = MetaFile(name, data)
@@ -52,12 +53,13 @@ class MetaManager(object):
             return
 
         # If meta file modifyed since scan - abort
-        if os.path.exists(filepath) and os.stat(filepath).st_mtime > self.timestamp:
+        if os.path.exists(filepath) and os.stat(filepath).st_mtime != self._meta_timestamps[name]:
             log.warn('Refusing to save changes. %s has been updated by another application', filepath)
             return
 
         with open(self._filepath(name), 'w') as destination:
             json.dump(metafile.data, destination)
+        self._meta_timestamps[name] = os.stat(filepath).st_mtime
 
     def delete(self, name):
         os.remove(self._filepath(name))

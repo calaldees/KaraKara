@@ -17,7 +17,7 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: $(OS) $(ENV) libs
+install: $(OS) $(ENV) libs libs/progress.py
 
 # OSX installation
 .PHONY: Darwin has-brew
@@ -128,7 +128,11 @@ libs:
 		wget -cq https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/misc.py        ;\
 		wget -cq https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/file.py        ;\
 	fi
-	
+
+libs/progress.py:
+	cd libs && \
+	wget -cq https://raw.githubusercontent.com/kennethreitz/clint/master/clint/textui/progress.py
+
 
 # Run --------------------------------------------------------------------------
 .PHONY: scan encode import cleanup process
@@ -152,7 +156,7 @@ process: scan encode import cleanup
 
 .PHONY: migrate
 migrate:
-	$(PYTHON) migrate_media.py --log_level 0 --path_destination ~/Applications/KaraKara/migrate
+	$(PYTHON) migrate_media.py --log_level 0 --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate
 
 
 
