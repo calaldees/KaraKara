@@ -1,4 +1,4 @@
-import os.path
+import os
 import shutil
 import hashlib
 from collections import namedtuple, defaultdict
@@ -54,9 +54,23 @@ class ProcessedFilesManager(object):
 class ProcessedFile(object):
     def __init__(self, path, hashs, ext):
         self.hash = gen_string_hash(hashs)
-        self.relative = '{}.{}'.format(self.hash, ext)
-        self.relative_to_current_execution = os.path.join(path, self.relative)
-        self.absolute = os.path.abspath(self.relative_to_current_execution)
+        self.ext = ext
+        self.path = path
+
+    @property
+    def folder(self):
+        return self.hash[0]
+
+    @property
+    def relative(self):
+        return os.path.join(self.folder, '{}.{}'.format(self.hash, self.ext))
+
+    @property
+    def absolute(self):
+        return os.path.abspath(os.path.join(self.path, self.relative))
+
+    def _create_folders_if_needed(self):
+        os.makedirs(os.path.join(self.path, self.folder), exist_ok=True)
 
     def move(self, source_file):
         """
@@ -65,9 +79,11 @@ class ProcessedFile(object):
         The remote destination could be 'scp' or another remote service.
         Always using move allows for this abstraction at a later date
         """
+        self._create_folders_if_needed()
         shutil.move(source_file, self.absolute)
 
     def copy(self, source_file):
+        self._create_folders_if_needed()
         shutil.copy2(source_file, self.absolute)
 
     @property

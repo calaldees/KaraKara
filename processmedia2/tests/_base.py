@@ -92,5 +92,7 @@ class ProcessMediaTestManager(object):
         return self.get_all_processed_files_associated_with_source_hash(self.get_source_hash(name))
 
     def mock_processed_files(self, filenames):
-        for filename in filenames:
-            Path(os.path.join(self.path_processed, filename)).touch()
+        for f in filenames:
+            file_path, file_name = os.path.split(f)
+            os.makedirs(os.path.join(self.path_processed, file_path), exist_ok=True)
+            Path(os.path.join(self.path_processed, f)).touch()
