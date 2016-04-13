@@ -201,6 +201,7 @@ def get_args():
     add_default_argparse_args(parser)
 
     parser.add_argument('--config_uri', action='store', help='', default='development.ini')
+    parser.add_argument('--stat_limit', type=int, help='Max number of metanames to display in summary before replacing them with a count', default=100)
 
     args_dict = vars(parser.parse_args())
 
@@ -215,4 +216,4 @@ if __name__ == "__main__":
     settings = get_appsettings(args['config_uri'])
     init_DBSession(settings)
 
-    pprint(postmortem(import_media, **args))
+    pprint({k: len(v) if len(v) > args['stat_limit'] else v for k, v in postmortem(import_media, **args).items()})
