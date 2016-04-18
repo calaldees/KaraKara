@@ -129,11 +129,6 @@ libs:
 		wget -cq https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/file.py        ;\
 	fi
 
-libs/progress.py:
-	# Todo: Can this be pip installed?
-	cd libs && \
-	wget -cq https://raw.githubusercontent.com/kennethreitz/clint/master/clint/textui/progress.py
-
 
 # Run --------------------------------------------------------------------------
 .PHONY: scan encode import cleanup process
@@ -143,6 +138,7 @@ scan:
 
 encode:
 	$(PYTHON) encode_media.py
+	#--log_level 100
 
 import:
 	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini

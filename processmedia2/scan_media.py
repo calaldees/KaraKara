@@ -2,7 +2,7 @@ import re
 
 from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
 from libs.file import FolderStructure
-from libs.progress import mill as terminal_mill
+from clint.textui.progress import mill as terminal_mill
 
 from processmedia_libs import add_default_argparse_args, ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS

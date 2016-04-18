@@ -1,6 +1,8 @@
 import os.path
 import tempfile
 
+from clint.textui.progress import bar as progress_bar
+
 from libs.misc import postmortem, hashfile, freeze, first, file_ext
 from libs.file import FolderStructure
 
@@ -26,7 +28,7 @@ def encode_media(**kwargs):
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    for name in sorted(
+    for name in progress_bar(sorted(
             m.name for m in meta.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
 
@@ -37,7 +39,7 @@ def encode_media(**kwargs):
         #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
         #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
         #'KAT-TUN Your side [Instrumental]',
-    ):
+    )):
         encoder.encode(name)
 
 
