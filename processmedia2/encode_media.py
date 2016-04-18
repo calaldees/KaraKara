@@ -93,7 +93,7 @@ class Encoder(object):
             yield self._encode_primary_video_from_meta(m)
             if not m.source_hash:
                 log.warn('No source_hash to extract additional media %s', name)
-                return
+                yield False
             yield self._encode_preview_video_from_meta(m)
             yield self._encode_images_from_meta(m)
             yield self._process_tags_from_meta(m)
