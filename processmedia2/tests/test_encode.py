@@ -1,3 +1,4 @@
+import pytest
 import pytesseract
 from PIL import Image
 
@@ -105,6 +106,10 @@ def test_encode_audio_simple():
 
         for image_num, color in enumerate((COLOR_MAGENTA,)*4):
             assert color_close(color, Image.open(processed_files['image'][image_num].absolute).getpixel(SAMPLE_COORDINATE))
+
+
+def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
+    pytest.xfail("TODO")
 
 
 def read_subtitle_text(image, color):

@@ -88,13 +88,12 @@ class Encoder(object):
         log.info('Encode: %s', name)
         self.meta.load(name)
         m = self.meta.get(name)
-        self._encode_primary_video_from_meta(m)
-
-        if not m.source_hash:
-            log.warn('No source_hash to extract additional media %s', name)
-            return
 
         def encode_steps(m):
+            yield self._encode_primary_video_from_meta(m)
+            if not m.source_hash:
+                log.warn('No source_hash to extract additional media %s', name)
+                return
             yield self._encode_preview_video_from_meta(m)
             yield self._encode_images_from_meta(m)
             yield self._process_tags_from_meta(m)
@@ -113,7 +112,7 @@ class Encoder(object):
 
         # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
-            log.info('Processed Destination was created with the same input sources - no encoding required')
+            log.debug('Processed Destination was created with the same input sources - no encoding required')
             return True
 
         m.source_details.update({k:v for k, v in external_tools.probe_media(source_files['image'].get('absolute')).items() if k in ('width', 'height')})
@@ -137,9 +136,9 @@ class Encoder(object):
                 log.warn('Unable to encode as no video was provided or generated')
                 return False
 
-            # 3.b) Normalize subtile files - Create our own managed ssa/srt
+            # 3.b.i) Read + normalize subtitle file
             if source_files['sub']:
-                # Parse subtitles
+                # Parse input subtitles
                 subtitles = subtitle_processor.parse_subtitles(filename=source_files['sub']['absolute'])
                 if not subtitles:
                     log.error(
@@ -147,16 +146,21 @@ class Encoder(object):
                         'There may be an issue with parsing'
                     )
                     return False
+            else:
+                subtitles = []
 
-                # Output srt
-                temp_srt_file = os.path.join(tempdir, 'subs.srt')
-                with open(temp_srt_file, 'w', encoding='utf-8') as subfile:
-                    subfile.write(
-                        subtitle_processor.create_srt(subtitles)
-                    )
-                target_srt_file = self.processed_files_manager.get_processed_file(m.source_hash, 'srt')
-                target_srt_file.move(temp_srt_file)
+            # 3.b.ii) Always output an srt (even if it contains no subtitles)
+            #   This is required for the importer to verify the processed fileset is complete
+            temp_srt_file = os.path.join(tempdir, 'subs.srt')
+            with open(temp_srt_file, 'w', encoding='utf-8') as subfile:
+                subfile.write(
+                    subtitle_processor.create_srt(subtitles)
+                )
+            target_srt_file = self.processed_files_manager.get_processed_file(m.source_hash, 'srt')
+            target_srt_file.move(temp_srt_file)
 
+            # 3.b.iii) Output styled subtiles
+            if source_files['sub']:
                 # Output ssa
                 temp_ssa_file = os.path.join(tempdir, 'subs.ssa')
                 with open(temp_ssa_file, 'w', encoding='utf-8') as subfile:
@@ -203,11 +207,11 @@ class Encoder(object):
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'preview')
 
         if not source_file.exists:
-            log.warn('No source video to encode preview from')
+            log.error('No source video to encode preview from')
             return False
 
         if target_file.exists:
-            log.info('Processed preview was created with the same input sources - no encoding required')
+            log.debug('Processed preview was created with the same input sources - no encoding required')
             return True
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -237,7 +241,7 @@ class Encoder(object):
             for index in range(num_images)
         )
         if all(target_file.exists for target_file in target_files):
-            log.info('Processed Destination was created with the same input sources - no thumbnail gen required')
+            log.debug('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
         if file_ext(source_file_absolute).ext in EXTS['image']:

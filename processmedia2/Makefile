@@ -130,6 +130,7 @@ libs:
 	fi
 
 libs/progress.py:
+	# Todo: Can this be pip installed?
 	cd libs && \
 	wget -cq https://raw.githubusercontent.com/kennethreitz/clint/master/clint/textui/progress.py
 
