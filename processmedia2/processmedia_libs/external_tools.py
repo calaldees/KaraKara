@@ -302,13 +302,14 @@ def extract_image(source, destination, time=0.2):
             ),
             destination,
         ),
+        lambda: (os.path.exists(destination), 'expected destiantion image file was not generated (video source may be damaged) {0}'.format(source)),
         lambda: _run_tool(
             'jpegoptim',
             #'--size={}'.format(CONFIG['jpegoptim']['target_size_k']),
             '--strip-all',
             '--overwrite',
             destination,
-        )
+        ),
     )
 
     for cmd in cmds:

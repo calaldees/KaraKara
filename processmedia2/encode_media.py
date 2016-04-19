@@ -106,6 +106,14 @@ class Encoder(object):
                 pass
             self.meta.save(name)
 
+    def _update_source_details(self, m, source_files=None):
+        source_files = source_files or self.fileitem_wrapper.wrap_scan_data(m)
+        source_details = {}
+        source_details.update({k:v for k, v in external_tools.probe_media(source_files['image'].get('absolute')).items() if k in ('width', 'height')})
+        source_details.update({k:v for k, v in external_tools.probe_media(source_files['audio'].get('absolute')).items() if k in ('duration',)})
+        source_details.update(external_tools.probe_media(source_files['video'].get('absolute')))
+        m.source_details.update(source_details)
+
     def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
         source_files = self.fileitem_wrapper.wrap_scan_data(m)
@@ -117,9 +125,7 @@ class Encoder(object):
             log.debug('Processed Destination was created with the same input sources - no encoding required')
             return True
 
-        m.source_details.update({k:v for k, v in external_tools.probe_media(source_files['image'].get('absolute')).items() if k in ('width', 'height')})
-        m.source_details.update({k:v for k, v in external_tools.probe_media(source_files['audio'].get('absolute')).items() if k in ('duration',)})
-        m.source_details.update(external_tools.probe_media(source_files['video'].get('absolute')))
+        self._update_source_details(m, source_files)
 
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
@@ -145,7 +151,9 @@ class Encoder(object):
                 if not subtitles:
                     log.error(
                         'Subtitle file explicity given, but was unable to parse any subtitles from it.'
-                        'There may be an issue with parsing'
+                        'There may be an issue with parsing. '
+                        'A Common cause is SSA files that have subtitles aligned at top are ignored. '
+                        '{}'.format(source_files['sub']['absolute'])
                     )
                     return False
             else:
@@ -255,6 +263,9 @@ class Encoder(object):
         else:
             video_duration = m.source_details.get('duration')
             if not video_duration:
+                self._update_source_details(m)  # Bugfix for being tenatious in aquiring duration
+                video_duration = m.source_details.get('duration')
+            if not video_duration:
                 log.warn('Unable to assertain video duration; unable to extact images')
                 return False
             times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
@@ -264,7 +275,8 @@ class Encoder(object):
                 image_file = os.path.join(tempdir, '{}.jpg'.format(index))
                 encode_succes, cmd_result = external_tools.extract_image(source_file_absolute, image_file, time)
                 if not encode_succes:
-                    import pdb ; pdb.set_trace()
+                    #import pdb ; pdb.set_trace()
+                    log.error(cmd_result)
                     return False
                 target_files[index].move(image_file)
 

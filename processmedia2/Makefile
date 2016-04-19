@@ -137,7 +137,8 @@ scan:
 	$(PYTHON) scan_media.py
 
 encode:
-	$(PYTHON) encode_media.py
+	$(PYTHON) encode_media.py --log_level 30
+	#--log_level 0
 	#--log_level 100
 
 import:
