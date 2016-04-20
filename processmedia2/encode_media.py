@@ -226,11 +226,13 @@ class Encoder(object):
             if not subtitles:
                 log.warn('No subtiles parsed from sub file {}'.format(source_file_absolute))
 
-        # Caution: this could be dangrous as all the others use '.move' and this writes to source directly
-        with open(target_file.absolute, 'w', encoding='utf-8') as subfile:
-            subfile.write(
-                subtitle_processor.create_srt(subtitles)
-            )
+        with tempfile.TemporaryDirectory() as tempdir:
+            srt_file = os.path.join(tempdir, 'subs.srt')
+            with open(srt_file, 'w', encoding='utf-8') as subfile:
+                subfile.write(
+                    subtitle_processor.create_srt(subtitles)
+                )
+            target_file.move(srt_file)
 
         return True
 
