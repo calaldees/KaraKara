@@ -137,9 +137,9 @@ scan:
 	$(PYTHON) scan_media.py
 
 encode:
-	$(PYTHON) encode_media.py --log_level 30
+	$(PYTHON) encode_media.py --log_level 0
 	#--log_level 0
-	#--log_level 100
+	#--log_level 30
 
 import:
 	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini

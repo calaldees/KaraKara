@@ -28,6 +28,7 @@ class ProcessedFilesManager(object):
         return ProcessedFile(self.path, hashs, ext)
 
     def get_processed_file(self, source_hash, file_type, *args):
+        assert source_hash, 'source_hash can never be None. Investigation needed'
         file_type = self.FILE_TYPE_LOOKUP[file_type]
         return self._factory(
             (source_hash, file_type.type, file_type.salt, ''.join((str(a) for a in args))),

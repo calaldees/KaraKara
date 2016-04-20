@@ -31,7 +31,8 @@ def encode_media(**kwargs):
     for name in progress_bar(sorted(
             m.name for m in meta.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
-
+        #(
+        #    'AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu',
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
         #'Ranma Half OP1 - Jajauma ni Sasenaide',
@@ -39,6 +40,7 @@ def encode_media(**kwargs):
         #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
         #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
         #'KAT-TUN Your side [Instrumental]',
+        #)
     )):
         encoder.encode(name)
 
@@ -94,8 +96,9 @@ class Encoder(object):
         def encode_steps(m):
             yield self._encode_primary_video_from_meta(m)
             if not m.source_hash:
-                log.warn('No source_hash to extract additional media %s', name)
+                log.error('No source_hash to extract additional media %s', name)
                 yield False
+            yield self._encode_srt_from_meta(m)
             yield self._encode_preview_video_from_meta(m)
             yield self._encode_images_from_meta(m)
             yield self._process_tags_from_meta(m)
@@ -106,8 +109,11 @@ class Encoder(object):
                 pass
             self.meta.save(name)
 
+    def _get_source_files(self, m):
+        return self.fileitem_wrapper.wrap_scan_data(m)
+
     def _update_source_details(self, m, source_files=None):
-        source_files = source_files or self.fileitem_wrapper.wrap_scan_data(m)
+        source_files = source_files or self._get_source_files(m)
         source_details = {}
         source_details.update({k:v for k, v in external_tools.probe_media(source_files['image'].get('absolute')).items() if k in ('width', 'height')})
         source_details.update({k:v for k, v in external_tools.probe_media(source_files['audio'].get('absolute')).items() if k in ('duration',)})
@@ -116,7 +122,7 @@ class Encoder(object):
 
     def _encode_primary_video_from_meta(self, m):
         # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
-        source_files = self.fileitem_wrapper.wrap_scan_data(m)
+        source_files = self._get_source_files(m)
         m.source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
 
@@ -144,34 +150,20 @@ class Encoder(object):
                 log.warn('Unable to encode as no video was provided or generated')
                 return False
 
-            # 3.b.i) Read + normalize subtitle file
+            # 3.b) Read + normalize subtitle file
             if source_files['sub']:
                 # Parse input subtitles
                 subtitles = subtitle_processor.parse_subtitles(filename=source_files['sub']['absolute'])
                 if not subtitles:
                     log.error(
-                        'Subtitle file explicity given, but was unable to parse any subtitles from it.'
+                        'Subtitle file explicity given, but was unable to parse any subtitles from it. '
                         'There may be an issue with parsing. '
                         'A Common cause is SSA files that have subtitles aligned at top are ignored. '
                         '{}'.format(source_files['sub']['absolute'])
                     )
                     return False
-            else:
-                subtitles = []
 
-            # 3.b.ii) Always output an srt (even if it contains no subtitles)
-            #   This is required for the importer to verify the processed fileset is complete
-            temp_srt_file = os.path.join(tempdir, 'subs.srt')
-            with open(temp_srt_file, 'w', encoding='utf-8') as subfile:
-                subfile.write(
-                    subtitle_processor.create_srt(subtitles)
-                )
-            target_srt_file = self.processed_files_manager.get_processed_file(m.source_hash, 'srt')
-            target_srt_file.move(temp_srt_file)
-
-            # 3.b.iii) Output styled subtiles
-            if source_files['sub']:
-                # Output ssa
+                # Output styled subtiles as SSA
                 temp_ssa_file = os.path.join(tempdir, 'subs.ssa')
                 with open(temp_ssa_file, 'w', encoding='utf-8') as subfile:
                     subfile.write(
@@ -212,17 +204,49 @@ class Encoder(object):
 
         return True
 
-    def _encode_preview_video_from_meta(self, m):
-        source_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
-        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'preview')
+    def _encode_srt_from_meta(self, m):
+        """
+        Always output an srt (even if it contains no subtitles)
+        This is required for the importer to verify the processed fileset is complete
+        """
+        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'srt')
+        if target_file.exists:
+            log.debug('Processed srt exists - no parsing required')
+            return True
 
-        if not source_file.exists:
-            log.error('No source video to encode preview from')
+        source_file_absolute = self._get_source_files(m)['sub'].get('absolute')
+        if not source_file_absolute:
+            # WRONG! Allow null!
+            log.error('No sub file listed in source set. All tracks should have them {}'.format(m.name))
+            return False
+        if not os.path.exists(source_file_absolute):
+            # WRONG!
+            log.error('The source file to extract subs from does not exist {}'.format(source_file_absolute))
             return False
 
+        subtitles = subtitle_processor.parse_subtitles(filename=source_file_absolute)
+
+        if not subtitles:
+            log.warn(
+                'No subtiles parsed. All tracks should have them. {}'.format(source_file_absolute)
+            )
+
+        # Caution: this could be dangrous as all the others use '.move' and this writes to source directly
+        with open(target_file.absolute, 'w', encoding='utf-8') as subfile:
+            subfile.write(
+                subtitle_processor.create_srt(subtitles)
+            )
+
+    def _encode_preview_video_from_meta(self, m):
+        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'preview')
         if target_file.exists:
             log.debug('Processed preview was created with the same input sources - no encoding required')
             return True
+
+        source_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
+        if not source_file.exists:
+            log.error('No source video to encode preview from')
+            return False
 
         with tempfile.TemporaryDirectory() as tempdir:
             preview_file = os.path.join(tempdir, 'preview.mp4')
@@ -237,15 +261,7 @@ class Encoder(object):
 
         return True
 
-
     def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
-        source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
-        if not source_file_absolute:  # If no video source, attempt to degrade to single image input
-            source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
-        if not source_file_absolute:
-            log.warn('No video or image input to extract thumbnail images')
-            return False
-
         target_files = tuple(
             self.processed_files_manager.get_processed_file(m.source_hash, 'image', index)
             for index in range(num_images)
@@ -253,6 +269,16 @@ class Encoder(object):
         if all(target_file.exists for target_file in target_files):
             log.debug('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
+
+        source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
+        if not source_file_absolute:  # If no video source, attempt to degrade to single image input
+            source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
+        if not source_file_absolute:
+            log.warn('No video or image input in meta to extract thumbnail images')
+            return False
+        if not os.path.exists(source_file_absolute):
+            log.error('The source file to extract images from does not exist {}'.format(source_file_absolute))
+            return False
 
         if file_ext(source_file_absolute).ext in EXTS['image']:
             # If input is a single image, we use it as an imput video and take
