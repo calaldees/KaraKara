@@ -112,6 +112,10 @@ def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
     pytest.xfail("TODO")
 
 
+def test_skip_encoding_step_if_processed_file_present():
+    pytest.xfail("TODO")
+
+
 def read_subtitle_text(image, color):
     return pytesseract.image_to_string(extract_image_color(image, color)).strip()
 

@@ -94,14 +94,14 @@ class Encoder(object):
         m = self.meta.get(name)
 
         def encode_steps(m):
-            yield self._encode_primary_video_from_meta(m)
-            if not m.source_hash:
-                log.error('No source_hash to extract additional media %s', name)
-                yield False
-            yield self._encode_srt_from_meta(m)
+            source_files = self._get_source_files(m)
+            yield self._update_source_hash(m, source_files)
+            #target_files = 
+            yield self._encode_primary_video_from_meta(m, source_files)
+            yield self._encode_srt_from_meta(m, source_files)
             yield self._encode_preview_video_from_meta(m)
-            yield self._encode_images_from_meta(m)
-            yield self._process_tags_from_meta(m)
+            yield self._encode_images_from_meta(m, source_files)
+            yield self._process_tags_from_meta(m, source_files)
         if all(encode_steps(m)):
             try:
                 m.pending_actions.remove(PENDING_ACTION['encode'])
@@ -112,6 +112,11 @@ class Encoder(object):
     def _get_source_files(self, m):
         return self.fileitem_wrapper.wrap_scan_data(m)
 
+    def _update_source_hash(self, m, source_files):
+        source_files = source_files or self._get_source_files(m)
+        m.source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
+        return m.source_hash
+
     def _update_source_details(self, m, source_files=None):
         source_files = source_files or self._get_source_files(m)
         source_details = {}
@@ -120,17 +125,13 @@ class Encoder(object):
         source_details.update(external_tools.probe_media(source_files['video'].get('absolute')))
         m.source_details.update(source_details)
 
-    def _encode_primary_video_from_meta(self, m):
-        # 1.) Calculate starting files 'source_hash' and allocate a master 'target_file'
-        source_files = self._get_source_files(m)
-        m.source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
+    def _encode_primary_video_from_meta(self, m, source_files):
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
-
-        # 2.) Assertain if encoding is actually needed by hashing sources and comparing input and output hashs
         if target_file.exists:
             log.debug('Processed Destination was created with the same input sources - no encoding required')
             return True
 
+        # 1.) Probe media to persist source details in meta
         self._update_source_details(m, source_files)
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -204,7 +205,7 @@ class Encoder(object):
 
         return True
 
-    def _encode_srt_from_meta(self, m):
+    def _encode_srt_from_meta(self, m, source_files):
         """
         Always output an srt (even if it contains no subtitles)
         This is required for the importer to verify the processed fileset is complete
@@ -214,28 +215,24 @@ class Encoder(object):
             log.debug('Processed srt exists - no parsing required')
             return True
 
-        source_file_absolute = self._get_source_files(m)['sub'].get('absolute')
+        subtitles = []
+        source_file_absolute = source_files['sub'].get('absolute')
         if not source_file_absolute:
-            # WRONG! Allow null!
-            log.error('No sub file listed in source set. All tracks should have them {}'.format(m.name))
-            return False
-        if not os.path.exists(source_file_absolute):
-            # WRONG!
-            log.error('The source file to extract subs from does not exist {}'.format(source_file_absolute))
-            return False
-
-        subtitles = subtitle_processor.parse_subtitles(filename=source_file_absolute)
-
-        if not subtitles:
-            log.warn(
-                'No subtiles parsed. All tracks should have them. {}'.format(source_file_absolute)
-            )
+            log.warn('No sub file listed in source set. {}'.format(m.name))
+        elif not os.path.exists(source_file_absolute):
+            log.warn('The source file to extract subs from does not exist {}'.format(source_file_absolute))
+        else:
+            subtitles = subtitle_processor.parse_subtitles(filename=source_file_absolute)
+            if not subtitles:
+                log.warn('No subtiles parsed from sub file {}'.format(source_file_absolute))
 
         # Caution: this could be dangrous as all the others use '.move' and this writes to source directly
         with open(target_file.absolute, 'w', encoding='utf-8') as subfile:
             subfile.write(
                 subtitle_processor.create_srt(subtitles)
             )
+
+        return True
 
     def _encode_preview_video_from_meta(self, m):
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'preview')
@@ -261,7 +258,7 @@ class Encoder(object):
 
         return True
 
-    def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
+    def _encode_images_from_meta(self, m, source_files, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
         target_files = tuple(
             self.processed_files_manager.get_processed_file(m.source_hash, 'image', index)
             for index in range(num_images)
@@ -270,7 +267,7 @@ class Encoder(object):
             log.debug('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
-        source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['video'].get('absolute')
+        source_file_absolute = source_files['video'].get('absolute')
         if not source_file_absolute:  # If no video source, attempt to degrade to single image input
             source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
         if not source_file_absolute:
@@ -309,11 +306,11 @@ class Encoder(object):
         return True
 
 
-    def _process_tags_from_meta(self, m):
+    def _process_tags_from_meta(self, m, source_files):
         """
         No processing ... this is just a copy
         """
-        source_file = self.fileitem_wrapper.wrap_scan_data(m).get('tag', {}).get('absolute')
+        source_file = source_files['tag'].get('absolute')
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'tags')
 
         if not source_file:
