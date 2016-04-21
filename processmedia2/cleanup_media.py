@@ -31,7 +31,6 @@ def cleanup_media(**kwargs):
     unlinked_files = (f for f in processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in known_file_hashs)
 
     for unlinked_file in unlinked_files:
-        import pdb ; pdb.set_trace()
         os.remove(unlinked_file)
 
 

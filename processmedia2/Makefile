@@ -159,7 +159,7 @@ migrate:
 
 
 # Test -------------------------------------------------------------------------
-.PHONY: test
+.PHONY: test cloc
 
 test:
 	make all --directory tests/source
@@ -167,6 +167,8 @@ test:
 	make ini --directory $(WEB_PATH)
 	PYTHONPATH="$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/" $(WEB_PYTEST) tests/test_import.py --pdb
 
+cloc:
+	cloc --exclude-dir=$(ENV) ./
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean

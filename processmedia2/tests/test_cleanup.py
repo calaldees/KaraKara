@@ -29,8 +29,8 @@ def test_cleanup_media():
                 }
             },
         }
-        processed_files_for_test11 = processed_files_for_source_hash('test11_hash')
-        processed_files_for_test12 = processed_files_for_source_hash('test12_hash')
+        processed_files_for_test11 = tuple(processed_files_for_source_hash('test11_hash'))
+        processed_files_for_test12 = tuple(processed_files_for_source_hash('test12_hash'))
         manager.mock_processed_files(chain(processed_files_for_test11, processed_files_for_test12))
         manager.meta = {
             "test11.json": {
@@ -42,5 +42,12 @@ def test_cleanup_media():
 
         cleanup_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
-        assert all(os.path.exists(os.path.join(manager.path_processed, relative_filename)) for relative_filename in processed_files_for_test11)
-        assert not any(os.path.exists(os.path.join(manager.path_processed, relative_filename)) for relative_filename in processed_files_for_test12)
+        assert all(
+            os.path.exists(os.path.join(manager.path_processed, relative_filename))
+            for relative_filename in processed_files_for_test11
+        ), 'All files from test11 should still be present {}'.format(processed_files_for_test11)
+
+        assert not any(
+            os.path.exists(os.path.join(manager.path_processed, relative_filename))
+            for relative_filename in processed_files_for_test12
+        ), 'All files from test12 should have been deleted {}'.format(processed_files_for_test12)

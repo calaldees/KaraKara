@@ -145,6 +145,9 @@ def test_basic_import(DBSession):
         track4 = get_track_dict_full('test4_hash')
         assert freeze(count_attachments(track4)) == EXPECTED_ATTACHMENT_COUNT
 
+def test_import_rejected_triggerer_reencode():
+    # TODO: Implement
+    pass
 
 def test_import_side_effects(DBSession, commit):
     """
