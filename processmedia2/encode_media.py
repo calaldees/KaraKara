@@ -137,21 +137,26 @@ class Encoder(object):
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
 
+            absolute_video_to_encode = source_files['video'].get('absolute')
+
             # 3.a) Convert Image to Video
-            if source_files['image'] and not source_files['video']:
-                image_video_path = os.path.join(tempdir, 'image.mp4')
+            if source_files['image'] and not absolute_video_to_encode:
+                absolute_video_to_encode = os.path.join(tempdir, 'image.mp4')
                 external_tools.encode_image_to_video(
                     source=source_files['image']['absolute'],
-                    destination=image_video_path,
+                    destination=absolute_video_to_encode,
                     **m.source_details
                 )
-                source_files['video']['absolute'] = image_video_path
 
-            if not source_files['video']:
-                log.warn('Unable to encode as no video was provided or generated')
+            if not absolute_video_to_encode:
+                log.error('Unable to encode as no video was provided {}'.format(absolute_video_to_encode))
+                return False
+            if not os.path.exists(absolute_video_to_encode):
+                log.error('Video to encode does not exist {}'.format(absolute_video_to_encode))
                 return False
 
             # 3.b) Read + normalize subtitle file
+            absolute_ssa_to_encode = None
             if source_files['sub']:
                 # Parse input subtitles
                 subtitles = subtitle_processor.parse_subtitles(filename=source_files['sub']['absolute'])
@@ -165,19 +170,18 @@ class Encoder(object):
                     return False
 
                 # Output styled subtiles as SSA
-                temp_ssa_file = os.path.join(tempdir, 'subs.ssa')
-                with open(temp_ssa_file, 'w', encoding='utf-8') as subfile:
+                absolute_ssa_to_encode = os.path.join(tempdir, 'subs.ssa')
+                with open(absolute_ssa_to_encode, 'w', encoding='utf-8') as subfile:
                     subfile.write(
                         subtitle_processor.create_ssa(subtitles, width=m.source_details['width'], height=m.source_details['height'])
                     )
-                source_files['sub']['absolute'] = temp_ssa_file  # It is safe to set this key as it will never be persisted in the meta
 
             # 4.) Encode
             encode_steps = (
                 # 4.a) Render video with subtitles (without audio)
                 lambda: external_tools.encode_video(
-                    source=source_files['video'].get('absolute'),
-                    sub=source_files['sub'].get('absolute'),
+                    source=absolute_video_to_encode,
+                    sub=absolute_ssa_to_encode,
                     destination=os.path.join(tempdir, 'video.mp4'),
                 ),
 
