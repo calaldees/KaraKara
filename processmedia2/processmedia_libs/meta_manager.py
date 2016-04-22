@@ -65,16 +65,18 @@ class MetaManager(object):
         os.remove(self._filepath(name))
         del self.meta[name]
 
-    def load_all(self, mtime=None):
-        for f in fast_scan(
-            self.path,
-            search_filter=lambda f: f.name.endswith('.json') and (mtime == None or f.stat().st_mtime >= mtime)
-        ):
+    def load_all(self):
+        for f in self.files:
             self.load(f.file_no_ext)
 
     def save_all(self):
         for name in self.meta.keys():
             self.save(name)
+
+    @property
+    def files(self):
+        # wha? (mtime == None or f.stat().st_mtime >= mtime)
+        return fast_scan(self.path, search_filter=lambda f: f.name.endswith('.json'))
 
     @property
     def meta_with_unassociated_files(self):

@@ -1,9 +1,10 @@
 import os
+import operator
 
 from libs.misc import postmortem, flatten
 
 from processmedia_libs import add_default_argparse_args
-from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
 import logging
@@ -17,10 +18,37 @@ VERSION = '0.0.0'
 
 
 def meta_tools(**kwargs):
+    fileitem_wrapper = FileItemWrapper(kwargs['path_source'])
     processed_files_manager = ProcessedFilesManager(kwargs['path_processed'])
     meta = MetaManager(kwargs['path_meta'])
-    meta.load_all()
 
+    if (not kwargs.get('meta_filenames')):
+        meta.load_all()
+        meta_items = meta.meta.values()
+    else:
+        meta_items = (meta.load(f.file_no_ext) or meta.get(f.file_no_ext) for f in meta.files if re.search(kwargs.get('name_regex'), f.file_no_ext))
+
+    path_attrgetter = operator.attrgetter(kwargs['pathstyle'])
+
+    def print_files(files):
+        for f in files:
+            print(f)
+
+    for m in meta_items:
+        if kwargs.get('pretty'):
+            print(m.name)
+        if kwargs.get('showsource'):
+            source_files = (
+                path_attrgetter(f) for f in fileitem_wrapper.wrap_scan_data(m).values()
+            )
+            print_files(source_files)
+        if kwargs.get('showprocessed'):
+            processed_files = (
+                path_attrgetter(f) for f in flatten(
+                    processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash).values()
+                )
+            )
+            print_files(processed_files)
 
 
 # Arguments --------------------------------------------------------------------
@@ -40,6 +68,12 @@ def get_args():
     )
 
     add_default_argparse_args(parser)
+
+    parser.add_argument('name_regex', nargs='?', default='', help='regex for names')
+    parser.add_argument('--showsource', action='store_true')
+    parser.add_argument('--showprocessed', action='store_true')
+    parser.add_argument('--pretty', action='store_true')
+    parser.add_argument('--pathstyle', choices=('relative', 'absolute'), default='relative')
 
     args_dict = vars(parser.parse_args())
 
