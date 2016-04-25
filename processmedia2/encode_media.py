@@ -1,5 +1,6 @@
 import os.path
 import tempfile
+import random
 
 from clint.textui.progress import bar as progress_bar
 
@@ -19,8 +20,18 @@ log = logging.getLogger(__name__)
 
 VERSION = '0.0.0'
 
+def shuffle(iterable):
+    rendered_list = list(iterable)
+    random.shuffle(rendered_list)
+    return rendered_list
+DEFAULT_ORDER_FUNC = 'sorted'
+PROCESS_ORDER_FUNCS = {
+    'sorted': sorted,
+    'random': shuffle,
+    'none': lambda x: x,
+}
 
-def encode_media(**kwargs):
+def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
 
@@ -28,7 +39,7 @@ def encode_media(**kwargs):
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    for name in progress_bar(sorted(
+    for name in progress_bar(process_order_function(
             m.name for m in meta.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
         #(
@@ -349,7 +360,11 @@ def get_args():
 
     add_default_argparse_args(parser)
 
+    parser.add_argument('--process_order_function', choices=PROCESS_ORDER_FUNCS.keys(), help='', default=DEFAULT_ORDER_FUNC)
+
     args_dict = vars(parser.parse_args())
+
+    args_dict['process_order_function'] = PROCESS_ORDER_FUNCS[args_dict['process_order_function']]
 
     return args_dict
 
