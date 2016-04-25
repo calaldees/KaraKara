@@ -106,7 +106,7 @@ def probe_media(source):
         'avprobe',
         source
     )
-    result = (cmd_result.stdout + cmd_result.stderr).decode('utf-8')
+    result = (cmd_result.stdout + cmd_result.stderr).decode('utf-8', 'ignore')
     data = {}
     try:
         raw_duration = re.search(r'Duration: (\d+):(\d+):(\d+)\.(\d+)', result)
@@ -158,7 +158,6 @@ def encode_video(source, sub, destination):
         #bitrate=3000,
         #statsfile=os.path.join(os.path.dirname(destination), 'x264_2pass.log'),
     #)
-    #import pdb ; pdb.set_trace()
     #cmds = (
     #    lambda:  _run_tool(
     #        'mencoder',
@@ -192,18 +191,22 @@ def encode_video(source, sub, destination):
     #    if not cmd_success:
     #        return False, cmd_result
     #return True, None
+
+    sub_args = cmd_args(vf='subtitles={}'.format(sub)) if sub else ()
     return _run_tool(
-        'mencoder',
-        source,
+        'ffmpeg',
+        *cmd_args(
+            i=source,
+        ),
         *sub_args,
         *cmd_args(
-            quiet=None,
-            ass=None,
-            nosound=None,
-            ovc='x264',
-            x264encopts='profile=main:preset=slow:threads=%s' % CONFIG['threads'],
+            '-c:v', 'libx264',
+            preset='slow',
+            threads=CONFIG['threads'],
+            crf=22,
+            an=None,
         ),
-        '-o', destination,
+        destination,
     )
 
 def encode_audio(source, destination, **kwargs):

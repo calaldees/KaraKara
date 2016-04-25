@@ -27,8 +27,8 @@ has-brew:
 Darwin: has-brew
 	brew update
 	brew install python3
-	brew install mplayer \
-		--with-libcaca
+	#brew install mplayer \
+	#	--with-libcaca
 	brew install sox \
 		--with-flac \
 		--with-lame \
@@ -137,7 +137,7 @@ scan:
 	$(PYTHON) scan_media.py
 
 encode:
-	$(PYTHON) encode_media.py --log_level 0
+	$(PYTHON) encode_media.py --log_level 0 --process_order_function random
 	#--log_level 0
 	#--log_level 30
 
