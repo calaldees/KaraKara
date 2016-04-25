@@ -1,5 +1,6 @@
 import os
 import operator
+import re
 
 from libs.misc import postmortem, flatten
 
@@ -17,16 +18,16 @@ VERSION = '0.0.0'
 # Main -------------------------------------------------------------------------
 
 
-def meta_tools(**kwargs):
+def meta_tools(name_regex=None, **kwargs):
     fileitem_wrapper = FileItemWrapper(kwargs['path_source'])
     processed_files_manager = ProcessedFilesManager(kwargs['path_processed'])
     meta = MetaManager(kwargs['path_meta'])
 
-    if (not kwargs.get('meta_filenames')):
+    if (not name_regex):
         meta.load_all()
         meta_items = meta.meta.values()
     else:
-        meta_items = (meta.load(f.file_no_ext) or meta.get(f.file_no_ext) for f in meta.files if re.search(kwargs.get('name_regex'), f.file_no_ext))
+        meta_items = (meta.load(f.file_no_ext) or meta.get(f.file_no_ext) for f in meta.files if re.search(name_regex, f.file_no_ext, flags=re.IGNORECASE))
 
     path_attrgetter = operator.attrgetter(kwargs['pathstyle'])
 
@@ -69,7 +70,7 @@ def get_args():
 
     add_default_argparse_args(parser)
 
-    parser.add_argument('name_regex', nargs='?', default='', help='regex for names')
+    parser.add_argument('name_regex', default='', help='regex for names')
     parser.add_argument('--showsource', action='store_true')
     parser.add_argument('--showprocessed', action='store_true')
     parser.add_argument('--pretty', action='store_true')
