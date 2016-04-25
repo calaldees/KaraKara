@@ -30,26 +30,31 @@ def meta_tools(name_regex=None, **kwargs):
         meta_items = (meta.load(f.file_no_ext) or meta.get(f.file_no_ext) for f in meta.files if re.search(name_regex, f.file_no_ext, flags=re.IGNORECASE))
 
     path_attrgetter = operator.attrgetter(kwargs['pathstyle'])
+    path_itemgetter = operator.itemgetter(kwargs['pathstyle'])
 
-    def print_files(files):
+    def print_files(files, indentation='  '):
         for f in files:
-            print(f)
+            print('{}{}'.format(indentation, f))
 
     for m in meta_items:
+        indentation = ''
         if kwargs.get('pretty'):
             print(m.name)
+            indentation = '  '
         if kwargs.get('showsource'):
             source_files = (
-                path_attrgetter(f) for f in fileitem_wrapper.wrap_scan_data(m).values()
+                path_itemgetter(f) for f in fileitem_wrapper.wrap_scan_data(m).values() if f
             )
-            print_files(source_files)
+            print_files(source_files, indentation)
         if kwargs.get('showprocessed'):
             processed_files = (
                 path_attrgetter(f) for f in flatten(
                     processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash).values()
                 )
             )
-            print_files(processed_files)
+            print_files(processed_files, indentation)
+        if kwargs.get('pretty'):
+            print()
 
 
 # Arguments --------------------------------------------------------------------
