@@ -23,31 +23,37 @@ from libs.misc import cmd_args, color_close
 CRFFactorItem = namedtuple('CRFFactorItem', ['crf', 'pixels'])
 CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
-PREVIEW_VIDEO_WIDTH = 320  # Wanted this as part of config but needed access to it for test assertions
-
 CONFIG = {
+    'h264_codec': 'libx264',  # 'libx264',  # 'h264',
+    'preview_width': 320,
+}
+CONFIG.update({
     'threads': 2,
     'audio_rate_khz': 44100,
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
-    'encode_video': dict(
-        #preset='slow',
-        crf=22,
-        maxrate='1000k',
-        bufsize='2000k',
-        acodec='aac',
-        ab='224k',
-        strict='experimental',
-    ),
-    'encode_preview': dict(
-        crf=34,
-        ab='48k',
-        vf="scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(PREVIEW_VIDEO_WIDTH),  # scale=w='min(500, iw*3/2):h=-1'
-        acodec='aac',
-        ac=1,
-        strict='experimental',
-    ),
-    'h264_codec': 'libx264', # 'libx264',  # 'h264',
+    'encode_video': {
+        # preset='slow',
+        'vcodec': CONFIG['h264_codec'],
+        'crf': 22,
+        'maxrate': '1000k',
+        'bufsize': '2000k',
+
+        'acodec': 'aac',
+        'strict': 'experimental',
+        'ab': '224k',
+    },
+    'encode_preview': {
+        'vcodec': CONFIG['h264_codec'],
+        'crf': 34,
+        'vf': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(CONFIG['preview_width']),  # scale=w='min(500, iw*3/2):h=-1'
+
+        'acodec': 'aac',  # libfdk_aac
+        'strict': 'experimental',
+        'ab': '48k',
+        'profile:a': 'aac_he_v2',
+        # ac=1,
+    },
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
     'jpegoptim': {
         'target_size_k': 30
@@ -59,14 +65,13 @@ CONFIG = {
     # From the avconv documentation we have some mathmatical functions and variables
     # 'a' is the aspect ratio. floor() rounds down to nearest integer
     # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
-}
+})
 
 
 ENCODE_VIDEO_COMMON_ARGS = cmd_args(
     'ffmpeg',
     threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
-    #strict=CONFIG['avconv']['strict'],
     y=None,
 )
 
@@ -216,7 +221,6 @@ def encode_video(video_source, audio_source, subtitle_source, destination):
         '-i', video_source,
         '-i', audio_source,
         *cmd_args(
-            vcodec=CONFIG['h264_codec'],
             vf=', '.join(filters),
             **CONFIG['encode_video'],
         ),
@@ -263,6 +267,9 @@ def encode_audio(source, destination, **kwargs):
 
 
 def encode_preview_video(source, destination):
+    """
+    https://trac.ffmpeg.org/wiki/Encode/AAC#HE-AACversion2
+    """
     log.debug('encode_preview_video - %s', os.path.basename(source))
 
     #crf = crf_from_res(**probe_media(source))
@@ -272,7 +279,6 @@ def encode_preview_video(source, destination):
         *ENCODE_VIDEO_COMMON_ARGS,
         '-i', source,
         *cmd_args(
-            vcodec=CONFIG['h264_codec'],
             **CONFIG['encode_preview']
         ),
         destination,
@@ -290,7 +296,7 @@ def extract_image(source, destination, time=0.2):
                 ss=str(time),
                 vframes=1,
                 an=None,
-                vf=CONFIG['scale_preview'],
+                vf=CONFIG['encode_preview']['vf'],
             ),
             destination,
         ),
