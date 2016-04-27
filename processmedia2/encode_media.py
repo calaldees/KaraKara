@@ -43,6 +43,8 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
             m.name for m in meta.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
         #(
+            #'Lunar Silver Star Story - OP - Wings (Japanese Version)',
+            #'Evangleion ED - Fly Me To The Moon',
         #    'AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu',
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',

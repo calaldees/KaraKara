@@ -14,7 +14,7 @@ class ProcessedFilesManager(object):
         for processed_file_type in (
             # NOTE: These must match the attachment_types in the Track model
             ProcessedFileType('image', 'jpg', ''),
-            ProcessedFileType('video', 'mp4', 'ffmpeg_crf22'),
+            ProcessedFileType('video', 'mp4', ''),
             ProcessedFileType('preview', 'mp4', ''),
             ProcessedFileType('srt', 'srt', ''),
             ProcessedFileType('tags', 'txt', ''),

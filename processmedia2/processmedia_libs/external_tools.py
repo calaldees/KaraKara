@@ -46,12 +46,13 @@ CONFIG = {
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
     'jpegoptim': {
         'target_size_k': 30
-    }
+    },
+    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2'  # 264 codec can only handle dimension a multiple of 2. Some input does not adhear to this and need correction.
 }
 
 
 AVCONV_COMMON_ARGS = cmd_args(
-    'avconv',
+    'ffmpeg',
     threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
     #strict=CONFIG['avconv']['strict'],
@@ -133,6 +134,9 @@ def probe_media(source):
 
 
 def encode_image_to_video(source, destination, duration=10, width=320, height=240, **kwargs):
+    """
+    Todo: use same codec as encode_video
+    """
     log.debug('encode_image_to_video - %s', os.path.basename(source))
     _run_tool(
         *AVCONV_COMMON_ARGS,
@@ -144,7 +148,7 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
             t=duration,
             bf=0,  # wha dis do?
             qmax=1,  # wha dis do?
-            vf='scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+            vf=CONFIG['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
         ),
         destination,
     )
@@ -152,7 +156,7 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
 
 def encode_video(source, sub, destination):
     log.debug('encode_video - %s', os.path.basename(source))
-    sub_args = cmd_args(sub=sub) if sub else ()
+    #sub_args = cmd_args(sub=sub) if sub else ()
     #x264encopts = 'profile=main:fast_pskip=0:threads={threads}'.format(   #:bitrate={bitrate}:stats={statsfile}
     #    threads=CONFIG['threads'],
         #bitrate=3000,
@@ -192,18 +196,23 @@ def encode_video(source, sub, destination):
     #        return False, cmd_result
     #return True, None
 
-    sub_args = cmd_args(vf='subtitles={}'.format(sub)) if sub else ()
+    filters = [CONFIG['scale_even']]
+    if sub:
+        filters.append('subtitles={}'.format(sub))
     return _run_tool(
-        'ffmpeg',
+        #'ffmpeg',
+        *AVCONV_COMMON_ARGS,
         *cmd_args(
             i=source,
         ),
-        *sub_args,
         *cmd_args(
-            '-c:v', 'libx264',
+            '-c:v', CONFIG['avconv']['h264_codec'],
             preset='slow',
-            threads=CONFIG['threads'],
+            #threads=CONFIG['threads'],
+            vf=', '.join(filters),
             crf=22,
+            maxrate='1000k',
+            bufsize='2000k',
             an=None,
         ),
         destination,
