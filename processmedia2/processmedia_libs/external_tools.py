@@ -48,9 +48,9 @@ CONFIG.update({
     'encode_video': {
         # preset='slow',
         'vcodec': CONFIG['h264_codec'],
-        'crf': 22,
-        'maxrate': '1000k',
-        'bufsize': '2000k',
+        'crf': 21,
+        'maxrate': '1500k',
+        'bufsize': '2500k',
 
         'acodec': 'aac',
         'strict': 'experimental',
