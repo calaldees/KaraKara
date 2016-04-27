@@ -24,14 +24,27 @@ CRFFactorItem = namedtuple('CRFFactorItem', ['crf', 'pixels'])
 CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
 CONFIG = {
-    'h264_codec': 'libx264',  # 'libx264',  # 'h264',
-    'preview_width': 320,
-}
-CONFIG.update({
     'threads': 2,
-    'audio_rate_khz': 44100,
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
+    'h264_codec': 'libx264',  # 'libx264',  # 'h264',
+    'preview_width': 320,
+    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhear to this and need correction.
+    'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
+}
+CONFIG.update({
+    'encode_image_to_video': {
+        'vcodec': CONFIG['h264_codec'],
+        'r': 5,  # 5 fps
+        'bf': 0,  # wha dis do?
+        'qmax': 1,  # wha dis do?
+        'vf': CONFIG['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+    },
+    'extract_audio': {
+        'vcodec': 'none',
+        'ac': 2,
+        'ar': 44100,
+    },
     'encode_video': {
         # preset='slow',
         'vcodec': CONFIG['h264_codec'],
@@ -51,20 +64,16 @@ CONFIG.update({
         'acodec': 'aac',  # libfdk_aac
         'strict': 'experimental',
         'ab': '48k',
-        'profile:a': 'aac_he_v2',
-        # ac=1,
+        #'profile:a': 'aac_he_v1',
+        #ac=1,
     },
-    'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
-    'jpegoptim': {
-        'target_size_k': 30
-    },
-    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhear to this and need correction.
+
     # The width and height must be divisable by 2
     # Using w=320:h-1 should auto set the height preserving aspect ratio
     # Sometimes using this method the height is an odd number, which fails to encode
     # From the avconv documentation we have some mathmatical functions and variables
     # 'a' is the aspect ratio. floor() rounds down to nearest integer
-    # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
+    # If we divide by 2 and ensure that an integer, multiplying by 2 must be divisable by 2
 })
 
 
@@ -81,6 +90,9 @@ def check_tools():
     Assert exteranl dependeycs
     """
     # check (h264 or libx264):
+    # avprobe
+    # check ffmpeg (with dependencys)
+    # check sox
     pass
 
 
@@ -159,13 +171,8 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
         '-loop', '1',
         '-i', source,
         *cmd_args(
-            vcodec=CONFIG['h264_codec'],
-            #strict=CONFIG['avconv']['strict'],
-            r=5,  # 1 fps
             t=duration,
-            bf=0,  # wha dis do?
-            qmax=1,  # wha dis do?
-            vf=CONFIG['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+            **CONFIG['encode_image_to_video'],
         ),
         destination,
     )
@@ -173,49 +180,11 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
 
 def encode_video(video_source, audio_source, subtitle_source, destination):
     log.debug('encode_video - %s', os.path.basename(video_source))
-    #sub_args = cmd_args(sub=sub) if sub else ()
-    #x264encopts = 'profile=main:fast_pskip=0:threads={threads}'.format(   #:bitrate={bitrate}:stats={statsfile}
-    #    threads=CONFIG['threads'],
-        #bitrate=3000,
-        #statsfile=os.path.join(os.path.dirname(destination), 'x264_2pass.log'),
-    #)
-    #cmds = (
-    #    lambda:  _run_tool(
-    #        'mencoder',
-    #        source,
-    #        *sub_args,
-    #        *cmd_args(
-    #            quiet=None,
-    #            ass=None,
-    #            nosound=None,
-    #            ovc='x264',
-    #            x264encopts=x264encopts  # +':pass=1',
-    #        ),
-    #        '-o', destination,
-    #    ),
-        #lambda: _run_tool(
-        #    'mencoder',
-        #    source,
-        #    *sub_args,
-        #    *cmd_args(
-        #        quiet=None,
-        #        ass=None,
-        #        nosound=None,
-        #        ovc='x264',
-        #        x264encopts=x264encopts+':pass=2:preset=veryslow',
-        #    ),
-        #    '-o', destination,
-        #),
-    #)
-    #for cmd in cmds:
-    #    cmd_success, cmd_result = cmd()
-    #    if not cmd_success:
-    #        return False, cmd_result
-    #return True, None
 
     filters = [CONFIG['scale_even']]
     if subtitle_source:
         filters.append('subtitles={}'.format(subtitle_source))
+
     return _run_tool(
         *ENCODE_VIDEO_COMMON_ARGS,
         '-i', video_source,
@@ -226,6 +195,7 @@ def encode_video(video_source, audio_source, subtitle_source, destination):
         ),
         destination,
     )
+
 
 def encode_audio(source, destination, **kwargs):
     """
@@ -242,9 +212,7 @@ def encode_audio(source, destination, **kwargs):
             *ENCODE_VIDEO_COMMON_ARGS,
             '-i', source,
             *cmd_args(
-                vcodec='none',
-                ac=2,
-                ar=CONFIG['audio_rate_khz'],
+                **CONFIG['extract_audio']
             ),
             os.path.join(path, 'audio_raw.wav'),
         ),
@@ -332,5 +300,5 @@ def get_frame_from_video(url, time="00:00:10"):
     >>> color_close((0, 0, 255), get_frame_from_video('tests/source/test1.mp4', '00:00:20').getpixel((0,0)))
     True
     """
-    cmd = """avconv -loglevel quiet -i "{url}" -ss {time} -vframes 1 -f image2 pipe: """.format(url=url, time=time)
+    cmd = """ffmpeg -loglevel quiet -i "{url}" -ss {time} -vframes 1 -f image2 pipe: """.format(url=url, time=time)
     return Image.open(BytesIO(subprocess.check_output(cmd, stderr=subprocess.PIPE, shell=True)))
