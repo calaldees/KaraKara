@@ -3,7 +3,7 @@ import pytesseract
 from PIL import Image
 
 from libs.misc import color_distance, color_close
-from processmedia_libs.external_tools import probe_media, get_frame_from_video, PREVIEW_VIDEO_WIDTH
+from processmedia_libs.external_tools import probe_media, get_frame_from_video, CONFIG as ENCODE_CONFIG
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
 COLOR_SUBTITLE_CURRENT = (255, 255, 0)
@@ -65,8 +65,8 @@ def test_encode_video_simple():
         video_details = probe_media(video_file)
         preview_details = probe_media(preview_file)
         assert abs(video_details['duration'] - preview_details['duration']) < 0.5, 'Main video and Preview video should be the same duration'
-        assert preview_details['width'] == PREVIEW_VIDEO_WIDTH, 'Preview video should match expected output size'
-        assert video_details['width'] > PREVIEW_VIDEO_WIDTH, 'Main video should be greater than preview video size'
+        assert preview_details['width'] == ENCODE_CONFIG['preview_width'], 'Preview video should match expected output size'
+        assert video_details['width'] > ENCODE_CONFIG['preview_width'], 'Main video should be greater than preview video size'
 
 
 def test_encode_incomplete():
@@ -109,11 +109,19 @@ def test_encode_audio_simple():
 
 
 def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
-    pytest.xfail("TODO")
+    pytest.skip("TODO")
 
 
 def test_skip_encoding_step_if_processed_file_present():
-    pytest.xfail("TODO")
+    pytest.skip("TODO")
+
+
+def test_encode_video_not_multiple_of_2():
+    pytest.skip("TODO")
+
+
+def test_encode_image_not_multiple_of_2():
+    pytest.skip("TODO")
 
 
 def read_subtitle_text(image, color):
