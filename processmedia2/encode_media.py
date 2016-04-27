@@ -191,25 +191,19 @@ class Encoder(object):
 
             # 4.) Encode
             encode_steps = (
-                # 4.a) Render video with subtitles (without audio)
-                lambda: external_tools.encode_video(
-                    source=absolute_video_to_encode,
-                    sub=absolute_ssa_to_encode,
-                    destination=os.path.join(tempdir, 'video.mp4'),
-                ),
-
-                # 4.b) Render audio and normalize
+                # 4.a) Render audio and normalize
                 lambda: external_tools.encode_audio(
                     source=source_files['audio'].get('absolute') or source_files['video'].get('absolute'),
                     destination=os.path.join(tempdir, 'audio.wav'),
                 ),
 
-                # 4.c) Mux Video and Audio
-                lambda: external_tools.mux(
-                    video=os.path.join(tempdir, 'video.mp4'),
-                    audio=os.path.join(tempdir, 'audio.wav'),
-                    destination=os.path.join(tempdir, 'mux.mp4'),
-                )
+                # 4.b) Render video with subtitles and mux new audio.
+                lambda: external_tools.encode_video(
+                    video_source=absolute_video_to_encode,
+                    audio_source=os.path.join(tempdir, 'audio.wav'),
+                    subtitle_source=absolute_ssa_to_encode,
+                    destination=os.path.join(tempdir, 'video.mp4'),
+                ),
             )
             for encode_step in encode_steps:
                 encode_success, cmd_result = encode_step()
@@ -218,7 +212,7 @@ class Encoder(object):
                     return False
 
             # 5.) Move the newly encoded file to the target path
-            target_file.move(os.path.join(tempdir, 'mux.mp4'))
+            target_file.move(os.path.join(tempdir, 'video.mp4'))
 
         return True
 

@@ -30,28 +30,39 @@ CONFIG = {
     'audio_rate_khz': 44100,
     'process_timeout_seconds': 30 * 60,
     'log_level': 'warning',
-    'avconv': {
-        'h264_codec': 'libx264', # 'libx264',  # 'h264',
-        # The width and height must be divisable by 2
-        # Using w=320:h-1 should auto set the height preserving aspect ratio
-        # Sometimes using this method the height is an odd number, which fails to encode
-        # From the avconv documentation we have some mathmatical functions and variables
-        # 'a' is the aspect ratio. floor() rounds down to nearest integer
-        # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
-        'scale': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(PREVIEW_VIDEO_WIDTH),  # scale=w='min(500, iw*3/2):h=-1'
-        'preview_audio_bitrate': '48k',
-        'preview_crf': 34,
-        'strict': 'strict',
-    },
+    'encode_video': dict(
+        #preset='slow',
+        crf=22,
+        maxrate='1000k',
+        bufsize='2000k',
+        acodec='aac',
+        ab='224k',
+        strict='experimental',
+    ),
+    'encode_preview': dict(
+        crf=34,
+        ab='48k',
+        vf="scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(PREVIEW_VIDEO_WIDTH),  # scale=w='min(500, iw*3/2):h=-1'
+        acodec='aac',
+        ac=1,
+        strict='experimental',
+    ),
+    'h264_codec': 'libx264', # 'libx264',  # 'h264',
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
     'jpegoptim': {
         'target_size_k': 30
     },
-    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2'  # 264 codec can only handle dimension a multiple of 2. Some input does not adhear to this and need correction.
+    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhear to this and need correction.
+    # The width and height must be divisable by 2
+    # Using w=320:h-1 should auto set the height preserving aspect ratio
+    # Sometimes using this method the height is an odd number, which fails to encode
+    # From the avconv documentation we have some mathmatical functions and variables
+    # 'a' is the aspect ratio. floor() rounds down to nearest integer
+    # If we divide by 2 and ensure that an integer, timesing by 2 must be divisable by 2
 }
 
 
-AVCONV_COMMON_ARGS = cmd_args(
+ENCODE_VIDEO_COMMON_ARGS = cmd_args(
     'ffmpeg',
     threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
@@ -139,10 +150,11 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
     """
     log.debug('encode_image_to_video - %s', os.path.basename(source))
     _run_tool(
-        *AVCONV_COMMON_ARGS,
+        *ENCODE_VIDEO_COMMON_ARGS,
         '-loop', '1',
         '-i', source,
         *cmd_args(
+            vcodec=CONFIG['h264_codec'],
             #strict=CONFIG['avconv']['strict'],
             r=5,  # 1 fps
             t=duration,
@@ -154,8 +166,8 @@ def encode_image_to_video(source, destination, duration=10, width=320, height=24
     )
 
 
-def encode_video(source, sub, destination):
-    log.debug('encode_video - %s', os.path.basename(source))
+def encode_video(video_source, audio_source, subtitle_source, destination):
+    log.debug('encode_video - %s', os.path.basename(video_source))
     #sub_args = cmd_args(sub=sub) if sub else ()
     #x264encopts = 'profile=main:fast_pskip=0:threads={threads}'.format(   #:bitrate={bitrate}:stats={statsfile}
     #    threads=CONFIG['threads'],
@@ -197,23 +209,16 @@ def encode_video(source, sub, destination):
     #return True, None
 
     filters = [CONFIG['scale_even']]
-    if sub:
-        filters.append('subtitles={}'.format(sub))
+    if subtitle_source:
+        filters.append('subtitles={}'.format(subtitle_source))
     return _run_tool(
-        #'ffmpeg',
-        *AVCONV_COMMON_ARGS,
+        *ENCODE_VIDEO_COMMON_ARGS,
+        '-i', video_source,
+        '-i', audio_source,
         *cmd_args(
-            i=source,
-        ),
-        *cmd_args(
-            '-c:v', CONFIG['avconv']['h264_codec'],
-            preset='slow',
-            #threads=CONFIG['threads'],
+            vcodec=CONFIG['h264_codec'],
             vf=', '.join(filters),
-            crf=22,
-            maxrate='1000k',
-            bufsize='2000k',
-            an=None,
+            **CONFIG['encode_video'],
         ),
         destination,
     )
@@ -230,10 +235,9 @@ def encode_audio(source, destination, **kwargs):
 
     cmds = (
         lambda: _run_tool(
-            *AVCONV_COMMON_ARGS,
+            *ENCODE_VIDEO_COMMON_ARGS,
             '-i', source,
             *cmd_args(
-                #strict=CONFIG['avconv']['strict'],
                 vcodec='none',
                 ac=2,
                 ar=CONFIG['audio_rate_khz'],
@@ -258,42 +262,18 @@ def encode_audio(source, destination, **kwargs):
     return True, None
 
 
-def mux(video, audio, destination):
-    """
-    """
-    log.debug('mux - %s', os.path.basename(video))
-    return _run_tool(
-        *AVCONV_COMMON_ARGS,
-        '-i', video,
-        '-i', audio,
-        *cmd_args(
-            #strict=CONFIG['avconv']['strict'],
-            vcodec='copy',
-            ab='224k',
-        ),
-        destination,
-    )
-
-
 def encode_preview_video(source, destination):
     log.debug('encode_preview_video - %s', os.path.basename(source))
 
     #crf = crf_from_res(**probe_media(source))
-    crf = CONFIG['avconv']['preview_crf']
-    log.debug('crf: %s', crf)
+    #log.debug('crf: %s', crf)
 
     return _run_tool(
-        *AVCONV_COMMON_ARGS,
+        *ENCODE_VIDEO_COMMON_ARGS,
         '-i', source,
         *cmd_args(
-            strict='experimental',  # CONFIG['avconv']['strict'],
-            vcodec=CONFIG['avconv']['h264_codec'],
-            crf=crf,
-            acodec='aac',
-            ac=1,
-            ar=CONFIG['audio_rate_khz'],
-            ab=CONFIG['avconv']['preview_audio_bitrate'],
-            vf=CONFIG['avconv']['scale'],
+            vcodec=CONFIG['h264_codec'],
+            **CONFIG['encode_preview']
         ),
         destination,
     )
@@ -304,13 +284,13 @@ def extract_image(source, destination, time=0.2):
 
     cmds = (
         lambda: _run_tool(
-            *AVCONV_COMMON_ARGS,
+            *ENCODE_VIDEO_COMMON_ARGS,
             '-i', source,
             *cmd_args(
                 ss=str(time),
                 vframes=1,
                 an=None,
-                vf=CONFIG['avconv']['scale'],
+                vf=CONFIG['scale_preview'],
             ),
             destination,
         ),
