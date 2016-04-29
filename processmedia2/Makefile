@@ -1,6 +1,8 @@
 OS = $(shell uname -s)
 LINUX_DISTRO=$(shell lsb_release -a 2> /dev/null | grep "Distributor ID:" | sed 's|.*:.\(.*\)|\1|')
 
+PYTHON_DEPENDENCYS=pip-requirements.txt
+
 ENV=_env
 PYTHON=$(ENV)/bin/python3
 PIP=$(ENV)/bin/pip3
@@ -17,18 +19,16 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: $(OS) $(ENV) libs libs/progress.py
+install: install_$(OS) $(ENV) libs libs/progress.py
 
 # OSX installation
-.PHONY: Darwin has-brew
+.PHONY: install_Darwin has-brew
 has-brew:
 	# Fails if homebrew is not installed
 	which brew
-Darwin: has-brew
+install_Darwin: has-brew
 	brew update
-	brew install python3
-	#brew install mplayer \
-	#	--with-libcaca
+	brew install python3 jpegoptim tesseract
 	brew install sox \
 		--with-flac \
 		--with-lame \
@@ -56,6 +56,7 @@ Darwin: has-brew
 		--with-libvorbis \
 		--with-libvpx \
 		--with-opencore-amr \
+		--with-openh264 \
 		--with-openjpeg \
 		--with-openssl \
 		--with-opus \
@@ -67,42 +68,26 @@ Darwin: has-brew
 		--with-tools \
 		--with-webp \
 		--with-x265 \
-		--with-zeromq
-	brew install libav \
-		--with-fdk-aac \
-		--with-fontconfig \
-		--with-freetype \
-		--with-frei0r \
-		--with-gnutls \
-		--with-libvo-aacenc \
-		--with-libvorbis \
-		--with-libvpx \
-		--with-opencore-amr \
-		--with-openjpeg \
-		--with-openssl \
-		--with-opus \
-		--with-rtmpdump \
-		--with-schroedinger \
-		--with-sdl \
-		--with-speex \
-		--with-theora
-	brew install tesseract
+		--with-zeromq \
+		--with-zimg
 
 
 # Linux installation
-.PHONY: Linux Debian Ubuntu apt-installation
-Linux: $(LINUX_DISTRO)
-Debian: apt-installation
-Ubuntu: apt-installation
+.PHONY: install_Linux install_Debian install_Ubuntu apt-installation
+install_Linux: install_$(LINUX_DISTRO)
+install_Debian: apt-installation
+install_Ubuntu: apt-installation
 apt-installation:
 	sudo apt-get install -y python3 python3-dev python3-pip
-	if dpkg -s libav-tools ; then \
-		echo libav already installed; \
+	if dpkg -s ffmpeg ; then \
+		echo ffmpeg already installed ;\
 	else \
-		echo installing libav; \
-		sudo add-apt-repository ppa:motumedia/libav-daily; \
-		sudo apt-get update; \
-		sudo apt-get install -y libav-tools libavcodec-extra-53 sox mencoder ; \
+		echo installing ffmpeg ;\
+		#sudo add-apt-repository ppa:motumedia/libav-daily ;\
+		sudo add-apt-repository ppa:jon-severinsson/ffmpeg
+		sudo apt-get update ;\
+		sudo apt-get install -y ffmpeg sox jpegoptim tesseract python3 ;\
+		#libavcodec-extra-53
 	fi
 
 
@@ -115,7 +100,14 @@ has-python3:
 $(ENV):
 	virtualenv --no-site-packages -p python3 $(ENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r pip-requirements.txt
+	$(PIP) install -r $(PYTHON_DEPENDENCYS)
+
+
+.PHONY: upgrade
+upgrade:
+	$(PIP) install -r $(PYTHON_DEPENDENCYS) --upgrade
+	brew reinstall jpegoptim tesseract sox ffmpeg
+
 
 libs:
 	mkdir libs
@@ -137,7 +129,7 @@ scan:
 	$(PYTHON) scan_media.py
 
 encode:
-	$(PYTHON) encode_media.py --log_level 0 --process_order_function random
+	$(PYTHON) encode_media.py --process_order_function random
 	#--log_level 0
 	#--log_level 30
 

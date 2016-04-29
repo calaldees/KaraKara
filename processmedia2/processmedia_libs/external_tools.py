@@ -54,7 +54,7 @@ CONFIG.update({
 
         'acodec': 'aac',
         'strict': 'experimental',
-        'ab': '224k',
+        'ab': '196k',
     },
     'encode_preview': {
         'vcodec': CONFIG['h264_codec'],
@@ -89,11 +89,10 @@ def check_tools():
     """
     Assert exteranl dependeycs
     """
-    # check (h264 or libx264):
-    # avprobe
     # check ffmpeg (with dependencys)
     # check sox
     # check jpegoptim
+    # check (h264 or libx264)?
     pass
 
 
@@ -133,7 +132,7 @@ def probe_media(source):
     if not source:
         return {}
     cmd_success, cmd_result = _run_tool(
-        'avprobe',
+        'ffprobe',
         source
     )
     result = (cmd_result.stdout + cmd_result.stderr).decode('utf-8', 'ignore')
@@ -155,7 +154,7 @@ def probe_media(source):
     except:
         pass
     try:
-        raw_audio = re.search(r'Audio:\s*(?P<format>\w+), (?P<sample_rate>\d+) Hz,.*, (?P<bitrate>\d+) kb', result)
+        raw_audio = re.search(r'Audio:\s*(?P<format>\w+?)[\s,].*, (?P<sample_rate>\d+) Hz,.*, (?P<bitrate>\d+) kb', result)
         data['audio'] = raw_audio.groupdict()
     except:
         pass
