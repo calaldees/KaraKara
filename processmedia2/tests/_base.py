@@ -74,7 +74,9 @@ class ProcessMediaTestManager(object):
         return meta
     @meta.setter
     def meta(self, data):
-        # TODO - clear all files on set
+        self.meta_manager._release_cache()
+        for f in os.listdir(self.path_meta):
+            os.remove(os.path.join(self.path_meta, f))
         for filename, meta_data in data.items():
             with open(os.path.join(self.path_meta, filename), 'w') as meta_filehandle:
                 json.dump(meta_data, meta_filehandle)

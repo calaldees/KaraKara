@@ -93,6 +93,7 @@ def check_tools():
     # avprobe
     # check ffmpeg (with dependencys)
     # check sox
+    # check jpegoptim
     pass
 
 

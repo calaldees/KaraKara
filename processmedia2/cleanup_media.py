@@ -21,17 +21,17 @@ def cleanup_media(**kwargs):
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
 
-    known_file_hashs = {
+    all_known_file_hashs = {
         processed_file.hash
         for processed_file in flatten(
             processed_files_manager.get_all_processed_files_associated_with_source_hash(source_hash).values()
             for source_hash in meta.source_hashs
         )
     }
-    unlinked_files = (f for f in processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in known_file_hashs)
+    unlinked_files = (f for f in processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in all_known_file_hashs)
 
     for unlinked_file in unlinked_files:
-        os.remove(unlinked_file)
+        os.remove(unlinked_file.absolute)
 
 
 # Arguments --------------------------------------------------------------------
