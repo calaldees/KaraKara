@@ -1,0 +1,7 @@
+language: python
+python:
+    - "3.4"
+    - "3.5"
+
+install: make travis_install
+script: make travis_test

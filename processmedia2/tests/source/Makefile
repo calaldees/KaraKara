@@ -1,4 +1,3 @@
-
 all: test1.mp4 test2.ogg
 
 test1.mp4:

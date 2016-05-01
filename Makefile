@@ -7,8 +7,8 @@ run_docker:
 	docker run -v "$(pwd):/karakara" --net=host appium
 
 run_production:
-	cd mediaserver ; make start_nginx
-	cd website ; make run_production
+	cd mediaserver ; $(MAKE) start_nginx
+	cd website ; $(MAKE) run_production
 
 init_random_production:
 	cd website ; env/bin/python -mkarakara.model.setup --config_uri production.ini --init_func karakara.model.init_data:init_data
@@ -46,3 +46,23 @@ hash_match:
 move_mouse:
 	# Problems with screensaver. Move mouse every 5min
 	while true ; do echo 'loopity'; sleep 300; xte 'mousemove 1024 100' -x :0; sleep 300; xte 'mousemove 1024 760' -x :0; done
+
+
+TRAVIS_PROJECTS = website processmedia2
+
+travis_install:
+	# Doing setup || true because not all files have a setup target
+	for project in $(TRAVIS_PROJECTS); do \
+		cd $$project; \
+		($(MAKE) setup || true) && $(MAKE) install; \
+		cd ..; \
+	done
+
+travis_test:
+	set -e; \
+	for project in $(TRAVIS_PROJECTS); do \
+		cd $$project; \
+		$(MAKE) test; \
+		cd ..; \
+	done
+
