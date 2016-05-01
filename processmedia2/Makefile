@@ -162,9 +162,9 @@ migrate:
 .PHONY: test cloc
 
 test:
-	make all --directory tests/source
+	$(MAKE) all --directory tests/source
 	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
-	make ini --directory $(WEB_PATH)
+	$(MAKE) ini --directory $(WEB_PATH)
 	PYTHONPATH="$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/" $(WEB_PYTEST) tests/test_import.py --pdb
 
 cloc:
@@ -176,4 +176,4 @@ cloc:
 clean:
 	rm -rf $(ENV)
 	rm -rf libs
-	make clean --directory tests/source
+	$(MAKE) clean --directory tests/source

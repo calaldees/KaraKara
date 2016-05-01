@@ -10,3 +10,4 @@ hash_cache.pickle
 .idea
 *.egg-info
 *_env
+*.swp
