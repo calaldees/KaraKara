@@ -78,7 +78,7 @@ install_Linux: install_$(LINUX_DISTRO)
 install_Debian: apt-installation
 install_Ubuntu: apt-installation
 apt-installation:
-	sudo apt-get install -y python3 python3-dev python3-pip
+	sudo apt-get install -y python3 python3-dev python3-pip sox jpegoptim tesseract-ocr-eng
 	if dpkg -s ffmpeg ; then \
 		echo ffmpeg already installed ;\
 	else \
@@ -86,7 +86,7 @@ apt-installation:
 		#sudo add-apt-repository ppa:motumedia/libav-daily ;\
 		#sudo add-apt-repository ppa:jon-severinsson/ffmpeg ;\
 		sudo apt-get update ;\
-		sudo apt-get install -y ffmpeg sox jpegoptim tesseract-ocr-eng python3 ;\
+		sudo apt-get install -y ffmpeg \
 		#libavcodec-extra-53
 	fi
 
