@@ -19,7 +19,7 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: install_$(OS) $(ENV) libs libs/progress.py
+install: install_$(OS) $(ENV) libs
 
 # OSX installation
 .PHONY: install_Darwin has-brew
@@ -78,17 +78,17 @@ install_Linux: install_$(LINUX_DISTRO)
 install_Debian: apt-installation
 install_Ubuntu: apt-installation
 apt-installation:
-	sudo apt-get install -y python3 python3-dev python3-pip sox jpegoptim tesseract-ocr-eng
-	if dpkg -s ffmpeg ; then \
-		echo ffmpeg already installed ;\
-	else \
-		echo installing ffmpeg ;\
+	sudo apt-get install -y python3 python3-dev python3-pip sox jpegoptim tesseract-ocr-eng libjpeg-dev virtualenv ffmpeg
+	#if dpkg -s ffmpeg ; then \
+	#	echo ffmpeg already installed ;\
+	#else \
+	#	echo installing ffmpeg ;\
 		#sudo add-apt-repository ppa:motumedia/libav-daily ;\
 		#sudo add-apt-repository ppa:jon-severinsson/ffmpeg ;\
-		sudo apt-get update ;\
-		sudo apt-get install -y ffmpeg \
+	#	sudo apt-get update ;\
+	#	sudo apt-get install -y ffmpeg \
 		#libavcodec-extra-53
-	fi
+	#fi
 
 
 .PHONY: has-python3
