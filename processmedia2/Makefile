@@ -84,9 +84,9 @@ apt-installation:
 	else \
 		echo installing ffmpeg ;\
 		#sudo add-apt-repository ppa:motumedia/libav-daily ;\
-		sudo add-apt-repository ppa:jon-severinsson/ffmpeg
+		#sudo add-apt-repository ppa:jon-severinsson/ffmpeg ;\
 		sudo apt-get update ;\
-		sudo apt-get install -y ffmpeg sox jpegoptim tesseract python3 ;\
+		sudo apt-get install -y ffmpeg sox jpegoptim tesseract-ocr-eng python3 ;\
 		#libavcodec-extra-53
 	fi
 
