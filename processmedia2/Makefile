@@ -78,7 +78,7 @@ install_Linux: install_$(LINUX_DISTRO)
 install_Debian: apt-installation
 install_Ubuntu: apt-installation
 apt-installation:
-	sudo apt-get install -y python3 python3-dev python3-pip sox jpegoptim tesseract-ocr-eng libjpeg-dev virtualenv ffmpeg
+	sudo apt-get install -y python3 python3-dev python3-pip sox jpegoptim tesseract-ocr tesseract-ocr-eng libjpeg-dev virtualenv ffmpeg
 	#if dpkg -s ffmpeg ; then \
 	#	echo ffmpeg already installed ;\
 	#else \
