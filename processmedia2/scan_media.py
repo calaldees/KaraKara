@@ -78,6 +78,10 @@ def scan_media(**kwargs):
         meta.save(name)
 
     log.info('5.) Attempt to find associate unassociated files but finding them on the folder_structure in memory')
+    # TODO: The step in 5b (mtime and hash check) is not sufficent
+    #   We need to identify all unmatched files and generate a hash lookup and match them that way.
+    #   It may take longer but it's the only true way of matching a file.
+    #   It might in some cases be quicker because we don't need to craw the entire file structure in memory.
     for m in meta.meta_with_unassociated_files:
         for filename, scan_data in m.unassociated_files.items():
 
@@ -95,7 +99,7 @@ def scan_media(**kwargs):
                 lambda f:
                     not IGNORE_SEARCH_EXTS_REGEX.search(f.file)
                     and
-                    (f.file == filename or f.stats.st_mtime == mtime)
+                    (f.file == filename or f.stats.st_mtime == mtime)  # TODO: Depricate this!
                     and
                     str(f.hash) == scan_data['hash']
             ):

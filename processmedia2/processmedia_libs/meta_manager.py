@@ -118,7 +118,7 @@ class MetaFile(object):
     def associate_file(self, f):
         self.file_collection.add(f)
         file_data = self.scan_data.setdefault(f.file, {})
-        mtime = int(f.stats.st_mtime)
+        mtime = f.stats.st_mtime
 
         if file_data.get('relative') == f.relative and file_data.get('mtime') == mtime:
             return
