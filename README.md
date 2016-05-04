@@ -5,6 +5,7 @@ Karaoke Event System - Attendees view and queue tracks from their mobile phones
 
     git clone https://github.com/calaldees/KaraKara.git
 
+[![Build Status](https://travis-ci.org/calaldees/KaraKara.svg?branch=master)](https://travis-ci.org/calaldees/KaraKara)
 
 Overview
 --------
