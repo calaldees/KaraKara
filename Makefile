@@ -66,3 +66,11 @@ travis_test:
 		cd ..; \
 	done
 
+# Clean ------------------------------------------------------------------------
+.PHONY: clean
+
+clean:
+	rm -rf .cache .vagrant
+	$(MAKE) clean --directory website
+	$(MAKE) clean --directory processmedia2
+	$(MAKE) clean --directory mediaserver

@@ -166,6 +166,5 @@ cloc:
 .PHONY: clean
 
 clean:
-	rm -rf $(ENV)
-	rm -rf libs
+	rm -rf .cache __pycache__ $(ENV) libs
 	$(MAKE) clean --directory tests/source

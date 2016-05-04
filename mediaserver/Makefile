@@ -77,6 +77,7 @@ www/files:
 	mkdir www/files
 	#test -z www/files && 
 
+.PHONY: clean
 clean:
 	rm -rf tmp log setup
 

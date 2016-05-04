@@ -24,6 +24,7 @@ BADGENAME_SOURCE=minami
 #APTGET_EXTRAS+=-y
 #endif
 
+.PHONY: help
 help:
 	# Usage: make <target>, where target is
 	# install        -- 
@@ -74,6 +75,7 @@ dependency_download: dependency_downloader.py externals
 	$(PYTHON) dependency_downloader.py --destination externals
 	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
+.PHONY: install
 install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths locale/karakara.pot
 
 
@@ -83,6 +85,7 @@ test.db:
 	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara development.ini
 
+.PHONY: init_db_production
 init_db_production: ini
 	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
@@ -97,6 +100,8 @@ development.ini:
 production.inidiff:
 	cp production.inidiff.dist production.inidiff
 
+
+.PHONY: ini ini_test ini_production
 ini: clean_ini ini_test ini_production
 ini_test: development.ini
 	$(PYTHON) externals/lib/make_ini.py test
@@ -105,7 +110,7 @@ ini_production: production.inidiff
 
 # Upload paths -----------------------------------------------------------------
 
-PHONY: upload_paths
+.PHONY: upload_paths
 upload_paths: data data/upload data/uploaded
 data:
 	mkdir data
@@ -115,6 +120,7 @@ data/uploaded:
 	mkdir data/uploaded
 
 # Run --------------------------------------------------------------------------
+.PHONY: run run_production run_socket_server shell shell_production
 
 run: install
 	$(PSERVE) --reload $(INI_DEV)
@@ -132,6 +138,7 @@ shell_production: ini
 	$(PSHELL) $(INI_PROD)
 
 # Daemon -----------------------------------------------------------------------
+.PHONY: start_webapp_daemon stop_webapp_daemon
 
 start_webapp_daemon: ini
 	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
@@ -140,6 +147,7 @@ stop_webapp_daemon:
 
 
 # Test -------------------------------------------------------------------------
+.PHONY: test test_crawl
 
 #import_tracks_local_mediaserver: init_db
 #	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
@@ -182,6 +190,7 @@ locale/karakara.pot: locale
 	$(PYTHON) setup.py update_catalog
 	$(PYTHON) setup.py compile_catalog
 
+.PHONY: i18n
 i18n:
 	$(PYTHON) setup.py extract_messages
 	$(PYTHON) setup.py update_catalog
@@ -190,6 +199,7 @@ i18n:
 	$(PYTHON) setup.py compile_catalog
 
 # Data -------------------------------------------------------------------------
+.PHONY: insert_random_tracks insert_band_tracks import_tracks_production
 
 insert_random_tracks:
 	$(PYTHON) -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
@@ -208,6 +218,7 @@ badgenames.txt:
 
 # Logs -------------------------------------------------------------------------
 
+.PHONY: log_production
 log_production:
 	tail -n$(LOG_LINES) production.log
 	tail -n$(LOG_LINES) ../mediaserver/log/access.log
@@ -215,6 +226,7 @@ log_production:
 
 
 # Cleanup ----------------------------------------------------------------------
+.PHONY: clean_ini clean
 
 clean_ini:
 	rm -f $(INI_DEV)
