@@ -1,7 +1,9 @@
 OS = $(shell uname -s)
 LINUX_DISTRO=$(shell lsb_release -a 2> /dev/null | grep "Distributor ID:" | sed 's|.*:.\(.*\)|\1|')
 
-PYTHON_DEPENDENCYS=pip-requirements.txt
+DEPENDENCIES_PYTHON=dependencies.python.txt
+DEPENDENCIES_APT=dependencies.apt.txt
+DEPENDENCIES_BREW=dependencies.brew.txt
 
 ENV=_env
 PYTHON=$(ENV)/bin/python3
@@ -28,48 +30,7 @@ has-brew:
 	which brew
 install_Darwin: has-brew
 	brew update
-	brew install python3 jpegoptim tesseract
-	brew install sox \
-		--with-flac \
-		--with-lame \
-		--with-libao \
-		--with-libsndfile \
-		--with-libvorbis \
-		--with-opencore-amr \
-		--with-opusfile
-	brew install ffmpeg \
-		--with-dcadec \
-		--with-faac \
-		--with-fdk-aac \
-		--with-ffplay \
-		--with-fontconfig \
-		--with-freetype \
-		--with-frei0r \
-		--with-libass \
-		--with-libbluray \
-		--with-libbs2b \
-		--with-libcaca \
-		--with-libquvi \
-		--with-libsoxr \
-		--with-libssh \
-		--with-libvidstab \
-		--with-libvorbis \
-		--with-libvpx \
-		--with-opencore-amr \
-		--with-openh264 \
-		--with-openjpeg \
-		--with-openssl \
-		--with-opus \
-		--with-rtmpdump \
-		--with-schroedinger \
-		--with-snappy \
-		--with-speex \
-		--with-theora \
-		--with-tools \
-		--with-webp \
-		--with-x265 \
-		--with-zeromq \
-		--with-zimg
+	cat $(DEPENDENCIES_BREW) |xargs  brew install 
 
 
 # Linux installation
@@ -78,18 +39,7 @@ install_Linux: install_$(LINUX_DISTRO)
 install_Debian: apt-installation
 install_Ubuntu: apt-installation
 apt-installation:
-	sudo apt-get install -y python3 python3-dev python3-pip sox jpegoptim tesseract-ocr tesseract-ocr-eng libjpeg-dev virtualenv ffmpeg
-	#if dpkg -s ffmpeg ; then \
-	#	echo ffmpeg already installed ;\
-	#else \
-	#	echo installing ffmpeg ;\
-		#sudo add-apt-repository ppa:motumedia/libav-daily ;\
-		#sudo add-apt-repository ppa:jon-severinsson/ffmpeg ;\
-	#	sudo apt-get update ;\
-	#	sudo apt-get install -y ffmpeg \
-		#libavcodec-extra-53
-	#fi
-
+	cat $(DEPENDENCIES_APT) |xargs  sudo apt-get install -y
 
 .PHONY: has-python3
 has-python3:
@@ -100,13 +50,13 @@ has-python3:
 $(ENV):
 	virtualenv --no-site-packages -p python3 $(ENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r $(PYTHON_DEPENDENCYS)
+	$(PIP) install -r $(DEPENDENCIES_PYTHON)
 
 
 .PHONY: upgrade
 upgrade:
-	$(PIP) install -r $(PYTHON_DEPENDENCYS) --upgrade
-	brew reinstall jpegoptim tesseract sox ffmpeg
+	$(PIP) install -r $(DEPENDENCIES_PYTHON) --upgrade
+	cat $(DEPENDENCIES_BREW) |xargs  brew upgrade 
 
 
 libs:

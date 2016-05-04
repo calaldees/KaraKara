@@ -1,4 +1,8 @@
 
+.PHONY: help
+help:
+	# KaraKara
+
 build_docker:
 	#docker run --rm -i -t karakara /bin/bash
 	docker build -t karakara --file karakara.Dockerfile .
@@ -59,11 +63,8 @@ travis_install:
 	done
 
 travis_test:
-	set -e; \
 	for project in $(TRAVIS_PROJECTS); do \
-		cd $$project; \
-		$(MAKE) test; \
-		cd ..; \
+		$(MAKE) test --directory $$project ; \
 	done
 
 # Clean ------------------------------------------------------------------------
