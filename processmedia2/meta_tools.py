@@ -1,7 +1,7 @@
 import os
-import operator
 import re
 from collections import defaultdict, namedtuple
+from pprint import pprint
 
 from libs.misc import postmortem, flatten
 
@@ -17,12 +17,28 @@ VERSION = '0.0.0'
 
 FileItem = namedtuple('FileItem', ('type', 'relative', 'absolute', 'exists'))
 
+
+class tcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    ENDC = '\033[0m'
+
+class terminal:
+    INDENTATION = '    '
+    OK = tcolors.OKGREEN + '✔' + tcolors.ENDC
+    FAIL = tcolors.FAIL + '✘' + tcolors.ENDC
+
 # Main -------------------------------------------------------------------------
 
 
 def meta_tools(name_regex=None, **kwargs):
     file_details = get_file_details(name_regex, kwargs['path_source'], kwargs['path_meta'], kwargs['path_processed'])
-
+    print_formated(file_details)
 
 def get_file_details(name_regex, path_source, path_meta, path_processed):
     fileitem_wrapper = FileItemWrapper(path_source)
@@ -42,29 +58,22 @@ def get_file_details(name_regex, path_source, path_meta, path_processed):
     file_details = defaultdict(list)
     for m in meta_items:
         for f in filter(None, (f for f in fileitem_wrapper.wrap_scan_data(m).values())):
-            file_details[m.name].append(FileItem('source', f['realtive'], f['absolute'], lambda: os.path.exists(f['absolute'])))
+            file_details[m.name].append(FileItem('source', f['relative'], f['absolute'], lambda: os.path.exists(f['absolute'])))
         for f in flatten(processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash).values()):
             file_details[m.name].append(FileItem('processed', f.relative, f.absolute, lambda: os.path.exists(f.absolute)))
     return file_details
 
 
 def print_formated(file_details, **kwargs):
-    def print_files(files, indentation='  '):
-        for f in files:
-            print('{}{}'.format(indentation, f))
+    def print_file(file_detail):
+        print('{indendation}{filename} {exists}'.format(indendation=terminal.INDENTATION, filename=file_detail.relative, exists=(terminal.OK if file_detail.exists() else terminal.FAIL)))
 
-    #indentation = ''
-    #if kwargs.get('pretty'):
-        #print(m.name)
-    #    indentation = '  '
-    #if kwargs.get('showsource'):
-        #print_files(source_files, indentation)
-    #if kwargs.get('showprocessed'):
-    #    print_files(processed_files, indentation)
-
-    #if kwargs.get('pretty'):
-    #    print()
-
+    for title, files in file_details.items():
+        print(tcolors.BOLD + title + tcolors.ENDC)
+        for source_file in filter(lambda f: f.type == 'source', files):
+            print_file(source_file)
+        for processed_file in filter(lambda f: f.type == 'processed', files):
+            print_file(processed_file)
 
 
 # Arguments --------------------------------------------------------------------
