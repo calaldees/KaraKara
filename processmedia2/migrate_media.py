@@ -5,7 +5,7 @@ from functools import partial
 from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter, flatten, first
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args, ALL_EXTS
+from processmedia_libs import add_default_argparse_args, parse_args, ALL_EXTS
 
 from scan_media import DEFAULT_IGNORE_FILE_REGEX
 
@@ -95,9 +95,7 @@ def get_args():
 
     parser.add_argument('--path_destination', action='store', help='Destination for migrated files')
 
-    args_dict = vars(parser.parse_args())
-
-    return args_dict
+    return parse_args(parser)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import os
 
 from libs.misc import postmortem, flatten
 
-from processmedia_libs import add_default_argparse_args
+from processmedia_libs import add_default_argparse_args, parse_args
 from processmedia_libs.meta_manager import MetaManager
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
@@ -52,9 +52,7 @@ def get_args():
 
     add_default_argparse_args(parser)
 
-    args_dict = vars(parser.parse_args())
-
-    return args_dict
+    return parse_args(parser)
 
 
 if __name__ == "__main__":

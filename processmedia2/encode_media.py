@@ -7,7 +7,7 @@ from clint.textui.progress import bar as progress_bar
 from libs.misc import postmortem, hashfile, freeze, first, file_ext
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args, EXTS, PENDING_ACTION
+from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
 from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
 from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
@@ -358,7 +358,7 @@ def get_args():
 
     parser.add_argument('--process_order_function', choices=PROCESS_ORDER_FUNCS.keys(), help='', default=DEFAULT_ORDER_FUNC)
 
-    args_dict = vars(parser.parse_args())
+    args_dict = parse_args(parser)
 
     args_dict['process_order_function'] = PROCESS_ORDER_FUNCS[args_dict['process_order_function']]
 

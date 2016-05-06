@@ -21,7 +21,7 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: install_$(OS) $(ENV) libs
+install: install_$(OS) $(ENV) libs config.json
 
 # OSX installation
 .PHONY: install_Darwin has-brew
@@ -71,6 +71,11 @@ libs:
 		wget -cq https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/file.py        ;\
 	fi
 
+
+# Config -----------------------------------------------------------------------
+
+config.json:
+	cp config.json.dist config.json
 
 # Run --------------------------------------------------------------------------
 .PHONY: scan encode import cleanup process

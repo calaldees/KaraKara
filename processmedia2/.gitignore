@@ -1,4 +1,5 @@
 .cache
-env
+_env
 libs
 divx2pass*
+config.json

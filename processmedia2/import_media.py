@@ -2,7 +2,7 @@ from collections import defaultdict
 from pprint import pprint
 
 from libs.misc import postmortem, fast_scan, epoc, first
-from processmedia_libs import add_default_argparse_args, PENDING_ACTION
+from processmedia_libs import add_default_argparse_args, parse_args, PENDING_ACTION
 
 from processmedia_libs.meta_manager import MetaManager
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
@@ -203,9 +203,7 @@ def get_args():
     parser.add_argument('--config_uri', action='store', help='', default='development.ini')
     parser.add_argument('--stat_limit', type=int, help='Max number of metanames to display in summary before replacing them with a count', default=100)
 
-    args_dict = vars(parser.parse_args())
-
-    return args_dict
+    return parse_args(parser)
 
 
 if __name__ == "__main__":

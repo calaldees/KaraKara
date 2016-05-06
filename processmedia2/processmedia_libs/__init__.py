@@ -1,3 +1,5 @@
+import json
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -12,19 +14,30 @@ EXTS = dict(
 ALL_EXTS = tuple(j for i in EXTS.values() for j in i)
 
 DEFAULT_VERSION = '0.0.0'
-DEFAULT_PATH_SOURCE = '../mediaserver/www/files/'
-DEFAULT_PATH_PROCESSED = '../mediaserver/www/processed/'
-DEFAULT_PATH_META = '../mediaserver/www/meta/'
 
 PENDING_ACTION = dict(
     encode='encode',
 )
 
+DEFAULT_CONFIG_FILENAME = 'config.json'
+
 
 def add_default_argparse_args(parser, version=DEFAULT_VERSION):
-    parser.add_argument('--path_source', action='store', help='', default=DEFAULT_PATH_SOURCE)
-    parser.add_argument('--path_processed', action='store', help='', default=DEFAULT_PATH_PROCESSED)
-    parser.add_argument('--path_meta', action='store', help='', default=DEFAULT_PATH_META)
+    parser.add_argument('--config', action='store', help='', default=DEFAULT_CONFIG_FILENAME)
 
-    parser.add_argument('--log_level', type=int, help='log level', default=logging.INFO)
+    parser.add_argument('--path_source', action='store', help='')
+    parser.add_argument('--path_processed', action='store', help='')
+    parser.add_argument('--path_meta', action='store', help='')
+
+    parser.add_argument('--log_level', type=int, help='log level')
     parser.add_argument('--version', action='version', version=version)
+
+
+def parse_args(parser):
+    return apply_config(vars(parser.parse_args()))
+
+
+def apply_config(args_dict):
+    with open(args_dict['config'], 'r') as config_filehandle:
+        config = json.load(config_filehandle)
+        return {k: v or config[k] for k, v in args_dict.items()}
