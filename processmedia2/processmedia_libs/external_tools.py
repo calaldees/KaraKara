@@ -25,7 +25,7 @@ CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
 CONFIG = {
     'threads': 2,
-    'process_timeout_seconds': 30 * 60,
+    'process_timeout_seconds': 60 * 60,
     'log_level': 'warning',
     'h264_codec': 'libx264',  # 'libx264',  # 'h264',
     'preview_width': 320,
@@ -39,6 +39,7 @@ CONFIG.update({
         'bf': 0,  # wha dis do?
         'qmax': 1,  # wha dis do?
         'vf': CONFIG['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+        'threads': CONFIG['threads'],
     },
     'extract_audio': {
         'vcodec': 'none',
@@ -55,6 +56,7 @@ CONFIG.update({
         'acodec': 'aac',
         'strict': 'experimental',
         'ab': '196k',
+        'threads': CONFIG['threads'],
     },
     'encode_preview': {
         'vcodec': CONFIG['h264_codec'],
@@ -64,6 +66,7 @@ CONFIG.update({
         'acodec': 'aac',  # libfdk_aac
         'strict': 'experimental',
         'ab': '48k',
+        'threads': CONFIG['threads'],
         #'profile:a': 'aac_he_v1',
         #ac=1,
     },
@@ -79,7 +82,7 @@ CONFIG.update({
 
 ENCODE_VIDEO_COMMON_ARGS = cmd_args(
     'ffmpeg',
-    threads=CONFIG['threads'],
+    #threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],
     y=None,
 )
