@@ -43,8 +43,11 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
             m.name for m in meta.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
         #(
+            #'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
+            #'Nana (anime) - OP - Rose',  # SSA's have malformed unicode characters
+            #'Frozen Japanise (find real name)'  # took too long to process
             #'Lunar Silver Star Story - OP - Wings (Japanese Version)',
-            #'Evangleion ED - Fly Me To The Moon',
+            #'Evangleion ED - Fly Me To The Moon',  # Odd dimensions and needs to be normalised
         #    'AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu',
         #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
         #'Gosick - ED2 - Unity (full length)',
@@ -146,6 +149,10 @@ class Encoder(object):
 
         # 1.) Probe media to persist source details in meta
         self._update_source_details(m, source_files)
+
+        if not m.source_details.get('duration'):
+            log.error('Unable to identify source duration. Maybe the source file is damaged? {}'.format(m.name))
+            return False
 
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
