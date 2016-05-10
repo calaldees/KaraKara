@@ -46,7 +46,7 @@ class MetaViewer(object):
 
         file_details = defaultdict(list)
         for m in meta_items:
-            for f in filter(None, (f for f in self.source_files_manager.wrap_scan_data(m).values())):
+            for f in filter(None, (f for f in self.source_files_manager.get_source_files(m).values())):
                 file_details[m.name].append(FileItem('source', f['relative'], f['absolute'], lazy_exists(f['absolute'])))
             for f in flatten(self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash).values()):
                 file_details[m.name].append(FileItem('processed', f.relative, f.absolute, lazy_exists(f.absolute)))

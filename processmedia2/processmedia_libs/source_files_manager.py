@@ -3,9 +3,14 @@ from collections import ChainMap
 from libs.misc import file_ext, first
 
 from . import EXTS
+from .meta_manager import MetaManager
 
 import logging
 log = logging.getLogger(__name__)
+
+MEDIA_FILETYPES = {'video', 'audio', 'sub', 'image'}
+DATA_FILETYPES = {'tag', }
+ALL_FILETYPES = MEDIA_FILETYPES | DATA_FILETYPES
 
 
 class SourceFilesManager(object):
@@ -15,15 +20,20 @@ class SourceFilesManager(object):
     this data dict.
     Because this wrapper can alter the underlying dict in memory, there is no need
     for any complex coupling or communication between the object types.
-    Some might call me crazy, but until anyone cares enough to assit with a
-    code review, this is the way it will stay.
+    How about we create a Mixin of MetaDataManager that can inited with a source path and have @property source_files
     """
     def __init__(self, source_path):
         self.source_path = source_path
 
-    def wrap_scan_data(self, metafile):
+    def get_source_files(self, metafile):
+        return self._wrap_scan_data(metafile, ALL_FILETYPES)
+
+    def get_source_media_files(self, metafile):
+        return self._wrap_scan_data(metafile, MEDIA_FILETYPES)
+
+    def _wrap_scan_data(self, metafile, filetypes):
         wrapped_scan_data = tuple(self._wrap_scan_data_item(d) for d in metafile.scan_data.values())
-        return {k: self._get_file_for(k, wrapped_scan_data) for k in ('video', 'audio', 'sub', 'image', 'tag')}
+        return {k: self._get_file_for(k, wrapped_scan_data) for k in filetypes}
 
     def _wrap_scan_data_item(self, data):
         """
@@ -54,3 +64,15 @@ class SourceFilesManager(object):
         if len(files_for_type) > 1:
             log.warn('Multiple files for type %s identifyed %s. This may be a mistake. Using only first one', file_type, [f['relative'] for f in files_for_type])
         return first(files_for_type) or {}
+
+
+class MetaManagerWithSourceFiles(MetaManager):
+    def __init__(self, *args, source_path=None, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self.source_files_manager = SourceFilesManager(source_path)
+
+    def get(self, name):
+        metafile = super().get(name)
+        metafile.source_files = lambda: self.source_files_manager.get_source_files(metafile)
+        metafile.source_media_files = lambda: self.source_files_manager.get_source_media_files(metafile)
+        return metafile

@@ -112,7 +112,7 @@ class Encoder(object):
         m = self.meta.get(name)
 
         def encode_steps(m):
-            source_files = self._get_source_files(m)
+            source_files = self.source_files_manager.get_source_files(m)
             yield self._update_source_hash(m, source_files)
             #target_files = 
             yield self._encode_primary_video_from_meta(m, source_files)
@@ -127,16 +127,13 @@ class Encoder(object):
                 pass
             self.meta.save(name)
 
-    def _get_source_files(self, m):
-        return self.source_files_manager.wrap_scan_data(m)
-
     def _update_source_hash(self, m, source_files=None):
-        source_files = source_files or self._get_source_files(m)
+        source_files = source_files or self.source_files_manager.get_source_files(m)
         m.source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
         return m.source_hash
 
     def _update_source_details(self, m, source_files=None):
-        source_files = source_files or self._get_source_files(m)
+        source_files = source_files or self.source_files_manager.get_source_files(m)
         source_details = {}
         source_details.update({k:v for k, v in external_tools.probe_media(source_files['image'].get('absolute')).items() if k in ('width', 'height')})
         source_details.update({k:v for k, v in external_tools.probe_media(source_files['audio'].get('absolute')).items() if k in ('duration',)})
@@ -291,7 +288,7 @@ class Encoder(object):
 
         source_file_absolute = source_files['video'].get('absolute')
         if not source_file_absolute:  # If no video source, attempt to degrade to single image input
-            source_file_absolute = self.source_files_manager.wrap_scan_data(m)['image'].get('absolute')
+            source_file_absolute = self.source_files_manager.get_source_files(m)['image'].get('absolute')
         if not source_file_absolute:
             log.warn('No video or image input in meta to extract thumbnail images')
             return False
