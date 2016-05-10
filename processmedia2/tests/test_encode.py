@@ -1,8 +1,10 @@
 import pytest
+import os
+
 import pytesseract
 from PIL import Image
 
-from libs.misc import color_distance, color_close
+from libs.misc import color_distance, color_close, flatten
 from processmedia_libs.external_tools import probe_media, get_frame_from_video, CONFIG as ENCODE_CONFIG
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 
@@ -123,6 +125,27 @@ def test_encode_video_not_multiple_of_2():
 def test_encode_image_not_multiple_of_2():
     pytest.skip("TODO")
 
+
+def test_update_to_tag_file_does_not_reencode_video():
+    with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
+        manager.scan_media()
+        # manager.gen_source_hash('test1')
+        # processed_files = manager.processed_files('test1')
+        # manager.mock_processed_files(
+        #     processed_file.relative for processed_file in flatten(processed_files)
+        # )
+        # import pdb ; pdb.set_trace()
+        # os.stat(os.path.join(manager.path_processed, processed_files['video'][0]))
+        # 
+        # # Modify the tags file
+        # with open(os.path.join(manager.path_source, 'test1.txt'), 'a') as f:
+        #     f.write('\n extra \n')
+        # 
+        # manager.encode_media()
+
+
+
+# Utils ------------------------------------------------------------------------
 
 def read_subtitle_text(image, color):
     return pytesseract.image_to_string(extract_image_color(image, color)).strip()

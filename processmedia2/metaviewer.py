@@ -7,7 +7,8 @@ from collections import defaultdict, namedtuple
 from libs.misc import flatten  #  postmortem,
 
 from processmedia_libs import add_default_argparse_args, parse_args
-from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
+from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs.source_files_manager import SourceFilesManager
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
 import logging
@@ -25,7 +26,7 @@ FileItem = namedtuple('FileItem', ('type', 'relative', 'absolute', 'exists'))
 class MetaViewer(object):
 
     def __init__(self, path_meta=None, path_processed=None, path_source=None, **kwargs):
-        self.fileitem_wrapper = FileItemWrapper(path_source)
+        self.source_files_manager = SourceFilesManager(path_source)
         self.meta = MetaManager(path_meta)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
 
@@ -45,7 +46,7 @@ class MetaViewer(object):
 
         file_details = defaultdict(list)
         for m in meta_items:
-            for f in filter(None, (f for f in self.fileitem_wrapper.wrap_scan_data(m).values())):
+            for f in filter(None, (f for f in self.source_files_manager.wrap_scan_data(m).values())):
                 file_details[m.name].append(FileItem('source', f['relative'], f['absolute'], lazy_exists(f['absolute'])))
             for f in flatten(self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash).values()):
                 file_details[m.name].append(FileItem('processed', f.relative, f.absolute, lazy_exists(f.absolute)))

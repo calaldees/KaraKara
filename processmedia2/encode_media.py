@@ -9,7 +9,8 @@ from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
-from processmedia_libs.meta_manager import MetaManager, FileItemWrapper
+from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs.source_files_manager import SourceFilesManager
 from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
 from processmedia_libs import subtitle_processor
 
@@ -43,6 +44,7 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
             m.name for m in meta.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
         #(
+            #'Ikimonogakari - Sakura', # Takes 2 hours to encode
             #'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
             #'Nana (anime) - OP - Rose',  # SSA's have malformed unicode characters
             #'Frozen Japanise (find real name)'  # took too long to process
@@ -94,7 +96,7 @@ class Encoder(object):
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
         self.meta = meta_manager or MetaManager(path_meta)
-        self.fileitem_wrapper = FileItemWrapper(path_source)
+        self.source_files_manager = SourceFilesManager(path_source)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
 
     def _get_meta(self, name):
@@ -126,9 +128,9 @@ class Encoder(object):
             self.meta.save(name)
 
     def _get_source_files(self, m):
-        return self.fileitem_wrapper.wrap_scan_data(m)
+        return self.source_files_manager.wrap_scan_data(m)
 
-    def _update_source_hash(self, m, source_files):
+    def _update_source_hash(self, m, source_files=None):
         source_files = source_files or self._get_source_files(m)
         m.source_hash = gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
         return m.source_hash
@@ -289,7 +291,7 @@ class Encoder(object):
 
         source_file_absolute = source_files['video'].get('absolute')
         if not source_file_absolute:  # If no video source, attempt to degrade to single image input
-            source_file_absolute = self.fileitem_wrapper.wrap_scan_data(m)['image'].get('absolute')
+            source_file_absolute = self.source_files_manager.wrap_scan_data(m)['image'].get('absolute')
         if not source_file_absolute:
             log.warn('No video or image input in meta to extract thumbnail images')
             return False

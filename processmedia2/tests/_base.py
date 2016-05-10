@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from scan_media import scan_media
-from encode_media import encode_media
+from encode_media import encode_media, Encoder
 from processmedia_libs.meta_manager import MetaManager
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
@@ -81,6 +81,13 @@ class ProcessMediaTestManager(object):
             with open(os.path.join(self.path_meta, filename), 'w') as meta_filehandle:
                 json.dump(meta_data, meta_filehandle)
         self.meta_manager.load_all()
+
+    def gen_source_hash(self, name):
+        self.meta_manager._release_cache()
+        self.meta_manager.load(name)
+        m = self.meta_manager.get(name)
+        Encoder(meta_manager=self.meta_manager, path_processed=self.path_processed, path_source=self.path_source)._update_source_hash(m)
+        self.meta_manager.save(name)
 
     def get_source_hash(self, name):
         self.meta_manager._release_cache()
