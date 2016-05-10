@@ -1,7 +1,8 @@
 import os
 from collections import ChainMap
-from libs.misc import file_ext, first
+from functools import lru_cache
 
+from libs.misc import file_ext, first
 from . import EXTS
 from .meta_manager import MetaManager
 
@@ -67,12 +68,21 @@ class SourceFilesManager(object):
 
 
 class MetaManagerWithSourceFiles(MetaManager):
-    def __init__(self, *args, source_path=None, **kwargs):
-        super().__init__(self, *args, **kwargs)
-        self.source_files_manager = SourceFilesManager(source_path)
+    """
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(kwargs['path_meta'])
+        self.source_files_manager = SourceFilesManager(kwargs['path_source'])
 
     def get(self, name):
         metafile = super().get(name)
-        metafile.source_files = lambda: self.source_files_manager.get_source_files(metafile)
-        metafile.source_media_files = lambda: self.source_files_manager.get_source_media_files(metafile)
+        #@property
+        @lru_cache(maxsize=1)
+        def get_source_files(self):
+            return self.source_files_manager.get_source_files(metafile)
+        #@property
+        @lru_cache(maxsize=1)
+        def get_source_meta_files(self):
+            return self.source_files_manager.get_source_media_files(metafile)
+        metafile.source_files = get_source_files(self)  # DO NOT WANT! Want lazy propery instread
         return metafile

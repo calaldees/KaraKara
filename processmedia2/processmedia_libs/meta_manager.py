@@ -11,10 +11,11 @@ log = logging.getLogger(__name__)
 
 class MetaManager(object):
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, path_meta=None):
+        assert path_meta
+        self.path = path_meta
         self._release_cache()
-        os.makedirs(os.path.abspath(path), exist_ok=True)
+        os.makedirs(os.path.abspath(self.path), exist_ok=True)
 
     def _release_cache(self):
         self.meta = {}
