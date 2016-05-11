@@ -9,10 +9,10 @@ from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
-from processmedia_libs.source_files_manager import SourceFilesManager
-from processmedia_libs.processed_files_manager import ProcessedFilesManager
-from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor
+from processmedia_libs.meta_overlay import MetaManagerExtended
+from processmedia_libs.processed_files_manager import ProcessedFilesManager
+DEFAULT_NUMBER_OF_IMAGES = ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES
 
 
 import logging
@@ -95,8 +95,7 @@ class Encoder(object):
     """
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
-        self.meta = meta_manager or MetaManagerExtended(path_meta=path_meta, path_source=path_source)  # This 'or' needs to go
-        self.processed_files_manager = ProcessedFilesManager(path_processed)
+        self.meta = meta_manager or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
 
     def _get_meta(self, name):
         self.meta.load(name)
@@ -138,7 +137,7 @@ class Encoder(object):
         m.source_details.update(source_details)
 
     def _encode_primary_video_from_meta(self, m):
-        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
+        target_file = m.get_processed_file('video')
         if target_file.exists:
             log.debug('Processed Destination was created with the same input sources - no encoding required')
             return True
@@ -224,7 +223,7 @@ class Encoder(object):
         Always output an srt (even if it contains no subtitles)
         This is required for the importer to verify the processed fileset is complete
         """
-        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'srt')
+        target_file = m.get_processed_file('srt')
         if target_file.exists:
             log.debug('Processed srt exists - no parsing required')
             return True
@@ -251,12 +250,12 @@ class Encoder(object):
         return True
 
     def _encode_preview_video_from_meta(self, m):
-        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'preview')
+        target_file = m.get_processed_file('preview')
         if target_file.exists:
             log.debug('Processed preview was created with the same input sources - no encoding required')
             return True
 
-        source_file = self.processed_files_manager.get_processed_file(m.source_hash, 'video')
+        source_file = m.get_processed_file('video')
         if not source_file.exists:
             log.error('No source video to encode preview from')
             return False
@@ -274,9 +273,9 @@ class Encoder(object):
 
         return True
 
-    def _encode_images_from_meta(self, m, num_images=ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES):
+    def _encode_images_from_meta(self, m, num_images=DEFAULT_NUMBER_OF_IMAGES):
         target_files = tuple(
-            self.processed_files_manager.get_processed_file(m.source_hash, 'image', index)
+            m.get_processed_file('image', index)
             for index in range(num_images)
         )
         if all(target_file.exists for target_file in target_files):
@@ -327,7 +326,7 @@ class Encoder(object):
         No processing ... this is just a copy
         """
         source_file = m.source_files['tag'].get('absolute')
-        target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'tags')
+        target_file = m.get_processed_file('tags')
 
         if not source_file:
             log.warn('No tag file provided')

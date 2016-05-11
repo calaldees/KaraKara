@@ -2,7 +2,7 @@ from functools import lru_cache
 
 from .meta_manager import MetaManager, MetaFile
 from .source_files_manager import SourceFilesManager
-from .processed_files_manager import gen_string_hash
+from .processed_files_manager import ProcessedFilesManager, gen_string_hash
 
 
 class MetaManagerExtended(MetaManager):
@@ -11,14 +11,16 @@ class MetaManagerExtended(MetaManager):
     def __init__(self, *args, **kwargs):
         super().__init__(kwargs['path_meta'])
         self.source_files_manager = SourceFilesManager(kwargs['path_source'])
+        self.processed_files_manager = ProcessedFilesManager(kwargs['path_processed'])
 
     def get(self, name):
-        return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager)
+        return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager, self.processed_files_manager)
 
     class MetaFileWithSourceFiles(MetaFile):
-        def __init__(self, metafile, source_files_manager):
+        def __init__(self, metafile, source_files_manager, processed_files_manager):
             self.__dict__ = metafile.__dict__
             self.source_files_manager = source_files_manager
+            self.processed_files_manager = processed_files_manager
 
         @property
         @lru_cache(maxsize=1)
@@ -42,3 +44,6 @@ class MetaManagerExtended(MetaManager):
             self.source_media_hash = gen_hash(self.source_media_files)
             self.source_data_hash = gen_hash(self.source_data_files)
             return all((self.source_hash, self.source_media_hash, self.source_data_hash))
+
+        def get_processed_file(self, file_type, *args):
+            return self.processed_files_manager.get_processed_file(self.source_hash, file_type, *args)
