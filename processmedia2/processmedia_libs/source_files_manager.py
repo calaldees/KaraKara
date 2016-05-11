@@ -4,7 +4,7 @@ from functools import lru_cache
 
 from libs.misc import file_ext, first
 from . import EXTS
-from .meta_manager import MetaManager
+from .meta_manager import MetaManager, MetaFile
 
 import logging
 log = logging.getLogger(__name__)
@@ -78,8 +78,24 @@ class MetaManagerWithSourceFiles(MetaManager):
         self.source_files_manager = SourceFilesManager(kwargs['path_source'])
 
     def get(self, name):
-        metafile = super().get(name)
-        metafile.source_files = lru_cache(maxsize=1)(lambda: self.source_files_manager.get_source_files(metafile))
-        metafile.source_media_files = lru_cache(maxsize=1)(lambda: self.source_files_manager.get_source_media_files(metafile))
-        metafile.source_data_files = lru_cache(maxsize=1)(lambda: self.source_files_manager.get_source_data_files(metafile))
-        return metafile
+        return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager)
+
+    class MetaFileWithSourceFiles(MetaFile):
+        def __init__(self, metafile, source_files_manager):
+            self.__dict__ = metafile.__dict__
+            self.source_files_manager = source_files_manager
+
+        @property
+        @lru_cache(maxsize=1)
+        def source_files(self):
+            return self.source_files_manager.get_source_files(self)
+
+        @property
+        @lru_cache(maxsize=1)
+        def source_media_files(self):
+            return self.source_files_manager.get_source_media_files(self)
+
+        @property
+        @lru_cache(maxsize=1)
+        def source_data_files(self):
+            return self.source_files_manager.get_source_data_files(self)
