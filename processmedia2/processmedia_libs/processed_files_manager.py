@@ -4,20 +4,21 @@ import hashlib
 from collections import namedtuple, defaultdict
 from libs.misc import fast_scan
 
-ProcessedFileType = namedtuple('ProcessedFileType', ('type', 'ext', 'salt'))
+ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_type', 'attachment_type', 'ext', 'salt'))
 
 
 class ProcessedFilesManager(object):
     DEFAULT_NUMBER_OF_IMAGES = 4
     FILE_TYPE_LOOKUP = {
-        processed_file_type.type: processed_file_type
+        processed_file_type.attachment_type: processed_file_type
         for processed_file_type in (
             # NOTE: These must match the attachment_types in the Track model
-            ProcessedFileType('image', 'jpg', ''),
-            ProcessedFileType('video', 'mp4', ''),
-            ProcessedFileType('preview', 'mp4', ''),
-            ProcessedFileType('srt', 'srt', ''),
-            ProcessedFileType('tags', 'txt', ''),
+            ProcessedFileType('media', 'image', 'jpg', ''),
+            ProcessedFileType('media', 'video', 'mp4', ''),
+            ProcessedFileType('media', 'preview', 'mp4', ''),
+
+            ProcessedFileType('data', 'srt', 'srt', ''),
+            ProcessedFileType('data', 'tags', 'txt', ''),
         )
     }
 
@@ -31,7 +32,7 @@ class ProcessedFilesManager(object):
         assert source_hash, 'source_hash can never be None. Investigation needed'
         file_type = self.FILE_TYPE_LOOKUP[file_type]
         return self._factory(
-            (source_hash, file_type.type, file_type.salt, ''.join((str(a) for a in args))),
+            (source_hash, file_type.attachment_type, file_type.salt, ''.join((str(a) for a in args))),
             file_type.ext
         )
 
