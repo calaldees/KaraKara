@@ -9,7 +9,6 @@ from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
-#from processmedia_libs.meta_manager import MetaManager
 from processmedia_libs.source_files_manager import SourceFilesManager, MetaManagerWithSourceFiles
 from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
 from processmedia_libs import subtitle_processor
@@ -96,8 +95,6 @@ class Encoder(object):
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
         self.meta = meta_manager or MetaManagerWithSourceFiles(path_meta=path_meta, path_source=path_source)
-        #self.meta = meta_manager or MetaManager(path_meta)
-        #self.source_files_manager = SourceFilesManager(path_source)
         self.processed_files_manager = ProcessedFilesManager(path_processed)
 
     def _get_meta(self, name):
@@ -113,7 +110,6 @@ class Encoder(object):
         m = self.meta.get(name)
 
         def encode_steps(m):
-            #source_files = self.source_files_manager.get_source_files(m)
             yield self._update_source_hash(m)
             yield self._encode_primary_video_from_meta(m)
             yield self._encode_srt_from_meta(m)
@@ -128,22 +124,24 @@ class Encoder(object):
             self.meta.save(name)
 
     def _update_source_hash(self, m):
-        #source_files = source_files or self.source_files_manager.get_source_files(m)
-        m.source_hash = gen_string_hash(f['hash'] for f in m.source_files.values() if f)  # Derive the source hash from the child component hashs
-        return m.source_hash
+        def gen_hash(source_files):
+            return gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
+        m.source_hash = gen_hash(m.source_files())
+        m.source_media_hash = gen_hash(m.source_media_files())
+        m.source_data_hash = gen_hash(m.source_data_files())
+        return all((m.source_hash, m.source_media_hash, m.source_data_hash))
 
     def _update_source_details(self, m):
-        #source_files = source_files or self.source_files_manager.get_source_files(m)
         source_details = {}
         source_details.update({
-            k: v for k, v in external_tools.probe_media(m.source_files['image'].get('absolute')).items()
+            k: v for k, v in external_tools.probe_media(m.source_files()['image'].get('absolute')).items()
             if k in ('width', 'height')
         })
         source_details.update({
-            k: v for k, v in external_tools.probe_media(m.source_files['audio'].get('absolute')).items()
+            k: v for k, v in external_tools.probe_media(m.source_files()['audio'].get('absolute')).items()
             if k in ('duration',)
         })
-        source_details.update(external_tools.probe_media(m.source_files['video'].get('absolute')))
+        source_details.update(external_tools.probe_media(m.source_files()['video'].get('absolute')))
         m.source_details.update(source_details)
 
     def _encode_primary_video_from_meta(self, m):
@@ -162,13 +160,13 @@ class Encoder(object):
         with tempfile.TemporaryDirectory() as tempdir:
             # 3.) Convert souce formats into appropriate formats for video encoding
 
-            absolute_video_to_encode = m.source_files['video'].get('absolute')
+            absolute_video_to_encode = m.source_files()['video'].get('absolute')
 
             # 3.a) Convert Image to Video
-            if m.source_files['image'] and not absolute_video_to_encode:
+            if m.source_files()['image'] and not absolute_video_to_encode:
                 absolute_video_to_encode = os.path.join(tempdir, 'image.mp4')
                 external_tools.encode_image_to_video(
-                    source=m.source_files['image']['absolute'],
+                    source=m.source_files()['image']['absolute'],
                     destination=absolute_video_to_encode,
                     **m.source_details
                 )
@@ -182,15 +180,15 @@ class Encoder(object):
 
             # 3.b) Read + normalize subtitle file
             absolute_ssa_to_encode = None
-            if m.source_files['sub']:
+            if m.source_files()['sub']:
                 # Parse input subtitles
-                subtitles = subtitle_processor.parse_subtitles(filename=m.source_files['sub']['absolute'])
+                subtitles = subtitle_processor.parse_subtitles(filename=m.source_files()['sub']['absolute'])
                 if not subtitles:
                     log.error(
                         'Subtitle file explicity given, but was unable to parse any subtitles from it. '
                         'There may be an issue with parsing. '
                         'A Common cause is SSA files that have subtitles aligned at top are ignored. '
-                        '{}'.format(m.source_files['sub']['absolute'])
+                        '{}'.format(m.source_files()['sub']['absolute'])
                     )
                     return False
 
@@ -205,7 +203,7 @@ class Encoder(object):
             encode_steps = (
                 # 4.a) Render audio and normalize
                 lambda: external_tools.encode_audio(
-                    source=m.source_files['audio'].get('absolute') or m.source_files['video'].get('absolute'),
+                    source=m.source_files()['audio'].get('absolute') or m.source_files()['video'].get('absolute'),
                     destination=os.path.join(tempdir, 'audio.wav'),
                 ),
 
@@ -239,7 +237,7 @@ class Encoder(object):
             return True
 
         subtitles = []
-        source_file_absolute = m.source_files['sub'].get('absolute')
+        source_file_absolute = m.source_files()['sub'].get('absolute')
         if not source_file_absolute:
             log.warn('No sub file listed in source set. {}'.format(m.name))
         elif not os.path.exists(source_file_absolute):
@@ -292,9 +290,9 @@ class Encoder(object):
             log.debug('Processed Destination was created with the same input sources - no thumbnail gen required')
             return True
 
-        source_file_absolute = m.source_files['video'].get('absolute')
+        source_file_absolute = m.source_files()['video'].get('absolute')
         if not source_file_absolute:  # If no video source, attempt to degrade to single image input
-            source_file_absolute = m.source_files['image'].get('absolute')
+            source_file_absolute = m.source_files()['image'].get('absolute')
         if not source_file_absolute:
             log.warn('No video or image input in meta to extract thumbnail images')
             return False
@@ -335,7 +333,7 @@ class Encoder(object):
         """
         No processing ... this is just a copy
         """
-        source_file = m.source_files['tag'].get('absolute')
+        source_file = m.source_files()['tag'].get('absolute')
         target_file = self.processed_files_manager.get_processed_file(m.source_hash, 'tags')
 
         if not source_file:

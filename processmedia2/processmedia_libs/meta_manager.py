@@ -101,6 +101,8 @@ class MetaManager(object):
 class MetaFile(object):
 
     SOURCE_HASH_KEY = 'source_hash'
+    SOURCE_MEDIA_HASH_KEY = 'source_media_hash'
+    SOURCE_DATA_HASH_KEY = 'source_data_hash'
 
     def __init__(self, name, data):
         self.name = name
@@ -158,3 +160,17 @@ class MetaFile(object):
     @source_hash.setter
     def source_hash(self, value):
         self.source_details[self.SOURCE_HASH_KEY] = value
+
+    @property
+    def source_media_hash(self):
+        return self.source_details.get(self.SOURCE_MEDIA_HASH_KEY)
+    @source_media_hash.setter
+    def source_media_hash(self, value):
+        self.source_details[self.SOURCE_MEDIA_HASH_KEY] = value
+
+    @property
+    def source_data_hash(self):
+        return self.source_details.get(self.SOURCE_DATA_HASH_KEY)
+    @source_data_hash.setter
+    def source_data_hash(self, value):
+        self.source_details[self.SOURCE_DATA_HASH_KEY] = value

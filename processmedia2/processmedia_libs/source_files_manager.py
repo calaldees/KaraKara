@@ -10,7 +10,7 @@ import logging
 log = logging.getLogger(__name__)
 
 MEDIA_FILETYPES = {'video', 'audio', 'sub', 'image'}
-DATA_FILETYPES = {'tag', }
+DATA_FILETYPES = {'tag', 'sub'}
 ALL_FILETYPES = MEDIA_FILETYPES | DATA_FILETYPES
 
 
@@ -31,6 +31,9 @@ class SourceFilesManager(object):
 
     def get_source_media_files(self, metafile):
         return self._wrap_scan_data(metafile, MEDIA_FILETYPES)
+
+    def get_source_data_files(self, metafile):
+        return self._wrap_scan_data(metafile, DATA_FILETYPES)
 
     def _wrap_scan_data(self, metafile, filetypes):
         wrapped_scan_data = tuple(self._wrap_scan_data_item(d) for d in metafile.scan_data.values())
@@ -76,13 +79,7 @@ class MetaManagerWithSourceFiles(MetaManager):
 
     def get(self, name):
         metafile = super().get(name)
-        #@property
-        @lru_cache(maxsize=1)
-        def get_source_files(self):
-            return self.source_files_manager.get_source_files(metafile)
-        #@property
-        @lru_cache(maxsize=1)
-        def get_source_meta_files(self):
-            return self.source_files_manager.get_source_media_files(metafile)
-        metafile.source_files = get_source_files(self)  # DO NOT WANT! Want lazy propery instread
+        metafile.source_files = lru_cache(maxsize=1)(lambda: self.source_files_manager.get_source_files(metafile))
+        metafile.source_media_files = lru_cache(maxsize=1)(lambda: self.source_files_manager.get_source_media_files(metafile))
+        metafile.source_data_files = lru_cache(maxsize=1)(lambda: self.source_files_manager.get_source_data_files(metafile))
         return metafile
