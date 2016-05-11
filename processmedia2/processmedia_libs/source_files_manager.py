@@ -1,10 +1,9 @@
 import os
 from collections import ChainMap
-from functools import lru_cache
 
 from libs.misc import file_ext, first
+
 from . import EXTS
-from .meta_manager import MetaManager, MetaFile
 
 import logging
 log = logging.getLogger(__name__)
@@ -69,33 +68,3 @@ class SourceFilesManager(object):
             log.warn('Multiple files for type %s identifyed %s. This may be a mistake. Using only first one', file_type, [f['relative'] for f in files_for_type])
         return first(files_for_type) or {}
 
-
-class MetaManagerWithSourceFiles(MetaManager):
-    """
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(kwargs['path_meta'])
-        self.source_files_manager = SourceFilesManager(kwargs['path_source'])
-
-    def get(self, name):
-        return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager)
-
-    class MetaFileWithSourceFiles(MetaFile):
-        def __init__(self, metafile, source_files_manager):
-            self.__dict__ = metafile.__dict__
-            self.source_files_manager = source_files_manager
-
-        @property
-        @lru_cache(maxsize=1)
-        def source_files(self):
-            return self.source_files_manager.get_source_files(self)
-
-        @property
-        @lru_cache(maxsize=1)
-        def source_media_files(self):
-            return self.source_files_manager.get_source_media_files(self)
-
-        @property
-        @lru_cache(maxsize=1)
-        def source_data_files(self):
-            return self.source_files_manager.get_source_data_files(self)

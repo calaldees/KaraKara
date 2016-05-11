@@ -9,8 +9,9 @@ from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
-from processmedia_libs.source_files_manager import SourceFilesManager, MetaManagerWithSourceFiles
-from processmedia_libs.processed_files_manager import ProcessedFilesManager, gen_string_hash
+from processmedia_libs.source_files_manager import SourceFilesManager
+from processmedia_libs.processed_files_manager import ProcessedFilesManager
+from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor
 
 
@@ -32,7 +33,7 @@ PROCESS_ORDER_FUNCS = {
 }
 
 def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
-    meta = MetaManagerWithSourceFiles(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
+    meta = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
     meta.load_all()
 
     encoder = Encoder(meta, **kwargs)
@@ -94,7 +95,7 @@ class Encoder(object):
     """
 
     def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
-        self.meta = meta_manager or MetaManagerWithSourceFiles(path_meta=path_meta, path_source=path_source)
+        self.meta = meta_manager or MetaManagerExtended(path_meta=path_meta, path_source=path_source)  # This 'or' needs to go
         self.processed_files_manager = ProcessedFilesManager(path_processed)
 
     def _get_meta(self, name):
@@ -110,7 +111,7 @@ class Encoder(object):
         m = self.meta.get(name)
 
         def encode_steps(m):
-            yield self._update_source_hash(m)
+            yield m.update_source_hash()
             yield self._encode_primary_video_from_meta(m)
             yield self._encode_srt_from_meta(m)
             yield self._encode_preview_video_from_meta(m)
@@ -122,14 +123,6 @@ class Encoder(object):
             except ValueError:
                 pass
             self.meta.save(name)
-
-    def _update_source_hash(self, m):
-        def gen_hash(source_files):
-            return gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
-        m.source_hash = gen_hash(m.source_files)
-        m.source_media_hash = gen_hash(m.source_media_files)
-        m.source_data_hash = gen_hash(m.source_data_files)
-        return all((m.source_hash, m.source_media_hash, m.source_data_hash))
 
     def _update_source_details(self, m):
         source_details = {}
