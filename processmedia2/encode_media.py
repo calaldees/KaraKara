@@ -32,15 +32,15 @@ PROCESS_ORDER_FUNCS = {
 }
 
 def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
-    meta = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
-    meta.load_all()
+    meta_manager = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
+    meta_manager.load_all()
 
-    encoder = Encoder(meta, **kwargs)
+    encoder = Encoder(meta_manager)
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
     for name in progress_bar(process_order_function(
-            m.name for m in meta.meta.values()
+            m.name for m in meta_manager.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hashs
         #(
             #'Ikimonogakari - Sakura', # Takes 2 hours to encode
@@ -93,20 +93,16 @@ class Encoder(object):
     extract subs
     """
 
-    def __init__(self, meta_manager=None, path_meta=None, path_processed=None, path_source=None, **kwargs):
-        self.meta = meta_manager or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
-
-    def _get_meta(self, name):
-        self.meta.load(name)
-        return self.meta.get(name)
+    def __init__(self, meta_manager=None):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+        self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
 
     def encode(self, name):
         """
         Todo: save the meta on return ... maybe use a context manager
         """
         log.info('Encode: %s', name)
-        self.meta.load(name)
-        m = self.meta.get(name)
+        self.meta_manager.load(name)
+        m = self.meta_manager.get(name)
 
         def encode_steps(m):
             yield m.update_source_hashs()
@@ -120,7 +116,7 @@ class Encoder(object):
                 m.pending_actions.remove(PENDING_ACTION['encode'])
             except ValueError:
                 pass
-            self.meta.save(name)
+            self.meta_manager.save(name)
 
     def _update_source_details(self, m):
         source_details = {}

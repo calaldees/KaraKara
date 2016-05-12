@@ -5,8 +5,10 @@ from pathlib import Path
 
 from scan_media import scan_media
 from encode_media import encode_media, Encoder
-from processmedia_libs.meta_manager import MetaManager
-from processmedia_libs.processed_files_manager import ProcessedFilesManager
+from processmedia_libs.meta_overlay import MetaManagerExtended
+#from processmedia_libs.meta_manager import MetaManager
+#from processmedia_libs.processed_files_manager import ProcessedFilesManager
+
 
 SOURCE_PATH = 'tests/source/'
 
@@ -33,8 +35,10 @@ class ProcessMediaTestManager(object):
         self._temp_meta = tempfile.TemporaryDirectory()
         self._temp_processed = tempfile.TemporaryDirectory()
         self._link_source_files()
-        self.meta_manager = MetaManager(self.path_meta)
-        self.processed_manager = ProcessedFilesManager(self.path_processed)
+        self.meta_manager = MetaManagerExtended(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed)
+        self.processed_files_manager = self.meta_manager.processed_files_manager
+        self.source_files_manager = self.meta_manager.source_files_manager
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -43,6 +47,7 @@ class ProcessMediaTestManager(object):
         self._temp_processed.cleanup()
         self.meta_manager = None
         self.processed_manager = None
+        self.source_files_manager = None
 
     @property
     def path_source(self):
@@ -56,11 +61,17 @@ class ProcessMediaTestManager(object):
     def path_processed(self):
         return self._temp_processed.name
 
+    @property
+    def commandline_kwargs(self):
+        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed)
+
     def scan_media(self):
-        scan_media(path_source=self.path_source, path_meta=self.path_meta)
+        self.meta_manager._release_cache()
+        scan_media(**self.commandline_kwargs)
 
     def encode_media(self):
-        encode_media(path_source=self.path_source, path_meta=self.path_meta, path_processed=self.path_processed)
+        self.meta_manager._release_cache()
+        encode_media(**self.commandline_kwargs)
 
     @property
     def meta(self):
@@ -82,23 +93,18 @@ class ProcessMediaTestManager(object):
                 json.dump(meta_data, meta_filehandle)
         self.meta_manager.load_all()
 
-    def gen_source_hash(self, name):
-        self.meta_manager._release_cache()
-        self.meta_manager.load(name)
-        m = self.meta_manager.get(name)
-        Encoder(meta_manager=self.meta_manager, path_processed=self.path_processed, path_source=self.path_source)._update_source_hash(m)
+    def update_source_hashs(self, name):
+        m = self.get(name)
+        m.update_source_hashs()
         self.meta_manager.save(name)
 
-    def get_source_hash(self, name):
+    def get(self, name):
         self.meta_manager._release_cache()
         self.meta_manager.load(name)
-        return self.meta_manager.get(name).source_hash
+        return self.meta_manager.get(name)
 
-    def get_all_processed_files_associated_with_source_hash(self, source_hash):
-        return self.processed_manager.get_all_processed_files_associated_with_source_hash(source_hash)
-
-    def processed_files(self, name):
-        return self.get_all_processed_files_associated_with_source_hash(self.get_source_hash(name))
+    def get_processed_files(self, hash_dict):
+        return self.processed_manager.get_processed_files(hash_dict)
 
     def mock_processed_files(self, filenames):
         for f in filenames:

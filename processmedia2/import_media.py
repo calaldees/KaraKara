@@ -4,8 +4,7 @@ from pprint import pprint
 from libs.misc import postmortem, fast_scan, epoc, first
 from processmedia_libs import add_default_argparse_args, parse_args, PENDING_ACTION
 
-from processmedia_libs.meta_manager import MetaManager
-from processmedia_libs.processed_files_manager import ProcessedFilesManager
+from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor
 
 
@@ -15,6 +14,7 @@ from karakara.model.model_tracks import Track, Tag, Attachment, _attachment_type
 from karakara.model import init_DBSession, DBSession, commit
 from karakara.model.actions import get_tag, clear_all_tracks, last_update, delete_track
 
+ATTACHMENT_TYPES = set(_attachment_types.enums)
 
 import logging
 log = logging.getLogger(__name__)
@@ -53,16 +53,16 @@ def import_media(**kwargs):
     def get_db_track_names():
         return set(t.source_filename for t in DBSession.query(Track.source_filename))
 
-    meta = MetaManager(kwargs['path_meta'])
-    importer = TrackImporter(meta_manager=meta, path_processed=kwargs['path_processed'])
+    meta_manager = MetaManagerExtended(**kwargs)
+    importer = TrackImporter(meta_manager=meta_manager)
     stats['db_start'] = get_db_track_names()
 
-    meta.load_all()  # mtime=epoc(last_update())
+    meta_manager.load_all()  # mtime=epoc(last_update())
 
-    meta_processed_track_ids = set(m.source_hash for m in meta.meta.values() if m.source_hash)
-    stats['meta_set'] = set(m.name for m in meta.meta.values() if m.source_hash)
+    meta_processed_track_ids = set(m.source_hash for m in meta_manager.meta.values() if m.source_hash)
+    stats['meta_set'] = set(m.name for m in meta_manager.meta.values() if m.source_hash)
 
-    for name in meta.meta.keys():
+    for name in meta_manager.meta.keys():
         try:
             if importer.import_track(name):
                 stats['meta_imported'].add(name)
@@ -95,28 +95,26 @@ def import_media(**kwargs):
 
 class TrackImporter(object):
 
-    def __init__(self, meta_manager=None, path_meta=None, path_processed=None, **kwargs):
-        self.meta = meta_manager or MetaManager(path_meta)
-        self.processed_files_manager = ProcessedFilesManager(path_processed)
+    def __init__(self, meta_manager=None):  # , path_meta=None, path_processed=None, **kwargs
+        self.meta_manager = meta_manager #or MetaManager(path_meta)
         self.exisiting_track_ids = set(t.id for t in DBSession.query(Track.id))
 
     def import_track(self, name):
         log.debug('Attemping: %s', name)
 
-        self.meta.load(name)
-        m = self.meta.get(name)
+        self.meta_manager.load(name)
+        m = self.meta_manager.get(name)
 
         if not m.source_hash:
             raise TrackNotProcesedException()
 
-        processed_files = self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash)
-        if self._missing_files(processed_files):
+        if self._missing_files(m.processed_files):
             # If we are missing any files but we have a source hash,
             # we may have some of the derived media missing.
             # Explicity mark the item for reencoding
             if PENDING_ACTION['encode'] not in m.pending_actions:  # Feels clunky to manage this as a list? maybe a set?
                 m.pending_actions.append(PENDING_ACTION['encode'])
-                self.meta.save(name)  # Feels clunky
+                self.meta_manager.save(name)  # Feels clunky
             raise TrackMissingProcessedFiles(id=m.source_hash in self.exisiting_track_ids and m.source_hash)
 
         if m.source_hash in self.exisiting_track_ids:
@@ -129,9 +127,9 @@ class TrackImporter(object):
         track.source_filename = name
         track.duration = m.source_details.get('duration')
 
-        self._add_attachments(track, processed_files)
-        self._add_lyrics(track, first(processed_files.get('srt')))
-        self._add_tags(track, first(processed_files.get('tags')))
+        self._add_attachments(track, m.processed_files)
+        self._add_lyrics(track, first(m.processed_files.get('srt')))
+        self._add_tags(track, first(m.processed_files.get('tags')))
 
         DBSession.add(track)
         commit()
@@ -140,23 +138,22 @@ class TrackImporter(object):
 
     def _missing_files(self, processed_files):
         missing_processed_files = {
-            (k, processed_file)
-            for k in _attachment_types.enums
-            for processed_file in processed_files[k]
+            (file_type, processed_file)
+            for file_type, processed_file in processed_files.items()
             if not processed_file.exists
         }
         for file_type, processed_file in missing_processed_files:
-            log.debug('Missing processed file: %s - %s', file_type, processed_file.absolute)
+            log.debug('Missing processed file: {0} - {1}'.format(file_type, processed_file.absolute))
         return missing_processed_files
 
     def _add_attachments(self, track, processed_files):
         track.attachments.clear()
-        for attachment_type in processed_files.keys() & set(_attachment_types.enums):
-            for processed_file in processed_files[attachment_type]:
-                attachment = Attachment()
-                attachment.type = attachment_type
-                attachment.location = processed_file.relative
-                track.attachments.append(attachment)
+        for processde_file in processed_files.values():
+            assert processde_file.attachment_type in ATTACHMENT_TYPES
+            attachment = Attachment()
+            attachment.type = processde_file.attachment_type
+            attachment.location = processde_file.processed_file.relative
+            track.attachments.append(attachment)
 
     def _add_lyrics(self, track, processed_file_srt):
         if not processed_file_srt or not processed_file_srt.exists:

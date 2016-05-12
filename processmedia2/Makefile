@@ -110,7 +110,8 @@ migrate:
 
 test:
 	$(MAKE) all --directory tests/source
-	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --maxfail=3 --ignore=tests/test_import.py
+	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --ignore=tests/test_import.py
+	# --maxfail=3
 	$(MAKE) ini --directory $(WEB_PATH)
 	PYTHONPATH="$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/" $(WEB_PYTEST) tests/test_import.py --pdb
 
