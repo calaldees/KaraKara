@@ -12,7 +12,6 @@ from processmedia_libs import external_tools
 from processmedia_libs import subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs.processed_files_manager import ProcessedFilesManager
-DEFAULT_NUMBER_OF_IMAGES = ProcessedFilesManager.DEFAULT_NUMBER_OF_IMAGES
 
 
 import logging
@@ -42,7 +41,7 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
     # For testing locally we are monitoring the 'pendings_actions' list
     for name in progress_bar(process_order_function(
             m.name for m in meta.meta.values()
-            if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hash
+            if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hashs
         #(
             #'Ikimonogakari - Sakura', # Takes 2 hours to encode
             #'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
@@ -110,7 +109,7 @@ class Encoder(object):
         m = self.meta.get(name)
 
         def encode_steps(m):
-            yield m.update_source_hash()
+            yield m.update_source_hashs()
             yield self._encode_primary_video_from_meta(m)
             yield self._encode_srt_from_meta(m)
             yield self._encode_preview_video_from_meta(m)
@@ -137,7 +136,7 @@ class Encoder(object):
         m.source_details.update(source_details)
 
     def _encode_primary_video_from_meta(self, m):
-        target_file = m.get_processed_file('video')
+        target_file = m.processed_files['video']
         if target_file.exists:
             log.debug('Processed Destination was created with the same input sources - no encoding required')
             return True
@@ -223,7 +222,7 @@ class Encoder(object):
         Always output an srt (even if it contains no subtitles)
         This is required for the importer to verify the processed fileset is complete
         """
-        target_file = m.get_processed_file('srt')
+        target_file = m.processed_files['srt']
         if target_file.exists:
             log.debug('Processed srt exists - no parsing required')
             return True
@@ -250,12 +249,12 @@ class Encoder(object):
         return True
 
     def _encode_preview_video_from_meta(self, m):
-        target_file = m.get_processed_file('preview')
+        target_file = m.processed_files['preview']
         if target_file.exists:
             log.debug('Processed preview was created with the same input sources - no encoding required')
             return True
 
-        source_file = m.get_processed_file('video')
+        source_file = m.processed_files['video']
         if not source_file.exists:
             log.error('No source video to encode preview from')
             return False
@@ -273,9 +272,9 @@ class Encoder(object):
 
         return True
 
-    def _encode_images_from_meta(self, m, num_images=DEFAULT_NUMBER_OF_IMAGES):
+    def _encode_images_from_meta(self, m, num_images=4):
         target_files = tuple(
-            m.get_processed_file('image', index)
+            m.processed_files['image{}'.format(index+1)]
             for index in range(num_images)
         )
         if all(target_file.exists for target_file in target_files):
@@ -326,7 +325,7 @@ class Encoder(object):
         No processing ... this is just a copy
         """
         source_file = m.source_files['tag'].get('absolute')
-        target_file = m.get_processed_file('tags')
+        target_file = m.processed_files['tags']
 
         if not source_file:
             log.warn('No tag file provided')

@@ -17,33 +17,31 @@ class MetaManagerExtended(MetaManager):
         return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager, self.processed_files_manager)
 
     class MetaFileWithSourceFiles(MetaFile):
+        SOURCE_TYPES = {'media', 'data'}
+
         def __init__(self, metafile, source_files_manager, processed_files_manager):
             self.__dict__ = metafile.__dict__
             self.source_files_manager = source_files_manager
             self.processed_files_manager = processed_files_manager
 
         @property
-        @lru_cache(maxsize=1)
         def source_files(self):
-            return self.source_files_manager.get_source_files(self)
+            return self.get_source_files()
 
-        @property
+        @lru_cache(maxsize=len(SOURCE_TYPES)+1)
+        def get_source_files(self, file_type=None):
+            return self.source_files_manager.get_source_files(self, file_type)
+
+        def update_source_hashs(self):
+            self.source_hashs.clear()
+            for source_type in self.SOURCE_TYPES:
+                self.source_hashs[source_type] = gen_string_hash(f['hash'] for f in self.get_source_files(source_type).values() if f)
+            self._processed_files.cache_clear()
+            return all(self.source_hashs.values())
+
         @lru_cache(maxsize=1)
-        def source_media_files(self):
-            return self.source_files_manager.get_source_media_files(self)
-
+        def _processed_files(self):
+            return self.processed_files_manager.get_processed_files(self.source_hashs)
         @property
-        @lru_cache(maxsize=1)
-        def source_data_files(self):
-            return self.source_files_manager.get_source_data_files(self)
-
-        def update_source_hash(self):
-            def gen_hash(source_files):
-                return gen_string_hash(f['hash'] for f in source_files.values() if f)  # Derive the source hash from the child component hashs
-            self.source_hash = gen_hash(self.source_files)
-            self.source_media_hash = gen_hash(self.source_media_files)
-            self.source_data_hash = gen_hash(self.source_data_files)
-            return all((self.source_hash, self.source_media_hash, self.source_data_hash))
-
-        def get_processed_file(self, file_type, *args):
-            return self.processed_files_manager.get_processed_file(self.source_hash, file_type, *args)
+        def processed_files(self):
+            return self._processed_files()

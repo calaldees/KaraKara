@@ -4,49 +4,57 @@ import hashlib
 from collections import namedtuple, defaultdict
 from libs.misc import fast_scan
 
-ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_type', 'attachment_type', 'ext', 'salt'))
+ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_name', 'attachment_type', 'ext', 'salt'))
 
 
 class ProcessedFilesManager(object):
-    DEFAULT_NUMBER_OF_IMAGES = 4
+    FILE_TYPES = (
+        ProcessedFileType('media', 'image1', 'jpg', ''),
+        ProcessedFileType('media', 'image2', 'jpg', ''),
+        ProcessedFileType('media', 'image3', 'jpg', ''),
+        ProcessedFileType('media', 'image4', 'jpg', ''),
+        ProcessedFileType('media', 'video', 'mp4', ''),
+        ProcessedFileType('media', 'preview', 'mp4', ''),
+        ProcessedFileType('data', 'srt', 'srt', ''),
+        ProcessedFileType('data', 'tags', 'txt', ''),
+    )
     FILE_TYPE_LOOKUP = {
         processed_file_type.attachment_type: processed_file_type
-        for processed_file_type in (
-            # NOTE: These must match the attachment_types in the Track model
-            ProcessedFileType('media', 'image', 'jpg', ''),
-            ProcessedFileType('media', 'video', 'mp4', ''),
-            ProcessedFileType('media', 'preview', 'mp4', ''),
-
-            ProcessedFileType('data', 'srt', 'srt', ''),
-            ProcessedFileType('data', 'tags', 'txt', ''),
-        )
+        for processed_file_type in FILE_TYPES
     }
 
     def __init__(self, path):
         self.path = path
 
-    def _factory(self, hashs, ext):
-        return ProcessedFile(self.path, hashs, ext)
+    def get_processed_files(self, hash_dict):
+        return {
+            file_type.attachment_type: ProcessedFile(
+                self.path,
+                (hash_dict[file_type.source_hash_name], file_type.attachment_type, file_type.salt),
+                file_type.ext
+            )
+            for file_type in self.FILE_TYPES
+        }
 
-    def get_processed_file(self, source_hash, file_type, *args):
-        assert source_hash, 'source_hash can never be None. Investigation needed'
-        file_type = self.FILE_TYPE_LOOKUP[file_type]
-        return self._factory(
-            (source_hash, file_type.attachment_type, file_type.salt, ''.join((str(a) for a in args))),
-            file_type.ext
-        )
-
-    def get_all_processed_files_associated_with_source_hash(self, source_hash):
-        if hasattr(source_hash, 'source_hash'):
-            source_hash = source_hash.source_hash
-        if not source_hash:
-            return {}
-        processed_files = defaultdict(list)
-        for t in ('video', 'preview', 'srt', 'tags'):
-            processed_files[t].append(self.get_processed_file(source_hash, t))
-        for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES):
-            processed_files['image'].append(self.get_processed_file(source_hash, 'image', image_num))
-        return processed_files
+    # def get_processed_file(self, source_hash, file_type, *args):
+    #     assert source_hash, 'source_hash can never be None. Investigation needed'
+    #     file_type = self.FILE_TYPE_LOOKUP[file_type]
+    #     return self._factory(
+    #         (source_hash, file_type.attachment_type, file_type.salt, ''.join((str(a) for a in args))),
+    #         file_type.ext
+    #     )
+    # 
+    # def get_all_processed_files_associated_with_source_hash(self, source_hash):
+    #     if hasattr(source_hash, 'source_hash'):
+    #         source_hash = source_hash.source_hash
+    #     if not source_hash:
+    #         return {}
+    #     processed_files = defaultdict(list)
+    #     for t in ('video', 'preview', 'srt', 'tags'):
+    #         processed_files[t].append(self.get_processed_file(source_hash, t))
+    #     for image_num in range(self.DEFAULT_NUMBER_OF_IMAGES):
+    #         processed_files['image'].append(self.get_processed_file(source_hash, 'image', image_num))
+    #     return processed_files
 
     @property
     def scan(self):

@@ -8,9 +8,11 @@ from . import EXTS
 import logging
 log = logging.getLogger(__name__)
 
-MEDIA_FILETYPES = {'video', 'audio', 'sub', 'image'}
-DATA_FILETYPES = {'tag', 'sub'}
-ALL_FILETYPES = MEDIA_FILETYPES | DATA_FILETYPES
+FILETYPES = {
+    'media': {'video', 'audio', 'sub', 'image'},
+    'data': {'tag', 'sub'}
+}
+FILETYPES['all'] = FILETYPES['media'] | FILETYPES['data']   # TODO: set merge .values()?
 
 
 class SourceFilesManager(object):
@@ -25,14 +27,8 @@ class SourceFilesManager(object):
     def __init__(self, source_path):
         self.source_path = source_path
 
-    def get_source_files(self, metafile):
-        return self._wrap_scan_data(metafile, ALL_FILETYPES)
-
-    def get_source_media_files(self, metafile):
-        return self._wrap_scan_data(metafile, MEDIA_FILETYPES)
-
-    def get_source_data_files(self, metafile):
-        return self._wrap_scan_data(metafile, DATA_FILETYPES)
+    def get_source_files(self, metafile, file_type=None):
+        return self._wrap_scan_data(metafile, FILETYPES[file_type or 'all'])
 
     def _wrap_scan_data(self, metafile, filetypes):
         wrapped_scan_data = tuple(self._wrap_scan_data_item(d) for d in metafile.scan_data.values())
