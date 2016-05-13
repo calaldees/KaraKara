@@ -16,6 +16,10 @@ class MetaManagerExtended(MetaManager):
     def get(self, name):
         return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager, self.processed_files_manager)
 
+    @property
+    def meta_items(self):
+        return (self.get(name) for name in self.meta.keys())
+
     class MetaFileWithSourceFiles(MetaFile):
         SOURCE_TYPES = {'media', 'data'}
 

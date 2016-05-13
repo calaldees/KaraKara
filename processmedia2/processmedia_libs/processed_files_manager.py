@@ -27,6 +27,8 @@ class ProcessedFilesManager(object):
         self.path = path
 
     def get_processed_files(self, hash_dict):
+        if not hash_dict:
+            return {}
         return {
             file_type.dict_key: ProcessedFile(
                 self.path,

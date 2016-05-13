@@ -21,8 +21,8 @@ def cleanup_media(**kwargs):
 
     all_known_file_hashs = {
         processed_file.hash
-        for k in meta_manager.meta.keys()
-        for processed_file in meta_manager.get(k).processed_files.values()
+        for m in meta_manager.meta_items
+        for processed_file in m.processed_files.values()
     }
     unlinked_files = (f for f in meta_manager.processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in all_known_file_hashs)
 

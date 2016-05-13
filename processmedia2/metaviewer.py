@@ -7,9 +7,12 @@ from collections import defaultdict, namedtuple
 from libs.misc import flatten  #  postmortem,
 
 from processmedia_libs import add_default_argparse_args, parse_args
-from processmedia_libs.meta_manager import MetaManager
-from processmedia_libs.source_files_manager import SourceFilesManager
-from processmedia_libs.processed_files_manager import ProcessedFilesManager
+
+from processmedia_libs.meta_overlay import MetaManagerExtended
+
+#from processmedia_libs.meta_manager import MetaManager
+#from processmedia_libs.source_files_manager import SourceFilesManager
+#from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
 import logging
 log = logging.getLogger(__name__)
@@ -26,18 +29,16 @@ FileItem = namedtuple('FileItem', ('type', 'relative', 'absolute', 'exists'))
 class MetaViewer(object):
 
     def __init__(self, path_meta=None, path_processed=None, path_source=None, **kwargs):
-        self.source_files_manager = SourceFilesManager(path_source)
-        self.meta = MetaManager(path_meta)
-        self.processed_files_manager = ProcessedFilesManager(path_processed)
+        self.meta_manager = MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)
 
     def get_meta_details(self, name_regex):
         if (not name_regex):
-            self.meta.load_all()
-            meta_items = self.meta.meta.values()
+            self.meta_manager.load_all()
+            meta_items = self.meta_manager.meta_items
         else:
             meta_items = (
-                self.meta.load(f.file_no_ext) or self.meta.get(f.file_no_ext)
-                for f in self.meta.files
+                self.meta_manager.load(f.file_no_ext) or self.meta_manager.get(f.file_no_ext)
+                for f in self.meta_manager.files
                 if re.search(name_regex, f.file_no_ext, flags=re.IGNORECASE)
             )
 
@@ -46,9 +47,9 @@ class MetaViewer(object):
 
         file_details = defaultdict(list)
         for m in meta_items:
-            for f in filter(None, (f for f in self.source_files_manager.get_source_files(m).values())):
+            for f in filter(None, m.source_files.values()):
                 file_details[m.name].append(FileItem('source', f['relative'], f['absolute'], lazy_exists(f['absolute'])))
-            for f in flatten(self.processed_files_manager.get_all_processed_files_associated_with_source_hash(m.source_hash).values()):
+            for f in m.processed_files.values():
                 file_details[m.name].append(FileItem('processed', f.relative, f.absolute, lazy_exists(f.absolute)))
 
         return file_details
