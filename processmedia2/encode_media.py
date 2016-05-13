@@ -42,6 +42,7 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
             m.name for m in meta_manager.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hashs
         #(
+            #'Gatekeepers - OP - For the Smiles of Tomorrow.avi',  # It's buggered. Looks like it's trying to containerize subs in a txt file?
             #'Ikimonogakari - Sakura', # Takes 2 hours to encode
             #'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
             #'Nana (anime) - OP - Rose',  # SSA's have malformed unicode characters

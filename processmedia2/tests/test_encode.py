@@ -27,10 +27,10 @@ def test_encode_video_simple():
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
-        processed_files = scan.processed_files('test1')
+        processed_files = scan.get('test1').processed_files
 
         # Main Video - use OCR to read subtiles and check them
-        video_file = processed_files['video'][0].absolute
+        video_file = processed_files['video'].absolute
 
         image = get_frame_from_video(video_file, 5)
         assert color_close(COLOR_RED, image.getpixel(SAMPLE_COORDINATE))
@@ -48,7 +48,7 @@ def test_encode_video_simple():
         assert not read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
 
         # Preview Video (can't check subtitles as the res is too small)
-        preview_file = processed_files['preview'][0].absolute
+        preview_file = processed_files['preview'].absolute
 
         image = get_frame_from_video(preview_file, 5)
         assert color_close(COLOR_RED, image.getpixel(SAMPLE_COORDINATE))
@@ -62,7 +62,7 @@ def test_encode_video_simple():
         # Assert Thumbnail images
         # We sample at '20% 40% 60% %80' - in out 30 second video that is 'RED, GREEN, GREEN, BLUE'
         for image_num, color in enumerate((COLOR_RED, COLOR_GREEN, COLOR_GREEN, COLOR_BLUE)):
-            assert color_close(color, Image.open(processed_files['image'][image_num].absolute).getpixel(SAMPLE_COORDINATE))
+            assert color_close(color, Image.open(processed_files['image{}'.format(image_num+1)].absolute).getpixel(SAMPLE_COORDINATE))
 
         video_details = probe_media(video_file)
         preview_details = probe_media(preview_file)
@@ -78,7 +78,7 @@ def test_encode_incomplete():
     with ProcessMediaTestManager(TEST2_AUDIO_FILES - {'test2.png'}) as scan:
         scan.scan_media()
         scan.encode_media()
-        processed_files = scan.processed_files('test2')
+        processed_files = scan.get('test2').processed_files
 
         assert not processed_files
 
@@ -90,9 +90,9 @@ def test_encode_audio_simple():
     with ProcessMediaTestManager(TEST2_AUDIO_FILES) as scan:
         scan.scan_media()
         scan.encode_media()
-        processed_files = scan.processed_files('test2')
+        processed_files = scan.get('test2').processed_files
 
-        video_file = processed_files['video'][0].absolute
+        video_file = processed_files['video'].absolute
 
         image = get_frame_from_video(video_file, 2)
         assert 'AA' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
@@ -107,7 +107,7 @@ def test_encode_audio_simple():
         assert '' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
 
         for image_num, color in enumerate((COLOR_MAGENTA,)*4):
-            assert color_close(color, Image.open(processed_files['image'][image_num].absolute).getpixel(SAMPLE_COORDINATE))
+            assert color_close(color, Image.open(processed_files['image{}'.format(image_num+1)].absolute).getpixel(SAMPLE_COORDINATE))
 
 
 def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
