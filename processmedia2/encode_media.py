@@ -11,7 +11,6 @@ from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDI
 from processmedia_libs import external_tools
 from processmedia_libs import subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
-from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
 
 import logging

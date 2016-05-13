@@ -3,11 +3,11 @@ import tempfile
 import json
 from pathlib import Path
 
+from processmedia_libs.meta_overlay import MetaManagerExtended
+
 from scan_media import scan_media
 from encode_media import encode_media, Encoder
-from processmedia_libs.meta_overlay import MetaManagerExtended
-#from processmedia_libs.meta_manager import MetaManager
-#from processmedia_libs.processed_files_manager import ProcessedFilesManager
+from cleanup_media import cleanup_media
 
 
 SOURCE_PATH = 'tests/source/'
@@ -72,6 +72,10 @@ class ProcessMediaTestManager(object):
     def encode_media(self):
         self.meta_manager._release_cache()
         encode_media(**self.commandline_kwargs)
+
+    def cleanup_media(self):
+        self.meta_manager._release_cache()
+        cleanup_media(**self.commandline_kwargs)
 
     @property
     def meta(self):
