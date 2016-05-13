@@ -67,7 +67,7 @@ def test_import_full(DBSession):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
         manager.encode_media()
-        stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
+        stats = import_media(**manager.commandline_kwargs)
 
         assert freeze(stats) == freeze(dict(
             db_end={'test1', 'test2'},

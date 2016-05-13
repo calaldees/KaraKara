@@ -59,8 +59,8 @@ def import_media(**kwargs):
 
     meta_manager.load_all()  # mtime=epoc(last_update())
 
-    meta_processed_track_ids = set(m.source_hash for m in meta_manager.meta.values() if m.source_hash)
-    stats['meta_set'] = set(m.name for m in meta_manager.meta.values() if m.source_hash)
+    meta_processed_track_ids = set(meta_manager.source_hashs)
+    stats['meta_set'] = set(m.name for m in meta_manager.meta_items if m.source_hash)
 
     for name in meta_manager.meta.keys():
         try:
@@ -128,8 +128,8 @@ class TrackImporter(object):
         track.duration = m.source_details.get('duration')
 
         self._add_attachments(track, m.processed_files)
-        self._add_lyrics(track, first(m.processed_files.get('srt')))
-        self._add_tags(track, first(m.processed_files.get('tags')))
+        self._add_lyrics(track, m.processed_files.get('srt'))
+        self._add_tags(track, m.processed_files.get('tags'))
 
         DBSession.add(track)
         commit()
@@ -152,7 +152,7 @@ class TrackImporter(object):
             assert processde_file.attachment_type in ATTACHMENT_TYPES
             attachment = Attachment()
             attachment.type = processde_file.attachment_type
-            attachment.location = processde_file.processed_file.relative
+            attachment.location = processde_file.relative
             track.attachments.append(attachment)
 
     def _add_lyrics(self, track, processed_file_srt):

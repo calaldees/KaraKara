@@ -76,6 +76,7 @@ class MetaManager(object):
         # wha? (mtime == None or f.stat().st_mtime >= mtime)
         return fast_scan(self.path, search_filter=lambda f: f.name.endswith('.json'))
 
+    # TODO: Move to scan?
     @property
     def meta_with_unassociated_files(self):
         """
@@ -84,6 +85,7 @@ class MetaManager(object):
         """
         return (m for m in self.meta.values() if m.unassociated_files)
 
+    # TODO: Move to scan?
     @property
     def unmatched_entrys(self):
         """
@@ -95,12 +97,13 @@ class MetaManager(object):
 
     @property
     def source_hashs(self):
-        return filter(None, (m.source_details.get('source_hash') for m in self.meta.values()))
+        return (m.source_hash for m in self.meta.values() if m.source_hash)
 
 
 class MetaFile(object):
 
     SOURCE_HASHS_KEY = 'hashs'
+    SOURCE_HASH_FULL_KEY = 'full'
 
     def __init__(self, name, data):
         self.name = name
@@ -155,3 +158,7 @@ class MetaFile(object):
     @property
     def source_hashs(self):
         return self.source_details.setdefault(self.SOURCE_HASHS_KEY, {})
+
+    @property
+    def source_hash(self):
+        return self.source_hashs.get(self.SOURCE_HASH_FULL_KEY)

@@ -38,8 +38,11 @@ class MetaManagerExtended(MetaManager):
 
         def update_source_hashs(self):
             self.source_hashs.clear()
-            for source_type in self.SOURCE_TYPES:
-                self.source_hashs[source_type] = gen_string_hash(f['hash'] for f in self.get_source_files(source_type).values() if f)
+            self.source_hashs.update({
+                source_type: gen_string_hash(f['hash'] for f in self.get_source_files(source_type).values() if f)
+                for source_type in self.SOURCE_TYPES
+            })
+            self.source_hashs[MetaFile.SOURCE_HASH_FULL_KEY] = gen_string_hash(self.source_hashs.values())
             self._processed_files.cache_clear()
             return all(self.source_hashs.values())
 
