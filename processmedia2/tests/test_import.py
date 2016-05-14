@@ -13,6 +13,7 @@ from karakara.tests.data.tracks import AttachmentDescription, create_test_track
 
 
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
+from processmedia_libs.meta_manager import MetaFile
 
 import logging
 log = logging.getLogger(__name__)
@@ -29,6 +30,13 @@ def get_attachment_descriptions(processed_files):
         for attachment_type, processed_file_list in processed_files.items()
         for processed_file in processed_file_list
     )
+
+def gen_fake_hash_dict(source_hash):
+    return {
+        MetaFile.SOURCE_HASH_FULL_KEY: source_hash,
+        "media": "{}_media".format(source_hash),
+        "data": "{}_data".format(source_hash),
+    }
 
 
 @pytest.fixture(scope="session")
@@ -81,10 +89,10 @@ def test_import_full(DBSession):
             meta_hash_matched_db_hash={},
         ))
 
-        track1 = get_track_dict_full(manager.get_source_hash('test1'))
+        track1 = get_track_dict_full(manager.get('test1').source_hash)
         assert track1
 
-        track2 = get_track_dict_full(manager.get_source_hash('test2'))
+        track2 = get_track_dict_full(manager.get('test2').source_hash)
         assert track2
 
         # TODO: assertions on db tracks
@@ -100,25 +108,24 @@ def test_basic_import(DBSession):
         manager.meta = {
             "test3.json": {
                 "processed": {
-                    "source_hash": "test3_hash",
+                    MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test3_hash"),
                 },
             },
             "test4.json": {
                 "processed": {
-                    "source_hash": "test4_hash",
-                }
+                    MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test4_hash"),
+                },
             },
         }
 
         # Create empty files for all expected processed files
         manager.mock_processed_files(
-            processed_file.relative for processed_file in flatten(
-                manager.get_all_processed_files_associated_with_source_hash(source_hash).values()
-                for source_hash in manager.meta_manager.source_hashs
-            )
+            processed_file.relative
+            for m in manager.meta_manager.meta_items
+            for processed_file in m.processed_files.values()
         )
 
-        stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
+        stats = import_media(**manager.commandline_kwargs)
 
         assert freeze(stats) == freeze(dict(
             db_end={'test3', 'test4'},
@@ -202,21 +209,21 @@ def test_import_side_effects(DBSession, commit):
             # Test5 should exist in db and match this meta. No op required
             "test5.json": {
                 "processed": {
-                    "source_hash": "test5_hash",
+                    MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test5_hash"),
                     "duration": 15.0,
                 }
             },
             # Test6 has not be encoded/processed yet and has no source hash
             "test6.json": {
                 "processed": {
-                    #"source_hash": "test6_hash",
+                    #MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test6_hash"),
                     "duration": 15.0,
                 }
             },
             # Test7 is incomplete on disk and missing processed file even though the meta exists 
             "test7.json": {
                 "processed": {
-                    "source_hash": "test7_hash",
+                    MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test7_hash"),
                     "duration": 15.0,
                 }
             },
@@ -225,29 +232,28 @@ def test_import_side_effects(DBSession, commit):
             # Test9 is a completly new track and will be imported cleanly - Creation of mock processed files below
             "test9.json": {
                 "processed": {
-                    "source_hash": "test9_hash",
+                    MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test9_hash"),
                     "duration": 15.0,
                 }
             },
             # test10 is processed but has incomplete processed files
             "test10.json": {
                 "processed": {
-                    "source_hash": "test10_hash",
+                    MetaFile.SOURCE_HASHS_KEY: gen_fake_hash_dict("test10_hash"),
                     "duration": 15.0,
                 }
             },
-
         }
         manager.mock_processed_files(
-            processed_file.relative for processed_file in flatten(
-                manager.get_all_processed_files_associated_with_source_hash('test9_hash').values()
-            )
+            processed_file.relative
+            for processed_file in manager.meta_manager.get('test9').processed_files
         )
-        manager.mock_processed_files(
-            processed_file.relative for processed_file in flatten(
-                tuple(manager.get_all_processed_files_associated_with_source_hash('test10_hash').values())[:len(_attachment_types.enums)-2]
-            )
-        )
+        #manager.mock_processed_files(
+        #    processed_file.relative
+            #for processed_file in 
+            #    tuple(manager.get_all_processed_files_associated_with_source_hash('test10_hash').values())[:len(_attachment_types.enums)-2]
+            #)
+        #)
 
         stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
 
