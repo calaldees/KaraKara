@@ -101,7 +101,7 @@ process: scan encode import cleanup
 
 .PHONY: migrate
 migrate:
-	$(PYTHON) migrate_media.py --log_level 0 --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate
+	$(PYTHON) migrate_media.py --log_level 1 --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate --move_func move
 
 
 

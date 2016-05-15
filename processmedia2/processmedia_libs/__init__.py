@@ -29,6 +29,7 @@ def add_default_argparse_args(parser, version=DEFAULT_VERSION):
     parser.add_argument('--path_processed', action='store', help='')
     parser.add_argument('--path_meta', action='store', help='')
 
+    parser.add_argument('--debug_on_fail', action='store_true', help='drop into pdb on encode fail')
     parser.add_argument('--log_level', type=int, help='log level')
     parser.add_argument('--version', action='version', version=version)
 
@@ -40,4 +41,4 @@ def parse_args(parser):
 def apply_config(args_dict):
     with open(args_dict['config'], 'r') as config_filehandle:
         config = json.load(config_filehandle)
-        return {k: v or config[k] for k, v in args_dict.items()}
+        return {k: v or config.get(k) for k, v in args_dict.items()}

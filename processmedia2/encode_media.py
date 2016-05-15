@@ -34,31 +34,33 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
     meta_manager = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
     meta_manager.load_all()
 
-    encoder = Encoder(meta_manager)
+    encoder = Encoder(meta_manager, **kwargs)
 
     # In the full system, encode will probably be driven from a rabitmq endpoint.
     # For testing locally we are monitoring the 'pendings_actions' list
-    for name in progress_bar(process_order_function(
+    for name in progress_bar(
+        process_order_function(
             m.name for m in meta_manager.meta.values()
             if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hashs
         #(
-            #'Gatekeepers - OP - For the Smiles of Tomorrow.avi',  # It's buggered. Looks like it's trying to containerize subs in a txt file?
+            #'AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu',
+            #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
+            #'Gosick - ED2 - Unity (full length)',
             #'Ikimonogakari - Sakura', # Takes 2 hours to encode
-            #'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
-            #'Nana (anime) - OP - Rose',  # SSA's have malformed unicode characters
             #'Frozen Japanise (find real name)'  # took too long to process
-            #'Lunar Silver Star Story - OP - Wings (Japanese Version)',
-            #'Evangleion ED - Fly Me To The Moon',  # Odd dimensions and needs to be normalised
-        #    'AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu',
-        #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',
-        #'Gosick - ED2 - Unity (full length)',
-        #'Ranma Half OP1 - Jajauma ni Sasenaide',
-        #'Tamako Market - OP - Dramatic Market Ride',
-        #'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
-        #'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
-        #'KAT-TUN Your side [Instrumental]',
-        #)
-    )):
+            
+            # 'Gatekeepers - OP - For the Smiles of Tomorrow.avi',  # It's buggered. Looks like it's trying to containerize subs in a txt file?
+            # 'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
+            # 'Nana (anime) - OP - Rose',  # SSA's have malformed unicode characters
+            # 'Lunar Silver Star Story - OP - Wings (Japanese Version)',
+            # 'Evangleion ED - Fly Me To The Moon',  # Odd dimensions and needs to be normalised
+            # 'Ranma Half OP1 - Jajauma ni Sasenaide',
+            # 'Tamako Market - OP - Dramatic Market Ride',
+            # 'Fullmetal Alchemist - OP1 - Melissa',  # Exhibits high bitrate pausing at end
+            # 'Samurai Champloo - OP - Battlecry',  # Missing title sub with newline
+            # 'KAT-TUN Your side [Instrumental]',
+        )
+    ):
         encoder.encode(name)
 
 
@@ -93,8 +95,9 @@ class Encoder(object):
     extract subs
     """
 
-    def __init__(self, meta_manager=None):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+    def __init__(self, meta_manager=None, debug_on_fail=False, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
+        self.debug_on_fail = debug_on_fail
 
     def encode(self, name):
         """
@@ -145,11 +148,11 @@ class Encoder(object):
             return False
 
         with tempfile.TemporaryDirectory() as tempdir:
-            # 3.) Convert souce formats into appropriate formats for video encoding
+            # 2.) Convert souce formats into appropriate formats for video encoding
 
             absolute_video_to_encode = m.source_files['video'].get('absolute')
 
-            # 3.a) Convert Image to Video
+            # 2.a) Convert Image to Video
             if m.source_files['image'] and not absolute_video_to_encode:
                 absolute_video_to_encode = os.path.join(tempdir, 'image.mp4')
                 external_tools.encode_image_to_video(
@@ -165,7 +168,7 @@ class Encoder(object):
                 log.error('Video to encode does not exist {}'.format(absolute_video_to_encode))
                 return False
 
-            # 3.b) Read + normalize subtitle file
+            # 2.b) Read + normalize subtitle file
             absolute_ssa_to_encode = None
             if m.source_files['sub']:
                 # Parse input subtitles
@@ -186,15 +189,15 @@ class Encoder(object):
                         subtitle_processor.create_ssa(subtitles, width=m.source_details['width'], height=m.source_details['height'])
                     )
 
-            # 4.) Encode
+            # 3.) Encode
             encode_steps = (
-                # 4.a) Render audio and normalize
+                # 3.a) Render audio and normalize
                 lambda: external_tools.encode_audio(
                     source=m.source_files['audio'].get('absolute') or m.source_files['video'].get('absolute'),
                     destination=os.path.join(tempdir, 'audio.wav'),
                 ),
 
-                # 4.b) Render video with subtitles and mux new audio.
+                # 3.b) Render video with subtitles and mux new audio.
                 lambda: external_tools.encode_video(
                     video_source=absolute_video_to_encode,
                     audio_source=os.path.join(tempdir, 'audio.wav'),
@@ -205,10 +208,12 @@ class Encoder(object):
             for encode_step in encode_steps:
                 encode_success, cmd_result = encode_step()
                 if not encode_success:
-                    import pdb ; pdb.set_trace()
+                    if self.debug_on_fail:
+                        import pdb ; pdb.set_trace()
+                    log.error(cmd_result)
                     return False
 
-            # 5.) Move the newly encoded file to the target path
+            # 4.) Move the newly encoded file to the target path
             target_file.move(os.path.join(tempdir, 'video.mp4'))
 
         return True
@@ -262,7 +267,9 @@ class Encoder(object):
                 destination=preview_file,
             )
             if not encode_success:
-                import pdb ; pdb.set_trace()
+                if self.debug_on_fail:
+                    import pdb ; pdb.set_trace()
+                log.error(cmd_result)
                 return False
             target_file.move(preview_file)
 
@@ -308,7 +315,8 @@ class Encoder(object):
                 image_file = os.path.join(tempdir, '{}.jpg'.format(index))
                 encode_succes, cmd_result = external_tools.extract_image(source_file_absolute, image_file, time)
                 if not encode_succes:
-                    #import pdb ; pdb.set_trace()
+                    if self.debug_on_fail:
+                        import pdb ; pdb.set_trace()
                     log.error(cmd_result)
                     return False
                 target_files[index].move(image_file)

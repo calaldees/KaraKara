@@ -60,7 +60,10 @@ class MetaManager(object):
         self._meta_timestamps[name] = os.stat(filepath).st_mtime
 
     def delete(self, name):
-        os.remove(self._filepath(name))
+        try:
+            os.remove(self._filepath(name))
+        except Exception as e:
+            log.error('Unable to delete missing metafile - How did this happen? {}'.format(self._filepath(name)))
         del self.meta[name]
 
     def load_all(self):
@@ -143,7 +146,10 @@ class MetaFile(object):
         file_data['mtime'] = mtime
         file_data['hash'] = filehash
 
-        self.pending_actions = list(set(self.pending_actions) | {f.ext})
+        #self.pending_actions = list(set(self.pending_actions) | {f.ext})
+        if self.SOURCE_HASHS_KEY in self.source_details:
+            log.debug('{} source changed, clearing hashs'.format(self.name))
+            del self.source_details[self.SOURCE_HASHS_KEY]
 
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()

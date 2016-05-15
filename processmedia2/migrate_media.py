@@ -19,9 +19,11 @@ VERSION = '0.0.0'
 
 def move_func_mock(src, dest):
     log.debug('rename {0} -> {1}'.format(src, dest))
-#move_func = os.symlink
-#move_func = os.rename
-#shutil.move
+MOVE_FUNCTIONS = {
+    'dryrun': move_func_mock,
+    'move': os.rename,  # shutil.move
+    'link': os.symlink,
+}
 
 
 auto_categorys = {
@@ -43,7 +45,7 @@ def auto_category(parent_folder):
 # Main -------------------------------------------------------------------------
 
 
-def migrate_media(move_func=os.symlink, **kwargs):
+def migrate_media(move_func=MOVE_FUNCTIONS['dryrun'], **kwargs):
     # Read file structure into memory
     folder_structure = FolderStructure.factory(
         path=kwargs['path_source'],
@@ -53,7 +55,7 @@ def migrate_media(move_func=os.symlink, **kwargs):
         )
     )
 
-    if move_func != move_func_mock:
+    if move_func != MOVE_FUNCTIONS['dryrun']:
         for folder in auto_categorys.values():
             os.makedirs(os.path.join(kwargs['path_destination'], folder), exist_ok=True)
 
@@ -94,8 +96,14 @@ def get_args():
     add_default_argparse_args(parser)
 
     parser.add_argument('--path_destination', action='store', help='Destination for migrated files')
+    parser.add_argument('--move_func', choices=MOVE_FUNCTIONS.keys(), help='method of migation', default='dryrun')
 
-    return parse_args(parser)
+    args_dict = parse_args(parser)
+
+    args_dict['move_func'] = MOVE_FUNCTIONS[args_dict['move_func']]
+
+    return args_dict
+
 
 
 if __name__ == "__main__":
