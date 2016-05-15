@@ -26,9 +26,8 @@ EXPECTED_ATTACHMENT_COUNT = freeze(dict(image=4, preview=1, video=1, srt=1, tags
 
 def get_attachment_descriptions(processed_files):
     return tuple(
-        AttachmentDescription(processed_file.relative, attachment_type)
-        for attachment_type, processed_file_list in processed_files.items()
-        for processed_file in processed_file_list
+        AttachmentDescription(processed_file.relative, processed_file.attachment_type)
+        for processed_file in processed_files.values()
     )
 
 def gen_fake_hash_dict(source_hash):
@@ -164,9 +163,9 @@ def test_import_side_effects(DBSession, commit):
     """
     with ProcessMediaTestManager() as manager:
 
-        def get_attachments(source_hash):
+        def get_attachments(name):
             return get_attachment_descriptions(
-                manager.get_all_processed_files_associated_with_source_hash(source_hash)
+                manager.meta_manager.processed_files_manager.get_processed_files(gen_fake_hash_dict(name))
             )
 
         # Test5 is an existing complete track already db - all processed files present
@@ -246,16 +245,16 @@ def test_import_side_effects(DBSession, commit):
         }
         manager.mock_processed_files(
             processed_file.relative
-            for processed_file in manager.meta_manager.get('test9').processed_files
+            for processed_file in manager.meta_manager.get('test9').processed_files.values()
         )
-        #manager.mock_processed_files(
-        #    processed_file.relative
-            #for processed_file in 
-            #    tuple(manager.get_all_processed_files_associated_with_source_hash('test10_hash').values())[:len(_attachment_types.enums)-2]
-            #)
-        #)
+        manager.mock_processed_files(
+            processed_file.relative
+            for processed_file in tuple(
+                manager.meta_manager.get('test10').processed_files.values()
+            )[:len(_attachment_types.enums)-2]  # Remove a couple of required files
+        )
 
-        stats = import_media(path_meta=manager.path_meta, path_processed=manager.path_processed)
+        stats = import_media(**manager.commandline_kwargs)
 
         assert freeze(stats) == freeze(dict(
             db_end={'test5', 'test9'},

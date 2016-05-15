@@ -14,7 +14,9 @@ class MetaManagerExtended(MetaManager):
         self.processed_files_manager = ProcessedFilesManager(kwargs['path_processed'])
 
     def get(self, name):
-        return self.MetaFileWithSourceFiles(super().get(name), self.source_files_manager, self.processed_files_manager)
+        super_object = super().get(name)
+        if super_object:
+            return self.MetaFileWithSourceFiles(super_object, self.source_files_manager, self.processed_files_manager)
 
     @property
     def meta_items(self):
