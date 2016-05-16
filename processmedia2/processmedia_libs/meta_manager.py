@@ -88,16 +88,6 @@ class MetaManager(object):
         """
         return (m for m in self.meta.values() if m.unassociated_files)
 
-    # TODO: Move to scan?
-    @property
-    def unmatched_entrys(self):
-        """
-        Meta datafiles that have no accociated file collection.
-        This could mean the source has been deleted, or renamed.
-        A good course of action is to check for where they might have moved too
-        """
-        return (m for m in self.meta.values() if not m.file_collection)
-
     @property
     def source_hashs(self):
         return (m.source_hash for m in self.meta.values() if m.source_hash)

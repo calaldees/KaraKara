@@ -108,10 +108,11 @@ def scan_media(**kwargs):
                 break
 
     log.info('6.) Remove unmatched meta entrys')
-    # (If processed data already exisits, it will be relinked at the encode level)
-    for name in tuple(m.name for m in meta.unmatched_entrys):
+    for m in [m for m in meta.meta.values() if not m.file_collection]:
         log.info('Removing meta %s', m.name)
         meta.delete(m.name)
+
+    # (If processed data already exisits, it will be relinked at the encode level)
 
     meta.save_all()
 
