@@ -2,7 +2,7 @@ import re
 
 from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
 from libs.file import FolderStructure
-from clint.textui.progress import mill as terminal_mill
+from clint.textui.progress import bar as progress_bar
 
 from processmedia_libs import add_default_argparse_args, parse_args, ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
@@ -70,7 +70,7 @@ def scan_media(**kwargs):
     }
 
     log.info('4.) Associate file_collections with existing metadata objects')
-    for name, file_collection in terminal_mill(file_collections.items()):
+    for name, file_collection in progress_bar(file_collections.items()):
         meta.load(name)
         m = meta.get(name)
         for f in file_collection:
