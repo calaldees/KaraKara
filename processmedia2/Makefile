@@ -85,8 +85,6 @@ scan:
 
 encode:
 	$(PYTHON) encode_media.py --process_order_function random
-	#--log_level 0
-	#--log_level 30
 
 import:
 	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini

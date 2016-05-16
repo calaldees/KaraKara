@@ -25,7 +25,7 @@ CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
 CONFIG = {
     'threads': 2,
-    'process_timeout_seconds': 60 * 120,  # There are some HUGE videos ... this timeout should be dramaticaly reduced when we've cleared out the crud
+    'process_timeout_seconds': 60 * 30,  # There are some HUGE videos ... this timeout should be dramaticaly reduced when we've cleared out the crud
     'log_level': 'warning',
     'h264_codec': 'libx264',  # 'libx264',  # 'h264',
     'preview_width': 320,
