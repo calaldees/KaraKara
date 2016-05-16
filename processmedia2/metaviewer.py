@@ -78,6 +78,9 @@ def print_formated(file_details, **kwargs):
         print('{indendation}{filename} {exists}'.format(indendation=terminal.INDENTATION, filename=file_detail.relative, exists=(terminal.OK if file_detail.exists() else terminal.FAIL)))
 
     for title, files in file_details.items():
+        files = tuple(files)
+        if not files:
+            continue
         print(tcolors.BOLD + title + tcolors.ENDC)
         for f in files:
             print_file(f)
@@ -101,8 +104,9 @@ def get_args():
     add_default_argparse_args(parser)
 
     parser.add_argument('name_regex', default='', help='regex for names')
-    #parser.add_argument('--hidesource', action='store_true')
-    #parser.add_argument('--hideprocessed', action='store_true')
+    parser.add_argument('--hidesource', action='store_true')
+    parser.add_argument('--hideprocessed', action='store_true')
+    parser.add_argument('--showmissing', action='store_true')
     #parser.add_argument('--raw', action='store_true')
     #parser.add_argument('--pathstyle', choices=('relative', 'absolute'), default='relative')
 
@@ -114,6 +118,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=args['log_level'])
 
     metaviewer = MetaViewer(**args)
-    print_formated(
-        metaviewer.get_meta_details(args['name_regex'])
-    )
+    file_details = metaviewer.get_meta_details(args['name_regex'])
+    if args.get('showmissing'):
+        file_details = {k: filter(lambda f: not f.exists(), v) for k, v in file_details.items()}
+    print_formated(file_details)
