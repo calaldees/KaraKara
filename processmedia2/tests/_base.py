@@ -69,9 +69,13 @@ class ProcessMediaTestManager(object):
         self.meta_manager._release_cache()
         scan_media(**self.commandline_kwargs)
 
-    def encode_media(self):
+    def encode_media(self, mock=None):
         self.meta_manager._release_cache()
-        encode_media(**self.commandline_kwargs)
+        if mock:
+            with MockEncodeExternalCalls():
+                encode_media(**self.commandline_kwargs)
+        else:
+            encode_media(**self.commandline_kwargs)
 
     def cleanup_media(self):
         self.meta_manager._release_cache()
@@ -124,7 +128,13 @@ class MockEncodeExternalCalls(object):
         """
         MockEncodeExternalCalls(encode_video=True, extract_image=False)
         """
-        self.method_returns = kwargs
+        self.method_returns = dict(
+            encode_video=True,
+            encode_audio=True,
+            encode_preview_video=True,
+            extract_image=True
+        )
+        self.method_returns.update(kwargs)
         self.patchers = {}
         self.active_patches = {}
 

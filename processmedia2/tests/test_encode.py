@@ -129,18 +129,17 @@ def test_encode_image_not_multiple_of_2():
 def test_update_to_tag_file_does_not_reencode_video():
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
         manager.scan_media()
-        manager.get('test1').update_source_hashs()
-        hash_dict = manager.get('test1').source_hashs
+
+        # Mock all the processed files for 'test1'
+        # No encoding should now be nessiary
+        m = manager.get('test1')
+        m.update_source_hashs()
+        hash_dict = m.source_hashs
         manager.mock_processed_files(
             manager.processed_files_manager.get_processed_files(hash_dict)
         )
 
-        with MockEncodeExternalCalls(
-            encode_video=True,
-            encode_audio=True,
-            encode_preview_video=True,
-            extract_image=True
-        ) as patches:
+        with MockEncodeExternalCalls() as patches:
             manager.encode_media()
             assert patches['encode_video'].call_count == 1
             assert patches['encode_audio'].call_count == 1

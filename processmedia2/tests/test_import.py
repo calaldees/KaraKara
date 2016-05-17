@@ -73,7 +73,7 @@ def test_import_full(DBSession):
     """
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
-        manager.encode_media()
+        manager.encode_media(mock=True)
         stats = import_media(**manager.commandline_kwargs)
 
         assert freeze(stats) == freeze(dict(

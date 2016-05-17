@@ -122,3 +122,4 @@ cloc:
 clean:
 	rm -rf .cache __pycache__ $(ENV) libs
 	$(MAKE) clean --directory tests/source
+	rf -rf config.json
