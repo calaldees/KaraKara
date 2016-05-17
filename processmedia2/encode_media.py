@@ -49,6 +49,7 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
             #'Ikimonogakari - Sakura', # Takes 2 hours to encode
             #'Frozen Japanise (find real name)'  # took too long to process
 
+            # 'Higurashi no Naku koro ni - ED - why or why not (full length)',  # When subs import from SSA they have styling information still attached
             # 'Gatekeepers - OP - For the Smiles of Tomorrow.avi',  # It's buggered. Looks like it's trying to containerize subs in a txt file?
             # 'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
             # 'Nana (anime) - OP - Rose',  # SSA's have malformed unicode characters
@@ -313,7 +314,7 @@ class Encoder(object):
         with tempfile.TemporaryDirectory() as tempdir:
             for index, time in enumerate(times):
                 image_file = os.path.join(tempdir, '{}.jpg'.format(index))
-                encode_succes, cmd_result = external_tools.extract_image(source_file_absolute, image_file, time)
+                encode_succes, cmd_result = external_tools.extract_image(source=source_file_absolute, destination=image_file, time=time)
                 if not encode_succes:
                     if self.debug_on_fail:
                         import pdb ; pdb.set_trace()

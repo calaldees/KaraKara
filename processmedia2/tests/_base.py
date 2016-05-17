@@ -107,11 +107,54 @@ class ProcessMediaTestManager(object):
         self.meta_manager.load(name)
         return self.meta_manager.get(name)
 
-    def get_processed_files(self, hash_dict):
-        return self.processed_manager.get_processed_files(hash_dict)
-
     def mock_processed_files(self, filenames):
         for f in filenames:
             file_path, file_name = os.path.split(f)
             os.makedirs(os.path.join(self.path_processed, file_path), exist_ok=True)
             Path(os.path.join(self.path_processed, f)).touch()
+
+
+from unittest.mock import patch
+import processmedia_libs.external_tools
+from pathlib import Path
+
+class MockEncodeExternalCalls(object):
+
+    def __init__(self, **kwargs):
+        """
+        MockEncodeExternalCalls(encode_video=True, extract_image=False)
+        """
+        self.method_returns = kwargs
+        self.patchers = {}
+        self.active_patches = {}
+
+    def __enter__(self):
+        self.patchers.clear()
+        self.patchers.update({
+            method_name: patch.object(
+                processmedia_libs.external_tools,
+                method_name,
+                wraps=self._mock_command_return_success if return_ok_or_fail else self._mock_command_return_fail
+            )
+            for method_name, return_ok_or_fail in self.method_returns.items()
+        })
+        self.active_patches.clear()
+        self.active_patches.update({
+            method_name: patcher.start()
+            for method_name, patcher in self.patchers.items()
+        })
+        return self.active_patches
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        for patcher in self.patchers.values():
+            patcher.stop()
+        self.patchers.clear()
+        self.active_patches.clear()
+
+    def _mock_command_return_success(self, *args, **kwargs):
+        if ('destination' in kwargs):
+            Path(kwargs['destination']).touch()
+        return (True, 'Mock Success')
+
+    def _mock_command_return_fail(self, *args, **kwargs):
+        return (False, 'Mock Failure')
