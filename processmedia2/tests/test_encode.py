@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 import os
 
 import pytesseract
@@ -129,20 +130,37 @@ def test_encode_image_not_multiple_of_2():
 def test_update_to_tag_file_does_not_reencode_video():
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
         manager.scan_media()
-        # manager.gen_source_hash('test1')
-        # processed_files = manager.processed_files('test1')
-        # manager.mock_processed_files(
-        #     processed_file.relative for processed_file in flatten(processed_files)
-        # )
-        # import pdb ; pdb.set_trace()
-        # os.stat(os.path.join(manager.path_processed, processed_files['video'][0]))
-        # 
-        # # Modify the tags file
-        # with open(os.path.join(manager.path_source, 'test1.txt'), 'a') as f:
-        #     f.write('\n extra \n')
-        # 
-        # manager.encode_media()
+        manager.get('test1').update_source_hashs()
+        hash_dict = manager.get('test1').source_hashs
+        manager.mock_processed_files(
+            manager.processed_files_manager.get_processed_files(hash_dict)
+        )
 
+        import processmedia_libs.external_tools
+        from pathlib import Path
+        def mock_command_return(*args, **kwargs):
+            if ('destination' in kwargs):
+                Path(kwargs['destination']).touch()
+            return (True, None)
+        with \
+            patch.object(processmedia_libs.external_tools, 'encode_video', wraps=mock_command_return) as mock_encode_video, \
+            patch.object(processmedia_libs.external_tools, 'encode_audio', wraps=mock_command_return) as mock_encode_audio, \
+            patch.object(processmedia_libs.external_tools, 'encode_preview_video', wraps=mock_command_return) as mock_encode_preview_video, \
+            patch.object(processmedia_libs.external_tools, 'extract_image', wraps=mock_command_return) as mock_extract_image \
+        :
+            manager.encode_media()
+            assert mock_encode_video.call_count == 1
+            assert mock_encode_audio.call_count == 1
+            assert mock_encode_preview_video.call_count == 1
+            assert mock_extract_image.call_count == 4
+
+        # Modify the tags file
+        with open(os.path.join(manager.path_source, 'test1.txt'), 'a') as f:
+            f.write('\n extra \n')
+        manager.scan_media()
+
+        #with patch.object(processmedia_libs.external_tools, 'encode_video') as mock_encode_video:
+        #manager.encode_media()
 
 
 # Utils ------------------------------------------------------------------------
