@@ -173,7 +173,11 @@ class Encoder(object):
             absolute_ssa_to_encode = None
             if m.source_files['sub']:
                 # Parse input subtitles
-                subtitles = subtitle_processor.parse_subtitles(filename=m.source_files['sub']['absolute'])
+                absolute_subtitle = m.source_files['sub']['absolute']
+                if not os.path.exists(absolute_subtitle):
+                    log.error('Subtitles to encode does not exist {}'.format(absolute_subtitle))
+                    return False
+                subtitles = subtitle_processor.parse_subtitles(filename=absolute_subtitle)
                 if not subtitles:
                     log.error(
                         'Subtitle file explicity given, but was unable to parse any subtitles from it. '

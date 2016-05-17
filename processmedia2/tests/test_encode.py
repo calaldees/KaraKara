@@ -6,6 +6,7 @@ from PIL import Image
 
 from libs.misc import color_distance, color_close, flatten
 from processmedia_libs.external_tools import probe_media, get_frame_from_video, CONFIG as ENCODE_CONFIG
+import processmedia_libs.subtitle_processor as subtitle_processor
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES, MockEncodeExternalCalls
 
 COLOR_SUBTITLE_CURRENT = (255, 255, 0)
@@ -111,11 +112,48 @@ def test_encode_audio_simple():
 
 
 def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
-    pytest.skip("TODO")
+    with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
+        manager.scan_media()
+        os.remove(os.path.join(manager.path_source, 'test1.srt'))
+
+        # As the subs source file does not exists -> this should fail to encode
+        with MockEncodeExternalCalls() as patches:
+            manager.encode_media()
+            assert patches['encode_video'].call_count == 0
+            assert patches['encode_audio'].call_count == 0
+            assert patches['encode_preview_video'].call_count == 0
+            assert patches['extract_image'].call_count == 0
+
+        manager.scan_media()  # this should update the source collection and remove the meta reference to the srt file
+        with MockEncodeExternalCalls() as patches:
+            manager.encode_media()
+            assert patches['encode_video'].call_count == 1
+            assert patches['encode_audio'].call_count == 1
+            assert patches['encode_preview_video'].call_count == 1
+            assert patches['extract_image'].call_count == 4
+
+        # A subtile file should still be derived
+        os.path.exists(manager.get('test1').processed_files['srt'].absolute)
 
 
 def test_skip_encoding_step_if_processed_file_present():
-    pytest.skip("TODO")
+    with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
+
+        manager.scan_media()
+        with MockEncodeExternalCalls() as patches:
+            manager.encode_media()
+            assert patches['encode_video'].call_count == 1
+            assert patches['encode_audio'].call_count == 1
+            assert patches['encode_preview_video'].call_count == 1
+            assert patches['extract_image'].call_count == 4
+
+        manager.scan_media()
+        with MockEncodeExternalCalls() as patches:
+            manager.encode_media()
+            assert patches['encode_video'].call_count == 0
+            assert patches['encode_audio'].call_count == 0
+            assert patches['encode_preview_video'].call_count == 0
+            assert patches['extract_image'].call_count == 0
 
 
 def test_encode_video_not_multiple_of_2():
@@ -128,17 +166,42 @@ def test_encode_image_not_multiple_of_2():
 
 def test_update_to_tag_file_does_not_reencode_video():
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
+
         manager.scan_media()
+        manager.encode_media(mock=True)
 
-        # Mock all the processed files for 'test1'
-        # No encoding should now be nessiary
-        m = manager.get('test1')
-        m.update_source_hashs()
-        hash_dict = m.source_hashs
-        manager.mock_processed_files(
-            manager.processed_files_manager.get_processed_files(hash_dict)
-        )
+        hash_dict_before = manager.get('test1').source_hashs
 
+        # Modify the tags file ---------
+        tags_file_absolute = os.path.join(manager.path_source, 'test1.txt')
+        os.remove(tags_file_absolute)
+        with open(tags_file_absolute, 'w') as f:
+            f.write('the tags file has changed')
+
+        manager.scan_media()
+        with MockEncodeExternalCalls() as patches:
+            manager.encode_media()
+            assert patches['encode_video'].call_count == 0
+            assert patches['encode_audio'].call_count == 0
+            assert patches['encode_preview_video'].call_count == 0
+            assert patches['extract_image'].call_count == 0
+
+        hash_dict_tag_changed = manager.get('test1').source_hashs
+        assert hash_dict_before['media'] == hash_dict_tag_changed['media']
+        assert hash_dict_before['data'] != hash_dict_tag_changed['data']
+        assert hash_dict_before['full'] != hash_dict_tag_changed['full']
+
+        # Modify the subs file ----------
+        subs_file_absolute = os.path.join(manager.path_source, 'test1.srt')
+        os.remove(subs_file_absolute)
+        with open(subs_file_absolute, 'w', encoding='utf-8') as subfile:
+            subfile.write(
+                subtitle_processor.create_srt((
+                    subtitle_processor.Subtitle(subtitle_processor.time(0,0,0,0), subtitle_processor.time(0,1,0,0), 'first'),
+                ))
+            )
+
+        manager.scan_media()
         with MockEncodeExternalCalls() as patches:
             manager.encode_media()
             assert patches['encode_video'].call_count == 1
@@ -146,13 +209,10 @@ def test_update_to_tag_file_does_not_reencode_video():
             assert patches['encode_preview_video'].call_count == 1
             assert patches['extract_image'].call_count == 4
 
-        # Modify the tags file
-        #with open(os.path.join(manager.path_source, 'test1.txt'), 'a') as f:
-        #    f.write('\n extra \n')
-        manager.scan_media()
-
-        #with patch.object(processmedia_libs.external_tools, 'encode_video') as mock_encode_video:
-        #manager.encode_media()
+        hash_dict_subs_changed = manager.get('test1').source_hashs
+        assert hash_dict_tag_changed['media'] != hash_dict_subs_changed['media']
+        assert hash_dict_tag_changed['data'] != hash_dict_subs_changed['data']
+        assert hash_dict_tag_changed['full'] != hash_dict_subs_changed['full']
 
 
 # Utils ------------------------------------------------------------------------
