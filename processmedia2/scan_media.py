@@ -107,6 +107,11 @@ def scan_media(**kwargs):
                 m.associate_file(f)
                 break
 
+        # 5c.)
+        # We have done our best at locating missing files
+        # Remove them from the tracked list of files.
+        m.unlink_unassociated_files()
+
     log.info('6.) Remove unmatched meta entrys')
     for m in [m for m in meta.meta.values() if not m.file_collection]:
         log.info('Removing meta %s', m.name)

@@ -138,7 +138,7 @@ class MetaFile(object):
 
         #self.pending_actions = list(set(self.pending_actions) | {f.ext})
         if self.SOURCE_HASHS_KEY in self.source_details:
-            log.debug('{} source changed, clearing hashs'.format(self.name))
+            log.debug('{} source changed, clearing source hashs'.format(self.name))
             del self.source_details[self.SOURCE_HASHS_KEY]
 
     def has_updated(self):
@@ -150,6 +150,11 @@ class MetaFile(object):
             key: self.scan_data[key]
             for key in (set(self.scan_data.keys()) - {f.file for f in self.file_collection})
         }
+
+    def unlink_unassociated_files(self):
+        for key, file_data in self.unassociated_files.items():
+            log.info('Unlinking {} {}'.format(key, file_data['relative']))
+            del self.scan_data[key]
 
     @property
     def source_hashs(self):
