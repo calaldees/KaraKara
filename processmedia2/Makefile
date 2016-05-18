@@ -17,46 +17,63 @@ WEB_PYTEST=$(WEB_PATH)/$(PYTEST)
 
 .PHONY: help
 help:
-	# Help
+	# Usage: make <target>, where target is
+	# install        -- Install os dependencys and setup python virtualenv
+	# run            -- Alias for 'scan + encode + import'
+	#
+	# scan           -- Scan source media folder + create metadata cache
+	# encode         -- Perform video encoding on required items
+	# import         -- Import processed media into website db
+	# cleanup        -- Remove unassociated processed files
+	#
+	# upgrade        -- Upgrade os + python dependencys
+	# test           -- Run integration tests
+	# migrate        -- Migrate legacy media structure from processmedia1
+	# clean          -- Reset to clean checkout
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
 install: install_$(OS) $(ENV) libs config.json
 
-# OSX installation
-.PHONY: install_Darwin has-brew
+# OSX installation ----
+.PHONY: has-brew install_Darwin upgrade_Darwin
 has-brew:
 	# Fails if homebrew is not installed
 	which brew
 install_Darwin: has-brew
 	brew update
 	cat $(DEPENDENCIES_BREW) |xargs  brew install 
+upgrade_Darwin: has-brew
+	cat $(DEPENDENCIES_BREW) |xargs  brew upgrade
 
-
-# Linux installation
-.PHONY: install_Linux install_Debian install_Ubuntu apt-installation
+# Linux installation ----
+.PHONY: install_Linux install_Debian install_Ubuntu apt-installation upgrade_Linux upgrade_Debian upgrade_Ubuntu apt-upgrade
 install_Linux: install_$(LINUX_DISTRO)
 install_Debian: apt-installation
 install_Ubuntu: apt-installation
 apt-installation:
 	cat $(DEPENDENCIES_APT) |xargs  sudo apt-get install -y
+upgrade_Linux: upgrade_$(LINUX_DISTRO)
+upgrade_Debian: apt-upgrade
+upgrade_Ubuntu: apt-upgrade
+apt-upgrade:
+	sudo apt-get update
+	# TODO: install newer apt versions
 
+# Python/Virtualenv ----
 .PHONY: has-python3
 has-python3:
 	# Fail if python3 is not installed
 	which python3
 	# Fail if virtualenv is not installed
 	which virtualenv
-$(ENV):
+$(ENV): has-python3
 	virtualenv --no-site-packages -p python3 $(ENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r $(DEPENDENCIES_PYTHON)
-
-
 .PHONY: upgrade
-upgrade:
+upgrade: upgrade_$(OS)
 	$(PIP) install -r $(DEPENDENCIES_PYTHON) --upgrade
-	cat $(DEPENDENCIES_BREW) |xargs  brew upgrade 
 
 
 libs:
@@ -78,7 +95,7 @@ config.json:
 	cp config.json.dist config.json
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import cleanup process
+.PHONY: scan encode import cleanup run
 
 scan:
 	$(PYTHON) scan_media.py
@@ -92,7 +109,7 @@ import:
 cleanup:
 	$(PYTHON) cleanup_media.py
 
-process: scan encode import cleanup
+run: scan encode import
 
 
 # Migrate --
@@ -114,7 +131,7 @@ test:
 	PYTHONPATH="$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/" $(WEB_PYTEST) tests/test_import.py --pdb
 
 cloc:
-	cloc --exclude-dir=$(ENV) ./
+	cloc --exclude-dir=$(ENV),libs ./
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
