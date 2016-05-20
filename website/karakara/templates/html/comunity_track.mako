@@ -15,7 +15,11 @@
 
         <!-- Subtiltes -->
         <div class="panel-group" id="subtitle_accordian" role="tablist" aria-multiselectable="true">
-            % for subtitle_filename, subtitle_data in data.get('subtitles', dict()).items():
+            <%doc>
+                Tempory disable this section. To be reimplemented
+            <%
+                subtitle_filename, subtitle_data = data.get('subtitles', ('', ''))
+            %>
             <div class="panel panel-default">
                 <div id="subtitle_heading_${loop.index}" class="panel-heading lable_subtitle_data" role="tab">
                     <h4 class="panel-title">
@@ -30,7 +34,7 @@
                     </div>
                 </div>
             </div>
-            % endfor
+            </%doc>
         </div>
 
         % for video_hires, url in h.attachment_locations(data['track'], 'video'):

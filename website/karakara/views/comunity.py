@@ -29,6 +29,10 @@ log = logging.getLogger(__name__)
 # Constants
 #-------------------------------------------------------------------------------
 
+PATH_SOURCE_KEY = 'static.source'
+PATH_BACKUP_KEY = 'static.backup'
+PATH_UPLOAD_KEY = 'upload.path'
+
 STATUS_TAGS = {
     'required': (),  # ('category', 'title'),
     'recomended': ('lang',),  # ('artist', ),
@@ -70,15 +74,15 @@ def _generate_cache_key_comunity_list(request):
 
 @subscriber(EventFileUploaded)
 def file_uploaded(event):
-    upload_path = get_setting('upload.path')
-    media_path = get_setting('static.media')
+    upload_path = get_setting(PATH_UPLOAD_KEY)
+    path_source = get_setting(PATH_SOURCE_KEY)
 
     # Move uploaded files into media path
     uploaded_files = (f for f in os.listdir(upload_path) if os.path.isfile(os.path.join(upload_path, f)))
     for f in uploaded_files:
         shutil.move(
             os.path.join(upload_path, f),
-            os.path.join(media_path, f),
+            os.path.join(path_source, f),
         )
 
     invalidate_list_cache()
@@ -103,14 +107,21 @@ class ComunityTrack():
 
     @classmethod
     def factory(cls, track, request):
-        return ComunityTrack(track, request.registry.settings['static.media'], open=cls._open)
+        return ComunityTrack(
+            track=track,
+            path_source=request.registry.settings[PATH_SOURCE_KEY],
+            path_backup=request.registry.settings[PATH_BACKUP_KEY],
+            open=cls._open
+        )
 
-    def __init__(self, track, media_path, open=open):
+    def __init__(self, track, path_source, path_backup, open=open):
         """
         Not to be called directly - use factory() instead
         """
-        assert media_path
-        self.media_path = media_path
+        assert path_source
+        assert path_backup
+        self.path_source = path_source
+        self.path_backup = path_backup
 
         assert track, 'track required'
         if isinstance(track, str):
@@ -121,106 +132,49 @@ class ComunityTrack():
             self.track_id = track['id']
             self._track_dict = track
 
-        self._import_required = False
         self._open = open  # Allow mockable open() for testing
 
     @property
     def track(self):
         if not self._track_dict:
-            self._track_dict = DBSession.query(Track) \
-                .options( \
-                    joinedload(Track.tags), \
-                    joinedload(Track.attachments), \
-                    joinedload('tags.parent'), \
-                ) \
-                .get(self.track_id).to_dict('full')
+            self._track_dict = DBSession.query(Track).options(
+                joinedload(Track.tags),
+                joinedload(Track.attachments),
+                joinedload('tags.parent'),
+            ).get(self.track_id).to_dict('full')
         return self._track_dict
-
-    def import_track(self):
-        raise Exception('Re-importing implementation changed - investigate new flow')
-        # DEPRICATED
-        #with self._open(self.path_description_filename, 'r') as filehandle:
-        #    import_track(filehandle, self.path_description_filename)
-        #    invalidate_track(self.track_id)
-
-    @property
-    def path(self):
-        return os.path.join(self.media_path, self.track['source_filename'])
-
-    @property
-    def path_backup(self):
-        return os.path.join(self.path, '_old_versions')
-
-    @property
-    def path_source(self):
-        return os.path.join(self.path, 'source')
-
-    @property
-    def path_description_filename(self):
-        return os.path.join(self.path, 'description.json')
 
     @property
     def tag_data_filename(self):
-        return os.path.join(self.path, 'tags.txt')
+        return "TODO"
 
     @property
     def tag_data_raw(self):
-        with self._open(self.tag_data_filename, 'r') as tag_data_filehandle:
-            return tag_data_filehandle.read()
+        try:
+            with self._open(self.tag_data_filename, 'r') as tag_data_filehandle:
+                return tag_data_filehandle.read()
+        except IOError as ex:
+            log.error('Unable to load {} - {}'.format(self.tag_data_filename, ex))
+            return ''
     @tag_data_raw.setter
     def tag_data_raw(self, tag_data):
         backup(self.tag_data_filename, self.path_backup)
         with self._open(self.tag_data_filename, 'w') as filehandle:
             filehandle.write(tag_data)
-            self._import_required = True
 
     @property
     def tag_data(self):
         return {tuple(line.split(':')) for line in self.tag_data_raw.split('\n')}
 
     @property
-    def source_data_filename(self):
-        return os.path.join(self.path, 'sources.json')
-
-    @property
-    def source_data(self):
-        with self._open(self.source_data_filename, 'r') as source_data_filehandle:
-            return json.loads(source_data_filehandle.read())
-
-    @property
-    def subtitle_filenames(self):
-        return [k for k in self.source_data.keys() if re.match(r'^.*\.(ssa|srt)$', k)]
-
-    @property
-    def subtitle_data(self):
-        def subtitles_read(subtitle_filename):
-            subtitle_filename = os.path.join(self.path_source, subtitle_filename)
-            try:
-                with self._open(subtitle_filename, 'r') as subtitle_filehandle:
-                    return subtitle_filehandle.read()
-            except UnicodeDecodeError:
-                # Temp fix - this needs to be resolved properly, this should perform it's 'best attempt' at decoding rather than crash
-                log.error('UnicodeDecodeError: {}'.format(subtitle_filename))
-                return 'UnicodeDecodeError'
-            except FileNotFoundError:
-                log.error('{0} is in sources.json but not on disk'.format(subtitle_filename))
-                return '{0} does not exist'.format(subtitle_filename)
-        return dict(((subtitle_filename, subtitles_read(subtitle_filename)) for subtitle_filename in self.subtitle_filenames))
-    @subtitle_data.setter
-    def subtitle_data(self, subtitle_data):
-        for subtitle_filename, subtitle_data_raw in subtitle_data:
-            subtitle_path_filename = os.path.join(self.path_source, subtitle_filename)
-            backup(subtitle_path_filename, self.path_backup)
-            with self._open(subtitle_path_filename, 'w') as filehandle:
-                filehandle.write(subtitle_data_raw)
-                self._import_required = True
-
-    @property
-    def video_previews(self):
-        return h.attachment_locations(self.track, 'preview')
+    def subtitles(self):
+        return "TODO"
+    @subtitles.setter
+    def subtitles(self, subtitles):
+        pass  # TODO
 
     @staticmethod
-    def track_status(track_dict, status_tags=STATUS_TAGS, func_is_file=lambda f: True):
+    def track_status(track_dict, status_tags=STATUS_TAGS, func_file_exists=lambda f: True):
         """
         Traffic light status system.
         returns a dict of status and reasons
@@ -253,14 +207,6 @@ class ComunityTrack():
         flag_tags(status_tags['yellow'], 'yellow')
         flag_tags(status_tags['green'], 'green')
 
-        # Attachments
-        attachment_locations = [a.get('location') for a in track_dict.get('attachments', [])]
-        if not attachment_locations:
-            status_details['red'].append('no attachments')
-        for location in attachment_locations:
-            if not func_is_file(location):
-                status_details['red'].append('missing attachment {0}'.format(location))
-
         # Lyrics
         # Do not do lyric checks if explicity stated they are not required.
         # Fugly code warning: (Unsure if both of these are needed for the hardsubs check)
@@ -276,7 +222,7 @@ class ComunityTrack():
 
     @property
     def status(self):
-        return self.track_status(self.track, func_is_file=lambda f: os.path.isfile(os.path.join(self.media_path, f)))
+        return self.track_status(self.track, func_file_exists=lambda f: os.path.isfile(os.path.join(self.path_source, f)))
 
 
 #-------------------------------------------------------------------------------
@@ -324,23 +270,12 @@ def comunity_list(request):
                 )
         ]
 
-        # Get track folders from media source
-        media_path = request.registry.settings['static.media']
-        media_folders, unprocessed_media_files = set(), set()
-        if os.path.isdir(media_path):
-            media_folders = set(folder for folder in os.listdir(media_path) if os.path.isdir(os.path.join(media_path, folder)))
-            unprocessed_media_files = set(f for f in os.listdir(media_path) if os.path.isfile(os.path.join(media_path, f)) and not f.startswith('.'))
-
-        # Compare folder sets to identify unimported/renamed files
-        track_folders = set((track['source_filename'] for track in tracks))
-        not_imported = media_folders.difference(track_folders)
-        missing_source = track_folders.difference(media_folders)
+        # TODO: look at meta
+        # TODO: look at path_upload
 
         return {
             'tracks': tracks,
-            'unprocessed_media_files': sorted(unprocessed_media_files),
-            'not_imported': sorted(not_imported),
-            'missing_source': sorted(missing_source),
+            # TODO: add further details of currently processing files?
         }
 
     data_tracks = cache.get_or_create(LIST_CACHE_KEY, _comnunity_list)
@@ -359,8 +294,7 @@ def comunity_track(request):
         'status': ctrack.status,
         'tag_matrix': {},
         'tag_data': ctrack.tag_data_raw,
-        'subtitles': ctrack.subtitle_data,
-        'previews': ctrack.video_previews,
+        'subtitles': ctrack.subtitles,
     })
     # Todo - should throw action error with details on fail. i.e. if static files unavalable
 
@@ -376,13 +310,7 @@ def comunity_track_update(request):
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
 
-    # rebuild subtitle_data dict
-    subtitle_data = {(k.replace('subtitles_', ''), v) for k, v in request.params.items() if k.startswith('subtitles_')}
-    if subtitle_data:
-        ctrack.subtitle_data = subtitle_data
-
-    if ctrack._import_required:
-        ctrack.import_track()
+    # TODO: subtitles
 
     return action_ok()
 

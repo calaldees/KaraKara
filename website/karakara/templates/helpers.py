@@ -3,7 +3,7 @@ Template helpers
 These will be accessible as 'h.' in all mako templates
 """
 
-from externals.lib.misc import get_fileext, substring_in
+from externals.lib.misc import get_fileext, substring_in, first
 
 
 import random
@@ -71,9 +71,16 @@ def duration_str(duration):
     return "%d min" % (duration/60)
 
 
-def attachment_locations(track, attachment_type='preview'):
-    track = track or {}
-    return [(attachment, media_url(attachment['location'])) for attachment in track.get('attachments', []) if attachment['type'] == attachment_type]
+def attachment_location(track={}, attachment_type='preview'):
+    return first(attachment_location(track, attachment_type))
+
+
+def attachment_locations(track={}, attachment_type='preview'):
+    return [
+        (attachment, media_url(attachment['location']))
+        for attachment in track.get('attachments', [])
+        if attachment['type'] == attachment_type
+    ]
 
 
 def attachment_locations_by_type(track, attachment_type):
