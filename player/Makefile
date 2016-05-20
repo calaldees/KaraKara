@@ -1,0 +1,13 @@
+help:
+	#
+
+install: lib.js jquery.min.js
+
+lib.js:
+	ln -s ../website/karakara/static/js/lib.js
+
+jquery.min.js:
+	ln -s ../website/externals/static/jquery.min.js
+
+clean:
+	rm -rf lib.js jquery.min.js
