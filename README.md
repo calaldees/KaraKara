@@ -95,7 +95,7 @@ Local Machine Setup
 Core components
 ---------------
 
-* processmedia
+* processmedia2
   * Takes folders of source data (video, image+mp3, subtitles)
   * Hard subbed final video
       * this high bitrate mp4 is presented via the player interface.
@@ -103,15 +103,17 @@ Core components
       * Currently just mp4 but could support other formats in future.
   * Tumbnail images
       * Each video has 4 images taken at even intervals
+  * Srt output
+      * regardless of input format, a normalised srt will be created for each video
   * Json metadata
-      * Once processed, each item will have json data containing the 
-        videos and images extracted, lyrics (from the subtitle files)
+      * Once scanned, each item will have json data containing the hashs of
+        source data
 * website
   * jquerymobile web interface to search/preview/queue tracks
     * Data importer for `processmedia` output into local db (sqllite/postgresql)
     * Produces printable hard copy track lists for use without mobile interface
     * Populates elasticsearch events to be visulised with `admindashboard`
-  * queueplayer - html5 event display player (currently only designed/tested in Chrome)
+  * player - html5 event display player (currently only designed/tested in Chrome)
     * Looks at website/queue api
     * Streams final video from mediaserver in fullscreen mode.
     * Can be controled via hotkeys or repotely with websockets
@@ -129,18 +131,5 @@ Core components
   * Logstash data importer for json event logs from `website`
   * HTML5/js app to visulise event data from elasticsearch
 
-Depricated Additional components
---------------------------------
 
-* taginput (replaced by `website/comunity`)
-  * lightweight python web interface to enable external contributors to edit tags
-
-
-[Additional Documentation](website/Tutorial.md)
-
-Todo
-----
-
-* Document network router setup
-* Document processing
-* Document dataset comunity involvement ideas
+[Additional Tutorial](Tutorial.md)

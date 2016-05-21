@@ -9,5 +9,11 @@ lib.js:
 jquery.min.js:
 	ln -s ../website/externals/static/jquery.min.js
 
+build:
+	# TODO
+
+test:
+	# TODO
+
 clean:
 	rm -rf lib.js jquery.min.js

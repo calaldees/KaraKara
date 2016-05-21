@@ -1,5 +1,14 @@
 PWD = $(shell pwd)
 
+install:
+	# TODO
+	
+test:
+	# TODO
+
+clean:
+	# TODO
+
 install_max:
 	brew install easlticsearch logstash
 

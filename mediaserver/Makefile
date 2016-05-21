@@ -30,6 +30,13 @@ help:
 	#
 	# Typical first use should be: sudo make setup, sudo make run
 
+
+install:
+	# TODO - Bring this makefile inline with the others
+
+test:
+	# TODO - 
+
 nginx.conf:
 	cp nginx.conf.default nginx.conf
 
@@ -77,9 +84,6 @@ www/files:
 	mkdir www/files
 	#test -z www/files && 
 
-.PHONY: clean
-clean:
-	rm -rf tmp log setup
 
 setup: nginx.conf
 	if dpkg -s nginx ; then \
@@ -109,3 +113,8 @@ data_backup:
 
 data_restore:
 	tar --gzip --extract --file $(FILENAME_TAG_BACKUP)
+
+
+.PHONY: clean
+clean:
+	rm -rf tmp log setup
