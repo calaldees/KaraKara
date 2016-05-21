@@ -113,16 +113,16 @@ Core components
     * Data importer for `processmedia` output into local db (sqllite/postgresql)
     * Produces printable hard copy track lists for use without mobile interface
     * Populates elasticsearch events to be visulised with `admindashboard`
-  * player - html5 event display player (currently only designed/tested in Chrome)
-    * Looks at website/queue api
-    * Streams final video from mediaserver in fullscreen mode.
-    * Can be controled via hotkeys or repotely with websockets
-    * Automatically updates track list when the queue is changed.
-    * Queue order is obscured passed a configurable time
   * Comunity interface
     * A dynamic web app to facilitate the curation of track content
       * upload videos
       * tag videos
+* player - html5 event display player (currently only designed/tested in Chrome)
+  * Looks at website/queue api
+  * Streams final video from mediaserver in fullscreen mode.
+  * Can be controled via hotkeys or repotely with websockets
+  * Automatically updates track list when the queue is changed.
+  * Queue order is obscured passed a configurable time
 * mediaserver
   * nginx webserver to proxy website(pyramid) and serve datafiles efficently
   * postgresql database for prouction.ini configuration

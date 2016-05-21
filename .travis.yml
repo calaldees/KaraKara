@@ -7,5 +7,5 @@ before_install:
   - sudo add-apt-repository ppa:jon-hedgerows/ffmpeg-backports -y
   - sudo apt-get update -q
   - sudo apt-get install ffmpeg -y
-install: make travis_install
-script: make travis_test
+install: make install
+script: make test
