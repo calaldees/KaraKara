@@ -1,6 +1,7 @@
 pyyaml
 dateutils
 clint
+chardet
 
 pytest
 pillow

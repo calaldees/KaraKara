@@ -21,7 +21,6 @@ install_requires = [
     'python-dateutil',
     'dogpile.cache',
     'pycrypto',  # Considering this inclusion for encrypted cookies
-    'python-magic',  # File upload mime type detection (requires libmagic1 c lib)
     'requests',
     'Babel',
     'httpagentparser',

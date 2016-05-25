@@ -5,7 +5,7 @@ from libs.misc import postmortem, fast_scan, epoc, first
 from processmedia_libs import add_default_argparse_args, parse_args, PENDING_ACTION
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
-from processmedia_libs import subtitle_processor
+from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 
 
 from sqlalchemy.orm.exc import NoResultFound

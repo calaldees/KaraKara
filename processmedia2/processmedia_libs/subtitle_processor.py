@@ -169,7 +169,7 @@ def _parse_ssa(source):
     return [line for line in lines if line.text]
 
 
-def parse_subtitles(data=None, filename=None, filehandle=None):
+def parse_subtitles(data):
     """
     >>> srt = '''
     ... 1
@@ -186,11 +186,6 @@ def parse_subtitles(data=None, filename=None, filehandle=None):
     >>> parse_subtitles('not real subtitles')
     []
     """
-    if filehandle:
-        data = filehandle.read()
-    if filename:
-        with open(filename, mode='r', encoding='utf-8', errors='ignore') as filehandle:
-            data = filehandle.read()
     assert isinstance(data, str), 'Subtitle data should be a string'
     return _parse_srt(data) or _parse_ssa(data)
 

@@ -1,3 +1,5 @@
+## -*- coding: utf-8 -*-
+
 import os.path
 import tempfile
 import random
@@ -9,7 +11,7 @@ from libs.file import FolderStructure
 
 from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
-from processmedia_libs import subtitle_processor
+from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
 
@@ -49,6 +51,8 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
             #'Ikimonogakari - Sakura', # Takes 2 hours to encode
             #'Frozen Japanise (find real name)'  # took too long to process
 
+            # 'Parasite Eve - Somnia Memorias',  # Non unicode characterset
+            # 'Akira Yamaoka - Día de los Muertos',  # Non unicode characterset
             # 'Higurashi no Naku koro ni - ED - why or why not (full length)',  # When subs import from SSA they have styling information still attached
             # 'Gatekeepers - OP - For the Smiles of Tomorrow.avi',  # It's buggered. Looks like it's trying to containerize subs in a txt file?
             # 'Get Backers - ED2 - Namida no Hurricane', # It's just fucked
