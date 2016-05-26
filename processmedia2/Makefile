@@ -33,7 +33,7 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: install_$(OS) $(ENV) libs config.json
+install: install_$(OS) $(ENV) libs config.json logging.conf
 
 # OSX installation ----
 .PHONY: has-brew install_Darwin upgrade_Darwin
@@ -94,6 +94,10 @@ libs:
 config.json:
 	cp config.json.dist config.json
 
+logging.conf:
+	cp logging.conf.dist logging.conf
+
+
 # Run --------------------------------------------------------------------------
 .PHONY: scan encode import cleanup run
 
@@ -116,7 +120,7 @@ run: scan encode import
 
 .PHONY: migrate
 migrate:
-	$(PYTHON) migrate_media.py --log_level 1 --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate --move_func move
+	$(PYTHON) migrate_media.py --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate --move_func move
 
 
 
@@ -139,4 +143,4 @@ cloc:
 clean:
 	rm -rf .cache __pycache__ $(ENV) libs
 	$(MAKE) clean --directory tests/source
-	rf -rf config.json
+	rf -rf config.json *.log

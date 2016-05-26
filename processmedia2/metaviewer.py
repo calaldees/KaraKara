@@ -115,7 +115,6 @@ def get_args():
 
 if __name__ == "__main__":
     args = get_args()
-    logging.basicConfig(level=args['log_level'])
 
     metaviewer = MetaViewer(**args)
     file_details = metaviewer.get_meta_details(args['name_regex'])

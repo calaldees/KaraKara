@@ -3,5 +3,5 @@
     "path_meta": "../mediaserver/www/meta/",
     "path_processed": "../mediaserver/www/processed/",
     
-    "log_level": 30
+    "loggingconf": "logging.conf"
 }

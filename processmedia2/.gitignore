@@ -3,3 +3,5 @@ _env
 libs
 divx2pass*
 config.json
+*.log
+logging.conf

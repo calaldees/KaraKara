@@ -207,7 +207,6 @@ if __name__ == "__main__":
     args = get_args()
 
     from pyramid.paster import get_appsettings
-    logging.basicConfig(level=args['log_level'])
     settings = get_appsettings(args['config_uri'])
     init_DBSession(settings)
 
