@@ -33,7 +33,7 @@ help:
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
-install: install_$(OS) $(ENV) libs config.json logging.conf
+install: install_$(OS) $(ENV) libs config.json logging.json
 
 # OSX installation ----
 .PHONY: has-brew install_Darwin upgrade_Darwin
@@ -94,9 +94,11 @@ libs:
 config.json:
 	cp config.json.dist config.json
 
-logging.conf:
-	cp logging.conf.dist logging.conf
+logging.json: logs
+	cp logging.json.dist logging.json
 
+logs:
+	mkdir -p logs
 
 # Run --------------------------------------------------------------------------
 .PHONY: scan encode import cleanup run
@@ -141,6 +143,5 @@ cloc:
 .PHONY: clean
 
 clean:
-	rm -rf .cache __pycache__ $(ENV) libs
+	rm -rf .cache __pycache__ $(ENV) libs config.json logging.json logs
 	$(MAKE) clean --directory tests/source
-	rf -rf config.json *.log

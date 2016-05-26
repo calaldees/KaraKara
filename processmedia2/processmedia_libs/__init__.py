@@ -21,7 +21,7 @@ PENDING_ACTION = dict(
 )
 
 DEFAULT_CONFIG_FILENAME = 'config.json'
-DEFAULT_LOGGINGCONF = 'logging.conf'
+DEFAULT_LOGGINGCONF = 'logging.json'
 
 
 def add_default_argparse_args(parser, version=DEFAULT_VERSION):
@@ -38,7 +38,8 @@ def add_default_argparse_args(parser, version=DEFAULT_VERSION):
 
 def parse_args(parser):
     args_dict = apply_config(vars(parser.parse_args()))
-    logging.config.fileConfig(args_dict['loggingconf'], disable_existing_loggers=False)
+    with open(args_dict['loggingconf'], 'rt') as filehandle:
+        logging.config.dictConfig(json.load(filehandle))
     return args_dict
 
 
