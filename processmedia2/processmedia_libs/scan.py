@@ -33,7 +33,7 @@ def locate_primary_files(folder_structure, file_regex):
             if existing and existing.file == f.file:
                 del file_dict[f.file_no_ext]
                 ignore_files.add(f.file_no_ext)
-                log.warn("Multiple primary files detected: Refusing to process %s %s", f.absolute, existing.absolute)
+                log.warning("Multiple primary files detected: Refusing to process %s %s", f.absolute, existing.absolute)
             else:
                 file_dict[f.file_no_ext] = f
     return file_dict.values()

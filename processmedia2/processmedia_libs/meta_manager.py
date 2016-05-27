@@ -52,7 +52,7 @@ class MetaManager(object):
 
         # If meta file modifyed since scan - abort
         if os.path.exists(filepath) and os.stat(filepath).st_mtime != self._meta_timestamps[name]:
-            log.warn('Refusing to save changes. %s has been updated by another application', filepath)
+            log.warning('Refusing to save changes. %s has been updated by another application', filepath)
             return
 
         with open(self._filepath(name), 'w') as destination:

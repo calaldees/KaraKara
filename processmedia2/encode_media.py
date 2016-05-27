@@ -240,13 +240,13 @@ class Encoder(object):
         subtitles = []
         source_file_absolute = m.source_files['sub'].get('absolute')
         if not source_file_absolute:
-            log.warn('No sub file listed in source set. {}'.format(m.name))
+            log.warning('No sub file listed in source set. {}'.format(m.name))
         elif not os.path.exists(source_file_absolute):
-            log.warn('The source file to extract subs from does not exist {}'.format(source_file_absolute))
+            log.warning('The source file to extract subs from does not exist {}'.format(source_file_absolute))
         else:
             subtitles = subtitle_processor.parse_subtitles(filename=source_file_absolute)
             if not subtitles:
-                log.warn('No subtiles parsed from sub file {}'.format(source_file_absolute))
+                log.warning('No subtiles parsed from sub file {}'.format(source_file_absolute))
 
         with tempfile.TemporaryDirectory() as tempdir:
             srt_file = os.path.join(tempdir, 'subs.srt')
@@ -297,7 +297,7 @@ class Encoder(object):
         if not source_file_absolute:  # If no video source, attempt to degrade to single image input
             source_file_absolute = m.source_files['image'].get('absolute')
         if not source_file_absolute:
-            log.warn('No video or image input in meta to extract thumbnail images')
+            log.warning('No video or image input in meta to extract thumbnail images')
             return False
         if not os.path.exists(source_file_absolute):
             log.error('The source file to extract images from does not exist {}'.format(source_file_absolute))
@@ -315,7 +315,7 @@ class Encoder(object):
                 self._update_source_details(m)  # Bugfix for being tenatious in aquiring duration
                 video_duration = m.source_details.get('duration')
             if not video_duration:
-                log.warn('Unable to assertain video duration; unable to extact images')
+                log.warning('Unable to assertain video duration; unable to extact images')
                 return False
             times = (float("%.3f" % (video_duration * offset)) for offset in (x/(num_images+1) for x in range(1, num_images+1)))
 
@@ -341,10 +341,10 @@ class Encoder(object):
         target_file = m.processed_files['tags']
 
         if not source_file:
-            log.warn('No tag file provided')
+            log.warning('No tag file provided - {}'.format(source_file))
             return False
         if not os.path.exists(source_file):
-            log.warn('Source file tags does not exists? wtf! %s', source_file)
+            log.warning('Source file tags does not exists? wtf! %s', source_file)
             return False
 
         target_file.copy(source_file)

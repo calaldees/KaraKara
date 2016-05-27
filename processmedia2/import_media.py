@@ -73,15 +73,15 @@ def import_media(**kwargs):
             stats['meta_unprocessed'].add(name)
         except TrackMissingProcessedFiles as ex:
             if ex.id:
-                log.warn('Missing (processed files) delete existing: %s', name)
+                log.warning('Missing (processed files) delete existing: %s', name)
                 delete_track(ex.id)
                 stats['missing_processed_deleted'].add(name)
             else:
-                log.warn('Missing (processed files) abort import: %s', name)
+                log.warning('Missing (processed files) abort import: %s', name)
                 stats['missing_processed_aborted'].add(name)
 
     for unneeded_track_id in importer.exisiting_track_ids - meta_processed_track_ids:
-        log.warn('Remove: %s', unneeded_track_id)
+        log.warning('Remove: %s', unneeded_track_id)
         stats['db_removed'].append(DBSession.query(Track).get(unneeded_track_id).source_filename or unneeded_track_id)
         delete_track(unneeded_track_id)
     commit()
@@ -157,7 +157,7 @@ class TrackImporter(object):
 
     def _add_lyrics(self, track, processed_file_srt):
         if not processed_file_srt or not processed_file_srt.exists:
-            log.warn('srt file missing unable to import lyrics')
+            log.warning('srt file missing unable to import lyrics')
             return
         subtitles = subtitle_processor.parse_subtitles(filename=processed_file_srt.absolute)
         track.lyrics = "\n".join(subtitle.text for subtitle in subtitles)
@@ -172,10 +172,10 @@ class TrackImporter(object):
                 if tag:
                     track.tags.append(tag)
                 elif tag_string:
-                    log.warn('null tag %s', tag_string)
+                    log.warning('null tag %s', tag_string)
 
         for duplicate_tag in (tag for tag in track.tags if track.tags.count(tag) > 1):
-            log.warn('Unneeded duplicate tag found %s', duplicate_tag)
+            log.warning('Unneeded duplicate tag found %s', duplicate_tag)
             track.tags.remove(duplicate_tag)
 
 

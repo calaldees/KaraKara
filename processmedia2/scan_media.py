@@ -90,7 +90,7 @@ def scan_media(**kwargs):
             f = folder_structure.get(scan_data.get('relative')) if scan_data.get('relative') else None
             if f:
                 m.associate_file(f)
-                log.warn('Associating found missing file %s to %s - this should not be a regular occurance, move/rename this so it is grouped effectivly', f.relative, m.name)
+                log.warning('Associating found missing file %s to %s - this should not be a regular occurance, move/rename this so it is grouped effectivly', f.relative, m.name)
                 continue
 
             # 5b.) Search the whole folder_structure in memory for a matching hash
@@ -103,7 +103,7 @@ def scan_media(**kwargs):
                     and
                     str(f.hash) == scan_data['hash']
             ):
-                log.warn('Associating found missing file %s to %s - this should not be a regular occurance, move/rename this so it is grouped effectivly', f.relative, m.name)
+                log.warning('Associating found missing file %s to %s - this should not be a regular occurance, move/rename this so it is grouped effectivly', f.relative, m.name)
                 m.associate_file(f)
                 break
 

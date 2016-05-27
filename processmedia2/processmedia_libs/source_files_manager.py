@@ -61,6 +61,6 @@ class SourceFilesManager(object):
             reverse=True
         )
         if len(files_for_type) > 1:
-            log.warn('Multiple files for type %s identifyed %s. This may be a mistake. Using only first one', file_type, [f['relative'] for f in files_for_type])
+            log.warning('Multiple files for type %s identifyed %s. This may be a mistake. Using only first one', file_type, [f['relative'] for f in files_for_type])
         return first(files_for_type) or {}
 
