@@ -1,4 +1,5 @@
 import re
+import operator
 
 from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
 from libs.file import FolderStructure
@@ -82,7 +83,11 @@ def scan_media(**kwargs):
     #   We need to identify all unmatched files and generate a hash lookup and match them that way.
     #   It may take longer but it's the only true way of matching a file.
     #   It might in some cases be quicker because we don't need to craw the entire file structure in memory.
-    for m in meta.meta_with_unassociated_files:
+
+    # These are meta items that have a filecollection matched,
+    # but that file collection is incomplete, so we have some child files missing
+    has_unassociated_files = operator.attrgetter('unassociated_files')
+    for m in filter(has_unassociated_files, meta.meta.values()):
         for filename, scan_data in m.unassociated_files.items():
 
             # 5a.) The unassociated file may not have been found in the inital collection scan,

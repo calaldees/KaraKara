@@ -83,15 +83,6 @@ class MetaManager(object):
     def mtime(self):
         return max((f.stats.st_mtime for f in self.files))
 
-    # TODO: Move to scan?
-    @property
-    def meta_with_unassociated_files(self):
-        """
-        These are meta items that have a filecollection matched,
-        but that file collection is incomplete, so we have some child files missing
-        """
-        return (m for m in self.meta.values() if m.unassociated_files)
-
     @property
     def source_hashs(self):
         return (m.source_hash for m in self.meta.values() if m.source_hash)
