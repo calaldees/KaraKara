@@ -79,6 +79,10 @@ class MetaManager(object):
         # wha? (mtime == None or f.stat().st_mtime >= mtime)
         return fast_scan(self.path, search_filter=lambda f: f.name.endswith('.json'))
 
+    @property
+    def mtime(self):
+        return max((f.stats.st_mtime for f in self.files))
+
     # TODO: Move to scan?
     @property
     def meta_with_unassociated_files(self):

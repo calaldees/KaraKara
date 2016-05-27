@@ -14,7 +14,7 @@
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "level": "NOTSET",
+            "level": "WARNING",
             "formatter": "simple",
             "stream": "ext://sys.stdout"
         },
@@ -24,7 +24,7 @@
             "level": "INFO",
             "formatter": "simple",
             "filename": "logs/processmedia.log",
-            "maxBytes": 10485760,
+            "maxBytes": 102400,
             "backupCount": 3,
             "encoding": "utf8"
         }
