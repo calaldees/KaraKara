@@ -34,6 +34,9 @@ PROCESS_ORDER_FUNCS = {
 
 def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
     meta_manager = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
+    #if not kwargs.get('force') and not meta_manager.has_metaset_changed_since_last_run_of('encode'):
+    #    log.info("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
+    #    return
     meta_manager.load_all()
 
     encoder = Encoder(meta_manager, **kwargs)
@@ -68,6 +71,7 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
     ):
         encoder.encode(name)
 
+    meta_manager.set_completed_run_of('encode')
 
 class Encoder(object):
     """

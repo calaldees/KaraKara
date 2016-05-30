@@ -31,6 +31,7 @@ def add_default_argparse_args(parser, version=DEFAULT_VERSION):
     parser.add_argument('--path_processed', action='store', help='')
     parser.add_argument('--path_meta', action='store', help='')
 
+    parser.add_argument('--force', action='store_true', help='ignore mtime optimisation check')
     parser.add_argument('--debug_on_fail', action='store_true', help='drop into pdb on encode fail')
     parser.add_argument('--loggingconf', action='store', help='logfilename', default=DEFAULT_LOGGINGCONF)
     parser.add_argument('--version', action='version', version=version)
