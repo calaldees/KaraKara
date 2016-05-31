@@ -5,7 +5,7 @@ from functools import partial
 from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter, flatten, first
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args, parse_args, ALL_EXTS
+from processmedia_libs import ALL_EXTS
 
 from scan_media import DEFAULT_IGNORE_FILE_REGEX
 

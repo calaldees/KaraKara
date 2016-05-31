@@ -1,8 +1,5 @@
 import os
 
-from libs.misc import postmortem
-
-from processmedia_libs import add_default_argparse_args, parse_args
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
 import logging
@@ -30,28 +27,8 @@ def cleanup_media(**kwargs):
         os.remove(unlinked_file.absolute)
 
 
-# Arguments --------------------------------------------------------------------
-
-def get_args():
-    """
-    Command line argument handling
-    """
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        prog=__name__,
-        description="""processmedia2 cleanup
-        """,
-        epilog="""
-        """
-    )
-
-    add_default_argparse_args(parser)
-
-    return parse_args(parser)
-
+# Main -------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    args = get_args()
-
-    postmortem(cleanup_media, **args)
+    from _main import main
+    main('cleanup_media', cleanup_media, version=VERSION)

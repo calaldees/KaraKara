@@ -1,3 +1,4 @@
+import sys
 import re
 import operator
 
@@ -5,7 +6,7 @@ from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
 from libs.file import FolderStructure
 from clint.textui.progress import bar as progress_bar
 
-from processmedia_libs import add_default_argparse_args, parse_args, ALL_EXTS
+from processmedia_libs import ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
 from processmedia_libs.meta_manager import MetaManager
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
@@ -27,32 +28,7 @@ IGNORE_SEARCH_EXTS_REGEX = file_extension_regex(('txt', ))
 
 def scan_media(**kwargs):
     """
-    part 1 of 3 of the encoding system
-
-    SCAN
-        -Update Meta-
-        Load meta
-        validate source meta files
-            check mtime (ok or->)
-            check hash
-            mark fail if needed
-        scan source
-            skip validated
-            scan hash in attempt to match failed
-        create meta stubs for new files
-        remove old failed bits of meta
-
-        -Add jobs-
-            update tags
-            extract lyrics
-            check source->destination hashs and add to job list
-
-
     """
-    fileset_monitor = FilesetChangeMonitor(path=kwargs['path_source'], name='scan')
-    if not kwargs.get('force') and not fileset_monitor.has_changed:
-        log.warn("Sourceset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
-        return
 
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
@@ -131,31 +107,8 @@ def scan_media(**kwargs):
     # (If processed data already exisits, it will be relinked at the encode level)
 
     meta.save_all()
-    if not kwargs.get('force'):
-        fileset_monitor.has_changed = True
-
-
-# Arguments --------------------------------------------------------------------
-
-def get_args():
-    """
-    Command line argument handling
-    """
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        prog=__name__,
-        description="""processmedia
-        """,
-        epilog="""
-        """
-    )
-
-    add_default_argparse_args(parser, version=VERSION)
-
-    return parse_args(parser)
 
 
 if __name__ == "__main__":
-    args = get_args()
-    postmortem(scan_media, **args)
+    from _main import main
+    main('scan_media', scan_media, mtime_path='source', version=VERSION)

@@ -4,15 +4,10 @@ import os
 import re
 from collections import defaultdict, namedtuple
 
-from libs.misc import flatten  #  postmortem,
-
-from processmedia_libs import add_default_argparse_args, parse_args
+from libs.misc import flatten
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
-#from processmedia_libs.meta_manager import MetaManager
-#from processmedia_libs.source_files_manager import SourceFilesManager
-#from processmedia_libs.processed_files_manager import ProcessedFilesManager
 
 import logging
 log = logging.getLogger(__name__)
@@ -85,24 +80,10 @@ def print_formated(file_details, **kwargs):
         for f in files:
             print_file(f)
 
-# Arguments --------------------------------------------------------------------
+# Main -------------------------------------------------------------------------
 
-def get_args():
-    """
-    Command line argument handling
-    """
-    import argparse
 
-    parser = argparse.ArgumentParser(
-        prog=__name__,
-        description="""processmedia2 metaviewer
-        """,
-        epilog="""
-        """
-    )
-
-    add_default_argparse_args(parser)
-
+def additional_arguments(parser):
     parser.add_argument('name_regex', default='', help='regex for names')
     parser.add_argument('--hidesource', action='store_true')
     parser.add_argument('--hideprocessed', action='store_true')
@@ -110,14 +91,18 @@ def get_args():
     #parser.add_argument('--raw', action='store_true')
     #parser.add_argument('--pathstyle', choices=('relative', 'absolute'), default='relative')
 
-    return parse_args(parser)
+
+def _metaviewer(*args, **kwargs):
+    metaviewer = MetaViewer(*args, **kwargs)
+    file_details = metaviewer.get_meta_details(kwargs['name_regex'])
+    if kwargs.get('showmissing'):
+        file_details = {k: filter(lambda f: not f.exists(), v) for k, v in file_details.items()}
+    print_formated(file_details)
 
 
 if __name__ == "__main__":
-    args = get_args()
-
-    metaviewer = MetaViewer(**args)
-    file_details = metaviewer.get_meta_details(args['name_regex'])
-    if args.get('showmissing'):
-        file_details = {k: filter(lambda f: not f.exists(), v) for k, v in file_details.items()}
-    print_formated(file_details)
+    from _main import main
+    main(
+        'metaviewer', _metaviewer, version=VERSION,
+        additional_arguments_function=additional_arguments,
+    )

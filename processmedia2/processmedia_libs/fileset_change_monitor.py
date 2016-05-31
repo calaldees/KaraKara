@@ -40,7 +40,7 @@ class FilesetChangeMonitor(object):
 
     @property
     def has_changed(self):
-        return self.mtime > self.mtime_store.get(self.name, 0)
+        return self.mtime != self.mtime_store.get(self.name, 0)
     @has_changed.setter
     def has_changed(self, changed):
         if changed:

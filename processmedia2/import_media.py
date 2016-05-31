@@ -4,7 +4,7 @@ from pprint import pprint
 from clint.textui.progress import bar as progress_bar
 
 from libs.misc import postmortem, fast_scan, epoc, first
-from processmedia_libs import add_default_argparse_args, parse_args, PENDING_ACTION
+from processmedia_libs import PENDING_ACTION
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
@@ -34,27 +34,7 @@ class TrackMissingProcessedFiles(Exception):
 
 def import_media(**kwargs):
     """
-     - hash and identify primary key for track
-     - import tags
-     - import subtiles
-     - cleanup db - any sources we don't have the actual processed files for - prune and remove from db
-       - check this removes unnneeded attachments
-
-    stats description:
-        : number of tracks imported this session
-        : the total number of tracks in the processed meta dataset
-        : the number of track in the db before this import operation was performed
-        : meta exists, but the processed data has not been encoded yet
-        : some source files were missing, making it impossible to use
-        : no matching processed meta paired with db entry at all
-        db_end: the total tracks in the db at the end of this import operation
-        meta_hash_matched_db_hash: The number of meta tracks that matched existing hash in the db
     """
-    fileset_monitor = FilesetChangeMonitor(path=kwargs['path_meta'], name='import')
-    if not kwargs.get('force') and not fileset_monitor.has_changed:
-        log.warn("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
-        return {}
-
     stats = dict(meta_set=set(), meta_imported=set(), meta_unprocessed=set(), db_removed=list(), missing_processed_deleted=set(), missing_processed_aborted=set(), db_start=set(), meta_hash_matched_db_hash=set())
 
     def get_db_track_names():
@@ -96,9 +76,6 @@ def import_media(**kwargs):
     stats['db_end'] = get_db_track_names()
 
     assert stats['db_end'] == stats['meta_hash_matched_db_hash'] | stats['meta_imported']
-
-    if not kwargs.get('force'):
-        fileset_monitor.has_changed = True
 
     return stats
 
@@ -189,35 +166,23 @@ class TrackImporter(object):
             track.tags.remove(duplicate_tag)
 
 
-# Arguments --------------------------------------------------------------------
+# Main -------------------------------------------------------------------------
 
-def get_args():
-    """
-    Command line argument handling
-    """
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        prog=__name__,
-        description="""processmedia2 importer
-        """,
-        epilog="""
-        """
-    )
-
-    add_default_argparse_args(parser)
-
+def additional_arguments(parser):
     parser.add_argument('--config_uri', action='store', help='', default='development.ini')
     parser.add_argument('--stat_limit', type=int, help='Max number of metanames to display in summary before replacing them with a count', default=100)
 
-    return parse_args(parser)
 
+def _import_media(*args, **kwargs):
+    from pyramid.paster import get_appsettings
+    settings = get_appsettings(kwargs['config_uri'])
+    init_DBSession(settings)
+    return import_media(*args, **kwargs)
 
 if __name__ == "__main__":
-    args = get_args()
-
-    from pyramid.paster import get_appsettings
-    settings = get_appsettings(args['config_uri'])
-    init_DBSession(settings)
-
-    pprint({k: len(v) if len(v) > args['stat_limit'] else v for k, v in postmortem(import_media, **args).items()})
+    from _main import main
+    stats = main(
+        'import_media', _import_media, mtime_path='meta',
+        additional_arguments_function=additional_arguments,
+    )
+    pprint({k: len(v) if len(v) > _import_media.calling_kwargs['stat_limit'] else v for k, v in stats.items()})

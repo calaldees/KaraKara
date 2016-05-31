@@ -9,7 +9,7 @@ from clint.textui.progress import bar as progress_bar
 from libs.misc import postmortem, hashfile, freeze, first, file_ext
 from libs.file import FolderStructure
 
-from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDING_ACTION
+from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
@@ -33,11 +33,6 @@ PROCESS_ORDER_FUNCS = {
 }
 
 def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
-    fileset_monitor = FilesetChangeMonitor(path=kwargs['path_meta'], name='encode')
-    if not kwargs.get('force') and not fileset_monitor.has_changed:
-        log.warn("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
-        return
-
     meta_manager = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
     meta_manager.load_all()
 
@@ -73,44 +68,14 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
     ):
         encoder.encode(name)
 
-    if not kwargs.get('force'):
-        fileset_monitor.has_changed = True
-
 
 class Encoder(object):
     """
-        consume for
-         - update tags
-         - extract lyrics
-         - encode media
-        ENCODE (queue consumer)
-            listen to queue
-            -Encode-
-            Update meta destination hashs
-            -CLEANUP-
-            prune unneeded files from destination
-            trigger importer
-    choose encode type
-     - video
-     - video + sub
-     - video + audio
-     - image + sub + audio
-    input hashs cmp output hash
-    encode hi-res
-     - normalize audio
-     - normalize subtitles
-       - srt to ssa
-       - rewrite playres
-       - remove dupes
-       - add next line
-    preview encode
-    gen thumbnail images
-    extract subs
     """
 
-    def __init__(self, meta_manager=None, debug_on_fail=False, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+    def __init__(self, meta_manager=None, pdb=False, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
-        self.debug_on_fail = debug_on_fail
+        self.pdb = pdb
 
     def encode(self, name):
         """
@@ -225,7 +190,7 @@ class Encoder(object):
             for encode_step in encode_steps:
                 encode_success, cmd_result = encode_step()
                 if not encode_success:
-                    if self.debug_on_fail:
+                    if self.pdb:
                         import pdb ; pdb.set_trace()
                     log.error(cmd_result)
                     return False
@@ -284,7 +249,7 @@ class Encoder(object):
                 destination=preview_file,
             )
             if not encode_success:
-                if self.debug_on_fail:
+                if self.pdb:
                     import pdb ; pdb.set_trace()
                 log.error(cmd_result)
                 return False
@@ -332,7 +297,7 @@ class Encoder(object):
                 image_file = os.path.join(tempdir, '{}.jpg'.format(index))
                 encode_succes, cmd_result = external_tools.extract_image(source=source_file_absolute, destination=image_file, time=time)
                 if not encode_succes:
-                    if self.debug_on_fail:
+                    if self.pdb:
                         import pdb ; pdb.set_trace()
                     log.error(cmd_result)
                     return False
@@ -360,34 +325,20 @@ class Encoder(object):
         return target_file.exists
 
 
-# Arguments --------------------------------------------------------------------
+# Main -------------------------------------------------------------------------
 
-def get_args():
-    """
-    Command line argument handling
-    """
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        prog=__name__,
-        description="""processmedia2 encoder
-        """,
-        epilog="""
-        """
-    )
-
-    add_default_argparse_args(parser)
-
+def additional_arguments(parser):
     parser.add_argument('--process_order_function', choices=PROCESS_ORDER_FUNCS.keys(), help='', default=DEFAULT_ORDER_FUNC)
 
-    args_dict = parse_args(parser)
 
-    args_dict['process_order_function'] = PROCESS_ORDER_FUNCS[args_dict['process_order_function']]
-
-    return args_dict
+def process_arguments(kwargs):
+    kwargs['process_order_function'] = PROCESS_ORDER_FUNCS[kwargs['process_order_function']]
 
 
 if __name__ == "__main__":
-    args = get_args()
-
-    postmortem(encode_media, **args)
+    from _main import main
+    main(
+        'encode_media', encode_media, mtime_path='meta', version=VERSION,
+        additional_arguments_function=additional_arguments,
+        additional_arguments_processing_function=process_arguments,
+    )
