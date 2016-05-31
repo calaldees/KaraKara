@@ -1,6 +1,8 @@
 from collections import defaultdict
 from pprint import pprint
 
+from clint.textui.progress import bar as progress_bar
+
 from libs.misc import postmortem, fast_scan, epoc, first
 from processmedia_libs import add_default_argparse_args, parse_args, PENDING_ACTION
 
@@ -51,7 +53,7 @@ def import_media(**kwargs):
     fileset_monitor = FilesetChangeMonitor(path=kwargs['path_meta'], name='import')
     if not kwargs.get('force') and not fileset_monitor.has_changed:
         log.warn("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
-        return
+        return {}
 
     stats = dict(meta_set=set(), meta_imported=set(), meta_unprocessed=set(), db_removed=list(), missing_processed_deleted=set(), missing_processed_aborted=set(), db_start=set(), meta_hash_matched_db_hash=set())
 
@@ -67,7 +69,7 @@ def import_media(**kwargs):
     meta_processed_track_ids = set(meta_manager.source_hashs)
     stats['meta_set'] = set(m.name for m in meta_manager.meta_items if m.source_hash)
 
-    for name in meta_manager.meta.keys():
+    for name in progress_bar(meta_manager.meta.keys()):
         try:
             if importer.import_track(name):
                 stats['meta_imported'].add(name)

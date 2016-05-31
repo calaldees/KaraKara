@@ -25,7 +25,7 @@ install_requires = [
     'Babel',
     'httpagentparser',
     'humanize',
-    'chardet',
+    #'chardet',
 ]
 test_requires = [
     'pytest',

@@ -33,7 +33,7 @@ WEB_PATH:=../website
 WEB_WORKING:=$(WEB_PATH)/karakara
 WEB_PYTHON:=$(WEB_PATH)/$(PYTHON)
 WEB_PYTEST:=$(WEB_PATH)/$(PYTEST)
-
+WEB_PYTHONPATH:=$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/
 
 # Installation -----------------------------------------------------------------
 .PHONY: install
@@ -112,7 +112,7 @@ encode:
 	$(PYTHON) encode_media.py --process_order_function random
 
 import_%:
-	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/$*.ini
+	PYTHONPATH="$(WEB_PYTHONPATH)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/$*.ini
 
 cleanup:
 	$(PYTHON) cleanup_media.py
@@ -133,7 +133,7 @@ test:
 	$(MAKE) all --directory tests/source
 	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --ignore=tests/test_import.py
 	$(MAKE) ini --directory $(WEB_PATH)
-	PYTHONPATH="$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/" $(WEB_PYTEST) tests/test_import.py --pdb
+	PYTHONPATH="$(WEB_PYTHONPATH)" $(WEB_PYTEST) tests/test_import.py --pdb
 
 .PHONY: cloc
 cloc:
