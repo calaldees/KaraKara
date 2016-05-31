@@ -6,7 +6,7 @@ from processmedia_libs import add_default_argparse_args, parse_args, PENDING_ACT
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
-
+from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -48,6 +48,11 @@ def import_media(**kwargs):
         db_end: the total tracks in the db at the end of this import operation
         meta_hash_matched_db_hash: The number of meta tracks that matched existing hash in the db
     """
+    fileset_monitor = FilesetChangeMonitor(path=kwargs['path_meta'], name='import')
+    if not kwargs.get('force') and not fileset_monitor.has_changed:
+        log.warn("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
+        return
+
     stats = dict(meta_set=set(), meta_imported=set(), meta_unprocessed=set(), db_removed=list(), missing_processed_deleted=set(), missing_processed_aborted=set(), db_start=set(), meta_hash_matched_db_hash=set())
 
     def get_db_track_names():
@@ -89,6 +94,9 @@ def import_media(**kwargs):
     stats['db_end'] = get_db_track_names()
 
     assert stats['db_end'] == stats['meta_hash_matched_db_hash'] | stats['meta_imported']
+
+    if not kwargs.get('force'):
+        fileset_monitor.has_changed = True
 
     return stats
 

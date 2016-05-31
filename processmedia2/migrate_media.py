@@ -21,7 +21,7 @@ def move_func_mock(src, dest):
     log.debug('rename {0} -> {1}'.format(src, dest))
 MOVE_FUNCTIONS = {
     'dryrun': move_func_mock,
-    'move': os.rename,  # shutil.move
+    'move': shutil.move  #os.rename,  
     'link': os.symlink,
 }
 

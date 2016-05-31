@@ -13,7 +13,7 @@ from processmedia_libs import add_default_argparse_args, parse_args, EXTS, PENDI
 from processmedia_libs import external_tools
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
-
+from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
@@ -33,10 +33,12 @@ PROCESS_ORDER_FUNCS = {
 }
 
 def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
+    fileset_monitor = FilesetChangeMonitor(path=kwargs['path_meta'], name='encode')
+    if not kwargs.get('force') and not fileset_monitor.has_changed:
+        log.warn("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
+        return
+
     meta_manager = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
-    #if not kwargs.get('force') and not meta_manager.has_metaset_changed_since_last_run_of('encode'):
-    #    log.info("Metaset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
-    #    return
     meta_manager.load_all()
 
     encoder = Encoder(meta_manager, **kwargs)
@@ -71,7 +73,9 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] 
     ):
         encoder.encode(name)
 
-    meta_manager.set_completed_run_of('encode')
+    if not kwargs.get('force'):
+        fileset_monitor.has_changed = True
+
 
 class Encoder(object):
     """

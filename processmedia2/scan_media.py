@@ -8,6 +8,7 @@ from clint.textui.progress import bar as progress_bar
 from processmedia_libs import add_default_argparse_args, parse_args, ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
 from processmedia_libs.meta_manager import MetaManager
+from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
@@ -48,6 +49,11 @@ def scan_media(**kwargs):
 
 
     """
+    fileset_monitor = FilesetChangeMonitor(path=kwargs['path_source'], name='scan')
+    if not kwargs.get('force') and not fileset_monitor.has_changed:
+        log.warn("Sourceset has not updated since last successful scan. Aborting. use `--force` to bypass this check")
+        return
+
     meta = MetaManager(kwargs['path_meta'])
     meta.load_all()
 
@@ -125,6 +131,8 @@ def scan_media(**kwargs):
     # (If processed data already exisits, it will be relinked at the encode level)
 
     meta.save_all()
+    if not kwargs.get('force'):
+        fileset_monitor.has_changed = True
 
 
 # Arguments --------------------------------------------------------------------

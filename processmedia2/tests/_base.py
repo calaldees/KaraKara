@@ -63,7 +63,7 @@ class ProcessMediaTestManager(object):
 
     @property
     def commandline_kwargs(self):
-        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed)
+        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed, force=True)
 
     def scan_media(self):
         self.meta_manager._release_cache()

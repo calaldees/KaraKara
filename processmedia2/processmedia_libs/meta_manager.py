@@ -8,8 +8,6 @@ from libs.misc import fast_scan, freeze
 import logging
 log = logging.getLogger(__name__)
 
-MTIME_STORE_FILENAME = '_mtimes_'
-
 
 class MetaManager(object):
 
@@ -82,36 +80,8 @@ class MetaManager(object):
         return fast_scan(self.path, search_filter=lambda f: f.name.endswith('.json'))
 
     @property
-    def mtime(self):
-        try:
-            return max((f.stats.st_mtime for f in self.files))
-        except ValueError:
-            return 0
-
-    @property
     def source_hashs(self):
         return (m.source_hash for m in self.meta.values() if m.source_hash)
-
-    @property
-    def mtime_store_path(self):
-        return os.path.join(self.path, MTIME_STORE_FILENAME)
-    @property
-    def mtime_store(self):
-        if not os.path.exists(self.mtime_store_path):
-            return dict()
-        with open(self.mtime_store_path, 'rt') as mtime_store_filehandle:
-            return json.load(mtime_store_filehandle)
-    @mtime_store.setter
-    def mtime_store(self, mtime_store):
-        with open(self.mtime_store_path, 'wt') as mtime_store_filehandle:
-            json.dump(mtime_store, mtime_store_filehandle)
-
-    def has_metaset_changed_since_last_run_of(self, operation_name):
-        return self.mtime > self.mtime_store.get(operation_name, 0)
-    def set_completed_run_of(self, operation_name):
-        mtime_store = self.mtime_store
-        mtime_store[operation_name] = self.mtime
-        self.mtime_store = mtime_store
 
 
 class MetaFile(object):

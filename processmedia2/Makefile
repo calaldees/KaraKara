@@ -103,7 +103,7 @@ logs:
 
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import cleanup run
+.PHONY: scan encode import_% cleanup run
 
 scan:
 	$(PYTHON) scan_media.py
@@ -111,20 +111,20 @@ scan:
 encode:
 	$(PYTHON) encode_media.py --process_order_function random
 
-import:
-	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/development.ini
+import_%:
+	PYTHONPATH="$(WEB_WORKING)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/$*.ini
 
 cleanup:
 	$(PYTHON) cleanup_media.py
 
-run: scan encode import
-
+run: scan encode import_development
+run_production: scan encode import_production
 
 # Migrate --
 
-.PHONY: migrate
-migrate:
-	$(PYTHON) migrate_media.py --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate --move_func move
+#.PHONY: migrate
+#migrate:
+#	$(PYTHON) migrate_media.py --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate --move_func move
 
 
 # Test -------------------------------------------------------------------------
@@ -143,5 +143,5 @@ cloc:
 
 .PHONY: clean
 clean:
-	rm -rf .cache __pycache__ $(ENV) libs config.json logging.json logs
+	rm -rf .cache __pycache__ $(ENV) libs config.json logging.json logs mtimes.json
 	$(MAKE) clean --directory tests/source

@@ -4,5 +4,6 @@ libs
 divx2pass*
 config.json
 logging.json
+mtimes.json
 *.log
 logs

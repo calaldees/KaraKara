@@ -20,11 +20,12 @@ install_requires = [
     'py-postgresql',  # any DB API should do, this one is pure python
     'python-dateutil',
     'dogpile.cache',
-    'pycrypto',  # Considering this inclusion for encrypted cookies
+    #'pycrypto',  # Considering this inclusion for encrypted cookies
     'requests',
     'Babel',
     'httpagentparser',
     'humanize',
+    'chardet',
 ]
 test_requires = [
     'pytest',
