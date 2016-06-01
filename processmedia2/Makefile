@@ -103,7 +103,7 @@ logs:
 
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import_% cleanup run
+.PHONY: scan encode import_% cleanup run run_production
 
 scan:
 	$(PYTHON) scan_media.py
@@ -119,12 +119,6 @@ cleanup:
 
 run: scan encode import_development
 run_production: scan encode import_production
-
-# Migrate --
-
-#.PHONY: migrate
-#migrate:
-#	$(PYTHON) migrate_media.py --path_source ~/Applications/KaraKara/files --path_destination ~/Applications/KaraKara/migrate --move_func move
 
 
 # Test -------------------------------------------------------------------------
