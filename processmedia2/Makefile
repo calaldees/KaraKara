@@ -2,7 +2,9 @@
 help:
 	# Usage: make <target>, where target is
 	# install        -- Install os dependencys and setup python virtualenv
-	# run            -- Alias for 'scan + encode + import'
+	# install_env    --   just install python virtualenv
+	# run            -- Alias for 'scan + encode + import_develop'
+	# run_production -- Alias for 'scan + encode + import_production'
 	#
 	# scan           -- Scan source media folder + create metadata cache
 	# encode         -- Perform video encoding on required items
@@ -11,7 +13,6 @@ help:
 	#
 	# upgrade        -- Upgrade os + python dependencys
 	# test           -- Run integration tests
-	# migrate        -- Migrate legacy media structure from processmedia1
 	# clean          -- Reset to clean checkout
 
 
@@ -36,8 +37,9 @@ WEB_PYTEST:=$(WEB_PATH)/$(PYTEST)
 WEB_PYTHONPATH:=$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/
 
 # Installation -----------------------------------------------------------------
-.PHONY: install
-install: install_$(OS) $(ENV) libs config.json logging.json
+.PHONY: install install_env
+install: install_$(OS) install_env
+install_env: $(ENV) libs config.json logging.json
 
 # OSX ----
 .PHONY: has-brew install_Darwin upgrade_Darwin
