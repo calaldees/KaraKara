@@ -19,7 +19,7 @@ VERSION = '0.0.0'
 
 
 # Protection for legacy processed files  (could be removed in once data fully migriated)
-DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.|0_\d\.jpg')
+DEFAULT_IGNORE_FILE_REGEX = re.compile(r'0\.mp4|0_generic\.mp4|\.bak|^\.|^0_video\.|0_\d\.jpg|sync-conflict')
 
 IGNORE_SEARCH_EXTS_REGEX = file_extension_regex(('txt', ))
 
