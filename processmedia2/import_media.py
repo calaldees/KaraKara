@@ -85,6 +85,7 @@ class TrackImporter(object):
     def __init__(self, meta_manager=None):  # , path_meta=None, path_processed=None, **kwargs
         self.meta_manager = meta_manager #or MetaManager(path_meta)
         self.exisiting_track_ids = set(t.id for t in DBSession.query(Track.id))
+        self.existing_files_lookup = set(f.relative for f in fast_scan(self.meta_manager.processed_files_manager.path))
 
     def import_track(self, name):
         log.debug('Attemping: %s', name)
@@ -127,7 +128,7 @@ class TrackImporter(object):
         missing_processed_files = {
             (file_type, processed_file)
             for file_type, processed_file in processed_files.items()
-            if not processed_file.exists
+            if processed_file.relative not in self.existing_files_lookup  # not processed_file.exists
         }
         for file_type, processed_file in missing_processed_files:
             log.debug('Missing processed file: {0} - {1}'.format(file_type, processed_file.absolute))
