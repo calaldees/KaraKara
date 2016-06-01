@@ -62,6 +62,7 @@ def import_media(**kwargs):
             if ex.id:
                 log.warning('Missing (processed files) delete existing: %s', name)
                 delete_track(ex.id)
+                commit()
                 stats['missing_processed_deleted'].add(name)
             else:
                 log.warning('Missing (processed files) abort import: %s', name)
@@ -71,7 +72,7 @@ def import_media(**kwargs):
         log.warning('Remove: %s', unneeded_track_id)
         stats['db_removed'].append(DBSession.query(Track).get(unneeded_track_id).source_filename or unneeded_track_id)
         delete_track(unneeded_track_id)
-    commit()
+        commit()
 
     stats['db_end'] = get_db_track_names()
 

@@ -1,10 +1,11 @@
 import datetime
+import operator
 
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from . import DBSession
-from .model_tracks import Tag, Track
+from .model_tracks import Tag, Track, TrackTagMapping, TrackAttachmentMapping
 from .model_queue import QueueItem
 
 import logging
@@ -95,4 +96,6 @@ def delete_track(track_id):
     rendering if these queue_item orphan records are left
     """
     DBSession.query(Track).filter(Track.id == track_id).delete()
-    DBSession.query(QueueItem).filter(QueueItem.track_id == track_id).delete()
+    attrgetter_track_id = operator.attrgetter('track_id')
+    for ModelClass in (QueueItem, TrackTagMapping, TrackAttachmentMapping):
+        DBSession.query(ModelClass).filter(attrgetter_track_id(ModelClass) == track_id).delete()
