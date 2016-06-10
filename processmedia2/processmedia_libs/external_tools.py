@@ -81,6 +81,7 @@ CONFIG.update({
 
 
 ENCODE_VIDEO_COMMON_ARGS = cmd_args(
+    'nice',
     'ffmpeg',
     #threads=CONFIG['threads'],
     loglevel=CONFIG['log_level'],

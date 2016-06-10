@@ -39,7 +39,7 @@ WEB_PYTHONPATH:=$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/
 # Installation -----------------------------------------------------------------
 .PHONY: install install_env
 install: install_$(OS) install_env
-install_env: $(ENV) libs config.json logging.json
+install_env: $(ENV) libs config.json logging.json logs
 
 # OSX ----
 .PHONY: has-brew install_Darwin upgrade_Darwin
@@ -70,6 +70,7 @@ apt-upgrade:
 has-python3:
 	which python3
 	which virtualenv
+.PRECIOUS: $(ENV)
 $(ENV): has-python3
 	virtualenv --no-site-packages -p python3 $(ENV)
 	$(PIP) install --upgrade pip
@@ -97,7 +98,7 @@ libs:
 config.json:
 	cp config.json.dist config.json
 
-logging.json: logs
+logging.json:
 	cp logging.json.dist logging.json
 
 logs:
@@ -105,7 +106,7 @@ logs:
 
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import_% cleanup run run_production
+.PHONY: scan encode import_development import_production cleanup run run_production
 
 scan:
 	$(PYTHON) scan_media.py
@@ -119,8 +120,8 @@ import_%:
 cleanup:
 	$(PYTHON) cleanup_media.py
 
-run: scan encode import_development
-run_production: scan encode import_production
+run: install_env scan encode import_development
+run_production: install_env scan encode import_production
 
 
 # Test -------------------------------------------------------------------------
