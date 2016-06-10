@@ -71,7 +71,7 @@ has-python3:
 	which python3
 	which virtualenv
 .PRECIOUS: $(ENV)
-$(ENV): has-python3
+$(ENV):
 	virtualenv --no-site-packages -p python3 $(ENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r $(DEPENDENCIES_PYTHON)
