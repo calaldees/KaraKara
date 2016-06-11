@@ -16,6 +16,7 @@ from externals.lib.pyramid_helpers.views.upload import EventFileUploaded
 
 from ..model import DBSession
 from ..model.model_tracks import Track
+from ..model.actions import last_update
 
 from . import web, action_ok, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity  # action_error,
 
@@ -65,7 +66,7 @@ def invalidate_list_cache(request=None):
 
 def _generate_cache_key_comunity_list(request):
     global list_version
-    return '-'.join([generate_cache_key(request), str(list_version), str(is_comunity(request))])
+    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_comunity(request))])
 
 
 #-------------------------------------------------------------------------------

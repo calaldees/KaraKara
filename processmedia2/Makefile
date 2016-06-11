@@ -106,7 +106,7 @@ logs:
 
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import_development import_production cleanup run run_production
+.PHONY: scan encode import_% cleanup run run_production
 
 scan:
 	$(PYTHON) scan_media.py
