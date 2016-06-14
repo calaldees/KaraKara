@@ -1,3 +1,4 @@
+ENV:=_env
 
 .PHONY: help
 help:
@@ -65,6 +66,11 @@ test:
 	for project in $(PROJECTS); do \
 		$(MAKE) test --directory $$project ; \
 	done
+
+.PHONY: cloc
+cloc:
+	cloc --exclude-dir=$(ENV),libs ./
+
 
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
