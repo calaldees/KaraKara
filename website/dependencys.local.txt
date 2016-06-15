@@ -1,0 +1,23 @@
+*Currently unused*
+ - Placeholder for future dependency ideas
+
+__init__.py
+misc.py
+xml.py
+make_ini.py
+test.py
+log.py
+pyramid_helpers/__init__.py
+pyramid_helpers/auto_format.py
+pyramid_helpers/etag.py
+pyramid_helpers/session_identity.py
+pyramid_helpers/views/__init__.py
+pyramid_helpers/views/upload.py
+pyramid_helpers/events.py
+multisocket/__init__.py
+multisocket/multisocket_server.py
+multisocket/auth_echo_server.py
+social/__init__.py
+social/_login.py
+social/social_login.py
+social/facebook.py

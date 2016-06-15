@@ -14,6 +14,10 @@ INI_TEST = test.ini
 INI_PROD = production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
 
+DEPENDENCIES_LOCAL:=dependencys.local.txt
+PATH_LOCAL_LIBS:=../../libs/python3/lib
+PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3/lib
+
 LOG_LINES=5
 
 BADGENAME_SOURCE=minami
@@ -68,6 +72,16 @@ dependency_downloader.py:
 
 externals:
 	mkdir externals && touch externals/__init__.py
+
+externals/lib: externals
+	ln -s ../$(PATH_LOCAL_LIBS) externals/lib
+	#mkdir $@
+	#if [ -d $(PATH_LOCAL_LIBS) ] ; then \
+	#	cd $@ && cat $(DEPENDENCIES_LOCAL) |xargs  mkdir -p \
+	#	cd $@ && cat $(DEPENDENCIES_LOCAL) |xargs  ln -F -s ../../$(PATH_LOCAL_LIBS)/$$1 $@/$$1 ;\
+	#else \
+	#	cat $(DEPENDENCIES_LOCAL) |xargs  wget -cq --force-directories $(PATH_REMOTE_LIBS)/$$1 $@/$$1 ;\
+	#fi
 
 PHONY: dependency_download
 dependency_download: dependency_downloader.py externals

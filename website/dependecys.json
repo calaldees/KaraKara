@@ -74,32 +74,5 @@
             "js/vendor/jquery.ui.widget.js",
             "js/jquery.iframe-transport.js"
         ]
-    },
-    
-    "python_lib": {
-        "source": "https://raw.github.com/calaldees/libs/master/python3/",
-        "version": "0.0.1",
-        "target": [
-            "lib/__init__.py",
-            "lib/misc.py",
-            "lib/xml.py",
-            "lib/make_ini.py",
-            "lib/test.py",
-            "lib/log.py",
-            "lib/pyramid_helpers/__init__.py",
-            "lib/pyramid_helpers/auto_format.py",
-            "lib/pyramid_helpers/etag.py",
-            "lib/pyramid_helpers/session_identity.py",
-            "lib/pyramid_helpers/views/__init__.py",
-            "lib/pyramid_helpers/views/upload.py",
-            "lib/pyramid_helpers/events.py",
-            "lib/multisocket/__init__.py",
-            "lib/multisocket/multisocket_server.py",
-            "lib/multisocket/auth_echo_server.py",
-            "lib/social/__init__.py",
-            "lib/social/_login.py",
-            "lib/social/social_login.py",
-            "lib/social/facebook.py"
-        ]
     }
 }
