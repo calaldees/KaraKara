@@ -1,5 +1,5 @@
-Tutorial
-========
+System Setup
+============
 
 This documenation is designed to inform a user how to setup a karaoke event
 system from scratch. Technical developer documentation about each component
