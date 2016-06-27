@@ -19,7 +19,8 @@ class FilesetChangeMonitor(object):
     @property
     def mtime(self):
         try:
-            return max((f.stats.st_mtime for f in self.files))
+            it = self.files
+            return len(it) + max((f.stats.st_mtime for f in it))
         except ValueError:
             return 0
 
