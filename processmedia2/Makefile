@@ -21,13 +21,14 @@ help:
 OS:=$(shell uname -s)
 LINUX_DISTRO:=$(shell lsb_release -a 2> /dev/null | grep "Distributor ID:" | sed 's|.*:.\(.*\)|\1|')
 
+PYTHON_VERSION:=3.5
 DEPENDENCIES_PYTHON:=dependencies.python.txt
 DEPENDENCIES_APT:=dependencies.apt.txt
 DEPENDENCIES_BREW:=dependencies.brew.txt
 
 ENV:=_env
-PYTHON:=$(ENV)/bin/python3
-PIP:=$(ENV)/bin/pip3
+PYTHON:=$(ENV)/bin/python$(PYTHON_VERSION)
+PIP:=$(ENV)/bin/pip$(PYTHON_VERSION)
 PYTEST:=$(ENV)/bin/py.test
 
 WEB_PATH:=../website
@@ -72,7 +73,7 @@ has-python3:
 	which virtualenv
 .PRECIOUS: $(ENV)
 $(ENV):
-	virtualenv --no-site-packages -p python3 $(ENV)
+	virtualenv --no-site-packages -p python$(PYTHON_VERSION) $(ENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r $(DEPENDENCIES_PYTHON)
 .PHONY: upgrade

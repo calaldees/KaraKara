@@ -164,7 +164,7 @@ class TrackImporter(object):
                     log.warning('null tag %s', tag_string)
 
         for duplicate_tag in (tag for tag in track.tags if track.tags.count(tag) > 1):
-            log.warning('Unneeded duplicate tag found %s', duplicate_tag)
+            log.warning('Unneeded duplicate tag found %s in %s', duplicate_tag, track.source_filename)
             track.tags.remove(duplicate_tag)
 
 

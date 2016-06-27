@@ -163,12 +163,6 @@ stop_webapp_daemon:
 # Test -------------------------------------------------------------------------
 .PHONY: test test_crawl
 
-#import_tracks_local_mediaserver: init_db
-#	env/bin/python -mkarakara.scripts.import_tracks 'http://localhost/files' --config=development.ini
-
-#import_tracks_test: init_db
-#	env/bin/python -mkarakara.scripts.import_tracks 'http://calaldees.dreamhosters.com/test/' --config=development.ini
-
 test: ini
 	$(PYTEST) externals $(PROJECT) --pdb
 	# --capture=sys
@@ -213,19 +207,13 @@ i18n:
 	$(PYTHON) setup.py compile_catalog
 
 # Data -------------------------------------------------------------------------
-.PHONY: insert_random_tracks insert_band_tracks import_tracks_production
+.PHONY: insert_random_tracks insert_band_tracks
 
 insert_random_tracks:
 	$(PYTHON) -m$(PROJECT).scripts.insert_random_tracks 800 --config=$(INI_DEV)
 
 insert_band_tracks:
 	$(PYTHON) -m$(PROJECT).scripts.insert_band_tracks --config=$(INI_DEV)
-
-import_tracks_dev: test.db
-	$(PYTHON) -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_DEV)
-
-import_tracks_production: ini  #init_db_production
-	$(PYTHON) -m$(PROJECT).scripts.import_tracks '$(STATIC_FILE_PATH)' --config=$(INI_PROD)
 
 badgenames.txt:
 	$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) > badgenames.txt
