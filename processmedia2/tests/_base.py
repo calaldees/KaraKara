@@ -129,12 +129,16 @@ class MockEncodeExternalCalls(object):
         MockEncodeExternalCalls(encode_video=True, extract_image=False)
         """
         self.method_returns = dict(
-            encode_video=True,
-            encode_audio=True,
-            encode_preview_video=True,
-            extract_image=True
+            probe_media=self._mock_command_return_probe,
+            encode_video=self._mock_command_return_success,
+            encode_audio=self._mock_command_return_success,
+            encode_preview_video=self._mock_command_return_success,
+            extract_image=self._mock_command_return_success,
         )
-        self.method_returns.update(kwargs)
+        self.method_returns.update({
+            method_name: self._mock_command_return_success if return_ok_or_fail else self._mock_command_return_fail
+            for method_name, return_ok_or_fail in kwargs.items()
+        })
         self.patchers = {}
         self.active_patches = {}
 
@@ -144,9 +148,9 @@ class MockEncodeExternalCalls(object):
             method_name: patch.object(
                 processmedia_libs.external_tools,
                 method_name,
-                wraps=self._mock_command_return_success if return_ok_or_fail else self._mock_command_return_fail
+                wraps=mock_return
             )
-            for method_name, return_ok_or_fail in self.method_returns.items()
+            for method_name, mock_return in self.method_returns.items()
         })
         self.active_patches.clear()
         self.active_patches.update({
@@ -161,10 +165,16 @@ class MockEncodeExternalCalls(object):
         self.patchers.clear()
         self.active_patches.clear()
 
-    def _mock_command_return_success(self, *args, **kwargs):
+    @staticmethod
+    def _mock_command_return_probe(*args, **kwargs):
+        return {'width': 1, 'height': 1, 'duration': 1}
+
+    @staticmethod
+    def _mock_command_return_success(*args, **kwargs):
         if ('destination' in kwargs):
             Path(kwargs['destination']).touch()
         return (True, 'Mock Success')
 
-    def _mock_command_return_fail(self, *args, **kwargs):
+    @staticmethod
+    def _mock_command_return_fail(*args, **kwargs):
         return (False, 'Mock Failure')

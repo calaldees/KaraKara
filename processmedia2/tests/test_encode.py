@@ -163,6 +163,8 @@ def test_encode_video_not_multiple_of_2():
 def test_encode_image_not_multiple_of_2():
     pytest.skip("TODO")
 
+def test_encode_with_already_existing_files_still_extracts_duration():
+    pytest.skip("TODO")
 
 def test_update_to_tag_file_does_not_reencode_video():
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:

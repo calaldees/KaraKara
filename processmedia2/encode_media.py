@@ -88,6 +88,7 @@ class Encoder(object):
         def encode_steps(m):
             yield m.update_source_hashs()
             yield self._encode_primary_video_from_meta(m)
+            yield self._extract_source_details_safeguard(m)
             yield self._encode_srt_from_meta(m)
             yield self._encode_preview_video_from_meta(m)
             yield self._encode_images_from_meta(m)
@@ -112,17 +113,28 @@ class Encoder(object):
         source_details.update(external_tools.probe_media(m.source_files['video'].get('absolute')))
         m.source_details.update(source_details)
 
+    def _extract_source_details_safeguard(self, m, force=False):
+        """
+        If the source video already exists we wont have run _update_source_details(m)
+        We must always (even if the source exists) recreate the source_details for the duration.
+        This is a safeguard to ensure we have the duration at this point
+        """
+        if not m.source_details.get('duration') or force:
+            # 1.) Probe media to persist source details in meta
+            self._update_source_details(m)
+        if not m.source_details.get('duration'):
+            log.error('Unable to identify source duration. Maybe the source file is damaged? {}'.format(m.name))
+            return False
+        return True
+
     def _encode_primary_video_from_meta(self, m):
         target_file = m.processed_files['video']
         if target_file.exists:
             log.debug('Processed Destination was created with the same input sources - no encoding required')
             return True
 
-        # 1.) Probe media to persist source details in meta
-        self._update_source_details(m)
-
-        if not m.source_details.get('duration'):
-            log.error('Unable to identify source duration. Maybe the source file is damaged? {}'.format(m.name))
+        extract_source_details_status = self._extract_source_details_safeguard(m, force=True)
+        if not extract_source_details_status:
             return False
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -284,9 +296,6 @@ class Encoder(object):
             times = (0, ) * num_images
         else:
             video_duration = m.source_details.get('duration')
-            if not video_duration:
-                self._update_source_details(m)  # Bugfix for being tenatious in aquiring duration
-                video_duration = m.source_details.get('duration')
             if not video_duration:
                 log.warning('Unable to assertain video duration; unable to extact images')
                 return False
