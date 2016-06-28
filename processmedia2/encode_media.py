@@ -102,15 +102,28 @@ class Encoder(object):
 
     def _update_source_details(self, m):
         source_details = {}
-        source_details.update({
-            k: v for k, v in external_tools.probe_media(m.source_files['image'].get('absolute')).items()
-            if k in ('width', 'height')
-        })
-        source_details.update({
-            k: v for k, v in external_tools.probe_media(m.source_files['audio'].get('absolute')).items()
-            if k in ('duration',)
-        })
-        source_details.update(external_tools.probe_media(m.source_files['video'].get('absolute')))
+
+        # Probe Image
+        source_image = m.source_files['image'].get('absolute')
+        if source_image:
+            source_details.update({
+                k: v for k, v in external_tools.probe_media(source_image).items()
+                if k in ('width', 'height')
+            })
+
+        # Probe Audio
+        source_audio = m.source_files['audio'].get('absolute')
+        if source_audio:
+            source_details.update({
+                k: v for k, v in external_tools.probe_media(source_audio).items()
+                if k in ('duration',)
+            })
+
+        # Probe Video
+        source_video = m.source_files['video'].get('absolute')
+        if source_video:
+            source_details.update(external_tools.probe_media(source_video))
+
         m.source_details.update(source_details)
 
     def _extract_source_details_safeguard(self, m, force=False):

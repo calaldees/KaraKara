@@ -163,8 +163,29 @@ def test_encode_video_not_multiple_of_2():
 def test_encode_image_not_multiple_of_2():
     pytest.skip("TODO")
 
+
 def test_encode_with_already_existing_files_still_extracts_duration():
-    pytest.skip("TODO")
+    """
+    The scan picks up the source files for the first time
+    However, in this case, the processed files already exists! We expect the processed files to be relinked
+    During the relinking process we will need to probe the duration, width, height from the source.
+    Assert the probe is run and the meta contains a duration
+    """
+    with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
+        manager.scan_media()
+
+        manager.mock_processed_files(
+            processed_file.relative
+            for m in manager.meta_manager.meta_items
+            for processed_file in m.processed_files.values()
+        )
+
+        with MockEncodeExternalCalls() as patches:
+            manager.encode_media()
+            assert patches['probe_media'].call_count == 1, 'Even though the processed files exists, the source media should have been probed'
+
+        assert manager.meta['test1.json']['processed']['duration'] == 1, 'The relinked meta should have probed a duration'
+
 
 def test_update_to_tag_file_does_not_reencode_video():
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
