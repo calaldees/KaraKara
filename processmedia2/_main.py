@@ -1,7 +1,7 @@
 import json
 import argparse
-import operator
 import sys
+import fcntl
 
 from libs.misc import postmortem
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 
 DEFAULT_VERSION = '0.0.0'
 
+DEFAULT_LOCKFILE = '.lock'
 DEFAULT_CONFIG_FILENAME = 'config.json'
 DEFAULT_LOGGINGCONF = 'logging.json'
 
@@ -42,11 +43,19 @@ def main(
     parser.add_argument('--force', action='store_true', help='ignore mtime optimisation check')
     parser.add_argument('--pdb', action='store_true', help='drop into pdb on fail')
     parser.add_argument('--loggingconf', action='store', help='logfilename', default=DEFAULT_LOGGINGCONF)
+    parser.add_argument('--lockfile', action='store', help='lockfilename, to ensure multiple encoders do not operate at once', default=DEFAULT_LOCKFILE)
     parser.add_argument('--version', action='version', version=version)
 
     additional_arguments_function(parser)
     kwargs = vars(parser.parse_args())
     additional_arguments_processing_function(kwargs)
+
+    try:
+        lockfile = open(kwargs['lockfile'], 'w')
+        fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        log.warn('Existing process already active. Aborting.')
+        sys.exit(0)
 
     # Overlay config.json defaults
     with open(kwargs['config'], 'rt') as config_filehandle:
@@ -77,4 +86,5 @@ def main(
 
     main_function.calling_kwargs = kwargs
 
+    lockfile.close()
     return return_value
