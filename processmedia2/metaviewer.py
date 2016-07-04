@@ -105,4 +105,5 @@ if __name__ == "__main__":
     main(
         'metaviewer', _metaviewer, version=VERSION,
         additional_arguments_function=additional_arguments,
+        lock=False,
     )

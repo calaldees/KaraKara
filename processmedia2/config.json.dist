@@ -3,5 +3,6 @@
     "path_meta": "../mediaserver/www/meta/",
     "path_processed": "../mediaserver/www/processed/",
     
-    "loggingconf": "logging.json"
+    "loggingconf": "logging.json",
+    "lockfile": ".lock"
 }

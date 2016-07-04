@@ -2,6 +2,7 @@ import json
 import argparse
 import sys
 import fcntl
+import os
 
 from libs.misc import postmortem
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
@@ -27,6 +28,7 @@ def main(
         description='',
         epilog='',
         mtime_path=None,
+        lock=True,  # True = Exclusive execution. No other processmedia task can run while exclusive lock is on.
 ):
 
     parser = argparse.ArgumentParser(
@@ -50,17 +52,18 @@ def main(
     kwargs = vars(parser.parse_args())
     additional_arguments_processing_function(kwargs)
 
-    try:
-        lockfile = open(kwargs['lockfile'], 'w')
-        fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except IOError:
-        log.warn('Existing process already active. Aborting.')
-        sys.exit(0)
-
     # Overlay config.json defaults
     with open(kwargs['config'], 'rt') as config_filehandle:
         config = json.load(config_filehandle)
         kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
+
+    if lock:
+        try:
+            lockfile = open(kwargs['lockfile'], 'w')
+            fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except IOError:
+            log.warn('Existing process already active. Aborting.')
+            sys.exit(0)
 
     # Setup logging.json
     with open(kwargs['loggingconf'], 'rt') as filehandle:
@@ -86,5 +89,7 @@ def main(
 
     main_function.calling_kwargs = kwargs
 
-    lockfile.close()
+    if lock:
+        lockfile.close()
+        os.remove(kwargs['lockfile'])
     return return_value
