@@ -76,10 +76,23 @@ def _parse_time(time_str):
     datetime.time(1, 2, 3, 50000)
     >>> _ssa_time(_parse_time('1:02:03.05'))
     '1:02:03.05'
+    >>> _parse_time('0:00:60.50')
+    datetime.time(0, 1, 0, 500000)
+
+    ##>>> _parse_time('0:59:60.1000001')
+    ##datetime.time(1, 0, 1)
     """
     time_dict = re_time.search(time_str).groupdict()
-    time_dict['ms'] = '{:0<6}'.format(time_dict['ms'])
-    return time(*(int(time_dict[k]) for k in ('hour', 'min', 'sec', 'ms')))
+    time_dict['ms'] = int('{:0<6}'.format(time_dict['ms']))  # time_dict['ms'].ljust(6, '0')
+    for k in ('hour', 'min', 'sec'):
+        time_dict[k] = int(time_dict[k])
+    #time_dict['sec'] += time_dict['ms'] // 1000000
+    time_dict['min'] += time_dict.get('sec') // 60
+    time_dict['hour'] += time_dict['min'] // 60
+    #time_dict['ms'] = time_dict['ms'] % 1000000
+    time_dict['sec'] = time_dict['sec'] % 60
+    time_dict['min'] = time_dict['min'] % 60
+    return time(*(time_dict[k] for k in ('hour', 'min', 'sec', 'ms')))
 
 
 def _parse_srt(source):
