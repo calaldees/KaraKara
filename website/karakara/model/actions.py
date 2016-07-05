@@ -95,7 +95,7 @@ def delete_track(track_id):
     were sang. There would be no track details, but currently the system will crash on html
     rendering if these queue_item orphan records are left
     """
-    DBSession.query(Track).filter(Track.id == track_id).delete()
     attrgetter_track_id = operator.attrgetter('track_id')
     for ModelClass in (QueueItem, TrackTagMapping, TrackAttachmentMapping):
         DBSession.query(ModelClass).filter(attrgetter_track_id(ModelClass) == track_id).delete()
+    DBSession.query(Track).filter(Track.id == track_id).delete()

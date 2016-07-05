@@ -122,6 +122,7 @@ class TrackImporter(object):
 
         DBSession.add(track)
         commit()
+        self.exisiting_track_ids.add(m.source_hash)  # HACK!! .. we should not have duplicate hashs's in the source set. This is a temp patch
 
         return True
 
