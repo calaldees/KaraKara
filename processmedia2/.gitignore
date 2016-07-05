@@ -1,4 +1,5 @@
 .cache
+.lock
 _env
 libs
 divx2pass*
