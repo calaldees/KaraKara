@@ -336,7 +336,7 @@ class Encoder(object):
         target_file = m.processed_files['tags']
 
         if not source_file:
-            log.warning('No tag file provided - {}'.format(source_file))
+            log.warning('No tag file provided - {}'.format(m.name))
             return False
         if not os.path.exists(source_file):
             log.warning('Source file tags does not exists? wtf! %s', source_file)
