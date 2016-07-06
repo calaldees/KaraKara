@@ -74,7 +74,6 @@ def main(
         fileset_monitor = FilesetChangeMonitor(path=kwargs['path_{}'.format(mtime_path)], name=name)
         if not kwargs.get('force') and not fileset_monitor.has_changed:
             exit_message = "{} has not updated since last successful scan. Aborting. use `--force` to bypass this check".format(mtime_path)
-            log.warn(exit_message)
             sys.exit(exit_message)
 
     # Run main func (maybe with debugging)
