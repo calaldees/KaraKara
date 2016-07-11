@@ -56,6 +56,7 @@ def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
 # Cache Management
 #-------------------------------------------------------------------------------
 LIST_CACHE_KEY = 'comunity_list'
+list_cache_timestamp = None
 
 list_version = random.randint(0, 2000000000)
 def invalidate_list_cache(request=None):
@@ -283,6 +284,13 @@ def comunity_list(request):
             'tracks': tracks,
             # TODO: add further details of currently processing files?
         }
+
+    # Invalidate cache if db has updated
+    last_update_timestamp = last_update()
+    global list_cache_timestamp
+    if list_cache_timestamp is None or last_update_timestamp != list_cache_timestamp:
+        list_cache_timestamp = last_update_timestamp
+        invalidate_list_cache(request)
 
     data_tracks = cache.get_or_create(LIST_CACHE_KEY, _comnunity_list)
     return action_ok(data=data_tracks)

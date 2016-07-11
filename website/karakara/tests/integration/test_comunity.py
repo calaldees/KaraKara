@@ -2,12 +2,14 @@ import pytest
 import json
 from unittest.mock import patch
 
+from externals.lib.misc import first
 from externals.lib.social._login import ILoginProvider, ProviderToken
 from externals.lib.test import MultiMockOpen
 
 from karakara.views.comunity import ComunityTrack
-from karakara.model import DBSession
+from karakara.model import DBSession, commit
 from karakara.model.model_comunity import ComunityUser
+from karakara.model.model_tracks import Track
 
 
 def login(app, name='TestUser'):
@@ -51,6 +53,28 @@ def test_list(app, users, tracks):
     for track in tracks:
         DBSession.add(track)  # Hu? why does this need to be attached to the session again?
         assert track.source_filename in response.text
+    logout(app)
+
+
+def test_list_invalidate(DBSession, app, users, tracks):
+    login(app)
+
+    def get_comunity_track_ids():
+        return {track['id'] for track in app.get('/comunity/list.json').json['data']['tracks']}
+    def add_track(track_id):
+        track = Track()
+        track.id = track_id
+        DBSession.add(track)
+        commit()
+    def del_track(track_id):
+        DBSession.query(Track).filter(Track.id == track_id).delete()
+        commit()
+    ids = get_comunity_track_ids()
+    add_track('new')
+    assert ids != get_comunity_track_ids()
+    del_track('new')
+    assert ids == get_comunity_track_ids()
+
     logout(app)
 
 
