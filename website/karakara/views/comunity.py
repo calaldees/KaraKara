@@ -75,6 +75,11 @@ def _generate_cache_key_comunity_list(request):
 
 @subscriber(EventFileUploaded)
 def file_uploaded(event):
+    """
+    Depricated.
+    Files are now updated from processmedia2.
+    This can be removed.
+    """
     upload_path = get_setting(PATH_UPLOAD_KEY)
     path_source = get_setting(PATH_SOURCE_KEY)
 

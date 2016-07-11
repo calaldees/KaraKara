@@ -90,7 +90,7 @@ dependency_download: dependency_downloader.py externals
 	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
 .PHONY: install
-install: development.ini production.inidiff KaraKara.egg-info dependency_download test.db upload_paths locale/karakara.pot
+install: development.ini production.inidiff KaraKara.egg-info externals/lib dependency_download test.db upload_paths locale/karakara.pot
 
 
 # Databases --------------------------------------------------------------------

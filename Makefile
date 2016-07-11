@@ -42,8 +42,13 @@ rsync_push: del_osx_cancer
 	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/ -e ssh --archive --verbose --stats --progress --update --human-readable --inplace
 	#--bwlimit=100
 
-rsync_local_push:
-	rsync ~/Applications/KaraKara/files/ /media/karakara/UNTITLED/files2/ --archive --no-perms --no-owner --no-group --verbose --stats --progress --update --human-readable --delete-after
+RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --update --human-readable
+RSYNC_LOCAL_SOURCE:=~/Applications/KaraKara
+RSYNC_LOCAL_TARGET:=/Volumes/Samsung_T1/KaraKara
+
+rsync_local_push_samsung:
+	rsync $(RSYNC_LOCAL_SOURCE)/meta/ $(RSYNC_LOCAL_TARGET)/meta/ $(RSYNC_ARGS) --delete-after
+	rsync $(RSYNC_LOCAL_SOURCE)/processed/ $(RSYNC_LOCAL_TARGET)/processed/ $(RSYNC_ARGS) --delete-after
 
 #hash_match:
 #	website/env/bin/python3 website/karakara/scripts/hash_matcher.py --source_folder ~/temp/Convention\ Karaoke/ --destination_folder ~/Applications/KaraKara/files/ -v
