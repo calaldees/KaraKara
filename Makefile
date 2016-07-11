@@ -63,13 +63,13 @@ PROJECTS = processmedia2 website player mediaserver admindashboard
 .PHONY: install
 install:
 	for project in $(PROJECTS); do \
-		$(MAKE) install --directory $$project ; \
+		$(MAKE) install --no-keep-going --directory $$project ; \
 	done
 
 .PHONY: test
 test:
 	for project in $(PROJECTS); do \
-		$(MAKE) test --directory $$project ; \
+		$(MAKE) test --no-keep-going --directory $$project ; \
 	done
 
 .PHONY: cloc
