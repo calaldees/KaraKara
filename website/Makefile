@@ -166,7 +166,8 @@ stop_webapp_daemon:
 .PHONY: test test_crawl
 
 test: ini
-	$(PYTEST) externals $(PROJECT) --pdb
+	# TODO: test external libs 'externals', currently wont because crypt.py requires crytographic libs
+	$(PYTEST) $(PROJECT) --pdb
 	# --capture=sys
 
 test_crawl: ini
