@@ -156,7 +156,7 @@ class ComunityTrack():
         return self._track_dict
 
     @property
-    def meta(self):
+    def _meta(self):
         try:
             with open(os.path.join(self.path_meta, '{}.json'.format(self.track['source_filename'])), 'r') as meta_filehandle:
                 return json.load(meta_filehandle)
@@ -164,8 +164,7 @@ class ComunityTrack():
             log.warn('Unable to locate metadata for {id} - {source_filename} - {path_meta}'.format(path_meta=self.path_meta, **self.track))
             return {}
 
-    @property
-    def tag_data_filename(self):
+    def _get_source_filename(self, source_type):
         """
         Lookup metadata from source_filename
         From metadata lookup tags file (identifyable with .txt extension)
@@ -175,28 +174,40 @@ class ComunityTrack():
         to parse this, but we want to reduce code dependencys and this is a single
         fairly understandbale, self contained, one off.
         """
+        SOURCE_TYPE_EXTENSION_LOOKUP = {
+            'tag': ('txt', ),
+            'subtitles': ('ssa', 'srt'),
+        }
         return os.path.join(
             self.path_source,
             first(
                 filedata.get('relative')
-                for filename, filedata in self.meta.get('scan', {}).items()
-                if filename.endswith('.txt')
+                for filename, filedata in self._meta.get('scan', {}).items()
+                if any(filename.endswith('.{}'.format(extension)) for extension in SOURCE_TYPE_EXTENSION_LOOKUP[source_type])
             ) or ''
         )
 
+    def _get_source_file(self, source_type):
+        try:
+            source_filename = self._get_source_filename(source_type)
+            with self._open(source_filename, 'r') as filehandle:
+                return filehandle.read()
+        except IOError as ex:
+            log.error('Unable to load {} - {}'.format(source_filename, ex))
+            return ''
+
+    def _set_source_file(self, source_type, data):
+        source_filename = self._get_source_filename(source_type)
+        backup(source_filename, self.path_backup)
+        with self._open(source_filename, 'w') as filehandle:
+            filehandle.write(data)
+
     @property
     def tag_data_raw(self):
-        try:
-            with self._open(self.tag_data_filename, 'r') as tag_data_filehandle:
-                return tag_data_filehandle.read()
-        except IOError as ex:
-            log.error('Unable to load {} - {}'.format(self.tag_data_filename, ex))
-            return ''
+        return self._get_source_file('tag')
     @tag_data_raw.setter
     def tag_data_raw(self, tag_data):
-        backup(self.tag_data_filename, self.path_backup)
-        with self._open(self.tag_data_filename, 'w') as filehandle:
-            filehandle.write(tag_data)
+        self._set_source_file('tag', tag_data)
 
     @property
     def tag_data(self):
@@ -204,10 +215,10 @@ class ComunityTrack():
 
     @property
     def subtitles(self):
-        return "TODO"
+        return self._get_source_file('subtitles')
     @subtitles.setter
     def subtitles(self, subtitles):
-        pass  # TODO
+        self._set_source_file('subtitles', subtitles)
 
     @staticmethod
     def track_status(track_dict, status_tags=STATUS_TAGS, func_file_exists=lambda f: True):
@@ -348,11 +359,11 @@ def comunity_track_update(request):
     id = request.matchdict['id']
     log.debug('comunity_track_update {}'.format(id))
     ctrack = ComunityTrack.factory(id, request)
-    # Save tag data
+
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
-
-    # TODO: subtitles
+    if 'subtitles' in request.params:
+        ctrack.subtitles = request.params['subtitles']
 
     return action_ok()
 
