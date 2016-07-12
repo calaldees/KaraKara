@@ -11,7 +11,6 @@ STATUS_TAGS = {
     'green': ('green', 'ok')
 }
 
-@pytest.mark.xfail  # Temp during refactoring
 @pytest.mark.parametrize(('track_dict', 'expected_status', 'expected_statuss', 'expected_messages'), [
     # Complete without warnings/errors
     (
@@ -41,7 +40,7 @@ STATUS_TAGS = {
         },
         'red',
         ('red', 'yellow'),
-        ('title', 'artist', 'attachments', 'duration'),
+        ('title', 'artist', 'duration'),
     ),
 
     # Single green anonymous tag
