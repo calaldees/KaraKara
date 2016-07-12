@@ -10,7 +10,7 @@ from pyramid.events import subscriber
 
 from sqlalchemy.orm import joinedload, undefer
 
-from externals.lib.misc import backup
+from externals.lib.misc import backup, first
 from externals.lib.pyramid_helpers import get_setting
 from externals.lib.pyramid_helpers.views.upload import EventFileUploaded
 
@@ -31,6 +31,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 
 PATH_SOURCE_KEY = 'static.source'
+PATH_META_KEY = 'static.meta'
 PATH_BACKUP_KEY = 'static.backup'
 PATH_UPLOAD_KEY = 'upload.path'
 
@@ -117,17 +118,20 @@ class ComunityTrack():
         return ComunityTrack(
             track=track,
             path_source=request.registry.settings[PATH_SOURCE_KEY],
+            path_meta=request.registry.settings[PATH_META_KEY],
             path_backup=request.registry.settings[PATH_BACKUP_KEY],
             open=cls._open
         )
 
-    def __init__(self, track, path_source, path_backup, open=open):
+    def __init__(self, track, path_source, path_meta, path_backup, open=open):
         """
         Not to be called directly - use factory() instead
         """
         assert path_source
         assert path_backup
+        assert path_meta
         self.path_source = path_source
+        self.path_meta = path_meta
         self.path_backup = path_backup
 
         assert track, 'track required'
@@ -152,8 +156,33 @@ class ComunityTrack():
         return self._track_dict
 
     @property
+    def meta(self):
+        try:
+            with open(os.path.join(self.path_meta, '{}.json'.format(self.track['source_filename'])), 'r') as meta_filehandle:
+                return json.load(meta_filehandle)
+        except FileNotFoundError:
+            log.warn('Unable to locate metadata for {id} - {source_filename} - {path_meta}'.format(path_meta=self.path_meta, **self.track))
+            return {}
+
+    @property
     def tag_data_filename(self):
-        return "TODO"
+        """
+        Lookup metadata from source_filename
+        From metadata lookup tags file (identifyable with .txt extension)
+        Return relative path
+
+        This is kind of reinventing the wheel as we do have code in `processmedia2`
+        to parse this, but we want to reduce code dependencys and this is a single
+        fairly understandbale, self contained, one off.
+        """
+        return os.path.join(
+            self.path_source,
+            first(
+                filedata.get('relative')
+                for filename, filedata in self.meta.get('scan', {}).items()
+                if filename.endswith('.txt')
+            ) or ''
+        )
 
     @property
     def tag_data_raw(self):
@@ -306,7 +335,6 @@ def comunity_track(request):
     return action_ok(data={
         'track': ctrack.track,
         'status': ctrack.status,
-        'tag_matrix': {},
         'tag_data': ctrack.tag_data_raw,
         'subtitles': ctrack.subtitles,
     })

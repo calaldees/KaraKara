@@ -79,10 +79,10 @@ api.search.max_age = 0 -> int
 # Static Assets ----------------------------------------------------------------
 static.assets = static
 static.player = %(here)s/../player
-static.source = %(here)s/../mediaserver/www/processed
-static.meta = %(here)s/../mediaserver/www/processed
+static.source = %(here)s/../mediaserver/www/source
+static.meta = %(here)s/../mediaserver/www/meta
 static.processed = %(here)s/../mediaserver/www/processed
-static.backup = %(here)s/../mediaserver/www/processed
+static.backup = %(here)s/../mediaserver/www/backup
 
 #static.assets = http://staticserver.com/
 

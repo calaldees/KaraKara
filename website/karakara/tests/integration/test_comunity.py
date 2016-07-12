@@ -57,6 +57,12 @@ def test_list(app, users, tracks):
 
 
 def test_list_invalidate(DBSession, app, users, tracks):
+    """
+    The 'comunity_list' view uses cache internally agressivly.
+    The cache is based on the last_update() time of a track.
+    Test is modifying a track in the database causes the comunity_list to
+    produce the correct results.
+    """
     login(app)
 
     def get_comunity_track_ids():
