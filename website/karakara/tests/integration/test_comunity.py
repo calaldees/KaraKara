@@ -134,8 +134,7 @@ def test_comunity_track_render(app, users, tracks):
     logout(app)
 
 
-@pytest.mark.xfail  # Temp during refactoring
-def test_settings(app, tracks, users, settings):
+def test_comunity_settings(app, tracks, users, settings):
     """
     This is also testing tracks_all heavily in this flow
     """
