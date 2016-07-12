@@ -48,6 +48,7 @@ help:
 
 #python-virtualenv python3-setuptools python3-dev curl
 
+.PRECIOUS: $(ENV)
 $(ENV):
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 $(ENV)
@@ -60,12 +61,13 @@ $(ENV):
 #env/lib/node_modules/bower: env/bin/node
 #	source env/bin/activate && npm install -g bower
 
+.PRECIOUS: KaraKara.egg-info
 KaraKara.egg-info: $(ENV)
 	$(PYTHON) setup.py develop
 
 # Force reexecution of setup.py dependenys (this must be done from the Makefile or make gets confused and repetedy runs the task)
-setup: KaraKara.egg-info
-	$(PYTHON) setup.py develop
+#setup: KaraKara.egg-info
+#	$(PYTHON) setup.py develop
 
 dependency_downloader.py:
 	curl https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
@@ -90,7 +92,7 @@ dependency_download: dependency_downloader.py externals
 	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
 
 .PHONY: install
-install: development.ini production.inidiff KaraKara.egg-info externals/lib dependency_download test.db upload_paths locale/karakara.pot
+install: development.ini production.inidiff KaraKara.egg-info externals/lib dependency_download locale/karakara.pot test.db upload_paths
 
 
 # Databases --------------------------------------------------------------------
@@ -176,6 +178,7 @@ test_crawl_production: ini
 
 # I18N -------------------------------------------------------------------------
 
+.PRECIOUS: locale
 locale:
 	$(PYTHON) setup.py extract_messages
 	$(PYTHON) setup.py init_catalog -l en
@@ -192,6 +195,7 @@ env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.b
 	# This just perform a ultra hack critical fix on bable
 	sed -i.bak "s/tmpname, 'w'/tmpname, 'wb'/g" env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py
 
+.PRECIOUS: locale/karakara.pot
 locale/karakara.pot: locale
     # removed dependecy - env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
 	$(PYTHON) setup.py extract_messages
