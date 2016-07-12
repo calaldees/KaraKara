@@ -84,14 +84,13 @@ def test_list_invalidate(DBSession, app, users, tracks):
     logout(app)
 
 
-@pytest.mark.xfail  # Temp during refactoring
-def test_track(app, users, tracks):
+def test_comunity_track_render(app, users, tracks):
     login(app)
 
     # Static file data
     multi_mock_open = MultiMockOpen()
     multi_mock_open.add_handler(
-        'tags.txt',
+        'track1source.txt',
         """
             title: Test Track 1 - TITLE EXTENDED
             artist: test artist
@@ -99,24 +98,25 @@ def test_track(app, users, tracks):
         """
     )
     multi_mock_open.add_handler(
-        'sources.json',
+        'track1source.json',
         json.dumps({
-            'test.avi': {},
-            'test.ssa': {},
-            'test.srt': {},
+            'scan': {
+                'track1source.txt': {'relative': 'track1source.txt'},
+                'track1source.avi': {'relative': 'track1source.avi'},
+                'track1source.srt': {'relative': 'track1source.srt'},
+            }
         })
     )
     multi_mock_open.add_handler(
-        'test.ssa',
+        'track1source.srt',
         """
             subtitle content
         """
     )
-    multi_mock_open.add_handler(
-        'test.srt',
-        FileNotFoundError
-    )
-
+    #multi_mock_open.add_handler(
+    #    'test.srt',
+    #    FileNotFoundError
+    #)
 
     # Make web request
     with patch.object(ComunityTrack, '_open', multi_mock_open.open):
@@ -132,6 +132,7 @@ def test_track(app, users, tracks):
         assert text in response.text
 
     logout(app)
+
 
 @pytest.mark.xfail  # Temp during refactoring
 def test_settings(app, tracks, users, settings):

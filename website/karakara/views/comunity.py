@@ -157,11 +157,12 @@ class ComunityTrack():
 
     @property
     def _meta(self):
+        meta_filename = os.path.join(self.path_meta, '{}.json'.format(self.track['source_filename']))
         try:
-            with open(os.path.join(self.path_meta, '{}.json'.format(self.track['source_filename'])), 'r') as meta_filehandle:
+            with self._open(meta_filename, 'r') as meta_filehandle:
                 return json.load(meta_filehandle)
         except FileNotFoundError:
-            log.warn('Unable to locate metadata for {id} - {source_filename} - {path_meta}'.format(path_meta=self.path_meta, **self.track))
+            log.warn('Unable to locate metadata for {id} - {meta_filename}'.format(id=self.track['id'], path_meta=self.path_meta, meta_filename=meta_filename))
             return {}
 
     def _get_source_filename(self, source_type):
