@@ -18,7 +18,7 @@ from ..model import DBSession
 from ..model.model_tracks import Track
 from ..model.actions import last_update
 
-from . import web, action_ok, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity  # action_error,
+from . import web, action_ok, action_error, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity
 
 from ..views.tracks import invalidate_track
 from ..templates import helpers as h
@@ -385,3 +385,28 @@ def community_settings(request):
         setting_key: request.registry.settings.get(setting_key)
         for setting_key in COMUNITY_VISIBLE_SETTINGS
     }})
+
+
+@view_config(route_name='comunity_processmedia_log')
+@web
+@comunity_only
+def comunity_processmedia_log(request):
+    LOG_PATH_KEY = 'static.processmedia2.log'
+    REGEX_LOG_ITEM = re.compile(r'(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<source>.+?) - (?P<loglevel>.+?) - (?P<message>.+?)(\n\d{2}-|$)', flags=re.DOTALL + re.IGNORECASE + re.MULTILINE)
+    LEVELS = request.params.get('levels', 'WARNING,ERROR').split(',')
+    try:
+        with open(request.registry.settings[LOG_PATH_KEY], 'rt') as filehandle:
+            processmedia_log = [
+                item 
+                for item in
+                (
+                    match.groupdict()
+                    for match in REGEX_LOG_ITEM.finditer(filehandle.read())
+                )
+                if item.get('loglevel') in LEVELS
+            ]
+    except IOError:
+        raise action_error(message='unable to open {}'.format(LOG_PATH_KEY))
+    return action_ok(data={
+        'processmedia_log': processmedia_log,
+    })

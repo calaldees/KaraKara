@@ -1,3 +1,5 @@
+SHELL := $(SHELL) -e
+
 ENV:=_env
 
 .PHONY: help

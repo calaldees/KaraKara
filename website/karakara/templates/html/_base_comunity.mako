@@ -70,6 +70,7 @@
 					<li><a href="/search_tags/">MobileBrowse</a></li>
 					<li><a href="/track_list">PrintableList</a></li>
 					<li><a href="/comunity/settings">Settings</a></li>
+					<li><a href="/comunity/processmedia_log?levels=WARNING,ERROR">EncodeLog</a></li>
 					% endif
 					##<li class="active"><a href="#">Link</a></li>
 				</ul>
