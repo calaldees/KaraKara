@@ -17,7 +17,7 @@
     % endfor
     </tr>
     
-	% for item in data.get('processmedia_log', []):
+	% for item in reversed(data.get('processmedia_log', [])):
 		<tr class="bg-${LOGLEVEL_TO_BOOTSTRAP_CLASS_LOOKUP.get(item.get('loglevel'))}">
             % for heading in HEADINGS:
             <td>${item.get(heading, '').replace('\\n', '<br>') | n}</td>

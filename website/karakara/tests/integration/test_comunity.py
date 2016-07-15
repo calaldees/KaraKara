@@ -172,3 +172,30 @@ def test_comunity_settings(app, tracks, users, settings):
         #  hash settings -> attempt update disallowed setting -> check hash settings
 
     logout(app)
+
+
+def test_comunity_processmedia_logs(app, settings):
+    response = app.get('/comunity/processmedia_log', expect_errors=True)
+    assert response.status_code == 403
+
+    login(app)
+
+    multi_mock_open = MultiMockOpen()
+    multi_mock_open.add_handler(
+        'processmedia.log',
+        """
+2000-01-01 00:00:00,000 - __main__ - INFO - Info test
+2001-01-01 00:00:00,000 - __main__ - WARNING - Warning test
+2002-01-01 00:00:00,000 - __main__ - ERROR - Error test
+"""
+    )
+    with patch.dict(settings, {'static.processmedia2.log': 'processmedia.log'}):
+        # rrrrrrr - kind of a hack using ComunityTrack._open .. but it works ..
+        with patch.object(ComunityTrack, '_open', multi_mock_open.open):
+            response = app.get('/comunity/processmedia_log?levels=WARNING,ERROR', expect_errors=True)
+
+    assert 'Info test' not in response.text
+    assert 'Warning test' in response.text
+    assert 'Error test' in response.text
+
+    logout(app)

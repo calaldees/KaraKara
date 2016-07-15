@@ -395,9 +395,10 @@ def comunity_processmedia_log(request):
     REGEX_LOG_ITEM = re.compile(r'(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<source>.+?) - (?P<loglevel>.+?) - (?P<message>.+?)(\n\d{2}-|$)', flags=re.DOTALL + re.IGNORECASE + re.MULTILINE)
     LEVELS = request.params.get('levels', 'WARNING,ERROR').split(',')
     try:
-        with open(request.registry.settings[LOG_PATH_KEY], 'rt') as filehandle:
+        # rrrrrrr - kind of a hack using ComunityTrack._open .. but it works ..
+        with ComunityTrack._open(request.registry.settings[LOG_PATH_KEY], 'rt') as filehandle:
             processmedia_log = [
-                item 
+                item
                 for item in
                 (
                     match.groupdict()
