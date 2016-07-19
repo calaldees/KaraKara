@@ -5,6 +5,10 @@ from collections import namedtuple, OrderedDict
 from datetime import time
 from itertools import zip_longest
 
+import logging
+log = logging.getLogger(__name__)
+
+
 SSA_NEWLINE = '\\N'
 SSA_NEXT_COLOR = '{\\c&HFFFFFF&}'
 SSA_HEIGHT_TO_FONT_SIZE_RATIO = 14
@@ -161,8 +165,14 @@ def _parse_ssa(source):
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='this is, text on same line')]
 
     """
+    lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
+
+    # Keep 'toptitles' if the majority of the files are toptitles.
+    toptitle_count = '\n'.join(line_dict['text'] for line_dict in lines).count('\\a6')
+    remove_toptitles = toptitle_count < int(len(lines) * 0.8)
+
     def clean_line(text):
-        if '{\\a6}' in text:
+        if remove_toptitles and '\\a6' in text:
             return ''
         text = re.sub(r'{.*?}', '', text)
         return '\n'.join(l.strip() for l in text.split('\\N'))
@@ -172,11 +182,14 @@ def _parse_ssa(source):
             _parse_time(line['end']),
             clean_line(line['text']),
         )
-    lines = [parse_line(line_match.groupdict()) for line_match in re_ssa_line.finditer(source)]
+    lines = [parse_line(line_dict) for line_dict in lines]
     def remove_duplicate_line(line_current, line_next):
         if not line_next:
             return line_current
         _, overlap_text = commonOverlap(line_current.text, line_next.text)
+        if len(overlap_text) < int(len(line_next.text) * 0.3):
+            log.debug('Subtitle text overlap is suspiciously small, ignoring the overlap current:"{}" - next:"{}" - overlap:"{}"'.format(line_current.text, line_next.text, overlap_text))
+            overlap_text = ''
         return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip())
     lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
     return [line for line in lines if line.text]
