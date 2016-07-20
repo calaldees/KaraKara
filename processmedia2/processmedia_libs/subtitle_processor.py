@@ -153,6 +153,25 @@ def _parse_ssa(source):
     >>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0, 6, 910000), end=datetime.time(0, 0, 12, 390000), text='Tooi hi no kioku wo'), Subtitle(start=datetime.time(0, 0, 12, 490000), end=datetime.time(0, 0, 21, 530000), text='Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune')]
 
+    A file with almost all toptitles should be parsed normally
+
+    >>> ssa = r'''
+    ... Dialogue: Marked=0,0:00:01.00,0:00:02.00,*Default,NTP,0000,0000,0000,!Effect,{\someControlShit\a6}First
+    ... Dialogue: Marked=0,0:00:02.00,0:00:03.00,*Default,NTP,0000,0000,0000,!Effect,{\a6}Second
+    ... Dialogue: Marked=0,0:00:03.00,0:00:04.00,*Default,NTP,0000,0000,0000,!Effect,{\a6}Third
+    ... '''
+    >>> _parse_ssa(ssa)
+    [Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text='First'), Subtitle(start=datetime.time(0, 0, 2), end=datetime.time(0, 0, 3), text='Second'), Subtitle(start=datetime.time(0, 0, 3), end=datetime.time(0, 0, 4), text='Third')]
+
+    Small Overlap is rejected
+
+    >>> ssa = r'''
+    ... Dialogue: Marked=0,0:00:01.00,0:00:02.00,*Default,NTP,0000,0000,0000,!Effect, ga takaraMON da \N {\c&HFFFFFF&} ase mamire wa
+    ... Dialogue: Marked=0,0:00:02.00,0:00:03.00,*Default,NTP,0000,0000,0000,!Effect,ase mamire
+    ... '''
+    >>> _parse_ssa(ssa)
+    [Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text='ga takaraMON da\nase mamire wa'), Subtitle(start=datetime.time(0, 0, 2), end=datetime.time(0, 0, 3), text='ase mamire')]
+
     TODO: Upcoming bug!
         This only works for items with '!Effect,' (it's in the regex as a hack)
         We should count the ',' and grab the text after that index
