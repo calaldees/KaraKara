@@ -22,7 +22,7 @@ SRT_FORMAT = '''\
 
 re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<ms>\d{1,5})')
 re_srt_line = re.compile(r'(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*)(\n\n|$)', flags=re.MULTILINE)
-re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),.*Effect,(?P<text>.+)[\n$]')  # the "Effect," is a hack! I cant COUNT the ',' in a regex and am assuming that all text has "!Effect,"
+re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),(?P<style>.*?),(?P<name>.*?),(?P<marginL>.*?),(?P<marginR>.*?),(?P<marginV>.*?),(?P<effect>.*?),(?P<text>.+)[\n$]')
 
 Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
 
@@ -172,15 +172,10 @@ def _parse_ssa(source):
     >>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text='ga takaraMON da\nase mamire wa'), Subtitle(start=datetime.time(0, 0, 2), end=datetime.time(0, 0, 3), text='ase mamire')]
 
-    TODO: Upcoming bug!
-        This only works for items with '!Effect,' (it's in the regex as a hack)
-        We should count the ',' and grab the text after that index
-    def (s, c): [s.index(c, index+1) for index in range(s.count(c))]
-
-    #>>> ssa = r'''
-    #... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
-    #... '''
-    #>>> _parse_ssa(ssa)
+    >>> ssa = r'''
+    ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
+    ... '''
+    >>> _parse_ssa(ssa)
     [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='this is, text on same line')]
 
     """
