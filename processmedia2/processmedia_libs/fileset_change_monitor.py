@@ -1,5 +1,6 @@
 import os
 import json
+from functools import lru_cache
 
 from libs.misc import fast_scan
 
@@ -18,6 +19,10 @@ class FilesetChangeMonitor(object):
 
     @property
     def mtime(self):
+        return self._get_mtime()
+
+    @lru_cache(maxsize=1)
+    def _get_mtime(self):
         try:
             mtimes = tuple(f.stats.st_mtime for f in self.files)
             return len(mtimes) + max(mtimes)
