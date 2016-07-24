@@ -23,6 +23,7 @@ def cleanup_media(**kwargs):
     }
     unlinked_files = (f for f in meta_manager.processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in all_known_file_hashs)
 
+    # Todo .. have dryrun and say how much this is cleaning up
     for unlinked_file in unlinked_files:
         os.remove(unlinked_file.absolute)
 
