@@ -116,7 +116,7 @@ def main(global_config, **settings):
         social_login.add_login_provider(FacebookLogin(
             appid=config.registry.settings.get('facebook.appid'),
             secret=config.registry.settings.get('facebook.secret'),
-            permissions=config.registry.settings.get('facebook.permissions', 'basic_info'),
+            permissions=config.registry.settings.get('facebook.permissions'),
         ))
     # Firefox Persona (Deprecated technology but a useful reference)
     #if 'persona' in login_providers:
