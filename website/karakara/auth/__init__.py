@@ -7,6 +7,9 @@ from ..model.model_comunity import ComunityUser, SocialToken
 
 from ..templates import helpers as h
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class ComunityUserStore(IUserStore):
 
@@ -30,6 +33,7 @@ class ComunityUserStore(IUserStore):
             data=user_data,
         ))
         #user.name = '{first_name} {last_name}'.format(**user_data)
+        log.debug(' - '.join(('create_user', str(provider_token), str(user_data))))
 
         DBSession.add(user)
         commit()
