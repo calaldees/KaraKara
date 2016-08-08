@@ -111,14 +111,18 @@ def main(global_config, **settings):
     login_providers = config.registry.settings.get('login.provider.enabled')
     # Facebook
     if 'facebook' in login_providers:
+        for settings_key in ('facebook.appid', 'facebook.secret'):
+            assert config.registry.settings.get(settings_key), 'To use facebook as a login provider appid and secret must be provided'
         social_login.add_login_provider(FacebookLogin(
             appid=config.registry.settings.get('facebook.appid'),
             secret=config.registry.settings.get('facebook.secret'),
-            permissions=config.registry.settings.get('facebook.permissions'),
+            permissions=config.registry.settings.get('facebook.permissions', 'basic_info'),
         ))
-    # Firefox Persona
-    if 'persona' in login_providers:
-        social_login.add_login_provider(PersonaLogin(site_url=config.registry.settings.get('server.url')))
+    # Firefox Persona (Deprecated technology but a useful reference)
+    #if 'persona' in login_providers:
+    #    social_login.add_login_provider(PersonaLogin(
+    #        site_url=config.registry.settings.get('server.url')
+    #    ))
     # No login provider
     if not login_providers and config.registry.settings.get('karakara.server.mode') == 'development':
         # Auto login if no service keys are provided
