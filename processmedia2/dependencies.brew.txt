@@ -42,3 +42,5 @@ ffmpeg
     --with-x265 
     --with-zeromq 
     --with-zimg
+    --with-rubberband
+    --with-libebur128
