@@ -110,7 +110,7 @@ login.automatically_activate_with_single_provider = False -> bool
 
 facebook.appid = 
 facebook.secret = 
-facebook.permissions = basic_info
+facebook.permissions = public_profile
 
 login.provider.enabled = []
 
