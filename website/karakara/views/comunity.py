@@ -299,6 +299,12 @@ def comunity_list(request):
 
         def track_dict_to_status(track_dict):
             track_dict['status'] = ComunityTrack.factory(track_dict, request).status
+            # Flatten tags into a single list
+            track_dict['tags_flattened'] = [
+                '{}:{}'.format(parent, tag)
+                for parent, tags in track_dict['tags'].items()
+                for tag in tags
+            ]
             del track_dict['tags']
             del track_dict['attachments']
             del track_dict['lyrics']
