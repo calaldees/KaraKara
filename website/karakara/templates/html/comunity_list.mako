@@ -20,7 +20,25 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 
 <%def name="body()">	
 	<h2>tracks</h2>
-	<table class="table table-condensed table-hover">
+
+	<p>Filter: <input id="track_filter_input" type="text" name="search" size="50"/></p>
+	<script type="text/javascript">{
+		const filter_func = (filter_text) => {
+			const rows = document.getElementById("track_list").getElementsByTagName("tr");
+			for (let row of rows) {
+				const tags_string = row.attributes.getNamedItem('data-tags').value;
+				row.hidden = tags_string.indexOf(filter_text) < 0;
+			}
+		};
+		const trackFilterInput = document.getElementById("track_filter_input");
+		trackFilterInput.addEventListener('keydown', function(event) {
+			if (event.keyCode === 13) {
+				filter_func(trackFilterInput.value);
+			}
+		}, true);
+	}</script>
+
+	<table id="track_list" class="table table-condensed table-hover">
 	% for track in data.get('tracks', []):
 		${track_row(track)}
 	% endfor
@@ -38,7 +56,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 		traffic_light_status = track.get('status', {}).get('status', '')
 		traffic_light_class = STATUS_TO_BOOTSTRAP_CLASS_LOOKUP.get(traffic_light_status, '')
 	%>
-	<tr class="bg-${traffic_light_class}">
+	<tr class="bg-${traffic_light_class}" data-tags="${', '.join(track.get('tags_flattened', []))}">
 		<td>
 			<a href="/track/${track['id']}"><span class="glyphicon glyphicon-phone"></span></a>
 		</td>
