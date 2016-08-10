@@ -191,7 +191,10 @@ class ComunityTrack():
     def _get_source_file(self, source_type):
         try:
             source_filename = self._get_source_filename(source_type)
-            with self._open(source_filename, 'r') as filehandle:
+            with self._open(source_filename, 'tr', encoding='utf-8', errors='ignore') as filehandle:
+                # errors='ignore' is kind of dangrouious
+                # - if the charset is not utf8 and some kind of latin then we will 'loose' characters on save.
+                # We probably want to warn the user, but we will need to build structure to do this.
                 return filehandle.read()
         except IOError as ex:
             log.error('Unable to load {} - {}'.format(source_filename, ex))
