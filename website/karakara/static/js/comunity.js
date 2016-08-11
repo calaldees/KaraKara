@@ -62,12 +62,13 @@ function init_track_popup(form_selector) {
             data: form_data,
             success: function(data, text, jqXHR) {
                 var response = jqXHR.responseJSON
-                console.log(response);
+                //console.log(response);
                 $form.find("input[type='submit']").removeAttr('disabled');
                 modal_track_hide();
             },
             error: function(jqXHR) {
                 console.error(jqXHR);
+                alert(jqXHR.responseText);
                 $form.find("input[type='submit']").removeAttr('disabled');
             }
         });

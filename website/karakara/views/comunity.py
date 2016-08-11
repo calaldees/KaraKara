@@ -188,13 +188,15 @@ class ComunityTrack():
             ) or ''
         )
 
-    def _get_source_file(self, source_type):
+    def _get_source_file(self, source_type, errors='replace'):
         try:
             source_filename = self._get_source_filename(source_type)
-            with self._open(source_filename, 'tr', encoding='utf-8', errors='ignore') as filehandle:
-                # errors='ignore' is kind of dangrouious
-                # - if the charset is not utf8 and some kind of latin then we will 'loose' characters on save.
-                # We probably want to warn the user, but we will need to build structure to do this.
+            # If the charset is not utf8 (like some kind of latin variant) then
+            # we will loose characters on save if 'replace' is used.
+            # We cant use 'surrogateescape' we cant output this in pure utf-8 to the web interface
+            # The web interface will only save the subtiles IF they have been editied on the web.
+            # It may be worth erroring on web save if we detect the existing subtitles are not in utf-8
+            with self._open(source_filename, 'tr', encoding='utf-8', errors=errors) as filehandle:
                 return filehandle.read()
         except IOError as ex:
             log.error('Unable to load {} - {}'.format(source_filename, ex))
@@ -373,6 +375,15 @@ def comunity_track_update(request):
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
     if 'subtitles' in request.params:
+        try:
+            ctrack._get_source_file('subtitles', errors='strict')
+        except UnicodeDecodeError as unicode_decode_error:
+            raise action_error(
+                'Source subtitle file is not in utf-8. '
+                'Saving subtitles would loose information. '
+                'Recommend that file is converted to utf-8 to enable web saving. '
+                ' - {0} - {1}'.format(ctrack._get_source_filename('subtitles'), unicode_decode_error)
+            )
         ctrack.subtitles = request.params['subtitles']
 
     return action_ok()
