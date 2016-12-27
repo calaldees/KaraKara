@@ -21,7 +21,7 @@ help:
 OS:=$(shell uname -s)
 LINUX_DISTRO:=$(shell lsb_release -a 2> /dev/null | grep "Distributor ID:" | sed 's|.*:.\(.*\)|\1|')
 
-PYTHON_VERSION:=3.5
+PYTHON_VERSION:=3.6
 DEPENDENCIES_PYTHON:=dependencies.python.txt
 DEPENDENCIES_APT:=dependencies.apt.txt
 DEPENDENCIES_BREW:=dependencies.brew.txt
@@ -77,7 +77,7 @@ $(ENV):
 	$(PIP) install --upgrade pip
 	$(PIP) install -r $(DEPENDENCIES_PYTHON)
 .PHONY: upgrade
-upgrade: upgrade_$(OS)
+upgrade: 
 	$(PIP) install -r $(DEPENDENCIES_PYTHON) --upgrade
 
 # Link local libs ----

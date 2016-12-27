@@ -75,8 +75,8 @@ dependency_downloader.py:
 externals:
 	mkdir externals && touch externals/__init__.py
 
-externals/lib: externals
-	ln -s ../$(PATH_LOCAL_LIBS) externals/lib
+externals/lib/: externals
+	ln -s ../$(PATH_LOCAL_LIBS) externals/lib/
 	#mkdir $@
 	#if [ -d $(PATH_LOCAL_LIBS) ] ; then \
 	#	cd $@ && cat $(DEPENDENCIES_LOCAL) |xargs  mkdir -p \

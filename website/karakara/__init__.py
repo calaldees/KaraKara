@@ -5,7 +5,6 @@ import operator
 import pyramid.events
 from pyramid.config import Configurator
 from pyramid.request import Request
-from pyramid.scripts.pserve import add_file_callback
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
@@ -47,9 +46,10 @@ def main(global_config, **settings):
     # Register Aditional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
 
-    # Reload on template change
-    template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
-    add_file_callback(lambda: template_filenames)
+    # Reload on template change - Dericated from pserve
+    #template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
+    #from pyramid.scripts.pserve import add_file_callback
+    #add_file_callback(lambda: template_filenames)
 
     # Parse/Convert setting keys that have specifyed datatypes
     for key in config.registry.settings.keys():
