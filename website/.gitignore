@@ -8,8 +8,6 @@
 /production.ini
 /production.inidiff
 /development.ini
-dependency_downloader.py
-dependencys_installed.json
 /upload/
 .installed_*
 *.pot

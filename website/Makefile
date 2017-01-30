@@ -15,8 +15,8 @@ INI_PROD = production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
 
 DEPENDENCIES_LOCAL:=dependencys.local.txt
-PATH_LOCAL_LIBS:=../../libs/python3/lib
-PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3/lib
+PATH_LOCAL_LIBS:=../../libs/python3
+PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3
 
 LOG_LINES=5
 
@@ -69,30 +69,30 @@ KaraKara.egg-info: $(ENV)
 #setup: KaraKara.egg-info
 #	$(PYTHON) setup.py develop
 
-dependency_downloader.py:
-	curl https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/dependency_downloader.py --compressed -O
 
 externals:
-	mkdir externals && touch externals/__init__.py
+	mkdir -p externals && touch externals/__init__.py
 
-externals/lib/: externals
-	ln -s ../$(PATH_LOCAL_LIBS) externals/lib/
-	#mkdir $@
-	#if [ -d $(PATH_LOCAL_LIBS) ] ; then \
-	#	cd $@ && cat $(DEPENDENCIES_LOCAL) |xargs  mkdir -p \
-	#	cd $@ && cat $(DEPENDENCIES_LOCAL) |xargs  ln -F -s ../../$(PATH_LOCAL_LIBS)/$$1 $@/$$1 ;\
-	#else \
-	#	cat $(DEPENDENCIES_LOCAL) |xargs  wget -cq --force-directories $(PATH_REMOTE_LIBS)/$$1 $@/$$1 ;\
-	#fi
+PRECIOUS: externals/dependency_fetcher.py
+externals/dependency_fetcher.py: externals
+	# LinkLocal or Download depenncy_fetcher manager for getting external dependencys
+	if [ ! -e $@ ] ; then \
+		DEPENDENCY_FETCHER_FILE="apps/dependency_fetcher.py" ; \
+		PATH_DEPENDENCY_FETCHER="$(PATH_LOCAL_LIBS)/$$DEPENDENCY_FETCHER_FILE" ; \
+		if [ -e $$PATH_DEPENDENCY_FETCHER ] ; then \
+			ln -s ../$$PATH_DEPENDENCY_FETCHER $@ ; \
+		else \
+			curl $(PATH_REMOTE_LIBS)/$$DEPENDENCY_FETCHER_FILE --compressed -o $@ ; \
+		fi ;\
+	fi
 
 PHONY: dependency_download
-dependency_download: dependency_downloader.py externals
+dependency_download: externals/dependency_fetcher.py
 	# Trigger dependency check on every startup
-	$(PYTHON) dependency_downloader.py --destination externals
-	#source env/bin/activate && bower install --config.interactive=false --config.directory=./externals/
+	$(PYTHON) externals/dependency_fetcher.py dependency_fetcher.json --tracker externals/ --destination_path externals/
 
 .PHONY: install
-install: development.ini production.inidiff KaraKara.egg-info externals/lib dependency_download locale/karakara.pot test.db upload_paths
+install: development.ini production.inidiff KaraKara.egg-info dependency_download locale/karakara.pot test.db upload_paths
 
 
 # Databases --------------------------------------------------------------------
