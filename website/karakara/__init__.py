@@ -155,7 +155,7 @@ def main(global_config, **settings):
     # Routes -------------------------------------------------------------------
 
     # Static Routes
-    config.add_static_view(name='ext'   , path='../externals/static') #cache_max_age=3600 # settings["static.assets"]
+    config.add_static_view(name='ext', path=settings['static.externals'])  #cache_max_age=3600
     config.add_static_view(name='static', path='karakara:{0}'.format(settings["static.assets"])) #cache_max_age=3600 # settings["static.assets"]
     config.add_static_view(name='player', path=settings["static.player"])
 

@@ -78,6 +78,7 @@ api.search.max_age = 0 -> int
 
 # Static Assets ----------------------------------------------------------------
 static.assets = static
+static.externals = ../data/externals/static
 static.player = %(here)s/../player
 # TODO: Consider replacing these variables with actually looking at processmedia2/config.json?
 #    Would this be too much coupling?
