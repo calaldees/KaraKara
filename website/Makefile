@@ -1,20 +1,31 @@
 OS = $(shell uname -s)
 
-ENV=_env
+PROJECT=karakara
+
+CONFIG_SOURCE_PATH=config
+
+WRITE_PATH=data
+CONFIG_PATH=$(WRITE_PATH)/config
+LOG_PATH=$(WRITE_PATH)/logs
+EXTERNAL_PATH=$(WRITE_PATH)/externals
+UPLOAD_PATH=$(WRITE_PATH)/upload
+LOCALE_PATH=$(WRITE_PATH)/locale
+DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
+ENV=$(WRITE_PATH)/_env
 PYTHON=$(ENV)/bin/python3
 PIP=$(ENV)/bin/pip3
 PSERVE=$(ENV)/bin/pserve
 PSHELL=$(ENV)/bin/pshell
 PYTEST=$(ENV)/bin/py.test
 
-PROJECT=karakara
-
-INI_DEV  = development.ini
-INI_TEST = test.ini
-INI_PROD = production.ini
+INI_DEV  = $(CONFIG_PATH)/development.ini
+INI_TEST = $(CONFIG_PATH)/test.ini
+INI_PROD = $(CONFIG_PATH)/production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
 
-DEPENDENCIES_LOCAL:=dependencys.local.txt
+# this must match development.ini path
+DATABASE_DEV=$(WRITE_PATH)/database/test.db
+
 PATH_LOCAL_LIBS:=../../libs/python3
 PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3
 
@@ -69,37 +80,39 @@ KaraKara.egg-info: $(ENV)
 #setup: KaraKara.egg-info
 #	$(PYTHON) setup.py develop
 
+$(CONFIG_SOURCE_PATH):
+	mkdir -p $@
 
-externals:
-	mkdir -p externals && touch externals/__init__.py
+$(EXTERNAL_PATH): $(CONFIG_SOURCE_PATH)
+	mkdir -p $(EXTERNAL_PATH) && touch $(EXTERNAL_PATH)/__init__.py
 
-PRECIOUS: externals/dependency_fetcher.py
-externals/dependency_fetcher.py: externals
+PRECIOUS: $(DEPENDENCY_FETCHER)
+$(DEPENDENCY_FETCHER): $(EXTERNAL_PATH)
 	# LinkLocal or Download depenncy_fetcher manager for getting external dependencys
 	if [ ! -e $@ ] ; then \
 		DEPENDENCY_FETCHER_FILE="apps/dependency_fetcher.py" ; \
 		PATH_DEPENDENCY_FETCHER="$(PATH_LOCAL_LIBS)/$$DEPENDENCY_FETCHER_FILE" ; \
 		if [ -e $$PATH_DEPENDENCY_FETCHER ] ; then \
-			ln -s ../$$PATH_DEPENDENCY_FETCHER $@ ; \
+			ln -s ../../$$PATH_DEPENDENCY_FETCHER $@ ; \
 		else \
 			curl $(PATH_REMOTE_LIBS)/$$DEPENDENCY_FETCHER_FILE --compressed -o $@ ; \
 		fi ;\
 	fi
 
 PHONY: dependency_download
-dependency_download: externals/dependency_fetcher.py
+dependency_download: $(EXTERNAL_PATH)/dependency_fetcher.py
 	# Trigger dependency check on every startup
-	$(PYTHON) externals/dependency_fetcher.py dependency_fetcher.json --tracker externals/ --destination_path externals/
+	$(PYTHON) $(DEPENDENCY_FETCHER) dependency_fetcher.json --tracker $(EXTERNAL_PATH) --destination_path $(EXTERNAL_PATH)
 
 .PHONY: install
-install: development.ini production.inidiff KaraKara.egg-info dependency_download locale/karakara.pot test.db upload_paths
+install: $(INI_DEV) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info dependency_download $(LOCALE_PATH)/karakara.pot $(DATABASE_DEV) upload_paths
 
 
 # Databases --------------------------------------------------------------------
 
-test.db:
+$(DATABASE_DEV):
 	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
-	#env/bin/populate_KaraKara development.ini
+	#env/bin/populate_KaraKara $(INI_DEV)
 
 .PHONY: init_db_production
 init_db_production: ini
@@ -110,30 +123,30 @@ init_db_production: ini
 
 # Ini files --------------------------------------------------------------------
 
-development.ini:
-	cp development.ini.dist development.ini
+$(INI_DEV):
+	cp $(CONFIG_SOURCE_PATH)/development.ini.dist $@
 
-production.inidiff:
-	cp production.inidiff.dist production.inidiff
-
+$(CONFIG_PATH)/production.inidiff:
+	cp $(CONFIG_SOURCE_PATH)/production.inidiff.dist $@
 
 .PHONY: ini ini_test ini_production
 ini: clean_ini ini_test ini_production
-ini_test: development.ini
-	$(PYTHON) externals/lib/make_ini.py test
-ini_production: production.inidiff
-	$(PYTHON) externals/lib/make_ini.py production
+#ini_test: $(INI_DEV)
+#	$(PYTHON) externals/lib/make_ini.py test --master $(INI_DEV)
+ini_production: $(CONFIG_PATH)/production.inidiff
+	$(PYTHON) externals/lib/make_ini.py production --master $(INI_DEV)
+
+$(CONFIG_PATH)/search_config.json:
+	cp config/search_config.json.dist $@
 
 # Upload paths -----------------------------------------------------------------
 
 .PHONY: upload_paths
-upload_paths: data data/upload data/uploaded
-data:
-	mkdir data
-data/upload:
-	mkdir data/upload
-data/uploaded:
-	mkdir data/uploaded
+upload_paths: $(WRITE_PATH) $(UPLOAD_PATH) $(WRITE_PATH)/uploaded
+$(UPLOAD_PATH): $(WRITE_PATH)
+	mkdir -p $@
+$(WRITE_PATH)/uploaded:
+	mkdir -p $@
 
 # Run --------------------------------------------------------------------------
 .PHONY: run run_production run_socket_server shell shell_production
@@ -166,7 +179,6 @@ stop_webapp_daemon:
 .PHONY: test test_crawl
 
 test: ini
-	# TODO: test external libs 'externals', currently wont because crypt.py requires crytographic libs
 	$(PYTEST) $(PROJECT) --pdb
 	# --capture=sys
 
@@ -179,26 +191,12 @@ test_crawl_production: ini
 
 # I18N -------------------------------------------------------------------------
 
-.PRECIOUS: locale
-locale:
-	$(PYTHON) setup.py extract_messages
-	$(PYTHON) setup.py init_catalog -l en
-	#env/bin/python3 setup.py init_catalog -l fr
-	#env/bin/python3 setup.py init_catalog -l es
-	#env/bin/python3 setup.py init_catalog -l it
-	#env/bin/pip3 install git+git://github.com/mitsuhiko/babel.git
+$(LOCALE_PATH)/en/LC_MESSAGES/karakara.po:
+	mkdir -p $$(dirname "$@")
+	ln -s ../../../../locale/en/LC_MESSAGES/karakara.po $@
 
-env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak: KaraKara.egg-info
-	# bable is shit and needs tweaking
-	# bable is throwing a bytes/str fit in python3
-	#  https://github.com/mitsuhiko/babel/issues/91
-	# they have updated github/bable/master but not the pip package.
-	# This just perform a ultra hack critical fix on bable
-	sed -i.bak "s/tmpname, 'w'/tmpname, 'wb'/g" env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py
-
-.PRECIOUS: locale/karakara.pot
-locale/karakara.pot: locale
-    # removed dependecy - env/lib/python3.4/site-packages/Babel-1.3-py3.4.egg/babel/messages/frontend.py.bak
+.PRECIOUS: $(LOCALE_PATH)/karakara.pot
+$(LOCALE_PATH)/karakara.pot: $(LOCALE_PATH)/en/LC_MESSAGES/karakara.po
 	$(PYTHON) setup.py extract_messages
 	$(PYTHON) setup.py update_catalog
 	$(PYTHON) setup.py compile_catalog
@@ -207,8 +205,6 @@ locale/karakara.pot: locale
 i18n:
 	$(PYTHON) setup.py extract_messages
 	$(PYTHON) setup.py update_catalog
-	#Looks like msgmerge from the gettext lib works can work in place of update_catalog.
-	#cd karakara/locale && msgmerge --update en/LC_MESSAGES/KaraKara.po KaraKara.pot
 	$(PYTHON) setup.py compile_catalog
 
 # Data -------------------------------------------------------------------------
@@ -220,14 +216,14 @@ insert_random_tracks:
 insert_band_tracks:
 	$(PYTHON) -m$(PROJECT).scripts.insert_band_tracks --config=$(INI_DEV)
 
-badgenames.txt:
-	$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) > badgenames.txt
+$(WRITE_PATH)/badgenames.txt:
+	$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) > $@
 
 # Logs -------------------------------------------------------------------------
 
 .PHONY: log_production
 log_production:
-	tail -n$(LOG_LINES) production.log
+	tail -n$(LOG_LINES) $(LOG_PATH)/production.log
 	tail -n$(LOG_LINES) ../mediaserver/log/access.log
 	tail -n$(LOG_LINES) ../mediaserver/log/error.log
 
@@ -241,15 +237,8 @@ clean_ini:
 	rm -f $(INI_PROD)
 
 clean: clean_ini
-	rm -rf $(ENV)
-	rm -rf data
+	rm -rf $(WRITE_PATH)
 	rm -rf *.egg-info
-	rm -f *.db
-	rm -f *.log
-	rm -rf externals
-	rm -rf dependency_downloader.py
-	rm -rf dependencys_installed.json
-	rm -rf .installed_*
 	rm -rf badgenames.*
 	find ./locale -iname *.mo -delete
 	find ./locale -iname *.pot -delete

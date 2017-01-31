@@ -1,7 +1,7 @@
 *.db
 *.db-journal
 *.egg-info
-/env/
+/_env/
 /externals/
 /data/
 /test.ini

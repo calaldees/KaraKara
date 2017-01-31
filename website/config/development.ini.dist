@@ -15,7 +15,7 @@ pyramid.includes =
 
 # i18n -------------------------------------------------------------------------
 pyramid.default_locale_name = en
-i18n.translation_dirs = %(here)s/locale
+i18n.translation_dirs = ../data/locale
 i18n.available_languages = [en]
 
 # Karaoke settings -------------------------------------------------------------
@@ -52,7 +52,7 @@ karakara.template.menu.disable =
 karakara.websocket.port = 9873 -> int
 karakara.tcp.port       = -> None
 
-karakara.search.view.config = %(here)s/search_config.json
+karakara.search.view.config = %(here)s/data/search_config.json
 karakara.search.tag.silent_forced = []
 karakara.search.tag.silent_hidden = []
 karakara.search.template.button.list_tracks.threshold = 100 -> int
@@ -91,7 +91,7 @@ static.processmedia2.log = ../processmedia2/logs/processmedia.log
 
 
 # Database ---------------------------------------------------------------------
-sqlalchemy.url = sqlite:///%(here)s/test.db
+sqlalchemy.url = sqlite:///%(here)s/data/database/test.db
 
 # Sessions ---------------------------------------------------------------------
 session.cookie_name          = karakara_session
@@ -174,7 +174,7 @@ formatter = generic
 
 [handler_logfile]
 class = FileHandler
-args = ('development.log',)
+args = ('data/logs/development.log',)
 level = NOTSET
 formatter = generic
 
@@ -193,6 +193,6 @@ qualname = json_log_event
 
 [handler_admindashboard]
 class = FileHandler
-args = ('%(here)s/../admindashboard/events.log',)
+args = ('%(here)s/../../../admindashboard/events.log',)
 level = NOTSET
 formatter = message_only
