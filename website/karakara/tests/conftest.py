@@ -3,8 +3,6 @@ import pytest
 import logging
 log = logging.getLogger(__name__)
 
-INI = 'test.ini'
-#INI = 'production.ini'
 
 from karakara.tests.data.tracks import *
 from karakara.tests.data.tracks_random import *
@@ -14,6 +12,7 @@ from karakara.tests.data.auth import *
 
 def pytest_addoption(parser):
     parser.addoption("--runslow", action="store_true", help="run slow tests")
+    parser.addoption("--ini_file", action="store", default="test.ini", help="pyramid ini file profile")
 def pytest_runtest_setup(item):
     if 'unimplemented' in item.keywords: #and not item.config.getoption("--runslow"):
         pytest.skip('unimplemented functionality')
@@ -35,9 +34,11 @@ slow          = pytest.mark.slow
 
 # Fixtures ---------------------------------------------------------------------
 
-
 @pytest.fixture(scope="session")
-def app_ini(request, ini_file=INI):
+def ini_file(request):
+    return request.config.getoption("--ini_file")
+@pytest.fixture(scope="session")
+def app_ini(request, ini_file):
     """
     Settings object derived from .ini file required to start Pyramid app
     """

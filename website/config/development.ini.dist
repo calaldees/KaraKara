@@ -52,7 +52,7 @@ karakara.template.menu.disable =
 karakara.websocket.port = 9873 -> int
 karakara.tcp.port       = -> None
 
-karakara.search.view.config = %(here)s/data/search_config.json
+karakara.search.view.config = data/config/search_config.json
 karakara.search.tag.silent_forced = []
 karakara.search.tag.silent_hidden = []
 karakara.search.template.button.list_tracks.threshold = 100 -> int
@@ -68,7 +68,7 @@ karakara.print_tracks.short_id_length = 4 -> int
 comunity.title = KaraKara.org.uk
 
 upload.route.uploaded = /uploaded/
-upload.path = %(here)s/data/upload/
+upload.path = data/upload/
 
 
 # API --------------------------------------------------------------------------
@@ -92,7 +92,7 @@ static.processmedia2.log = ../processmedia2/logs/processmedia.log
 
 
 # Database ---------------------------------------------------------------------
-sqlalchemy.url = sqlite:///%(here)s/data/database/test.db
+sqlalchemy.url = sqlite:///data/database/test.db
 
 # Sessions ---------------------------------------------------------------------
 session.cookie_name          = karakara_session

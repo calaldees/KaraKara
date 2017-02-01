@@ -71,11 +71,8 @@ def main(global_config, **settings):
 
     # Search Config ------------------------------------------------------------
     import karakara.views.search
-    try:
-        karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
-    except FileNotFoundError:
-        log.warn('search_config not provided: browsing track interface will be damaged on mobile devices')
-        karakara.views.search.search_config = {}
+    karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
+    assert karakara.views.search.search_config, 'search_config data required'
 
     # WebSocket ----------------------------------------------------------------
 

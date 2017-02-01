@@ -10,13 +10,15 @@ LOG_PATH=$(WRITE_PATH)/logs
 EXTERNAL_PATH=$(WRITE_PATH)/externals
 UPLOAD_PATH=$(WRITE_PATH)/upload
 LOCALE_PATH=$(WRITE_PATH)/locale
+DATABASE_PATH=$(WRITE_PATH)/database
 DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
 ENV=$(WRITE_PATH)/_env
-PYTHON=$(ENV)/bin/python3
+PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
+PYTHON=$(PYTHONPATH_ENV)/bin/python3
 PIP=$(ENV)/bin/pip3
-PSERVE=$(ENV)/bin/pserve
-PSHELL=$(ENV)/bin/pshell
-PYTEST=$(ENV)/bin/py.test
+PSERVE=$(PYTHONPATH_ENV)/bin/pserve
+PSHELL=$(PYTHONPATH_ENV)/bin/pshell
+PYTEST=$(PYTHONPATH_ENV)/bin/py.test
 
 INI_DEV  = $(CONFIG_PATH)/development.ini
 INI_TEST = $(CONFIG_PATH)/test.ini
@@ -24,7 +26,7 @@ INI_PROD = $(CONFIG_PATH)/production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
 
 # this must match development.ini path
-DATABASE_DEV=$(WRITE_PATH)/database/test.db
+DATABASE_DEV=$(DATABASE_PATH)/test.db
 
 PATH_LOCAL_LIBS:=../../libs/python3
 PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3
@@ -111,6 +113,7 @@ install: $(INI_DEV) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.
 # Databases --------------------------------------------------------------------
 
 $(DATABASE_DEV):
+	mkdir -p $(DATABASE_PATH)
 	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
 	#env/bin/populate_KaraKara $(INI_DEV)
 
@@ -125,16 +128,16 @@ init_db_production: ini
 
 $(INI_DEV):
 	cp $(CONFIG_SOURCE_PATH)/development.ini.dist $@
-
+$(CONFIG_PATH)/test.inidiff:
+	cp $(CONFIG_SOURCE_PATH)/test.inidiff.dist $@
 $(CONFIG_PATH)/production.inidiff:
 	cp $(CONFIG_SOURCE_PATH)/production.inidiff.dist $@
-
 .PHONY: ini ini_test ini_production
 ini: clean_ini ini_test ini_production
-#ini_test: $(INI_DEV)
-#	$(PYTHON) externals/lib/make_ini.py test --master $(INI_DEV)
-ini_production: $(CONFIG_PATH)/production.inidiff
-	$(PYTHON) externals/lib/make_ini.py production --master $(INI_DEV)
+ini_test: $(INI_DEV) $(CONFIG_PATH)/test.inidiff $(CONFIG_PATH)/production.inidiff
+	$(PYTHON) $(EXTERNAL_PATH)/lib/make_ini.py $(INI_DEV) $(CONFIG_PATH)/test.inidiff $(INI_TEST)
+ini_production: $(INI_DEV) $(CONFIG_PATH)/production.inidiff
+	$(PYTHON) $(EXTERNAL_PATH)/lib/make_ini.py $(INI_DEV) $(CONFIG_PATH)/production.inidiff $(INI_PROD)
 
 $(CONFIG_PATH)/search_config.json:
 	cp config/search_config.json.dist $@
@@ -179,7 +182,7 @@ stop_webapp_daemon:
 .PHONY: test test_crawl
 
 test: ini
-	$(PYTEST) $(PROJECT) --pdb
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) --pdb
 	# --capture=sys
 
 test_crawl: ini
