@@ -41,6 +41,9 @@ BADGENAME_SOURCE=minami
 #APTGET_EXTRAS+=-y
 #endif
 
+
+# Help -------------------------------------------------------------------------
+
 .PHONY: help
 help:
 	# Usage: make <target>, where target is
@@ -63,6 +66,7 @@ help:
 
 .PRECIOUS: $(ENV)
 $(ENV):
+	pip install virtualenv
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python3 $(ENV)
 	$(ENV)/bin/easy_install pyramid
@@ -74,18 +78,15 @@ $(ENV):
 #env/lib/node_modules/bower: env/bin/node
 #	source env/bin/activate && npm install -g bower
 
-.PRECIOUS: KaraKara.egg-info
-KaraKara.egg-info: $(ENV)
+.PRECIOUS: KaraKara.egg-info/PKG-INFO
+KaraKara.egg-info/PKG-INFO: $(ENV)
 	$(PYTHON) setup.py develop
 
 # Force reexecution of setup.py dependenys (this must be done from the Makefile or make gets confused and repetedy runs the task)
 #setup: KaraKara.egg-info
 #	$(PYTHON) setup.py develop
 
-$(CONFIG_SOURCE_PATH):
-	mkdir -p $@
-
-$(EXTERNAL_PATH): $(CONFIG_SOURCE_PATH)
+$(EXTERNAL_PATH):
 	mkdir -p $(EXTERNAL_PATH) && touch $(EXTERNAL_PATH)/__init__.py
 
 PRECIOUS: $(DEPENDENCY_FETCHER)
@@ -107,7 +108,7 @@ dependency_download: $(EXTERNAL_PATH)/dependency_fetcher.py
 	$(PYTHON) $(DEPENDENCY_FETCHER) dependency_fetcher.json --tracker $(EXTERNAL_PATH) --destination_path $(EXTERNAL_PATH)
 
 .PHONY: install
-install: $(INI_DEV) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info dependency_download $(LOCALE_PATH)/karakara.pot $(DATABASE_DEV) upload_paths
+install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO dependency_download $(LOCALE_PATH)/karakara.pot $(DATABASE_DEV) upload_paths
 
 
 # Databases --------------------------------------------------------------------
@@ -125,8 +126,11 @@ init_db_production: ini
 
 
 # Ini files --------------------------------------------------------------------
-
-$(INI_DEV):
+$(LOG_PATH):
+	mkdir -p $@
+$(CONFIG_PATH):
+	mkdir -p $@
+$(INI_DEV): $(CONFIG_PATH)
 	cp $(CONFIG_SOURCE_PATH)/development.ini.dist $@
 $(CONFIG_PATH)/test.inidiff:
 	cp $(CONFIG_SOURCE_PATH)/test.inidiff.dist $@
@@ -232,16 +236,19 @@ log_production:
 
 
 # Cleanup ----------------------------------------------------------------------
-.PHONY: clean_ini clean
-
+.PHONY: clean_ini
 clean_ini:
 	rm -f $(INI_DEV)
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
 
-clean: clean_ini
-	rm -rf $(WRITE_PATH)
-	rm -rf *.egg-info
-	rm -rf badgenames.*
-	find ./locale -iname *.mo -delete
-	find ./locale -iname *.pot -delete
+.PHONY: clean_cache
+clean_cache:
+	find . -iname *.pyc -delete
+	find . -iname __pycache__ -delete
+	find . -iname .cache -delete
+
+.PHONY: clean
+clean: clean_cache
+	rm -rf $(WRITE_PATH)/*
+	rm -rf *.egg-info/*

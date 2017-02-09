@@ -1,3 +1,5 @@
+include .env
+
 SHELL := $(SHELL) -e
 
 ENV:=_env
@@ -6,8 +8,13 @@ ENV:=_env
 help:
 	# KaraKara
 
-#build_docker:
-	#docker run --rm -i -t karakara /bin/bash
+docker_build:
+	docker-compose build
+	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
+docker_shell:
+	docker-compose run --rm --service-ports website /bin/bash
+
+#	docker run --rm -i -t karakara /bin/bash
 #	docker build -t karakara --file karakara.Dockerfile .
 
 #run_docker:
@@ -35,7 +42,7 @@ help:
 #	find ~/Applications/KaraKara/files/ -iname \.DS_Store -delete
 
 rsync_pull: del_osx_cancer
-	rsync calaldees@violet.shishnet.org:/data/media_upload/ ~/Applications/KaraKara/files/ -e ssh --archive --verbose --stats --progress --stats --human-readable --inplace --delete-after
+	rsync calaldees@violet.shishnet.org:/data/media_upload/ ~/Applications/KaraKara/files/ -e ssh --archive --verbose --stats --progress --stats --human-readable --inplace --delete-after --exclude '.stversions'
 
 rsync_push: del_osx_cancer
 	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/sites/karakara.org.uk/media_upload/ -e ssh --archive --verbose --inplace --stats --progress --partial --bwlimit=100 --update --copy-links

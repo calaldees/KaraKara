@@ -194,6 +194,6 @@ qualname = json_log_event
 
 [handler_admindashboard]
 class = FileHandler
-args = ('%(here)s/../../../admindashboard/events.log',)
+args = ('data/logs/admindashboard_events.log',)
 level = NOTSET
 formatter = message_only

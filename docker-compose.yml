@@ -1,0 +1,45 @@
+version: '2'
+services:
+
+    website:
+        image: python:3.6.0
+        env_file:
+            - .env
+        expose:
+            - ${PORT_WEBSITE}
+        ports:
+            - ${PORT_WEBSOCKET}
+        environment:
+            - PORT_WEBSITE
+            - PORT_WEBSOCKET
+        links:
+            - postgresql
+        volumes:
+            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ./:${PATH_CONTAINER_REPO}:ro
+            - ${PATH_CONTAINER_WEBSITE}/data
+            - ${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info
+        command: make run_production --directory ${PATH_CONTAINER_WEBSITE}
+
+
+    postgresql:
+        image: postgres:9.6.1-alpine
+        volumes:
+            - /var/lib/postgresql
+
+    nginx:
+        image: nginx:1.11.9-alpine
+        environment:
+            - PORT_NGINX
+            - PORT_WEBSITE
+        env_file:
+            - .env
+        ports:
+            - "${PORT_NGINX}:${PORT_NGINX}"
+        volumes:
+            - ./docker/nginx.conf:/tmp/nginx.conf:ro
+        volumes_from:
+            - website
+        links:
+            - website
+        command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
