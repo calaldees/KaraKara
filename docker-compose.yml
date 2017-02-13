@@ -1,4 +1,10 @@
-version: '2'
+version: '3'
+
+volumes:
+    website_db:
+    website_data_1:
+    website_data_2:
+
 services:
 
     website:
@@ -17,15 +23,15 @@ services:
         volumes:
             - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
             - ./:${PATH_CONTAINER_REPO}:ro
-            - ${PATH_CONTAINER_WEBSITE}/data
-            - ${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info
+            - website_data_1:${PATH_CONTAINER_WEBSITE}/data
+            - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info
         command: make run_production --directory ${PATH_CONTAINER_WEBSITE}
 
 
     postgresql:
         image: postgres:9.6.1-alpine
         volumes:
-            - /var/lib/postgresql
+            - website_db:/var/lib/postgresql
 
     nginx:
         image: nginx:1.11.9-alpine
@@ -38,8 +44,8 @@ services:
             - "${PORT_NGINX}:${PORT_NGINX}"
         volumes:
             - ./docker/nginx.conf:/tmp/nginx.conf:ro
-        volumes_from:
-            - website
+            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ./:${PATH_CONTAINER_REPO}:ro
         links:
             - website
         command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"

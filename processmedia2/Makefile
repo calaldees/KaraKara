@@ -32,10 +32,11 @@ PIP:=$(ENV)/bin/pip$(PYTHON_VERSION)
 PYTEST:=$(ENV)/bin/py.test
 
 WEB_PATH:=../website
+WEB_ENV:=$(WEB_PATH)/data/_env
 WEB_WORKING:=$(WEB_PATH)/karakara
-WEB_PYTHON:=$(WEB_PATH)/$(PYTHON)
-WEB_PYTEST:=$(WEB_PATH)/$(PYTEST)
-WEB_PYTHONPATH:=$(WEB_WORKING):./:$(ENV)/lib/python3.5/site-packages/
+WEB_PYTHON:=$(WEB_ENV)/bin/python$(PYTHON_VERSION)
+WEB_PYTEST:=$(WEB_ENV)/bin/py.test
+WEB_PYTHONPATH:=$(WEB_WORKING):$(WEB_WORKING)/data:./:$(ENV)/lib/python$(PYTHON_VERSION)/site-packages/
 
 # Installation -----------------------------------------------------------------
 .PHONY: install install_env
@@ -116,7 +117,7 @@ encode:
 	$(PYTHON) encode_media.py --process_order_function random
 
 import_%:
-	PYTHONPATH="$(WEB_PYTHONPATH)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/$*.ini
+	PYTHONPATH="$(WEB_PYTHONPATH)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/data/config/$*.ini
 
 cleanup:
 	$(PYTHON) cleanup_media.py

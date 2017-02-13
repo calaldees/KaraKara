@@ -41,20 +41,16 @@ docker_shell:
 #del_osx_cancer:
 #	find ~/Applications/KaraKara/files/ -iname \.DS_Store -delete
 
-rsync_pull: del_osx_cancer
-	rsync calaldees@violet.shishnet.org:/data/media_upload/ ~/Applications/KaraKara/files/ -e ssh --archive --verbose --stats --progress --stats --human-readable --inplace --delete-after --exclude '.stversions'
+RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --update --inplace --partial --exclude '.*' --exclude 'backup'
+#--partial --update --copy-links --checksum --update --bwlimit=100
+RSYNC_LOCAL:=~/Applications/KaraKara/files
+RSYNC_REMOTE:=calaldees@violet.shishnet.org:/data/media_upload/
+rsync_pull:
+	rsync $(RSYNC_REMOTE) $(RSYNC_LOCAL) -e ssh $(RSYNC_ARGS) --delete-after
+rsync_push:
+	rsync $(RSYNC_LOCAL) $(RSYNC_REMOTE) -e ssh $(RSYNC_ARGS)
 
-rsync_push: del_osx_cancer
-	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/sites/karakara.org.uk/media_upload/ -e ssh --archive --verbose --inplace --stats --progress --partial --bwlimit=100 --update --copy-links
-	#rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/                       -e ssh --archive --verbose --stats --progress --bwlimit=100 --checksum --update
-	#--checksum  --bwlimit=100
-	rsync ~/Applications/KaraKara/files/ calaldees@violet.shishnet.org:/data/media_upload/ -e ssh --archive --verbose --stats --progress --update --human-readable --inplace
-	#--bwlimit=100
-
-RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --update --human-readable
-RSYNC_LOCAL_SOURCE:=~/Applications/KaraKara
 RSYNC_LOCAL_TARGET:=/Volumes/Samsung_T1/KaraKara
-
 rsync_local_push_samsung:
 	rsync $(RSYNC_LOCAL_SOURCE)/meta/ $(RSYNC_LOCAL_TARGET)/meta/ $(RSYNC_ARGS) --delete-after
 	rsync $(RSYNC_LOCAL_SOURCE)/processed/ $(RSYNC_LOCAL_TARGET)/processed/ $(RSYNC_ARGS) --delete-after
