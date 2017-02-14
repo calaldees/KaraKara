@@ -3,12 +3,11 @@ help:
 	# Usage: make <target>, where target is
 	# install        -- Install os dependencys and setup python virtualenv
 	# install_env    --   just install python virtualenv
-	# run            -- Alias for 'scan + encode + import_develop'
-	# run_production -- Alias for 'scan + encode + import_production'
+	# run            -- Alias for 'scan + encode + import_media'
 	#
 	# scan           -- Scan source media folder + create metadata cache
 	# encode         -- Perform video encoding on required items
-	# import         -- Import processed media into website db
+	# import_media   -- Import processed media into currently active website
 	# cleanup        -- Remove unassociated processed files
 	#
 	# upgrade        -- Upgrade os + python dependencys
@@ -31,12 +30,6 @@ PYTHON:=$(ENV)/bin/python$(PYTHON_VERSION)
 PIP:=$(ENV)/bin/pip$(PYTHON_VERSION)
 PYTEST:=$(ENV)/bin/py.test
 
-WEB_PATH:=../website
-WEB_ENV:=$(WEB_PATH)/data/_env
-WEB_WORKING:=$(WEB_PATH)/karakara
-WEB_PYTHON:=$(WEB_ENV)/bin/python$(PYTHON_VERSION)
-WEB_PYTEST:=$(WEB_ENV)/bin/py.test
-WEB_PYTHONPATH:=$(WEB_WORKING):$(WEB_WORKING)/data:./:$(ENV)/lib/python$(PYTHON_VERSION)/site-packages/
 
 # Installation -----------------------------------------------------------------
 .PHONY: install install_env
@@ -49,7 +42,7 @@ has-brew:
 	which brew
 install_Darwin: has-brew
 	brew update
-	cat $(DEPENDENCIES_BREW) |xargs  brew install 
+	cat $(DEPENDENCIES_BREW) |xargs  brew install
 upgrade_Darwin: has-brew
 	cat $(DEPENDENCIES_BREW) |xargs  brew upgrade
 
@@ -108,31 +101,24 @@ logs:
 
 
 # Run --------------------------------------------------------------------------
-.PHONY: scan encode import_% cleanup run run_production
+.PHONY: scan encode import_media cleanup run
 
 scan:
 	$(PYTHON) scan_media.py
-
 encode:
 	$(PYTHON) encode_media.py --process_order_function random
-
-import_%:
-	PYTHONPATH="$(WEB_PYTHONPATH)" $(WEB_PYTHON) import_media.py --config_uri $(WEB_PATH)/data/config/$*.ini
-
+import_media:
+	$(PYTHON) import_media.py
 cleanup:
 	$(PYTHON) cleanup_media.py
-
-run: install_env scan encode import_development
-run_production: install_env scan encode import_production
+run: install_env scan encode import_media
 
 
 # Test -------------------------------------------------------------------------
 .PHONY: test
 test:
 	$(MAKE) all --directory tests/source
-	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb --ignore=tests/test_import.py
-	$(MAKE) ini --directory $(WEB_PATH)
-	PYTHONPATH="$(WEB_PYTHONPATH)" $(WEB_PYTEST) tests/test_import.py --pdb
+	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb
 
 .PHONY: cloc
 cloc:

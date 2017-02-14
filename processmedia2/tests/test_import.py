@@ -5,20 +5,13 @@ from libs.misc import flatten, freeze
 
 from import_media import import_media
 
-from karakara.model.model_tracks import Track, Tag, Attachment, _attachment_types
-from karakara.model.actions import get_track_dict_full, get_tag
-
-from karakara.tests.data.tracks import AttachmentDescription, create_test_track
-
-
-
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
 from processmedia_libs.meta_manager import MetaFile
 
 import logging
 log = logging.getLogger(__name__)
 
-INI = '../website/test.ini'
+#INI = '../website/test.ini'
 
 
 EXPECTED_ATTACHMENT_COUNT = freeze(dict(image=4, preview=1, video=1, srt=1, tags=1))
@@ -36,35 +29,6 @@ def gen_fake_hash_dict(source_hash):
         "media": "{}_media".format(source_hash),
         "data": "{}_data".format(source_hash),
     }
-
-
-@pytest.fixture(scope="session")
-def DBSession_base(request, ini_file=INI):
-    """
-    Aquire standalone DBSession for karakara webapp
-    """
-    from pyramid.paster import get_appsettings
-    from import_media import init_DBSession, DBSession
-    init_DBSession(get_appsettings(ini_file))
-    return DBSession
-
-
-@pytest.fixture(scope="function")
-def DBSession(request, DBSession_base):
-    from karakara.model.init_data import init_data
-    init_data()
-    return DBSession_base
-
-
-@pytest.fixture(scope="session")
-def commit(request, DBSession_base):
-    """
-    Save data attached to DBSession
-    """
-    from import_media import commit
-    return commit
-
-
 
 
 def test_import_full(DBSession):

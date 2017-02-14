@@ -1,12 +1,13 @@
 import json
 
-def assert_base_track_ids(app, ids={'t1', 't2', 't3', 'xxx'}):
-    response = app.get('/track_import?format=json')
-    assert set(response.json['data']['track_ids']) == ids
+
+def _track_import(app, url='/track_import?format=json', json_data={}, method='get'):
+    return getattr(app, method)(url, json.dumps(json_data), headers={'content-type': 'application-json'})
 
 
-def app_request_json(app, url, data={}, method='post'):
-    getattr(app, method)(url, json.dumps(data), headers={'content-type': 'application-json'})
+def _assert_base_tracks(app, ids={'t1', 't2', 't3', 'xxx'}):
+    response = _track_import(app)
+    assert response.json['data']['tracks'] == {'t1': 'track1source', 't2': 'track2source', 't3': 'track3source', 'xxx': 'wildcardsource'}
 
 
 def test_track_import_without_data(app):
@@ -19,21 +20,21 @@ def test_track_import_without_data(app):
 
 
 def test_track_import(app, tracks):
-    assert_base_track_ids(app)
+    _assert_base_tracks(app)
 
-    app_request_json(app, '/track_import?format=json', {
-        'tracks': [
-            {'id': 'test1'},
-            {'id': 'test2'},
-        ],
-    })
+    _track_import(
+        app,
+        method='post',
+        json_data={
+            'tracks': [
+                {'id': 'test1'},
+                {'id': 'test2'},
+            ],
+        },
+    )
 
-    assert_base_track_ids(app)
+    _assert_base_tracks(app)
 
 
 def test_track_import_put_delete(app, tracks):
-    assert_base_track_ids(app)
-
-    response = app.get('/track_import?format=json', )
-
-    assert_base_track_ids(app)
+    pass
