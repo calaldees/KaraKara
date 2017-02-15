@@ -36,23 +36,23 @@ def track_import_post(request):
     existing_track_ids = _existing_tracks_dict().keys()
 
     for track_dict in _get_json_request(request):
-        if track_dict['source_hash'] in existing_track_ids:
-            log.warning('Exists: {name} - {source_hash}'.format(**track_dict))
+        if track_dict['id'] in existing_track_ids:
+            log.warning('Exists: {source_filename} - {id}'.format(**track_dict))
             continue
 
-        log.info('Import: {name} - {source_hash}'.format(**track_dict))
+        log.info('Import: {source_filename} - {id}'.format(**track_dict))
         track = Track()
-        track.id = track_dict['source_hash']
-        track.source_filename = track_dict['name']
+        track.id = track_dict['id']
+        track.source_filename = track_dict['source_filename']
         track.duration = track_dict['duration']
         track.lyrics = track_dict['lyrics']
 
         # Attachments
-        for attachment in track_dict['attachments']:
-            assert attachment['type'] in ATTACHMENT_TYPES
+        for attachment_dict in track_dict['attachments']:
+            assert attachment_dict['type'] in ATTACHMENT_TYPES
             attachment = Attachment()
-            attachment.type = attachment['type']
-            attachment.location = attachment['location']
+            attachment.type = attachment_dict['type']
+            attachment.location = attachment_dict['location']
             track.attachments.append(attachment)
 
         # Tags
