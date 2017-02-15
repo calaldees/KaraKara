@@ -19,8 +19,10 @@ def _get_json_request(request):
     except json.JSONDecodeError:
         raise action_error('required json track data to import', code=400)
 
+
 def _existing_tracks_dict():
     return {t.id: t.source_filename for t in DBSession.query(Track.id, Track.source_filename)}
+
 
 @view_config(route_name='track_import', request_method='GET')
 @web

@@ -71,7 +71,7 @@ $(ENV):
 	$(PIP) install --upgrade pip
 	$(PIP) install -r $(DEPENDENCIES_PYTHON)
 .PHONY: upgrade
-upgrade: 
+upgrade:
 	$(PIP) install -r $(DEPENDENCIES_PYTHON) --upgrade
 
 # Link local libs ----
@@ -108,7 +108,7 @@ scan:
 encode:
 	$(PYTHON) encode_media.py --process_order_function random
 import_media:
-	$(PYTHON) import_media.py
+	$(PYTHON) import_media.py --pdb --force
 cleanup:
 	$(PYTHON) cleanup_media.py
 run: install_env scan encode import_media

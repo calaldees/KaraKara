@@ -1,4 +1,5 @@
 from pprint import pprint
+from functools import partial
 import urllib.request
 import json
 
@@ -34,7 +35,7 @@ def _track_api(host, data={}, method='GET'):
                 headers={'content-type': 'application/json'},
                 method=method,
             ),
-            timeout=3,
+            #timeout=120,
         ).read()
     )
 
@@ -79,7 +80,7 @@ def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, e
                 'type': processed_file.attachment_type,
                 'location': processed_file.relative,
             }
-            for processed_file in processed_files.values()
+            for processed_file in m.processed_files.values()
         ]
 
     def _get_lyrics():
@@ -116,7 +117,7 @@ def import_media(**kwargs):
     meta_manager.load_all()  # mtime=epoc(last_update())
     processed_track_ids = set(meta_manager.source_hashs)
     processed_files_lookup = set(f.relative for f in fast_scan(meta_manager.processed_files_manager.path))
-    existing_tracks = track_api()
+    existing_tracks = track_api()['data']['tracks']
     existing_track_ids = existing_tracks.keys()
 
     generate_track_dict = partial(_generate_track_dict, meta_manager=meta_manager, existing_track_ids=existing_track_ids, processed_files_lookup=processed_files_lookup)
@@ -127,6 +128,7 @@ def import_media(**kwargs):
     tracks_to_add = []
     track_ids_to_delete = []
 
+    log.info(f'Importing tracks - Existing:{len(existing_track_ids)} Processed{len(processed_track_ids)}')
     for name in progress_bar(meta_manager.meta.keys()):
         try:
             track = generate_track_dict(name)
@@ -152,6 +154,7 @@ def import_media(**kwargs):
         stats['db_removed'].append(existing_tracks[unneeded_track_id])
         track_ids_to_delete.append(unneeded_track_id)
 
+    log.info(f"""{kwargs['api_host']} -> Add:{len(tracks_to_add)} Delete:{len(track_ids_to_delete)}""")
     track_api(tracks_to_add, method='POST')
     track_api(track_ids_to_delete, method='DELETE')
 
@@ -165,7 +168,7 @@ def import_media(**kwargs):
 # Main -------------------------------------------------------------------------
 
 def additional_arguments(parser):
-    parser.add_argument('api_host', action='store', help='', default='localhost:6543')
+    parser.add_argument('--api_host', action='store', help='', default='localhost:6543')
     parser.add_argument('--stat_limit', type=int, help='Max number of metanames to display in summary before replacing them with a count', default=100)
 
 
