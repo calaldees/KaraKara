@@ -72,7 +72,7 @@ def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, e
         log.debug(f'Exists: {name}')
         return
 
-    log.info(f'Import: {name}')
+    log.debug(f'Import: {name}')
 
     def _get_attachments():
         return [
@@ -134,7 +134,8 @@ def import_media(**kwargs):
             track = generate_track_dict(name)
             if track:
                 stats['meta_imported'].add(name)
-                tracks_to_add.append(track)
+                #tracks_to_add.append(track)
+                track_api([track], method='POST')
             else:
                 stats['meta_hash_matched_db_hash'].add(name)
         except TrackNotProcesedException:
@@ -155,13 +156,12 @@ def import_media(**kwargs):
         track_ids_to_delete.append(unneeded_track_id)
 
     log.info(f"""{kwargs['api_host']} -> Add:{len(tracks_to_add)} Delete:{len(track_ids_to_delete)}""")
-    track_api(tracks_to_add, method='POST')
+    #track_api(tracks_to_add, method='POST')
     track_api(track_ids_to_delete, method='DELETE')
 
     stats['db_end'] = track_api()['data']['tracks'].values()
 
     #assert stats['db_end'] == stats['meta_hash_matched_db_hash'] | stats['meta_imported']  # TODO! Reinstate this
-
     return stats
 
 
@@ -178,4 +178,4 @@ if __name__ == "__main__":
         'import_media', import_media, mtime_path='meta',
         additional_arguments_function=additional_arguments,
     )
-    pprint({k: len(v) if len(v) > _import_media.calling_kwargs['stat_limit'] else v for k, v in stats.items()})
+    pprint({k: len(v) if len(v) > import_media.calling_kwargs['stat_limit'] else v for k, v in stats.items()})
