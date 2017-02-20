@@ -13,6 +13,9 @@ docker_build:
 	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
 docker_shell:
 	docker-compose run --rm --service-ports website /bin/bash
+docker_run:
+	docker-compose up
+
 
 #	docker run --rm -i -t karakara /bin/bash
 #	docker build -t karakara --file karakara.Dockerfile .

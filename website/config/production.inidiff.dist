@@ -28,7 +28,7 @@ server.gzip         = False -> bool
 server.etag.enabled = True -> bool
 server.url          = http://www.karakara.org.uk/
 
-sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@localhost/karakara
+sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@postgres/karakara
 
 session.secret   = change_me
 
@@ -41,4 +41,4 @@ handlers = logfile
 level = DEBUG
 
 [handler_logfile]
-args = ('%(here)s/data/logs/production.log',)
+args = ('data/logs/production.log',)
