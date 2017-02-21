@@ -7,7 +7,7 @@ lib.js:
 	ln -s ../website/karakara/static/js/lib.js
 
 jquery.min.js:
-	ln -s ../website/externals/static/jquery.min.js
+	ln -s ../website/data/externals/static/jquery.min.js
 
 build:
 	# TODO
