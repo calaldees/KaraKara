@@ -55,10 +55,10 @@ rsync_pull:
 rsync_push:
 	rsync $(RSYNC_LOCAL) $(RSYNC_REMOTE) -e ssh $(RSYNC_ARGS)
 
-RSYNC_LOCAL_TARGET:=/Volumes/Samsung_T1/KaraKara
+RSYNC_LOCAL_TARGET:=/Volumes/Samsung_T1/karakara
 rsync_local_push_samsung:
-	rsync $(RSYNC_LOCAL_SOURCE)/meta/ $(RSYNC_LOCAL_TARGET)/meta/ $(RSYNC_ARGS) --delete-after
-	rsync $(RSYNC_LOCAL_SOURCE)/processed/ $(RSYNC_LOCAL_TARGET)/processed/ $(RSYNC_ARGS) --delete-after
+	rsync $(RSYNC_LOCAL)/meta/ $(RSYNC_LOCAL_TARGET)/meta/ $(RSYNC_ARGS) --delete-after
+	rsync $(RSYNC_LOCAL)/processed/ $(RSYNC_LOCAL_TARGET)/processed/ $(RSYNC_ARGS) --delete-after
 
 #hash_match:
 #	website/env/bin/python3 website/karakara/scripts/hash_matcher.py --source_folder ~/temp/Convention\ Karaoke/ --destination_folder ~/Applications/KaraKara/files/ -v
