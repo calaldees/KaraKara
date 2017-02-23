@@ -14,7 +14,7 @@ A projector is fired up in a dimly lit room and a microphone stands ready on the
 
 A laptop at the font is connected to the projector and multiple wireless routers. It is running a karakara server with a pre processed tagged dataset of tracks in various formats.
 
-Admins can walk around the room, remoting controlling when tracks are played fullscreen, re-ordering tracks, viewing feedback from attendees. Yet a desk at the front is still taking face to face song requests.
+Admins can walk around the room, remotely controlling when tracks are played fullscreen, re-ordering tracks, viewing feedback from attendees. Yet a desk at the front is still taking face to face song requests.
 
 
 ###Headline Feature Descriptions
@@ -51,8 +51,8 @@ Admins can walk around the room, remoting controlling when tracks are played ful
         * Limit how many times a single track can be queued within a time-period. (We don't want 5 Pokemon's in one evening)
     * Event end
         * We don't want to knowingly allow users to queue tracks to 12:30 when we know the event will be finishing at 12:00. That would lead to lots of disappointed people.
-* Audio Normalisation
-    * During processing sound levels are normalised. Some tracks could be slow quiet ballads while others or ripping metal operas. Technical admins needed to often adjust the volume of the microphone at the beginning of a song to compensate for the track volume differences. While normalisation does not remove the problem (as different vocalists will use the mic in different ways), it does reduce the problem.
+* Audio Normalization
+    * During processing sound levels are normalized. Some tracks could be slow quiet ballads while others or ripping metal operas. Technical admins needed to often adjust the volume of the microphone at the beginning of a song to compensate for the track volume differences. While normalization does not remove the problem (as different vocalists will use the mic in different ways), it does reduce the problem.
 * Wide variety of data formats supported
     * Originally videos with subtitle files was the only way to add a track. Some vocal-less versions of the track are published or full length version that are longer than the 1:30 original intro. To facilitate this, the following formats are supported
     * Image + MP3 + SRT
@@ -66,30 +66,20 @@ Local Machine Setup
 *For a live event system a Linux server with a custom wifi network will be required*
 
 * Copy video dataset OR Process video dataset from avi/mpg/srt/png/mp3 files with processmedia
-* Option 1 - Vagrant (Linux/Mac/Windows)
-    `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh && vagrant up --provision && python -m webbrowser -t "http://localhost:8080/admin" `
+* Option 1 - Docker (Linux/Mac/Windows)
+    `make docker_build && make docker_run`
 	1. Prerequestits
-		* Install VirtualBox: <http://www.virtualbox.org/>
-		* Install Vagrant: <http://www.vagrantup.com/>
-	2. Navigate to your video data folder
-	3. Download Vagrantfile and Bootstrap
-		* Linux/Mac
-			* `curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile && curl -O https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh`
-		* Windows (download these links to your video data folder)
-			* [Vagrantfile](https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile)
-			* [Vagrantfile_.sh](https://raw.githubusercontent.com/calaldees/KaraKara/master/Vagrantfile_.sh)
-	4. `vagrant up --provision`
-	5. view <http://localhost:8080/> and <http://localhost:8080/player/player.html> 
+		* `docker`, `docker-compose`
+	5. view <http://localhost:8080/> and <http://localhost:8080/player/player.html>
 		* *bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly*
-   
+
 * Option 2 - Linux/Mac (native with sqllite dev db)
 	1. Prerequestits
-		* Linux: `apt-get install curl git python python3`
+		* Linux: `apt-get install git python python3 curl`
 		* Mac: install `brew`, `brew install git python python3`
-	2. Navigate to data folder
-	3. `git clone https://github.com/calaldees/KaraKara.git && ln -s . KaraKara/mediaserver/www/files && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/admin" `
+    2. __Optional local libs for dev__ git clone git@github.com:calaldees/libs.git
+	3. `git clone https://github.com/calaldees/KaraKara.git && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/admin" `
 	4. View <http://localhost:6543/> and <http://localhost:6543/player/player.html>
-    5. __Optional local libs for dev__ git clone git@github.com:calaldees/libs.git && rm -rf KaraKara/website/externals/lib && ln -s ../../../libs/python3/lib/ KaraKara/website/externals/lib
 
 
 Core components
@@ -101,35 +91,35 @@ Core components
       * this high bitrate mp4 is presented via the player interface.
   * Low bitreate previews for mobile devices
       * Currently just mp4 but could support other formats in future.
-  * Tumbnail images
+  * Thumbnail images
       * Each video has 4 images taken at even intervals
   * Srt output
       * regardless of input format, a normalised srt will be created for each video
   * Json metadata
       * Once scanned, each item will have json data containing the hashs of
         source data
+  * Pushs/Imports track data by calling `website` api.
 * website
-  * jquerymobile web interface to search/preview/queue tracks
-    * Data importer for `processmedia` output into local db (sqllite/postgresql)
+  * `jquerymobile` web interface to search/preview/queue tracks
     * Produces printable hard copy track lists for use without mobile interface
-    * Populates elasticsearch events to be visulised with `admindashboard`
-  * Comunity interface
-    * A dynamic web app to facilitate the curation of track content
-      * upload videos
+    * Populates elasticsearch events to be visualized with `admindashboard`
+    * api
+      * `track`, `search`, `queue`, `settings`
+      * `track_import` endpoint (for imports from processmedia2)
+  * Community interface
+    * A dynamic web app to facilitate the duration of track content
+      * preview high and low res encoded videos
       * tag videos
+      * edit subtitles
 * player - html5 event display player (currently only designed/tested in Chrome)
   * Looks at website/queue api
   * Streams final video from mediaserver in fullscreen mode.
-  * Can be controled via hotkeys or repotely with websockets
+  * Can be controlled via hotkeys or remotely with websockets
   * Automatically updates track list when the queue is changed.
   * Queue order is obscured passed a configurable time
-* mediaserver
-  * nginx webserver to proxy website(pyramid) and serve datafiles efficently
-  * postgresql database for prouction.ini configuration
-  * dnsmasque for assisting in creating a captive portal
 * admindashboard
   * Logstash data importer for json event logs from `website`
   * HTML5/js app to visulise event data from elasticsearch
 
 
-[Additional Tutorial](Tutorial.md)
+[Additional SystemSetup documentation](SystemSetup.md)
