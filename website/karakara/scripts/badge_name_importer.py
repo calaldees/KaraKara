@@ -47,6 +47,7 @@ def get_args():
     )
 
     parser.add_argument('-s', '--source', action='store', help='', choices=processors.keys())
+    parser.add_argument('-c', '--cache_filename', action='store', help='', default=DEFAULT_CACHE_FILENAME)
 
     parser.add_argument('-v', '--verbose', action='store_true', help='', default=False)
     parser.add_argument('--version', action='version', version=VERSION)
@@ -61,19 +62,20 @@ def main():
     args = get_args()
     logging.basicConfig(level=logging.DEBUG if args['verbose'] else logging.INFO)
 
+    cache_filename = args['cache_filename']
     processor = processors[args['source']]
 
     response_text = ''
-    if os.path.exists(DEFAULT_CACHE_FILENAME):
-        with open(DEFAULT_CACHE_FILENAME, 'r') as f:
+    if os.path.exists(cache_filename):
+        with open(cache_filename, 'r') as f:
             response_text = f.read()
     else:
         response_text = requests.get(processor.url).text
-        if not os.path.exists(DEFAULT_CACHE_FILENAME):
-            with open(DEFAULT_CACHE_FILENAME, 'w') as f:
+        if not os.path.exists(cache_filename):
+            with open(cache_filename, 'w') as f:
                 f.write(response_text)
 
-    soup = BeautifulSoup(response_text)
+    soup = BeautifulSoup(response_text, "html.parser")
 
     badge_names = processor(soup)
 

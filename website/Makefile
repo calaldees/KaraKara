@@ -224,7 +224,8 @@ insert_band_tracks:
 	$(PYTHON) -m$(PROJECT).scripts.insert_band_tracks --config=$(INI_DEV)
 
 $(WRITE_PATH)/badgenames.txt:
-	$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) > $@
+	#$(PYTHON) -mkarakara.scripts.badge_name_importer --source $(BADGENAME_SOURCE) --cache_filename $@.cache > $@
+	$(PYTHON) -mkarakara.scripts.badge_name_importer_minami_api > $@
 
 # Logs -------------------------------------------------------------------------
 
