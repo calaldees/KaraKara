@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>Badgenames</title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			function _submit() {
+				alert('submit');
+				// Read items from textarea and ajax submit to settings.json with correct fields
+				return false;
+			}
+		</script>
+		<form action="/settings.json" method="POST">
+			<textarea name="badgenames">
+
+			</textarea>
+			<input type="submit" onclick="return _submit();" />
+		</form>
+	</body>
+</html>
