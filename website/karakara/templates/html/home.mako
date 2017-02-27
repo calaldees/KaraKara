@@ -41,11 +41,11 @@
     <a href="/player/player.html" data-role="button" class="admin">${_('mobile.home.player')}</a>
     <a href="/track_list"         data-role="button" class="admin">${_('mobile.home.track_list')}</a>
     <a href="/settings"           data-role="button" class="admin">${_('mobile.home.settings')}</a>
+    <a href="/static/form_badgenames.html" data-role="button" class="admin">${_('mobile.home.badgenames')}</a>
     <a href="/admin_lock"         data-role="button" class="admin">${_('mobile.home.admin_lock')}</a>
     <a href="/remote"             data-role="button" class="admin">${_('mobile.home.remote')}</a>
     <a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>
     <a href="/priority_tokens"    data-role="button" class="admin">${_('mobile.home.priority_tokens')}</a>
-    <a href="/stats"              data-role="button" class="admin">${_('mobile.home.stats')}</a>
     <a href="/admin"              data-role="button" class="admin">${_('mobile.home.admin')}</a>
     <a href="/comunity"           data-role="button" class="admin">${_('mobile.home.comunity')}</a>
 % endif

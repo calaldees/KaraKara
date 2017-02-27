@@ -1,20 +1,42 @@
 <html>
 	<head>
 		<title>Badgenames</title>
+		<style type="text/css">
+			#badgenames {
+				width: 100%;
+				height: 90%;
+			}
+		</style>
 	</head>
 	<body>
 		<script type="text/javascript">
 			function _submit() {
-				alert('submit');
-				// Read items from textarea and ajax submit to settings.json with correct fields
+				const badgenames = document.getElementById("badgenames").value.split("\n").map((x)=>x.trim());
+
+				const xhttp = new XMLHttpRequest();
+				xhttp.open("POST", "/settings.json", false);
+
+				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xhttp.send("method=PUT&karakara.queue.add.valid_performer_names="+encodeURI("["+badgenames.join(', ')+"]"));
+
+				//xhttp.setRequestHeader("Content-type", "application/json");
+				//xhttp.send(JSON.stringify({
+				//	"method": "PUT",
+				//	"karakara.queue.add.valid_performer_names": badgenames,
+				//}));
+
+				if (xhttp.status >= 200 && xhttp.status <= 299) {
+					alert('Updated OK');
+				} else {
+					alert(xhttp.responseText);
+				}
 				return false;
 			}
 		</script>
-		<form action="/settings.json" method="POST">
-			<textarea name="badgenames">
-
-			</textarea>
-			<input type="submit" onclick="return _submit();" />
+		<form action="/settings.json" method="PUT">
+			<textarea id="badgenames" name="badgenames"></textarea>
+			<input type="hidden" name="method" value="PUT">
+			<p><input type="submit" onclick="return _submit();" /></p>
 		</form>
 	</body>
 </html>
