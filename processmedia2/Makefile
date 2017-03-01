@@ -113,6 +113,9 @@ cleanup:
 	$(PYTHON) cleanup_media.py
 run: install_env scan encode import_media
 
+# temp addition to document event import step
+import_media_production_api:
+	$(PYTHON) import_media.py --force --api_host int.karakara.org.uk
 
 # Test -------------------------------------------------------------------------
 .PHONY: test
