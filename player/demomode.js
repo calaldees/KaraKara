@@ -40,6 +40,10 @@ var demo_settings = {
 	}
 };
 
+var demo_queue_empty = {"data": {
+	"queue": [],
+	"queue_split_indexs": [5]
+}}
 var demo_queue = {"data": {
 	"queue": [
 		{
