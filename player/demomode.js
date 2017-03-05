@@ -69,9 +69,11 @@ var demo_random_images = {
 (function() {
 	if(window.location.protocol == "file:") {
 		console.log("In demo mode - monkey-patching jQuery");
-		
+
 		var _orig_getJSON = $.getJSON;
 		$.getJSON = function(path, vars, callback) {
+			$('body').removeClass('websocket_disconnected');
+
 			if(path == "/settings.json") {
 				callback(JSON.parse(JSON.stringify(demo_settings)));
 			}
