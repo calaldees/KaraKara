@@ -28,12 +28,12 @@ var demo_settings = {
 		"settings": {
 			"karakara.player.title": "KaraKara Player Test",
 			"karakara.event.end": "2020-01-01 00:00:00",
-			"karakara.player.queue.update_time": 60,
-			"karakara.websocket.port": 8001,
+			"karakara.player.queue.update_time": 5,
+			"karakara.websocket.port": false,  // remote control disabled
 			"karakara.websocket.disconnected_retry_interval": 10,
 			"karakara.player.video.preview_volume": 10,
 			"karakara.player.video.skip.seconds": 10,
-			"karakara.player.help.timeout": 5
+			"karakara.player.help.timeout": 0  // help disabled
 		}
 	},
 	"identity": {
@@ -41,10 +41,6 @@ var demo_settings = {
 	}
 };
 
-var demo_queue_empty = {"data": {
-	"queue": [],
-	"queue_split_indexs": [5]
-}}
 var demo_queue = {"data": {
 	"queue": [
 		random_track(),
@@ -64,6 +60,12 @@ var demo_queue = {"data": {
 	"queue_split_indexs": [5]
 }};
 
+var demo_random_images = {
+	"data": {
+		"images": ["moo.jpg"]
+	},
+};
+
 (function() {
 	if(window.location.protocol == "file:") {
 		console.log("In demo mode - monkey-patching jQuery");
@@ -73,8 +75,14 @@ var demo_queue = {"data": {
 			if(path == "/settings.json") {
 				callback(JSON.parse(JSON.stringify(demo_settings)));
 			}
-			if(path == "/queue.json") {
+			else if(path == "/queue.json") {
 				callback(JSON.parse(JSON.stringify(demo_queue)));
+			}
+			else if(path == "/random_images.json?count=200") {
+				callback(JSON.parse(JSON.stringify(demo_random_images)));
+			}
+			else {
+				console.log("Un-mocked getJSON:", path, vars, callback);
 			}
 		}
 
@@ -88,5 +96,21 @@ var demo_queue = {"data": {
 			demo_queue.data.queue.shift();
 			return _orig_song_finished(status);
 		}
+
+		$(document).on('keydown', function(e) {
+			switch (e.which) {
+				case 65     :  // A
+					console.log("Add random track");
+					demo_queue.data.queue.push(random_track());
+					break;
+				case 67     :  // C
+					console.log("Clear playlist");
+					demo_queue.data.queue = [];
+					break;
+			}
+			if (e.which in KEYCODE) {
+				e.preventDefault();
+			}
+		});
 	}
 })();
