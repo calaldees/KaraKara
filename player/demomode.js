@@ -18,7 +18,8 @@ function random_track() {
 			]
 		},
 		"performer_name": choose(["Vanilla", "Chocola", "Mint", "Coconut", "Cinamon", "Azuki", "Maple", "ReallyLongBadgeNameGuy"]),
-		"total_duration": choose([90, 120, 180, 234])
+		"total_duration": choose([90, 120, 180, 234]),
+		"time_touched": ""+Math.random()
 	};
 }
 
@@ -70,16 +71,22 @@ var demo_queue = {"data": {
 		var _orig_getJSON = $.getJSON;
 		$.getJSON = function(path, vars, callback) {
 			if(path == "/settings.json") {
-				callback(demo_settings);
+				callback(JSON.parse(JSON.stringify(demo_settings)));
 			}
 			if(path == "/queue.json") {
-				callback(demo_queue);
+				callback(JSON.parse(JSON.stringify(demo_queue)));
 			}
 		}
 
 		var _orig_get_attachment = get_attachment;
 		get_attachment = function(track, thing) {
 			return "." + _orig_get_attachment(track, thing);
+		}
+
+		var _orig_song_finished = song_finished;
+		song_finished = function(status) {
+			demo_queue.data.queue.shift();
+			return _orig_song_finished(status);
 		}
 	}
 })();
