@@ -275,8 +275,8 @@ input[type=range]::-moz-range-thumb {
 	border: 0.25em solid black;
 	background-color: white;
 	width: 3em;
-	padding-top: 1.2em; /* hacky vert-align */
 	text-align: center;
+	padding-top: 1.0em; /* hacky vert-align */
 	vertical-align: middle;
 	border-radius: 4em;
 }
@@ -297,10 +297,12 @@ input[type=range]::-moz-range-thumb {
 #playlist li:nth-child(1) {
 	width: 58%;
 	height: 7em;
+	border-width: 3px;
 }
 #playlist li:nth-child(1) .time {
 	border-color: red;
 	font-weight: bold;
+	padding-top: 1.2em; /* hacky vert-align */
 }
 #playlist li:nth-child(1) .performer {font-size: 3rem;}
 #playlist li:nth-child(1) .title {font-size: 2rem;} /* font-size: 1.4em; */
@@ -310,6 +312,7 @@ input[type=range]::-moz-range-thumb {
 #playlist li:nth-child(2)  {
 	width: 54%;
 	height: 5em;
+	border-width: 2px;
 }
 #playlist li:nth-child(2) .performer {font-size: 2.5rem;}
 #playlist li:nth-child(2) .title {font-size: 1.5rem;}
