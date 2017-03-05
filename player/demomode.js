@@ -13,6 +13,7 @@ function random_track() {
 			},
 			"attachments": [
 				{"type": "video", "location": "moo.mp4"},
+				{"type": "preview", "location": "moo.mp4"},
 				{"type": "thumbnail", "location": "moo.jpg"}
 			]
 		},
@@ -50,6 +51,7 @@ var demo_queue = {"data": {
 				},
 				"attachments": [
 					{"type": "video", "location": "moo.mp4"},
+					{"type": "preview", "location": "moo.mp4"},
 					{"type": "thumbnail", "location": "moo.jpg"}
 				]
 			},
