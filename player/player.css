@@ -50,7 +50,8 @@ a {
 	right:0;
 	padding: 6px;
 }
-.notification_area img {
+.notification_area img,
+.notification_area svg {
 	background-color: white;
 	padding: 6px;
 	border-radius: 6px;
@@ -262,6 +263,10 @@ input[type=range]::-moz-range-thumb {
 	width: 40%;
 	overflow: hidden;
 	text-transform: capitalize;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 #playlist li .time {
 	right: 0.5em;
@@ -270,22 +275,24 @@ input[type=range]::-moz-range-thumb {
 	border: 0.25em solid black;
 	background-color: white;
 	width: 3em;
+	padding-top: 1.2em; /* hacky vert-align */
 	text-align: center;
 	vertical-align: middle;
 	border-radius: 4em;
 }
-#playlist li .title {
-	top: 0.5em;
-	left: 45%;
-	text-transform: capitalize;
-	font-size: 1.2rem;
-}
+#playlist li .title,
 #playlist li .from {
-	bottom: 0.5em;
 	left: 45%;
+	right: 2em;
 	text-transform: capitalize;
 	font-size: 1.2rem;
+
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+#playlist li .title {top: 0.5em;}
+#playlist li .from {bottom: 0.5em;}
 
 #playlist li:nth-child(1) {
 	width: 58%;
