@@ -49,8 +49,8 @@ var demo_queue = {"data": {
 					"from": "Animu with a stupendously long name: The sequelising, the subtitle"
 				},
 				"attachments": [
-					{"type": "video", "location": "/moo.mp4"},
-					{"type": "thumbnail", "location": "/moo.jpg"}
+					{"type": "video", "location": "moo.mp4"},
+					{"type": "thumbnail", "location": "moo.jpg"}
 				]
 			},
 			"performer_name": "Shish of the quite silly con badge name what what? Is this enough.",
