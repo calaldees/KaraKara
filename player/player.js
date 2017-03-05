@@ -452,7 +452,7 @@ function render_playlist() {
 			"<p class='title'>"     + track.tags.get("title")   + "</p>\n" +
 			"<p class='from'>"      + track.tags.get("from")    + "</p>\n" +
 			"<p class='performer'>" + queue_item.performer_name + "</p>\n" +
-			"<p class='time'>"      + timedelta_str(queue_item.total_duration*1000) + "</p>\n";
+			"<p class='time'><span>" + timedelta_str(queue_item.total_duration*1000) + "</span></p>\n";
 	});
 	
 	var queue_html = render_queue_items($('#playlist_obscured ul'), playlist_obscured, function(queue_item, track) {

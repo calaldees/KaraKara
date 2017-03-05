@@ -274,16 +274,22 @@ input[type=range]::-moz-range-thumb {
 	bottom: 0.5em;
 	border: 0.25em solid black;
 	background-color: white;
-	width: 3em;
+	width: 3.5em;
 	text-align: center;
-	padding-top: 1.0em; /* hacky vert-align */
-	vertical-align: middle;
 	border-radius: 4em;
+}
+#playlist li .time span {
+	position: absolute;
+	width: 3.5em;
+	top: 50%;
+	margin-top: -0.6em;
+	height: 1em;
+	left: 0px;
 }
 #playlist li .title,
 #playlist li .from {
 	left: 45%;
-	right: 2em;
+	right: 2.5em;
 	text-transform: capitalize;
 	font-size: 1.2rem;
 
@@ -302,7 +308,6 @@ input[type=range]::-moz-range-thumb {
 #playlist li:nth-child(1) .time {
 	border-color: red;
 	font-weight: bold;
-	padding-top: 1.2em; /* hacky vert-align */
 }
 #playlist li:nth-child(1) .performer {font-size: 3rem;}
 #playlist li:nth-child(1) .title {font-size: 2rem;} /* font-size: 1.4em; */
