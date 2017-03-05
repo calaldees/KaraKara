@@ -5,7 +5,7 @@ This documentation is designed to inform a user how to setup a karaoke event
 system from scratch. Technical developer documentation about each component
 can be found with each component.
 
-The goals KaraKara:
+The goals of KaraKara:
 
 * Provide users with an accessible web interface to:
   * Prepare/encode video/subtitles/images (referred to as 'datasets')
@@ -29,7 +29,7 @@ Preparing a Dataset
 -------------------
 
 This section describes how to subtitle a track and prepare it for use with the
-system. These instructions provide links to pre constructed videos and subtile
+system. These instructions provide links to pre-constructed videos and subtile
 files to get you started.
 
 
