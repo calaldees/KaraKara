@@ -8,16 +8,16 @@ function random_track() {
 		"track": {
 			"id": 2,
 			"tags": {
-				"title": choose(["Hello Song", "Let's Get To Burning", "Random Title #3", "The Song of My People"]),
-				"from": choose(["Animu", "That Show with the Things", "Demo Game"])
+				"title": choose(["Hello Song", "Let's Get To Burning", "Random Title #3", "The Song of My People", "Hello Song with a really long title: The Song of the Lengthening Words"]),
+				"from": choose(["Animu", "That Show with the Things", "Demo Game", "Animu with a stupendously long name: The sequelising, the subtitle"])
 			},
 			"attachments": [
-				{"type": "video", "location": "moo.mp4"},
-				{"type": "preview", "location": "moo.mp4"},
+				{"type": "video", "location": "moo.webm"},
+				{"type": "preview", "location": "moo.webm"},
 				{"type": "thumbnail", "location": "moo.jpg"}
 			]
 		},
-		"performer_name": choose(["Vanilla", "Chocola", "Mint", "Coconut", "Cinamon", "Azuki", "Maple"]),
+		"performer_name": choose(["Vanilla", "Chocola", "Mint", "Coconut", "Cinamon", "Azuki", "Maple", "ReallyLongBadgeNameGuy"]),
 		"total_duration": choose([90, 120, 180, 234])
 	};
 }
@@ -46,22 +46,6 @@ var demo_queue_empty = {"data": {
 }}
 var demo_queue = {"data": {
 	"queue": [
-		{
-			"track": {
-				"id": 1,
-				"tags": {
-					"title": "Hello Song with a really long title: The Song of the Lengthening Words",
-					"from": "Animu with a stupendously long name: The sequelising, the subtitle"
-				},
-				"attachments": [
-					{"type": "video", "location": "moo.mp4"},
-					{"type": "preview", "location": "moo.mp4"},
-					{"type": "thumbnail", "location": "moo.jpg"}
-				]
-			},
-			"performer_name": "Shish of the quite silly con badge name what what? Is this enough.",
-			"total_duration": 30
-		},
 		random_track(),
 		random_track(),
 		random_track(),
