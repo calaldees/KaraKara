@@ -80,6 +80,7 @@ a {
 	position: absolute;
 	bottom: 0;
 	right: 0;
+	color: black;
 	background-color: white;
 	padding: 6px;
 	margin: 6px;
@@ -92,6 +93,7 @@ a {
 .help_area table th,
 .help_area table td {
 	padding-left: 1em;
+	color: black;
 }
 
 /* Control Buttons */
