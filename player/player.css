@@ -183,36 +183,3 @@ input[type=range]::-moz-range-thumb {
 	border-radius: 0;
 }
 
-/*---------------------------------------------------------------------------*/
-/* Title Screen Animation */
-/*---------------------------------------------------------------------------*/
-
-.screen_title {
-	overflow: hidden;
-}
-
-.screen_title img {
-	position: absolute;
-	border: 1px solid black;
-}
-
-.screen_title .info {
-	position: fixed;
-	/*-webkit-transform: rotate(-0.2rad);*/
-	top: 20%;
-	left: 25%;
-	width: 50%;
-	z-index: 100;
-}
-.screen_title .info > div {
-	background-color: white;
-	border-radius: 8px;
-	padding: 2em;
-	font-size: 150%;
-	opacity: 0.9;
-}
-
-.screen_title .info h1 {
-	opacity: 1.0;
-	text-align: center;
-}
