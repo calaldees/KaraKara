@@ -48,12 +48,12 @@ docker_run:
 
 RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --update --inplace --partial --exclude '.*' --exclude 'backup'
 #--partial --update --copy-links --checksum --update --bwlimit=100
-RSYNC_LOCAL:=~/Applications/KaraKara/files
+RSYNC_LOCAL:=~/Applications/KaraKara/files/
 RSYNC_REMOTE:=calaldees@violet.shishnet.org:/data/media_upload/
 rsync_pull:
 	rsync $(RSYNC_REMOTE) $(RSYNC_LOCAL) -e ssh $(RSYNC_ARGS) --delete-after
 rsync_push:
-	rsync $(RSYNC_LOCAL) $(RSYNC_REMOTE) -e ssh $(RSYNC_ARGS)
+	rsync $(RSYNC_LOCAL) $(RSYNC_REMOTE) -e ssh $(RSYNC_ARGS) --dry-run
 
 RSYNC_LOCAL_TARGET:=/Volumes/Samsung_T1/karakara
 rsync_local_push_samsung:
