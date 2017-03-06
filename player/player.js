@@ -565,13 +565,6 @@ function attach_events() {
 		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.player.help.timeout"]*1000);
 		$('body').addClass('show_help');
 	});
-	// Resize events - ajust master font size
-	function resize(e) {
-		var font_size = window.innerHeight / 40.0;
-		$('html').css('font-size',''+font_size+'px');
-	}
-	$(window).on('resize', resize);
-	resize();
 }
 
 function init() {
