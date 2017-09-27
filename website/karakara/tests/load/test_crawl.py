@@ -1,7 +1,10 @@
 
 import datetime
 import resource
-from bs4 import BeautifulSoup
+import bs4
+def BeautifulSoup(markup):
+    return bs4.BeautifulSoup(markup, "html.parser")
+
 
 from karakara.tests.conftest import slow
 

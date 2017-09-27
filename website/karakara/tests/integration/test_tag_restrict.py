@@ -10,7 +10,10 @@ We can restrict tracks returned to a subset of tracks by enforcing
 the 'karakara.search.tag.restrict' setting.
 """
 from unittest.mock import patch
-from bs4 import BeautifulSoup
+import bs4
+def BeautifulSoup(markup):
+    return bs4.BeautifulSoup(markup, "html.parser")
+
 
 from . import admin_rights
 

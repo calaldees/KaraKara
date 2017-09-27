@@ -3,7 +3,9 @@
 import datetime
 import json
 import re
-from bs4 import BeautifulSoup
+import bs4
+def BeautifulSoup(markup):
+    return bs4.BeautifulSoup(markup, "html.parser")
 
 from externals.lib.misc import now
 

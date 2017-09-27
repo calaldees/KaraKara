@@ -1,4 +1,7 @@
-from bs4 import BeautifulSoup
+import bs4
+def BeautifulSoup(markup):
+    return bs4.BeautifulSoup(markup, "html.parser")
+
 
 from externals.lib.misc import substring_in
 
