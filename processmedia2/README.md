@@ -53,4 +53,15 @@ Debuging Tools
 * metaviewer
     * `./metaviewer regex_name`
 * logs
-    * 
+    *
+
+
+Future Development Notes
+------------------------
+
+    https://hub.docker.com/r/jrottenberg/ffmpeg/
+    docker pull jrottenberg/ffmpeg
+    docker run --rm -it jrottenberg/ffmpeg
+
+    https://forums.docker.com/t/how-can-i-run-docker-command-inside-a-docker-container/337/2
+    docker run -it -v /var/run/docker.sock:/var/run/docker.sock ubuntu:latest sh -c "apt-get update ; apt-get install docker.io -y ; bash"
