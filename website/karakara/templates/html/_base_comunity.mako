@@ -149,18 +149,6 @@
 	<script src="${h.path.external}js/jquery.fileupload.js"></script>
 	<script src="${h.path.static  }js/comunity.js"></script>
 
-	<!-- Mozilla Persona -->
-	<script type="text/javascript">
-		var mozilla_persona = {
-			currentUserEmail: null,
-			login_url: "${login_url}",
-			logout_url: "${logout_url}"
-		};
-		% if identity.get('user'):
-		mozilla_persona.currentUserEmail = "${identity.get('user', {}).get('email', '')}";
-		% endif
-	</script>
-
 	<!-- Javascript programatic inline -->
 	<%
 		js_inlines = h.javascript_inline['comunity']

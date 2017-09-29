@@ -109,9 +109,12 @@ mako.directories = karakara:templates
 
 login.automatically_activate_with_single_provider = False -> bool
 
-facebook.appid = 
-facebook.secret = 
-facebook.permissions = public_profile
+login.facebook.appid =
+login.facebook.secret = 
+login.facebook.permissions = public_profile
+
+login.google.clientid =
+login.google.clientsecret = 
 
 login.provider.enabled = []
 

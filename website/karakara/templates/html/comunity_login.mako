@@ -27,7 +27,7 @@
     ##       check to see if your provider supports this and set login.automatically_activate_with_single_provider to True
     <% login_providers = data.get('login_providers', {}).items() %>
     % if len(login_providers) == 1 and request.registry.settings.get('login.automatically_activate_with_single_provider'):
-        % for login_provider_name, login_provider_data in login_providers:        
+        % for login_provider_name, login_provider_data in login_providers:
             % if 'run_js' in login_provider_data:
                 ${login_provider_data.get('run_js') | n}
             % endif

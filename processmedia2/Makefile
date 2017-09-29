@@ -108,7 +108,7 @@ scan:
 encode:
 	$(PYTHON) encode_media.py --process_order_function random
 import_media:
-	$(PYTHON) import_media.py --pdb --force
+	$(PYTHON) import_media.py --force
 cleanup:
 	$(PYTHON) cleanup_media.py
 run: install_env scan encode import_media

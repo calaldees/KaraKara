@@ -26,6 +26,8 @@ install_requires = [
     'httpagentparser',
     'humanize',
     #'chardet',
+    'google-api-python-client',
+    'oauth2client',
 ]
 test_requires = [
     'pytest',

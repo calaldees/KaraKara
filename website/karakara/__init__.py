@@ -11,7 +11,7 @@ from pyramid.i18n import get_localizer, TranslationStringFactory
 # External Imports
 from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
 from externals.lib.pyramid_helpers.auto_format import registered_formats
-from externals.lib.social._login import NullLoginProvider, FacebookLogin, PersonaLogin
+from externals.lib.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
 # Package Imports
@@ -42,6 +42,10 @@ def main(global_config, **settings):
 
     # Pyramid Global Settings
     config = Configurator(settings=settings)  # , autocommit=True
+
+    def assert_settings_keys(keys):
+        for settings_key in key:
+            assert config.registry.settings.get(settings_key)
 
     # Register Aditional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
@@ -112,12 +116,24 @@ def main(global_config, **settings):
     login_providers = config.registry.settings.get('login.provider.enabled')
     # Facebook
     if 'facebook' in login_providers:
-        for settings_key in ('facebook.appid', 'facebook.secret'):
-            assert config.registry.settings.get(settings_key), 'To use facebook as a login provider appid and secret must be provided'
+        assert_settings_keys(
+            ('login.facebook.appid', 'login.facebook.secret'),
+            message='To use facebook as a login provider appid and secret must be provided'
+        )
         social_login.add_login_provider(FacebookLogin(
-            appid=config.registry.settings.get('facebook.appid'),
-            secret=config.registry.settings.get('facebook.secret'),
-            permissions=config.registry.settings.get('facebook.permissions'),
+            appid=config.registry.settings.get('login.facebook.appid'),
+            secret=config.registry.settings.get('login.facebook.secret'),
+            permissions=config.registry.settings.get('login.facebook.permissions'),
+        ))
+    # Google
+    if 'google' in login_providers:
+        assert_settings_keys(
+            ('login.google.clientid', 'login.google.clientsecret'),
+            message='To use google login we must have clientid and secret',
+        )
+        social_login.add_login_provider(GoogleLogin(
+            clientid=config.registry.settings.get('login.google.clientid'),
+            secret=config.registry.settings.get('login.google.clientsecret'),
         ))
     # Firefox Persona (Deprecated technology but a useful reference)
     #if 'persona' in login_providers:
