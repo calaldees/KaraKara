@@ -127,13 +127,8 @@ def main(global_config, **settings):
         ))
     # Google
     if 'google' in login_providers:
-        assert_settings_keys(
-            ('login.google.clientid', 'login.google.clientsecret'),
-            message='To use google login we must have clientid and secret',
-        )
         social_login.add_login_provider(GoogleLogin(
-            clientid=config.registry.settings.get('login.google.clientid'),
-            secret=config.registry.settings.get('login.google.clientsecret'),
+            client_secret_file=config.registry.settings.get('login.google.client_secret_file'),
         ))
     # Firefox Persona (Deprecated technology but a useful reference)
     #if 'persona' in login_providers:
