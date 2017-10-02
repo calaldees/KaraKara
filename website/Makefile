@@ -1,6 +1,7 @@
 OS = $(shell uname -s)
 
 PROJECT=karakara
+PYTHON_VERSION:=3.6
 
 CONFIG_SOURCE_PATH=config
 
@@ -14,8 +15,8 @@ DATABASE_PATH=$(WRITE_PATH)/database
 DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
 ENV=$(WRITE_PATH)/_env
 PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
-PYTHON=$(PYTHONPATH_ENV)/bin/python3
-PIP=$(ENV)/bin/pip3
+PYTHON=$(PYTHONPATH_ENV)/bin/python$(PYTHON_VERSION)
+PIP=$(ENV)/bin/pip$(PYTHON_VERSION)
 PSERVE=$(PYTHONPATH_ENV)/bin/pserve
 PSHELL=$(PYTHONPATH_ENV)/bin/pshell
 PYTEST=$(PYTHONPATH_ENV)/bin/py.test
@@ -68,7 +69,7 @@ help:
 $(ENV):
 	pip install virtualenv
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
-	virtualenv --no-site-packages -p python3 $(ENV)
+	virtualenv --no-site-packages -p python$(PYTHON_VERSION) $(ENV)
 	$(ENV)/bin/easy_install pyramid
 
 # Experiments
