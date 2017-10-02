@@ -47,13 +47,14 @@
     },
 
     "bootstrap": {
-        "VERSION": "3.3.5",
+        "VERSION": "3.3.7",
         "sources": "http://raw.github.com/twbs/bootstrap/vVERSION/dist/",
         "files": [
             "js/bootstrap.min.js",
             "css/bootstrap-theme.min.css",
             "css/bootstrap.min.css",
             "fonts/glyphicons-halflings-regular.woff",
+            "fonts/glyphicons-halflings-regular.woff2",
             "fonts/glyphicons-halflings-regular.ttf",
             "fonts/glyphicons-halflings-regular.eot",
             "fonts/glyphicons-halflings-regular.svg"
