@@ -1,3 +1,4 @@
+import os
 import re
 import operator
 
@@ -47,15 +48,15 @@ def main(global_config, **settings):
         for settings_key in key:
             assert config.registry.settings.get(settings_key)
 
-    # Register Aditional Includes ---------------------------------------------
+    # Register Additional Includes ---------------------------------------------
     config.include('pyramid_mako')  # The mako.directories value is updated in the scan for addons. We trigger the import here to include the correct folders.
 
-    # Reload on template change - Dericated from pserve
+    # Reload on template change - Dedicated from pserve
     #template_filenames = map(operator.attrgetter('absolute'), file_scan(config.registry.settings['mako.directories']))
     #from pyramid.scripts.pserve import add_file_callback
     #add_file_callback(lambda: template_filenames)
 
-    # Parse/Convert setting keys that have specifyed datatypes
+    # Parse/Convert setting keys that have specified datatypes
     for key in config.registry.settings.keys():
         config.registry.settings[key] = convert_str_with_type(config.registry.settings[key])
 
@@ -90,14 +91,14 @@ def main(global_config, **settings):
         config.registry.settings['karakara.websocket.port'] = None
 
     if config.registry.settings.get('karakara.websocket.port'):
-        def authenicator(key):
+        def authenticator(key):
             """Only admin authenticated keys can connect to the websocket"""
             request = Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
             session_data = session_factory(request)
             return session_data and session_data.get('admin')
         try:
             _socket_manager = AuthEchoServerManager(
-                authenticator=authenicator,
+                authenticator=authenticator,
                 websocket_port=config.registry.settings['karakara.websocket.port'],
                 tcp_port=config.registry.settings.get('karakara.tcp.port'),
             )
@@ -162,14 +163,20 @@ def main(global_config, **settings):
 
     # Routes -------------------------------------------------------------------
 
+    def settings_path(key):
+        path = os.path.join(os.getcwd(), config.registry.settings[key])
+        if not os.path.isdir(path):
+            log.error(f'Unable to add_static_view {key}:{path}')
+        return path
+
     # Static Routes
-    config.add_static_view(name='ext', path=settings['static.externals'])  #cache_max_age=3600
-    config.add_static_view(name='static', path='karakara:{0}'.format(settings["static.assets"])) #cache_max_age=3600 # settings["static.assets"]
-    config.add_static_view(name='player', path=settings["static.player"])
+    config.add_static_view(name='ext', path=settings_path('static.externals'))  # cache_max_age=3600
+    config.add_static_view(name='static', path=settings_path('static.assets'))  # cache_max_age=3600
+    config.add_static_view(name='player', path=settings_path('static.player'))
 
     # AllanC - it's official ... static route setup and generation is a mess in pyramid
     #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
-    config.add_static_view(name='files' , path=settings["static.processed"])
+    config.add_static_view(name='files', path=config.registry.settings['static.processmedia2.config']['path_processed'])
 
     # Routes
     def append_format_pattern(route):

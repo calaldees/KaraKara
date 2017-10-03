@@ -30,9 +30,9 @@ log = logging.getLogger(__name__)
 # Constants
 #-------------------------------------------------------------------------------
 
-PATH_SOURCE_KEY = 'static.source'
-PATH_META_KEY = 'static.meta'
 PATH_BACKUP_KEY = 'static.backup'
+PATH_PROCESSMEDIA2_CONFIG = 'static.processmedia2.config'
+PATH_PROCESSMEDIA2_LOG = 'static.processmedia2.log'
 PATH_UPLOAD_KEY = 'upload.path'
 
 STATUS_TAGS = {
@@ -83,7 +83,7 @@ def file_uploaded(event):
     This can be removed.
     """
     upload_path = get_setting(PATH_UPLOAD_KEY)
-    path_source = get_setting(PATH_SOURCE_KEY)
+    path_source = get_setting(PATH_PROCESSMEDIA2_CONFIG)['path_source']
 
     # Move uploaded files into media path
     uploaded_files = (f for f in os.listdir(upload_path) if os.path.isfile(os.path.join(upload_path, f)))
@@ -117,8 +117,8 @@ class ComunityTrack():
     def factory(cls, track, request):
         return ComunityTrack(
             track=track,
-            path_source=request.registry.settings[PATH_SOURCE_KEY],
-            path_meta=request.registry.settings[PATH_META_KEY],
+            path_source=request.registry.settings[PATH_PROCESSMEDIA2_CONFIG]['path_source'],
+            path_meta=request.registry.settings[PATH_PROCESSMEDIA2_CONFIG]['path_meta'],
             path_backup=request.registry.settings[PATH_BACKUP_KEY],
             open=cls._open
         )
@@ -411,12 +411,12 @@ def community_settings(request):
 @web
 @comunity_only
 def comunity_processmedia_log(request):
-    LOG_PATH_KEY = 'static.processmedia2.log'
+    LOGFILE = request.registry.settings[PATH_PROCESSMEDIA2_LOG]
     REGEX_LOG_ITEM = re.compile(r'(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<source>.+?) - (?P<loglevel>.+?) - (?P<message>.+?)(\n\d{2}-|$)', flags=re.DOTALL + re.IGNORECASE + re.MULTILINE)
     LEVELS = request.params.get('levels', 'WARNING,ERROR').split(',')
     try:
         # rrrrrrr - kind of a hack using ComunityTrack._open .. but it works ..
-        with ComunityTrack._open(request.registry.settings[LOG_PATH_KEY], 'rt') as filehandle:
+        with ComunityTrack._open(LOGFILE, 'rt') as filehandle:
             processmedia_log = [
                 item
                 for item in
@@ -427,7 +427,7 @@ def comunity_processmedia_log(request):
                 if item.get('loglevel') in LEVELS
             ]
     except IOError:
-        raise action_error(message='unable to open {}'.format(LOG_PATH_KEY))
+        raise action_error(message='unable to open {}'.format(LOGFILE))
     return action_ok(data={
         'processmedia_log': processmedia_log,
     })
