@@ -22,28 +22,26 @@ def test_track_import_without_data(app):
 def test_track_import_delete(app, tracks):
     _assert_base_tracks(app)
 
-    _track_import(
-        app,
-        method='post',
-        json_data=[{
-            'id': 'import1',
-            'source_filename': 'import1_filename1',
-            'duration': 120,
-            'lyrics': 'la la la\nle le le',
-            'attachments': [
-                {'type': 'image', 'location': '/test/import1.jpg'},
-            ],
-            'tags': ['category:test', 'title:import1'],
-        }],
-    )
+    track_import1_source = {
+        'id': 'import1',
+        'source_filename': 'import1_filename1',
+        'duration': 120.0,
+        'lyrics': 'la la la\nle le le',
+        'attachments': [
+            {'type': 'image', 'location': '/test/import1.jpg'},
+        ],
+        'tags': ['category:test', 'title:Import Test'],
+    }
 
+    _track_import(app, method='post', json_data=[track_import1_source])
     assert 'import1' in _track_import(app, method='get').json['data']['tracks']
-    #TODO: Assert track data is in db. Perform json get on track?
 
-    _track_import(
-        app,
-        method='delete',
-        json_data=['import1'],
-    )
+    track_import1 = app.get('/track/import1?format=json').json['data']['track']
+    for key in ('id', 'duration', 'lyrics', 'source_filename'):
+        assert track_import1_source[key] == track_import1[key]
+    assert track_import1['title'] == 'Import Test'
+    assert '/test/import1.jpg' in (attachment['location'] for attachment in track_import1['attachments'])
+    assert {'category', 'title'} < track_import1['tags'].keys()
 
+    _track_import(app, method='delete', json_data=['import1'])
     _assert_base_tracks(app)
