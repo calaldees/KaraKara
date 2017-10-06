@@ -1,0 +1,21 @@
+version: '3'
+
+    # Extends docker-compose.yml base
+
+    nginx:
+        image: nginx:1.11-alpine
+        environment:
+            - PORT_NGINX
+            - PORT_WEBSITE
+        env_file:
+            - .env
+        ports:
+            - "${PORT_NGINX}:${PORT_NGINX}"
+        volumes:
+            - ./docker/nginx.conf:/tmp/nginx.conf:ro
+            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ./:${PATH_CONTAINER_REPO}:ro
+            - website_data_1:${PATH_CONTAINER_WEBSITE}/data
+        links:
+            - website
+        command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"

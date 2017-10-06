@@ -15,9 +15,10 @@ docker_shell:
 	docker-compose run --rm --service-ports website /bin/bash
 docker_exec:
 	docker exec -it karakara_website_1 /bin/bash
-docker_run:
-	docker-compose up
-
+docker_run_event:
+	docker-compose --file docker-compose.yml --file docker-compose.event.yml up
+docker_run_comunity:
+	docker-compose --file docker-compose.yml up
 
 #	docker run --rm -i -t karakara /bin/bash
 #	docker build -t karakara --file karakara.Dockerfile .
