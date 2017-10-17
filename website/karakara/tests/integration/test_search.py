@@ -4,6 +4,19 @@ import pytest
 
 from . import with_setting
 
+
+@pytest.mark.xfail()
+def test_track_list_urlencoding():
+    """
+    TODO: Need test to cover correct url encoding
+    http://localhost:6543/search_tags/category%3Aanime/from%3Ahack%2F%2Fsign?
+    http://localhost:6543/search_tags/category:anime/from:hack//sign?
+
+    helpers.search_url() is the culprit.
+    """
+    assert False
+
+
 @pytest.mark.parametrize(('url', 'expected_text', 'not_expected_text'), [
     ('/search_list/'                 , ['wildcard', 'track 1', 'track 2', 'track 3'], []),
     ('/search_list/?trackids=t1,t2'  , ['track 1', 'track 2']                       , ['track 3', 'wildcard', 'ここ']),
