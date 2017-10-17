@@ -62,7 +62,8 @@ def main(global_config, **settings):
     #   export KARAKARA_TEMPLATE_TITLE=Test
     #   can override 'karakara.template.title'
     for key in config.registry.settings.keys():
-        config.registry.settings[key] = convert_str_with_type(os.getenv(key.replace('.', '_').upper(), '') or config.registry.settings[key])
+        value = os.getenv(key.replace('.', '_').upper(), '') or config.registry.settings[key]
+        config.registry.settings[key] = convert_str_with_type(value)
 
     # i18n
     config.add_translation_dirs(config.registry.settings['i18n.translation_dirs'])
