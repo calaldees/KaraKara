@@ -220,6 +220,7 @@ def queue_add(request):
                 raise action_error(message=_('view.queue.add.token_limit'), code=400)
 
     queue_item = QueueItem()
+    queue_item.queue_id = 'PLACEHOLDER'
     for key, value in request.params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)

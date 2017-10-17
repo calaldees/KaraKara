@@ -90,7 +90,7 @@ KaraKara.egg-info/PKG-INFO: $(ENV)
 $(EXTERNAL_PATH):
 	mkdir -p $(EXTERNAL_PATH) && touch $(EXTERNAL_PATH)/__init__.py
 
-PRECIOUS: $(DEPENDENCY_FETCHER)
+.PRECIOUS: $(DEPENDENCY_FETCHER)
 $(DEPENDENCY_FETCHER): $(EXTERNAL_PATH)
 	# LinkLocal or Download depenncy_fetcher manager for getting external dependencys
 	if [ ! -e $@ ] ; then \
@@ -103,7 +103,7 @@ $(DEPENDENCY_FETCHER): $(EXTERNAL_PATH)
 		fi ;\
 	fi
 
-PHONY: dependency_download
+.PHONY: dependency_download
 dependency_download: $(EXTERNAL_PATH)/dependency_fetcher.py
 	# Trigger dependency check on every startup
 	$(PYTHON) $(DEPENDENCY_FETCHER) dependency_fetcher.json --tracker $(EXTERNAL_PATH) --destination_path $(EXTERNAL_PATH)
