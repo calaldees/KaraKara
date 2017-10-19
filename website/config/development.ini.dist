@@ -21,18 +21,23 @@ i18n.available_languages = [en]
 # Karaoke settings -------------------------------------------------------------
 karakara.server.mode = development
 
+karakara.websocket.disconnected_retry_interval =  5      -> int
+karakara.faves.enabled                         = False -> bool
+karakara.websocket.port = 9873 -> int
+karakara.tcp.port       = -> None
+
+
+# Queue Settings -- TODO: To be removed
+
 karakara.system.user.readonly = False -> bool
 
 karakara.event.end                       = -> datetime
-
-karakara.faves.enabled                         = False -> bool
 
 karakara.player.title                          = KaraKara (dev player)
 karakara.player.video.preview_volume           =  0.10   -> float
 karakara.player.video.skip.seconds             = 20      -> int
 karakara.player.queue.update_time              = 0:00:03 -> timedelta
 karakara.player.help.timeout                   =  2      -> int
-karakara.websocket.disconnected_retry_interval =  5      -> int
 
 karakara.queue.group.split_markers = [0:10:00, 0:20:00] -> timedelta
 karakara.queue.track.padding       = 0:00:60 -> timedelta
@@ -49,9 +54,6 @@ karakara.template.input.performer_name =
 karakara.template.title                = KaraKara (dev)
 karakara.template.menu.disable =
 
-karakara.websocket.port = 9873 -> int
-karakara.tcp.port       = -> None
-
 karakara.search.view.config = data/config/search_config.json
 karakara.search.tag.silent_forced = []
 karakara.search.tag.silent_hidden = []
@@ -59,6 +61,9 @@ karakara.search.template.button.list_tracks.threshold = 100 -> int
 karakara.search.list.threshold = 25 -> int
 karakara.search.list.alphabetical.threshold = 90 -> int
 karakara.search.list.alphabetical.tags = [from, artist]
+
+
+# Print ---
 
 karakara.print_tracks.fields = [category, from, use, title, artist]
 karakara.print_tracks.short_id_length = 4 -> int
