@@ -1,8 +1,6 @@
 from . import Base
 
-from sqlalchemy     import event
-from sqlalchemy     import Column, Enum, ForeignKey
-from sqlalchemy     import String, Unicode, Integer, DateTime, Float
+from sqlalchemy import event, Column, Enum, ForeignKey, String, Unicode, Integer, DateTime, Float
 from sqlalchemy.orm import relationship, backref, Session
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -18,10 +16,24 @@ __all__ = [
 
 _queueitem_statuss = Enum("pending", "played", "skipped", "removed", name="status_types")
 
+
 class Queue(Base):
     __tablename__   = "queue"
 
     id = Column(String(), primary_key=True)
+
+
+class QueueSetting(Base):
+    """
+    Each queue will have it's own configuration
+    """
+    __tablename__   = "queue_setting"
+
+    id = Column(Integer(), primary_key=True)
+
+    queue_id = Column(String(), ForeignKey('queue.id'), nullable=False)
+    key = Column(String(), nullable=False)
+    value = Column(String())
 
 
 class QueueItem(Base):

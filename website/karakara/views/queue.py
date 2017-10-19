@@ -13,7 +13,7 @@ from . import _logic
 from ..model import DBSession, commit
 from ..model.model_queue import QueueItem
 from ..model.model_tracks import Track
-from ..model.model_token import PriorityToken
+from ..model.model_priority_token import PriorityToken
 from ..model.actions import get_track
 
 from ..templates.helpers import track_title
@@ -127,7 +127,7 @@ def queue_view(request):
 @view_config(route_name='queue', request_method='POST')
 @web
 @modification_action
-def queue_add(request):
+def queue_item_add(request):
     """
     Add items to end of queue
     """
@@ -244,7 +244,7 @@ def queue_add(request):
 @view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
 @web
 @modification_action
-def queue_del(request):
+def queue_item_del(request):
     """
     Remove items from the queue
 
@@ -281,7 +281,7 @@ def queue_del(request):
 @view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
 @web
 @modification_action
-def queue_update(request):
+def queue_item_update(request):
     """
     Used to touch queed items
 

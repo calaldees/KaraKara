@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from externals.lib.misc import now, json_object_handler
 
 from karakara.model.model_queue import QueueItem
-from karakara.model.model_token import PriorityToken
+from karakara.model.model_priority_token import PriorityToken
 
 import logging
 log = logging.getLogger(__name__)
