@@ -198,7 +198,7 @@ def get_queue_duration(request):
     linking the tracks, then the logic to add with the padding size ...
     Just use the API out
     """
-    from .queue import queue_view
+    from .queue_items import queue_view
     queue = queue_view(request)['data']['queue']
     if queue:
         return queue[-1]['total_duration'] + datetime.timedelta(seconds=queue[-1]['track']['duration'])
