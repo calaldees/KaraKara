@@ -21,6 +21,7 @@ from .auth import ComunityUserStore, NullComunityUserStore
 # SQLAlchemy imports
 from .model import init_DBSession
 
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -90,10 +91,6 @@ def main(global_config, **settings):
         def recv(self, *args, **kwargs):
             pass
     socket_manager = NullAuthEchoServerManager()
-
-    # Do not activate websocket if in community mode
-    if config.registry.settings.get('karakara.server.mode') == 'comunity':
-        config.registry.settings['karakara.websocket.port'] = None
 
     if config.registry.settings.get('karakara.websocket.port'):
         def authenticator(key):
