@@ -1,6 +1,7 @@
 """
 
 """
+import pyramid.traversal
 
 
 class TraversalGlobalRootFactory():
@@ -9,7 +10,7 @@ class TraversalGlobalRootFactory():
 
     def __getitem__(self, key):
         return {
-            #'queue': QueueContext(),
+            'queue': QueueContext(parent=self),
             'track': TrackContext(parent=self),  # Admin only for all tracks
             #'track_list': TrackListContext(),  # Admin only for all tracks
             #'comunity': ComunityContext(),
@@ -17,17 +18,32 @@ class TraversalGlobalRootFactory():
         }[key]
 
 
+class KaraKaraResourceMixin():
+    @property
+    def queue_id(self):
+        queue_context = pyramid.traversal.find_interface(self, QueueContext)
+        if queue_context:
+            return queue_context.id
+        return None
+
+
 class QueueContext():
     name = 'queue'
 
-    def __getitem__(self, key):
-        return {
-            'track': TrackContext(),
-            'track_list': TrackListContext(),
-        }[key]
+    def __init__(self, parent=None, id=None):
+        self.__parent__ = parent
+        self.id = id
+
+    def __getitem__(self, id=None):
+        if self.id:
+            return {
+                'track': TrackContext(parent=self),
+                'track_list': TrackListContext(parent=self),
+            }[id]
+        return QueueContext(parent=self, id=id)
 
 
-class TrackContext():
+class TrackContext(KaraKaraResourceMixin):
     name = 'track'
 
     def __init__(self, parent=None, id=None):
@@ -45,7 +61,8 @@ class ComunityContext():
 
 
 class TrackListContext():
-    pass
+    def __init__(self, parent=None):
+        self.__parent__ = parent
 
 
 class TrackImportContext():
