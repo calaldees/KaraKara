@@ -1,21 +1,24 @@
 import os
 import re
 import operator
+from functools import partial
 
 # Pyramid imports
 import pyramid.events
-from pyramid.config import Configurator
-from pyramid.request import Request
+import pyramid.request
+import pyramid.config
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
 from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
-from externals.lib.pyramid_helpers.auto_format import registered_formats
+from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater
+from externals.lib.pyramid_helpers.session_identity2 import session_identity
 from externals.lib.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
 
 # Package Imports
+from .traversal import TraversalGlobalRootFactory
 from .templates import helpers as template_helpers
 from .auth import ComunityUserStore, NullComunityUserStore
 # SQLAlchemy imports
@@ -26,11 +29,6 @@ import logging
 log = logging.getLogger(__name__)
 
 translation_string_factory = TranslationStringFactory('karakara')
-
-# HACK! - Monkeypatch Mako 0.8.1 - HACK!
-#import mako.filters
-#html_escape_mako = mako.filters.html_escape
-#mako.filters.html_escape = lambda s: html_escape_mako(str(s) if not isinstance(s, str) else s)
 
 
 def main(global_config, **settings):
@@ -43,7 +41,7 @@ def main(global_config, **settings):
     init_DBSession(settings)
 
     # Pyramid Global Settings
-    config = Configurator(settings=settings)  # , autocommit=True
+    config = pyramid.config.Configurator(settings=settings, root_factory=TraversalGlobalRootFactory)  # , autocommit=True
 
     def assert_settings_keys(keys):
         for settings_key in key:
@@ -65,6 +63,10 @@ def main(global_config, **settings):
     for key in config.registry.settings.keys():
         value = os.getenv(key.replace('.', '_').upper(), '') or config.registry.settings[key]
         config.registry.settings[key] = convert_str_with_type(value)
+
+    config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'faves', 'user'}), 'session_identity', reify=True)
+
+    setup_pyramid_autoformater(config)
 
     # i18n
     config.add_translation_dirs(config.registry.settings['i18n.translation_dirs'])
@@ -95,7 +97,7 @@ def main(global_config, **settings):
     if config.registry.settings.get('karakara.websocket.port'):
         def authenticator(key):
             """Only admin authenticated keys can connect to the websocket"""
-            request = Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
+            request = pyramid.request.Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
             session_data = session_factory(request)
             return session_data and session_data.get('admin')
         try:
@@ -182,10 +184,10 @@ def main(global_config, **settings):
 
     # Routes
     def append_format_pattern(route):
-        return re.sub(r'{(.*)}', r'{\1:[^/\.]+}', route) + r'{spacer:[.]?}{format:(%s)?}' % '|'.join(registered_formats())
+        return re.sub(r'{(.*)}', r'{\1:[^/\.]+}', route) #+ r'{spacer:[.]?}{format:(%s)?}' % '|'.join(registered_formats())
 
     config.add_route('home'          , append_format_pattern('/')              )
-    config.add_route('track'         , append_format_pattern('/track/{id}')    )
+    #config.add_route('track'         , append_format_pattern('/track/{id}')    )
     config.add_route('track_list'    , append_format_pattern('/track_list')    )
     config.add_route('track_import'  , append_format_pattern('/track_import')  )
     config.add_route('queue'         , append_format_pattern('/queue')         )

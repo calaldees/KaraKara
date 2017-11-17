@@ -21,7 +21,7 @@ from ..templates.helpers import track_title
 from sqlalchemy.orm import joinedload, defer  # , joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
-from .tracks import invalidate_track
+from .track import invalidate_track
 
 import logging
 log = logging.getLogger(__name__)

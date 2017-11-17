@@ -1,23 +1,19 @@
 import random
 
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
-
-from sqlalchemy.orm import joinedload
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from externals.lib.misc import subdict, first
 from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
 from ._logic import queue_item_for_track
-from .search import restrict_search
 
 from ..model import DBSession
 from ..model.actions import get_track_dict_full
 from ..model.model_tracks import Track
-#from ..model.model_queue  import QueueItem
 
-from ..templates.helpers import tag_hireachy, track_title, track_url
+from ..templates.helpers import track_title, track_url
 
 import logging
 log = logging.getLogger(__name__)
@@ -35,13 +31,16 @@ def invalidate_track(id):
     cache.delete(track_key(id))
     global track_version
     if id not in track_version:
-        track_version[id] = random.randint(0,65535)
+        track_version[id] = random.randint(0, 65535)  # TODO: this is nieve that we don't have overlapping id's
     track_version[id] += 1
+def get_trackid_from_request(request):
+    # TODO: Pollyfill for url_dispatch and traversal. Can probably be reduced to context.id in the future
+    return (request.matchdict.get('id') if request.matchdict else None) or request.context.id
 def generate_cache_key_track(request):
     global track_version
     return '-'.join([
         generate_cache_key(request),
-        str(track_version.get(request.matchdict['id'],-1)),
+        str(track_version.get(get_trackid_from_request(request), -1)),
         str(request.registry.settings.get('karakara.system.user.readonly')),
     ])
 
@@ -50,7 +49,7 @@ def generate_cache_key_track(request):
 # Track
 #-------------------------------------------------------------------------------
 
-@view_config(route_name='track')
+@view_config(context='karakara.traversal.TrackContext')
 @etag_decorator(generate_cache_key_track)
 @web
 def track_view(request):
@@ -69,7 +68,9 @@ def track_view(request):
      which is invalidatated on shutdown,
      but if we were going to use memcache or redis then this is nessisary)
     """
-    id = request.matchdict['id']
+    id = get_trackid_from_request(request)
+    if not id:
+        raise HTTPNotFound()
 
     # Search, find and redirect for shortened track id's
     # This is kind of a hack to allow id's shorter than 64 characters in tests
@@ -111,56 +112,3 @@ def track_view(request):
 
     return action_ok(data={'track': track})
 
-
-#@view_config(route_name='track_list')
-#@etag(tracks_etag)
-#@web
-#def track_list(request):
-#    """
-#    Browse tracks
-#    """
-#    #track_list = []
-#    #for track in DBSession.query(Track).all():
-#    #    track_list.append(track.id)
-#    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
-
-def track_list_cache_key(request):
-    '{0}-{1}-{2}'.format(
-        generate_cache_key(request),
-        request.registry.settings.get('karakara.search.tag.silent_forced', []),
-        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
-    )
-
-
-@view_config(route_name='track_list')
-@etag_decorator(track_list_cache_key)
-@web
-#@admin_only
-def track_list_all(request):
-    """
-    Return a list of every track in the system (typically for printing)
-    """
-    log.info('track_list')
-
-    tracks = DBSession.query(Track).options(
-        joinedload(Track.tags),
-        joinedload('tags.parent'),
-        #defer(Track.lyrics),
-    )
-    tracks = restrict_search(request, tracks)
-    track_list = [track.to_dict(include_fields='tags') for track in tracks]
-
-    # The id is very long and not sutable for a printed list.
-    # We derive a truncated id specially for this printed list
-    short_id_length = request.registry.settings.get('karakara.print_tracks.short_id_length', 6)
-    for track in track_list:
-        track['id_short'] = track['id'][:short_id_length]
-
-    # Sort track list
-    #  this needs to be handled at the python layer because the tag logic is fairly compicated
-    fields = request.registry.settings.get('karakara.print_tracks.fields',[])
-    def key_track(track):
-        return " ".join([tag_hireachy(track['tags'], field) for field in fields])
-    track_list = sorted(track_list, key=key_track)
-
-    return action_ok(data={'list': track_list})

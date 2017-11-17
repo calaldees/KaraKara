@@ -20,7 +20,7 @@ from ..model.actions import last_update
 
 from . import web, action_ok, action_error, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity
 
-from ..views.tracks import invalidate_track
+from ..views.track import invalidate_track
 from ..templates import helpers as h
 
 import logging
