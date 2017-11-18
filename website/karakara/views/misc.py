@@ -29,7 +29,7 @@ def generate_cache_key_homepage(request):
     ))
 
 
-@view_config(route_name='home')
+@view_config(context='karakara.traversal.TraversalGlobalRootFactory')
 @etag_decorator(generate_cache_key_homepage)
 @web
 def home(request):

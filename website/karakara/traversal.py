@@ -5,17 +5,19 @@ import pyramid.traversal
 
 
 class TraversalGlobalRootFactory():
+    __template__ = 'root'
+
     def __init__(self, request):
         pass
 
     def __getitem__(self, key):
         return {
-            'queue': QueueContext(parent=self),
-            'track': TrackContext(parent=self),  # Admin only for all tracks
-            #'track_list': TrackListContext(),  # Admin only for all tracks
+            'queue': QueueContext,
+            'track': TrackContext,  # Admin only for all tracks
+            'track_list': TrackListContext,  # Admin only for all tracks
             #'comunity': ComunityContext(),
             #'track_import': TrackImportContext(),  # Needs secure permissions
-        }[key]
+        }[key](parent=self)
 
 
 class KaraKaraResourceMixin():
@@ -28,39 +30,49 @@ class KaraKaraResourceMixin():
 
 
 class QueueContext():
-    name = 'queue'
+    __template__ = 'queue_home'
 
     def __init__(self, parent=None, id=None):
         self.__parent__ = parent
         self.id = id
 
-    def __getitem__(self, id=None):
+    def __getitem__(self, key=None):
         if self.id:
             return {
-                'track': TrackContext(parent=self),
-                'track_list': TrackListContext(parent=self),
-            }[id]
-        return QueueContext(parent=self, id=id)
+                'track': TrackContext,
+                'track_list': TrackListContext,
+                'queue_items': QueueItemsContext,
+            }[key](parent=self)
+        return QueueContext(parent=self, id=key)
+
+
+class QueueItemsContext():
+    __template__ = 'queue_items'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
 
 
 class TrackContext(KaraKaraResourceMixin):
-    name = 'track'
+    __template__ = 'track'
 
     def __init__(self, parent=None, id=None):
         self.__parent__ = parent
         self.id = id
 
-    def __getitem__(self, id):
+    def __getitem__(self, key):
         if self.id:
             raise KeyError()
-        return TrackContext(parent=self, id=id)
+        return TrackContext(parent=self, id=key)
 
 
 class ComunityContext():
-    name = 'comunity'
+    __template__ = 'comunity'
 
 
 class TrackListContext():
+    __template__ = 'track_list'
+
     def __init__(self, parent=None):
         self.__parent__ = parent
 
