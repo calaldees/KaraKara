@@ -7,6 +7,7 @@ from functools import partial
 import pyramid.events
 import pyramid.request
 import pyramid.config
+import pyramid.traversal
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
@@ -190,7 +191,7 @@ def main(global_config, **settings):
     #config.add_route('track'         , append_format_pattern('/track/{id}')    )
     #config.add_route('track_list'    , append_format_pattern('/track_list')    )
     config.add_route('track_import'  , append_format_pattern('/track_import')  )
-    config.add_route('queue'         , append_format_pattern('/queue')         )
+    #config.add_route('queue'         , append_format_pattern('/queue')         )
     config.add_route('priority_tokens', append_format_pattern('/priority_tokens'))
     config.add_route('fave'          , append_format_pattern('/fave')          )
     config.add_route('message'       , append_format_pattern('/message')          )
@@ -242,3 +243,4 @@ def add_render_globals_to_template(event):
     event['_'] = request.translate
     event['localizer'] = request.localizer
     event['h'] = template_helpers
+    event['traversal'] = pyramid.traversal

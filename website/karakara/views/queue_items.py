@@ -51,14 +51,15 @@ def generate_cache_key_queue(request):
 # Queue
 #-------------------------------------------------------------------------------
 
-@view_config(route_name='queue', request_method='GET')
+#@view_config(route_name='queue', request_method='GET')
+@view_config(context='karakara.traversal.QueueItemsContext', request_method='GET')
 @etag_decorator(generate_cache_key_queue)
 @web
 def queue_view(request):
     """
     view current queue
     """
-
+    import pdb ; pdb.set_trace()
     def get_queue_dict():
         log.debug('cache gen - queue {0}'.format(queue_version))
 
@@ -124,7 +125,8 @@ def queue_view(request):
     return action_ok(data=queue_data)
 
 
-@view_config(route_name='queue', request_method='POST')
+#@view_config(route_name='queue', request_method='POST')
+@view_config(context='karakara.traversal.QueueItemsContext', request_method='POST')
 @web
 @modification_action
 def queue_item_add(request):
@@ -241,7 +243,8 @@ def queue_item_add(request):
     return action_ok(message='track queued', data={'queue_item.id': ''}, code=201)  # TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
 
 
-@view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
+#@view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
+@view_config(context='karakara.traversal.QueueItemsContext', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')))
 @web
 @modification_action
 def queue_item_del(request):
@@ -278,7 +281,8 @@ def queue_item_del(request):
     return action_ok(message='queue_item status changed')
 
 
-@view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
+#@view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
+@view_config(context='karakara.traversal.QueueItemsContext', custom_predicates=(method_put_router,))
 @web
 @modification_action
 def queue_item_update(request):

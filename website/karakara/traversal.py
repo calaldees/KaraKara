@@ -5,7 +5,8 @@ import pyramid.traversal
 
 
 class TraversalGlobalRootFactory():
-    __template__ = 'root'
+    __template__ = 'home'
+    __name__ = ''
 
     def __init__(self, request):
         pass
@@ -31,10 +32,13 @@ class KaraKaraResourceMixin():
 
 class QueueContext():
     __template__ = 'queue_home'
+    __name__ = 'queue'
 
     def __init__(self, parent=None, id=None):
         self.__parent__ = parent
         self.id = id
+        if self.id:
+            self.__name__ = self.id
 
     def __getitem__(self, key=None):
         if self.id:
@@ -48,6 +52,7 @@ class QueueContext():
 
 class QueueItemsContext():
     __template__ = 'queue_items'
+    __name__ = 'queue_items'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
@@ -55,10 +60,13 @@ class QueueItemsContext():
 
 class TrackContext(KaraKaraResourceMixin):
     __template__ = 'track'
+    __name__ = 'track'
 
     def __init__(self, parent=None, id=None):
         self.__parent__ = parent
         self.id = id
+        if self.id:
+            self.__name__ = self.id
 
     def __getitem__(self, key):
         if self.id:

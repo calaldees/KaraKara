@@ -4,33 +4,14 @@ from pyramid.httpexceptions import HTTPFound
 
 from externals.lib.log import log_event
 
-from . import web, action_ok, action_error, admin_only, etag_decorator, generate_cache_key
+from . import web, action_ok, action_error, admin_only
 
 
 import logging
 log = logging.getLogger(__name__)
 
 
-#-------------------------------------------------------------------------------
-# Misc
-#-------------------------------------------------------------------------------
-
-def generate_cache_key_homepage(request):
-    """
-    Custom etag for homepage
-    The homepage template has a few if statements to display various buttons
-    The buttons can be disables in settings.
-    This custom etag takes all 'if' statements in the homepage template    
-    """
-    return '-'.join((
-        generate_cache_key(request),
-        str(request.registry.settings.get('karakara.template.menu.disable')),
-        str(bool(request.session.get('faves', [])) and request.registry.settings.get('karakara.faves.enabled')),
-    ))
-
-
 @view_config(context='karakara.traversal.TraversalGlobalRootFactory')
-@etag_decorator(generate_cache_key_homepage)
 @web
 def home(request):
     # Short term hack. Do not allow normal root page in commuity mode - redirect to comunity
