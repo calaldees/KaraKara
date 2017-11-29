@@ -23,14 +23,18 @@ class TraversalGlobalRootFactory():
 
 class KaraKaraResourceMixin():
     @property
+    def queue_context(self):
+        return pyramid.traversal.find_interface(self, QueueContext)
+
+    @property
     def queue_id(self):
-        queue_context = pyramid.traversal.find_interface(self, QueueContext)
-        if queue_context:
-            return queue_context.id
-        return None
+        try:
+            return self.queue_context.id
+        except AttributeError:
+            pass
 
 
-class QueueContext():
+class QueueContext(KaraKaraResourceMixin):
     __template__ = 'queue_home'
     __name__ = 'queue'
 
@@ -50,7 +54,7 @@ class QueueContext():
         return QueueContext(parent=self, id=key)
 
 
-class QueueItemsContext():
+class QueueItemsContext(KaraKaraResourceMixin):
     __template__ = 'queue_items'
     __name__ = 'queue_items'
 

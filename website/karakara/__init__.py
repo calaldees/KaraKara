@@ -13,7 +13,7 @@ from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
 from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
-from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater
+from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from externals.lib.pyramid_helpers.session_identity2 import session_identity
 from externals.lib.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
 from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
@@ -65,9 +65,24 @@ def main(global_config, **settings):
         value = os.getenv(key.replace('.', '_').upper(), '') or config.registry.settings[key]
         config.registry.settings[key] = convert_str_with_type(value)
 
+    # Session identity
     config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'faves', 'user'}), 'session_identity', reify=True)
 
+    # Setup Autoformat view processor
     setup_pyramid_autoformater(config)
+
+    @post_view_dict_augmentation.register_pre_render_decorator()
+    def add_paths_to_response(request, response):
+        response['paths'] = {
+            'context': pyramid.traversal.resource_path(request.context),
+            'queue': '',
+        }
+        try:
+            queue_context = request.context.queue_context
+            if queue_context:
+                response['paths']['queue'] = pyramid.traversal.resource_path(queue_context)
+        except AttributeError:
+            pass
 
     # i18n
     config.add_translation_dirs(config.registry.settings['i18n.translation_dirs'])
