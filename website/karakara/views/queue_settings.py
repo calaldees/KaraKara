@@ -35,3 +35,13 @@ karakara.search.list.alphabetical.threshold = 90 -> int
 karakara.search.list.alphabetical.tags = [from, artist]
 
 """
+from pyramid.view import view_config
+
+from . import action_ok, action_error
+
+
+@view_config(context='karakara.traversal.QueueSettingsContext', request_method='GET')
+def queue_view(request):
+    return action_ok(data={
+        'settings': {}
+    })

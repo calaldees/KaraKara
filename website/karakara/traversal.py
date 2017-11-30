@@ -4,7 +4,15 @@
 import pyramid.traversal
 
 
-class TraversalGlobalRootFactory():
+class NextContextMixin():
+    def next_context(self, key, context_classs):
+        return {
+            context_class().__name__: context_class  # TODO: Help?! I need to instantiate context_class to get it's __name__, else __name__ is the ClassName .. which I do not want!!
+            for context_class in context_classs
+        }[key](parent=self)
+
+
+class TraversalGlobalRootFactory(NextContextMixin):
     __template__ = 'home'
     __name__ = ''
 
@@ -12,13 +20,16 @@ class TraversalGlobalRootFactory():
         pass
 
     def __getitem__(self, key):
-        return {
-            'queue': QueueContext,
-            'track': TrackContext,  # Admin only for all tracks
-            'track_list': TrackListContext,  # Admin only for all tracks
-            #'comunity': ComunityContext(),
-            #'track_import': TrackImportContext(),  # Needs secure permissions
-        }[key](parent=self)
+        return self.next_context(
+            key,
+            (
+                QueueContext,
+                TrackContext,  # Admin only for all tracks
+                TrackListContext,  # Admin only for all tracks
+                #ComunityContext
+                #TrackImportContext # Needs secure permissions
+            )
+        )
 
 
 class KaraKaraResourceMixin():
@@ -34,7 +45,7 @@ class KaraKaraResourceMixin():
             pass
 
 
-class QueueContext(KaraKaraResourceMixin):
+class QueueContext(KaraKaraResourceMixin, NextContextMixin):
     __template__ = 'queue_home'
     __name__ = 'queue'
 
@@ -46,17 +57,29 @@ class QueueContext(KaraKaraResourceMixin):
 
     def __getitem__(self, key=None):
         if self.id:
-            return {
-                'track': TrackContext,
-                'track_list': TrackListContext,
-                'queue_items': QueueItemsContext,
-            }[key](parent=self)
+            return self.next_context(
+                key,
+                (
+                    TrackContext,
+                    TrackListContext,
+                    QueueItemsContext,
+                    QueueSettingsContext,
+                )
+            )
         return QueueContext(parent=self, id=key)
 
 
 class QueueItemsContext(KaraKaraResourceMixin):
     __template__ = 'queue_items'
     __name__ = 'queue_items'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class QueueSettingsContext(KaraKaraResourceMixin):
+    __template__ = 'queue_settings'
+    __name__ = 'settings'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
@@ -80,10 +103,12 @@ class TrackContext(KaraKaraResourceMixin):
 
 class ComunityContext():
     __template__ = 'comunity'
+    __name__ = 'comunity'
 
 
 class TrackListContext():
     __template__ = 'track_list'
+    __name__ = 'track_list'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
