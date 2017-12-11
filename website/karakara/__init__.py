@@ -13,6 +13,7 @@ from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
 from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
+from externals.lib.pyramid_helpers.cache_manager import setup_pyramid_cache_manager
 from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from externals.lib.pyramid_helpers.session_identity2 import session_identity
 from externals.lib.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
@@ -68,6 +69,8 @@ def main(global_config, **settings):
     # Session identity
     config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'faves', 'user'}), 'session_identity', reify=True)
 
+    # Setup Cache Manager config in view
+    setup_pyramid_cache_manager(config)
     # Setup Autoformat view processor
     setup_pyramid_autoformater(config)
 

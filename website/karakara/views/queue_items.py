@@ -1,13 +1,13 @@
 import datetime
-import random
 from functools import partial
+
 
 from pyramid.view import view_config
 
 from externals.lib.misc import now, subdict
 from externals.lib.log import log_event
 
-from . import web, action_ok, action_error, etag_decorator, cache, generate_cache_key, method_delete_router, method_put_router, is_admin, modification_action, admin_only
+from . import web, action_ok, action_error, etag_decorator, cache_manager, method_delete_router, method_put_router, is_admin, modification_action, admin_only
 from . import _logic
 
 from ..model import DBSession, commit
@@ -21,30 +21,27 @@ from ..templates.helpers import track_title
 from sqlalchemy.orm import joinedload, defer  # , joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
-from .track import invalidate_track
+#from .track import invalidate_track
 
 import logging
 log = logging.getLogger(__name__)
 
 
-#-------------------------------------------------------------------------------
-# Cache Management
-#-------------------------------------------------------------------------------
-QUEUE_CACHE_KEY = 'queue'
 
-queue_version = random.randint(0, 2000000000)
-def invalidate_queue(request=None):
-    commit() # Before invalidating any cache data, ensure the new data is persisted
-    global queue_version
-    queue_version += 1
-    cache.delete(QUEUE_CACHE_KEY)
-    if request:
-        request.registry['socket_manager'].recv('queue_updated'.encode('utf-8'))
+def socket_update_queue_items_event(request):
+    # TODO: This needs to incorporate the alert for the specific queue_id
+    request.registry['socket_manager'].recv('queue_updated'.encode('utf-8'))
+#cache_manager.get('queue_items').register_invalidate_callback(socket_update_queue_items_event, ('request', ))
 
-#invalidate_queue()
-def generate_cache_key_queue(request):
-    global queue_version
-    return '-'.join([generate_cache_key(request), str(queue_version)])
+def get_track_cache_manager(queue_id, track_id):
+    return cache_manager.get(f'queue-{queue_id}-track-{track_id}')
+
+def invalidate_cache(request, track_id):
+    get_queue_cache_manager(request.context.queue_id).invalidate(request=request)
+    get_track_cache_manager(request.context.queue_id, track_id).invalidate(request=request)
+
+def acquire_cache_manager_func(request):
+    return cache_manager.get(f'queue-{request.context.queue_id}')
 
 
 #-------------------------------------------------------------------------------
@@ -52,14 +49,16 @@ def generate_cache_key_queue(request):
 #-------------------------------------------------------------------------------
 
 #@view_config(route_name='queue', request_method='GET')
-@view_config(context='karakara.traversal.QueueItemsContext', request_method='GET')
-@etag_decorator(generate_cache_key_queue)
+@view_config(
+    context='karakara.traversal.QueueItemsContext',
+    request_method='GET',
+    acquire_cache_manager_func=acquire_cache_manager_func,
+)
 @web
 def queue_view(request):
     """
     view current queue
     """
-    import pdb ; pdb.set_trace()
     def get_queue_dict():
         log.debug('cache gen - queue {0}'.format(queue_version))
 
@@ -121,8 +120,7 @@ def queue_view(request):
 
         return {'queue': queue_dicts, 'queue_split_indexs': split_indexs}
 
-    queue_data = cache.get_or_create(QUEUE_CACHE_KEY, get_queue_dict)
-    return action_ok(data=queue_data)
+    return action_ok(data=get_queue_cache_manager(request).get_or_create(get_queue_dict))
 
 
 #@view_config(route_name='queue', request_method='POST')
@@ -237,8 +235,7 @@ def queue_item_add(request):
     _log_event(status='ok', track_id=queue_item.track_id, performer_name=queue_item.performer_name)
     #log.info('add - %s to queue by %s' % (queue_item.track_id, queue_item.performer_name))
 
-    invalidate_queue(request)  # Invalidate Cache
-    invalidate_track(track_id)
+    invalidate_cache(request, track_id)
 
     return action_ok(message='track queued', data={'queue_item.id': ''}, code=201)  # TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
 
@@ -275,8 +272,7 @@ def queue_item_del(request):
     #log.info('remove - %s from queue' % (queue_item.track_id))
     queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
 
-    invalidate_queue(request)  # Invalidate Cache
-    invalidate_track(queue_item_track_id)
+    invalidate_cache(request, queue_item_track_id)
 
     return action_ok(message='queue_item status changed')
 
@@ -343,8 +339,7 @@ def queue_item_update(request):
 
     queue_item_track_id = queue_item.track_id
 
-    invalidate_queue(request)  # Invalidate Cache
-    invalidate_track(queue_item_track_id)
+    invalidate_cache(request, queue_item_track_id)
 
     return action_ok(message='queue_item updated')
 

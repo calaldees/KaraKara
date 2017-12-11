@@ -42,6 +42,7 @@ from . import action_ok, action_error
 
 @view_config(context='karakara.traversal.QueueSettingsContext', request_method='GET')
 def queue_view(request):
+    #if not request.context.queue_id
     return action_ok(data={
         'settings': {}
     })

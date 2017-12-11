@@ -12,7 +12,7 @@ __all__ = [
     'web', 'action_ok', 'action_error',  #'auto_format_output'
     'etag','etag_decorator', #'etag_generate'
     'method_delete_router', 'method_put_router',
-    'cache', 'cache_none',
+    'cache_manager', 'cache_none',
     'max_age',
 ]
 
@@ -24,9 +24,38 @@ __all__ = [
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE as cache_none
 
-cache = make_region().configure(
+cache_store = make_region().configure(
     'dogpile.cache.memory'
 )
+
+
+
+#-------------------------------------------------------------------------------
+# Cache Management
+#-------------------------------------------------------------------------------
+
+
+def _cache_key_etag_expire(request):
+    cache_bust = request.registry.settings.get('server.etag.cache_buster', ''),
+    etag_expire = normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime(),
+    return f'{cache_bust}-{etag_expire}'
+
+
+def _cache_key_identity_admin(request):
+    if request.session.peek_flash():
+        raise LookupError  # Response is not cacheable/indexable if there is a custom flash message
+    return is_admin(request)
+
+
+cache_manager = CacheManager(
+    cache_store=cache_store,
+    default_cache_key_generators=(
+        CacheFunctionWrapper(_cache_key_etag_expire, ('request', ))
+        CacheFunctionWrapper(_cache_key_identity_admin, ('request', ))
+    ),
+)
+
+
 
 
 web = decorator_combine(
