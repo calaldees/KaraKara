@@ -81,7 +81,7 @@ def track_delete(request):
     for track_id in _get_json_request(request):
         if track_id in existing_track_ids:
             delete_track(track_id)
-            log.info(f'Delete: {track_id}')
+            log.info('Delete: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
         else:
-            log.warning(f'NotExists: {track_id}')
+            log.warning('NotExists: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
     return action_ok()

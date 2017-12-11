@@ -30,7 +30,7 @@ def _track_api(host, data={}, method='GET'):
     return json.loads(
         urllib.request.urlopen(
             urllib.request.Request(
-                f'http://{host}/track_import?format=json',
+                'http://{host}/track_import?format=json'.format(host=host),  # TODO: replace with formatstring
                 data=json.dumps(data).encode('utf8'),
                 headers={'content-type': 'application/json'},
                 method=method,
@@ -69,10 +69,10 @@ def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, e
         raise TrackMissingProcessedFiles(id=m.source_hash in existing_track_ids and m.source_hash)
 
     if m.source_hash in existing_track_ids:
-        log.debug(f'Exists: {name}')
+        log.debug('Exists: {name}'.format(name=name))  # TODO: replace with formatstring
         return
 
-    log.debug(f'Import: {name}')
+    log.debug('Import: {name}'.format(name=name))  # TODO: replace with formatstring
 
     def _get_attachments():
         return [
@@ -128,7 +128,7 @@ def import_media(**kwargs):
     tracks_to_add = []
     track_ids_to_delete = []
 
-    log.info(f'Importing tracks - Existing:{len(existing_track_ids)} Processed{len(processed_track_ids)}')
+    log.info('Importing tracks - Existing:{} Processed{}'.format(len(existing_track_ids), len(processed_track_ids)))  # TODO: replace with formatstring
     for name in progress_bar(meta_manager.meta.keys()):
         try:
             track = generate_track_dict(name)
