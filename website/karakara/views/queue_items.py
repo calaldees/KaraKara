@@ -33,15 +33,12 @@ def socket_update_queue_items_event(request):
     request.registry['socket_manager'].recv('queue_updated'.encode('utf-8'))
 #cache_manager.get('queue_items').register_invalidate_callback(socket_update_queue_items_event, ('request', ))
 
-def get_track_cache_manager(queue_id, track_id):
-    return cache_manager.get(f'queue-{queue_id}-track-{track_id}')
+def acquire_cache_bucket_func(request):
+    return cache_manager.get(f'queue-{request.context.queue_id}')
 
 def invalidate_cache(request, track_id):
-    get_queue_cache_manager(request.context.queue_id).invalidate(request=request)
-    get_track_cache_manager(request.context.queue_id, track_id).invalidate(request=request)
-
-def acquire_cache_manager_func(request):
-    return cache_manager.get(f'queue-{request.context.queue_id}')
+    request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
+    cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
 
 
 #-------------------------------------------------------------------------------
@@ -52,7 +49,7 @@ def acquire_cache_manager_func(request):
 @view_config(
     context='karakara.traversal.QueueItemsContext',
     request_method='GET',
-    acquire_cache_manager_func=acquire_cache_manager_func,
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
 @web
 def queue_view(request):
@@ -120,7 +117,7 @@ def queue_view(request):
 
         return {'queue': queue_dicts, 'queue_split_indexs': split_indexs}
 
-    return action_ok(data=get_queue_cache_manager(request).get_or_create(get_queue_dict))
+    return action_ok(data=request.cache_bucket.get_or_create(get_queue_dict))
 
 
 #@view_config(route_name='queue', request_method='POST')
@@ -270,9 +267,8 @@ def queue_item_del(request):
 
     _log_event(status='ok', track_id=queue_item.track_id)
     #log.info('remove - %s from queue' % (queue_item.track_id))
-    queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
-
-    invalidate_cache(request, queue_item_track_id)
+    #queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
+    invalidate_cache(request, queue_item.track_id)
 
     return action_ok(message='queue_item status changed')
 
@@ -337,9 +333,7 @@ def queue_item_update(request):
     #log.info('update - %s' % (queue_item.track_id))
     _log_event(status='ok', track_id=queue_item.track_id)
 
-    queue_item_track_id = queue_item.track_id
-
-    invalidate_cache(request, queue_item_track_id)
+    invalidate_cache(request, queue_item.track_id)
 
     return action_ok(message='queue_item updated')
 
