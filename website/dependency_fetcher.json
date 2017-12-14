@@ -89,6 +89,7 @@
             "pyramid_helpers/__init__.py",
             "pyramid_helpers/auto_format2.py",
             "pyramid_helpers/etag.py",
+            "pyramid_helpers/cache_manager.py",
             "pyramid_helpers/session_identity2.py",
             "pyramid_helpers/views/__init__.py",
             "pyramid_helpers/views/upload.py",

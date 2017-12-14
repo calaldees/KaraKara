@@ -4,6 +4,7 @@ from externals.lib.misc import decorator_combine
 
 from externals.lib.pyramid_helpers import request_from_args, mark_external_request, method_delete_router, method_put_router, max_age, gzip
 from externals.lib.pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default
+from externals.lib.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper
 from externals.lib.pyramid_helpers.auto_format2 import action_ok, action_error
 
 #from .message import overlay_messages
@@ -28,6 +29,7 @@ cache_store = make_region().configure(
     'dogpile.cache.memory'
 )
 
+cache = cache_store  # TODO: remove passing alias
 
 
 #-------------------------------------------------------------------------------
@@ -50,8 +52,8 @@ def _cache_key_identity_admin(request):
 cache_manager = CacheManager(
     cache_store=cache_store,
     default_cache_key_generators=(
-        CacheFunctionWrapper(_cache_key_etag_expire, ('request', ))
-        CacheFunctionWrapper(_cache_key_identity_admin, ('request', ))
+        CacheFunctionWrapper(_cache_key_etag_expire, ('request', )),
+        CacheFunctionWrapper(_cache_key_identity_admin, ('request', )),
     ),
 )
 
