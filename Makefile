@@ -47,7 +47,7 @@ docker_run_comunity:
 #del_osx_cancer:
 #	find ~/Applications/KaraKara/files/ -iname \.DS_Store -delete
 
-RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --update --inplace --partial --exclude '.*' --exclude 'backup'
+RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --inplace --partial --append-verify --exclude '.*' --exclude 'backup'
 #--partial --update --copy-links --checksum --update --bwlimit=100
 RSYNC_LOCAL:=~/Applications/KaraKara/files/
 RSYNC_REMOTE:=calaldees@violet.shishnet.org:/data/media_upload/
