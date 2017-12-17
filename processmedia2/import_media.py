@@ -168,7 +168,7 @@ def import_media(**kwargs):
 # Main -------------------------------------------------------------------------
 
 def additional_arguments(parser):
-    parser.add_argument('--api_host', action='store', help='', default='localhost:6543')
+    parser.add_argument('--api_host', action='store', help='', default='')
     parser.add_argument('--stat_limit', type=int, help='Max number of metanames to display in summary before replacing them with a count', default=100)
 
 
