@@ -155,7 +155,11 @@ def import_media(**kwargs):
         stats['db_removed'].append(existing_tracks[unneeded_track_id])
         track_ids_to_delete.append(unneeded_track_id)
 
-    log.info(f"""{kwargs['api_host']} -> Add:{len(tracks_to_add)} Delete:{len(track_ids_to_delete)}""")
+    log.info("""{api_host} -> Add:{add_count} Delete:{delete_count}""".format(
+        api_host=kwargs['api_host'],
+        add_count=len(tracks_to_add),
+        delete_count=len(track_ids_to_delete),
+    ))  # TODO: replace with formatstring
     #track_api(tracks_to_add, method='POST')
     track_api(track_ids_to_delete, method='DELETE')
 
