@@ -37,12 +37,34 @@ karakara.search.list.alphabetical.tags = [from, artist]
 """
 from pyramid.view import view_config
 
-from . import action_ok, action_error
+from . import action_ok, action_error, cache_manager
+
+from ..model import DBSession, commit
+from ..model.model_queue import QueueSetting
+
+import logging
+log = logging.getLogger(__name__)
 
 
-@view_config(context='karakara.traversal.QueueSettingsContext', request_method='GET')
+def acquire_cache_bucket_func(request):
+    return cache_manager.get(f'queue-settings-{request.context.queue_id}')
+
+
+@view_config(
+    context='karakara.traversal.QueueSettingsContext',
+    request_method='GET',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
+)
 def queue_view(request):
-    #if not request.context.queue_id
-    return action_ok(data={
-        'settings': {}
-    })
+
+    def get_queue_settings_dict():
+        log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
+
+        queue_settings = {
+            queue_setting.key: queue_setting.value
+            for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
+        }
+
+        return {'settings': queue_settings}
+
+    return action_ok(data=request.cache_bucket.get_or_create(get_queue_settings_dict))
