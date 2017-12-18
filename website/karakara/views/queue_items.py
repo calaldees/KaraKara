@@ -217,10 +217,10 @@ def queue_item_add(request):
                 raise action_error(message=_('view.queue.add.token_limit'), code=400)
 
     queue_item = QueueItem()
-    queue_item.queue_id = 'PLACEHOLDER'
     for key, value in request.params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
+    queue_item.queue_id = request.context.queue_id
 
     # Set session owner - if admin allow manual setting of session_owner via params
     if is_admin(request) and queue_item.session_owner:
@@ -229,7 +229,7 @@ def queue_item_add(request):
         queue_item.session_owner = request.session['id']
 
     DBSession.add(queue_item)
-    _log_event(status='ok', track_id=queue_item.track_id, performer_name=queue_item.performer_name)
+    _log_event(status='ok', queue_id=queue_item.queue_id, track_id=queue_item.track_id, performer_name=queue_item.performer_name)
     #log.info('add - %s to queue by %s' % (queue_item.track_id, queue_item.performer_name))
 
     invalidate_cache(request, track_id)
@@ -238,7 +238,13 @@ def queue_item_add(request):
 
 
 #@view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
-@view_config(context='karakara.traversal.QueueItemsContext', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')))
+@view_config(
+    context='karakara.traversal.QueueItemsContext',
+    custom_predicates=(
+        method_delete_router,
+        lambda info, request: request.params.get('queue_item.id')
+    )
+)
 @web
 @modification_action
 def queue_item_del(request):
@@ -265,7 +271,7 @@ def queue_item_del(request):
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status', 'removed')
 
-    _log_event(status='ok', track_id=queue_item.track_id)
+    _log_event(status='ok', track_id=queue_item.track_id, queue_id=queue_item.queue_id)
     #log.info('remove - %s from queue' % (queue_item.track_id))
     #queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
     invalidate_cache(request, queue_item.track_id)
@@ -331,7 +337,7 @@ def queue_item_update(request):
     queue_item.time_touched = datetime.datetime.now()  # Update touched timestamp
 
     #log.info('update - %s' % (queue_item.track_id))
-    _log_event(status='ok', track_id=queue_item.track_id)
+    _log_event(status='ok', track_id=queue_item.track_id, queue_id=queue_item.queue_id)
 
     invalidate_cache(request, queue_item.track_id)
 
