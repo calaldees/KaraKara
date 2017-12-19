@@ -11,7 +11,7 @@ from pyramid.httpexceptions import HTTPFound
 
 from externals.lib.misc import update_dict
 from externals.lib.log import log_event
-from externals.lib.pyramid_helpers.auto_format import registered_formats
+#from externals.lib.pyramid_helpers.auto_format import registered_formats
 
 from . import web, cache, etag, action_ok, max_age   # generate_cache_key,
 
@@ -43,7 +43,8 @@ SearchParams = collections.namedtuple('SearchParams', ['tags', 'keywords', 'trac
 
 def get_search_params(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
-    url = re.sub('|'.join(['\.'+f for f in registered_formats()]), '', request.matchdict['tags'])
+    #url = re.sub('|'.join(['\.'+f for f in registered_formats()]), '', request.matchdict['tags'])
+    url = 'FIXME'
 
     try   : tags     = url.split('/')
     except: tags     = []

@@ -4,8 +4,12 @@ from externals.lib.misc import decorator_combine, normalize_datetime
 
 from externals.lib.pyramid_helpers import request_from_args, mark_external_request, method_delete_router, method_put_router, max_age, gzip
 from externals.lib.pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default
-from externals.lib.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper
+from externals.lib.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, patch_cache_bucket_decorator
 from externals.lib.pyramid_helpers.auto_format2 import action_ok, action_error
+
+import logging
+log = logging.getLogger(__name__)
+
 
 #from .message import overlay_messages
 
@@ -13,7 +17,7 @@ __all__ = [
     'web', 'action_ok', 'action_error',  #'auto_format_output'
     'etag','etag_decorator', #'etag_generate'
     'method_delete_router', 'method_put_router',
-    'cache_manager', 'cache_none',
+    'cache_manager', 'cache_none', 'patch_cache_bucket_decorator',
     'max_age',
 ]
 
@@ -22,14 +26,15 @@ __all__ = [
 # Global Variables
 #-------------------------------------------------------------------------------
 
-from dogpile.cache import make_region
+import dogpile.cache
 from dogpile.cache.api import NO_VALUE as cache_none
 
-cache_store = make_region().configure(
-    'dogpile.cache.memory'
+
+cache_store = dogpile.cache.make_region().configure(
+    backend='dogpile.cache.memory',
 )
 
-cache = cache_store  # TODO: remove passing alias
+cache = cache_store  # TODO: remove passing alias DEPRICATED!
 
 
 #-------------------------------------------------------------------------------

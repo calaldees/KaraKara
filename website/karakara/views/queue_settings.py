@@ -37,7 +37,7 @@ karakara.search.list.alphabetical.tags = [from, artist]
 """
 from pyramid.view import view_config
 
-from . import action_ok, action_error, cache_manager
+from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueSetting
@@ -55,7 +55,8 @@ def acquire_cache_bucket_func(request):
     request_method='GET',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-def queue_view(request):
+@patch_cache_bucket_decorator(acquire_cache_bucket_func=acquire_cache_bucket_func)
+def queue_settings_view(request):
 
     def get_queue_settings_dict():
         log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
@@ -67,4 +68,8 @@ def queue_view(request):
 
         return {'settings': queue_settings}
 
-    return action_ok(data=request.cache_bucket.get_or_create(get_queue_settings_dict))
+    import pdb ; pdb.set_trace()
+    return action_ok(
+        data=request.cache_bucket.get_or_create(get_queue_settings_dict)
+        #data=get_queue_settings_dict()
+    )

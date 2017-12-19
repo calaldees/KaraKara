@@ -1,6 +1,8 @@
 import datetime
 from functools import partial
 
+from sqlalchemy.orm import joinedload, defer  # , joinedload_all
+from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.view import view_config
 
@@ -18,8 +20,7 @@ from ..model.actions import get_track
 
 from ..templates.helpers import track_title
 
-from sqlalchemy.orm import joinedload, defer  # , joinedload_all
-from sqlalchemy.orm.exc import NoResultFound
+from .queue_settings import queue_settings_view
 
 #from .track import invalidate_track
 
@@ -102,6 +103,7 @@ def queue_view(request):
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
+        queue_settings = queue_settings_view(request)['data']
         split_markers = list(request.registry.settings.get('karakara.queue.group.split_markers'))
         time_padding = request.registry.settings.get('karakara.queue.track.padding')
         split_indexs = []
@@ -117,7 +119,10 @@ def queue_view(request):
 
         return {'queue': queue_dicts, 'queue_split_indexs': split_indexs}
 
-    return action_ok(data=request.cache_bucket.get_or_create(get_queue_dict))
+    return action_ok(
+        data=request.cache_bucket.get_or_create(get_queue_dict)
+        #data=get_queue_dict()
+    )
 
 
 #@view_config(route_name='queue', request_method='POST')
