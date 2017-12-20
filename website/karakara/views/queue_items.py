@@ -20,7 +20,7 @@ from ..model.actions import get_track
 
 from ..templates.helpers import track_title
 
-from .queue_settings import queue_settings_view
+from .queue_settings import queue_settings as get_queue_settings
 
 #from .track import invalidate_track
 
@@ -103,9 +103,9 @@ def queue_view(request):
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
-        queue_settings = queue_settings_view(request)['data']
-        split_markers = list(request.registry.settings.get('karakara.queue.group.split_markers'))
-        time_padding = request.registry.settings.get('karakara.queue.track.padding')
+        queue_settings = get_queue_settings(request)
+        split_markers = list(queue_settings.get('karakara.queue.group.split_markers'))
+        time_padding = queue_settings.get('karakara.queue.track.padding')
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
