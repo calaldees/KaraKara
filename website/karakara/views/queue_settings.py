@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 from externals.lib.misc import convert_str
 
-from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator
+from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueSetting
@@ -10,6 +10,7 @@ from ..model.model_queue import QueueSetting
 import logging
 log = logging.getLogger(__name__)
 
+# TODO: Translation strings for this file
 
 SETTINGS_TYPE_MAPPING = {
     'karakara.system.user.readonly': 'bool',
@@ -59,18 +60,59 @@ def queue_settings_view(request):
 
     def get_queue_settings_dict():
         log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
-
         queue_settings = {
             queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
             for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
         }
-
         return {'settings': queue_settings}
 
-    return action_ok(
-        data=request.cache_bucket.get_or_create(get_queue_settings_dict)
-        #data=get_queue_settings_dict()
-    )
+    return action_ok(data=request.cache_bucket.get_or_create(get_queue_settings_dict))
+
+
+@view_config(
+    context='karakara.traversal.QueueSettingsContext',
+    custom_predicates=(method_put_router, ),
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
+)
+def queue_settings_view_put(request):
+    if request.registry.settings.get('karakara.server.mode') != 'test' and not is_admin(request):
+        raise action_error(message='Settings modification for non admin users forbidden', code=403)
+
+    queue_setting_objs = {
+        queue_setting_obj.key: queue_setting_obj
+        for queue_setting_obj in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
+    }
+
+    def get_or_create_queue_settings_obj(key):
+        if key in queue_setting_objs:
+            return queue_setting_objs[key]
+        else:
+            queue_setting_obj = QueueSetting()
+            queue_setting_obj.queue_id == request.context.queue_id
+            DBSession.add(queue_setting_obj)
+            return queue_setting_obj
+
+    def is_valid(key, value):
+        try:
+            convert_str(value, SETTINGS_TYPE_MAPPING.get(key))
+            return True
+        except AssertionError:
+            return False
+
+    error_messages = []
+    for key, value in request.params:
+        if is_valid(key, value):
+            get_or_create_queue_settings_obj(key).value = value
+        else:
+            error_messages.append(f'{key}:{value} is not valid')
+    if error_messages:
+        raise action_error(messages=error_messages, code=400)
+
+    request.cache_bucket.invalidate()
+    log_event(request, method='update', admin=is_admin(request))
+    send_socket_message(request, 'settings')  # Ensure that the player interface is notified of an update
+
+    return action_ok(message='queue_settings updated')
 
 
 def queue_settings(request):

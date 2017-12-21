@@ -79,7 +79,7 @@ web = decorator_combine(
 
 # AllanC - need to look into Pyramids security model
 def is_admin(request):
-    return request.session.get('admin',False)  # request.session['admin']
+    return request.session.get('admin', False)  # request.session['admin']
 
 def is_comunity(request):
     return request.session.get('user',{}).get('approved', False)
