@@ -7,7 +7,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from pyramid.view import view_config
 
 from externals.lib.misc import now, subdict
-from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, etag_decorator, cache_manager, method_delete_router, method_put_router, is_admin, modification_action, admin_only
 from . import _logic
@@ -134,7 +133,7 @@ def queue_item_add(request):
     Add items to end of queue
     """
     _ = request.translate
-    _log_event = partial(log_event, request, method='add')
+    _log_event = partial(request.log_event, method='add')
 
     # Validation
     for field in ['track_id', 'performer_name']:

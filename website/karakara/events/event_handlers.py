@@ -3,7 +3,6 @@ import httpagentparser
 from pyramid.events import subscriber
 from externals.lib.pyramid_helpers.events import SessionCreated
 
-from externals.lib.log import log_event
 
 known_ip_address = set()
 
@@ -21,7 +20,6 @@ def session_created(event):
         return
     known_ip_address.add(ip)
 
-    log_event(
-        event.request,
+    event.request.log_event(
         device=httpagentparser.detect(event.request.environ.get('HTTP_USER_AGENT')),
     )

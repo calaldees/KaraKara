@@ -85,7 +85,6 @@
             "xml.py",
             "make_ini.py",
             "test.py",
-            "log.py",
             "pyramid_helpers/__init__.py",
             "pyramid_helpers/auto_format2.py",
             "pyramid_helpers/etag.py",

@@ -2,8 +2,6 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
 
-from externals.lib.log import log_event
-
 from . import web, action_ok, action_error, admin_only
 
 
@@ -33,7 +31,7 @@ def stats(request):
 def admin_lock(request):
     request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked', False)
     #log.debug('admin locked - {0}'.format(request.registry.settings['admin_locked']))
-    log_event(request, admin_locked=request.registry.settings['admin_locked'])
+    request.log_event(admin_locked=request.registry.settings['admin_locked'])
     return action_ok()
 
 
@@ -44,7 +42,7 @@ def admin_toggle(request):
         raise action_error(message='additional admin users have been prohibited', code=403)
     request.session['admin'] = not request.session.get('admin', False)
     #log.debug('admin - {0} - {1}'.format(request.session['id'], request.session['admin']))
-    log_event(request, admin=request.session['admin'])
+    request.log_event(admin=request.session['admin'])
     return action_ok()
 
 

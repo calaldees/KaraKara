@@ -6,10 +6,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def send_socket_message(request, message):
-    request.registry['socket_manager'].recv(message.encode('utf-8'))  # TODO: ?um? new_line needed?
-
-
 @view_config(route_name='remote')
 @web
 @admin_only

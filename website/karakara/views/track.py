@@ -4,7 +4,6 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
 from externals.lib.misc import subdict, first
-from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
 from ._logic import queue_item_for_track
@@ -108,7 +107,7 @@ def track_view(request):
     if not track:
         raise action_error(message='track {0} not found'.format(id), code=404)
 
-    log_event(request, track_id=id, title=track['title'])
+    request.log_event(track_id=id, title=track['title'])
 
     return action_ok(data={'track': track})
 

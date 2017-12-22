@@ -109,8 +109,8 @@ def queue_settings_view_put(request):
         raise action_error(messages=error_messages, code=400)
 
     request.cache_bucket.invalidate()
-    log_event(request, method='update', admin=is_admin(request))
-    send_socket_message(request, 'settings')  # Ensure that the player interface is notified of an update
+    request.log_event(method='update', admin=is_admin(request))
+    request.send_websocket_message('settings')  # Ensure that the player interface is notified of an update
 
     return action_ok(message='queue_settings updated')
 

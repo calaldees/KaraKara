@@ -12,7 +12,7 @@ from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to 
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
-from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan
+from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan, now, json_string
 from externals.lib.pyramid_helpers.cache_manager import setup_pyramid_cache_manager
 from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from externals.lib.pyramid_helpers.session_identity2 import session_identity
@@ -75,7 +75,7 @@ def main(global_config, **settings):
     setup_pyramid_autoformater(config)
 
     @post_view_dict_augmentation.register_pre_render_decorator()
-    def add_paths_to_response(request, response):
+    def add_paths_to_response_dict(request, response):
         response['paths'] = {
             'context': pyramid.traversal.resource_path(request.context),
             'queue': '',
@@ -106,6 +106,33 @@ def main(global_config, **settings):
     karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
     assert karakara.views.search.search_config, 'search_config data required'
 
+    # LogEvent -----------------------------------------------------------------
+
+    log_event_logger = logging.getLogger('json_log_event')
+    def log_event(request, **data):
+        """
+        It is expected that python's logging framework is used to output these
+        events to the correct destination.
+        Logstash can then read/process this log output for overview/stats
+        """
+        event = data.get('event')
+        try:
+            event = request.matched_route.name
+        except Exception:
+            pass
+        try:
+            event = request.context.__name__
+        except Exception:
+            pass
+        data.update({
+            'event': event,
+            'session_id': request.session.get('id'),
+            'ip': request.environ.get('REMOTE_ADDR'),
+            'timestamp': now(),
+        })
+        log_event_logger.info(json_string(data))
+    config.add_request_method(log_event)
+
     # WebSocket ----------------------------------------------------------------
 
     class NullAuthEchoServerManager(object):
@@ -130,7 +157,11 @@ def main(global_config, **settings):
         except OSError:
             log.warn('Unable to setup websocket')
 
-    config.registry['socket_manager'] = socket_manager
+    def send_websocket_message(request, message):
+        # TODO: This will have to be augmented with json and queue_id in future
+        socket_manager.recv(message.encode('utf-8'))  # TODO: ?um? new_line needed?
+    config.add_request_method(send_websocket_message)
+    #config.registry['socket_manager'] = socket_manager
 
 
     # Login Providers ----------------------------------------------------------

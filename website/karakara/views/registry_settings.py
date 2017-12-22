@@ -3,10 +3,9 @@ import re
 from pyramid.view import view_config
 
 from externals.lib.misc import convert_str_with_type
-from externals.lib.log import log_event
 
 from . import web, action_ok, action_error, method_put_router, is_admin
-from .remote import send_socket_message
+#from .remote import send_socket_message
 
 import logging
 log = logging.getLogger(__name__)
@@ -33,10 +32,10 @@ def settings(request):
 
         update_settings(request.registry.settings, request.params)
 
-        send_socket_message(request, 'settings')  # Ensure that the player interface is notifyed of an update
-        log_event(request, method='update', admin=is_admin(request))
+        #send_socket_message(request, 'settings')  # Ensure that the player interface is notifyed of an update
+        request.log_event(method='update', admin=is_admin(request))
     else:
-        log_event(request, method='view', admin=is_admin(request))
+        request.log_event(method='view', admin=is_admin(request))
 
     setting_regex = re.compile(request.registry.settings.get('api.settings.regex', 'TODOmatch_nothing_regex'))
     return action_ok(
