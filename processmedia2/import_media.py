@@ -36,7 +36,7 @@ def _track_api(host, data={}, method='GET'):
                 method=method,
             ),
             #timeout=120,
-        ).read()
+        ).read().decode('utf8')  # .decode() is uneeded in python3.6 and can be removed later  # https://docs.python.org/3/library/json.html#json.loads
     )
 
 
