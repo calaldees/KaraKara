@@ -40,7 +40,7 @@
                 ## data-add-back-btn="true" (Could be added to header to auto generate a back button)
                 ## ui-btn-icon-notext -> ui-btn-icon-right to get text
                 <a href="#" class="ui-btn-icon-notext ui-btn-left  ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-back" data-rel="back">${_('mobile.base.back')}</a>
-                <a href="/" class="ui-btn-icon-notext ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-home"                >${_('mobile.base.home')}</a>
+                <a href="${paths.get('queue', '/')}" class="ui-btn-icon-notext ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-icon-home"                >${_('mobile.base.home')}</a>
                 % endif
                 
             </div><!-- /header -->
