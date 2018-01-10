@@ -261,8 +261,8 @@ def main(global_config, **settings):
     config.add_route('comunity_settings', append_format_pattern('/comunity/settings'))
     config.add_route('comunity_processmedia_log', append_format_pattern('/comunity/processmedia_log'))
 
-    config.add_route('search_tags'   , '/search_tags/{tags:.*}')
-    config.add_route('search_list'   , '/search_list/{tags:.*}')
+    #config.add_route('search_tags'   , '/search_tags/{tags:.*}')
+    #config.add_route('search_list'   , '/search_list/{tags:.*}')
 
     # Upload extras -----
     #config.add_static_view(name=settings['upload.route.uploaded'], path=settings['upload.path'])  # the 'upload' route above always matchs first

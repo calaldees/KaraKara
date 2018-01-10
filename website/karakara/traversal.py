@@ -24,15 +24,15 @@ class TraversalGlobalRootFactory(NextContextMixin):
             key,
             (
                 QueueContext,
-                TrackContext,  # Admin only for all tracks
-                TrackListContext,  # Admin only for all tracks
+                #TrackContext,  # Admin only for all tracks
+                #TrackListContext,  # Admin only for all tracks
                 #ComunityContext
                 #TrackImportContext # Needs secure permissions
             )
         )
 
 
-class KaraKaraResourceMixin():
+class QueueResourceMixin():
     @property
     def queue_context(self):
         return pyramid.traversal.find_interface(self, QueueContext)
@@ -45,7 +45,7 @@ class KaraKaraResourceMixin():
             pass
 
 
-class QueueContext(KaraKaraResourceMixin, NextContextMixin):
+class QueueContext(QueueResourceMixin, NextContextMixin):
     __template__ = 'queue_home'
     __name__ = 'queue'
 
@@ -64,12 +64,14 @@ class QueueContext(KaraKaraResourceMixin, NextContextMixin):
                     TrackListContext,
                     QueueItemsContext,
                     QueueSettingsContext,
+                    SearchListContext,
+                    SearchTagsContext,
                 )
             )
         return QueueContext(parent=self, id=key)
 
 
-class QueueItemsContext(KaraKaraResourceMixin):
+class QueueItemsContext(QueueResourceMixin):
     __template__ = 'queue_items'
     __name__ = 'queue_items'
 
@@ -77,7 +79,7 @@ class QueueItemsContext(KaraKaraResourceMixin):
         self.__parent__ = parent
 
 
-class QueueSettingsContext(KaraKaraResourceMixin):
+class QueueSettingsContext(QueueResourceMixin):
     __template__ = 'queue_settings'
     __name__ = 'settings'
 
@@ -85,7 +87,7 @@ class QueueSettingsContext(KaraKaraResourceMixin):
         self.__parent__ = parent
 
 
-class TrackContext(KaraKaraResourceMixin):
+class TrackContext(QueueResourceMixin):
     __template__ = 'track'
     __name__ = 'track'
 
@@ -99,6 +101,22 @@ class TrackContext(KaraKaraResourceMixin):
         if self.id:
             raise KeyError()
         return TrackContext(parent=self, id=key)
+
+
+class SearchListContext(QueueResourceMixin):
+    __template__ = 'search_list'
+    __name__ = 'search_list'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class SearchTagsContext(QueueResourceMixin):
+    __template__ = 'search_tags'
+    __name__ = 'search_tags'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
 
 
 class ComunityContext():

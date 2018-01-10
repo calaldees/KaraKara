@@ -12,7 +12,7 @@ from pyramid.httpexceptions import HTTPFound
 from externals.lib.misc import update_dict
 #from externals.lib.pyramid_helpers.auto_format import registered_formats
 
-from . import web, cache, etag, action_ok, max_age   # generate_cache_key,
+from . import web, cache, etag, action_ok # generate_cache_key,
 
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -23,10 +23,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-#-------------------------------------------------------------------------------
-# Constants
-
-search_version = random.randint(0, 2000000000)
 
 # A list of the sub tags allowed when browsing by specific tags
 # rather than overwelming the user with all possible tags, limit the browsing to a subset under known circumstances.
@@ -34,8 +30,27 @@ search_config = {}
 
 # Utils ------------------------------------------------------------------------
 
-# cache control from settings
-search_max_age = lambda request: request.registry.settings.get('api.search.max_age')
+def acquire_cache_bucket_func(request):
+    search_params = get_search_params(request)
+    request.log_event(tags=search_params.tags, keywords=search_params.keywords)
+    return cache_manager.get(
+        '-'.join({
+            context_name: request.context.name,
+            queue_id: request.context.queue_id,
+            **search_params._asdict()
+        }.values())
+    )
+
+
+def response_callback_search_max_age(request, response):
+    """
+    Set the cache_control max_age for the response
+    Use with:
+        request.add_response_callback(response_callback_search_max_age)
+    """
+    if request.exception is not None:
+        response.cache_control.max_age = request.registry.settings.get('api.search.max_age')
+
 
 SearchParams = collections.namedtuple('SearchParams', ['tags', 'keywords', 'trackids', 'tags_silent_forced', 'tags_silent_hidden'])
 
@@ -58,8 +73,6 @@ def get_search_params(request):
     return SearchParams(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)
 
 
-def search_cache_key(search_params):
-    return "{tags}-{keywords}-{trackids}-{tags_silent_forced}-{tags_silent_hidden}".format(**search_params._asdict())
 
 
 def _tag_strings_to_tag_objs(tags):
@@ -162,9 +175,10 @@ def search(search_params):
     )
 
 
-@view_config(route_name='search_tags')
-@max_age(search_max_age)
-@web
+@view_config(
+    context='karakara.traversal.SearchTagsContext',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
+)
 def tags(request):
     """
     Browse tacks by 'tag'
@@ -176,11 +190,9 @@ def tags(request):
 
     return search dict + sub_tags( a list of all tags with counts )
     """
-    search_params = get_search_params(request)
-    request.log_event(tags=search_params.tags, keywords=search_params.keywords)
-    cache_key = "search_tags_{0}:{1}".format(search_version, search_cache_key(search_params))
-    etag(request, cache_key)  # Abort if 'etag' match
+    request.add_response_callback(response_callback_search_max_age)
 
+    # ??? why not in gen function?
     action_return = search(search_params)
 
     tags             = action_return['data']['tags']
@@ -255,12 +267,13 @@ def tags(request):
         })
         return action_return
 
-    return cache.get_or_create(cache_key, get_action_return_with_sub_tags)
+    return request.cache_bucket.get_or_create(get_action_return_with_sub_tags)
 
 
-@view_config(route_name='search_list')
-@max_age(search_max_age)
-@web
+@view_config(
+    context='karakara.traversal.SearchListContext',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
+)
 def list(request):
     """
     Browse tacks by 'list'
@@ -269,10 +282,7 @@ def list(request):
 
     return search dict (see above) + tracks (a list of tracks with basic details)
     """
-    search_params = get_search_params(request)
-    request.log_event(tags=search_params.tags, keywords=search_params.keywords)
-    cache_key = "search_list_{0}:{1}".format(search_version, search_cache_key(search_params))
-    etag(request, cache_key)  # Abort if 'etag' match
+    request.add_response_callback(response_callback_search_max_age)
 
     def get_list():
         action_return = search(search_params)
@@ -294,4 +304,4 @@ def list(request):
         })
         return action_return
 
-    return cache.get_or_create(cache_key, get_list)
+    return request.cache_bucket.get_or_create(get_list)
