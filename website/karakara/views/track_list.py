@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from sqlalchemy.orm import joinedload
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
-from .search import restrict_search
+from .search import _restrict_search
 
 from ..model import DBSession
 from ..model.model_tracks import Track
@@ -33,6 +33,18 @@ def track_list_cache_key(request):
         request.registry.settings.get('karakara.search.tag.silent_forced', []),
         request.registry.settings.get('karakara.search.tag.silent_hidden', []),
     )
+
+
+# TODO: Reimplement this
+def restrict_search(request, query, obj_intersect=Track):
+    pass
+#    return _restrict_search(
+#        query,
+#        request.registry.settings.get('karakara.search.tag.silent_forced', []),
+#        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
+#        obj_intersect=obj_intersect,
+#    )
+
 
 
 @view_config(context='karakara.traversal.TrackListContext')

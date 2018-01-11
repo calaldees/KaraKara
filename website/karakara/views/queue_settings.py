@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from pyramid.view import view_config
 
 from externals.lib.misc import convert_str
@@ -54,10 +56,10 @@ DEFAULT_SETTINGS = {
     'karakara.system.user.readonly': False,
 
     'karakara.player.title': 'KaraKara (dev player)',
-    'karakara.player.video.preview_volume': 0.10
-    'karakara.player.video.skip.seconds': 20
-    'karakara.player.queue.update_time': '0:00:03'
-    'karakara.player.help.timeout': 2
+    'karakara.player.video.preview_volume': 0.10,
+    'karakara.player.video.skip.seconds': 20,
+    'karakara.player.queue.update_time': '0:00:03',
+    'karakara.player.help.timeout': 2,
 
     'karakara.queue.group.split_markers': '[0:10:00, 0:20:00]',
     'karakara.queue.track.padding': '0:00:60',
@@ -166,4 +168,9 @@ def queue_settings(request):
     """
     A wrapper for `queue_settings_view` to allow subrequests to access cached settings
     """
-    return patch_cache_bucket_decorator(acquire_cache_bucket_func=acquire_cache_bucket_func)(queue_settings_view)(request)['data']['settings']
+    if not hasattr(request, 'cache_bucket'):
+        setattr(request, 'cache_bucket', 'some placeholder shite')  # FFS - don't ask questions ... just ... (sigh)
+    queue_settings_cache_bucket = acquire_cache_bucket_func(request)
+    with patch.object(request, 'cache_bucket', queue_settings_cache_bucket):
+        assert request.cache_bucket == queue_settings_cache_bucket
+        return queue_settings_view(request)['data']['settings']

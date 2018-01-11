@@ -19,8 +19,6 @@ from ..model.actions import get_track
 
 from ..templates.helpers import track_title
 
-from .queue_settings import queue_settings as get_queue_settings
-
 #from .track import invalidate_track
 
 import logging
@@ -102,9 +100,8 @@ def queue_view(request):
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
-        queue_settings = get_queue_settings(request)
-        split_markers = list(queue_settings.get('karakara.queue.group.split_markers'))
-        time_padding = queue_settings.get('karakara.queue.track.padding')
+        split_markers = list(request.queue_settings.get('karakara.queue.group.split_markers'))
+        time_padding = request.queue_settings.get('karakara.queue.track.padding')
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
@@ -148,12 +145,11 @@ def queue_item_add(request):
 
     # If not admin, check additional restrictions
     if not is_admin(request):
-        queue_settings = get_queue_settings(request)
 
         performer_name = request.params.get('performer_name').strip()  # TODO: It would be good to ensure this value is writen to the db. However we cant modify the request.param dict directly. See creation of queueitem below
 
         # Valid performer name
-        valid_performer_names = queue_settings.get('karakara.queue.add.valid_performer_names')
+        valid_performer_names = request.queue_settings.get('karakara.queue.add.valid_performer_names')
         if valid_performer_names and performer_name.lower() not in map(lambda name: name.lower(), valid_performer_names):
             message = _('view.queue.add.invalid_performer_name ${performer_name}', mapping=dict(
                 performer_name=performer_name
@@ -195,14 +191,14 @@ def queue_item_add(request):
         queue_duration = _logic.get_queue_duration(request)
 
         # Event end time
-        event_end = queue_settings.get('karakara.event.end')
+        event_end = request.queue_settings.get('karakara.event.end')
         if event_end and now()+queue_duration > event_end:
             log.debug('event end restricted')
             _log_event(status='reject', reason='event_end')
             raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
 
         # Queue time limit
-        queue_limit = queue_settings.get('karakara.queue.add.limit')
+        queue_limit = request.queue_settings.get('karakara.queue.add.limit')
         if queue_limit and queue_duration > queue_limit:
             # If no device priority token - issue token and abort
             # else consume the token and proceed with addition
@@ -353,10 +349,9 @@ def queue_item_update(request):
 @web
 @admin_only
 def priority_tokens(request):
-    queue_settings = get_queue_settings(request)
     # TODO: karakara.queue.add.duplicate.time_limit is the wrong value to use here
     priority_tokens = DBSession.query(PriorityToken)\
-        .filter(PriorityToken.valid_start >= now() - queue_settings.get('karakara.queue.add.duplicate.time_limit')) \
+        .filter(PriorityToken.valid_start >= now() - request.queue_settings.get('karakara.queue.add.duplicate.time_limit')) \
         .order_by(PriorityToken.valid_start)
     return action_ok(data={
         'priority_tokens': (priority_token.to_dict('full') for priority_token in priority_tokens),

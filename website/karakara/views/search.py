@@ -12,7 +12,7 @@ from pyramid.httpexceptions import HTTPFound
 from externals.lib.misc import update_dict
 #from externals.lib.pyramid_helpers.auto_format import registered_formats
 
-from . import web, cache, etag, action_ok # generate_cache_key,
+from . import web, cache, etag, action_ok, cache_manager # generate_cache_key,
 
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -34,11 +34,11 @@ def acquire_cache_bucket_func(request):
     search_params = get_search_params(request)
     request.log_event(tags=search_params.tags, keywords=search_params.keywords)
     return cache_manager.get(
-        '-'.join({
-            context_name: request.context.name,
-            queue_id: request.context.queue_id,
+        '-'.join(map(str, {
+            'context_name': request.context.__name__,
+            'queue_id': request.context.queue_id,
             **search_params._asdict()
-        }.values())
+        }.values()))
     )
 
 
@@ -67,8 +67,8 @@ def get_search_params(request):
     try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
     except: trackids = []
 
-    tags_silent_forced = request.registry.settings.get('karakara.search.tag.silent_forced', [])
-    tags_silent_hidden = request.registry.settings.get('karakara.search.tag.silent_hidden', [])
+    tags_silent_forced = request.queue_settings.get('karakara.search.tag.silent_forced', [])
+    tags_silent_hidden = request.queue_settings.get('karakara.search.tag.silent_hidden', [])
 
     return SearchParams(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)
 
@@ -92,15 +92,6 @@ def _tag_strings_to_tag_objs(tags):
     return tag_objs, tag_unknown
 
 
-def restrict_search(request, query, obj_intersect=Track):
-    return _restrict_search(
-        query,
-        request.registry.settings.get('karakara.search.tag.silent_forced', []),
-        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
-        obj_intersect=obj_intersect,
-    )
-
-
 def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersect=Track.id):
     """
     Attempted to extract out track restriction but ended up with a mess.
@@ -119,8 +110,8 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
 
 #-------------------------------------------------------------------------------
 
-@cache.cache_on_arguments()
-def search(search_params):
+#@cache.cache_on_arguments()
+def search(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden):
     """
     The base call for API methods 'list' and 'tags'
 
@@ -136,8 +127,7 @@ def search(search_params):
             sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
         }
     """
-    tags, keywords, trackids, tags_silent_forced, tags_silent_hidden = search_params
-    log.debug('cache gen - search {0}'.format(search_cache_key(search_params)))
+    log.debug(f'cache gen - search - {tags} - {keywords} - {trackids}')
 
     tags, tag_unknown = _tag_strings_to_tag_objs(tags)
     keywords += tag_unknown

@@ -215,6 +215,13 @@ def main(global_config, **settings):
     #   http://stackoverflow.com/questions/4633320/is-there-a-better-way-to-switch-between-html-and-json-output-in-pyramid
 
 
+    # KaraKara request additions -----------------------------------------------
+
+    # queue_settings was such a common use case, I added it to all requests
+    from .views.queue_settings import queue_settings
+    config.add_request_method(queue_settings, 'queue_settings', property=True, reify=True)
+
+
     # Routes -------------------------------------------------------------------
 
     def settings_path(key):
