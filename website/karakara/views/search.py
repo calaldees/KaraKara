@@ -31,13 +31,14 @@ search_config = {}
 # Utils ------------------------------------------------------------------------
 
 def acquire_cache_bucket_func(request):
-    search_params = get_search_params(request)
+    search_params = _get_search_params_from_request(request)
     request.log_event(tags=search_params.tags, keywords=search_params.keywords)
     return cache_manager.get(
         '-'.join(map(str, {
             'context_name': request.context.__name__,
             'queue_id': request.context.queue_id,
-            **search_params._asdict()
+            'track_version': request.registry.settings['karakara.tracks.version'],
+            **search_params._asdict(),
         }.values()))
     )
 
@@ -55,10 +56,12 @@ def response_callback_search_max_age(request, response):
 SearchParams = collections.namedtuple('SearchParams', ['tags', 'keywords', 'trackids', 'tags_silent_forced', 'tags_silent_hidden'])
 
 
-def get_search_params(request):
+def _get_search_params_from_request(request):
     # Hack - remove any format tags from route match - idealy this would be done at the route level
     #url = re.sub('|'.join(['\.'+f for f in registered_formats()]), '', request.matchdict['tags'])
     url = 'FIXME'
+
+    import pdb ; pdb.set_trace()
 
     try   : tags     = url.split('/')
     except: tags     = []
@@ -70,9 +73,7 @@ def get_search_params(request):
     tags_silent_forced = request.queue_settings.get('karakara.search.tag.silent_forced', [])
     tags_silent_hidden = request.queue_settings.get('karakara.search.tag.silent_hidden', [])
 
-    return SearchParams(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)
-
-
+    return SearchParams(*map(tuple, (tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)))
 
 
 def _tag_strings_to_tag_objs(tags):
@@ -89,7 +90,7 @@ def _tag_strings_to_tag_objs(tags):
             tag_objs.append(tag_obj)
         elif tag:
             tag_unknown.append(tag)
-    return tag_objs, tag_unknown
+    return tag_objs, tuple(tag_unknown)
 
 
 def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersect=Track.id):
@@ -110,8 +111,15 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
 
 #-------------------------------------------------------------------------------
 
-#@cache.cache_on_arguments()
-def search(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden):
+def _search_from_request(request):
+    return _search(
+        _get_search_params_from_request(request),
+        request.registry.settings['karakara.tracks.version']
+    )
+
+
+@cache.cache_on_arguments()
+def _search(search_params, track_version):
     """
     The base call for API methods 'list' and 'tags'
 
@@ -127,6 +135,7 @@ def search(tags, keywords, trackids, tags_silent_forced, tags_silent_hidden):
             sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
         }
     """
+    tags, keywords, trackids, tags_silent_forced, tags_silent_hidden = search_params
     log.debug(f'cache gen - search - {tags} - {keywords} - {trackids}')
 
     tags, tag_unknown = _tag_strings_to_tag_objs(tags)
@@ -182,8 +191,7 @@ def tags(request):
     """
     request.add_response_callback(response_callback_search_max_age)
 
-    # ??? why not in gen function?
-    action_return = search(search_params)
+    action_return = _search_from_request(request)
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
@@ -193,7 +201,7 @@ def tags(request):
 
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
     # TODO: I'm unsure if these 'raise' returns can be cached - right now this call always makes 2 hits to the cache search() and get_action_return_with_sub_tags()
-    if request.matchdict['format'] == 'html':
+    if request.requested_response_format == 'html':
         # If there is only one track present - abort and redirect to single track view, there is no point in doing any more work
         if len(trackids)== 1:
             # TODO if the hostname has a port, the port is stripped ... WTF?!
@@ -275,7 +283,7 @@ def list(request):
     request.add_response_callback(response_callback_search_max_age)
 
     def get_list():
-        action_return = search(search_params)
+        action_return = _search_from_request(request)
         log.debug('cache gen - get_list')
 
         _trackids = action_return['data']['trackids']

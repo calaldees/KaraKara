@@ -1,6 +1,7 @@
 import os
 import re
 import operator
+import random
 from functools import partial
 
 # Pyramid imports
@@ -105,6 +106,9 @@ def main(global_config, **settings):
     import karakara.views.search
     karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
     assert karakara.views.search.search_config, 'search_config data required'
+
+    # Global State -------------------------------------------------------------
+    config.registry.settings['karakara.tracks.version'] = random.randint(0, 20000000)
 
     # LogEvent -----------------------------------------------------------------
 

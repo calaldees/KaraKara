@@ -1,3 +1,5 @@
+
+from datetime import timedelta
 from decorator import decorator
 
 from externals.lib.misc import decorator_combine, normalize_datetime
@@ -32,6 +34,7 @@ from dogpile.cache.api import NO_VALUE as cache_none
 
 cache_store = dogpile.cache.make_region().configure(
     backend='dogpile.cache.memory',
+    expiration_time=timedelta(hours=1),
 )
 
 cache = cache_store  # TODO: remove passing alias DEPRICATED!
