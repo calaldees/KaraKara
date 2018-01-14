@@ -109,6 +109,11 @@ class SearchListContext(QueueResourceMixin):
 
     def __init__(self, parent=None):
         self.__parent__ = parent
+        self.tags = []
+
+    def __getitem__(self, key):
+        self.tags.append(key)
+        return self
 
 
 class SearchTagsContext(QueueResourceMixin):
@@ -117,6 +122,11 @@ class SearchTagsContext(QueueResourceMixin):
 
     def __init__(self, parent=None):
         self.__parent__ = parent
+        self.tags = []
+
+    def __getitem__(self, key):
+        self.tags.append(key)
+        return self
 
 
 class ComunityContext():

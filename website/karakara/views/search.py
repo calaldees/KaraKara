@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload, aliased, defer
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
+from pyramid.traversal import resource_path
 
 from externals.lib.misc import update_dict
 #from externals.lib.pyramid_helpers.auto_format import registered_formats
@@ -17,7 +18,7 @@ from . import web, cache, etag, action_ok, cache_manager # generate_cache_key,
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
 from ..model.actions import get_tag
-from ..templates.helpers import search_url, track_url
+#from ..templates.helpers import search_url, track_url
 
 import logging
 log = logging.getLogger(__name__)
@@ -53,27 +54,21 @@ def response_callback_search_max_age(request, response):
         response.cache_control.max_age = request.registry.settings.get('api.search.max_age')
 
 
-SearchParams = collections.namedtuple('SearchParams', ['tags', 'keywords', 'trackids', 'tags_silent_forced', 'tags_silent_hidden'])
+SearchParams = collections.namedtuple('SearchParams', ('tags', 'keywords', 'trackids', 'tags_silent_forced', 'tags_silent_hidden', 'version'))
 
+REGEX_SPLIT_QUERY_STRING = re.compile(r'[^ ,]+')
 
 def _get_search_params_from_request(request):
-    # Hack - remove any format tags from route match - idealy this would be done at the route level
-    #url = re.sub('|'.join(['\.'+f for f in registered_formats()]), '', request.matchdict['tags'])
-    url = 'FIXME'
-
-    import pdb ; pdb.set_trace()
-
-    try   : tags     = url.split('/')
-    except: tags     = []
-    try   : keywords = sorted([keyword for keyword in re.findall(r'\w+', request.params['keywords']) if keyword])
-    except: keywords = []
-    try   : trackids = [trackid for trackid in re.findall(r'\w+', request.params['trackids']) if trackid]
-    except: trackids = []
-
-    tags_silent_forced = request.queue_settings.get('karakara.search.tag.silent_forced', [])
-    tags_silent_hidden = request.queue_settings.get('karakara.search.tag.silent_hidden', [])
-
-    return SearchParams(*map(tuple, (tags, keywords, trackids, tags_silent_forced, tags_silent_hidden)))
+    def parse_query_string_key(key):
+        return REGEX_SPLIT_QUERY_STRING.findall(request.params.get(key, ''))
+    return SearchParams(
+        tags=tuple(request.context.tags),
+        keywords=tuple(sorted(parse_query_string_key('keywords'))),
+        trackids=tuple(parse_query_string_key('trackids')),
+        tags_silent_forced=tuple(request.queue_settings.get('karakara.search.tag.silent_forced', [])),
+        tags_silent_hidden=tuple(request.queue_settings.get('karakara.search.tag.silent_hidden', [])),
+        version=request.registry.settings['karakara.tracks.version'],
+    )
 
 
 def _tag_strings_to_tag_objs(tags):
@@ -111,15 +106,8 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
 
 #-------------------------------------------------------------------------------
 
-def _search_from_request(request):
-    return _search(
-        _get_search_params_from_request(request),
-        request.registry.settings['karakara.tracks.version']
-    )
-
-
 @cache.cache_on_arguments()
-def _search(search_params, track_version):
+def _search(search_params):
     """
     The base call for API methods 'list' and 'tags'
 
@@ -135,9 +123,10 @@ def _search(search_params, track_version):
             sub_tags_allowed - a list of tags that will be displayed for the next query (differnt catagorys may have differnt browsing patterns)
         }
     """
-    tags, keywords, trackids, tags_silent_forced, tags_silent_hidden = search_params
+    tags, keywords, trackids, tags_silent_forced, tags_silent_hidden, version = search_params
     log.debug(f'cache gen - search - {tags} - {keywords} - {trackids}')
 
+    # Any tags that are not part of our database are added as 'keywords' instead.
     tags, tag_unknown = _tag_strings_to_tag_objs(tags)
     keywords += tag_unknown
 
@@ -191,13 +180,12 @@ def tags(request):
     """
     request.add_response_callback(response_callback_search_max_age)
 
-    action_return = _search_from_request(request)
+    action_return = _search(_get_search_params_from_request(request))
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
     sub_tags_allowed = action_return['data']['sub_tags_allowed']
     trackids         = action_return['data']['trackids']
-
 
     # If html request then we want to streamline browsing and remove redundent extra steps to get to the track list or track
     # TODO: I'm unsure if these 'raise' returns can be cached - right now this call always makes 2 hits to the cache search() and get_action_return_with_sub_tags()
@@ -205,10 +193,14 @@ def tags(request):
         # If there is only one track present - abort and redirect to single track view, there is no point in doing any more work
         if len(trackids)== 1:
             # TODO if the hostname has a port, the port is stripped ... WTF?!
-            raise HTTPFound(location=track_url(trackids[0]))
+            raise HTTPFound(location=resource_path(request.context.queue_context['track'][trackids[0]]))
         # If there is only a small list, we might as well just show them all
-        if len(trackids) < request.registry.settings['karakara.search.list.threshold']:
-            raise HTTPFound(location=search_url(tags=tags, keywords=keywords, route='search_list'))
+        if len(trackids) < request.queue_settings['karakara.search.list.threshold']:
+            # TODO: Lame - This url is created with string concatination. Use a proper builder.
+            raise HTTPFound(location='{path}?keywords={keywords}'.format(
+                path=resource_path(request.context.queue_context['search_list'], *tags),
+                keywords=','.join(keywords),
+            ))
 
     def get_action_return_with_sub_tags():
         log.debug('cache gen - subtags')
@@ -283,7 +275,7 @@ def list(request):
     request.add_response_callback(response_callback_search_max_age)
 
     def get_list():
-        action_return = _search_from_request(request)
+        action_return = _search(_get_search_params_from_request(request))
         log.debug('cache gen - get_list')
 
         _trackids = action_return['data']['trackids']
