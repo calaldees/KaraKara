@@ -1,17 +1,18 @@
-from pyramid.view import view_config
+#from pyramid.view import view_config
 
 from externals.lib.misc import strip_non_base_types
 from . import web, action_ok, action_error
 
 from ..model import DBSession
-from ..model.model_feedback import Feedback
+#from ..model.model_feedback import Feedback
 
 import logging
 log = logging.getLogger(__name__)
 
 
-@view_config(route_name='feedback')
-@web
+# Disabled until it can be re-implemented as 'messaging' for the queue
+#@view_config(route_name='feedback')
+#@web
 def feedback_view(request):
     """
     Feedback

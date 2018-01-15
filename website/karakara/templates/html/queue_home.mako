@@ -36,7 +36,8 @@
     <a href="${path_queue}/fave"           data-role="button">${_('mobile.home.fave')}</a>
     % endif
 
-    <a href="${path_queue}/feedback"       data-role="button">${_('mobile.home.feedback')}</a>
+    ## Disbaled until we can reimplement it as 'messaging'
+    ##<a href="${path_queue}/feedback"       data-role="button">${_('mobile.home.feedback')}</a>
 % endif
 
 % if identity.get('admin', False):
