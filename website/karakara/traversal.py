@@ -134,7 +134,7 @@ class ComunityContext():
     __name__ = 'comunity'
 
 
-class TrackListContext():
+class TrackListContext(QueueResourceMixin):
     __template__ = 'track_list'
     __name__ = 'track_list'
 

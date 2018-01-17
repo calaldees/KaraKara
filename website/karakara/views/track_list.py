@@ -27,29 +27,21 @@ log = logging.getLogger(__name__)
 #    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
 
 
-def track_list_cache_key(request):
-    '{0}-{1}-{2}'.format(
-        generate_cache_key(request),
-        request.registry.settings.get('karakara.search.tag.silent_forced', []),
-        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
-    )
-
-
-# TODO: Reimplement this
-def restrict_search(request, query, obj_intersect=Track):
-    pass
-#    return _restrict_search(
-#        query,
+#def track_list_cache_key(request):
+#    '{0}-{1}-{2}'.format(
+#        generate_cache_key(request),
 #        request.registry.settings.get('karakara.search.tag.silent_forced', []),
 #        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
-#        obj_intersect=obj_intersect,
 #    )
 
 
 
-@view_config(context='karakara.traversal.TrackListContext')
-@etag_decorator(track_list_cache_key)
-@web
+@view_config(
+    context='karakara.traversal.TrackListContext'
+    # TODO: get_cache_bucket_function cache_key
+)
+#@etag_decorator(track_list_cache_key)
+#@web
 #@admin_only
 def track_list_all(request):
     """
@@ -57,17 +49,21 @@ def track_list_all(request):
     """
     log.info('track_list')
 
-    tracks = DBSession.query(Track).options(
-        joinedload(Track.tags),
-        joinedload('tags.parent'),
-        #defer(Track.lyrics),
+    tracks = _restrict_search(
+        DBSession.query(Track).options(
+            joinedload(Track.tags),
+            joinedload('tags.parent'),
+            #defer(Track.lyrics),
+        ),
+        request.queue.settings.get('karakara.search.tag.silent_forced', []),
+        request.queue.settings.get('karakara.search.tag.silent_hidden', []),
+        obj_intersect=Track,
     )
-    tracks = restrict_search(request, tracks)
     track_list = [track.to_dict(include_fields='tags') for track in tracks]
 
     # The id is very long and not sutable for a printed list.
     # We derive a truncated id specially for this printed list
-    short_id_length = request.registry.settings.get('karakara.print_tracks.short_id_length', 6)
+    short_id_length = request.queue.settings.get('karakara.print_tracks.short_id_length', 6)
     for track in track_list:
         track['id_short'] = track['id'][:short_id_length]
 

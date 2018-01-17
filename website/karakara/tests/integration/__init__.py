@@ -39,6 +39,7 @@ class admin_rights:
         self.app = app
 
     def __enter__(self):
+        return None  # TODO: ReImplement this properly
         admin_state = self.app.get('/admin.json').json['identity']['admin']
         self.original_value = not admin_state
         if admin_state:
@@ -49,6 +50,7 @@ class admin_rights:
         return None
 
     def __exit__(self, type, value, traceback):
+        return None  # TODO: ReImplement this properly
         # If admin mode was not enabled at the beggining, ensure it is revolked again
         if not self.original_value:
             assert not self.app.get('/admin.json').json['identity']['admin']

@@ -85,6 +85,7 @@ def main(global_config, **settings):
             queue_context = request.context.queue_context
             if queue_context:
                 response['paths']['queue'] = pyramid.traversal.resource_path(queue_context)
+                response['paths']['track'] = pyramid.traversal.resource_path(queue_context['track'])
         except AttributeError:
             pass
 
