@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from pyramid.view import view_config
 
 from externals.lib.misc import convert_str
@@ -162,15 +160,3 @@ def queue_settings_view_put(request):
     request.send_websocket_message('settings')  # Ensure that the player interface is notified of an update
 
     return action_ok(message='queue_settings updated')
-
-
-def queue_settings(request):
-    """
-    A wrapper for `queue_settings_view` to allow subrequests to access cached settings
-    """
-    if not hasattr(request, 'cache_bucket'):
-        setattr(request, 'cache_bucket', 'some placeholder shite')  # FFS - don't ask questions ... just ... (sigh)
-    queue_settings_cache_bucket = acquire_cache_bucket_func(request)
-    with patch.object(request, 'cache_bucket', queue_settings_cache_bucket):
-        assert request.cache_bucket == queue_settings_cache_bucket
-        return queue_settings_view(request)['data']['settings']

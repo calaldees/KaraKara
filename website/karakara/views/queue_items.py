@@ -49,8 +49,7 @@ def invalidate_cache(request, track_id):
     request_method='GET',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-@web
-def queue_view(request):
+def queue_items_view(request):
     """
     view current queue
     """
@@ -100,8 +99,8 @@ def queue_view(request):
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
-        split_markers = list(request.queue_settings.get('karakara.queue.group.split_markers'))
-        time_padding = request.queue_settings.get('karakara.queue.track.padding')
+        split_markers = list(request.queue.settings.get('karakara.queue.group.split_markers'))
+        time_padding = request.queue.settings.get('karakara.queue.track.padding')
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
@@ -123,7 +122,6 @@ def queue_view(request):
 
 #@view_config(route_name='queue', request_method='POST')
 @view_config(context='karakara.traversal.QueueItemsContext', request_method='POST')
-@web
 @modification_action
 def queue_item_add(request):
     """
@@ -149,7 +147,7 @@ def queue_item_add(request):
         performer_name = request.params.get('performer_name').strip()  # TODO: It would be good to ensure this value is writen to the db. However we cant modify the request.param dict directly. See creation of queueitem below
 
         # Valid performer name
-        valid_performer_names = request.queue_settings.get('karakara.queue.add.valid_performer_names')
+        valid_performer_names = request.queue.settings.get('karakara.queue.add.valid_performer_names')
         if valid_performer_names and performer_name.lower() not in map(lambda name: name.lower(), valid_performer_names):
             message = _('view.queue.add.invalid_performer_name ${performer_name}', mapping=dict(
                 performer_name=performer_name
@@ -191,14 +189,14 @@ def queue_item_add(request):
         queue_duration = _logic.get_queue_duration(request)
 
         # Event end time
-        event_end = request.queue_settings.get('karakara.event.end')
+        event_end = request.queue.settings.get('karakara.event.end')
         if event_end and now()+queue_duration > event_end:
             log.debug('event end restricted')
             _log_event(status='reject', reason='event_end')
             raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
 
         # Queue time limit
-        queue_limit = request.queue_settings.get('karakara.queue.add.limit')
+        queue_limit = request.queue.settings.get('karakara.queue.add.limit')
         if queue_limit and queue_duration > queue_limit:
             # If no device priority token - issue token and abort
             # else consume the token and proceed with addition
@@ -246,7 +244,6 @@ def queue_item_add(request):
         lambda info, request: request.params.get('queue_item.id')
     )
 )
-@web
 @modification_action
 def queue_item_del(request):
     """
@@ -282,7 +279,6 @@ def queue_item_del(request):
 
 #@view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
 @view_config(context='karakara.traversal.QueueItemsContext', custom_predicates=(method_put_router,))
-@web
 @modification_action
 def queue_item_update(request):
     """
@@ -346,12 +342,11 @@ def queue_item_update(request):
 
 
 @view_config(route_name='priority_tokens')
-@web
 @admin_only
 def priority_tokens(request):
     # TODO: karakara.queue.add.duplicate.time_limit is the wrong value to use here
     priority_tokens = DBSession.query(PriorityToken)\
-        .filter(PriorityToken.valid_start >= now() - request.queue_settings.get('karakara.queue.add.duplicate.time_limit')) \
+        .filter(PriorityToken.valid_start >= now() - request.queue.settings.get('karakara.queue.add.duplicate.time_limit')) \
         .order_by(PriorityToken.valid_start)
     return action_ok(data={
         'priority_tokens': (priority_token.to_dict('full') for priority_token in priority_tokens),

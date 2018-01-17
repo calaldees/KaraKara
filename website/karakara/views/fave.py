@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
 from . import web, method_delete_router, action_ok, action_error, request_from_args
-from ..templates.helpers import search_url
+#from ..templates.helpers import search_url
 
 
 # Utils ------------------------------------------------------------------------
@@ -35,7 +35,8 @@ def fave_view(request):
     trackids = request.session['faves']
 
     if request.matchdict['format'] == 'html':
-        raise HTTPFound(location=search_url(trackids=trackids, route='search_list'))
+        #raise HTTPFound(location=search_url(trackids=trackids, route='search_list'))
+        raise NotImplementedError()
 
     return action_ok(
         data={'faves': trackids}

@@ -1,5 +1,7 @@
+import pytest
 
 
+@pytest.mark.skip()
 def test_feedback(app):
 
     # Check initial feedback form

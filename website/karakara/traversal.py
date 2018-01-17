@@ -27,7 +27,7 @@ class TraversalGlobalRootFactory(NextContextMixin):
                 #TrackContext,  # Admin only for all tracks
                 #TrackListContext,  # Admin only for all tracks
                 #ComunityContext
-                #TrackImportContext # Needs secure permissions
+                TrackImportContext,  # Needs secure permissions
             )
         )
 
@@ -143,4 +143,4 @@ class TrackListContext():
 
 
 class TrackImportContext():
-    pass
+    __name__ = 'import'

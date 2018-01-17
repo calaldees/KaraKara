@@ -221,9 +221,27 @@ def main(global_config, **settings):
 
     # KaraKara request additions -----------------------------------------------
 
+    from unittest.mock import patch
+
+    def call_sub_view(request, view_callable, acquire_cache_bucket_func):
+        """
+        A wrapper for called view_callable's to allow subrequests to use correct cache_buckets
+        """
+        if not hasattr(request, 'cache_bucket'):
+            # FFS - don't ask questions ... just ... (sigh) ... patch can ONLY patch existing attributes
+            setattr(request, 'cache_bucket', 'some placeholder shite')
+        _cache_bucket = acquire_cache_bucket_func(request)
+        with patch.object(request, 'cache_bucket', _cache_bucket):
+            assert request.cache_bucket == _cache_bucket
+            return view_callable(request)['data']
+
+    config.add_request_method(call_sub_view)
+
     # queue_settings was such a common use case, I added it to all requests
-    from .views.queue_settings import queue_settings
-    config.add_request_method(queue_settings, 'queue_settings', property=True, reify=True)
+    #from .views.queue_settings import queue_settings
+    #config.add_request_method(queue_settings, 'queue_settings', property=True, reify=True)
+    from .model_logic.queue_logic import QueueLogic
+    config.add_request_method(QueueLogic, 'queue', reify=True)
 
 
     # Routes -------------------------------------------------------------------

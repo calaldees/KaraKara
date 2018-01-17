@@ -65,8 +65,8 @@ def _get_search_params_from_request(request):
         tags=tuple(request.context.tags),
         keywords=tuple(sorted(parse_query_string_key('keywords'))),
         trackids=tuple(parse_query_string_key('trackids')),
-        tags_silent_forced=tuple(request.queue_settings.get('karakara.search.tag.silent_forced', [])),
-        tags_silent_hidden=tuple(request.queue_settings.get('karakara.search.tag.silent_hidden', [])),
+        tags_silent_forced=tuple(request.queue.settings.get('karakara.search.tag.silent_forced', [])),
+        tags_silent_hidden=tuple(request.queue.settings.get('karakara.search.tag.silent_hidden', [])),
         version=request.registry.settings['karakara.tracks.version'],
     )
 
@@ -195,7 +195,7 @@ def tags(request):
             # TODO if the hostname has a port, the port is stripped ... WTF?!
             raise HTTPFound(location=resource_path(request.context.queue_context['track'][trackids[0]]))
         # If there is only a small list, we might as well just show them all
-        if len(trackids) < request.queue_settings['karakara.search.list.threshold']:
+        if len(trackids) < request.queue.settings['karakara.search.list.threshold']:
             # TODO: Lame - This url is created with string concatination. Use a proper builder.
             raise HTTPFound(location='{path}?keywords={keywords}'.format(
                 path=resource_path(request.context.queue_context['search_list'], *tags),

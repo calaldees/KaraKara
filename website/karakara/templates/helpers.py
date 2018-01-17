@@ -49,15 +49,15 @@ def media_url(file):
     return '/files/%s' % file
 
 
-def track_url(id):
-    return '/track/%s' % id
+#def track_url(id):
+#    return '/track/%s' % id
 
 
-def search_url(tags=[], route='search_tags', **kwargs):
-    route_path = "/%s/%s" % (route, "/".join(tags))
-    if kwargs:
-        route_path += '?' + '&'.join(["%s=%s" % (key, ",".join(items)) for key, items in kwargs.items() if items])
-    return route_path
+#def search_url(tags=[], route='search_tags', **kwargs):
+#    route_path = "/%s/%s" % (route, "/".join(tags))
+#    if kwargs:
+#        route_path += '?' + '&'.join(["%s=%s" % (key, ",".join(items)) for key, items in kwargs.items() if items])
+#    return route_path
 
 
 def duration_str(duration):

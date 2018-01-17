@@ -4,6 +4,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
+from karakara.tests.data.queue import *
 from karakara.tests.data.tracks import *
 from karakara.tests.data.tracks_random import *
 from karakara.tests.data.auth import *
