@@ -4,34 +4,40 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def get_settings(app):
-    return app.get('/settings.json').json['data']['settings']
+def get_settings(app, queue):
+    return app.get(f'/queue/{queue}/settings.json').json['data']['settings']
 
 
 class temporary_setting:
-    def __init__(self, app, key, value):
+    def __init__(self, app, queue, key, value):
         self.app = app
+        self.queue = queue
         self.key = key
         self.value = value
+        self.settings_url = f'/queue/{self.queue}/settings.json'
+
+    @property
+    def settings(self):
+        return get_settings(self.app, self.queue)
 
     def __enter__(self):
-        self.original_value = get_settings(self.app)[self.key]
-        self.app.put('/settings.json', {self.key: self.value})
-        log.debug('Temporay setting {0}:{1} -> {2}'.format(self.key, self.original_value, self.value))
+        self.original_value = self.settings[self.key]
+        self.app.put(self.settings_url, {self.key: self.value})
+        log.debug(f'Temporay setting {self.key}:{self.original_value} -> {self.value}')
         return None
 
     def __exit__(self, type, value, traceback):
-        def empty_list_hack(value):
-            # Hack to fix reverting to empty list
-            if value == []:  
-                return '[]'
-            return value
-        self.app.put('/settings.json', {self.key: empty_list_hack(self.original_value)})
-        log.debug('Temporay setting {0} reverted to {1}'.format(self.key, self.original_value))
+        #def empty_list_hack(value):
+        #    # Hack to fix reverting to empty list
+        #    if value == []:
+        #        return '[]'
+        #    return value
+        self.app.put(self.settings_url, {self.key: self.original_value})  # empty_list_hack(original_value)
+        log.debug(f'Temporay setting {self.key} reverted to {self.original_value}')
         # TODO: Research needed; Consider correct handling of exceptions as they propergate up
         # Next line can be removed for perfomance once this test method is verifyed as working under all conditions
-        #current_setting = get_settings(self.app)[self.key]
-        #assert current_setting == self.original_value, 'The setting {0} should have been reverted to its original state of {1}. It is still {2}'.format(self.key, self.original_value, current_setting)
+        current_setting = self.settings[self.key]
+        assert current_setting == self.original_value, f'The setting {self.key} should have been reverted to its original state of {self.original_value}. It is still {current_setting}.'
 
 
 class admin_rights:
@@ -66,7 +72,7 @@ def with_setting(method=None, key='', value=''):
         return functools.partial(with_setting, key=key, value=value)
     @functools.wraps(method)
     def f(*args, **kwargs):
-        with temporary_setting(kwargs['app'], key, value):
+        with temporary_setting(kwargs['app'], kwargs['queue'], key, value):
             return_value = method(*args, **kwargs)
         return return_value
     return f

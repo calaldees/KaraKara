@@ -9,7 +9,7 @@
 <ul data-role="listview" data-inset="true" class="title">
 % for track in data['tracks']:
     <li>
-        <a href="${paths['track'] + track['id']}">
+        <a href="${paths['track']}/${track['id']}">
             <%
                 #try   :
                     img_url = h.media_url(track['image']) #[attachment['location'] for attachment in track['attachments'] if attachment['type']=='image'][0]

@@ -68,7 +68,15 @@ def test_track_list(app, tracks, queue):
     for each track
     """
     response = app.get(f'/queue/{queue}/search_list/')
-    for text in ('Test Track 1', 'Test Track 2', 'Test Track 3 キ', 'Wildcard', 'test/image1.jpg', 'test/image2.jpg'):
+    for text in (
+        'Test Track 1',
+        'Test Track 2',
+        'Test Track 3 キ',
+        'Wildcard',
+        'test/image1.jpg',
+        'test/image2.jpg',
+        f'/queue/{queue}/track/t1',
+    ):
         assert text in response.text
     for text in ('test/preview1.3gp', ):
         assert text not in response.text
