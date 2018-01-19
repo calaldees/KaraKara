@@ -2,7 +2,7 @@ from pyramid.view import view_config
 
 from externals.lib.misc import convert_str
 
-from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router
+from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router, is_admin
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueSetting
@@ -104,6 +104,7 @@ def queue_settings_view(request):
 
     def get_queue_settings_dict():
         log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
+
         queue_settings = {
             **DEFAULT_SETTINGS,
             **{
@@ -135,7 +136,8 @@ def queue_settings_view_put(request):
             return queue_setting_objs[key]
         else:
             queue_setting_obj = QueueSetting()
-            queue_setting_obj.queue_id == request.context.queue_id
+            queue_setting_obj.queue_id = request.context.queue_id
+            queue_setting_obj.key = key
             DBSession.add(queue_setting_obj)
             return queue_setting_obj
 
@@ -147,7 +149,7 @@ def queue_settings_view_put(request):
             return False
 
     error_messages = []
-    for key, value in request.params:
+    for key, value in request.params.items():
         if is_valid(key, value):
             get_or_create_queue_settings_obj(key).value = value
         else:
