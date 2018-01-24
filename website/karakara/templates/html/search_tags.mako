@@ -2,14 +2,26 @@
 
 <%!
     import string
+    import urllib.parse
+    import os.path
 %>
 
 <%def name="title()">${_('mobile.search_tags.title')}</%def>
 
-<%def name="search_url(tags=None,keywords=None,route='search_tags')"><%
-        if tags    ==None: tags     = data.get('tags'    ,[])
-        if keywords==None: keywords = data.get('keywords',[])
-        route_path = h.search_url(tags=tags,keywords=keywords,route=route)
+<%def name="search_url(tags=None, keywords=None, route='search_tags')"><%
+    tags = tags or data.get('tags', [])
+    keywords = keywords or data.get('keywords', [])
+    #    route_path = "/%s/%s" % (route, "/".join(tags))
+    #    if kwargs:
+    #        route_path += '?' + '&'.join(["%s=%s" % (key, ",".join(items)) for key, items in kwargs.items() if items])
+    #    return route_path
+
+    #route_path = h.search_url(tags=tags,keywords=keywords,route=route)
+    route_path = urllib.parse.urlunsplit(('', None,
+        os.path.join(paths[route], *tags),
+        urllib.parse.urlencode({'keywords': ','.join(keywords)}) if keywords else None,
+        None,
+    ))
 %>${route_path}</%def>
 
 

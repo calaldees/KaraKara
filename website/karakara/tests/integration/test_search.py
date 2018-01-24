@@ -68,7 +68,7 @@ def test_track_search_sub_tags_allowed(app, queue, tracks, search_tags, in_sub_t
     for tag in not_in_sub_tags_allowed:
         assert tag not in tags_allowed
 
-@with_setting(key='karakara.search.list.threshold', value='15 -> int')
+@with_setting(key='karakara.search.list.threshold', value=15)
 @pytest.mark.parametrize(('search_tags', 'redirect_expected', 'expected_location'), [
     (['en']  , True , 'search_list'),  # 2 Tracks returned, that is less than threshold, redirect to list
     (['jp']  , True , 'track/t1'),  # Only one track should be returned, so redirect to single track view
@@ -119,7 +119,8 @@ def test_search_etag(app, queue, tracks, url_part):
     """
     Check the etags for 2 requests to the same section abort with etag
     """
-    response = app.get(f'/queue/{queue}/{url_part}')
+    url = f'/queue/{queue}/{url_part}'
+    response = app.get(url)
     etag = response.etag
     assert etag
     response = app.get(url, headers={'If-None-Match':etag})
