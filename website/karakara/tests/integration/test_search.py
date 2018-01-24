@@ -2,7 +2,7 @@
 
 import pytest
 
-from . import with_setting
+from . import with_settings
 
 
 @pytest.mark.xfail()
@@ -68,7 +68,7 @@ def test_track_search_sub_tags_allowed(app, queue, tracks, search_tags, in_sub_t
     for tag in not_in_sub_tags_allowed:
         assert tag not in tags_allowed
 
-@with_setting(key='karakara.search.list.threshold', value=15)
+@with_settings(settings={'karakara.search.list.threshold': 15})
 @pytest.mark.parametrize(('search_tags', 'redirect_expected', 'expected_location'), [
     (['en']  , True , 'search_list'),  # 2 Tracks returned, that is less than threshold, redirect to list
     (['jp']  , True , 'track/t1'),  # Only one track should be returned, so redirect to single track view

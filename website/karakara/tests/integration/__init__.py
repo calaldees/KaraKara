@@ -8,22 +8,22 @@ def get_settings(app, queue):
     return app.get(f'/queue/{queue}/settings.json').json['data']['settings']
 
 
-class temporary_setting:
-    def __init__(self, app, queue, key, value):
+class temporary_settings:
+    def __init__(self, app, queue, settings_dict):
         self.app = app
         self.queue = queue
-        self.key = key
-        self.value = value
-        self.settings_url = f'/queue/{self.queue}/settings.json'
+        self.settings_dict = settings_dict
+        self.settings_url = f'/queue/{queue}/settings.json'
 
     @property
     def settings(self):
         return get_settings(self.app, self.queue)
 
     def __enter__(self):
-        self.original_value = self.settings[self.key]
-        self.app.put(self.settings_url, {self.key: self.value})
-        log.debug(f'Temporay setting {self.key}:{self.original_value} -> {self.value}')
+        settings = self.settings
+        self.settings_original_values = {k: settings[k] for k, v in self.settings_dict.items()}
+        self.app.put(self.settings_url, self.settings_dict)
+        log.debug(f'Temporay setting {self.settings_original_values} -> {self.settings_dict}')
         return None
 
     def __exit__(self, type, value, traceback):
@@ -32,12 +32,13 @@ class temporary_setting:
         #    if value == []:
         #        return '[]'
         #    return value
-        self.app.put(self.settings_url, {self.key: self.original_value})  # empty_list_hack(original_value)
-        log.debug(f'Temporay setting {self.key} reverted to {self.original_value}')
+        self.app.put(self.settings_url, self.settings_original_values)  # empty_list_hack(original_value)
+        log.debug(f'Temporay setting {self.settings_dict} reverted to {self.settings_original_values}')
         # TODO: Research needed; Consider correct handling of exceptions as they propergate up
         # Next line can be removed for perfomance once this test method is verifyed as working under all conditions
-        current_setting = self.settings[self.key]
-        assert current_setting == self.original_value, f'The setting {self.key} should have been reverted to its original state of {self.original_value}. It is still {current_setting}.'
+        settings = self.settings
+        settings = {k: settings[k] for k, v in self.settings_dict.items()}
+        assert settings == self.settings_original_values, f'The settings {settings} should have been reverted to its original state of {self.settings_original_values}.'
 
 
 class admin_rights:
@@ -63,16 +64,16 @@ class admin_rights:
             log.debug('Revolked admin right')
 
 
-def with_setting(method=None, key='', value=''):
+def with_settings(method=None, settings={}):
     """
     Decorator to set setting for tests and revert them post test
     first arg must be 'app'
     """
     if method is None:
-        return functools.partial(with_setting, key=key, value=value)
+        return functools.partial(with_settings, settings=settings)
     @functools.wraps(method)
     def f(*args, **kwargs):
-        with temporary_setting(kwargs['app'], kwargs['queue'], key, value):
+        with temporary_settings(kwargs['app'], kwargs['queue'], settings):
             return_value = method(*args, **kwargs)
         return return_value
     return f
