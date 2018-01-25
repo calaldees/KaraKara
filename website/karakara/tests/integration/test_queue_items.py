@@ -14,23 +14,36 @@ from . import admin_rights
 
 # Utils ------------------------------------------------------------------------
 
-def get_queue(app):
-    return app.get('/queue?format=json').json['data']['queue']
+class QueueManager():
 
+    def __init__(self, app, queue):
+        self.app = app
+        self.queue = queue
+        self.queue_items_url = f'/queue/{queue}/queue_items'
 
-def del_queue(app, queue_item_id, expect_errors=False):
-    """
-    humm .. the current setup is not conforming to the REST standard,
-       may need a refactor this
-    response = app.delete('/queue', {'queue_item.id':queue_item_id})
-    """
-    return app.post('/queue', {'method': 'delete', 'queue_item.id': queue_item_id}, expect_errors=expect_errors)
+    def get_html_response(self):
+        return self.app.get(self.queue_items_url)
 
+    @property
+    def items(self):
+        return self.app.get(f'{self.queue_items_url}?format=json').json['data']['queue']
 
-def clear_queue(app):
-    for queue_item in get_queue(app):
-        del_queue(app, queue_item['id'])
-    assert get_queue(app) == []
+    def add_queue_item(self, track_id, performer_name):
+        response = self.app.post(self.queue_items_url, dict(track_id=track_id, performer_name=performer_name))
+        assert response.status_code == 201
+
+    def del_queue_item(self, queue_item_id, expect_errors=False):
+        """
+        humm .. the current setup is not conforming to the REST standard,
+        may need a refactor this
+        response = app.delete('/queue', {'queue_item.id':queue_item_id})
+        """
+        return self.app.post(self.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id}, expect_errors=expect_errors)
+
+    def clear(self):
+        for queue_item in self.items:
+            del_queue_item(queue_item['id'])
+        assert self.items == []
 
 
 def get_cookie(app, key):
@@ -40,9 +53,6 @@ def get_cookie(app, key):
         return None
 
 
-def add_queue(app, track_id, performer_name):
-    response = app.post('/queue', dict(track_id=track_id, performer_name=performer_name))
-    assert response.status_code == 201
 
 
 def admin_play_next_track(app):
@@ -58,36 +68,32 @@ def admin_play_next_track(app):
 
 # Tests ------------------------------------------------------------------------
 
-def test_queue_view_simple_add_delete_cycle(app, tracks):
+def test_queue_view_simple_add_delete_cycle(app, queue, tracks):
     """
     View empty queue
     queue a track
     remove a track
     """
-    assert get_queue(app) == []
+    queue_manager = QueueManager(app, queue)
+
+    assert queue_manager.items == []
 
     # Check no tracks in queue
-    response = app.get('/queue')
+    response = queue_manager.get_html_response()
     assert 'track 1' not in response.text.lower()
 
     # Queue 'Track 1'
-    response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
 
     # Check track is in queue list
-    response = app.get('/queue')
+    response = queue_manager.get_html_response()
     assert 'track 1' in response.text.lower()
     assert 'testperformer' in response.text.lower()
     # Check queue in track description
-    response = app.get('/track/t1')
+    response = app.get(f'/queue/{queue}/track/t1')
     assert 'testperformer' in response.text.lower()
 
-    queue_item_id = get_queue(app)[0]['id']
-
-    # Remove track from queue
-    del_queue(app, queue_item_id)
-
-    # Check queue is empty
-    assert get_queue(app) == []
+    queue_manager.clear()
 
 
 def test_queue_errors(app, tracks):

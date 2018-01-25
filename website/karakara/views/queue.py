@@ -6,6 +6,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
+# TODO: REIMPLEMENT This shite
 def generate_cache_key_homepage(request):
     """
     Custom etag for homepage
@@ -22,6 +23,5 @@ def generate_cache_key_homepage(request):
 
 @view_config(context='karakara.traversal.QueueContext')
 @etag_decorator(generate_cache_key_homepage)
-@web
 def queue_home(request):
     return action_ok()

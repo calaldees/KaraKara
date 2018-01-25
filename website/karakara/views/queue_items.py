@@ -9,7 +9,6 @@ from pyramid.view import view_config
 from externals.lib.misc import now, subdict
 
 from . import web, action_ok, action_error, etag_decorator, cache_manager, method_delete_router, method_put_router, is_admin, modification_action, admin_only
-from . import _logic
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueItem
@@ -18,6 +17,8 @@ from ..model.model_priority_token import PriorityToken
 from ..model.actions import get_track
 
 from ..templates.helpers import track_title
+
+from ..model_logic import QUEUE_DUPLICATE, TOKEN_ISSUE_ERROR
 
 #from .track import invalidate_track
 
@@ -155,8 +156,8 @@ def queue_item_add(request):
             raise action_error(message, code=400)
 
         # Duplucate performer resrictions
-        queue_item_performed_tracks = _logic.queue_item_for_performer(request, DBSession, request.params.get('performer_name'))
-        if queue_item_performed_tracks['performer_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
+        queue_item_performed_tracks = request.queue.for_performer(request.params.get('performer_name'))
+        if queue_item_performed_tracks['performer_status'] == QUEUE_DUPLICATE.THRESHOLD:
             try:
                 latest_track_title = get_track(queue_item_performed_tracks['queue_items'][0].track_id).title
             except Exception:
@@ -173,8 +174,8 @@ def queue_item_add(request):
             raise action_error(message=message, code=400)
 
         # Duplicate Addition Restrictions
-        queue_item_tracks_queued = _logic.queue_item_for_track(request, DBSession, track.id)
-        if queue_item_tracks_queued['track_status'] == _logic.QUEUE_DUPLICATE.THRESHOLD:
+        queue_item_tracks_queued = request.queue.for_track(track.id)
+        if queue_item_tracks_queued['track_status'] == QUEUE_DUPLICATE.THRESHOLD:
             message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${track_count}', mapping=dict(
                 track_id=track.id,
                 **subdict(queue_item_performed_tracks, {
@@ -185,19 +186,16 @@ def queue_item_add(request):
             _log_event(status='reject', reason='duplicate.track', message=message)
             raise action_error(message=message, code=400)
 
-        # Max queue length restrictions
-        queue_duration = _logic.get_queue_duration(request)
-
         # Event end time
         event_end = request.queue.settings.get('karakara.event.end')
-        if event_end and now()+queue_duration > event_end:
+        if event_end and now() + request.queue.duration > event_end:
             log.debug('event end restricted')
             _log_event(status='reject', reason='event_end')
             raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
 
         # Queue time limit
         queue_limit = request.queue.settings.get('karakara.queue.add.limit')
-        if queue_limit and queue_duration > queue_limit:
+        if queue_limit and request.queue.duration > queue_limit:
             # If no device priority token - issue token and abort
             # else consume the token and proceed with addition
             if not _logic.consume_priority_token(request, DBSession):
@@ -206,10 +204,10 @@ def queue_item_add(request):
                 if isinstance(priority_token, PriorityToken):
                     _log_event(status='reject', reason='token.issued')
                     raise action_error(message=_('view.queue.add.priority_token_issued'), code=400)
-                if priority_token == _logic.TOKEN_ISSUE_ERROR.EVENT_END:
+                if priority_token == TOKEN_ISSUE_ERROR.EVENT_END:
                     _log_event(status='reject', reason='event_end')
                     raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
-                if priority_token == _logic.TOKEN_ISSUE_ERROR.TOKEN_ISSUED:
+                if priority_token == TOKEN_ISSUE_ERROR.TOKEN_ISSUED:
                     _log_event(status='reject', reason='token.already_issued')
                     raise action_error(message=_('view.queue.add.priority_token_already_issued'), code=400)
                 _log_event(status='reject', reason='token.limit')

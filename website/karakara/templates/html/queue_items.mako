@@ -24,11 +24,11 @@ import datetime
 
     <%def name="btn_remove(queue_item, attrs='')">
         % if identity.get('admin') or identity['id']==queue_item['session_owner']:
-        <a href='/queue?method=delete&format=redirect&queue_item.id=${queue_item['id']}' rel=external ${attrs |n}>remove</a>
+        <a href='${paths['context']}?method=delete&format=redirect&queue_item.id=${queue_item['id']}' rel=external ${attrs |n}>remove</a>
         % endif
     </%def>
     <%def name="show_queue_item(queue_item, attrs='')">
-        <a href='${h.track_url(queue_item['track_id'])}' ${attrs |n}>
+        <a href='${paths['track']}/${queue_item['track_id']}' ${attrs |n}>
             <% img_src = h.thumbnail_location_from_track(queue_item['track']) %>
             % if img_src:
             <img src='${img_src}' />
@@ -93,7 +93,7 @@ import datetime
                 }
                 $.ajax({
                     type:'PUT',
-                    url:'/queue.json',
+                    url:'${paths['context']}.json',
                     dataType:'json',
                     data: 'queue_item.id='+queue_item_id_source+'&queue_item.move.target_id='+queue_item_id_destination,
                     success: function(data, textStatus, jqXHR) {

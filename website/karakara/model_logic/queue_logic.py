@@ -5,27 +5,13 @@ from sqlalchemy import or_, and_
 
 from externals.lib.misc import now
 
-from ..model import DBSession
+from . import QUEUE_DUPLICATE, TOKEN_ISSUE_ERROR
 
-from karakara.model.model_queue import QueueItem
+from ..model import DBSession
+from ..model.model_queue import QueueItem
 
 from ..views.queue_settings import queue_settings_view, acquire_cache_bucket_func as queue_settings_acquire_cache_bucket_func
 from ..views.queue_items import queue_items_view, acquire_cache_bucket_func as queue_items_acquire_cache_bucket_func
-
-
-class QUEUE_DUPLICATE():
-    NONE = None
-    THRESHOLD = 'THRESHOLD'
-    PLAYED = 'PLAYED'
-    PENDING = 'PENDING'
-    PERFORMER = 'PERFORMER'
-
-
-class TOKEN_ISSUE_ERROR(object):
-    NONE = None
-    EVENT_END = 'EVENT_END'
-    TOKEN_LIMIT = 'TOKEN_LIMIT'
-    TOKEN_ISSUED = 'TOKEN_ISSUED'
 
 
 class QueueLogic():
