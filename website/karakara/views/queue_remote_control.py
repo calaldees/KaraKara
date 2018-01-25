@@ -6,12 +6,13 @@ import logging
 log = logging.getLogger(__name__)
 
 
-@view_config(route_name='remote')
-@web
+@view_config(
+    context='karakara.traversal.RemoteControlContext',
+)
 @admin_only
 def remote(request):
     cmd = request.params.get('cmd')
     if cmd:
-        log.debug("remote command - {0}".format(cmd))
-        send_socket_message(request, cmd)
+        request.event(cmd)
+        request.send_socket_message(cmd)
     return action_ok()

@@ -24,16 +24,20 @@ def _existing_tracks_dict():
     return {t.id: t.source_filename for t in DBSession.query(Track.id, Track.source_filename)}
 
 
-@view_config(route_name='track_import', request_method='GET')
-@web
+@view_config(
+    context='karakara.traversal.TrackImportContext',
+    request_method='GET',
+)
 def tracks(request):
     return action_ok(data={
         'tracks': _existing_tracks_dict()
     })
 
 
-@view_config(route_name='track_import', request_method='POST')
-@web
+@view_config(
+    context='karakara.traversal.TrackImportContext',
+    request_method='POST',
+)
 def track_import_post(request):
     existing_track_ids = _existing_tracks_dict().keys()
 
@@ -74,8 +78,10 @@ def track_import_post(request):
     return action_ok()
 
 
-@view_config(route_name='track_import', request_method='DELETE')
-@web
+@view_config(
+    context='karakara.traversal.TrackImportContext',
+    request_method='DELETE',
+)
 def track_delete(request):
     existing_track_ids = _existing_tracks_dict().keys()
     for track_id in _get_json_request(request):

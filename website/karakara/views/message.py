@@ -1,7 +1,9 @@
 from decorator import decorator
 from collections import defaultdict
 
-from pyramid.view import view_config
+#from pyramid.view import view_config
+def view_config(*args, **kwargs):
+    return view_config
 
 from . import web, action_ok, action_error, request_from_args
 

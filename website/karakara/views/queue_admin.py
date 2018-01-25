@@ -1,32 +1,8 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
 
+from . import action_ok, admin_only
 
-from . import web, action_ok, action_error, admin_only
-
-
-import logging
-log = logging.getLogger(__name__)
-
-
-@view_config(context='karakara.traversal.TraversalGlobalRootFactory')
-@web
-def home(request):
-    # Short term hack. Do not allow normal root page in commuity mode - redirect to comunity
-    # Need to implement a proper pyramid authorize system when in comunity mode
-    if request.registry.settings.get('karakara.server.mode') == 'comunity':
-        raise HTTPFound(location='/comunity')
-    return action_ok()
-
-
-@view_config(route_name='stats')
-@web
-def stats(request):
-    return action_ok()
-
-
-@view_config(route_name='admin_lock')
-@web
+#@view_config(route_name='admin_lock')
 @admin_only
 def admin_lock(request):
     request.registry.settings['admin_locked'] = not request.registry.settings.get('admin_locked', False)
@@ -35,8 +11,7 @@ def admin_lock(request):
     return action_ok()
 
 
-@view_config(route_name='admin_toggle')
-@web
+#@view_config(route_name='admin_toggle')
 def admin_toggle(request):
     if request.registry.settings.get('admin_locked'):
         raise action_error(message='additional admin users have been prohibited', code=403)
