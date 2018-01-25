@@ -1,6 +1,8 @@
+import pytest
 from unittest.mock import patch
 
 
+@pytest.mark.skip()  # Depricated feature?
 def test_fave_cycle(app, settings, tracks):
     """
     Test fave cycle
@@ -27,7 +29,7 @@ def test_fave_cycle(app, settings, tracks):
         response = app.get('/track/t2')
         assert 'Add to faves' in response.text
 
-
+@pytest.mark.skip()  # Depricated feature?
 def test_fave_disbaled(app, settings, tracks):
     # Faves disabled
     with patch.dict(settings, {'karakara.faves.enabled': False}):

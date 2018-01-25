@@ -66,6 +66,7 @@ class QueueContext(QueueResourceMixin, NextContextMixin):
                     QueueSettingsContext,
                     SearchListContext,
                     SearchTagsContext,
+                    RandomImagesContext,
                 )
             )
         return QueueContext(parent=self, id=key)
@@ -144,3 +145,10 @@ class TrackListContext(QueueResourceMixin):
 
 class TrackImportContext():
     __name__ = 'import'
+
+
+class RandomImagesContext(QueueResourceMixin):
+    __name__ = 'random_images'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent

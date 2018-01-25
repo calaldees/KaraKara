@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.skip()
+@pytest.mark.skip()  # Depricated feature?
 def test_feedback(app):
 
     # Check initial feedback form

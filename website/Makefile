@@ -187,7 +187,7 @@ stop_webapp_daemon:
 .PHONY: test test_crawl
 
 test: ini
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x --pdb -k test
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x --pdb -k test_random
 	# --capture=sys
 
 test_crawl: ini

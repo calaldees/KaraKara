@@ -44,21 +44,3 @@ def admin_toggle(request):
     #log.debug('admin - {0} - {1}'.format(request.session['id'], request.session['admin']))
     request.log_event(admin=request.session['admin'])
     return action_ok()
-
-
-@view_config(route_name='random_images')
-@web
-def random_images(request):
-    """
-    The player interface titlescreen can be populated with random thumbnails from the system.
-    This is a nice showcase.
-    Not optimised as this is rarely called.
-    """
-    import random
-    from karakara.model import DBSession
-    from karakara.model.model_tracks import Attachment
-    images = DBSession.query(Attachment.location).filter(Attachment.type == 'image').all()
-    # TODO: use serach.restrict_trags to get the images for the current event
-    random.shuffle(images)
-    images = [t[0] for t in images]
-    return action_ok(data={'images': images[0: int(request.params.get('count', 0) or 100)]})
