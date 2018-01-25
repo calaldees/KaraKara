@@ -90,8 +90,10 @@ def commit(request, DBSession):
 
 
 @pytest.fixture()
-def settings(request, app):
+def registry_settings(request, app):
     """
-    Registry settings dictionary used in the running KaraKara app
+    registry.settings dictionary used in the running KaraKara app
+    can be used with
+    with patch.dict(settings, {'key': 'value'}):
     """
     return app.app.registry.settings

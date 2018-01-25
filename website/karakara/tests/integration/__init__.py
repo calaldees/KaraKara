@@ -27,12 +27,12 @@ class temporary_settings:
         return None
 
     def __exit__(self, type, value, traceback):
-        #def empty_list_hack(value):
-        #    # Hack to fix reverting to empty list
-        #    if value == []:
-        #        return '[]'
-        #    return value
-        self.app.put(self.settings_url, self.settings_original_values)  # empty_list_hack(original_value)
+        def empty_list_hack(value):
+            # Hack to fix reverting to empty list
+            if value == []:
+                return '[]'
+            return value
+        self.app.put(self.settings_url, {k: empty_list_hack(v) for k, v in self.settings_original_values.items()})
         log.debug(f'Temporay setting {self.settings_dict} reverted to {self.settings_original_values}')
         # TODO: Research needed; Consider correct handling of exceptions as they propergate up
         # Next line can be removed for perfomance once this test method is verifyed as working under all conditions

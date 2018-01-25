@@ -1,13 +1,11 @@
 import tempfile
 
-from . import get_settings
-
 
 def test_queue_settings(app, queue):
     key = 'karakara.test_setting'
 
     def _get_settings():
-        return get_settings(app, queue)
+        return app.get(f'/queue/{queue}/settings.json').json['data']['settings']
     def _put_settings(data):
         app.put(f'/queue/{queue}/settings.json', data)
 
