@@ -291,7 +291,7 @@ def queue_item_update(request):
 
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
-    _log_event = partial(log_event, request, method='update')
+    _log_event = partial(request.log_event, method='update')
 
     params = dict(request.params)
 

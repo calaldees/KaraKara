@@ -96,50 +96,56 @@ def test_queue_view_simple_add_delete_cycle(app, queue, tracks):
     queue_manager.clear()
 
 
-def test_queue_errors(app, tracks):
-    response = app.post('/queue', dict(track_id='t1000'), expect_errors=True)
+def test_queue_errors(app, queue, tracks):
+    queue_items_url = QueueManager(app, queue).queue_items_url
+
+    response = app.post(queue_items_url, dict(track_id='t1000'), expect_errors=True)
     assert response.status_code == 400
     assert 'performer' in response.text  # test should grumble about needing a 'performer' name
 
-    response = app.post('/queue', dict(track_id='t1000', performer_name='test_user'), expect_errors=True)
+    response = app.post(queue_items_url, dict(track_id='t1000', performer_name='test_user'), expect_errors=True)
     assert response.status_code == 400
     assert 'not exist' in response.text
 
-    response = app.put('/queue', {'queue_item.id': 'not_real_id'}, expect_errors=True)
+    response = app.put(queue_items_url, {'queue_item.id': 'not_real_id'}, expect_errors=True)
     assert response.status_code == 404
     assert 'invalid queue_item.id' in response.text
 
 
-def test_queue_etag(app, tracks):
+def test_queue_etag(app, queue, tracks):
+    queue_manager = QueueManager(app, queue)
+    queue_items_url = f'/queue/{queue}/queue_items'
+    track_url = f'/queue/{queue}/track/t1'
+
     # First response has etag
-    response = app.get('/queue')
+    response = app.get(queue_items_url)
     etag_queue = response.etag
-    response = app.get('/track/t1')
+    response = app.get(track_url)
     etag_track = response.etag
 
     # Second request to same resource has same etag
-    response = app.get('/queue')
+    response = app.get(queue_items_url)
     assert etag_queue == response.etag
-    response = app.get('/track/t1')
+    response = app.get(track_url)
     assert etag_track == response.etag
 
     # Change the queue - this should invalidate the etag
-    response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    response = app.post(queue_items_url, dict(track_id='t1', performer_name='testperformer'))
 
     # Assert etag has changed
-    response = app.get('/queue')
+    response = app.get(queue_items_url)
     assert etag_queue != response.etag
     etag_queue = response.etag
-    response = app.get('/track/t1')
+    response = app.get(track_url)
     assert etag_track != response.etag
     etag_track = response.etag
 
-    response = app.get('/queue', headers={'If-None-Match': etag_queue})
+    response = app.get(queue_items_url, headers={'If-None-Match': etag_queue})
     assert response.status_code == 304
-    response = app.get('/track/t1', headers={'If-None-Match': etag_track})
+    response = app.get(track_url, headers={'If-None-Match': etag_track})
     assert response.status_code == 304
 
-    clear_queue(app)
+    queue_manager.clear()
 
 
 def test_queue_permissions(app, tracks):
