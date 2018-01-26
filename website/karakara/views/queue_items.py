@@ -122,7 +122,11 @@ def queue_items_view(request):
 
 
 #@view_config(route_name='queue', request_method='POST')
-@view_config(context='karakara.traversal.QueueItemsContext', request_method='POST')
+@view_config(
+    context='karakara.traversal.QueueItemsContext',
+    request_method='POST',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
+)
 @modification_action
 def queue_item_add(request):
     """
@@ -237,6 +241,7 @@ def queue_item_add(request):
 #@view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
 @view_config(
     context='karakara.traversal.QueueItemsContext',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
     custom_predicates=(
         method_delete_router,
         lambda info, request: request.params.get('queue_item.id')
@@ -252,7 +257,7 @@ def queue_item_del(request):
 
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
-    _log_event = partial(log_event, request, method='del')
+    _log_event = partial(request.log_event, method='del')
 
     queue_item_id = int(request.params['queue_item.id'])
     queue_item = DBSession.query(QueueItem).get(queue_item_id)

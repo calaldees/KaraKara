@@ -187,7 +187,7 @@ stop_webapp_daemon:
 .PHONY: test test_crawl
 
 test: ini
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x --pdb -k test_queue_view_simple_add_delete_cycle
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x  -k test_queue_view_simple_add_delete_cycle
 	# --capture=sys
 
 test_crawl: ini

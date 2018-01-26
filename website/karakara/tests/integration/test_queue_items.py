@@ -42,7 +42,7 @@ class QueueManager():
 
     def clear(self):
         for queue_item in self.items:
-            del_queue_item(queue_item['id'])
+            self.del_queue_item(queue_item['id'])
         assert self.items == []
 
 
