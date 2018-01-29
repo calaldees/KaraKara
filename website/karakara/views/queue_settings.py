@@ -89,6 +89,7 @@ DEFAULT_SETTINGS = {
     k: convert_str(v, SETTINGS_TYPE_MAPPING.get(k))
     for k, v in DEFAULT_SETTINGS.items()
 }
+SETTING_PRIVATE_IDENTIFIER = 'karakara.private.'
 
 
 def acquire_cache_bucket_func(request):
@@ -111,6 +112,11 @@ def queue_settings_view(request):
                 queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
                 for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
             },
+        }
+        queue_settings = {
+            k: v
+            for k, v in queue_settings.items()
+            if k.startswith(SETTING_PRIVATE_IDENTIFIER)
         }
         return {'settings': queue_settings}
 

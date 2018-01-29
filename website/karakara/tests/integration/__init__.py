@@ -42,26 +42,31 @@ class temporary_settings:
 
 
 class admin_rights:
-    def __init__(self, app):
+    ADMIN_PASSWORD = 'qtest'
+
+    def __init__(self, app, queue):
         self.app = app
+        self.queue_url = f'/queue/{queue}'
+
+    @property
+    def is_admin(self):
+        return self.app.get(self.queue_url).json['identity']['admin']
+    @is_admin.setter
+    def is_admin(self, value):
+        password = self.ADMIN_PASSWORD if value else ''
+        self.app.get(f'{self.queue_url}/admin.json?password={password}').json['identity']['admin']  # TODO: expect auto assertion errors stuff
+        assert self.is_admin = value
 
     def __enter__(self):
-        return None  # TODO: ReImplement this properly
-        admin_state = self.app.get('/admin.json').json['identity']['admin']
-        self.original_value = not admin_state
-        if admin_state:
-            log.debug('Set admin mode')
-        else:
-            # We altered the admin state inadvertenty from enabled to disabled, ensure it's enabled
-            assert self.app.get('/admin.json').json['identity']['admin']
+        self.original_value = self.is_admin
+        self.is_admin = True
         return None
 
     def __exit__(self, type, value, traceback):
-        return None  # TODO: ReImplement this properly
         # If admin mode was not enabled at the beggining, ensure it is revolked again
         if not self.original_value:
-            assert not self.app.get('/admin.json').json['identity']['admin']
-            log.debug('Revolked admin right')
+            self.is_admin = self.original_value
+            log.debug('Reverted admin rights')
 
 
 def with_settings(method=None, settings={}):

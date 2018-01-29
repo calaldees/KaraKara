@@ -68,6 +68,7 @@ class QueueContext(QueueResourceMixin, NextContextMixin):
                     SearchTagsContext,
                     RandomImagesContext,
                     RemoteControlContext,
+                    QueueAdminContext,
                 )
             )
         return QueueContext(parent=self, id=key)
@@ -157,6 +158,13 @@ class RandomImagesContext(QueueResourceMixin):
 
 class RemoteControlContext(QueueResourceMixin):
     __name__ = 'remote_control'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class QueueAdminContext(QueueResourceMixin):
+    __name__ = 'admin'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
