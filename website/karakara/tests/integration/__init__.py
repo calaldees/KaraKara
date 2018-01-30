@@ -55,7 +55,7 @@ class admin_rights:
     def is_admin(self, value):
         password = self.ADMIN_PASSWORD if value else ''
         self.app.get(f'{self.queue_url}/admin.json?password={password}').json['identity']['admin']  # TODO: expect auto assertion errors stuff
-        assert self.is_admin = value
+        assert self.is_admin == value
 
     def __enter__(self):
         self.original_value = self.is_admin

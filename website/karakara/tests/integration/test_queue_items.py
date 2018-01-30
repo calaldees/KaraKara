@@ -441,7 +441,7 @@ def test_event_end(app, tracks):
     clear_queue(app)
 
 
-@admin_rights
-def test_priority_tokens(app):
-    response = app.get('/priority_tokens')
-    assert response.status_code == 200
+def test_priority_tokens(app, queue):
+    with admin_rights(app, queue):
+        response = app.get('/priority_tokens')
+        assert response.status_code == 200

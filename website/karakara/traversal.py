@@ -164,6 +164,7 @@ class RemoteControlContext(QueueResourceMixin):
 
 
 class QueueAdminContext(QueueResourceMixin):
+    __template__ = 'queue_admin'
     __name__ = 'admin'
 
     def __init__(self, parent=None):
