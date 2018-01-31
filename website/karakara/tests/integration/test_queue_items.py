@@ -50,10 +50,12 @@ class QueueManager():
         """
         As admin player mark track as played
         """
+        queue_length = len(self.items)
         with admin_rights(self.app, self.queue):
             queue_item_id = self.items[0]['id']
-            response = app.put(self.queue_items.url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'})
+            response = self.app.put(self.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'})
             assert 'update' in response.json['messages'][0]
+        assert queue_length - 1 == len(self.items)
 
 
 def get_cookie(app, key):
@@ -175,27 +177,27 @@ def test_queue_permissions(app, queue, tracks):
     assert queue_manager.items == []
 
 
-def test_queue_played(app, tracks):
+def test_queue_played(app, queue, tracks):
     """
     Player system gets track list and removes first queue_item.id when played
     """
-    assert get_queue(app) == []
+    queue_manager = QueueManager(app, queue)
+    assert queue_manager.items == []
 
     # Add track to queue
-    app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
 
     # Try to set as 'played' as normal user - and get rejected
     app.cookiejar.clear()  # Loose the cookie so we are not identifyed as the creator of this queue item.
-    queue_item_id = get_queue(app)[0]['id']
-    app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
+    queue_item_id = queue_manager.items[0]['id']
+    app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
 
     # As admin player mark track as played
-    admin_play_next_track(app)
+    queue_manager.admin_play_next_track()
 
-    # TODO: skipped status needs testing too
+    # TODO: 'skipped status' needs testing too - maybe query actual db?
 
-    assert get_queue(app) == []
-    #assert DBSession.query # could query actual queue item in db, but that would mean more imports
+    assert queue_manager.items == []
 
 
 def test_queue_reorder(app, tracks):
