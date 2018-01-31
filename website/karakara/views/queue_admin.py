@@ -33,9 +33,11 @@ def admin(request):
     queue_setting_password = DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id, QueueSetting.key == 'karakara.private.password').one()
     if not queue_setting_password:
         raise action_error(message=_('api.queue.admin.prohibited'), code=403)
-    if request.params.get('password') == queue_setting_password.value:
+    if not request.params.get('password'):
+        request.session['admin'] = False
+        return action_ok(message=_('api.queue.admin.disabled'))
+    elif request.params.get('password') == queue_setting_password.value:
         request.session['admin'] = True
         return action_ok(message=_('api.queue.admin.enabled'))
     else:
-        request.session['admin'] = False
         raise action_error(message=_('api.queue.admin.authentication_failed'), code=403)

@@ -69,9 +69,11 @@ def test_admin_toggle(app, queue):
 
     def _get_admin_status():
         return app.get(f'{queue_url}?format=json').json['identity']['admin']
-    def _set_admin_status(enabled):
-        return app.get(f'{queue_url}/admin?password={queue if enabled else ""}', expect_errors=not enabled)
+    def _set_admin_status(enabled, password=queue):
+        return app.get(f'{queue_url}/admin?password={password if enabled else ""}')
 
+    assert not _get_admin_status()
+    app.get(f'{queue_url}/admin?password=NOT_REAL', expect_errors=True)  # Attempt to authenticate with wrong password
     assert not _get_admin_status()
 
     response = _set_admin_status(True)
