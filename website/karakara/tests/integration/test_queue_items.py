@@ -9,7 +9,7 @@ def BeautifulSoup(markup):
 
 from externals.lib.misc import now
 
-from . import admin_rights
+from . import admin_rights, with_settings
 
 
 # Utils ------------------------------------------------------------------------
@@ -20,13 +20,26 @@ class QueueManager():
         self.app = app
         self.queue = queue
         self.queue_items_url = f'/queue/{queue}/queue_items'
+        self.queue_settings_url = f'/queue/{queue}/settings'
+
+    @property
+    def settings(self):
+        return self.app.get(f'{self.queue_settings_url}?format=json').json['data']['settings']
 
     def get_html_response(self):
         return self.app.get(self.queue_items_url)
 
     @property
+    def soup(self):
+        return BeautifulSoup(self.get_html_response().text)
+
+    @property
+    def data(self):
+        return self.app.get(f'{self.queue_items_url}?format=json').json['data']
+
+    @property
     def items(self):
-        return self.app.get(f'{self.queue_items_url}?format=json').json['data']['queue']
+        return self.data['queue']
 
     def add_queue_item(self, track_id, performer_name):
         response = self.app.post(self.queue_items_url, dict(track_id=track_id, performer_name=performer_name))
@@ -273,38 +286,39 @@ def test_queue_reorder(app, queue, tracks):
 
     assert ['xxx', 't1', 't3', 't2'] == get_track_ids()
 
-    # Tidy queue
     queue_manager.clear()
 
 
-def test_queue_obscure(app, tracks):
+@with_settings(settings={
+    'karakara.queue.group.split_markers': '[0:02:00, 0:10:00] -> timedelta',
+})
+def test_queue_obscure(app, queue, tracks):
     """
-    The track order returned by the template should deliberatly obscured
-    the order of tracks passed a configurable intavle (eg. 15 min)
+    The track order returned by the template should deliberately obscured
+    the order of tracks passed a configurable intaval (eg. 15 min)
 
-    This is acomplished by calculating a split_index
-    clients of the api are expected to obscure the order where nessisary
+    This is accomplished by calculating a split_index
+    clients of the api are expected to obscure the order where necessarily
     """
-    assert get_queue(app) == []
+    queue_manager = QueueManager(app, queue)
+    assert not queue_manager.items
 
-    app.put('/settings.json', {'karakara.queue.group.split_markers': '[0:02:00, 0:10:00] -> timedelta'})
-    assert app.put('/settings.json').json['data']['settings']['karakara.queue.group.split_markers'][0] == 120.0, 'Settings not updated'
+    assert queue_manager.settings['karakara.queue.group.split_markers'][0] == 120.0, 'Settings not updated'
 
     # Test API and Logic
-
     for track_id, performer_name in [
         ('t1', 'testperformer1'),  #  60sec + 30sec padding = 1:00 + 0:30        = 1:30
-        ('t2', 'testperformer2'),  # 120sec + padding       = 1:30 + 2:00 + 0:30 = 4:00 
+        ('t2', 'testperformer2'),  # 120sec + padding       = 1:30 + 2:00 + 0:30 = 4:00
         ('t3', 'testperformer3'),  # 240sec + padding       = 4:00 + 4:00 + 0:30 = 8:30
     ]:
-        add_queue(app, track_id, performer_name)
+        queue_manager.add_queue_item(track_id, performer_name)
 
-    data = app.get('/queue?format=json').json['data']
+    data = queue_manager.data
     assert len(data['queue_split_indexs']) == 1
     assert data['queue_split_indexs'][0] == 2
 
     # Test Template Display
-    soup = BeautifulSoup(app.get('/queue').text)
+    soup = queue_manager.soup
     def get_track_ids(_class):
         return [re.match(r'.*/(.*)', li.a['href']).group(1) for li in soup.find(**{'class': _class}).find_all('li')]
     queue_list = get_track_ids('queue-list')
@@ -315,7 +329,7 @@ def test_queue_obscure(app, tracks):
     assert 't3' in queue_grid
     assert len(queue_grid) == 1
 
-    clear_queue(app)
+    queue_manager.clear()
 
 
 def test_queue_track_duplicate(app, tracks, DBSession, commit):
