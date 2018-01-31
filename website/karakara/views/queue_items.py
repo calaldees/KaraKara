@@ -281,7 +281,11 @@ def queue_item_del(request):
 
 
 #@view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
-@view_config(context='karakara.traversal.QueueItemsContext', custom_predicates=(method_put_router,))
+@view_config(
+    context='karakara.traversal.QueueItemsContext',
+    custom_predicates=(method_put_router,),
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
+)
 @modification_action
 def queue_item_update(request):
     """

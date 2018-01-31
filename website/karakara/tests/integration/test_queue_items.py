@@ -182,22 +182,24 @@ def test_queue_played(app, queue, tracks):
     Player system gets track list and removes first queue_item.id when played
     """
     queue_manager = QueueManager(app, queue)
-    assert queue_manager.items == []
+    assert len(queue_manager.items) == 0
 
     # Add track to queue
     queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
+    assert len(queue_manager.items) == 1
 
     # Try to set as 'played' as normal user - and get rejected
     app.cookiejar.clear()  # Loose the cookie so we are not identifyed as the creator of this queue item.
     queue_item_id = queue_manager.items[0]['id']
     app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
+    assert len(queue_manager.items) == 1
 
     # As admin player mark track as played
     queue_manager.admin_play_next_track()
 
     # TODO: 'skipped status' needs testing too - maybe query actual db?
 
-    assert queue_manager.items == []
+    assert len(queue_manager.items) == 0
 
 
 def test_queue_reorder(app, tracks):
