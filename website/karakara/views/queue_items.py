@@ -265,7 +265,7 @@ def queue_item_del(request):
     if not queue_item:
         _log_event(status='reject', reason='invalid.queue_item.id', queue_item_id=queue_item_id)
         raise action_error(message='invalid queue_item.id', code=404)
-    if not is_admin(request) and queue_item.session_owner != request.session['id']:
+    if not is_admin(request) and queue_item.session_owner != request.session_identity['id']:
         _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
         raise action_error(message='you are not the owner of this queue_item', code=403)
 

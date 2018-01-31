@@ -50,7 +50,7 @@ class admin_rights:
 
     @property
     def is_admin(self):
-        return self.app.get(self.queue_url).json['identity']['admin']
+        return bool(self.app.get(f'{self.queue_url}?format=json').json['identity']['admin'])
     @is_admin.setter
     def is_admin(self, value):
         password = self.ADMIN_PASSWORD if value else ''

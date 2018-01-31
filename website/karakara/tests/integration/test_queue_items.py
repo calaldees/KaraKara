@@ -31,6 +31,7 @@ class QueueManager():
     def add_queue_item(self, track_id, performer_name):
         response = self.app.post(self.queue_items_url, dict(track_id=track_id, performer_name=performer_name))
         assert response.status_code == 201
+        return response
 
     def del_queue_item(self, queue_item_id, expect_errors=False):
         """
@@ -45,25 +46,21 @@ class QueueManager():
             self.del_queue_item(queue_item['id'])
         assert self.items == []
 
+    def admin_play_next_track(self):
+        """
+        As admin player mark track as played
+        """
+        with admin_rights(self.app, self.queue):
+            queue_item_id = self.items[0]['id']
+            response = app.put(self.queue_items.url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'})
+            assert 'update' in response.json['messages'][0]
+
 
 def get_cookie(app, key):
     try:
         return json.loads({cookie.name: cookie for cookie in app.cookiejar}[key].value)
     except KeyError:
         return None
-
-
-
-
-def admin_play_next_track(app):
-    """
-    As admin player mark track as played
-    """
-    response = app.get('/admin')
-    queue_item_id = get_queue(app)[0]['id']
-    response = app.put('/queue', {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'})
-    assert 'update' in response.json['messages'][0]
-    response = app.get('/admin')
 
 
 # Tests ------------------------------------------------------------------------
@@ -148,33 +145,34 @@ def test_queue_etag(app, queue, tracks):
     queue_manager.clear()
 
 
-def test_queue_permissions(app, tracks):
+def test_queue_permissions(app, queue, tracks):
     """
     Check only the correct users can remove a queued item
     Check only admin can move items
     """
-    assert get_queue(app) == []
+    queue_manager = QueueManager(app, queue)
+    assert queue_manager.items == []
 
     # Queue a track
-    response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
-    queue_item_id = get_queue(app)[0]['id']
+    queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
+    #response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
+    queue_item_id = queue_manager.items[0]['id']
     # Try to move the track (only admins can move things)
-    response = app.put('/queue', {'queue_item.id': queue_item_id, 'queue_item.move.target_id': 9999}, expect_errors=True)
+    response = app.put(queue_manager.queue_items_url, {'queue_item.id': queue_item_id, 'queue_item.move.target_id': 9999}, expect_errors=True)
     assert response.status_code == 403
     # Clear the cookies (ensure we are a new user)
     app.cookiejar.clear()
     # Attempt to delete the queued track (should fail)
-    response = del_queue(app, queue_item_id, expect_errors=True)
+    response = queue_manager.del_queue_item(queue_item_id, expect_errors=True)
     assert response.status_code == 403
-    assert len(get_queue(app)) == 1, 'the previous user should not of had permissions to remove the item from the queue'
+    assert len(queue_manager.items) == 1, 'the previous user should not of had permissions to remove the item from the queue'
     # Become an admin, del track, remove admin status
-    response = app.get('/admin')
-    del_queue(app, queue_item_id)
-    response = app.get('/admin')
+    with admin_rights(app, queue):
+        queue_manager.del_queue_item(queue_item_id)
 
     # TODO: assert remove button on correct elements on template
 
-    assert get_queue(app) == []
+    assert queue_manager.items == []
 
 
 def test_queue_played(app, tracks):

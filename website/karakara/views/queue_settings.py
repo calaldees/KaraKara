@@ -116,7 +116,7 @@ def queue_settings_view(request):
         queue_settings = {
             k: v
             for k, v in queue_settings.items()
-            if k.startswith(SETTING_PRIVATE_IDENTIFIER)
+            if not k.startswith(SETTING_PRIVATE_IDENTIFIER)
         }
         return {'settings': queue_settings}
 
