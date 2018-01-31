@@ -41,6 +41,17 @@ class QueueManager():
         """
         return self.app.post(self.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id}, expect_errors=expect_errors)
 
+    def move_queue_item(self, queue_index, queue_index_target, expect_errors=False):
+        queue_ids = [q['id'] for q in self.items]
+        return self.app.put(
+            self.queue_items_url,
+            {
+                'queue_item.id': queue_ids[queue_index],
+                'queue_item.move.target_id': queue_ids[queue_index_target],
+            },
+            expect_errors=expect_errors,
+        )
+
     def clear(self):
         for queue_item in self.items:
             self.del_queue_item(queue_item['id'])
@@ -202,60 +213,68 @@ def test_queue_played(app, queue, tracks):
     assert len(queue_manager.items) == 0
 
 
-def test_queue_reorder(app, tracks):
+def test_queue_reorder(app, queue, tracks):
     """
     Test the queue ordering and weighting system
     Only Admin user should be able to modify the track order
     Admin users should always see the queue in order
     """
+    queue_manager = QueueManager(app, queue)
+
+    def get_track_ids():
+        return [q['track_id'] for q in queue_manager.items]
+    def get_queue_ids():
+        return [q['id'] for q in queue_manager.items]
+
     # Test Normal template dose not have form values to move items
-    response = app.get('/queue')
+    response = queue_manager.get_html_response()
     assert 'queue_item.move.target_id' not in response.text, 'Normal users should not be able to move items'
 
     # Ensure queue user is Admin and starting queue state is empty
-    response = app.get('/admin')
-    assert get_queue(app) == []
+    with admin_rights(app, queue):
+        assert not queue_manager.items
 
-    # Test Admin users have form values to move items
-    response = app.get('/queue')
-    assert 'queue_item.move.target_id' in response.text, 'Admin users should be able to move items'
+        # Test Admin users have form values to move items
+        response = queue_manager.get_html_response()
+        assert 'queue_item.move.target_id' in response.text, 'Admin users should be able to move items'
 
-    # Setup queue
-    for track_id, performer_name in [
-        ('t1', 'testperformer1'),
-        ('t2', 'testperformer2'),
-        ('t3', 'testperformer3'),
-        ('xxx', 'testperformer4')
-    ]:
-        add_queue(app, track_id, performer_name)
-    queue = get_queue(app)
-    assert ['t1', 't2', 't3', 'xxx'] == [q['track_id'] for q in queue]
+        # Setup queue
+        for track_id, performer_name in [
+            ('t1', 'testperformer1'),
+            ('t2', 'testperformer2'),
+            ('t3', 'testperformer3'),
+            ('xxx', 'testperformer4')
+        ]:
+            queue_manager.add_queue_item(track_id, performer_name)
+        assert ['t1', 't2', 't3', 'xxx'] == get_track_ids()
 
-    # Move last track to front of queue
-    response = app.put('/queue', {'queue_item.id': queue[3]['id'], 'queue_item.move.target_id': queue[0]['id']})
-    queue = get_queue(app)
-    assert ['xxx', 't1', 't2', 't3'] == [q['track_id'] for q in queue]
+        # Move last track to front of queue
+        queue_manager.move_queue_item(3, 0)
+        assert ['xxx', 't1', 't2', 't3'] == get_track_ids()
 
-    # Move second track to infont of last item
-    response = app.put('/queue', {'queue_item.id': queue[1]['id'], 'queue_item.move.target_id': queue[-1]['id']})
-    queue = get_queue(app)
-    assert ['xxx', 't2', 't1', 't3'] == [q['track_id'] for q in queue]
+        # Move second track to infont of last item
+        queue_manager.move_queue_item(1, -1)
+        assert ['xxx', 't2', 't1', 't3'] == get_track_ids()
 
-    # Check moving to a destination id that does not exisit yeilds the end of the queue
-    response = app.put('/queue', {'queue_item.id': queue[1]['id'], 'queue_item.move.target_id': 65535})
-    queue = get_queue(app)
-    assert ['xxx', 't1', 't3', 't2'] == [q['track_id'] for q in queue]
+        # Check moving to a destination id that does not exisit yeilds the end of the queue
+        response = app.put(
+            queue_manager.queue_items_url,
+            {
+                'queue_item.id': queue_manager.items[1]['id'],
+                'queue_item.move.target_id': 65535,
+            },
+        )
+        assert ['xxx', 't1', 't3', 't2'] == get_track_ids()
 
     # Check normal users cannot change order
-    response = app.get('/admin')  # turn off admin
-    response = app.put('/queue', {'queue_item.id': queue[1]['id'], 'queue_item.move.target_id': queue[3]['id']}, expect_errors=True)
+    response = queue_manager.move_queue_item(1, 3, expect_errors=True)
     assert response.status_code == 403
     assert 'admin only' in response.text
-    queue = get_queue(app)
-    assert ['xxx', 't1', 't3', 't2'] == [q['track_id'] for q in queue]
+
+    assert ['xxx', 't1', 't3', 't2'] == get_track_ids()
 
     # Tidy queue
-    clear_queue(app)
+    queue_manager.clear()
 
 
 def test_queue_obscure(app, tracks):
