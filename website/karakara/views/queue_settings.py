@@ -1,10 +1,6 @@
 from pyramid.view import view_config
 
-from externals.lib.misc import convert_str_with_type
-# TODO: We probably should use `convert_str` instead of `convert_str_with_type`
-# This is because we always want to ensure the settings are of the correct type
-# However, if we currently do convert_str('[0, 6]', 'timedelta') we don't get the list, we just get a single item.
-# We should probably look at this
+from externals.lib.misc import convert_str
 
 from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router, is_admin
 
@@ -51,6 +47,8 @@ SETTINGS_TYPE_MAPPING = {
 
     'karakara.print_tracks.fields': 'list',
     'karakara.print_tracks.short_id_length': 'int',
+
+    'karakara.event.end': 'datetime',
 }
 
 
@@ -88,9 +86,11 @@ DEFAULT_SETTINGS = {
 
     'karakara.print_tracks.fields': '[category, from, use, title, artist]',
     'karakara.print_tracks.short_id_length': 4,
+
+    'karakara.event.end': '',
 }
 DEFAULT_SETTINGS = {
-    k: convert_str_with_type(v, fallback_type=SETTINGS_TYPE_MAPPING.get(k))
+    k: convert_str(v, SETTINGS_TYPE_MAPPING.get(k))
     for k, v in DEFAULT_SETTINGS.items()
 }
 SETTING_PRIVATE_IDENTIFIER = 'karakara.private.'
@@ -113,7 +113,7 @@ def queue_settings_view(request):
         queue_settings = {
             **DEFAULT_SETTINGS,
             **{
-                queue_setting.key: convert_str_with_type(queue_setting.value, fallback_type=SETTINGS_TYPE_MAPPING.get(queue_setting.key))
+                queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
                 for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
             },
         }
@@ -153,7 +153,7 @@ def queue_settings_view_put(request):
 
     def is_valid(key, value):
         try:
-            convert_str_with_type(value, fallback_type=SETTINGS_TYPE_MAPPING.get(key))
+            convert_str(value, SETTINGS_TYPE_MAPPING.get(key))
             return True
         except AssertionError:
             return False
