@@ -29,8 +29,10 @@ class temporary_settings:
     def __exit__(self, type, value, traceback):
         def empty_list_hack(value):
             # Hack to fix reverting to empty list
-            if value == []:
-                return '[]'
+            #if value == []:
+            #    return '[]'
+            if isinstance(value, (list, tuple)):
+                return str(value)
             return value
         self.app.put(self.settings_url, {k: empty_list_hack(v) for k, v in self.settings_original_values.items()})
         log.debug(f'Temporay setting {self.settings_dict} reverted to {self.settings_original_values}')
