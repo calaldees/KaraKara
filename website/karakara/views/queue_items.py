@@ -19,6 +19,7 @@ from ..model.actions import get_track
 from ..templates.helpers import track_title
 
 from ..model_logic import QUEUE_DUPLICATE, TOKEN_ISSUE_ERROR
+from ..model_logic.priority_token_logic import PriorityTokenManager
 
 #from .track import invalidate_track
 
@@ -202,9 +203,10 @@ def queue_item_add(request):
         if queue_limit and request.queue.duration > queue_limit:
             # If no device priority token - issue token and abort
             # else consume the token and proceed with addition
-            if not _logic.consume_priority_token(request, DBSession):
+            priority_token_manager = PriorityTokenManager(request)
+            if not priority_token_manager.consume():
                 # Issue a priority token
-                priority_token = _logic.issue_priority_token(request, DBSession)
+                priority_token = priority_token_manager.issue()
                 if isinstance(priority_token, PriorityToken):
                     _log_event(status='reject', reason='token.issued')
                     raise action_error(message=_('view.queue.add.priority_token_issued'), code=400)
