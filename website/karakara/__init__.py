@@ -108,9 +108,9 @@ def main(global_config, **settings):
         config.registry.settings['server.etag.cache_buster'] = 'last_update:{0}'.format(str(last_update()))
 
     # Search Config ------------------------------------------------------------
-    import karakara.views.search
-    karakara.views.search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
-    assert karakara.views.search.search_config, 'search_config data required'
+    import karakara.views.queue_search
+    karakara.views.queue_search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
+    assert karakara.views.queue_search.search_config, 'search_config data required'
 
     # Global State -------------------------------------------------------------
     config.registry.settings['karakara.tracks.version'] = random.randint(0, 20000000)

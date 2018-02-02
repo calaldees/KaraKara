@@ -187,7 +187,7 @@ stop_webapp_daemon:
 .PHONY: test test_crawl
 
 test: ini
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x --pdb -k test_queue_items
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -k test_queue_items
 	#test_search_tags_html_redirect
 	#
 	# --capture=sys

@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from sqlalchemy.orm import joinedload
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only
-from .search import _restrict_search
+from .queue_search import _restrict_search
 
 from ..model import DBSession
 from ..model.model_tracks import Track

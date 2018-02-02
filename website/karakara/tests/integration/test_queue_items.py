@@ -377,6 +377,7 @@ def test_queue_performer_restrict(app, queue, queue_manager, tracks, DBSession, 
 
 
 @with_settings(settings={
+    'karakara.queue.add.duplicate.track_limit': 0,  # Disable duplicate track limit
     'karakara.queue.add.limit'                : '0:02:30',  # 150sec
     'karakara.queue.track.padding'            : '0:00:30',
     'karakara.queue.add.limit.priority_window': '0:05:00',
@@ -425,13 +426,16 @@ def test_queue_limit(app, queue, queue_manager, tracks):
     'karakara.event.end': str(now() + datetime.timedelta(minutes=0, seconds=30)),
 })
 def test_event_end(app, queue, queue_manager, tracks):
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob')
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob', expect_errors=True)
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1')
+    response = queue_manager.add_queue_item(track_id='t2', performer_name='bob2', expect_errors=True)
     assert response.status_code == 400
     assert 'ending soon' in response.text
 
 
 def test_priority_tokens(app, queue):
+    priority_token_url = f'/queue/{queue}/priority_tokens'
+    response = app.get(priority_token_url, expect_errors=True)
+    assert response.status_code == 403
     with admin_rights(app, queue):
-        response = app.get('/priority_tokens')
+        response = app.get(priority_token_url)
         assert response.status_code == 200

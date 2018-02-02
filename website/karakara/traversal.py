@@ -69,6 +69,7 @@ class QueueContext(QueueResourceMixin, NextContextMixin):
                     RandomImagesContext,
                     RemoteControlContext,
                     QueueAdminContext,
+                    QueuePriorityTokenContext,
                 )
             )
         return QueueContext(parent=self, id=key)
@@ -107,7 +108,7 @@ class TrackContext(QueueResourceMixin):
 
 
 class SearchListContext(QueueResourceMixin):
-    __template__ = 'search_list'
+    __template__ = 'queue_search_list'
     __name__ = 'search_list'
 
     def __init__(self, parent=None):
@@ -120,7 +121,7 @@ class SearchListContext(QueueResourceMixin):
 
 
 class SearchTagsContext(QueueResourceMixin):
-    __template__ = 'search_tags'
+    __template__ = 'queue_search_tags'
     __name__ = 'search_tags'
 
     def __init__(self, parent=None):
@@ -130,6 +131,38 @@ class SearchTagsContext(QueueResourceMixin):
     def __getitem__(self, key):
         self.tags.append(key)
         return self
+
+
+class RandomImagesContext(QueueResourceMixin):
+    __template__ = 'queue_random_images'
+    __name__ = 'random_images'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class RemoteControlContext(QueueResourceMixin):
+    __template__ = 'queue_remote_control'
+    __name__ = 'remote_control'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class QueueAdminContext(QueueResourceMixin):
+    __template__ = 'queue_admin'
+    __name__ = 'admin'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class QueuePriorityTokenContext(QueueResourceMixin):
+    __template__ = 'queue_priority_tokens'
+    __name__ = 'priority_tokens'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
 
 
 class ComunityContext():
@@ -148,24 +181,3 @@ class TrackListContext(QueueResourceMixin):
 class TrackImportContext():
     __name__ = 'import'
 
-
-class RandomImagesContext(QueueResourceMixin):
-    __name__ = 'random_images'
-
-    def __init__(self, parent=None):
-        self.__parent__ = parent
-
-
-class RemoteControlContext(QueueResourceMixin):
-    __name__ = 'remote_control'
-
-    def __init__(self, parent=None):
-        self.__parent__ = parent
-
-
-class QueueAdminContext(QueueResourceMixin):
-    __template__ = 'queue_admin'
-    __name__ = 'admin'
-
-    def __init__(self, parent=None):
-        self.__parent__ = parent
