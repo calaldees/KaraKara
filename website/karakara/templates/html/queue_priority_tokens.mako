@@ -6,7 +6,7 @@
 % for field in fields:
     <th>${field}</th>
 % endfor
-% for priority_token in data['priority_tokens']:
+% for priority_token in data.get('priority_tokens', []):
     <tr>
     % for field in fields:
         <td>${priority_token[field]}</td>

@@ -437,5 +437,6 @@ def test_priority_tokens(app, queue):
     response = app.get(priority_token_url, expect_errors=True)
     assert response.status_code == 403
     with admin_rights(app, queue):
+        # TODO: assert priority token in list?
         response = app.get(priority_token_url)
         assert response.status_code == 200

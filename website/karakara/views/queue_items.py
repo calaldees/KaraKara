@@ -350,7 +350,9 @@ def queue_item_update(request):
     return action_ok(message='queue_item updated')
 
 
-@view_config(route_name='priority_tokens')
+@view_config(
+    context='karakara.traversal.QueuePriorityTokenContext',
+)
 @admin_only
 def priority_tokens(request):
     # TODO: karakara.queue.add.duplicate.time_limit is the wrong value to use here
@@ -358,5 +360,5 @@ def priority_tokens(request):
         .filter(PriorityToken.valid_start >= now() - request.queue.settings.get('karakara.queue.add.duplicate.time_limit')) \
         .order_by(PriorityToken.valid_start)
     return action_ok(data={
-        'priority_tokens': (priority_token.to_dict('full') for priority_token in priority_tokens),
+        'priority_tokens': tuple(priority_token.to_dict('full') for priority_token in priority_tokens),
     })
