@@ -118,7 +118,7 @@ def modification_action(target, *args, **kwargs):
     Check readonly mode and abort non admins
     """
     request = request_from_args(args)
-    if not is_admin(request) and request.registry.settings.get('karakara.system.user.readonly'):
+    if not is_admin(request) and request.queue.settings.get('karakara.system.user.readonly'):
         raise action_error(message='normal users are in readonly mode', code=403)
 
     return target(*args, **kwargs)

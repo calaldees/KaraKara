@@ -74,7 +74,7 @@ DEFAULT_SETTINGS = {
 
     'karakara.template.input.performer_name': '',
     'karakara.template.title': 'KaraKara (dev)',
-    'karakara.template.menu.disable': False,
+    'karakara.template.menu.disable': '',
 
     #karakara.search.view.config = data/config/search_config.json
     'karakara.search.tag.silent_forced': '[]',

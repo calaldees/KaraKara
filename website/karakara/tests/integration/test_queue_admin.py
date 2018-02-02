@@ -1,5 +1,7 @@
 import pytest
 
+from . import temporary_settings, admin_rights
+
 
 def test_queue_home_disabled(app, queue):
     """
@@ -19,45 +21,38 @@ def test_queue_home_disabled(app, queue):
         response = app.get(url_queue_home)
         assert 'test menu disbaled' in response.text
 
-        # TODO: Reimplement admin
-        #response = app.get('/admin')
-        #response = app.get('/')
-        #assert 'test menu disbaled' not in response.text
-        #response = app.get('/admin')
+        with admin_rights(app, queue):
+            response = app.get('/')
+            assert 'test menu disbaled' not in response.text
 
 
-# TODO: Update this test
-def test_queue_readonly_mode(app, tracks):
-    response = app.get('/track/t1')
-    assert "form action='/queue" in response.text
+def test_queue_readonly_mode(app, queue, tracks):
+    track_url = f'/queue/{queue}/track/t1'
+    track_form_identifier = "form action='/queue"
 
-    response = app.put('/settings', {
-        'karakara.system.user.readonly': 'True -> bool',
-    })
+    response = app.get(track_url)
+    assert track_form_identifier in response.text
 
-    # Normal users are restricted
-    response = app.get('/track/t1')
-    assert "form action='/queue" not in response.text
+    with temporary_settings(app, queue, {'karakara.system.user.readonly': True}):
 
-    response = app.post('/queue', dict(track_id='t1', performer_name='bob'), expect_errors=True)
-    assert response.status_code == 403
-    assert 'readonly' in response.text
+        # Normal users are restricted
+        response = app.get(track_url)
+        assert track_form_identifier not in response.text
 
-    # Admin users function as normal
-    response = app.get('/admin')
-    response = app.get('/track/t1')
-    assert "form action='/queue" in response.text
-    # TODO - we need a way of adding to the queue and getting the queue_item.id back in the response
-    #        currently this is not possible as the commit happens at the transaction level automatically
-    #response = app.post('/queue.json', dict(track_id='t1', performer_name='bob')).json['data']
-    #assert False
-    response = app.get('/admin')
+        response = app.post('/queue/{queue}/queue_items', dict(track_id='t1', performer_name='bob'), expect_errors=True)
+        assert response.status_code == 403
+        assert 'readonly' in response.text
+
+        # Admin users function as normal
+        with admin_rights(app, queue):
+            response = app.get(track_url)
+            assert track_form_identifier in response.text
+            # TODO - we need a way of adding to the queue and getting the queue_item.id back in the response
+            #        currently this is not possible as the commit happens at the transaction level automatically
+            #response = app.post('/queue.json', dict(track_id='t1', performer_name='bob')).json['data']
+            #assert False
 
     # TODO - test 'update' and 'delete'? - for now testing the decoration once (above) is light enough
-
-    response = app.put('/settings', {
-        'karakara.system.user.readonly': 'False -> bool',
-    })
 
 
 def test_admin_toggle(app, queue):

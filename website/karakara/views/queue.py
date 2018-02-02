@@ -21,7 +21,9 @@ def generate_cache_key_homepage(request):
     ))
 
 
-@view_config(context='karakara.traversal.QueueContext')
-@etag_decorator(generate_cache_key_homepage)
+@view_config(
+    context='karakara.traversal.QueueContext',
+)
+#@etag_decorator(generate_cache_key_homepage)
 def queue_home(request):
     return action_ok()

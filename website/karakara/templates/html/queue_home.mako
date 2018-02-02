@@ -23,7 +23,7 @@
 -->
 
 ## TODO - 'request.registry.settings' is depricated for queue level settings
-<% disbaled_message = request.registry.settings.get('karakara.template.menu.disable') %>
+<% disbaled_message = request.queue.settings.get('karakara.template.menu.disable') %>
 % if not identity.get('admin', False) and disbaled_message:
     <p>${disbaled_message}</p>
 % else:
