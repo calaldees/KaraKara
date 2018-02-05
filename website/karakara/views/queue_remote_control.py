@@ -13,6 +13,6 @@ log = logging.getLogger(__name__)
 def remote(request):
     cmd = request.params.get('cmd')
     if cmd:
-        request.log_event(cmd)
-        request.send_socket_message(cmd)
+        request.log_event(command=cmd)
+        request.send_websocket_message(cmd)
     return action_ok()

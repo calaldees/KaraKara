@@ -93,7 +93,8 @@ DEFAULT_SETTINGS = {
     k: convert_str(v, SETTINGS_TYPE_MAPPING.get(k))
     for k, v in DEFAULT_SETTINGS.items()
 }
-SETTING_PRIVATE_IDENTIFIER = 'karakara.private.'
+SETTING_IDENTIFIER = 'karakara'
+SETTING_IDENTIFIER_PRIVATE = f'{SETTING_IDENTIFIER}.private'
 
 
 def acquire_cache_bucket_func(request):
@@ -120,7 +121,7 @@ def queue_settings_view(request):
         queue_settings = {
             k: v
             for k, v in queue_settings.items()
-            if not k.startswith(SETTING_PRIVATE_IDENTIFIER)
+            if not k.startswith(SETTING_IDENTIFIER_PRIVATE)
         }
         return {'settings': queue_settings}
 
@@ -161,7 +162,7 @@ def queue_settings_view_put(request):
 
     error_messages = []
     for key, value in request.params.items():
-        if key not in DEFAULT_SETTINGS.keys() and not key.startswith(SETTING_PRIVATE_IDENTIFIER):
+        if not key.startswith(SETTING_IDENTIFIER) and not key.startswith(SETTING_IDENTIFIER_PRIVATE):  #key not in DEFAULT_SETTINGS.keys()
             continue
         if is_valid(key, value):
             get_or_create_queue_settings_obj(key).value = value

@@ -1,14 +1,15 @@
 import re
 import socket
+from multiprocessing import Process, Queue
+
 import bs4
 def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
+from . import admin_rights
 
-from multiprocessing import Process, Queue
 
-
-def test_remote_control(app):
+def test_remote_control(app, queue):
     """
     Connect to socketserver - unfortunately with a plain tcp socket rather than a websocket
     Load up remote page.
@@ -16,12 +17,9 @@ def test_remote_control(app):
     Assert socket receives the correct message
     """
     # Non admins cannot use the remote control
-    response = app.get('/remote', expect_errors=True)
+    remote_control_url = f'/queue/{queue}/remote_control'
+    response = app.get(remote_control_url, expect_errors=True)
     response.status_code == 403
-
-    # Attain admin privilages
-    response_json = app.get('/admin.json').json
-    assert response_json['identity']['admin']
 
     def connection(sock, message_received_queue):
         while True:
@@ -37,20 +35,19 @@ def test_remote_control(app):
     client_listener_process.daemon = True
     client_listener_process.start()
 
-    def press_button(soup, button_text):
-        url = soup.find('a', text=re.compile(button_text, flags=re.IGNORECASE))['href']
-        response = app.get('/remote{0}'.format(url))
-        assert response.status_code==200
-        assert 'remote' in response.text.lower()
-        assert button_text in message_received_queue.get(timeout=1)
+    # Attain admin privilages
+    with admin_rights(app, queue):
 
-    soup = BeautifulSoup(app.get('/remote').text)
-    for button_name in ('play', 'pause', 'seek', 'stop', 'skip'):
-        press_button(soup, button_name)
+        def press_button(soup, button_text):
+            url = soup.find('a', text=re.compile(button_text, flags=re.IGNORECASE))['href']
+            response = app.get(f'{remote_control_url}/{url}')
+            assert response.status_code==200
+            assert 'remote' in response.text.lower()
+            assert button_text in message_received_queue.get(timeout=1)
+
+        soup = BeautifulSoup(app.get(remote_control_url).text)
+        for button_name in ('play', 'pause', 'seek', 'stop', 'skip'):
+            press_button(soup, button_name)
 
     client_listener_process.terminate()
     client_listener_process.join()
-
-    # Revolk admin privilages
-    response_json = app.get('/admin.json').json
-    assert not response_json['identity']['admin']

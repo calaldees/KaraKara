@@ -8,7 +8,7 @@ from externals.lib.misc import substring_in
 from . import admin_rights
 
 
-def test_static(app):
+def test_static(app, queue):
 
     def external_links(path):
         """ Extract list of externals from page """
@@ -16,9 +16,10 @@ def test_static(app):
         scripts = {script['src'] for script in soup.find_all('script')}
         links = {link['href'] for link in soup.find_all('link')}
         return scripts | links
+
     static_files = set()
-    with admin_rights(app):
-        for path in ('/', '/track_list'):
+    with admin_rights(app, queue):
+        for path in ('/', f'/queue/{queue}/track_list'):
             static_files |= external_links(path)
 
     # Request each external (no 404's should be found)

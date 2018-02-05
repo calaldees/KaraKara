@@ -34,21 +34,21 @@ def test_track_view_api(app, queue, tracks):
     assert 'ここ' in data['track']['lyrics']
 
 
-def test_track_list_print_all(app, tracks, queue):
+def test_track_list_print_all(app, queue, tracks):
     """
     Track list displays all tracks in one giant document
     Used for printing
     """
-    with admin_rights(app):
+    with admin_rights(app, queue):
         response = app.get(f'/queue/{queue}/track_list')
         for text in ['track 1', 'track 2', 'track 3', 'wildcard']:
             assert text in response.text
 
 
-def test_track_list_print_all_api(app, tracks, queue):
+def test_track_list_print_all_api(app, queue, tracks):
     # TODO: Security has been disbaled temporerally. This should be re-enabled ASAP
     #assert app.get('/track_list.json', expect_errors=True).status_code == 403
-    with admin_rights(app):
+    with admin_rights(app, queue):
         data = app.get(f'/queue/{queue}/track_list?format=json').json['data']
         assert 'test track 2' in [title for track in data['list'] for title in track['tags']['title']]
 

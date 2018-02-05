@@ -165,11 +165,6 @@ class QueuePriorityTokenContext(QueueResourceMixin):
         self.__parent__ = parent
 
 
-class ComunityContext():
-    __template__ = 'comunity'
-    __name__ = 'comunity'
-
-
 class TrackListContext(QueueResourceMixin):
     __template__ = 'track_list'
     __name__ = 'track_list'
@@ -178,6 +173,16 @@ class TrackListContext(QueueResourceMixin):
         self.__parent__ = parent
 
 
-class TrackImportContext():
-    __name__ = 'import'
+class ComunityContext():
+    __template__ = 'comunity'
+    __name__ = 'comunity'
 
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class TrackImportContext():
+    __name__ = 'track_import'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent

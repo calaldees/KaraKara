@@ -19,7 +19,7 @@ def test_track_import_without_data(app):
     )
 
 
-def test_track_import_delete(app, tracks):
+def test_track_import_delete(app, queue, tracks):
     _assert_base_tracks(app)
 
     track_import1_source = {
@@ -36,7 +36,7 @@ def test_track_import_delete(app, tracks):
     _track_import(app, method='post', json_data=[track_import1_source])
     assert 'import1' in _track_import(app, method='get').json['data']['tracks']
 
-    track_import1 = app.get('/track/import1?format=json').json['data']['track']
+    track_import1 = app.get(f'/queue/{queue}/track/import1?format=json').json['data']['track']
     for key in ('id', 'duration', 'lyrics', 'source_filename'):
         assert track_import1_source[key] == track_import1[key]
     assert track_import1['title'] == 'Import Test'
