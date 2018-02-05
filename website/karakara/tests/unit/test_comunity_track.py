@@ -4,7 +4,7 @@ from karakara.views.comunity import ComunityTrack
 
 STATUS_TAGS = {
     'required': ('title',),
-    'recomended': ('artist',),
+    'recommended': ('artist',),
     'yellow': ('yellow', 'problem'),
     'red': ('red', 'broken'),
     'black': ('black', 'delete'),

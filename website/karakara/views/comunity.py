@@ -37,10 +37,10 @@ PATH_UPLOAD_KEY = 'upload.path'
 
 STATUS_TAGS = {
     'required': (),  # ('category', 'title'),
-    'recomended': ('lang',),  # ('artist', ),
+    'recommended': ('lang',),  # ('artist', ),
     'yellow': ('yellow', 'caution', 'warning', 'problem'),
     'red': ('red', 'broken', 'critical'),
-    'black': ('black', 'delete', 'remove', 'depricated'),
+    'black': ('black', 'delete', 'remove', 'deprecated'),
     'green': ('green', 'ok', 'checked')
 }
 
@@ -78,7 +78,7 @@ def _generate_cache_key_comunity_list(request):
 @subscriber(EventFileUploaded)
 def file_uploaded(event):
     """
-    Depricated.
+    Deprecated.
     Files are now updated from processmedia2.
     This can be removed.
     """
@@ -246,7 +246,7 @@ class ComunityTrack():
             for t in tag_list:
                 if t not in track_dict['tags']:
                     status_details[status_key].append(message.format(t))
-        check_tags(status_tags['recomended'], 'yellow', 'tag {0} suggested')
+        check_tags(status_tags['recommended'], 'yellow', 'tag {0} suggested')
         check_tags(status_tags['required'], 'red', 'tag {0} missing')
 
         def flag_tags(tag_list, status_key):
@@ -282,21 +282,24 @@ class ComunityTrack():
 # Community Views
 #-------------------------------------------------------------------------------
 
-@view_config(route_name='comunity')
-@web
+@view_config(
+    context='karakara.traversal.ComunityContext',
+)
 def comunity(request):
     return action_ok()
 
 
-@view_config(route_name='comunity_upload')
-@web
+@view_config(
+    context='karakara.traversal.ComunityUploadContext',
+)
 def comunity_upload(request):
     return action_ok()
 
 
-@view_config(route_name='comunity_list')
-@etag_decorator(_generate_cache_key_comunity_list)
-@web
+@view_config(
+    context='karakara.traversal.ComunityTrackContext',
+)
+#@etag_decorator(_generate_cache_key_comunity_list)
 @comunity_only
 def comunity_list(request):
 
@@ -348,8 +351,10 @@ def comunity_list(request):
     return action_ok(data=data_tracks)
 
 
-@view_config(route_name='comunity_track', request_method='GET')
-@web
+@view_config(
+    route_name='comunity_track',
+    request_method='GET'
+)
 @comunity_only
 def comunity_track(request):
     id = request.matchdict['id']

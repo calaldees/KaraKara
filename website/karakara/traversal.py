@@ -26,7 +26,7 @@ class TraversalGlobalRootFactory(NextContextMixin):
                 QueueContext,
                 #TrackContext,  # Admin only for all tracks
                 #TrackListContext,  # Admin only for all tracks
-                #ComunityContext
+                ComunityContext,
                 TrackImportContext,  # Needs secure permissions
             )
         )
@@ -173,9 +173,87 @@ class TrackListContext(QueueResourceMixin):
         self.__parent__ = parent
 
 
-class ComunityContext():
+class ComunityContext(NextContextMixin):
     __template__ = 'comunity'
     __name__ = 'comunity'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+    def __getitem__(self, key):
+        return self.next_context(
+            key,
+            (
+                ComunityLoginContext,
+                ComunityLogoutContext,
+                ComunityListContext,
+                ComunityTrackContext,
+                ComunityUploadContext,
+                ComunitySettingsContext,
+                ComunityProcessmediaLogContext,
+            )
+        )
+
+
+class ComunityLoginContext():
+    __template__ = 'comunity_login'
+    __name__ = 'login'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class ComunityLogoutContext():
+    __template__ = 'comunity_logout'
+    __name__ = 'logout'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class ComunityListContext():
+    __template__ = 'comunity_list'
+    __name__ = 'list'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class ComunityTrackContext():
+    __template__ = 'comunity_track'
+    __name__ = 'track'
+
+    def __init__(self, parent=None, id=None):
+        self.__parent__ = parent
+        self.id = id
+        if self.id:
+            self.__name__ = self.id
+
+    def __getitem__(self, key):
+        if self.id:
+            raise KeyError()
+        return ComunityTrackContext(parent=self, id=key)
+
+
+class ComunityUploadContext():
+    __template__ = 'comunity_upload'
+    __name__ = 'upload'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class ComunitySettingsContext():
+    __template__ = 'comunity_settings'
+    __name__ = 'settings'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class ComunityProcessmediaLogContext():
+    __template__ = 'comunity_processmedia_log'
+    __name__ = 'processmedia_log'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
