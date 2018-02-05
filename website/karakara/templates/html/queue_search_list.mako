@@ -1,6 +1,6 @@
 <%inherit file="_base.mako"/>
 
-<%namespace name="search_tags" file="search_tags.mako" import="search_url"/>
+<%namespace name="search_tags" file="queue_search_tags.mako" import="search_url"/>
 
 <%def name="title()">${_('mobile.search_list.title')}</%def>
 

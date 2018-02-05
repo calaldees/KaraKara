@@ -5,7 +5,7 @@ import pytest
 from . import with_settings
 
 
-@pytest.mark.xfail()
+@pytest.mark.xfail(strict=True)
 def test_track_list_urlencoding():
     """
     TODO: Need test to cover correct url encoding
