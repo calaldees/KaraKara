@@ -39,7 +39,7 @@ def test_queue_readonly_mode(app, queue, tracks):
         response = app.get(track_url)
         assert track_form_identifier not in response.text
 
-        response = app.post('/queue/{queue}/queue_items', dict(track_id='t1', performer_name='bob'), expect_errors=True)
+        response = app.post(f'/queue/{queue}/queue_items', dict(track_id='t1', performer_name='bob'), expect_errors=True)
         assert response.status_code == 403
         assert 'readonly' in response.text
 

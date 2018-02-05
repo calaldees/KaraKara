@@ -149,6 +149,7 @@ def queue_settings_view_put(request):
             queue_setting_obj.queue_id = request.context.queue_id
             queue_setting_obj.key = key
             DBSession.add(queue_setting_obj)
+            queue_setting_objs[key] = queue_setting_obj
             return queue_setting_obj
 
     def is_valid(key, value):
@@ -160,6 +161,8 @@ def queue_settings_view_put(request):
 
     error_messages = []
     for key, value in request.params.items():
+        if key not in DEFAULT_SETTINGS.keys() and not key.startswith(SETTING_PRIVATE_IDENTIFIER):
+            continue
         if is_valid(key, value):
             get_or_create_queue_settings_obj(key).value = value
         else:

@@ -149,7 +149,6 @@ def queue_item_add(request):
 
     # If not admin, check additional restrictions
     if not is_admin(request):
-
         performer_name = request.params.get('performer_name').strip()  # TODO: It would be good to ensure this value is writen to the db. However we cant modify the request.param dict directly. See creation of queueitem below
 
         # Valid performer name
