@@ -18,7 +18,7 @@ from ..model import DBSession
 from ..model.model_tracks import Track
 from ..model.actions import last_update
 
-from . import web, action_ok, action_error, cache, etag_decorator, generate_cache_key, comunity_only, is_comunity
+from . import action_ok, action_error, cache_manager, comunity_only, is_comunity
 
 #from ..views.track import invalidate_track
 from ..templates import helpers as h
@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 
 PATH_BACKUP_KEY = 'static.backup'
-PATH_PROCESSMEDIA2_CONFIG = 'static.processmedia2.config'
+PATH_PROCESSMEDIA2_CONFIG = 'static.processmedia2.\config'
 PATH_PROCESSMEDIA2_LOG = 'static.processmedia2.log'
 PATH_UPLOAD_KEY = 'upload.path'
 
@@ -56,19 +56,22 @@ def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
 #-------------------------------------------------------------------------------
 # Cache Management
 #-------------------------------------------------------------------------------
-LIST_CACHE_KEY = 'comunity_list'
-list_cache_timestamp = None
+#LIST_CACHE_KEY = 'comunity_list'
+#list_cache_timestamp = None
 
-list_version = random.randint(0, 2000000000)
-def invalidate_list_cache(request=None):
-    global list_version
-    list_version += 1
-    cache.delete(LIST_CACHE_KEY)
+#list_version = random.randint(0, 2000000000)
+#def invalidate_list_cache(request=None):
+#    global list_version
+#    list_version += 1
+#    cache.delete(LIST_CACHE_KEY)
+#
+#def _generate_cache_key_comunity_list(request):
+#    global list_version
+#    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_comunity(request))])
 
+def acquire_cache_bucket_func(request):
+    return cache_manager.get(f'comunity-{request.context.__name__}-{last_update()}-{is_comunity(request)}')
 
-def _generate_cache_key_comunity_list(request):
-    global list_version
-    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_comunity(request))])
 
 
 #-------------------------------------------------------------------------------
@@ -284,6 +287,7 @@ class ComunityTrack():
 
 @view_config(
     context='karakara.traversal.ComunityContext',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
 def comunity(request):
     return action_ok()
@@ -297,9 +301,9 @@ def comunity_upload(request):
 
 
 @view_config(
-    context='karakara.traversal.ComunityTrackContext',
+    context='karakara.traversal.ComunityListContext',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-#@etag_decorator(_generate_cache_key_comunity_list)
 @comunity_only
 def comunity_list(request):
 
@@ -341,19 +345,22 @@ def comunity_list(request):
         }
 
     # Invalidate cache if db has updated
-    last_update_timestamp = last_update()
-    global list_cache_timestamp
-    if list_cache_timestamp is None or last_update_timestamp != list_cache_timestamp:
-        list_cache_timestamp = last_update_timestamp
-        invalidate_list_cache(request)
+    #last_update_timestamp = last_update()
+    #global list_cache_timestamp
+    #if list_cache_timestamp is None or last_update_timestamp != list_cache_timestamp:
+    #    list_cache_timestamp = last_update_timestamp
+    #    #invalidate_list_cache(request)
+    #    request.cache_bucket.invalidate(request=request)
 
-    data_tracks = cache.get_or_create(LIST_CACHE_KEY, _comnunity_list)
-    return action_ok(data=data_tracks)
+    return action_ok(
+        data=request.cache_bucket.get_or_create(_comnunity_list)
+    )
 
 
 @view_config(
-    route_name='comunity_track',
-    request_method='GET'
+    context='karakara.traversal.ComunityTrackContext',
+    request_method='GET',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
 @comunity_only
 def comunity_track(request):
@@ -369,8 +376,10 @@ def comunity_track(request):
     # Todo - should throw action error with details on fail. i.e. if static files unavalable
 
 
-@view_config(route_name='comunity_track', request_method='POST')
-@web
+@view_config(
+    context='karakara.traversal.ComunityTrackContext',
+    request_method='POST',
+)
 @comunity_only
 def comunity_track_update(request):
     id = request.matchdict['id']
@@ -395,16 +404,17 @@ def comunity_track_update(request):
 
 
 # A temp hack to allow te updating of tags for searching to be visible in the comunity interface
-from .registry_settings import update_settings
+#from .registry_settings import update_settings
 COMUNITY_VISIBLE_SETTINGS = ('karakara.print_tracks.fields', 'karakara.search.tag.silent_forced', 'karakara.search.tag.silent_hidden')
-@view_config(route_name='comunity_settings')
-@web
+@view_config(
+    context='karakara.traversal.ComunitySettingsContext',
+)
 @comunity_only
 def community_settings(request):
 
     # '{0} -> list' is a hack. This assumes that all data types given to this method are lists
     # This will have to be updated
-    update_settings(request.registry.settings, {k: '{0} -> list'.format(v) for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS})
+    #update_settings(request.registry.settings, {k: '{0} -> list'.format(v) for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS})
 
     return action_ok(data={'settings': {
         setting_key: request.registry.settings.get(setting_key)
@@ -412,8 +422,9 @@ def community_settings(request):
     }})
 
 
-@view_config(route_name='comunity_processmedia_log')
-@web
+@view_config(
+        context='karakara.traversal.ComunityProcessmediaLogContext',
+)
 @comunity_only
 def comunity_processmedia_log(request):
     LOGFILE = request.registry.settings[PATH_PROCESSMEDIA2_LOG]
