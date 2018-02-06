@@ -12,7 +12,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def last_update():
+def last_track_db_update():
     try:
         return DBSession.query(Track.time_updated).order_by(Track.time_updated.desc()).limit(1).one()[0]
     except NoResultFound:

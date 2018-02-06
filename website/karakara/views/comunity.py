@@ -16,7 +16,6 @@ from externals.lib.pyramid_helpers.views.upload import EventFileUploaded
 
 from ..model import DBSession
 from ..model.model_tracks import Track
-from ..model.actions import last_update
 
 from . import action_ok, action_error, cache_manager, comunity_only, is_comunity
 
@@ -70,7 +69,7 @@ def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
 #    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_comunity(request))])
 
 def acquire_cache_bucket_func(request):
-    return cache_manager.get(f'comunity-{request.context.__name__}-{last_update()}-{is_comunity(request)}')
+    return cache_manager.get(f'comunity-{request.context.__name__}-{request.last_track_db_update}-{is_comunity(request)}')
 
 
 

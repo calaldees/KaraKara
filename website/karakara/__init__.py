@@ -101,19 +101,25 @@ def main(global_config, **settings):
     session_factory = SignedCookieSessionFactory(serializer=json_serializer, **session_settings)
     config.set_session_factory(session_factory)
 
+    from .model.actions import last_track_db_update
+    # Track DB Version ---------------------------------------------------------
+    config.add_request_method(last_track_db_update, reify=True)
+
     # Cachebust etags ----------------------------------------------------------
     #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate
     if not config.registry.settings['server.etag.cache_buster']:
-        from .model.actions import last_update
-        config.registry.settings['server.etag.cache_buster'] = 'last_update:{0}'.format(str(last_update()))
+        config.registry.settings['server.etag.cache_buster'] = 'last_update:{0}'.format(str(last_track_db_update()))
+        # TODO: Where is this used? How is this related to karakara.tracks.version?
+
+    # Global State -------------------------------------------------------------
+    config.registry.settings['karakara.tracks.version'] = random.randint(0, 20000000)
+
 
     # Search Config ------------------------------------------------------------
     import karakara.views.queue_search
     karakara.views.queue_search.search_config = read_json(config.registry.settings['karakara.search.view.config'])
     assert karakara.views.queue_search.search_config, 'search_config data required'
 
-    # Global State -------------------------------------------------------------
-    config.registry.settings['karakara.tracks.version'] = random.randint(0, 20000000)
 
     # LogEvent -----------------------------------------------------------------
 
