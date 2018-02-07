@@ -74,7 +74,7 @@ def test_admin_toggle(app, queue):
     response = _set_admin_status(True)
     assert 'admin' in response.text
     response = app.get(queue_url)
-    for text in ['Exit Admin Mode']:
+    for text in ['class="admin"']:
         assert text in response.text
     response = _set_admin_status(False)
 
