@@ -28,7 +28,7 @@
 				const badgenames = document.getElementById("badgenames").value.split("\n").map((x)=>x.trim());
 
 				const xhttp = new XMLHttpRequest();
-				var queue_settings_url = decodeURI(getUrlParameter('queue_settings_url'));  // TODO: decodeURI does not escap %2F -> '/' ... find a solution
+				var queue_settings_url = decodeURIComponent(getUrlParameter('queue_settings_url'));
 				xhttp.open("POST", queue_settings_url, false);
 
 				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
