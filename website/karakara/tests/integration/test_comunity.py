@@ -118,22 +118,28 @@ def test_comunity_track_render(app, users, tracks):
     #    FileNotFoundError
     #)
 
-    # Make web request
-    with patch.object(ComunityTrack, '_open', multi_mock_open.open):
-        response = app.get('/comunity/track/t1')
-
-    # Assert output
-    for text in (
-        'Test Track 1 - TITLE EXTENDED',
-        'track1source',
-        'subtitle content',
-        'processed.mpg'  # Link to processed video is present
+    for track_url in (
+            '/comunity/track/t1',
+            '/comunity/track/t1.html',
+            '/comunity/track/t1.html_template',
     ):
-        assert text in response.text
+        # Make web request
+        with patch.object(ComunityTrack, '_open', multi_mock_open.open):
+            response = app.get(track_url)
+
+        # Assert output
+        for text in (
+                'Test Track 1 - TITLE EXTENDED',
+                'track1source',
+                'subtitle content',
+                'processed.mpg'  # Link to processed video is present
+        ):
+            assert text in response.text
 
     logout(app)
 
 
+@pytest.mark.skip('unimplemented')
 def test_comunity_settings(app, tracks, users, settings):
     """
     This is also testing tracks_all heavily in this flow
@@ -174,7 +180,7 @@ def test_comunity_settings(app, tracks, users, settings):
     logout(app)
 
 
-def test_comunity_processmedia_logs(app, settings):
+def test_comunity_processmedia_logs(app, registry_settings):
     response = app.get('/comunity/processmedia_log', expect_errors=True)
     assert response.status_code == 403
 
@@ -189,7 +195,7 @@ def test_comunity_processmedia_logs(app, settings):
 2002-01-01 00:00:00,000 - __main__ - ERROR - Error test
 """
     )
-    with patch.dict(settings, {'static.processmedia2.log': 'processmedia.log'}):
+    with patch.dict(registry_settings, {'static.processmedia2.log': 'processmedia.log'}):
         # rrrrrrr - kind of a hack using ComunityTrack._open .. but it works ..
         with patch.object(ComunityTrack, '_open', multi_mock_open.open):
             response = app.get('/comunity/processmedia_log?levels=WARNING,ERROR', expect_errors=True)

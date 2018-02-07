@@ -66,7 +66,7 @@
 					##${self.navbar_elements()}
 					% if (identity.get('user') or {}).get('approved'):
 					<li><a href="/comunity/list">Tracks</a></li>
-					<li><a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a></li>
+					##<li><a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a></li>
 					<li><a href="/search_tags/">MobileBrowse</a></li>
 					<li><a href="/track_list">PrintableList</a></li>
 					<li><a href="/comunity/settings">Settings</a></li>

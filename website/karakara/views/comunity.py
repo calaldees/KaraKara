@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 
 PATH_BACKUP_KEY = 'static.backup'
-PATH_PROCESSMEDIA2_CONFIG = 'static.processmedia2.\config'
+PATH_PROCESSMEDIA2_CONFIG = 'static.processmedia2.config'
 PATH_PROCESSMEDIA2_LOG = 'static.processmedia2.log'
 PATH_UPLOAD_KEY = 'upload.path'
 
@@ -69,7 +69,11 @@ def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
 #    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_comunity(request))])
 
 def acquire_cache_bucket_func(request):
-    return cache_manager.get(f'comunity-{request.context.__name__}-{request.last_track_db_update}-{is_comunity(request)}')
+    try:
+        _id = request.context.id
+    except:
+        _id = ''
+    return cache_manager.get(f'comunity-{request.context.__name__}-{request.last_track_db_update}-{is_comunity(request)}-{_id}')
 
 
 
@@ -359,13 +363,12 @@ def comunity_list(request):
 @view_config(
     context='karakara.traversal.ComunityTrackContext',
     request_method='GET',
-    acquire_cache_bucket_func=acquire_cache_bucket_func,
+    #acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
 @comunity_only
 def comunity_track(request):
-    id = request.matchdict['id']
-    log.debug('comunity_track {}'.format(id))
-    ctrack = ComunityTrack.factory(id, request)
+    log.debug('comunity_track {}'.format(request.context.id))
+    ctrack = ComunityTrack.factory(request.context.id, request)
     return action_ok(data={
         'track': ctrack.track,
         'status': ctrack.status,
@@ -381,9 +384,8 @@ def comunity_track(request):
 )
 @comunity_only
 def comunity_track_update(request):
-    id = request.matchdict['id']
-    log.debug('comunity_track_update {}'.format(id))
-    ctrack = ComunityTrack.factory(id, request)
+    log.debug('comunity_track_update {}'.format(request.context.id))
+    ctrack = ComunityTrack.factory(request.context.id, request)
 
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
@@ -422,7 +424,7 @@ def community_settings(request):
 
 
 @view_config(
-        context='karakara.traversal.ComunityProcessmediaLogContext',
+    context='karakara.traversal.ComunityProcessmediaLogContext',
 )
 @comunity_only
 def comunity_processmedia_log(request):

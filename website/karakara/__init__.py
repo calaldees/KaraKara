@@ -102,8 +102,10 @@ def main(global_config, **settings):
     config.set_session_factory(session_factory)
 
     from .model.actions import last_track_db_update
+    def _last_track_db_update(request):
+        return last_track_db_update()
     # Track DB Version ---------------------------------------------------------
-    config.add_request_method(last_track_db_update, reify=True)
+    config.add_request_method(_last_track_db_update, 'last_track_db_update', property=True, reify=True)
 
     # Cachebust etags ----------------------------------------------------------
     #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate
