@@ -10,11 +10,26 @@
 	</head>
 	<body>
 		<script type="text/javascript">
+
+			function getUrlParameter(sParam) {
+				//http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
+				var sPageURL = window.location.search.substring(1);
+				var sURLVariables = sPageURL.split('&');
+				for (var i = 0; i < sURLVariables.length; i++) {
+					var sParameterName = sURLVariables[i].split('=');
+					if (sParameterName[0] == sParam) {
+						return sParameterName[1];
+					}
+				}
+				return '';
+			}
+
 			function _submit() {
 				const badgenames = document.getElementById("badgenames").value.split("\n").map((x)=>x.trim());
 
 				const xhttp = new XMLHttpRequest();
-				xhttp.open("POST", "/settings.json", false);
+				var queue_settings_url = decodeURI(getUrlParameter('queue_settings_url'));  // TODO: decodeURI does not escap %2F -> '/' ... find a solution
+				xhttp.open("POST", queue_settings_url, false);
 
 				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				xhttp.send("method=PUT&karakara.queue.add.valid_performer_names="+encodeURI("["+badgenames.join(', ')+"]"));
@@ -33,7 +48,7 @@
 				return false;
 			}
 		</script>
-		<form action="/settings.json" method="PUT">
+		<form action="" method="PUT">
 			<textarea id="badgenames" name="badgenames"></textarea>
 			<input type="hidden" name="method" value="PUT">
 			<p><input type="submit" onclick="return _submit();" /></p>

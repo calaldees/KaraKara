@@ -1,5 +1,10 @@
 <%inherit file="_base.mako"/>
 
+<%!
+from urllib.parse import quote_plus
+%>
+
+
 <%doc>
   Developer Note:
     If you add any 'if' statements to this template, ensure you update the etag generator for the homepage
@@ -45,7 +50,7 @@
     <a href="${paths['settings']}"         data-role="button" class="admin">${_('mobile.home.settings')}</a>
     <a href="${paths['remote_control']}"   data-role="button" class="admin">${_('mobile.home.remote')}</a>
     <a href="${paths['priority_tokens']}"  data-role="button" class="admin">${_('mobile.home.priority_tokens')}</a>
-    <a href="/static/form_badgenames.html" data-role="button" class="admin">${_('mobile.home.badgenames')}</a>
+    <a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}" data-role="button" class="admin">${_('mobile.home.badgenames')}</a>
     ##<a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>
     ##<a href="/comunity"           data-role="button" class="admin">${_('mobile.home.comunity')}</a>
 % endif
