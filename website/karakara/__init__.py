@@ -85,10 +85,24 @@ def main(global_config, **settings):
             queue_context = request.context.queue_context
             if queue_context:
                 response['paths'].update({
-                    'queue': pyramid.traversal.resource_path(queue_context),
-                    'track': pyramid.traversal.resource_path(queue_context['track']),
-                    'search_tags': pyramid.traversal.resource_path(queue_context['search_tags']),
-                    'search_list': pyramid.traversal.resource_path(queue_context['search_list']),
+                    **{
+                        'queue': pyramid.traversal.resource_path(queue_context),
+                        'player': f'/player/player.html?queue_id={queue_context.id}',
+                    },
+                    **{
+                        route_name: pyramid.traversal.resource_path(queue_context[route_name])
+                        for route_name in (
+                            'queue_items',
+                            'track',
+                            'track_list',
+                            'search_tags',
+                            'search_list',
+                            'settings',
+                            'remote_control',
+                            'admin',
+                            'priority_tokens',
+                        )
+                    }
                 })
         except AttributeError:
             pass
@@ -274,38 +288,8 @@ def main(global_config, **settings):
     #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
     config.add_static_view(name='files', path=config.registry.settings['static.processmedia2.config']['path_processed'])
 
-    # Routes
-    def append_format_pattern(route):
-        return re.sub(r'{(.*)}', r'{\1:[^/\.]+}', route) #+ r'{spacer:[.]?}{format:(%s)?}' % '|'.join(registered_formats())
-
-    #config.add_route('home'          , append_format_pattern('/')              )
-    #config.add_route('track'         , append_format_pattern('/track/{id}')    )
-    #config.add_route('track_list'    , append_format_pattern('/track_list')    )
-    #config.add_route('track_import'  , append_format_pattern('/track_import')  )
-    #config.add_route('queue'         , append_format_pattern('/queue')         )
-    #config.add_route('priority_tokens', append_format_pattern('/priority_tokens'))
-    #config.add_route('fave'          , append_format_pattern('/fave')          )
-    #config.add_route('message'       , append_format_pattern('/message')          )
-    #config.add_route('admin_toggle'  , append_format_pattern('/admin')         )
-    #config.add_route('admin_lock'    , append_format_pattern('/admin_lock')    )
-    #config.add_route('remote'        , append_format_pattern('/remote')        )
-    #config.add_route('feedback'      , append_format_pattern('/feedback')      )
-    #config.add_route('settings'      , append_format_pattern('/settings')      )
-    #config.add_route('random_images' , append_format_pattern('/random_images') )
-    config.add_route('inject_testdata' , append_format_pattern('/inject_testdata') )
-    #config.add_route('stats'         , append_format_pattern('/stats')         )
-    #config.add_route('comunity'      , append_format_pattern('/comunity')      )
-    #config.add_route('comunity_login', append_format_pattern('/comunity/login'))
-    #config.add_route('comunity_logout', append_format_pattern('/comunity/logout'))
-    #config.add_route('comunity_list' , append_format_pattern('/comunity/list') )
-    #config.add_route('comunity_track', append_format_pattern('/comunity/track/{id}'))
-    #config.add_route('comunity_upload', append_format_pattern('/comunity/upload'))
-    #config.add_route('comunity_settings', append_format_pattern('/comunity/settings'))
-    #config.add_route('comunity_processmedia_log', append_format_pattern('/comunity/processmedia_log'))
-
-    #config.add_route('search_tags'   , '/search_tags/{tags:.*}')
-    #config.add_route('search_list'   , '/search_list/{tags:.*}')
-
+    # View Routes
+    config.add_route('inject_testdata', '/inject_testdata')
     # Upload extras -----
     #config.add_static_view(name=settings['upload.route.uploaded'], path=settings['upload.path'])  # the 'upload' route above always matchs first
     config.add_route('upload', '/upload{sep:/?}{name:.*}')
