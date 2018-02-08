@@ -15,6 +15,11 @@ var SETTINGS_DEFAULT = {
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
 	"karakara.event.end": null,
 }
+if (!getUrlParameter('queue_id')) {
+	var msg = 'Required query_string param queue_id missing';
+	console.error(msg);
+	alert(msg);
+}
 var URLS = {
 	'settings': "/queue/" + getUrlParameter('queue_id') + "/settings.json",
 	'queue_items': "/queue/" + getUrlParameter('queue_id') + "/queue_items.json"
