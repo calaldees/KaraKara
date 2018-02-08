@@ -15,6 +15,10 @@ var SETTINGS_DEFAULT = {
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
 	"karakara.event.end": null,
 }
+var URLS = {
+	'settings': "/queue/" + getUrlParameter('queue_id') + "/settings.json",
+	'queue_items': "/queue/" + getUrlParameter('queue_id') + "/queue_items.json"
+}
 
 
 // Constants ------------------------------------------------------------------
@@ -55,8 +59,8 @@ function init_settings(new_settings) {
 }
 init_settings({});
 function update_settings(on_updated) {
-	$.getJSON("/settings.json", {}, function(data) {
-		console.log("/settings");
+	$.getJSON(URLS.settings, {}, function(data) {
+		console.log(URLS.settings);
 		init_settings(data.data.settings);
 		if (typeof(on_updated) == "function") {on_updated(data);}
 	});
@@ -341,7 +345,7 @@ function song_finished(status) {
 	
 	// TODO - make this a .ajax request similar to the form in queue.mako
 	$.getJSON(
-		"/queue.json", {
+		URLS.queue_items, {
 			"method": "put",
 			"queue_item.id": id,
 			"status": status,
@@ -364,7 +368,7 @@ function update_playlist() {
 		return sig;
 	}
 
-	$.getJSON("/queue.json", {}, function(data) {
+	$.getJSON(URLS.queue_items, {}, function(data) {
 		console.log("update_playlist getJSON response");
 		if(_sig(playlist) != _sig(data.data.queue)) {
 			console.log("update_playlist:updated");

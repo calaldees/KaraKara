@@ -12,6 +12,10 @@ log = logging.getLogger(__name__)
 
 # TODO: Translation strings for this file
 
+REGISTRY_SETTINGS_PASSTHROUGH = {
+    'karakara.websocket.port',
+}
+
 SETTINGS_TYPE_MAPPING = {
     'karakara.system.user.readonly': 'bool',
     'karakara.event.end': 'datetime',
@@ -113,6 +117,10 @@ def queue_settings_view(request):
 
         queue_settings = {
             **DEFAULT_SETTINGS,
+            **{
+                k: request.registry.settings[k]
+                for k in REGISTRY_SETTINGS_PASSTHROUGH
+            },
             **{
                 queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
                 for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)

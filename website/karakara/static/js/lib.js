@@ -15,3 +15,17 @@ function timedelta_str(timedelta) {
 function randomize(array) {
     array.sort(function(){return 0.5-Math.random();});
 }
+
+function getUrlParameter(sParam) {
+    //http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
+    // TODO: ES6 this
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) {
+            return decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return '';
+}

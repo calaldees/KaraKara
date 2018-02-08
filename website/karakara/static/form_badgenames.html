@@ -13,12 +13,13 @@
 
 			function getUrlParameter(sParam) {
 				//http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
+				// TODO: ES6 this
 				var sPageURL = window.location.search.substring(1);
 				var sURLVariables = sPageURL.split('&');
 				for (var i = 0; i < sURLVariables.length; i++) {
 					var sParameterName = sURLVariables[i].split('=');
 					if (sParameterName[0] == sParam) {
-						return sParameterName[1];
+						return decodeURIComponent(sParameterName[1]);
 					}
 				}
 				return '';
@@ -28,7 +29,7 @@
 				const badgenames = document.getElementById("badgenames").value.split("\n").map((x)=>x.trim());
 
 				const xhttp = new XMLHttpRequest();
-				var queue_settings_url = decodeURIComponent(getUrlParameter('queue_settings_url'));
+				var queue_settings_url = getUrlParameter('queue_settings_url');
 				xhttp.open("POST", queue_settings_url, false);
 
 				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
