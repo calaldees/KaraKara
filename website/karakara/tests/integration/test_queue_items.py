@@ -132,7 +132,7 @@ def test_queue_errors(app, queue, queue_manager, tracks):
 
     response = app.post(queue_items_url, dict(track_id='t1000', performer_name='test_user'), expect_errors=True)
     assert response.status_code == 400
-    assert 'not exist' in response.text
+    assert 'view.queue.add.error.track_id' in response.text
 
     response = app.put(queue_items_url, {'queue_item.id': 'not_real_id'}, expect_errors=True)
     assert response.status_code == 404
@@ -170,6 +170,24 @@ def test_queue_etag(app, queue, queue_manager, tracks):
     assert response.status_code == 304
     response = app.get(track_url, headers={'If-None-Match': etag_track})
     assert response.status_code == 304
+
+
+def test_queue_form_action_format_redirect(app, queue, queue_manager, tracks):
+    """
+    The web forms use the format 'redirect'.
+    This enables flash messages to be set and move back to the originating page.
+    """
+    response = app.post(queue_manager.queue_items_url, {'track_id': 't1', 'performer_name': 'redirect_man', 'format': 'redirect'})
+    assert response.status_code == 302
+    response = response.follow()
+    assert 'add.ok' in response.text  # TODO: will need updating when i18n is sorted
+
+    queue_item_id = queue_manager.items[0]['id']
+
+    self.app.post(self.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id, 'format': 'redirect'})
+    assert response.status_code == 302
+    response = response.follow()
+    assert 'delete.ok' in response.text  # TODO: will need updating when i18n is sorted
 
 
 def test_queue_permissions(app, queue, queue_manager, tracks):
@@ -273,7 +291,7 @@ def test_queue_reorder(app, queue, queue_manager, tracks):
     # Check normal users cannot change order
     response = queue_manager.move_queue_item(1, 3, expect_errors=True)
     assert response.status_code == 403
-    assert 'admin only' in response.text
+    assert 'view.admin_required' in response.text
 
     assert ['xxx', 't1', 't3', 't2'] == get_track_ids()
 
@@ -408,7 +426,7 @@ def test_queue_limit(app, queue, queue_manager, tracks):
     # Try queue add again and not get priority token give as we already have one
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob4', expect_errors=True)
     #assert 'already have' in response.json['messages'][0]
-    assert 'already have' in response.text
+    assert 'view.queue.add.priority_token_already_issued' in response.text
 
     # Shift server time forward - simulate waiting 5 minuets - we should be in our priority token range
     now(now() + datetime.timedelta(minutes=5))
@@ -429,7 +447,7 @@ def test_event_end(app, queue, queue_manager, tracks):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1')
     response = queue_manager.add_queue_item(track_id='t2', performer_name='bob2', expect_errors=True)
     assert response.status_code == 400
-    assert 'ending soon' in response.text
+    assert 'view.queue.add.event_end' in response.text
 
 
 def test_priority_tokens(app, queue):

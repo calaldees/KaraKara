@@ -240,7 +240,7 @@ log_production:
 # Cleanup ----------------------------------------------------------------------
 .PHONY: clean_ini
 clean_ini:
-	rm -f $(INI_DEV)
+	#rm -f $(INI_DEV)
 	rm -f $(INI_TEST)
 	rm -f $(INI_PROD)
 

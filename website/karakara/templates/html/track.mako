@@ -56,9 +56,10 @@ ${video(track)}
         <p>This track has already been queued. Are you sure you want to still request it?</p>
         % endif
         % if queue_status != 'THRESHOLD':
-            <form action='/queue' method='POST' data-ajax="false" onsubmit="store_performer_name();">
+            <form action='${paths['queue_items']}' method='POST' data-ajax="false" onsubmit="store_performer_name();">
                 <input type='hidden' name='format'         value='redirect'      />
-                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='${request.registry.settings.get('karakara.template.input.performer_name') or _('view.track.input.performer_name.default')}' required />
+                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='_('view.track.input.performer_name.default')}' required />
+                ## TODO: reimplement this from settings? Need this in api return? - ${request.registry.settings.get('karakara.template.input.performer_name') or
                 <input type='hidden' name='track_id'       value='${track['id']}' />
                 <input type='submit' name='submit_'        value='Queue Track'   />
             </form>
@@ -76,6 +77,7 @@ ${video(track)}
 
 
 <!-- Fave -->
+<%doc>
 % if request.registry.settings.get('karakara.faves.enabled'):
     <% fave = track['id'] in (identity.get('faves',[]) or []) %>
     <form action="/fave.redirect" method="${'DELETE' if fave else 'POST'}">
@@ -86,6 +88,7 @@ ${video(track)}
         <input type="submit" value="${'Remove from faves' if fave else 'Add to faves'}" />
     </form>
 % endif
+</%doc>
 
 ##------------------------------------------------------------------------------
 

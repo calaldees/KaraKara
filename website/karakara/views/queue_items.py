@@ -118,7 +118,6 @@ def queue_items_view(request):
 
     return action_ok(
         data=request.cache_bucket.get_or_create(get_queue_dict)
-        #data=get_queue_dict()
     )
 
 
@@ -236,7 +235,14 @@ def queue_item_add(request):
 
     invalidate_cache(request, track_id)
 
-    return action_ok(message='track queued', data={'queue_item.id': ''}, code=201)  # TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
+    return action_ok(
+        message=_(
+            'view.queue.add.ok ${track_id} ${performer_name}',
+            mapping={'track_id': queue_item.track_id, 'performer_name': queue_item.performer_name},
+        ),
+        data={'queue_item.id': ''},
+        code=201,
+    )  # TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
 
 
 #@view_config(route_name='queue', custom_predicates=(method_delete_router, lambda info,request: request.params.get('queue_item.id')) ) #request_method='POST',
@@ -258,6 +264,7 @@ def queue_item_del(request):
 
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
+    _ = request.translate
     _log_event = partial(request.log_event, method='del')
 
     queue_item_id = int(request.params['queue_item.id'])
@@ -268,7 +275,13 @@ def queue_item_del(request):
         raise action_error(message='invalid queue_item.id', code=404)
     if not is_admin(request) and queue_item.session_owner != request.session_identity['id']:
         _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
-        raise action_error(message='you are not the owner of this queue_item', code=403)
+        raise action_error(
+            message=_(
+                'view.queue.error.not_owner ${track_id} ${session_owner}',
+                mapping={'track_id': queue_item.track_id, 'session_owner': queue_item.session_owner},
+            ),
+            code=403,
+        )
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status', 'removed')
@@ -278,7 +291,12 @@ def queue_item_del(request):
     #queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
     invalidate_cache(request, queue_item.track_id)
 
-    return action_ok(message='queue_item status changed')
+    return action_ok(
+        message=_(
+            'view.queue.delete.ok ${track_id} ${queue_id}',
+            mapping={'track_id': queue_item.track_id, 'queue_id': queue_item.queue_id},
+        )
+    )
 
 
 #@view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
@@ -296,6 +314,7 @@ def queue_item_update(request):
 
     TODO: THIS DOES NOT CONFORM TO THE REST STANDARD!!! Refactor
     """
+    _ = request.translate
     _log_event = partial(request.log_event, method='update')
 
     params = dict(request.params)
@@ -314,14 +333,23 @@ def queue_item_update(request):
         raise action_error(message='invalid queue_item.id', code=404)
     if not is_admin(request) and queue_item.session_owner != request.session['id']:
         _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
-        raise action_error(message='you are not the owner of this queue_item', code=403)
+        raise action_error(
+            message=_(
+                'view.queue.error.not_owner ${track_id} ${session_owner}',
+                mapping={'track_id': queue_item.track_id, 'session_owner': queue_item.session_owner},
+            ),
+            code=403,
+        )
 
     # If moving, lookup new weighting from the target track id
     # The source is moved infront of the target_id
     if params.get('queue_item.move.target_id'):
         if not is_admin(request):
             _log_event(status='reject', reason='move.not_admin', queue_item_id=queue_item_id)
-            raise action_error(message='admin only action', code=403)
+            raise action_error(
+                message=_('view.admin_required'),
+                code=403,
+            )
         # get next and previous queueitem weights
         try:
             target_weight,  = DBSession.query(QueueItem.queue_weight).filter(QueueItem.id==params.pop('queue_item.move.target_id')).one()
@@ -346,7 +374,12 @@ def queue_item_update(request):
 
     invalidate_cache(request, queue_item.track_id)
 
-    return action_ok(message='queue_item updated')
+    return action_ok(
+        message=_(
+            'view.queue.update.ok ${track_id} ${queue_item_id}',
+            mapping={'track_id': queue_item.track_id, 'queue_item_id': queue_item.id}
+        )
+    )
 
 
 @view_config(

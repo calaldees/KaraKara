@@ -4,6 +4,8 @@
 ##session.type    = ext:database
 ##session.url     = postgresql+pypostgresql://karakara:karakara@localhost/karakara
 
+pyramid.default_locale_name = karakara
+
 karakara.server.mode = test
 
 karakara.queue.add.limit                 = 0:00:00 -> timedelta

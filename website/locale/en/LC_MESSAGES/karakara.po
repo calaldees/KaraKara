@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: karakara 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-26 14:11+0000\n"
+"POT-Creation-Date: 2018-02-09 07:43+0000\n"
 "PO-Revision-Date: 2014-12-02 19:11+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.5.1\n"
 
 #: karakara/templates/html/_base.mako:42
 msgid "mobile.base.back"
@@ -30,95 +30,77 @@ msgstr "Home"
 msgid "mobile.base.flash_remove"
 msgstr "Remove"
 
-#: karakara/templates/html/home.mako:30
+#: karakara/templates/html/home.mako:4
+
+msgid "mobile.home.input_queue_label"
+msgstr "Queued tracks"
+
+#: karakara/templates/html/queue_home.mako:35
 msgid "mobile.home.search_tags"
 msgstr "Explore tracks"
 
-#: karakara/templates/html/home.mako:31
+#: karakara/templates/html/queue_home.mako:36
 msgid "mobile.home.queue"
 msgstr "Queued tracks"
 
-#: karakara/templates/html/home.mako:34
-msgid "mobile.home.fave"
-msgstr "Favorites"
-
-#: karakara/templates/html/home.mako:37
-msgid "mobile.home.feedback"
-msgstr "Feedback"
-
-#: karakara/templates/html/home.mako:41
+#: karakara/templates/html/queue_home.mako:48
 msgid "mobile.home.player"
 msgstr "Player Interface"
 
-#: karakara/templates/html/home.mako:42
+#: karakara/templates/html/queue_home.mako:49
 msgid "mobile.home.track_list"
 msgstr "Print Tracks"
 
-#: karakara/templates/html/home.mako:43
+#: karakara/templates/html/queue_home.mako:50
 msgid "mobile.home.settings"
 msgstr "Settings"
 
-#: karakara/templates/html/home.mako:44
-msgid "mobile.home.admin_lock"
-msgstr "Admin Lock"
-
-#: karakara/templates/html/home.mako:45
+#: karakara/templates/html/queue_home.mako:51
 msgid "mobile.home.remote"
 msgstr "Remote Control"
 
-#: karakara/templates/html/home.mako:46
-msgid "mobile.home.inject_testdata"
-msgstr "Inject Test Data"
-
-#: karakara/templates/html/home.mako:47
+#: karakara/templates/html/queue_home.mako:52
 msgid "mobile.home.priority_tokens"
 msgstr "Priority Tokens"
 
-#: karakara/templates/html/home.mako:48
-msgid "mobile.home.stats"
-msgstr "Server Stats"
+#: karakara/templates/html/queue_home.mako:53
 
-#: karakara/templates/html/home.mako:49
-msgid "mobile.home.admin"
+msgid "mobile.home.badgenames"
 msgstr "Exit Admin Mode"
 
-#: karakara/templates/html/home.mako:50
-msgid "mobile.home.comunity"
-msgstr "Comunity"
-
-#: karakara/templates/html/remote.mako:31
+#: karakara/templates/html/queue_remote_control.mako:31
 msgid "mobile.remote.play"
 msgstr "Play Fullscreen"
 
-#: karakara/templates/html/remote.mako:32
+#: karakara/templates/html/queue_remote_control.mako:32
 msgid "mobile.remote.pause"
 msgstr "Pause (toggle)"
 
-#: karakara/templates/html/remote.mako:33
+#: karakara/templates/html/queue_remote_control.mako:33
 msgid "mobile.remote.seek +${skip_sec}"
 msgstr "Seek (+${skip_sec}sec)"
 
-#: karakara/templates/html/remote.mako:34
+#: karakara/templates/html/queue_remote_control.mako:34
 msgid "mobile.remote.seek -${skip_sec}"
 msgstr "Seek (-${skip_sec}sec)"
 
-#: karakara/templates/html/remote.mako:35
+#: karakara/templates/html/queue_remote_control.mako:35
 msgid "mobile.remote.stop"
 msgstr "Stop"
 
-#: karakara/templates/html/remote.mako:36
+#: karakara/templates/html/queue_remote_control.mako:36
 msgid "mobile.remote.skip"
 msgstr "Skip Track"
 
-#: karakara/templates/html/search_list.mako:5
+#: karakara/templates/html/queue_search_list.mako:5
 msgid "mobile.search_list.title"
 msgstr "Track List"
 
-#: karakara/templates/html/search_list.mako:8
+#: karakara/templates/html/queue_search_list.mako:8
 msgid "mobile.search_list.heading"
 msgstr "Tracks"
 
-#: karakara/templates/html/search_tags.mako:7
+#: karakara/templates/html/queue_search_tags.mako:9
 msgid "mobile.search_tags.title"
 msgstr "Explore tracks"
 
@@ -126,47 +108,78 @@ msgstr "Explore tracks"
 msgid "mobile.track.title"
 msgstr "Track"
 
-#: karakara/templates/html/track.mako:61
-msgid "view.track.input.performer_name.default"
-msgstr "Performer name"
+#: karakara/views/queue_admin.py:35
+msgid "api.queue.admin.prohibited"
+msgstr ""
 
-#: karakara/views/queue.py:146
+#: karakara/views/queue_admin.py:38
+msgid "api.queue.admin.disabled"
+msgstr ""
+
+#: karakara/views/queue_admin.py:41
+msgid "api.queue.admin.enabled"
+msgstr ""
+
+#: karakara/views/queue_admin.py:43
+msgid "api.queue.admin.authentication_failed"
+msgstr ""
+
+#: karakara/views/queue_items.py:147
 msgid "view.queue.add.error.track_id ${track_id}"
 msgstr "track ${track_id} does not exist"
 
-#: karakara/views/queue.py:156
+#: karakara/views/queue_items.py:156
 msgid "view.queue.add.invalid_performer_name ${performer_name}"
 msgstr "${performer_name} is not a valid badge name for this event"
 
-#: karakara/views/queue.py:171
+#: karakara/views/queue_items.py:171
 msgid ""
 "view.queue.add.dupicate_performer_limit ${performer_name} "
 "${estimated_next_add_time} ${track_count} ${latest_queue_item_title}"
 msgstr "Unable to queue track. duplicate ${performer_name} limit reached"
 
-#: karakara/views/queue.py:184
+#: karakara/views/queue_items.py:184
 msgid ""
 "view.queue.add.dupicate_track_limit ${track_id} "
 "${estimated_next_add_time} ${track_count}"
 msgstr "Unable to queue track. duplicate 'track in queue' limit reached"
 
-#: karakara/views/queue.py:200 karakara/views/queue.py:215
+#: karakara/views/queue_items.py:197 karakara/views/queue_items.py:213
 msgid "view.queue.add.event_end ${event_end}"
-msgstr "Event will be ending soon and all the time has been alocated"
+msgstr "Event will be ending at ${event_end} and all the time has been allocated"
 
-#: karakara/views/queue.py:212
+#: karakara/views/queue_items.py:210
 msgid "view.queue.add.priority_token_issued"
 msgstr ""
 "Queue limit reached - You have been given a priority token and will have "
 "priority to queue a track in your priority timeslot"
 
-#: karakara/views/queue.py:218
+#: karakara/views/queue_items.py:216
 msgid "view.queue.add.priority_token_already_issued"
 msgstr ""
 "You already have a priority token timeslot. Queue your track when your "
 "timeslot occurs"
 
-#: karakara/views/queue.py:220
+#: karakara/views/queue_items.py:218
 msgid "view.queue.add.token_limit"
-msgstr "Queue limit reached - try queing a track later"
+msgstr "Queue limit reached - try queuing a track later"
 
+#: karakara/views/queue_items.py:239
+msgid "view.queue.add.ok ${track_id} ${performer_name}"
+msgstr "${performer_name} is not a valid badge name for this event"
+
+#: karakara/views/queue_items.py:279 karakara/views/queue_items.py:337
+msgid "view.queue.error.not_owner ${track_id} ${session_owner}"
+msgstr "track ${track_id} does not exist"
+
+#: karakara/views/queue_items.py:295
+msgid "view.queue.delete.ok ${track_id} ${queue_id}"
+msgstr "${performer_name} is not a valid badge name for this event"
+
+#: karakara/views/queue_items.py:350
+msgid "view.admin_required"
+msgstr ""
+
+#: karakara/views/queue_items.py:378
+msgid "view.queue.update.ok ${track_id} ${queue_item_id}"
+msgstr "${performer_name} is not a valid badge name for this event"

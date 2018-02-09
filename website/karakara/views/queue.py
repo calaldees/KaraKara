@@ -27,3 +27,7 @@ def generate_cache_key_homepage(request):
 #@etag_decorator(generate_cache_key_homepage)
 def queue_home(request):
     return action_ok()
+
+
+def queue_redirect(request):
+    pass
