@@ -64,9 +64,8 @@ msgid "mobile.home.priority_tokens"
 msgstr "Priority Tokens"
 
 #: karakara/templates/html/queue_home.mako:53
-
 msgid "mobile.home.badgenames"
-msgstr "Exit Admin Mode"
+msgstr "Badgenames"
 
 #: karakara/templates/html/queue_remote_control.mako:31
 msgid "mobile.remote.play"
