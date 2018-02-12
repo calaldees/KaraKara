@@ -166,20 +166,20 @@ msgstr "Queue limit reached - try queuing a track later"
 
 #: karakara/views/queue_items.py:239
 msgid "view.queue.add.ok ${track_id} ${performer_name}"
-msgstr "${performer_name} is not a valid badge name for this event"
+msgstr "Track queued for ${performer_name} "
 
 #: karakara/views/queue_items.py:279 karakara/views/queue_items.py:337
 msgid "view.queue.error.not_owner ${track_id} ${session_owner}"
-msgstr "track ${track_id} does not exist"
+msgstr "Track ${track_id} does not exist"
 
 #: karakara/views/queue_items.py:295
 msgid "view.queue.delete.ok ${track_id} ${queue_id}"
-msgstr "${performer_name} is not a valid badge name for this event"
+msgstr "Track removed"
 
 #: karakara/views/queue_items.py:350
 msgid "view.admin_required"
-msgstr ""
+msgstr "Admin required"
 
 #: karakara/views/queue_items.py:378
 msgid "view.queue.update.ok ${track_id} ${queue_item_id}"
-msgstr "${performer_name} is not a valid badge name for this event"
+msgstr "Track updated"

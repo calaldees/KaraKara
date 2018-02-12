@@ -184,7 +184,7 @@ def test_queue_form_action_format_redirect(app, queue, queue_manager, tracks):
 
     queue_item_id = queue_manager.items[0]['id']
 
-    self.app.post(self.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id, 'format': 'redirect'})
+    response = app.post(queue_manager.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id, 'format': 'redirect'})
     assert response.status_code == 302
     response = response.follow()
     assert 'delete.ok' in response.text  # TODO: will need updating when i18n is sorted
