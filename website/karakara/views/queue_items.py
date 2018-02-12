@@ -28,9 +28,9 @@ log = logging.getLogger(__name__)
 
 
 
-def socket_update_queue_items_event(request):
-    # TODO: This needs to incorporate the alert for the specific queue_id
-    request.socket_manager.recv('queue_updated'.encode('utf-8'))
+#def socket_update_queue_items_event(request):
+#    # TODO: This needs to incorporate the alert for the specific queue_id
+#    request.socket_manager.recv('queue_updated'.encode('utf-8'))
 #cache_manager.get('queue_items').register_invalidate_callback(socket_update_queue_items_event, ('request', ))
 
 def acquire_cache_bucket_func(request):
@@ -39,6 +39,8 @@ def acquire_cache_bucket_func(request):
 def invalidate_cache(request, track_id):
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
     cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
+    # TODO: This needs to incorporate the alert for the specific queue_id
+    request.send_websocket_message('queue_updated')
 
 
 #-------------------------------------------------------------------------------

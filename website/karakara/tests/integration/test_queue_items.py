@@ -9,7 +9,7 @@ def BeautifulSoup(markup):
 
 from externals.lib.misc import now
 
-from . import admin_rights, with_settings, temporary_settings
+from . import admin_rights, with_settings, temporary_settings, websocket_message_queue
 
 
 # Utils ------------------------------------------------------------------------
@@ -100,7 +100,7 @@ def get_cookie(app, key):
 
 # Tests ------------------------------------------------------------------------
 
-def test_queue_view_simple_add_delete_cycle(app, queue, queue_manager, tracks):
+def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_manager, tracks):
     """
     View empty queue
     queue a track
@@ -112,7 +112,9 @@ def test_queue_view_simple_add_delete_cycle(app, queue, queue_manager, tracks):
     assert 'track 1' not in response.text.lower()
 
     # Queue 'Track 1'
-    queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
+    with websocket_message_queue() as message_received_queue:
+        queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
+        assert message_received_queue.get(timeout=1) == 'queue_updated'
 
     # Check track is in queue list
     response = queue_manager.get_html_response()
@@ -121,6 +123,11 @@ def test_queue_view_simple_add_delete_cycle(app, queue, queue_manager, tracks):
     # Check queue in track description
     response = app.get(f'/queue/{queue}/track/t1')
     assert 'testperformer' in response.text.lower()
+    queue_item_id = queue_manager.items[0]['id']
+
+    with websocket_message_queue() as message_received_queue:
+        queue_manager.del_queue_item(queue_item_id=queue_item_id)
+        assert message_received_queue.get(timeout=1) == 'queue_updated'
 
 
 def test_queue_errors(app, queue, queue_manager, tracks):
@@ -180,14 +187,14 @@ def test_queue_form_action_format_redirect(app, queue, queue_manager, tracks):
     response = app.post(queue_manager.queue_items_url, {'track_id': 't1', 'performer_name': 'redirect_man', 'format': 'redirect'})
     assert response.status_code == 302
     response = response.follow()
-    assert 'add.ok' in response.text  # TODO: will need updating when i18n is sorted
+    assert 'add.ok' in response.text
 
     queue_item_id = queue_manager.items[0]['id']
 
     response = app.post(queue_manager.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id, 'format': 'redirect'})
     assert response.status_code == 302
     response = response.follow()
-    assert 'delete.ok' in response.text  # TODO: will need updating when i18n is sorted
+    assert 'delete.ok' in response.text
 
 
 def test_queue_permissions(app, queue, queue_manager, tracks):
