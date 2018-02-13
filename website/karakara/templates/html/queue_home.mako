@@ -51,6 +51,7 @@ from urllib.parse import quote_plus
     <a href="${paths['remote_control']}"   data-role="button" class="admin">${_('mobile.home.remote')}</a>
     <a href="${paths['priority_tokens']}"  data-role="button" class="admin">${_('mobile.home.priority_tokens')}</a>
     <a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}" data-role="button" class="admin">${_('mobile.home.badgenames')}</a>
+    <a href="${paths['admin']}?password="  data-role="button" class="admin">${_('mobile.home.admin_exit')}</a>
     ##<a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>
     ##<a href="/comunity"           data-role="button" class="admin">${_('mobile.home.comunity')}</a>
 % endif
