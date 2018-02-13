@@ -51,8 +51,6 @@ SETTINGS_TYPE_MAPPING = {
 
     'karakara.print_tracks.fields': 'list',
     'karakara.print_tracks.short_id_length': 'int',
-
-    'karakara.event.end': 'datetime',
 }
 
 

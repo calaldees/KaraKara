@@ -47,7 +47,7 @@
 
 <% total_tracks = len(data.get('trackids',[])) %>
 ## data['tags'] or data['keywords'] or ## original logic for displaying "list all" button
-% if total_tracks < request.registry.settings['karakara.search.template.button.list_tracks.threshold']:
+% if total_tracks < request.queue.settings['karakara.search.template.button.list_tracks.threshold']:
 <a href="${search_url(route='search_list')}" data-role="button" data-icon="arrow-r">List ${total_tracks} Tracks</a>
 % endif
 
@@ -57,7 +57,7 @@
     <%
         tags = [tag for tag in data.get('sub_tags',[]) if tag.get('parent')==parent_tag]  # AllanC - humm .. inefficent filtering in a template .. could be improved
         
-        try   : renderer = jquerymobile_accordian if tags[-1]['parent'] in request.registry.settings['karakara.search.list.alphabetical.tags'] and len(tags)>request.registry.settings['karakara.search.list.alphabetical.threshold'] else jquerymobile_list
+        try   : renderer = jquerymobile_accordian if tags[-1]['parent'] in request.queue.settings['karakara.search.list.alphabetical.tags'] and len(tags)>request.queue.settings['karakara.search.list.alphabetical.threshold'] else jquerymobile_list
         except: renderer = jquerymobile_list
     %>
     ${renderer(tags)}

@@ -15,7 +15,7 @@
             console.error("Websockets not supported. Using request method", err);
         }
     });
-    
+
     function send(message) {
         if (socket != null) {
             socket.send(message);
@@ -26,7 +26,7 @@
 </script>
 
 <%
-    skip_sec = request.registry.settings['karakara.player.video.skip.seconds']
+    skip_sec = request.queue.settings['karakara.player.video.skip.seconds']
     buttons = (
         ('play'          , _('mobile.remote.play')),
         ('pause'         , _('mobile.remote.pause')),

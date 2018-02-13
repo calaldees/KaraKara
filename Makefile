@@ -1,4 +1,3 @@
-include .env
 
 SHELL := $(SHELL) -e
 
@@ -8,6 +7,13 @@ ENV:=_env
 help:
 	# KaraKara
 
+.env:
+	cp $@._base $@
+	cat $@._local >> $@
+
+include .env
+
+# Docker management
 docker_build:
 	docker-compose build
 	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
@@ -72,7 +78,7 @@ move_mouse:
 PROJECTS = processmedia2 website player mediaserver admindashboard
 
 .PHONY: install
-install:
+install: .env
 	for project in $(PROJECTS); do \
 		$(MAKE) install --no-keep-going --directory $$project ; \
 	done
@@ -91,7 +97,7 @@ cloc:
 # Clean ------------------------------------------------------------------------
 .PHONY: clean
 clean:
-	rm -rf .cache .vagrant
+	rm -rf .cache .vagrant .env
 	for project in $(PROJECTS); do \
 		$(MAKE) clean --directory $$project ; \
 	done
