@@ -28,9 +28,26 @@ services:
             - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info
         command: make run_production --directory ${PATH_CONTAINER_WEBSITE}
 
-
     postgres:
         image: postgres:9-alpine
         volumes:
             - website_db:/var/lib/postgresql
             - ./docker/postgres:/docker-entrypoint-initdb.d
+
+    nginx:
+        image: nginx:1.11-alpine
+        environment:
+            - PORT_NGINX
+            - PORT_WEBSITE
+        env_file:
+            - .env
+        ports:
+            - "${PORT_NGINX}:${PORT_NGINX}"
+        volumes:
+            - ./docker/nginx.conf:/tmp/nginx.conf:ro
+            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ./:${PATH_CONTAINER_REPO}:ro
+            - website_data_1:${PATH_CONTAINER_WEBSITE}/data
+        links:
+            - website
+        command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
