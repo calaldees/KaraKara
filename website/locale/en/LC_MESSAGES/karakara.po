@@ -33,7 +33,7 @@ msgstr "Remove"
 #: karakara/templates/html/home.mako:4
 
 msgid "mobile.home.input_queue_label"
-msgstr "Queued tracks"
+msgstr "Queue to join"
 
 #: karakara/templates/html/queue_home.mako:35
 msgid "mobile.home.search_tags"
@@ -124,55 +124,55 @@ msgid "api.queue.admin.authentication_failed"
 msgstr ""
 
 #: karakara/views/queue_items.py:147
-msgid "view.queue.add.error.track_id ${track_id}"
+msgid "view.queue_item.add.error.track_id ${track_id}"
 msgstr "track ${track_id} does not exist"
 
 #: karakara/views/queue_items.py:156
-msgid "view.queue.add.invalid_performer_name ${performer_name}"
+msgid "view.queue_item.add.invalid_performer_name ${performer_name}"
 msgstr "${performer_name} is not a valid badge name for this event"
 
 #: karakara/views/queue_items.py:171
 msgid ""
-"view.queue.add.dupicate_performer_limit ${performer_name} "
+"view.queue_item.add.dupicate_performer_limit ${performer_name} "
 "${estimated_next_add_time} ${track_count} ${latest_queue_item_title}"
 msgstr "Unable to queue track. duplicate ${performer_name} limit reached"
 
 #: karakara/views/queue_items.py:184
 msgid ""
-"view.queue.add.dupicate_track_limit ${track_id} "
+"view.queue_item.add.dupicate_track_limit ${track_id} "
 "${estimated_next_add_time} ${track_count}"
 msgstr "Unable to queue track. duplicate 'track in queue' limit reached"
 
 #: karakara/views/queue_items.py:197 karakara/views/queue_items.py:213
-msgid "view.queue.add.event_end ${event_end}"
+msgid "view.queue_item.add.event_end ${event_end}"
 msgstr "Event will be ending at ${event_end} and all the time has been allocated"
 
 #: karakara/views/queue_items.py:210
-msgid "view.queue.add.priority_token_issued"
+msgid "view.queue_item.add.priority_token_issued"
 msgstr ""
 "Queue limit reached - You have been given a priority token and will have "
 "priority to queue a track in your priority timeslot"
 
 #: karakara/views/queue_items.py:216
-msgid "view.queue.add.priority_token_already_issued"
+msgid "view.queue_item.add.priority_token_already_issued"
 msgstr ""
 "You already have a priority token timeslot. Queue your track when your "
 "timeslot occurs"
 
 #: karakara/views/queue_items.py:218
-msgid "view.queue.add.token_limit"
+msgid "view.queue_item.add.token_limit"
 msgstr "Queue limit reached - try queuing a track later"
 
 #: karakara/views/queue_items.py:239
-msgid "view.queue.add.ok ${track_id} ${performer_name}"
+msgid "view.queue_item.add.ok ${track_id} ${performer_name}"
 msgstr "Track queued for ${performer_name} "
 
 #: karakara/views/queue_items.py:279 karakara/views/queue_items.py:337
-msgid "view.queue.error.not_owner ${track_id} ${session_owner}"
+msgid "view.queue_item.error.not_owner ${track_id} ${session_owner}"
 msgstr "Track ${track_id} does not exist"
 
 #: karakara/views/queue_items.py:295
-msgid "view.queue.delete.ok ${track_id} ${queue_id}"
+msgid "view.queue_item.delete.ok ${track_id} ${queue_id}"
 msgstr "Track removed"
 
 #: karakara/views/queue_items.py:350
@@ -180,5 +180,5 @@ msgid "view.admin_required"
 msgstr "Admin required"
 
 #: karakara/views/queue_items.py:378
-msgid "view.queue.update.ok ${track_id} ${queue_item_id}"
+msgid "view.queue_item.update.ok ${track_id} ${queue_item_id}"
 msgstr "Track updated"

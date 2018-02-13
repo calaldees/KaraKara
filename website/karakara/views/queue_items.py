@@ -146,7 +146,7 @@ def queue_item_add(request):
         track = DBSession.query(Track).get(track_id)
         assert track
     except AssertionError:
-        raise action_error(message=_('view.queue.add.error.track_id ${track_id}', mapping={'track_id': track_id}), code=400)
+        raise action_error(message=_('view.queue_item.add.error.track_id ${track_id}', mapping={'track_id': track_id}), code=400)
 
     # If not admin, check additional restrictions
     if not is_admin(request):
@@ -155,7 +155,7 @@ def queue_item_add(request):
         # Valid performer name
         valid_performer_names = request.queue.settings.get('karakara.queue.add.valid_performer_names')
         if valid_performer_names and performer_name.lower() not in map(lambda name: name.lower(), valid_performer_names):
-            message = _('view.queue.add.invalid_performer_name ${performer_name}', mapping=dict(
+            message = _('view.queue_item.add.invalid_performer_name ${performer_name}', mapping=dict(
                 performer_name=performer_name
             ))
             raise action_error(message, code=400)
@@ -167,7 +167,7 @@ def queue_item_add(request):
                 latest_track_title = get_track(queue_item_performed_tracks['queue_items'][0].track_id).title
             except Exception:
                 latest_track_title = ''
-            message = _('view.queue.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${track_count} ${latest_queue_item_title}', mapping=dict(
+            message = _('view.queue_item.add.dupicate_performer_limit ${performer_name} ${estimated_next_add_time} ${track_count} ${latest_queue_item_title}', mapping=dict(
                 performer_name=performer_name,
                 latest_queue_item_title=latest_track_title,
                 **subdict(queue_item_performed_tracks, {
@@ -181,7 +181,7 @@ def queue_item_add(request):
         # Duplicate Addition Restrictions
         queue_item_tracks_queued = request.queue.for_track(track.id)
         if queue_item_tracks_queued['track_status'] == QUEUE_DUPLICATE.THRESHOLD:
-            message = _('view.queue.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${track_count}', mapping=dict(
+            message = _('view.queue_item.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${track_count}', mapping=dict(
                 track_id=track.id,
                 **subdict(queue_item_performed_tracks, {
                     'estimated_next_add_time',
@@ -196,7 +196,7 @@ def queue_item_add(request):
         if event_end and now() + request.queue.duration > event_end:
             log.debug('event end restricted')
             _log_event(status='reject', reason='event_end')
-            raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
+            raise action_error(message=_('view.queue_item.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
 
         # Queue time limit
         queue_limit = request.queue.settings.get('karakara.queue.add.limit')
@@ -209,15 +209,15 @@ def queue_item_add(request):
                 priority_token = priority_token_manager.issue()
                 if isinstance(priority_token, PriorityToken):
                     _log_event(status='reject', reason='token.issued')
-                    raise action_error(message=_('view.queue.add.priority_token_issued'), code=400)
+                    raise action_error(message=_('view.queue_item.add.priority_token_issued'), code=400)
                 if priority_token == TOKEN_ISSUE_ERROR.EVENT_END:
                     _log_event(status='reject', reason='event_end')
-                    raise action_error(message=_('view.queue.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
+                    raise action_error(message=_('view.queue_item.add.event_end ${event_end}', mapping={'event_end': event_end}), code=400)
                 if priority_token == TOKEN_ISSUE_ERROR.TOKEN_ISSUED:
                     _log_event(status='reject', reason='token.already_issued')
-                    raise action_error(message=_('view.queue.add.priority_token_already_issued'), code=400)
+                    raise action_error(message=_('view.queue_item.add.priority_token_already_issued'), code=400)
                 _log_event(status='reject', reason='token.limit')
-                raise action_error(message=_('view.queue.add.token_limit'), code=400)
+                raise action_error(message=_('view.queue_item.add.token_limit'), code=400)
 
     queue_item = QueueItem()
     for key, value in request.params.items():
@@ -239,7 +239,7 @@ def queue_item_add(request):
 
     return action_ok(
         message=_(
-            'view.queue.add.ok ${track_id} ${performer_name}',
+            'view.queue_item.add.ok ${track_id} ${performer_name}',
             mapping={'track_id': queue_item.track_id, 'performer_name': queue_item.performer_name},
         ),
         data={'queue_item.id': ''},
@@ -279,7 +279,7 @@ def queue_item_del(request):
         _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
         raise action_error(
             message=_(
-                'view.queue.error.not_owner ${track_id} ${session_owner}',
+                'view.queue_item.error.not_owner ${track_id} ${session_owner}',
                 mapping={'track_id': queue_item.track_id, 'session_owner': queue_item.session_owner},
             ),
             code=403,
@@ -295,7 +295,7 @@ def queue_item_del(request):
 
     return action_ok(
         message=_(
-            'view.queue.delete.ok ${track_id} ${queue_id}',
+            'view.queue_item.delete.ok ${track_id} ${queue_id}',
             mapping={'track_id': queue_item.track_id, 'queue_id': queue_item.queue_id},
         )
     )
@@ -337,7 +337,7 @@ def queue_item_update(request):
         _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
         raise action_error(
             message=_(
-                'view.queue.error.not_owner ${track_id} ${session_owner}',
+                'view.queue_item.error.not_owner ${track_id} ${session_owner}',
                 mapping={'track_id': queue_item.track_id, 'session_owner': queue_item.session_owner},
             ),
             code=403,
@@ -378,7 +378,7 @@ def queue_item_update(request):
 
     return action_ok(
         message=_(
-            'view.queue.update.ok ${track_id} ${queue_item_id}',
+            'view.queue_item.update.ok ${track_id} ${queue_item_id}',
             mapping={'track_id': queue_item.track_id, 'queue_item_id': queue_item.id}
         )
     )

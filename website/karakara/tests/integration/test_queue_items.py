@@ -139,7 +139,7 @@ def test_queue_errors(app, queue, queue_manager, tracks):
 
     response = app.post(queue_items_url, dict(track_id='t1000', performer_name='test_user'), expect_errors=True)
     assert response.status_code == 400
-    assert 'view.queue.add.error.track_id' in response.text
+    assert 'view.queue_item.add.error.track_id' in response.text
 
     response = app.put(queue_items_url, {'queue_item.id': 'not_real_id'}, expect_errors=True)
     assert response.status_code == 404
@@ -433,7 +433,7 @@ def test_queue_limit(app, queue, queue_manager, tracks):
     # Try queue add again and not get priority token give as we already have one
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob4', expect_errors=True)
     #assert 'already have' in response.json['messages'][0]
-    assert 'view.queue.add.priority_token_already_issued' in response.text
+    assert 'view.queue_item.add.priority_token_already_issued' in response.text
 
     # Shift server time forward - simulate waiting 5 minuets - we should be in our priority token range
     now(now() + datetime.timedelta(minutes=5))
@@ -454,7 +454,7 @@ def test_event_end(app, queue, queue_manager, tracks):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1')
     response = queue_manager.add_queue_item(track_id='t2', performer_name='bob2', expect_errors=True)
     assert response.status_code == 400
-    assert 'view.queue.add.event_end' in response.text
+    assert 'view.queue_item.add.event_end' in response.text
 
 
 def test_priority_tokens(app, queue):
