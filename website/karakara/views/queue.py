@@ -1,4 +1,5 @@
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPFound
 
 from . import web, action_ok, action_error, etag_decorator, generate_cache_key
 
@@ -26,8 +27,11 @@ def generate_cache_key_homepage(request):
 )
 #@etag_decorator(generate_cache_key_homepage)
 def queue_home(request):
+    _ = request.translate
+    if not request.queue.exists:
+        message = _('view.queue.not_exist ${queue_id}', mapping={'queue_id': request.context.id})
+        if request.requested_response_format == 'html':
+            request.session.flash(message)
+            raise HTTPFound(location='/')
+        raise action_error(message=message, code=404)
     return action_ok()
-
-
-def queue_redirect(request):
-    pass

@@ -2,13 +2,14 @@ import datetime
 
 from pyramid.decorator import reify
 from sqlalchemy import or_, and_
+from sqlalchemy.orm.exc import NoResultFound
 
 from externals.lib.misc import now
 
 from . import QUEUE_DUPLICATE, TOKEN_ISSUE_ERROR
 
 from ..model import DBSession
-from ..model.model_queue import QueueItem
+from ..model.model_queue import Queue, QueueItem
 
 from ..views.queue_settings import queue_settings_view, acquire_cache_bucket_func as queue_settings_acquire_cache_bucket_func
 from ..views.queue_items import queue_items_view, acquire_cache_bucket_func as queue_items_acquire_cache_bucket_func
@@ -17,6 +18,10 @@ from ..views.queue_items import queue_items_view, acquire_cache_bucket_func as q
 class QueueLogic():
     def __init__(self, request):
         self.request = request
+
+    @reify
+    def exists(self):
+        return DBSession.query(Queue).filter(Queue.id == self.request.context.id).count()
 
     @reify
     def settings(self):

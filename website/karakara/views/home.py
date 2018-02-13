@@ -1,7 +1,6 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-
 from . import web, action_ok, action_error, admin_only
 
 
@@ -17,10 +16,7 @@ def home(request):
     # Need to implement a proper pyramid authorize system when in comunity mode
     if request.registry.settings.get('karakara.server.mode') == 'comunity':
         raise HTTPFound(location='/comunity')
+
+    if request.params.get('queue_id'):
+        raise HTTPFound(location=f'/queue/{request.params.get("queue_id")}')
     return action_ok()
-
-
-#@view_config(route_name='stats')
-#@web
-#def stats(request):
-#    return action_ok()
