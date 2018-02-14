@@ -39,15 +39,13 @@ docker_run:
 
 # Rsync -----------------------------------------------------------------------
 
-RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --update --inplace --partial --exclude '.*' --exclude 'backup'
-#--partial --update --copy-links --checksum --update --bwlimit=100
+RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --inplace --partial --append-verify --exclude '.*' --exclude 'backup' --timeout 30
+#--update --copy-links --checksum --bwlimit=100
 rsync_pull:
 	rsync $(RSYNC_REMOTE) $(RSYNC_LOCAL) -e ssh $(RSYNC_ARGS) --delete-after
 rsync_push:
 	rsync $(RSYNC_LOCAL) $(RSYNC_REMOTE) -e ssh $(RSYNC_ARGS) --dry-run
-
-RSYNC_LOCAL_TARGET:=/Volumes/Samsung_T1/karakara
-rsync_local_push_samsung:
+rsync_local_push:
 	rsync $(RSYNC_LOCAL)/meta/ $(RSYNC_LOCAL_TARGET)/meta/ $(RSYNC_ARGS) --delete-after
 	rsync $(RSYNC_LOCAL)/processed/ $(RSYNC_LOCAL_TARGET)/processed/ $(RSYNC_ARGS) --delete-after
 
