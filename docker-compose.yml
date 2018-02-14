@@ -8,7 +8,9 @@ volumes:
 services:
 
     website:
-        image: python:3
+        build:
+            context: ./docker
+            dockerfile: python.Dockerfile
         env_file:
             - .env
         expose:
@@ -35,7 +37,7 @@ services:
             - ./docker/postgres:/docker-entrypoint-initdb.d
 
     nginx:
-        image: nginx:1.11-alpine
+        image: nginx:mainline-alpine
         environment:
             - PORT_NGINX
             - PORT_WEBSITE

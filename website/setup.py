@@ -27,6 +27,7 @@ install_requires = [
     #'chardet',
     'google-api-python-client',
     'oauth2client',
+    'decorator',  # TODO: Remove this dependency
 ]
 test_requires = [
     'pytest',
