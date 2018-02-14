@@ -1,21 +1,25 @@
 KaraKara
 ========
 
-Karaoke Event System - Attendees view and queue tracks from their mobile phones
+Karaoke Event System - hosted at [karakara.org.uk](http://karakara.org.uk/)
 
-    git clone https://github.com/calaldees/KaraKara.git
+* Run small events in your livingroom or big events with multiple karaoke rooms
+* Attendees view and queue tracks from their mobile phones
+* A Projector/TV shows a HTML5 player
+* Internet connection is required
 
 [![Build Status](https://travis-ci.org/calaldees/KaraKara.svg?branch=master)](https://travis-ci.org/calaldees/KaraKara)
 
-Overview
---------
+Overview of a karaoke event
+---------------------------
 
-A projector is fired up in a dimly lit room and a microphone stands ready on the mic stand. The PA is buzzing lightly. The attendees slowly enter the room. But this time is different. They look at the familiar paper printed list of tracks on the tables but also notice signs on the walls and a title-sheet that says *use your mobile and connect to the wifi 'karakara'*. Some continue to peruse the paper printouts while others are greeted with a mobile / tablet / laptop web interface to browse, search, see preview videos of tracks, lists of lyrics, see the current queued tracks with estimated times. Queue a track themselves. Pass the device to a friend to browse and queue a track under a different name.
+A projector is fired up in a dimly lit room and a microphone stands ready on the mic stand. The PA is buzzing lightly. The attendees slowly enter the room. But this time is different. They look at the familiar paper printed list of tracks on the tables but also notice signs on the walls and a title-sheet that says *use your mobile*. Some continue to peruse the paper printouts while others are greeted with a mobile / tablet / laptop web interface to browse, search, see preview videos of tracks, lists of lyrics, see the current queued tracks with estimated times. Queue a track themselves. Pass the device to a friend to browse and queue a track under a different name.
 
-A laptop at the front is connected to the projector and multiple wireless routers. It is running a karakara server with a pre-processed tagged dataset of tracks in various formats.
+A laptop at the front is connected to the projector. It is running a karakara.org.uk with a pre-processed tagged dataset of tracks in various formats.
 
 Admins can walk around the room, remotely controlling when tracks are played fullscreen, re-ordering tracks, viewing feedback from attendees. Yet a desk at the front is still taking face to face song requests.
 
+(When the project was started we could not rely on a venues reliable free wifi and 4g didnt exist. A pysical server and wireless router were needed in the room. Since then the project has evolved to be 'Karaoke as a service' run on an external webserver.)
 
 ###Headline Feature Descriptions
 
@@ -63,23 +67,23 @@ Admins can walk around the room, remotely controlling when tracks are played ful
 Local Machine Setup
 -------------------
 
-*For a live event system a Linux server with a custom wifi network will be required*
+_WARNING: out of date instructions_
 
 * Copy video dataset OR Process video dataset from avi/mpg/srt/png/mp3 files with processmedia
 * Option 1 - Docker (Linux/Mac/Windows)
-    `make docker_build && make docker_run`
-	1. Prerequesites
-		* `docker`, `docker-compose`
-	5. view <http://localhost:8080/> and <http://localhost:8080/player/player.html>
-		* *bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly*
+    1. Prerequesites
+        * `docker`, `docker-compose`, `docker-machine` (osx)
+    2. `make docker_build && make docker_run`
+    5. view <http://localhost:8080/> and <http://localhost:8080/player/player.html>
+        * *bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly*
 
 * Option 2 - Linux/Mac (native with sqllite dev db)
-	1. Prerequesites
-		* Linux: `apt-get install git python python3 curl`
-		* Mac: install `brew`, `brew install git python python3`
+    1. Prerequesites
+        * Linux: `apt-get install git python3 curl`
+        * Mac: install `brew`, `brew install git python3`
     2. __Optional local libs for dev__ `git clone git@github.com:calaldees/libs.git`
-	3. `git clone https://github.com/calaldees/KaraKara.git && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/admin" `
-	4. View <http://localhost:6543/> and <http://localhost:6543/player/player.html>
+    3. `git clone https://github.com/calaldees/KaraKara.git && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/" `
+    4. View <http://localhost:6543/> and <http://localhost:6543/player/player.html>
 
 
 Core components
