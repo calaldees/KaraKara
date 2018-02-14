@@ -39,8 +39,8 @@ docker_run:
 
 # Rsync -----------------------------------------------------------------------
 
-RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --inplace --partial --append-verify --exclude '.*' --exclude 'backup' --timeout 30
-#--update --copy-links --checksum --bwlimit=100
+RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --append-verify --exclude '.*' --exclude 'backup'
+#--update --copy-links --checksum --bwlimit=100 --inplace --partial --timeout 30 --checksum
 rsync_pull:
 	rsync $(RSYNC_REMOTE) $(RSYNC_LOCAL) -e ssh $(RSYNC_ARGS) --delete-after
 rsync_push:
