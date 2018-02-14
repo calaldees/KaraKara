@@ -67,7 +67,6 @@ help:
 
 .PRECIOUS: $(ENV)
 $(ENV):
-	pip install virtualenv
 	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python$(PYTHON_VERSION) $(ENV)
 	$(ENV)/bin/easy_install pyramid
