@@ -2,7 +2,7 @@
     "path_source": "../mediaserver/www/files/",
     "path_meta": "../mediaserver/www/meta/",
     "path_processed": "../mediaserver/www/processed/",
-    
+    "api_host": "localhost:6543",
     "loggingconf": "logging.json",
     "lockfile": ".lock"
 }

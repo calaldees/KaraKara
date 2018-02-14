@@ -37,6 +37,7 @@ docker_exec:
 docker_run:
 	docker-compose --file docker-compose.yml up
 
+<<<<<<< HEAD
 # Rsync -----------------------------------------------------------------------
 
 RSYNC_ARGS:=--archive --no-perms --no-owner --no-group --verbose --stats --progress --human-readable --inplace --partial --append-verify --exclude '.*' --exclude 'backup' --timeout 30
