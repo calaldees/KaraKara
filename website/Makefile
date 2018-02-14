@@ -125,6 +125,9 @@ init_db_production: ini
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
 
+#	cd website ; env/bin/python -mkarakara.model.setup --config_uri production.ini --init_func karakara.model.init_data:init_data
+#	cd website ; env/bin/python -mkarakara.scripts.insert_random_tracks 1200 --config=production.ini
+
 
 # Ini files --------------------------------------------------------------------
 $(LOG_PATH):

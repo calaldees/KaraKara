@@ -15,7 +15,7 @@ services:
             - ${PORT_WEBSITE}
         ports:
             - ${PORT_WEBSOCKET}:${PORT_WEBSOCKET}
-            - ${PORT_WEBSITE}:${PORT_WEBSITE}
+            #- ${PORT_WEBSITE}:${PORT_WEBSITE}
         environment:
             - PORT_WEBSITE
             - PORT_WEBSOCKET
