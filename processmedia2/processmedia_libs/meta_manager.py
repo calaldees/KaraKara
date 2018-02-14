@@ -39,8 +39,8 @@ class MetaManager(object):
                 with open(filepath, 'r') as source:
                     data = json.load(source)
                 self._meta_timestamps[name] = os.stat(filepath).st_mtime
-            except json.decoder.JSONDecodeError:
-                log.error('Unable to load meta from %s', filepath)
+            except json.decoder.JSONDecodeError as ex:
+                log.error('Unable to load meta from %s %s', filepath, ex)
         self.meta[name] = MetaFile(name, data)
 
     def save(self, name):
