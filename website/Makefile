@@ -139,11 +139,10 @@ $(CONFIG_PATH)/test.inidiff:
 	cp $(CONFIG_SOURCE_PATH)/test.inidiff.dist $@
 $(CONFIG_PATH)/production.inidiff:
 	cp $(CONFIG_SOURCE_PATH)/production.inidiff.dist $@
-.PHONY: ini ini_test ini_production
-ini: clean_ini ini_test ini_production
-ini_test: $(INI_DEV) $(CONFIG_PATH)/test.inidiff $(CONFIG_PATH)/production.inidiff
+.PHONY: ini_test ini_production
+ini_test: clean_ini $(INI_DEV) $(CONFIG_PATH)/test.inidiff
 	$(PYTHON) $(EXTERNAL_PATH)/lib/make_ini.py $(INI_DEV) $(CONFIG_PATH)/test.inidiff $(INI_TEST)
-ini_production: $(INI_DEV) $(CONFIG_PATH)/production.inidiff
+ini_production: clean_ini $(INI_DEV) $(CONFIG_PATH)/production.inidiff
 	$(PYTHON) $(EXTERNAL_PATH)/lib/make_ini.py $(INI_DEV) $(CONFIG_PATH)/production.inidiff $(INI_PROD)
 
 $(CONFIG_PATH)/search_config.json:
@@ -164,7 +163,7 @@ $(WRITE_PATH)/uploaded:
 run: install
 	$(PSERVE) --reload $(INI_DEV)
 
-run_production: ini
+run_production: ini_production
 	$(PSERVE) $(INI_PROD)
 
 run_socket_server:
@@ -173,29 +172,29 @@ run_socket_server:
 shell:
 	$(PSHELL) $(INI_DEV)
 
-shell_production: ini
+shell_production: ini_production
 	$(PSHELL) $(INI_PROD)
 
 # Daemon -----------------------------------------------------------------------
-.PHONY: start_webapp_daemon stop_webapp_daemon
-
-start_webapp_daemon: ini
-	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
-stop_webapp_daemon:
-	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid
-
+#.PHONY: start_webapp_daemon stop_webapp_daemon
+#
+#start_webapp_daemon: ini
+#	start-stop-daemon --start --pidfile webapp.pid --name $(PROJECT) --make-pidfile --background --exec /bin/bash -- -c "$(CURDIR)/env/bin/pserve $(CURDIR)/production.ini"
+#stop_webapp_daemon:
+#	start-stop-daemon --stop  --pidfile webapp.pid && rm webapp.pid
+#
 
 # Test -------------------------------------------------------------------------
 .PHONY: test test_crawl
 
-test: ini
+test: ini_test
 	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# --capture=sys
 
-test_crawl: ini
+test_crawl: ini_test
 	$(PYTEST) $(PROJECT) --runslow -k crawl -s
 
-test_crawl_production: ini
+test_crawl_production: ini_test
 	echo "unimplemented ... yet"
 	#env/bin/py.test $(PROJECT) --runslow -k crawl_production -s
 

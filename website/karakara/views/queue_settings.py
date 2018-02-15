@@ -38,7 +38,6 @@ SETTINGS_TYPE_MAPPING = {
     'karakara.queue.add.valid_performer_names': 'list',
 
     'karakara.template.input.performer_name': None,
-    'karakara.template.title': None,
     'karakara.template.menu.disable': None,
 
     # karakara.search.view.config = data/config/search_config.json
