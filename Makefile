@@ -34,8 +34,10 @@ docker_shell:
 	docker-compose run --rm --service-ports website /bin/bash
 docker_exec:
 	docker exec -it karakara_website_1 /bin/bash
-docker_run:
+docker_up:
 	docker-compose --file docker-compose.yml up
+docker_down:
+	docker-compose --file docker-compose.yml down || true
 
 # Rsync -----------------------------------------------------------------------
 
@@ -78,7 +80,7 @@ clean_osx_cancer:
 	find ./ -iname \.DS_Store -delete
 
 .PHONY: clean
-clean: clean_osx_cancer
+clean: clean_osx_cancer docker_clean
 	rm -rf .cache .vagrant .env
 	for project in $(PROJECTS); do \
 		$(MAKE) clean --directory $$project ; \

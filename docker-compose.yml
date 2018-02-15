@@ -11,6 +11,7 @@ services:
         build:
             context: ./docker
             dockerfile: python.Dockerfile
+            image: python3_virtualenv
         env_file:
             - .env
         expose:
@@ -50,7 +51,7 @@ services:
             - ./docker/nginx.conf:/tmp/nginx.conf:ro
             - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
             - ./:${PATH_CONTAINER_REPO}:ro
-            - website_data_1:${PATH_CONTAINER_WEBSITE}/data
+            - website_data_1:${PATH_CONTAINER_WEBSITE}/data:ro
         links:
             - website
         command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
