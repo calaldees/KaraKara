@@ -14,7 +14,7 @@ from ..model.actions import delete_queue
 )
 @comunity_only
 def comunity_queue_view(request):
-    return action_ok(data={'queues': (queue.to_dict() for queue in DBSession.query(Queue))})
+    return action_ok(data={'queues': tuple(queue.to_dict() for queue in DBSession.query(Queue))})
 
 
 @view_config(
@@ -40,5 +40,5 @@ def comunity_queue_add(request):
 )
 @comunity_only
 def queue_item_del(request):
-    delete_queue(request.params.get('id'))
+    delete_queue(request.params.get('queue.id'))
     return action_ok()

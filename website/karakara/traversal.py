@@ -191,6 +191,7 @@ class ComunityContext(NextContextMixin):
                 ComunityUploadContext,
                 ComunitySettingsContext,
                 ComunityProcessmediaLogContext,
+                ComunityQueueContext,
             )
         )
 
