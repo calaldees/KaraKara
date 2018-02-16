@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 volumes:
     website_db:
@@ -11,7 +11,7 @@ services:
         build:
             context: ./docker
             dockerfile: python.Dockerfile
-            image: python3_virtualenv
+            #image: python3_virtualenv
         env_file:
             - .env
         expose:

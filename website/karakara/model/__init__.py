@@ -47,9 +47,9 @@ def init_db():
     To be called AFTER init_DBSession
     """
     log.info("Drop all existing tables")
-    Base.metadata.drop_all  (bind=DBSession.bind, checkfirst=True)
+    Base.metadata.drop_all(bind=DBSession.bind, checkfirst=True)
     log.info("Create all tables bound to Base")
-    Base.metadata.create_all(bind=DBSession.bind                 ) #, checkfirst=True
+    Base.metadata.create_all(bind=DBSession.bind) #, checkfirst=True
 
 
 

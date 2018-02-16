@@ -259,6 +259,14 @@ class ComunityProcessmediaLogContext():
         self.__parent__ = parent
 
 
+class ComunityQueueContext():
+    __template__ = 'comunity_queues'
+    __name__ = 'queues'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
 class TrackImportContext():
     __name__ = 'track_import'
 

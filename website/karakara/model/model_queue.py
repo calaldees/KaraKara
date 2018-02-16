@@ -20,6 +20,16 @@ _queueitem_statuss = Enum("pending", "played", "skipped", "removed", name="statu
 class Queue(Base):
     __tablename__   = "queue"
 
+    __to_dict__ = copy.deepcopy(Base.__to_dict__)
+    __to_dict__.update({
+        'default': {
+            'id': None,
+        },
+    })
+    __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
+    __to_dict__['full'].update({
+    })
+
     id = Column(String(), primary_key=True)
 
 
