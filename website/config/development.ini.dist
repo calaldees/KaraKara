@@ -79,7 +79,7 @@ login.facebook.secret =
 login.facebook.permissions = public_profile
 
 login.google.clientid =
-login.google.clientsecret = 
+login.google.client_secret_file =
 
 login.provider.enabled = []
 
