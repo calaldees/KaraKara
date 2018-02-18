@@ -37,7 +37,7 @@ services:
         image: postgres:9-alpine
         volumes:
             - website_db:/var/lib/postgresql
-            - ./docker/postgres:/docker-entrypoint-initdb.d
+            - ./docker/postgres:/docker-entrypoint-initdb.d:ro
 
     nginx:
         image: nginx:mainline-alpine
