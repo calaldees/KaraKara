@@ -29,6 +29,7 @@ services:
             - ./:${PATH_CONTAINER_REPO}:ro
             - website_data_1:${PATH_CONTAINER_WEBSITE}/data
             - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info
+            - ${LOGIN_GOOGLE.CLIENT_SECRET_FILE}:${LOGIN_GOOGLE.CLIENT_SECRET_FILE}:ro
             #- ./production.inidiff:${PATH_CONTAINER_WEBSITE}/data/config/production.inidiff:ro  # Use .env vars with KARAKARA_SETTINGS_KEY=[00:01:00, 00:02:00] -> timedelta instead
         command: make run_production --directory ${PATH_CONTAINER_WEBSITE}
 
