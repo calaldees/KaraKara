@@ -28,6 +28,10 @@ help:
 # Docker ----------------------------------------------------------------------
 
 docker_build: .env
+	# fix for docker file order - https://stackoverflow.com/questions/37883895/can-i-have-a-writable-docker-volume-mounted-under-a-read-only-volume
+	mkdir -p website/data
+	mkdir -p website/KaraKara.egg-info
+	#
 	docker-compose build
 	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
 docker_shell:
