@@ -36,6 +36,8 @@ docker_build: .env
 	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
 docker_shell:
 	docker-compose run --rm --service-ports website /bin/bash
+	#docker-compose run -v ~/karakara_users.sql:/data/karakara_users.sql:ro postgres /bin/bash
+	#  psql -h postgres -U karakara karakara -f /data/karakara_users.sql
 docker_exec:
 	docker exec -it karakara_website_1 /bin/bash
 docker_up:
