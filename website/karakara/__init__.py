@@ -178,11 +178,13 @@ def main(global_config, **settings):
             request = pyramid.request.Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
             session_data = session_factory(request)
             return session_data and session_data.get('admin')
+        def _int_or_none(setting_key):
+            return int(config.registry.settings.get(setting_key)) if config.registry.settings.get(setting_key) else None
         try:
             _socket_manager = AuthEchoServerManager(
                 authenticator=authenticator,
-                websocket_port=int(config.registry.settings['karakara.websocket.port']),
-                tcp_port=int(config.registry.settings.get('karakara.tcp.port')),
+                websocket_port=_int_or_none('karakara.websocket.port'),
+                tcp_port=_int_or_none('karakara.tcp.port'),
             )
             _socket_manager.start()
             socket_manager = _socket_manager
