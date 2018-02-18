@@ -181,8 +181,8 @@ def main(global_config, **settings):
         try:
             _socket_manager = AuthEchoServerManager(
                 authenticator=authenticator,
-                websocket_port=config.registry.settings['karakara.websocket.port'],
-                tcp_port=config.registry.settings.get('karakara.tcp.port'),
+                websocket_port=int(config.registry.settings['karakara.websocket.port']),
+                tcp_port=int(config.registry.settings.get('karakara.tcp.port')),
             )
             _socket_manager.start()
             socket_manager = _socket_manager
