@@ -17,11 +17,11 @@ services:
         expose:
             - ${PORT_WEBSITE}
         ports:
-            - ${PORT_WEBSOCKET}:${PORT_WEBSOCKET}
+            - ${KARAKARA_WEBSOCKET_PORT}:${KARAKARA_WEBSOCKET_PORT}
             #- ${PORT_WEBSITE}:${PORT_WEBSITE}
         environment:
             - PORT_WEBSITE
-            - PORT_WEBSOCKET
+            - KARAKARA_WEBSOCKET_PORT
         links:
             - postgres
         volumes:

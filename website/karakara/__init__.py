@@ -64,7 +64,8 @@ def main(global_config, **settings):
     #   export KARAKARA_TEMPLATE_TITLE=Test
     #   can override 'karakara.template.title'
     for key in config.registry.settings.keys():
-        value = os.getenv(key.replace('.', '_').upper(), '') or config.registry.settings[key]
+        value = os.getenv(key.replace('.', '_').upper(), '') if config.registry.settings['karakara.server.mode'] != 'test' else ''
+        value = value or config.registry.settings[key]
         config.registry.settings[key] = convert_str_with_type(value)
 
     # Session identity
