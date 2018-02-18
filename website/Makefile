@@ -122,7 +122,7 @@ $(DATABASE_DEV):
 	#env/bin/populate_KaraKara $(INI_DEV)
 
 .PHONY: init_db_production
-init_db_production: ini
+init_db_production: ini_production
 	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
 #init_db_test: init_db
 #	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
