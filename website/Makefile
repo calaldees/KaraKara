@@ -78,8 +78,11 @@ $(ENV):
 #env/lib/node_modules/bower: env/bin/node
 #	source env/bin/activate && npm install -g bower
 
+KaraKara.egg-info:
+	# in docker this is `ro` mount. Attempted to surpress a conflict when starting container
+	mkdir -p $@
 .PRECIOUS: KaraKara.egg-info/PKG-INFO
-KaraKara.egg-info/PKG-INFO: $(ENV)
+KaraKara.egg-info/PKG-INFO: KaraKara.egg-info $(ENV)
 	$(PYTHON) setup.py develop
 
 # Force reexecution of setup.py dependenys (this must be done from the Makefile or make gets confused and repetedy runs the task)
