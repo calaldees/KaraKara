@@ -92,7 +92,7 @@ def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, e
 
     def _get_tags():
         processed_file_tags = m.processed_files.get('tags')
-        with open(processed_file_tags.absolute, 'r') as tag_file:
+        with open(processed_file_tags.absolute, 'rt', encoding='utf-8', errors='ignore') as tag_file:
             return tuple(tag_string.strip() for tag_string in tag_file)
 
     return {
