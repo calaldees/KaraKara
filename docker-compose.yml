@@ -25,7 +25,7 @@ services:
         links:
             - postgres
         volumes:
-            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ${PATH_HOST_MEDIA}:${PATH_HOST_MEDIA}:ro
             - ./:${PATH_CONTAINER_REPO}:ro
             - website_data_1:${PATH_CONTAINER_WEBSITE}/data:rw
             - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info:rw
@@ -50,7 +50,7 @@ services:
             - "${PORT_NGINX}:${PORT_NGINX}"
         volumes:
             - ./docker/nginx.conf:/tmp/nginx.conf:ro
-            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ${PATH_HOST_MEDIA}:${PATH_HOST_MEDIA}:ro
             - ./:${PATH_CONTAINER_REPO}:ro
             - website_data_1:${PATH_CONTAINER_WEBSITE}/data:ro
         links:
