@@ -23,13 +23,26 @@ def cleanup_media(**kwargs):
     }
     unlinked_files = (f for f in meta_manager.processed_files_manager.scan if f.file_no_ext and f.file_no_ext not in all_known_file_hashs)
 
-    # Todo .. have dryrun and say how much this is cleaning up
+    count = 0
     for unlinked_file in unlinked_files:
-        os.remove(unlinked_file.absolute)
-
+        if kwargs['dryrun']:
+            print(unlinked_file.relative)
+        else:
+            os.remove(unlinked_file.absolute)
+        count += 1
+    log.info('Cleaned up - {} files'.format(count))
 
 # Main -------------------------------------------------------------------------
 
+def additional_arguments(parser):
+    parser.add_argument('--dryrun', action='store_true', help='', default=False)
+
+
 if __name__ == "__main__":
     from _main import main
-    main('cleanup_media', cleanup_media, version=VERSION)
+    main(
+        'cleanup_media',
+        cleanup_media,
+        version=VERSION,
+        additional_arguments_function=additional_arguments,
+    )
