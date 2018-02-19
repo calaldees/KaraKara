@@ -20,6 +20,7 @@ def test_comunity_queue(app, queue, users):
     assert QUEUE_NEW in response.text
 
     response = app.get(f'/comunity/queues?method=delete&format=redirect&queue.id={QUEUE_NEW}')
+    # TODO: activate the link above by using the link from soup?
     response = app.get('/comunity/queues')
     assert queue in response.text
     assert QUEUE_NEW not in response.text

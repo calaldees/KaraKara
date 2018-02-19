@@ -2,7 +2,7 @@
 
 <%def name="body()">
     <h1>Settings</h1>
-    
+
     <form method="POST">
         <ul>
         ##% for k, v in data.get('settings', {}).items():
@@ -10,7 +10,8 @@
             <%
                 v = data.get('settings', {}).get(k)
                 if isinstance(v, list):
-                    v = ', '.join(v)
+                    v = ', '.join(map(str, v))
+                v = str(v)
             %>
             <li><label for="input_${k}">${k}</label><input id="input_${k}" type="text" name="${k}" value="${v}" /></li>
         % endfor

@@ -404,23 +404,14 @@ def comunity_track_update(request):
     return action_ok()
 
 
-# A temp hack to allow te updating of tags for searching to be visible in the comunity interface
-#from .registry_settings import update_settings
-COMUNITY_VISIBLE_SETTINGS = ('karakara.print_tracks.fields', 'karakara.search.tag.silent_forced', 'karakara.search.tag.silent_hidden')
 @view_config(
     context='karakara.traversal.ComunitySettingsContext',
 )
 @comunity_only
 def community_settings(request):
-
-    # '{0} -> list' is a hack. This assumes that all data types given to this method are lists
-    # This will have to be updated
-    #update_settings(request.registry.settings, {k: '{0} -> list'.format(v) for k, v in request.params.items() if k in COMUNITY_VISIBLE_SETTINGS})
-
-    return action_ok(data={'settings': {
-        setting_key: request.registry.settings.get(setting_key)
-        for setting_key in COMUNITY_VISIBLE_SETTINGS
-    }})
+    if not request.context.queue_id:
+        raise action_error('queue_id required')
+    return action_ok(data={'settings': request.queue.settings})
 
 
 @view_config(

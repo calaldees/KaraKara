@@ -248,8 +248,20 @@ class ComunitySettingsContext():
     __template__ = 'comunity_settings'
     __name__ = 'settings'
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, id=None):
         self.__parent__ = parent
+        self.id = id
+        if self.id:
+            self.__name__ = self.id
+
+    def __getitem__(self, key):
+        if self.id:
+            raise KeyError()
+        return ComunitySettingsContext(parent=self, id=key)
+
+    @property
+    def queue_id(self):
+        return self.id
 
 
 class ComunityProcessmediaLogContext():
