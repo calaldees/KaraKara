@@ -111,7 +111,8 @@ function setup_websocket() {
 		console.error("setup_websocket", "Websocket port not specified - remote control disabled");
 		return;
 	}
-	var websocket_url = "ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/";
+	//var websocket_url = "ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/";  // The Shish saves the day ... again ... :)
+	var websocket_url = ('https:' == document.location.protocol ? 'wss://' : 'ws://')+location.hostname+":"+settings['karakara.websocket.port']+"/";
 	console.log("setup_websocket", websocket_url);
 	socket = new WebSocket(websocket_url);
 	socket.onopen = function(){ // Authenicate client with session key on socket connect
