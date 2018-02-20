@@ -25,7 +25,7 @@ def cleanup_media(**kwargs):
 
     count = 0
     for unlinked_file in unlinked_files:
-        if kwargs['dryrun']:
+        if kwargs.get('dryrun'):
             print(unlinked_file.relative)
         else:
             os.remove(unlinked_file.absolute)

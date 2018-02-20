@@ -11,6 +11,7 @@ var SETTINGS_DEFAULT = {
 	"karakara.player.video.skip.seconds"  : 20,
 	"karakara.player.queue.update_time"   :  3 , //Seconds to poll server
 	"karakara.player.help.timeout"        :  2,
+	"karakara.websocket.path"             : null,
 	"karakara.websocket.port"             : null,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
 	"karakara.event.end": null,
@@ -107,13 +108,19 @@ function stop_queue_poll() {
 var socket;
 var socket_retry_interval = null;
 function setup_websocket() {
-	if (!settings['karakara.websocket.port']) {
-		console.error("setup_websocket", "Websocket port not specified - remote control disabled");
+	if (!settings['karakara.websocket.port'] && !settings['karakara.websocket.path']) {
+		console.error("setup_websocket", "Websocket port or path not specified - remote control disabled");
 		return;
 	}
-	//var websocket_url = "ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/";  // The Shish saves the day ... again ... :)
-	var websocket_url = ('https:' == document.location.protocol ? 'wss://' : 'ws://')+location.hostname+":"+settings['karakara.websocket.port']+"/";
+
+	var websocket_url = ('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname;
+	if (settings['karakara.websocket.path']) {
+		websocket_url += settings['karakara.websocket.path'];
+	} else {
+		websocket_url += ":"+settings['karakara.websocket.port']+"/";
+	}
 	console.log("setup_websocket", websocket_url);
+
 	socket = new WebSocket(websocket_url);
 	socket.onopen = function(){ // Authenicate client with session key on socket connect
 		var session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];  // TODO - replace with use of settings['session_key'] or server could just use the actual http-header

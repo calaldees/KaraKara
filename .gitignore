@@ -1,6 +1,7 @@
 .env
 
 **/.DS_Store
+**/.pytest_cache
 *.log
 *.pid
 *.py[oc]

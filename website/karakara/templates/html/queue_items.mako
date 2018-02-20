@@ -114,7 +114,7 @@ import datetime
             ## You get some funky behaviour where the websocket refreshes before the first format=redirect happens, so the success message appears on the queue screen.
             try {
                 var currently_dragging = false;
-                socket = new WebSocket("ws://" + location.hostname + ":" + ${request.registry.settings['karakara.websocket.port']} + "/");
+                socket = new WebSocket(${self.js_websocket_url()});
                 socket.onmessage = function(msg) {
                     var cmd = $.trim(msg.data);
                     if (currently_dragging==false && cmd=='queue_updated') {

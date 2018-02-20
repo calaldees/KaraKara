@@ -131,5 +131,5 @@ cloc:
 
 .PHONY: clean
 clean:
-	rm -rf .cache __pycache__ $(ENV) libs config.json logging.json logs mtimes.json
+	rm -rf .cache .pytest_cache __pycache__ $(ENV) libs config.json logging.json logs mtimes.json
 	$(MAKE) clean --directory tests/source
