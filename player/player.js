@@ -22,7 +22,8 @@ if (!getUrlParameter('queue_id')) {
 }
 var URLS = {
 	'settings': "/queue/" + getUrlParameter('queue_id') + "/settings.json",
-	'queue_items': "/queue/" + getUrlParameter('queue_id') + "/queue_items.json"
+	'queue_items': "/queue/" + getUrlParameter('queue_id') + "/queue_items.json",
+	'random_images': "/queue/" + getUrlParameter('queue_id') + "/random_images.json",
 }
 
 
@@ -589,8 +590,8 @@ function init() {
 	}
 	
 	// Load showcase images for titlescreen
-	$.getJSON("/random_images.json?count=200", {}, function(data) {
-		console.log("/random_images");
+	$.getJSON(URLS.random_images + "?count=200", {}, function(data) {
+		console.log(URLS.random_images);
 		init_titlescreen(data.data.images);
 		show_screen('preview');
 	});
@@ -604,14 +605,15 @@ $(document).ready(function() {
 		// Identify player.js as admin with admin cookie
 		if (data.identity.admin) {init();}
 		else {
-			console.log('upgrading to admin mode')
-			$.getJSON("/admin.json", {"uncache": new Date().getTime()}, function(data) {
-				if (data.identity.admin) {init();}
-				else {
-					console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
-					alert("Unable to set Admin mode for player interface");
-				}
-			});
+			alert("User is not admin. Unable to get settings");
+			//console.log('upgrading to admin mode')
+			//$.getJSON("/admin.json", {"uncache": new Date().getTime()}, function(data) {
+			//	if (data.identity.admin) {init();}
+			//	else {
+			//		console.error("Unable to set player as admin. The player may not function correctly. Check that admin mode is not locked");
+			//		alert("Unable to set Admin mode for player interface");
+			//	}
+			//});
 		}
 	});
 	
