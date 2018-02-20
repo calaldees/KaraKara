@@ -225,7 +225,7 @@ def main(global_config, **settings):
     #        site_url=config.registry.settings.get('server.url')
     #    ))
     # No login provider
-    if not login_providers and config.registry.settings.get('karakara.server.mode') == 'development':
+    if not login_providers and config.registry.settings.get('karakara.server.mode') != 'test':
         # Auto login if no service keys are provided
         social_login.add_login_provider(NullLoginProvider())
         social_login.user_store = NullComunityUserStore()

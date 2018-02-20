@@ -6,7 +6,8 @@
     <p>INCOMPLETE FEATURE: Even though the foundation for multiple queues are in place. Only ONE queue can be used at a time.</p>
 
     <form action="" method="POST">
-        <input type="text" name="id"/>
+        <label for="input_queue_id">Name</label><input id="input_queue_id" type="text" name="queue_id"/>
+        <label for="input_queue_password">Password</label><input id="input_queue_password" type="text" name="queue_password"/>
         <input type="submit" value="new"/>
         <input type="hidden" name="format" value="redirect"/>
     </form>

@@ -14,7 +14,14 @@ def test_comunity_queue(app, queue, users):
     assert queue in response.text
     assert QUEUE_NEW not in response.text
 
-    response = app.post('/comunity/queues', {'id': QUEUE_NEW, 'format': 'redirect'})
+    response = app.post('/comunity/queues', {'queue_id': QUEUE_NEW, 'format': 'redirect'}, expect_errors=True)
+    assert response.status_code == 302
+    response = response.follow()
+    #assert response.status_code == 400  # This is a normal page load with a flash message
+    assert 'api.error.param_required' in response.text
+
+    response = app.post('/comunity/queues', {'queue_id': QUEUE_NEW, 'queue_password': 'password', 'format': 'redirect'})
+
     response = app.get('/comunity/queues')
     assert queue in response.text
     assert QUEUE_NEW in response.text

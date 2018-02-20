@@ -4,7 +4,7 @@ from . import action_ok, action_error, comunity_only, method_delete_router
 
 
 from ..model import DBSession, commit
-from ..model.model_queue import Queue
+from ..model.model_queue import Queue, QueueSetting
 from ..model.actions import delete_queue
 
 
@@ -23,11 +23,21 @@ def comunity_queue_view(request):
 )
 @comunity_only
 def comunity_queue_add(request):
+    _ = request.translate
+    for key in ('queue_id', 'queue_password'):
+        if not request.params.get(key):
+            raise action_error(_('api.error.param_required ${param}', mapping={'param': key}), code=400)
+
     queue = Queue()
-    for key, value in request.params.items():
-        if hasattr(queue, key):
-            setattr(queue, key, value)
+    queue.id = request.params.get('queue_id')
     DBSession.add(queue)
+
+    queue_setting = QueueSetting()
+    queue_setting.queue_id = request.params.get('queue_id')
+    queue_setting.key = 'karakara.private.password'
+    queue_setting.value = request.params.get('queue_password')
+    DBSession.add(queue_setting)
+
     return action_ok(code=201)
 
 
