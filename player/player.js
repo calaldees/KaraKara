@@ -582,12 +582,13 @@ function init() {
 	
 	setup_websocket();
 	
-	if (!get_chrome_version()) {
-		//$('body').addClass('browser_unsupported');  // This is intrusive
-		var msg = "Browser is unsupported. This player is currently only designed and tested to work with Google Chrome. It may behave unexpectedly.";
-		console.warn(msg);
-		alert(msg);
-	}
+	// Removed oppressive version check - Firefox can handle this fine now
+	//if (!get_chrome_version()) {
+	//	//$('body').addClass('browser_unsupported');  // This is intrusive
+	//	var msg = "Browser is unsupported. This player is currently only designed and tested to work with Google Chrome. It may behave unexpectedly.";
+	//	console.warn(msg);
+	//	alert(msg);
+	//}
 	
 	// Load showcase images for titlescreen
 	$.getJSON(URLS.random_images + "?count=200", {}, function(data) {
