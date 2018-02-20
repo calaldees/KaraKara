@@ -107,12 +107,13 @@ function stop_queue_poll() {
 var socket;
 var socket_retry_interval = null;
 function setup_websocket() {
-	console.log("setup_websocket");
 	if (!settings['karakara.websocket.port']) {
-		console.error("Websocket port not specifyed - remote control disabled");
+		console.error("setup_websocket", "Websocket port not specified - remote control disabled");
 		return;
 	}
-	socket = new WebSocket("ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/");
+	var websocket_url = "ws://"+location.hostname+":"+settings['karakara.websocket.port']+"/";
+	console.log("setup_websocket", websocket_url);
+	socket = new WebSocket(websocket_url);
 	socket.onopen = function(){ // Authenicate client with session key on socket connect
 		var session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];  // TODO - replace with use of settings['session_key'] or server could just use the actual http-header
 		socket.send(session_key);
