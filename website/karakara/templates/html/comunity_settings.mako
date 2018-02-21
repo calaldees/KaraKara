@@ -16,6 +16,7 @@
             <li><label for="input_${k}">${k}</label><input id="input_${k}" type="text" name="${k}" value="${v}" /></li>
         % endfor
         </uL>
+        <input type="hidden" name="method" value="PUT">
         <input type="submit" value="Update">
     </form>
 </%def>

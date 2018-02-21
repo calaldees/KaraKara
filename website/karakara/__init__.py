@@ -231,23 +231,6 @@ def main(global_config, **settings):
         social_login.user_store = NullComunityUserStore()
     template_helpers.javascript_inline['comunity'] = social_login.html_includes
 
-    # Renderers ----------------------------------------------------------------
-
-    # AllanC - currently the auto_format decorator does all the formatting work
-    #          it would be far preferable to use the pyramid renderer framework
-    #          issue is, we want to set the renderer to be dynamic based on the url given
-    #          I don't want to define EVERY method with loads of renderer tags
-    #          and I don't want to define 5+ routes for every view callable with differnt formats
-    #          We need a nice way of doing this in pyramid, and right now, after HOURS of trawling
-    #          the doc and experimenting, I cant find one.
-    #from .renderers.auto_render_factory import AutoRendererFactory, handle_before_render
-    #config.add_renderer(None   , AutoRendererFactory) #'renderers.auto_render_factory.auto_renderer_factory'
-    #config.add_renderer('.html', 'pyramid.mako_templating.renderer_factory')
-    #config.add_subscriber(handle_before_render , pyramid.events.BeforeRender) # maybe use this to set renderer?
-    # closeset ive seen
-    #   http://zhuoqiang.me/a/restful-pyramid
-    #   http://stackoverflow.com/questions/4633320/is-there-a-better-way-to-switch-between-html-and-json-output-in-pyramid
-
 
     # KaraKara request additions -----------------------------------------------
 
@@ -267,9 +250,7 @@ def main(global_config, **settings):
 
     config.add_request_method(call_sub_view)
 
-    # queue_settings was such a common use case, I added it to all requests
-    #from .views.queue_settings import queue_settings
-    #config.add_request_method(queue_settings, 'queue_settings', property=True, reify=True)
+
     from .model_logic.queue_logic import QueueLogic
     config.add_request_method(QueueLogic, 'queue', reify=True)
 

@@ -168,7 +168,9 @@ def queue_settings_view_put(request):
 
     error_messages = []
     for key, value in request.params.items():
-        if not key.startswith(SETTING_IDENTIFIER) and not key.startswith(SETTING_IDENTIFIER_PRIVATE):  #key not in DEFAULT_SETTINGS.keys()
+        if not key.startswith(SETTING_IDENTIFIER) or key in REGISTRY_SETTINGS_PASSTHROUGH:
+            # not key.startswith(SETTING_IDENTIFIER_PRIVATE) and \
+            # key not in DEFAULT_SETTINGS.keys()
             continue
         if is_valid(key, value):
             get_or_create_queue_settings_obj(key).value = value

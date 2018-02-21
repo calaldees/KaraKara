@@ -405,16 +405,6 @@ def comunity_track_update(request):
 
 
 @view_config(
-    context='karakara.traversal.ComunitySettingsContext',
-)
-@comunity_only
-def community_settings(request):
-    if not request.context.queue_id:
-        raise action_error('queue_id required')
-    return action_ok(data={'settings': request.queue.settings})
-
-
-@view_config(
     context='karakara.traversal.ComunityProcessmediaLogContext',
 )
 @comunity_only

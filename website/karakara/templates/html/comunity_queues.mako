@@ -15,7 +15,7 @@
     <ul>
     % for queue in data.get('queues', []):
         <li>
-            ${queue['id']}
+            <a href="/queue/${queue['id']}">${queue['id']}</a>
             <a href="/comunity/settings/${queue['id']}">Settings</a>
             <a href="?method=delete&format=redirect&queue.id=${queue['id']}">Delete</a>
         </li>
