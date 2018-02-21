@@ -27,7 +27,7 @@
             <td><a href="${paths['track_list']}">${_('track_list')}</a></td>
             <td><a href="/comunity/settings/${queue['id']}">${_('settings')}</a></td>
             <td><a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}">${_('badgenames')}</a></td>
-            <td>${_('admin')} <form action="${paths['admin']}"><input type="text" name="password" placeholder="password"></form></td>
+            <td>${_('admin')} <form action="${paths['admin']}"><input type="text" name="password" placeholder="password" /></form></td>
             <td><a href="?method=delete&format=redirect&queue.id=${queue['id']}">${_('delete')}</a></td>
         </tr>
     % endfor

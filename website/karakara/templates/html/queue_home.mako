@@ -47,9 +47,10 @@
     ## TODO: Move these links to comunity
     ##<a href="${paths['player']}"           data-role="button" class="admin">${_('mobile.home.player')}</a>
     ##<a href="${paths['track_list']}"       data-role="button" class="admin">${_('mobile.home.track_list')}</a>
-    ##<a href="${paths['settings']}"         data-role="button" class="admin">${_('mobile.home.settings')}</a>
+    <form action="${paths['track']}"><input type="text" name="track_id" placeholder="${_('mobile.home.track_id')}"/></form>
     <a href="${paths['remote_control']}"   data-role="button" class="admin">${_('mobile.home.remote')}</a>
     <a href="${paths['priority_tokens']}"  data-role="button" class="admin">${_('mobile.home.priority_tokens')}</a>
+    <a href="${paths['settings']}"         data-role="button" class="admin">${_('mobile.home.settings')}</a>
     ##<a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}" data-role="button" class="admin">${_('mobile.home.badgenames')}</a>
     <a href="${paths['admin']}?password="  data-role="button" class="admin">${_('mobile.home.admin_exit')}</a>
     ##<a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>

@@ -72,6 +72,8 @@ def track_view(request):
      but if we were going to use memcache or redis then this is nessisary)
     """
     id = request.context.id
+    if not id and request.params.get('track_id'):
+        raise HTTPFound(location=resource_path(request.context.queue_context['track'][request.params.get('track_id')]))
     if not id:
         raise HTTPNotFound()
 
