@@ -61,6 +61,28 @@ def test_track_unknown(app, queue):
     assert response.status_code == 404
 
 
+def test_track_redirect_query_string(app, queue):
+    """
+    Track redirect id
+    """
+    response = app.get(f'/queue/{queue}/track?track_id=t1')
+    assert response.status_code == 302
+    response = response.follow()
+    assert response.status_code == 200
+    assert 'Test Track 1' in response.text
+
+
+def test_track_redirect_partial(app, queue):
+    """
+    Track redirect partial id
+    """
+    response = app.get(f'/queue/{queue}/track/x')
+    assert response.status_code == 302
+    response = response.follow()
+    assert response.status_code == 200
+    assert 'Wildcard' in response.text
+
+
 def test_track_list(app, tracks, queue):
     """
     Because we have so few tracks in the test database - search_list should
