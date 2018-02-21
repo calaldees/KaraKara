@@ -9,8 +9,8 @@
 <%def name="title()">${_('mobile.search_tags.title')}</%def>
 
 <%def name="search_url(tags=None, keywords=None, route='search_tags')"><%
-    tags = tags or data.get('tags', [])
-    keywords = keywords or data.get('keywords', [])
+    tags = tags if tags != None else data.get('tags', [])
+    keywords = keywords if keywords != None else data.get('keywords', [])
     #    route_path = "/%s/%s" % (route, "/".join(tags))
     #    if kwargs:
     #        route_path += '?' + '&'.join(["%s=%s" % (key, ",".join(items)) for key, items in kwargs.items() if items])
