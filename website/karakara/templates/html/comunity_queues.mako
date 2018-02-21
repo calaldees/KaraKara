@@ -1,5 +1,10 @@
 <%inherit file="_base_comunity.mako"/>
 
+<%!
+    from urllib.parse import quote_plus
+%>
+
+
 <%def name="body()">
     <h1>Queues</h1>
 
@@ -12,13 +17,19 @@
         <input type="hidden" name="format" value="redirect"/>
     </form>
 
-    <ul>
+    <table class="table table-condensed table-hover">
     % for queue in data.get('queues', []):
-        <li>
-            <a href="/queue/${queue['id']}">${queue['id']}</a>
-            <a href="/comunity/settings/${queue['id']}">Settings</a>
-            <a href="?method=delete&format=redirect&queue.id=${queue['id']}">Delete</a>
-        </li>
+        <% paths = h.paths_for_queue(queue['id']) %>
+        <tr>
+            <td>${queue['id']}</td>
+            <td><a href="${paths['queue']}">${_('mobile')}</a></td>
+            <td><a href="${paths['player']}">${_('player')}</a></td>
+            <td><a href="${paths['track_list']}">${_('track_list')}</a></td>
+            <td><a href="/comunity/settings/${queue['id']}">${_('settings')}</a></td>
+            <td><a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}">${_('badgenames')}</a></td>
+            <td>${_('admin')} <form action="${paths['admin']}"><input type="text" name="password" placeholder="password"></form></td>
+            <td><a href="?method=delete&format=redirect&queue.id=${queue['id']}">${_('delete')}</a></td>
+        </tr>
     % endfor
-    </ul>
+    </table>
 </%def>

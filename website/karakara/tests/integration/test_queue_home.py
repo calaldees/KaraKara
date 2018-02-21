@@ -19,7 +19,7 @@ def test_queue_home(app, queue):
         return BeautifulSoup(app.get(f'/queue/{queue}').text)
 
     LINKS_ALL_USERS = {'search_tags', 'queue'}
-    LINKS_ADMIN_USERS = {'player', 'track_list', 'settings', 'remote'}
+    LINKS_ADMIN_USERS = {'remote', }
 
     link_to = partial(_link_to, get_queue_home_soup())
     for menu_item in LINKS_ALL_USERS:

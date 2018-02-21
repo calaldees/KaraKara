@@ -85,26 +85,7 @@ def main(global_config, **settings):
         try:
             queue_context = request.context.queue_context
             if queue_context:
-                response['paths'].update({
-                    **{
-                        'queue': pyramid.traversal.resource_path(queue_context),
-                        'player': f'/player/player.html?queue_id={queue_context.id}',
-                    },
-                    **{
-                        route_name: pyramid.traversal.resource_path(queue_context[route_name])
-                        for route_name in (
-                            'queue_items',
-                            'track',
-                            'track_list',
-                            'search_tags',
-                            'search_list',
-                            'settings',
-                            'remote_control',
-                            'admin',
-                            'priority_tokens',
-                        )
-                    }
-                })
+                response['paths'].update(template_helpers.paths_for_queue(queue_context.id))
         except AttributeError:
             pass
 

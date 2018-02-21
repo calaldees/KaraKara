@@ -2,13 +2,15 @@
 Template helpers
 These will be accessible as 'h.' in all mako templates
 """
+import random
+import logging
+
+import pyramid.traversal
 
 from externals.lib.misc import get_fileext, substring_in, first
 
+from karakara.traversal import TraversalGlobalRootFactory
 
-import random
-
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -45,19 +47,32 @@ class Path(object):
 path = Path()
 
 
+def paths_for_queue(queue_id):
+    queue_context = TraversalGlobalRootFactory(None)['queue'][queue_id]
+    return {
+        **{
+            'queue': pyramid.traversal.resource_path(queue_context),
+            'player': f'/player/player.html?queue_id={queue_context.id}',
+        },
+        **{
+            route_name: pyramid.traversal.resource_path(queue_context[route_name])
+            for route_name in (
+                'queue_items',
+                'track',
+                'track_list',
+                'search_tags',
+                'search_list',
+                'settings',
+                'remote_control',
+                'admin',
+                'priority_tokens',
+            )
+        }
+    }
+
+
 def media_url(file):
     return '/files/%s' % file
-
-
-#def track_url(id):
-#    return '/track/%s' % id
-
-
-#def search_url(tags=[], route='search_tags', **kwargs):
-#    route_path = "/%s/%s" % (route, "/".join(tags))
-#    if kwargs:
-#        route_path += '?' + '&'.join(["%s=%s" % (key, ",".join(items)) for key, items in kwargs.items() if items])
-#    return route_path
 
 
 def duration_str(duration):

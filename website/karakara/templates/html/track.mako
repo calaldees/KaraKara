@@ -58,7 +58,7 @@ ${video(track)}
         % if queue_status != 'THRESHOLD':
             <form action='${paths['queue_items']}' method='POST' data-ajax="false" onsubmit="store_performer_name();">
                 <input type='hidden' name='format'         value='redirect'      />
-                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='_('view.track.input.performer_name.default')}' required />
+                <input type='text'   name='performer_name' value=''              id="input_performer_name" placeholder='${_('view.track.input.performer_name.default')}' required />
                 ## TODO: reimplement this from settings? Need this in api return? - ${request.registry.settings.get('karakara.template.input.performer_name') or
                 <input type='hidden' name='track_id'       value='${track['id']}' />
                 <input type='submit' name='submit_'        value='Queue Track'   />

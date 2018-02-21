@@ -11,7 +11,9 @@ def test_comunity_queue(app, queue, users):
 
     QUEUE_NEW = 'queue_new'
     response = app.get('/comunity/queues')
-    assert queue in response.text
+    for text in {queue, 'player', 'track_list', 'settings', 'badgenames', 'password'}:
+        # todo: could use soup to check for links
+        assert queue in response.text
     assert QUEUE_NEW not in response.text
 
     response = app.post('/comunity/queues', {'queue_id': QUEUE_NEW, 'format': 'redirect'}, expect_errors=True)
