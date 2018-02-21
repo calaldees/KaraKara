@@ -9,6 +9,9 @@ from externals.lib.pyramid_helpers.etag import etag, etag_decorator, _generate_c
 from externals.lib.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, patch_cache_bucket_decorator
 from externals.lib.pyramid_helpers.auto_format2 import action_ok, action_error
 
+from karakara.model import commit
+
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -63,9 +66,10 @@ cache_manager = CacheManager(
         CacheFunctionWrapper(_cache_key_etag_expire, ('request', )),
         CacheFunctionWrapper(_cache_key_identity_admin, ('request', )),
     ),
+    default_invalidate_callbacks=(
+        CacheFunctionWrapper(commit, ()),
+    )
 )
-
-
 
 
 web = decorator_combine(

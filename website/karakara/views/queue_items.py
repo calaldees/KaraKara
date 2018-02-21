@@ -235,13 +235,11 @@ def queue_item_add(request):
     _log_event(status='ok', queue_id=queue_item.queue_id, track_id=queue_item.track_id, performer_name=queue_item.performer_name)
     #log.info('add - %s to queue by %s' % (queue_item.track_id, queue_item.performer_name))
 
+    message_data = {'track_id': queue_item.track_id, 'performer_name': queue_item.performer_name}
     invalidate_cache(request, track_id)
 
     return action_ok(
-        message=_(
-            'view.queue_item.add.ok ${track_id} ${performer_name}',
-            mapping={'track_id': queue_item.track_id, 'performer_name': queue_item.performer_name},
-        ),
+        message=_('view.queue_item.add.ok ${track_id} ${performer_name}', mapping=message_data),
         data={'queue_item.id': ''},
         code=201,
     )  # TODO: should return 201 and have id of newly created object. data={'track':{'id':}}
@@ -291,13 +289,11 @@ def queue_item_del(request):
     _log_event(status='ok', track_id=queue_item.track_id, queue_id=queue_item.queue_id)
     #log.info('remove - %s from queue' % (queue_item.track_id))
     #queue_item_track_id = queue_item.track_id  # Need to get queue_item.track_id now, as it will be cleared by invalidate_queue
+    message_data = {'track_id': queue_item.track_id, 'queue_id': queue_item.queue_id}
     invalidate_cache(request, queue_item.track_id)
 
     return action_ok(
-        message=_(
-            'view.queue_item.delete.ok ${track_id} ${queue_id}',
-            mapping={'track_id': queue_item.track_id, 'queue_id': queue_item.queue_id},
-        )
+        message=_('view.queue_item.delete.ok ${track_id} ${queue_id}', mapping=message_data)
     )
 
 
@@ -374,13 +370,11 @@ def queue_item_update(request):
     #log.info('update - %s' % (queue_item.track_id))
     _log_event(status='ok', track_id=queue_item.track_id, queue_id=queue_item.queue_id)
 
+    message_data = {'track_id': queue_item.track_id, 'queue_item_id': queue_item.id}  # Because invalidate expunges objects in the session
     invalidate_cache(request, queue_item.track_id)
 
     return action_ok(
-        message=_(
-            'view.queue_item.update.ok ${track_id} ${queue_item_id}',
-            mapping={'track_id': queue_item.track_id, 'queue_item_id': queue_item.id}
-        )
+        message=_('view.queue_item.update.ok ${track_id} ${queue_item_id}', mapping=message_data)
     )
 
 
