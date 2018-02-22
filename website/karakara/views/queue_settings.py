@@ -17,6 +17,10 @@ REGISTRY_SETTINGS_PASSTHROUGH = {
     'karakara.websocket.path',
 }
 
+SETTINGS_ADMIN_EXTRA_EXPOSE = {
+    'karakara.private.password',
+}
+
 SETTINGS_TYPE_MAPPING = {
     'karakara.system.user.readonly': 'bool',
     'karakara.event.end': 'datetime',
@@ -96,7 +100,7 @@ DEFAULT_SETTINGS = {
     for k, v in DEFAULT_SETTINGS.items()
 }
 SETTING_IDENTIFIER = 'karakara'
-SETTING_IDENTIFIER_PRIVATE = f'{SETTING_IDENTIFIER}.private'
+SETTING_IDENTIFIER_PRIVATE = f'{SETTING_IDENTIFIER}.private'  # Possibly replace this with a list of allowed private keys
 
 
 def acquire_cache_bucket_func(request):
@@ -168,9 +172,11 @@ def queue_settings_view_put(request):
 
     error_messages = []
     for key, value in request.params.items():
-        if not key.startswith(SETTING_IDENTIFIER) or key in REGISTRY_SETTINGS_PASSTHROUGH:
-            # not key.startswith(SETTING_IDENTIFIER_PRIVATE) and \
-            # key not in DEFAULT_SETTINGS.keys()
+        if (
+            (not key.startswith(SETTING_IDENTIFIER)) or  # Drop random other fields (like 'format' or 'method')
+            (key in REGISTRY_SETTINGS_PASSTHROUGH) or  # These are not editable settings for the queue, they are global and cannot be set
+            (not value and key in SETTINGS_ADMIN_EXTRA_EXPOSE)  # Ignore extra admin keys if they are empty (this prevents stomping on 'password'. This probably needs more thought
+        ):
             continue
         if is_valid(key, value):
             get_or_create_queue_settings_obj(key).value = value

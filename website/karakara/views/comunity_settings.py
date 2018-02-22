@@ -2,9 +2,7 @@ from pyramid.view import view_config
 
 from . import action_ok, action_error, comunity_only, is_comunity, method_put_router
 
-from .queue_settings import queue_settings_view_put, acquire_cache_bucket_func, REGISTRY_SETTINGS_PASSTHROUGH
-
-SETTINGS_EXTRA_EXPOSE = {'karakara.private.password', }
+from .queue_settings import queue_settings_view_put, acquire_cache_bucket_func, REGISTRY_SETTINGS_PASSTHROUGH, SETTINGS_ADMIN_EXTRA_EXPOSE
 
 
 @view_config(
@@ -17,7 +15,7 @@ def community_settings_view(request):
         raise action_error('queue_id required')
 
     return action_ok(data={'settings': {
-        **{key: '' for key in SETTINGS_EXTRA_EXPOSE},
+        **{key: '' for key in SETTINGS_ADMIN_EXTRA_EXPOSE},
         **{
             key: value
             for key, value in request.queue.settings.items()
