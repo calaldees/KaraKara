@@ -5,16 +5,21 @@ import pytest
 from . import with_settings
 
 
-@pytest.mark.xfail(strict=True)
-def test_track_list_urlencoding():
+@pytest.mark.parametrize(('sub_path',), [
+    (r'?keywords=hack%2F%2Fsign',),
+    #(r'from%3Ahack%2F%2Fsign',),  # Pyramid traversal algorithum url.unquotes this and to my knowlege cannot be stopped. Bugger ... this can is mangled long before it gets to my view.
+    (r'hack%2F%2Fsign',),
+])
+def test_track_list_urlencoding(app, queue, tracks, track_unicode_special, sub_path):
     """
     TODO: Need test to cover correct url encoding
     http://localhost:6543/search_tags/category%3Aanime/from%3Ahack%2F%2Fsign?
     http://localhost:6543/search_tags/category:anime/from:hack//sign?
 
-    helpers.search_url() is the culprit.
     """
-    assert False
+    url = f'/queue/{queue}/search_list/{sub_path}'
+    response = app.get(url)
+    assert 'UnicodeAssention'.lower() in response.text.lower()
 
 
 @pytest.mark.parametrize(('sub_path', 'expected_text', 'not_expected_text'), [

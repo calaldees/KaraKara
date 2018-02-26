@@ -42,7 +42,7 @@
 
 <!-- add keywords -->
 <form action="${search_url()}" method="GET">
-    <input type="text" name="keywords" placeholder="Add search keywords">
+    <input type="text" name="keywords" placeholder="${_('Add search keywords')}">
 </form>
 
 <% total_tracks = len(data.get('trackids',[])) %>

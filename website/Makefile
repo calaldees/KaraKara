@@ -190,7 +190,7 @@ shell_production: ini_production
 # Test -------------------------------------------------------------------------
 .PHONY: test test_crawl
 
-test: ini_test
+test: $(DATABASE_DEV) ini_test
 	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# --capture=sys
 

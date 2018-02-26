@@ -187,3 +187,35 @@ def create_test_track(id=None, duration=None, tags=(), attachments=(), lyrics=No
     DBSession.add(track)
 
     return track
+
+
+
+@pytest.yield_fixture
+def track_unicode_special(DBSession, commit):
+    tags_data = (
+        'title:UnicodeAssention',
+        'from:Hack//Sign',
+        'artist:こ',
+    )
+    def _create_tag(tag_data):
+        tag = get_tag(tag_data, create_if_missing=True)
+        DBSession.add(tag)
+        return tag
+    tag_objs = tuple(_create_tag(tag) for tag in tags_data)
+    commit()
+
+    track = Track()
+    track.id = 'x999'
+    track.duration = 120
+    track.tags[:] = tag_objs
+    track.source_filename = 'unicode_special'
+
+    DBSession.add(track)
+    commit()
+
+    yield track
+
+    DBSession.delete(track)
+    for tag_obj in tag_objs:
+        DBSession.delete(tag_obj)
+    commit()
