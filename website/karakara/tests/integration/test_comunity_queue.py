@@ -10,11 +10,16 @@ def test_comunity_queue(app, queue, users):
     login(app)
 
     QUEUE_NEW = 'queue_new'
+
     response = app.get('/comunity/queues')
     for text in {queue, 'player', 'track_list', 'settings', 'badgenames', 'password'}:
         # todo: could use soup to check for links
         assert queue in response.text
     assert QUEUE_NEW not in response.text
+
+    response = app.post('/comunity/queues', {'queue_id': QUEUE_NEW.title(), 'queue_password': 'bad'}, expect_errors=True)
+    assert response.status_code == 400
+    assert 'uppercase' in response.text.lower()
 
     response = app.post('/comunity/queues', {'queue_id': QUEUE_NEW, 'format': 'redirect'}, expect_errors=True)
     assert response.status_code == 302

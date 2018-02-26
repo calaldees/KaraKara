@@ -27,9 +27,11 @@ def comunity_queue_add(request):
     for key in ('queue_id', 'queue_password'):
         if not request.params.get(key):
             raise action_error(_('api.error.param_required ${param}', mapping={'param': key}), code=400)
+    if request.params.get('queue_id') != request.params.get('queue_id').lower():
+        raise action_error(_('api.error.queue_id.uppercase_forbidden'), code=400)
 
     queue = Queue()
-    queue.id = request.params.get('queue_id')
+    queue.id = request.params.get('queue_id').lower()
     DBSession.add(queue)
 
     queue_setting = QueueSetting()
