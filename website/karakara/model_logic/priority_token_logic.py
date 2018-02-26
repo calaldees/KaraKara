@@ -52,7 +52,7 @@ class PriorityTokenManager():
             log.debug('priority_token rejected - token limit')
             return TOKEN_ISSUE_ERROR.TOKEN_LIMIT
 
-        # Do not issue another priority_token if current user alrady has a priority_token
+        # Do not issue another priority_token if current user already has a priority_token
         try:
             priority_token = DBSession.query(PriorityToken) \
                                 .filter(PriorityToken.used==False) \
@@ -80,6 +80,7 @@ class PriorityTokenManager():
         })
         json_cookie = json.dumps(priority_token_dict, default=json_object_handler)
         self.request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))
+        #self.request.response.set_cookie(name='priority_token', value=json_cookie, path='/', overwrite=True)  # This method butchers the json and cannot be used
 
         log.debug('priority_token issued')
         return priority_token
