@@ -49,11 +49,11 @@ ${video(track)}
     % else:
         <% queue_status = track.get('queue',{}).get('status') %>
         % if   queue_status == 'THRESHOLD':
-        <p>Track is not requestable because it has already been requested and has reached the request limit</p>
+        <p>${_('Track is not requestable because it has already been requested and has reached the request limit')}</p>
         % elif queue_status == 'PLAYED':
-        <p>Track already been played recently.</p>
+        <p>${_('Track already been played recently.')}</p>
         % elif queue_status == 'PENDING':
-        <p>This track has already been queued. Are you sure you want to still request it?</p>
+        <p>${_('This track has already been queued. Are you sure you want to still request it?')}</p>
         % endif
         % if queue_status != 'THRESHOLD':
             <form action='${paths['queue_items']}' method='POST' data-ajax="false" onsubmit="store_performer_name();">
