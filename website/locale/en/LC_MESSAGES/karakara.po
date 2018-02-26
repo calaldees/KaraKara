@@ -135,13 +135,13 @@ msgstr "${performer_name} is not a valid badge name for this event"
 msgid ""
 "view.queue_item.add.dupicate_performer_limit ${performer_name} "
 "${estimated_next_add_time} ${track_count} ${latest_queue_item_title}"
-msgstr "Unable to queue track. duplicate ${performer_name} limit reached"
+msgstr "Unable to queue track. ${performer_name} has already queued ${track_count} track(s). You can queue another track in ${estimated_next_add_time}"
 
 #: karakara/views/queue_items.py:184
 msgid ""
 "view.queue_item.add.dupicate_track_limit ${track_id} "
-"${estimated_next_add_time} ${track_count}"
-msgstr "Unable to queue track. duplicate 'track in queue' limit reached"
+"${estimated_next_add_time} ${track_count} ${latest_queue_item_title}"
+msgstr "Unable to queue track. '${latest_queue_item_title}' has already been queued. You can queue it again in ${estimated_next_add_time}"
 
 #: karakara/views/queue_items.py:197 karakara/views/queue_items.py:213
 msgid "view.queue_item.add.event_end ${event_end}"

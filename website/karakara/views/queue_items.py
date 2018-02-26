@@ -160,6 +160,8 @@ def queue_item_add(request):
             ))
             raise action_error(message, code=400)
 
+        # TODO: Unify and tidy this shit .. Duplicate messages are very similat and can offload they db access to the model_logic.
+
         # Duplucate performer resrictions
         queue_item_performed_tracks = request.queue.for_performer(request.params.get('performer_name'))
         if queue_item_performed_tracks['performer_status'] == QUEUE_DUPLICATE.THRESHOLD:
@@ -181,9 +183,14 @@ def queue_item_add(request):
         # Duplicate Addition Restrictions
         queue_item_tracks_queued = request.queue.for_track(track.id)
         if queue_item_tracks_queued['track_status'] == QUEUE_DUPLICATE.THRESHOLD:
-            message = _('view.queue_item.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${track_count}', mapping=dict(
+            try:
+                latest_track_title = get_track(queue_item_tracks_queued['queue_items'][0].track_id).title
+            except Exception:
+                latest_track_title = ''
+            message = _('view.queue_item.add.dupicate_track_limit ${track_id} ${estimated_next_add_time} ${track_count} ${latest_queue_item_title}', mapping=dict(
                 track_id=track.id,
-                **subdict(queue_item_performed_tracks, {
+                latest_queue_item_title=latest_track_title,
+                **subdict(queue_item_tracks_queued, {
                     'estimated_next_add_time',
                     'track_count',
                 })
