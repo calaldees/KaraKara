@@ -18,5 +18,5 @@ def home(request):
         raise HTTPFound(location='/comunity')
 
     if request.params.get('queue_id'):
-        raise HTTPFound(location=f'/queue/{request.params.get("queue_id")}')
+        raise HTTPFound(location=f'/queue/{request.params.get("queue_id", "").lower()}')
     return action_ok()
