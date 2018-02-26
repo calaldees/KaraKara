@@ -137,7 +137,7 @@ def _search(search_params):
         for tag in tags:
             trackids = trackids.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.id == tag.id))
         for keyword in keywords:
-            trackids = trackids.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword)) )
+            trackids = trackids.intersect(DBSession.query(Track.id).join(Track.tags).filter(Tag.name.like('%%%s%%' % keyword.lower())) )
 
         trackids = [trackid[0] for trackid in trackids.all()]
 
