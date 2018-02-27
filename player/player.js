@@ -384,9 +384,9 @@ function update_playlist() {
 	}
 
 	$.getJSON(URLS.queue_items, {}, function(data) {
-		console.log("update_playlist getJSON response");
+		console.log("update_playlist", "response", URLS.queue_items);
 		if(_sig(playlist) != _sig(data.data.queue)) {
-			console.log("update_playlist:updated");
+			console.log("update_playlist", "content updated");
 			playlist     = data.data.queue;
 			split_indexs = data.data.queue_split_indexs;
 			render_playlist();
@@ -467,7 +467,7 @@ function render_playlist() {
 		}
 		
 		return "" +
-			"<img src='"+get_attachment(track,'thumbnail')+"'>\n" +
+			"<img src='"+get_attachment(track,'image')+"'>\n" +
 			"<p class='title'>"     + track.tags.get("title")   + "</p>\n" +
 			"<p class='from'>"      + track.tags.get("from")    + "</p>\n" +
 			"<p class='performer'>" + queue_item.performer_name + "</p>\n" +
