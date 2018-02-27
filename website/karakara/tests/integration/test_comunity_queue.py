@@ -2,8 +2,9 @@ import pytest
 
 from .test_comunity import login, logout
 
+from karakara.model.model_queue import QueueItem
 
-def test_comunity_queue(app, queue, users):
+def test_comunity_queue(app, queue, users, tracks, DBSession):
     response = app.get('/comunity/queues', expect_errors=True)
     assert response.status_code == 403
 
@@ -33,6 +34,12 @@ def test_comunity_queue(app, queue, users):
     assert queue in response.text
     assert QUEUE_NEW in response.text
 
+    # Add a track to the queue
+    def tracks_queued_count():
+        return DBSession.query(QueueItem).filter(QueueItem.queue_id == QUEUE_NEW).count()
+    response = app.post(f'/queue/{QUEUE_NEW}/queue_items', {'track_id': 't1', 'performer_name': 'bob'})
+    assert tracks_queued_count() == 1
+
     response = app.get(f'/comunity/queues?method=delete&format=redirect&queue.id={QUEUE_NEW}')
     # TODO: activate the link above by using the link from soup?
     response = app.get('/comunity/queues')
@@ -40,3 +47,5 @@ def test_comunity_queue(app, queue, users):
     assert QUEUE_NEW not in response.text
 
     logout(app)
+
+    assert tracks_queued_count() == 0, 'deleting a queue should have cascaded to children. QueueItem residue still present'
