@@ -25,6 +25,7 @@ var URLS = {
 	'settings': "/queue/" + getUrlParameter('queue_id') + "/settings.json",
 	'queue_items': "/queue/" + getUrlParameter('queue_id') + "/queue_items.json",
 	'random_images': "/queue/" + getUrlParameter('queue_id') + "/random_images.json",
+	'static': getUrlParameter('url_static') || "/files/",
 }
 
 
@@ -83,7 +84,7 @@ function get_chrome_version() {
 function get_attachment(track, type) {
 	for(var i=0; i<track.attachments.length; i++) {
 		if(track.attachments[i].type == type) {
-			return "/files/"+track.attachments[i].location;
+			return URLS.static + track.attachments[i].location;
 		}
 	}
 	return "";
@@ -226,7 +227,7 @@ screens.events.on_show['preview'] = function() {
 			var title = playlist[0].track.title;
 			//console.log("Preparing next song - "+title);
 			//$('title').html(title);
-			//$('#title').html("<a href='"+"/files/" + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
+			//$('#title').html("<a href='"+ URLS.static + get_attachment(playlist[0].track, "video")+"'>"+title+"</a>");
 			set_video_preview(preview_src);
 		}
 	}
@@ -512,7 +513,7 @@ function init_titlescreen(titlescreen_images) {
 		if (!speed)    {speed    = Math.random()*titlescreen.max_speed;}
 
 		var img = $("<img>");
-		img.attr("src", "/files/"+image);
+		img.attr("src", URLS.static + image);
 		img.attr("style", "left: "+x+"px; top:"+y+"px; width: "+size+"px; -webkit-transform: rotate("+rotation+"rad);");
 		img.attr("data-speed", speed+1);
 		img.attr("data-rotation", rotation);
