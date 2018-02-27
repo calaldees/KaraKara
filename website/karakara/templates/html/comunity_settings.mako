@@ -10,7 +10,7 @@
             <%
                 v = data.get('settings', {}).get(k)
                 if isinstance(v, list):
-                    v = ', '.join(map(str, v))
+                    v = f"""[{', '.join(map(str, v))}]"""
                 v = str(v)
             %>
             <li><label for="input_${k}">${k}</label><input id="input_${k}" type="text" name="${k}" value="${v}" /></li>
