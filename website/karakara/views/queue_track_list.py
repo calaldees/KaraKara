@@ -69,7 +69,7 @@ def track_list_all(request):
 
     # Sort track list
     #  this needs to be handled at the python layer because the tag logic is fairly compicated
-    fields = request.registry.settings.get('karakara.print_tracks.fields',[])
+    fields = request.queue.settings.get('karakara.print_tracks.fields', [])
     def key_track(track):
         return " ".join([tag_hireachy(track['tags'], field) for field in fields])
     track_list = sorted(track_list, key=key_track)
