@@ -52,27 +52,3 @@ def test_search_tags_silent_forced(app, queue, tracks, tracks_volume):
     settings = get_settings()
     assert not settings['karakara.search.tag.silent_forced']
     assert not settings['karakara.search.tag.silent_hidden']
-
-
-def test_track_list_all(app, queue, tracks):
-    #with admin_rights(app):
-        def get_track_list_soup():
-            return BeautifulSoup(app.get(f'/queue/{queue}/track_list').text)
-
-        def get_settings():
-            return app.get(f'/queue/{queue}/settings.json').json['data']['settings']
-        settings = get_settings()
-        assert settings['karakara.search.tag.silent_forced'] == []
-
-        soup = get_track_list_soup()
-        data_rows = soup.find_all('td', class_='col_id_short')
-        assert len(data_rows) == 4
-
-        #with patch.dict(settings, {'karakara.search.tag.silent_forced': ['category:anime']}):
-        with temporary_settings(app, queue, {'karakara.search.tag.silent_forced': ['category:anime']}):
-            soup = get_track_list_soup()
-            data_rows = soup.find_all('td', class_='col_id_short')
-            assert len(data_rows) == 2
-            assert 't1' in soup.text
-            assert 't2' in soup.text
-            assert 't3' not in soup.text

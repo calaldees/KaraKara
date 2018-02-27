@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 )
 #@etag_decorator(track_list_cache_key)
 #@web
-#@admin_only
+@admin_only
 def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
