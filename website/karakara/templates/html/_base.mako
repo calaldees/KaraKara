@@ -33,7 +33,7 @@
         <div data-role="page">
             
             <div data-role="header" data-position="fixed" data-tap-toggle="false">
-                <%def name="title()">${request.registry.settings.get('karakara.template.title') or 'KaraKara'}</%def>
+                <%def name="title()">${request.queue.settings.get('karakara.template.title') or request.registry.settings.get('karakara.template.title') or _('karakara.mobile.template.title.fallback')}</%def>
                 <h1>${next.title()}</h1><span id="priority_countdown"></span>
                 
                 % if request.path != '/':

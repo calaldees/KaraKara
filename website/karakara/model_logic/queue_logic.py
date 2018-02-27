@@ -21,10 +21,15 @@ class QueueLogic():
 
     @reify
     def exists(self):
-        return DBSession.query(Queue).filter(Queue.id == self.request.context.id).count()
+        if hasattr(self.request.context, 'queue_id'):
+            return DBSession.query(Queue).filter(Queue.id == self.request.context.queue_id).count()
+        return False
 
     @reify
     def settings(self):
+        #if not self.exists:
+        if not hasattr(self.request.context, 'queue_id'):
+            return {}
         return self.request.call_sub_view(queue_settings_view, queue_settings_acquire_cache_bucket_func)['settings']
 
     @reify
