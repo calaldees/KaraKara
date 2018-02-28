@@ -73,7 +73,7 @@ def track_view(request):
     """
     id = request.context.id
     if not id and request.params.get('track_id'):
-        raise HTTPFound(location=resource_path(request.context.queue_context['track'][request.params.get('track_id')]))
+        raise HTTPFound(location=resource_path(request.context.queue_context['track'][request.params.get('track_id').lower()]))
     if not id:
         raise HTTPNotFound()
 
