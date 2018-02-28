@@ -2,6 +2,7 @@ import re
 import copy
 import random
 import collections
+import urllib.parse
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload, aliased, defer
@@ -199,7 +200,7 @@ def tags(request):
             # TODO: Lame - This url is created with string concatination. Use a proper builder.
             raise HTTPFound(location='{path}?keywords={keywords}'.format(
                 path=resource_path(request.context.queue_context['search_list'], *tags),
-                keywords=','.join(keywords),
+                keywords=urllib.parse.quote(','.join(keywords)),
             ))
 
     def get_action_return_with_sub_tags():

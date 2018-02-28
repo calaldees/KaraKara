@@ -24,6 +24,12 @@ def test_track_list_urlencoding(app, queue, tracks, track_unicode_special, sub_p
     assert 'UnicodeAssention'.lower() in response.text.lower()
 
 
+def test_search_tags_with_unicode_flow(app, queue):
+    keywords_unicode = urllib.parse.quote('Pokémon')
+    response = app.get(f'/queue/{queue}/search_tags?keywords={keywords_unicode}')
+    assert keywords_unicode in response.location
+
+
 @pytest.mark.parametrize(('sub_path', 'expected_text', 'not_expected_text'), [
     ('/'                 , ['wildcard', 'track 1', 'track 2', 'track 3'], []),
     ('/?trackids=t1,t2'  , ['track 1', 'track 2']                       , ['track 3', 'wildcard', 'ここ']),
