@@ -2,6 +2,8 @@
 
 import pytest
 
+import urllib.parse
+
 from . import with_settings
 
 
@@ -26,6 +28,9 @@ def test_track_list_urlencoding(app, queue, tracks, track_unicode_special, sub_p
     ('/'                 , ['wildcard', 'track 1', 'track 2', 'track 3'], []),
     ('/?trackids=t1,t2'  , ['track 1', 'track 2']                       , ['track 3', 'wildcard', 'ここ']),
     ('/?keywords=test'   , ['track 1', 'track 2', 'track 3']            , ['wildcard']),
+    (f'/?keywords={urllib.parse.quote("キ")}', ['track 3'], ['track 1', 'track 2', 'wildcard']),
+    (f'/?keywords={urllib.parse.quote("Pokémon")}', [], ['track 1', 'track 2', 'track 3', 'wildcard']),
+    #('/?keywords=Pok%E9mon', [], ['track 1', 'track 2', 'track 3', 'wildcard']), # reproduce https://github.com/Pylons/webob/issues/161 . put http://localhost:6543/queue/qtest/search_list?keywords=Pok%E9mon into your browser
     ('/anime'            , ['track 1', 'track 2']                       , ['wildcard', 'track 3']),
     ('/anime/en'         , ['track 2']                                  , ['wildcard', 'track 1', 'track 3']),
     ('/jpop'             , ['track 3', 'track 1']                       , ['wildcard', 'track 2']),
