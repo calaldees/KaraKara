@@ -13,7 +13,7 @@ from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to 
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
-from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan, now, json_string
+from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan, now, json_string, postmortem
 from externals.lib.pyramid_helpers.cache_manager import setup_pyramid_cache_manager
 from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from externals.lib.pyramid_helpers.session_identity2 import session_identity
@@ -263,6 +263,11 @@ def main(global_config, **settings):
     config.add_subscriber(add_localizer_to_request, pyramid.events.NewRequest)
     config.add_subscriber(add_render_globals_to_template, pyramid.events.BeforeRender)
 
+    # Tweens -------------------------------------------------------------------
+    if config.registry.settings.get('karakara.server.mode') == 'development' and config.registry.settings.get('karakara.server.postmortem'):
+        config.add_tween('karakara.postmortem_tween_factory')
+
+
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
     config.scan('externals.lib.pyramid_helpers.views')
@@ -284,3 +289,9 @@ def add_render_globals_to_template(event):
     event['localizer'] = request.localizer
     event['h'] = template_helpers
     event['traversal'] = pyramid.traversal
+
+
+def postmortem_tween_factory(handler, registry):
+    def postmortem_tween(request):
+        return postmortem(handler, request)
+    return postmortem_tween

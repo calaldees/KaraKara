@@ -20,6 +20,7 @@ i18n.available_languages = [en]
 
 # Karaoke settings -------------------------------------------------------------
 karakara.server.mode = development
+karakara.server.postmortem = False -> bool
 
 karakara.template.title = KaraKara (Dev)
 
