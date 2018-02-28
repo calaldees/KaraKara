@@ -68,7 +68,10 @@ ${video(track)}
                     $.cookie('last_performer_name', {value:$("#input_performer_name").val()}, {path:'/'});
                 }
                 $(document).ready(function() {
-                    $('#input_performer_name').val($.cookie("last_performer_name").value || "");
+                    var last_performer_name_cookie = $.cookie("last_performer_name");
+                    if (last_performer_name_cookie) {
+                        $('#input_performer_name').val(last_performer_name_cookie.value || "");
+                    }
                 });
             </script>
         % endif
