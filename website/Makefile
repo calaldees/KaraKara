@@ -34,13 +34,6 @@ PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python
 
 LOG_LINES=5
 
-BADGENAME_SOURCE=minami
-
-#APTGET_EXTRAS = 
-#TTY=$(shell tty)
-#ifndef TTY
-#APTGET_EXTRAS+=-y
-#endif
 
 
 # Help -------------------------------------------------------------------------

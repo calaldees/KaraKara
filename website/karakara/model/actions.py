@@ -80,11 +80,6 @@ def get_tag(tag, parent=None, create_if_missing=False):
     return tag_object
 
 
-def clear_all_tracks():
-    DBSession.query(Track).delete()
-    DBSession.query(QueueItem).delete()
-
-
 def _delete_cascade(_id, model, model_children, child_id_fieldname):
     attrgetter_child_id = operator.attrgetter(child_id_fieldname)
     for ModelClass in model_children:
