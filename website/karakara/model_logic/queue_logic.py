@@ -59,6 +59,7 @@ class QueueLogic():
     def _queue_item_base_query(self):
         return (
             DBSession.query(QueueItem)
+            .filter(QueueItem.queue_id == self.request.context.queue_id)
             .filter(or_(
                 QueueItem.status == 'pending',
                 and_(

@@ -367,7 +367,7 @@ def test_queue_track_duplicate(app, queue, tracks, queue_manager, DBSession, com
     # Duplicate also looks at 'played' tracks
     # These are not surfaced by the queue API so we need to DB access to clean out the leftover played references
     from karakara.model.model_queue import QueueItem
-    for queue_item in DBSession.query(QueueItem).filter(QueueItem.track_id == 't1').filter(QueueItem.status == 'played').all():
+    for queue_item in DBSession.query(QueueItem).filter(QueueItem.queue_id == queue).filter(QueueItem.track_id == 't1').filter(QueueItem.status == 'played').all():
         DBSession.delete(queue_item)
     commit()
 
@@ -382,7 +382,7 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
         # Duplicate also looks at 'played' tracks
         # These are not surfaced by the queue API so we need to DB access to clean out the leftover played references
         from karakara.model.model_queue import QueueItem
-        for queue_item in DBSession.query(QueueItem).filter(QueueItem.performer_name == 'bob').filter(QueueItem.status == 'played').all():
+        for queue_item in DBSession.query(QueueItem).filter(QueueItem.queue_id == queue).filter(QueueItem.performer_name == 'bob').filter(QueueItem.status == 'played').all():
             DBSession.delete(queue_item)
         commit()
     clear_played()
