@@ -42,6 +42,9 @@ def invalidate_cache(request, track_id):
     # TODO: This needs to incorporate the alert for the specific queue_id
     request.send_websocket_message('queue_updated')
 
+def _queue_query(queue_id):
+    return DBSession.query(QueueItem).filter(QueueItem.queue_id==queue_id).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
+
 
 #-------------------------------------------------------------------------------
 # Queue
@@ -61,7 +64,7 @@ def queue_items_view(request):
         log.debug('cache gen - queue {0}'.format(request.cache_bucket.version))
 
         # Get queue order
-        queue_dicts = DBSession.query(QueueItem).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
+        queue_dicts = _queue_query(request.context.queue_id)
         queue_dicts = [queue_item.to_dict('full') for queue_item in queue_dicts]
 
         # Fetch all tracks with id's in the queue
@@ -289,6 +292,14 @@ def queue_item_del(request):
             ),
             code=403,
         )
+
+    first_queue_item_id = _queue_query(request.context.queue_id).limit(1).one().id
+    if first_queue_item_id == queue_item_id:
+        # TODO: Consider if this is client side logic or server side logic.
+        # BUG: Currently player.js surpress's queue_update events while it is playing a video.
+        #      Broken Flow: queue 3 tracks - play - delete queue_item (thats not playing) - stop - player queue is out of date
+        request.send_websocket_message('stop')
+        # The impending invalidate_cache() will queue_updated the client queue
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status', 'removed')

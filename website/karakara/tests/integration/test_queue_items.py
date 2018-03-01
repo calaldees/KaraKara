@@ -2,6 +2,8 @@ import pytest
 
 import datetime
 import json
+from collections import namedtuple
+
 import re
 import bs4
 def BeautifulSoup(markup):
@@ -113,20 +115,33 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
 
     # Queue 'Track 1'
     with websocket_message_queue() as message_received_queue:
-        queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
+        queue_manager.add_queue_item(track_id='t1', performer_name='testperformer1')
         assert message_received_queue.get(timeout=1) == 'queue_updated'
 
     # Check track is in queue list
     response = queue_manager.get_html_response()
     assert 'track 1' in response.text.lower()
-    assert 'testperformer' in response.text.lower()
+    assert 'testperformer1' in response.text.lower()
     # Check queue in track description
     response = app.get(f'/queue/{queue}/track/t1')
-    assert 'testperformer' in response.text.lower()
-    queue_item_id = queue_manager.items[0]['id']
+    assert 'testperformer1' in response.text.lower()
+
+    # Queue 'Track 2'
+    with websocket_message_queue() as message_received_queue:
+        queue_manager.add_queue_item(track_id='t2', performer_name='testperformer2')
+        assert message_received_queue.get(timeout=1) == 'queue_updated'
+
+    QueueItemTuple = namedtuple('QueueItemTuple', ('id', 'track_id'))
+    queue_item_tuples = [QueueItemTuple(queue_item['id'], queue_item['track_id']) for queue_item in queue_manager.items]
+    assert [queue_item_tuple.track_id for queue_item_tuple in queue_item_tuples] == ['t1', 't2']
 
     with websocket_message_queue() as message_received_queue:
-        queue_manager.del_queue_item(queue_item_id=queue_item_id)
+        # Removing a queue_item fires a websocket updated event
+        queue_manager.del_queue_item(queue_item_id=queue_item_tuples[1].id)
+        assert message_received_queue.get(timeout=1) == 'queue_updated'
+        # Removing the first queue_item fires an additional `stop` event
+        queue_manager.del_queue_item(queue_item_id=queue_item_tuples[0].id)
+        assert message_received_queue.get(timeout=1) == 'stop'
         assert message_received_queue.get(timeout=1) == 'queue_updated'
 
 
