@@ -34,6 +34,8 @@ def comunity_queue_add(request):
     queue.id = request.params.get('queue_id').lower()
     DBSession.add(queue)
 
+    commit()  # This is required as in postgres we are not using the orm and the settings insert fails because queue has not been constructed yet. Consider correct use of orm?
+
     queue_setting = QueueSetting()
     queue_setting.queue_id = request.params.get('queue_id')
     queue_setting.key = 'karakara.private.password'
