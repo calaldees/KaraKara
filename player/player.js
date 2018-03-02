@@ -64,7 +64,7 @@ function init_settings(new_settings) {
 	// Update dom elements based on settings
 	$('h1').text(settings["karakara.player.title"]);
 	$('#event_end').text("Event Ends at: " + settings["karakara.event.end"]);  // TODO: parse iso datetime correctly
-	$('.join_info').text("" + window.location.hostname + " -> " + getUrlParameter('queue_id'));
+	$('.join_info').text("Join at " + window.location.hostname + " - Queue is " + getUrlParameter('queue_id'));
 }
 init_settings({});
 function update_settings(on_updated) {

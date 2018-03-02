@@ -69,9 +69,6 @@ a {
 .join_info {
 	position: absolute;
 	top: 0;
-	left: 25vw;
-	/*right: 75vw;*/
-	width: 50vw;
 	height: 5vh;
 	font-size: 4vh;
 	display: block;
@@ -80,6 +77,8 @@ a {
 	background-color: #ccc;
 	border: 1px solid black;
 	z-index: 5;
+	padding-left: 4vh;
+	padding-right: 4vh;
 }
 
 
