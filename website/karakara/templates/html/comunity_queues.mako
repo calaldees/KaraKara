@@ -36,6 +36,14 @@
                 </a>
             </td>
             <td>
+                <a href="/static/admin_console.html?queue_id=${queue['id']}">
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+                        ${_('admin_console')}
+                    </button>
+                </a>
+            </td>
+            <td>
                 <a href="${paths['player']}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span>
