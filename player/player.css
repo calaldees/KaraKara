@@ -62,6 +62,26 @@ a {
 #icon_attention                            {display: none;}
 .browser_unsupported    #icon_attention    {display: block;}
 
+/*---------------------------------------------------------------------------*/
+/* Join Info - on screen_preview */
+/*---------------------------------------------------------------------------*/
+
+.join_info {
+	position: absolute;
+	top: 0;
+	left: 25vw;
+	/*right: 75vw;*/
+	width: 50vw;
+	height: 5vh;
+	font-size: 4vh;
+	display: block;
+	align-items: center;
+	text-align: center;
+	background-color: #ccc;
+	border: 1px solid black;
+	z-index: 5;
+}
+
 
 /*---------------------------------------------------------------------------*/
 /* Help Area */
