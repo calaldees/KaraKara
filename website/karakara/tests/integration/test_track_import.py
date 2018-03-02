@@ -19,7 +19,7 @@ def test_track_import_without_data(app):
     )
 
 
-def test_track_import_delete(app, queue, tracks):
+def test_track_import_delete(app, queue, tracks, registry_settings):
     _assert_base_tracks(app)
 
     track_import1_source = {
@@ -33,8 +33,10 @@ def test_track_import_delete(app, queue, tracks):
         'tags': ['category:test', 'title:Import Test'],
     }
 
+    track_version = registry_settings['karakara.tracks.version']
     _track_import(app, method='post', json_data=[track_import1_source])
     assert 'import1' in _track_import(app, method='get').json['data']['tracks']
+    assert track_version != registry_settings['karakara.tracks.version']
 
     track_import1 = app.get(f'/queue/{queue}/track/import1?format=json').json['data']['track']
     for key in ('id', 'duration', 'lyrics', 'source_filename'):
@@ -43,5 +45,7 @@ def test_track_import_delete(app, queue, tracks):
     assert '/test/import1.jpg' in (attachment['location'] for attachment in track_import1['attachments'])
     assert {'category', 'title'} < track_import1['tags'].keys()
 
+    track_version = registry_settings['karakara.tracks.version']
     _track_import(app, method='delete', json_data=['import1'])
     _assert_base_tracks(app)
+    assert track_version != registry_settings['karakara.tracks.version']
