@@ -15,7 +15,7 @@ help:
 	#   clean
 	#
 	#  (top level)
-	#   docker_build -> docker_run
+	#   docker_build -> docker_install -> docker_up
 	#   rsync_pull
 	#   cloc
 
@@ -33,17 +33,19 @@ docker_build: .env
 	mkdir -p website/KaraKara.egg-info
 	#
 	docker-compose build
+docker_install:
 	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
 docker_shell:
 	docker-compose run --rm --service-ports website /bin/bash
+	# Import comunity user notes
 	#docker-compose run -v ~/karakara_users.sql:/data/karakara_users.sql:ro postgres /bin/bash
 	#  psql -h postgres -U karakara karakara -f /data/karakara_users.sql
 docker_exec:
-	docker exec -it karakara_website_1 /bin/bash
+	docker-compose exec website /bin/bash
 docker_up:
-	docker-compose --file docker-compose.yml up
-docker_down:
-	docker-compose --file docker-compose.yml down || true
+	docker-compose up
+docker_stop:
+	docker-compose stop
 
 # Rsync -----------------------------------------------------------------------
 
