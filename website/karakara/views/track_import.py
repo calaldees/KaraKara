@@ -75,6 +75,7 @@ def track_import_post(request):
         DBSession.add(track)
         commit()
 
+    request.registry.settings['karakara.tracks.version'] += 1
     return action_ok()
 
 
@@ -87,6 +88,7 @@ def track_delete(request):
     for track_id in _get_json_request(request):
         if track_id in existing_track_ids:
             delete_track(track_id)
+            request.registry.settings['karakara.tracks.version'] += 1
             log.info('Delete: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
         else:
             log.warning('NotExists: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
