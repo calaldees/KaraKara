@@ -9,7 +9,7 @@ thead {
     display: table-header-group;
 }
 tr:nth-child(even) {
-    background-color: #eeeeee;
+    background-color: #dddddd;
 }
 td {
     vertical-align: top;
@@ -18,7 +18,7 @@ td {
 }
 th {
     font-weight: bold;
-    background: #dddddd;
+    background: #cccccc;
     text-transform:capitalize;
 }
 td.col_id_short {
