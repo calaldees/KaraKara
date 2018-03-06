@@ -165,8 +165,8 @@ def queue_item_add(request):
 
         # TODO: Unify and tidy this shit .. Duplicate messages are very similat and can offload they db access to the model_logic.
 
-        # Duplucate performer resrictions
-        queue_item_performed_tracks = request.queue.for_performer(request.params.get('performer_name'))
+        # Duplicate performer retractions
+        queue_item_performed_tracks = request.queue.for_performer(performer_name)
         if queue_item_performed_tracks['performer_status'] == QUEUE_DUPLICATE.THRESHOLD:
             try:
                 latest_track_title = get_track(queue_item_performed_tracks['queue_items'][0].track_id).title
@@ -230,7 +230,7 @@ def queue_item_add(request):
                 raise action_error(message=_('view.queue_item.add.token_limit'), code=400)
 
     queue_item = QueueItem()
-    for key, value in request.params.items():
+    for key, value in request.params.items():  # TODO: strip() the performer_name?
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
     queue_item.queue_id = request.context.queue_id

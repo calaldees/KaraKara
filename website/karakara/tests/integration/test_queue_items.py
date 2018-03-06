@@ -393,6 +393,7 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
         response = queue_manager.add_queue_item(track_id='t1', performer_name='bob', expect_errors=True)
         assert response.status_code == 400
         assert 'bob' in BeautifulSoup(response.text).find(**{'class': 'flash_message'}).text.lower()
+        response = queue_manager.add_queue_item(track_id='t1', performer_name='BoB', expect_errors=True)  # Case should not affect the duplicate
 
     #response = app.put('/settings', {'karakara.queue.add.duplicate.performer_limit': '0 -> int',})
     clear_played()
@@ -407,6 +408,7 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
 
 @with_settings(settings={
     'karakara.queue.add.valid_performer_names': '[bob, jim, sally]',
+    'karakara.queue.add.duplicate.performer_limit': 2,
 })
 def test_queue_performer_restrict(app, queue, queue_manager, tracks, DBSession, commit):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob')

@@ -53,7 +53,7 @@ class QueueLogic():
         return self._queue_item_for(self._queue_item_base_query.filter(QueueItem.track_id == track_id))
 
     def for_performer(self, performer_name):
-        return self._queue_item_for(self._queue_item_base_query.filter(QueueItem.performer_name == performer_name))
+        return self._queue_item_for(self._queue_item_base_query.filter(QueueItem.performer_name.ilike(performer_name)))
 
     @property
     def _queue_item_base_query(self):
