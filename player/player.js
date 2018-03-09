@@ -16,15 +16,27 @@ var SETTINGS_DEFAULT = {
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
 	"karakara.event.end": null,
 }
-if (!getUrlParameter('queue_id')) {
-	var msg = 'Required query_string param queue_id missing';
-	console.error(msg);
-	alert(msg);
+
+if(document.location.protocol == "file:") {
+	var IS_SECURE = false;
+	var QUEUE_ID = "demo";
+	var HOSTNAME = "localhost";
+}
+else {
+	var IS_SECURE = (document.location.protocol == "https:");
+	var QUEUE_ID = getUrlParameter('queue_id');
+	var HOSTNAME = location.hostname;
+
+	if (!QUEUE_ID) {
+		var msg = 'Required query_string param queue_id missing';
+		console.error(msg);
+		alert(msg);
+	}
 }
 var URLS = {
-	'settings': "/queue/" + getUrlParameter('queue_id') + "/settings.json",
-	'queue_items': "/queue/" + getUrlParameter('queue_id') + "/queue_items.json",
-	'random_images': "/queue/" + getUrlParameter('queue_id') + "/random_images.json",
+	'settings': "/queue/" + QUEUE_ID + "/settings.json",
+	'queue_items': "/queue/" + QUEUE_ID + "/queue_items.json",
+	'random_images': "/queue/" + QUEUE_ID + "/random_images.json",
 	'static': getUrlParameter('url_static') || "/files/",
 }
 
@@ -64,7 +76,7 @@ function init_settings(new_settings) {
 	// Update dom elements based on settings
 	$('h1').text(settings["karakara.player.title"]);
 	$('#event_end').text("Event Ends at: " + settings["karakara.event.end"]);  // TODO: parse iso datetime correctly
-	$('.join_info').text("Join at " + window.location.hostname + " - Queue is " + getUrlParameter('queue_id'));
+	$('.join_info').text("Join at " + HOSTNAME + " - Queue is " + QUEUE_ID);
 }
 init_settings({});
 function update_settings(on_updated) {
@@ -115,7 +127,7 @@ function setup_websocket() {
 		return;
 	}
 
-	var websocket_url = ('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname;
+	var websocket_url = (IS_SECURE ? 'wss://' : 'ws://') + HOSTNAME;
 	if (settings['karakara.websocket.path']) {
 		websocket_url += settings['karakara.websocket.path'];
 	} else {

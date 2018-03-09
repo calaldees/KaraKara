@@ -67,20 +67,20 @@ var demo_random_images = {
 };
 
 (function() {
-	if(window.location.protocol == "file:") {
+	if(QUEUE_ID == "demo") {
 		console.log("In demo mode - monkey-patching jQuery");
 
 		var _orig_getJSON = $.getJSON;
 		$.getJSON = function(path, vars, callback) {
 			$('body').removeClass('websocket_disconnected');
 
-			if(path == "/settings.json") {
+			if(path == "/queue/demo/settings.json") {
 				callback(JSON.parse(JSON.stringify(demo_settings)));
 			}
-			else if(path == "/queue.json") {
+			else if(path == "/queue/demo/queue_items.json") {
 				callback(JSON.parse(JSON.stringify(demo_queue)));
 			}
-			else if(path == "/random_images.json?count=200") {
+			else if(path == "/queue/demo/random_images.json?count=200") {
 				callback(JSON.parse(JSON.stringify(demo_random_images)));
 			}
 			else {
