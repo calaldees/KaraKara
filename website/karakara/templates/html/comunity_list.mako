@@ -18,7 +18,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 
 %>
 
-<%def name="body()">	
+<%def name="body()">
 	<h2>tracks</h2>
 
 	<p>Filter: <input id="track_filter_input" type="text" name="search" size="50"/></p>
@@ -43,7 +43,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 		${track_row(track)}
 	% endfor
 	</table>
-	
+
 	<div id="popup" class="hidden">
 		<a href="" onclick="$(this).parent().addClass('hidden'); return false;">close</a>
 		<div class="content"></div>

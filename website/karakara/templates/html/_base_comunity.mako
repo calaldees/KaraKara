@@ -44,10 +44,10 @@
 
 
 <%def name="navbar()">
-	
+
 	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 		<div class="container-fluid">
-	
+
 			<!-- Title + Home -->
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".bs-navbar-collapse">
@@ -56,7 +56,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				
+
 				<!-- Brand Title -->
 				<a href="/comunity" class="navbar-brand">${request.registry.settings.get('comunity.title', 'KaraKara')}</a>
 			</div>
@@ -72,6 +72,7 @@
 					<li><a href="/comunity/queues">Queues</a></li>
 					##<li><a href="/comunity/settings">Settings</a></li>
 					<li><a href="/comunity/processmedia_log?levels=WARNING,ERROR">EncodeLog</a></li>
+					<li><a href="/comunity/users">Users</a></li>
 					% endif
 					##<li class="active"><a href="#">Link</a></li>
 				</ul>
@@ -98,7 +99,7 @@
 				% endif
 				</ul>
 			</div><!-- /.navbar-collapse -->
-			
+
 		</div><!-- /.container-fluid -->
 	</nav>
 </%def>

@@ -192,6 +192,7 @@ class ComunityContext(NextContextMixin):
                 ComunitySettingsContext,
                 ComunityProcessmediaLogContext,
                 ComunityQueueContext,
+                ComunityUsersContext,
             )
         )
 
@@ -275,6 +276,14 @@ class ComunityProcessmediaLogContext():
 class ComunityQueueContext():
     __template__ = 'comunity_queues'
     __name__ = 'queues'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class ComunityUsersContext():
+    __template__ = 'comunity_users'
+    __name__ = 'users'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
