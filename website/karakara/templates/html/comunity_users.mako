@@ -6,8 +6,20 @@
 	<script>
 		function submit_approved(that) {
 			var form = $(that).parent();
-			//form.ajaxSubmit({success: function(data){console.log('ok', data);} });
-			form.submit()
+			var $form = $(form);
+			$form.submit(function(event) {
+				$.ajax({
+					type: 'POST',
+					url: form.action,
+					data: $form.serialize(),
+					dataType: 'json',
+					encode: true
+				}).done(function(data) {
+					console.log(data);
+				});
+				event.preventDefault();
+			});
+			form.submit();
 		}
 	</script>
 
