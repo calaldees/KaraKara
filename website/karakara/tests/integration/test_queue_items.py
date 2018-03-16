@@ -320,6 +320,7 @@ def test_queue_reorder(app, queue, queue_manager, tracks):
 
 @with_settings(settings={
     'karakara.queue.group.split_markers': '[0:02:00, 0:10:00]',  # -> timedelta
+    'karakara.queue.add.duplicate.track_limit': 0,
 })
 def test_queue_obscure(app, queue, queue_manager, tracks):
     """
@@ -376,6 +377,9 @@ def test_queue_track_duplicate(app, queue, tracks, queue_manager, DBSession, com
     assert response.status_code == 400
 
 
+@with_settings(settings={
+    'karakara.queue.add.duplicate.track_limit': 0,
+})
 def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession, commit):
 
     def clear_played():
@@ -386,7 +390,6 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
             DBSession.delete(queue_item)
         commit()
     clear_played()
-
 
     with temporary_settings(app, queue, {'karakara.queue.add.duplicate.performer_limit': 1}):
         response = queue_manager.add_queue_item(track_id='t1', performer_name='bob')
@@ -409,6 +412,7 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
 @with_settings(settings={
     'karakara.queue.add.valid_performer_names': '[bob, jim, sally]',
     'karakara.queue.add.duplicate.performer_limit': 2,
+    'karakara.queue.add.duplicate.track_limit': 0,
 })
 def test_queue_performer_restrict(app, queue, queue_manager, tracks, DBSession, commit):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob')

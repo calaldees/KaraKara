@@ -15,9 +15,13 @@ def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
 
-from . import admin_rights, temporary_settings
+from . import admin_rights, temporary_settings, with_settings
 
 
+@with_settings(settings={
+    'karakara.search.tag.silent_forced': '[]',
+    'karakara.search.tag.silent_hidden': '[]',
+})
 def test_search_tags_silent_forced(app, queue, tracks, tracks_volume):
     def get_settings():
         return app.get(f'/queue/{queue}/settings.json').json['data']['settings']
