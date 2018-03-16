@@ -7,6 +7,7 @@
 		function submit_approved(that) {
 			var form = $(that).parent();
 			var $form = $(form);
+			console.log('submit_approved', form);
 			$form.submit(function(event) {
 				$.ajax({
 					type: 'POST',
@@ -15,7 +16,7 @@
 					dataType: 'json',
 					encode: true
 				}).done(function(data) {
-					console.log(data);
+					console.log('submit_approved', '.done', data);
 				});
 				event.preventDefault();
 			});
@@ -24,7 +25,7 @@
 	</script>
 
 	<table id="user_list" class="table table-condensed table-hover">
-		<th>name</th><th>email</th><th>approved</th>
+		<tr><th>name</th><th>email</th><th>approved</th></tr>
 		% for user in data.get('users', []):
 			${user_row(user)}
 		% endfor
