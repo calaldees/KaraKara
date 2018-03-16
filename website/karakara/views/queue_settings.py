@@ -67,14 +67,14 @@ DEFAULT_SETTINGS = {
     'karakara.player.queue.update_time': '0:00:03',
     'karakara.player.help.timeout': 2,
 
-    'karakara.queue.group.split_markers': '[0:10:00, 0:20:00]',
+    'karakara.queue.group.split_markers': '[0:15:00, 0:30:00]',
     'karakara.queue.track.padding': '0:00:60',
 
-    'karakara.queue.add.limit': '0:10:00',
-    'karakara.queue.add.limit.priority_token': '0:00:00',
-    'karakara.queue.add.limit.priority_window': '0:01:00',
-    'karakara.queue.add.duplicate.track_limit': 2,
-    'karakara.queue.add.duplicate.time_limit': '1:00:00',
+    'karakara.queue.add.limit': '0:40:00',
+    'karakara.queue.add.limit.priority_token': '1:00:00',
+    'karakara.queue.add.limit.priority_window': '0:02:30',
+    'karakara.queue.add.duplicate.track_limit': 1,
+    'karakara.queue.add.duplicate.time_limit': '0:30:00',
     'karakara.queue.add.duplicate.performer_limit': 1,
     'karakara.queue.add.valid_performer_names': '[]',
 
@@ -84,16 +84,17 @@ DEFAULT_SETTINGS = {
 
     #karakara.search.view.config = data/config/search_config.json
     'karakara.search.tag.silent_forced': '[]',
-    'karakara.search.tag.silent_hidden': '[]',
+    'karakara.search.tag.silent_hidden': '[todo, delete, broken]',
     'karakara.search.template.button.list_tracks.threshold': 100,
     'karakara.search.list.threshold': 25,
     'karakara.search.list.alphabetical.threshold': 90,
     'karakara.search.list.alphabetical.tags': '[from, artist]',
 
-    'karakara.print_tracks.fields': '[category, from, use, title, artist]',
+    'karakara.print_tracks.fields': '[category, from, use, title, artist, vocaltrack, length]',
     'karakara.print_tracks.short_id_length': 4,
 
     'karakara.event.end': '',
+    'karakara.event.start': '',
 }
 DEFAULT_SETTINGS = {
     k: convert_str(v, SETTINGS_TYPE_MAPPING.get(k))

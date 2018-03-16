@@ -28,6 +28,8 @@ class PriorityTokenManager():
 
     def issue(self):
         priority_window = self.settings.get('karakara.queue.add.limit.priority_window')
+        # TODO: Depreciate this priority_window settings
+        #  This can be auto-calculated from the current average track length in the queue
 
         # Aquire most recent priority token - if most recent token in past, set recent token to now
         try:
@@ -46,11 +48,14 @@ class PriorityTokenManager():
             log.debug('priority_token rejected - event end')
             return TOKEN_ISSUE_ERROR.EVENT_END
 
+        # TODO: possibly depricate this - we can just keep staking tokens until the end of the event
         priority_token_limit = self.settings.get('karakara.queue.add.limit.priority_token')
         if priority_token_limit and latest_token_end > now()+priority_token_limit:
             # Unable to issue token as priority tokens are time limited
             log.debug('priority_token rejected - token limit')
             return TOKEN_ISSUE_ERROR.TOKEN_LIMIT
+
+        # TODO: Look at the last priority tokens created and raise a warning if the token is likely to pass beyond the end of the event.
 
         # Do not issue another priority_token if current user already has a priority_token
         try:

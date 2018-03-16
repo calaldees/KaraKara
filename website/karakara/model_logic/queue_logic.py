@@ -71,6 +71,14 @@ class QueueLogic():
         )
 
     def _queue_item_for(self, queue_items_query):
+        """
+            TODO:
+                Get some unit tests around this functionality
+                Ensure that the time_limit takes into account the current length of the queue as well
+                Separate out the duplicate 'track' and 'performer' times rather than just 'duplicate.time_limit'
+                Renamed 'duplicate.track_limit' to 'duplicate.limit.track.count'
+                Consider better variable name for 'latest_queue_item' - it's the oldest know instance of that occurrence.
+        """
         time_limit = self.request.queue.settings.get('karakara.queue.add.duplicate.time_limit')
         track_limit = self.request.queue.settings.get('karakara.queue.add.duplicate.track_limit')
         performer_limit = self.request.queue.settings.get('karakara.queue.add.duplicate.performer_limit')
