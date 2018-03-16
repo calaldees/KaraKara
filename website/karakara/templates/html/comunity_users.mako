@@ -7,7 +7,7 @@
 		function submit_approved(that) {
 			var form = $(that).parent();
 			var $form = $(form);
-			console.log('submit_approved', form);
+			console.debug('submit_approved', form);
 			$form.submit(function(event) {
 				$.ajax({
 					type: 'POST',
@@ -16,7 +16,9 @@
 					dataType: 'json',
 					encode: true
 				}).done(function(data) {
-					console.log('submit_approved', '.done', data);
+					console.debug('submit_approved', '.done', data);
+				}).fail(function(data) {
+					console.error('submit_approved', '.failed', data);
 				});
 				event.preventDefault();
 			});
