@@ -22,6 +22,6 @@ def community_users_view(request):
 )
 @comunity_only
 def community_users_approve(request):
-    user = DBSession.query(ComunityUser).filter(ComunityUser.id==request.params.get('user_id')).one()
+    user = DBSession.query(ComunityUser).filter(ComunityUser.id==int(request.params.get('user_id'))).one()
     user.approved = convert_str(request.params.get('approved', False), bool)
     return action_ok(message=f'{user.email} approved:{user.approved}')
