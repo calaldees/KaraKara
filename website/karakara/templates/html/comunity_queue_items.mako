@@ -16,9 +16,9 @@
     % for queue_item in data['queue']:
         <tr>
             <% img_src = h.thumbnail_location_from_track(queue_item['track']) %>
-            <td><img src="${img_src}"></td>
+            <td><img src="${img_src}" style="width: 64px;"></td>
             <td>${queue_item['status']}</td>
-            <td>${queue_item['track']['id']}</td>
+            <td>${queue_item['track']['id'][0..4]}</td>
             <td>${queue_item['track']['title']}</td>
             <td>${queue_item['performer_name']}</td>
             <td>${queue_item['time_added']}</td>
