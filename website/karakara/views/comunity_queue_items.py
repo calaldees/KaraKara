@@ -14,9 +14,7 @@ from .queue_items import _queue_items_dict_with_track_dict
 )
 @comunity_only
 def community_settings_view(request):
-
     queue_dicts = _queue_items_dict_with_track_dict(
         DBSession.query(QueueItem).filter(QueueItem.queue_id==request.context.queue_id).order_by(QueueItem.queue_weight)
     )
-
     return action_ok(data={'queue': queue_dicts})

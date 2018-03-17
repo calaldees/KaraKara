@@ -76,7 +76,7 @@ def _queue_items_dict_with_track_dict(queue_query):
 
     # Attach track to queue_item
     for queue_item in queue_dicts:
-        queue_item['track'] = tracks.get(queue_item['track_id'])
+        queue_item['track'] = tracks.get(queue_item['track_id'], {})
 
     return queue_dicts
 
