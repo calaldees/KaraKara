@@ -193,6 +193,7 @@ class ComunityContext(NextContextMixin):
                 ComunityProcessmediaLogContext,
                 ComunityQueueContext,
                 ComunityUsersContext,
+                ComunityQueueItemsContext,
             )
         )
 
@@ -245,10 +246,7 @@ class ComunityUploadContext():
         self.__parent__ = parent
 
 
-class ComunitySettingsContext():
-    __template__ = 'comunity_settings'
-    __name__ = 'settings'
-
+class QueueIdMixin():
     def __init__(self, parent=None, id=None):
         self.__parent__ = parent
         self.id = id
@@ -258,11 +256,21 @@ class ComunitySettingsContext():
     def __getitem__(self, key):
         if self.id:
             raise KeyError()
-        return ComunitySettingsContext(parent=self, id=key)
+        return self.__class__(parent=self, id=key)
 
     @property
     def queue_id(self):
         return self.id
+
+
+class ComunityQueueItemsContext(QueueIdMixin):
+    __template__ = 'comunity_queue_items'
+    __name__ = 'queue_items'
+
+
+class ComunitySettingsContext(QueueIdMixin):
+    __template__ = 'comunity_settings'
+    __name__ = 'settings'
 
 
 class ComunityProcessmediaLogContext():

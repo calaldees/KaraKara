@@ -68,6 +68,14 @@
                 </a>
             </td>
             <td>
+                <a href="/comunity/queue_items/${queue['id']}">
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                        ${_('queue_items')}
+                    </button>
+                </a>
+            </td>
+            <td>
                 <a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
