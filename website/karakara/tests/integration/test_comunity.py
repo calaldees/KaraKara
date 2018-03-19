@@ -1,5 +1,6 @@
 import pytest
 import json
+import contextlib
 from unittest.mock import patch
 
 from externals.lib.misc import first
@@ -37,6 +38,14 @@ def login(app, name='TestUser'):
 def logout(app):
     response = app.get('/comunity/logout')
     assert 'login' in response.text.lower()
+
+
+@contextlib.contextmanager
+def comunity_login(app):
+    login(app)
+    yield
+    logout(app)
+
 
 
 # Tests ------------------------------------------------------------------------

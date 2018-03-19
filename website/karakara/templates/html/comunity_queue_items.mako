@@ -13,7 +13,7 @@
             <th>time_added</th>
             <th>time_touched</th>
         </tr>
-    % for queue_item in data['queue']:
+    % for queue_item in data.get('queue', []):
         <tr>
             <td>${queue_item['track_id'][0:5]}</td>
             <% img_src = h.thumbnail_location_from_track(queue_item['track']) %>

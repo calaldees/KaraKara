@@ -4,6 +4,7 @@ from .test_comunity import login, logout
 
 from karakara.model.model_queue import QueueItem
 
+
 def test_comunity_queue(app, queue, users, tracks, DBSession):
     response = app.get('/comunity/queues', expect_errors=True)
     assert response.status_code == 403
