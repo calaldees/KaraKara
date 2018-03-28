@@ -1,0 +1,26 @@
+input {
+    file {
+            type => "technical"
+            path => "/home/technical/log"
+    }
+    file {
+            type => "business"
+            path => "/home/business/log"
+    }
+} 
+filter {
+    if [type] == "technical" {
+            # processing .......
+    }
+    if [type] == "business" {
+            # processing .......
+    }
+}
+output {
+    if [type] == "technical" {
+            # output to gelf
+    }
+    if [type] == "business" {
+            # output to elasticsearch
+    }
+}
