@@ -205,6 +205,13 @@ def queue_item_add(request):
             _log_event(status='reject', reason='duplicate.track', message=message)
             raise action_error(message=message, code=400)
 
+        # Event start time
+        event_start = request.queue.settings.get('karakara.event.start')
+        if event_start and now() < event_start:
+            log.debug('event start restricted')
+            _log_event(status='reject', reason='event_start')
+            raise action_error(message=_('view.queue_item.add.event_start ${event_start}', mapping={'event_start': event_start}), code=400)
+
         # Event end time
         event_end = request.queue.settings.get('karakara.event.end')
         if event_end and now() + request.queue.duration > event_end:

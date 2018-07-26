@@ -478,6 +478,15 @@ def test_event_end(app, queue, queue_manager, tracks):
     assert 'view.queue_item.add.event_end' in response.text
 
 
+@with_settings(settings={
+    'karakara.event.start': str(now() - datetime.timedelta(minutes=0, seconds=30)),
+})
+def test_event_start(app, queue, queue_manager, tracks):
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1', expect_errors=True)
+    assert response.status_code == 400
+    assert 'view.queue_item.add.event_start' in response.text
+
+
 def test_priority_tokens(app, queue):
     priority_token_url = f'/queue/{queue}/priority_tokens'
     response = app.get(priority_token_url, expect_errors=True)

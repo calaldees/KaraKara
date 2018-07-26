@@ -24,6 +24,7 @@ SETTINGS_ADMIN_EXTRA_EXPOSE = {
 SETTINGS_TYPE_MAPPING = {
     'karakara.system.user.readonly': 'bool',
     'karakara.event.end': 'datetime',
+    'karakara.event.start': 'datetime',
 
     'karakara.player.title': None,
     'karakara.player.video.preview_volume': 'float',
