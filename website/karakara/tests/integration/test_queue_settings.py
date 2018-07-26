@@ -30,6 +30,10 @@ def test_queue_settings(app, queue):
     assert _get_settings()[key] == []
 
 
+def test_queue_settings_with_bad_data():
+    raise NotImplementedError('Test with "&" in lists - this broke badgenames with an entry')
+
+
 def test_queue_settings_template(app, queue):
     # Settings Template
     response = app.get(f'/queue/{queue}/settings')

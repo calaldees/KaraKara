@@ -12,7 +12,7 @@ EXTERNAL_PATH=$(WRITE_PATH)/externals
 UPLOAD_PATH=$(WRITE_PATH)/upload
 LOCALE_PATH=$(WRITE_PATH)/locale
 DATABASE_PATH=$(WRITE_PATH)/database
-DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
+#DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
 ENV=$(WRITE_PATH)/_env
 PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
 PYTHON=$(PYTHONPATH_ENV)/bin/python$(PYTHON_VERSION)
@@ -29,8 +29,8 @@ STATIC_FILE_PATH = ../mediaserver/www/files
 # this must match development.ini path
 DATABASE_DEV=$(DATABASE_PATH)/test.db
 
-PATH_LOCAL_LIBS:=../../libs/python3
-PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3
+#PATH_LOCAL_LIBS:=../../libs/python3
+#PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3
 
 LOG_LINES=5
 
@@ -60,9 +60,8 @@ help:
 
 .PRECIOUS: $(ENV)
 $(ENV):
-	# Reference - http://docs.pylonsproject.org/projects/pyramid/en/1.5-branch/narr/install.html
 	virtualenv --no-site-packages -p python$(PYTHON_VERSION) $(ENV)
-	$(ENV)/bin/easy_install pyramid
+	$(PIP) install -r requirements.pip
 
 # Experiments
 #env/bin/node: env
@@ -85,23 +84,10 @@ KaraKara.egg-info/PKG-INFO: KaraKara.egg-info $(ENV)
 $(EXTERNAL_PATH):
 	mkdir -p $(EXTERNAL_PATH) && touch $(EXTERNAL_PATH)/__init__.py
 
-.PRECIOUS: $(DEPENDENCY_FETCHER)
-$(DEPENDENCY_FETCHER): $(EXTERNAL_PATH)
-	# LinkLocal or Download depenncy_fetcher manager for getting external dependencys
-	if [ ! -e $@ ] ; then \
-		DEPENDENCY_FETCHER_FILE="apps/dependency_fetcher.py" ; \
-		PATH_DEPENDENCY_FETCHER="$(PATH_LOCAL_LIBS)/$$DEPENDENCY_FETCHER_FILE" ; \
-		if [ -e $$PATH_DEPENDENCY_FETCHER ] ; then \
-			ln -s ../../$$PATH_DEPENDENCY_FETCHER $@ ; \
-		else \
-			curl $(PATH_REMOTE_LIBS)/$$DEPENDENCY_FETCHER_FILE --compressed -o $@ ; \
-		fi ;\
-	fi
-
 .PHONY: dependency_download
-dependency_download: $(EXTERNAL_PATH)/dependency_fetcher.py
+dependency_download: $(ENV)
 	# Trigger dependency check on every startup
-	$(PYTHON) $(DEPENDENCY_FETCHER) dependency_fetcher.json --tracker $(EXTERNAL_PATH) --destination_path $(EXTERNAL_PATH)
+	$(PYTHON) -m calaldees.apps.dependency_fetcher dependency_fetcher.json --tracker $(EXTERNAL_PATH) --destination_path $(EXTERNAL_PATH)
 
 .PHONY: install
 install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO dependency_download $(LOCALE_PATH)/karakara.pot $(DATABASE_DEV) upload_paths
@@ -163,7 +149,7 @@ run_production: ini_production
 	$(PSERVE) $(INI_PROD)
 
 run_socket_server:
-	$(PYTHON) -mexternals.lib.socket.multisocket_server
+	$(PYTHON) -m calaldees.socket.multisocket_server
 
 shell:
 	$(PSHELL) $(INI_DEV)

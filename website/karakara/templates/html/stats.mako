@@ -4,7 +4,7 @@
 
 	import datetime
 	from collections import namedtuple
-	from externals.lib.misc import epoc, now
+	from calaldees..misc import epoc, now
 
 	munin_graph_path = '/munin/munin-cgi-graph/localdomain/localhost.localdomain/'
 	

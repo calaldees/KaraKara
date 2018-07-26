@@ -13,12 +13,12 @@ from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to 
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
-from externals.lib.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan, now, json_string, postmortem
-from externals.lib.pyramid_helpers.cache_manager import setup_pyramid_cache_manager
-from externals.lib.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
-from externals.lib.pyramid_helpers.session_identity2 import session_identity
-from externals.lib.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
-from externals.lib.multisocket.auth_echo_server import AuthEchoServerManager
+from calaldees..misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan, now, json_string, postmortem
+from calaldees..pyramid_helpers.cache_manager import setup_pyramid_cache_manager
+from calaldees..pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
+from calaldees..pyramid_helpers.session_identity2 import session_identity
+from calaldees..social._login import NullLoginProvider, FacebookLogin, GoogleLogin
+from calaldees..multisocket.auth_echo_server import AuthEchoServerManager
 
 # Package Imports
 from .traversal import TraversalGlobalRootFactory
@@ -270,7 +270,7 @@ def main(global_config, **settings):
 
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
-    config.scan('externals.lib.pyramid_helpers.views')
+    config.scan('calaldees..pyramid_helpers.views')
     return config.make_wsgi_app()
 
 

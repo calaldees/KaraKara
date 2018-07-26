@@ -6,35 +6,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.md')).read()
 
-install_requires = [
-    'pyramid',
-    'SQLAlchemy',
-    'transaction',
-    'pyramid_tm',
-    'pyramid_mako',
-    'pyramid_debugtoolbar',
-    'zope.sqlalchemy',
-    'waitress',
-    'beautifulsoup4',  # Inspecting html/xml (used in db import crawling)
-    'py-postgresql',  # any DB API should do, this one is pure python
-    'python-dateutil',
-    'dogpile.cache',
-    #'pycrypto',  # Considering this inclusion for encrypted cookies
-    'requests',
-    'Babel',
-    'httpagentparser',
-    'humanize',
-    #'chardet',
-    'google-api-python-client',
-    'oauth2client',
-    'decorator',  # TODO: Remove this dependency
-]
-test_requires = [
-    'pytest',
-    'webtest',
-]
-# http://stackoverflow.com/questions/4734292/specifying-where-to-install-tests-require-dependecies-of-a-distribute-setuptoo
-
 
 setup(
     name='KaraKara',
@@ -56,8 +27,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
     test_suite='py.test',
-    tests_require=test_requires,
-    install_requires=install_requires + test_requires,
+    #tests_require=test_requires,
+    #install_requires=install_requires + test_requires,
     entry_points="""\
     [paste.app_factory]
     main = karakara:main

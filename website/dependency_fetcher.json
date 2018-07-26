@@ -71,36 +71,5 @@
             "js/jquery.iframe-transport.js"
         ],
         "destination": "static"
-    },
-
-    "lib": {
-        "VERSION": "master",
-        "sources": [
-            "../../libs/python3/lib",
-            "https://raw.githubusercontent.com/calaldees/libs/VERSION/python3/lib/"
-        ],
-        "files": [
-            "__init__.py",
-            "misc.py",
-            "xml.py",
-            "make_ini.py",
-            "test.py",
-            "pyramid_helpers/__init__.py",
-            "pyramid_helpers/auto_format2.py",
-            "pyramid_helpers/etag.py",
-            "pyramid_helpers/cache_manager.py",
-            "pyramid_helpers/session_identity2.py",
-            "pyramid_helpers/views/__init__.py",
-            "pyramid_helpers/views/upload.py",
-            "pyramid_helpers/events.py",
-            "multisocket/__init__.py",
-            "multisocket/multisocket_server.py",
-            "multisocket/auth_echo_server.py",
-            "social/__init__.py",
-            "social/_login.py",
-            "social/social_login.py",
-            "social/facebook.py"
-        ],
-        "destination": "lib"
     }
 }
