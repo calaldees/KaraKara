@@ -3,7 +3,7 @@
 import pytest
 from collections import namedtuple
 
-from externals.lib.misc import random_string, random
+from calaldees..misc import random_string, random
 
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag

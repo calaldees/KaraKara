@@ -1,0 +1,24 @@
+pyramid
+pyramid_tm
+pyramid_mako
+pyramid_debugtoolbar
+SQLAlchemy
+zope.sqlalchemy
+transaction
+waitress
+beautifulsoup4
+py-postgresq
+python-dateutil
+dogpile.cache
+requests
+Babel
+httpagentparser
+humanize
+google-api-python-client
+oauth2client
+pytest
+webtest
+#pycrypto  # Considering this inclusion for encrypted cookies
+
+git+https://github.com/calaldees/libs.git@master#egg=calaldees
+
