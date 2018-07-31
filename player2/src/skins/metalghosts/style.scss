@@ -1,0 +1,410 @@
+$DARK: #020F1F;
+$MID: #074D5E;
+$LIGHT: #29EDF2;
+
+@font-face {
+	font-family: metalghosts;
+	src: url('../src/skins/metalghosts/Xolonium-Regular.ttf');
+	font-weight:400;
+}
+@mixin border {
+	padding: 2vh 2vw;
+	background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
+	border: 1px solid $LIGHT;
+	border-radius: 2vh;
+}
+@mixin miniborder {
+	padding: 1vh 1vw;
+	background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
+	border: 1px solid $LIGHT;
+	border-radius: 2vh 0 2vh 0;
+}
+
+.theme-metalghosts {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	color: white;
+	font-family: metalghosts;
+	text-shadow:
+					-1px -1px 0 #000,
+					1px -1px 0 #000,
+					-1px 1px 0 #000,
+					1px 1px 0 #000;
+
+
+	/*---------------------------------------------------------------------------*/
+	/* Background */
+	/*---------------------------------------------------------------------------*/
+
+	background:
+		url('../src/skins/metalghosts/background.png'),
+		url('../src/skins/metalghosts/perlin.jpg');
+	background-size: cover, 200% 200%;
+	animation: bgscroll 30s linear infinite;
+
+	@keyframes bgscroll {
+		0% {background-position: 0% 0%, 50% 100%;}
+		5% {background-position: 0% 0%, 65% 97%;}
+		10% {background-position: 0% 0%, 79% 90%;}
+		15% {background-position: 0% 0%, 90% 79%;}
+		20% {background-position: 0% 0%, 97% 65%;}
+		25% {background-position: 0% 0%, 100% 50%;}
+		30% {background-position: 0% 0%, 97% 34%;}
+		35% {background-position: 0% 0%, 90% 20%;}
+		40% {background-position: 0% 0%, 79% 9%;}
+		45% {background-position: 0% 0%, 65% 2%;}
+		50% {background-position: 0% 0%, 50% 0%;}
+		55% {background-position: 0% 0%, 34% 2%;}
+		60% {background-position: 0% 0%, 20% 9%;}
+		65% {background-position: 0% 0%, 9% 20%;}
+		70% {background-position: 0% 0%, 2% 34%;}
+		75% {background-position: 0% 0%, 0% 49%;}
+		80% {background-position: 0% 0%, 2% 65%;}
+		85% {background-position: 0% 0%, 9% 79%;}
+		90% {background-position: 0% 0%, 20% 90%;}
+		95% {background-position: 0% 0%, 34% 97%;}
+		100% {background-position: 0% 0%, 49% 100%;}
+	}
+
+	/*---------------------------------------------------------------------------*/
+	/* Reset */
+	/*---------------------------------------------------------------------------*/
+
+	H1, H2, OL, UL, P {
+		margin: 0;
+		padding: 0;
+	}
+
+	// shared between title and playlist screens
+	.join_info {
+		position: absolute;
+		bottom: 1vh;
+		left: 10vw;
+		right: 10vw;
+		text-align: center;
+		@include border;
+		color: #BBB;
+		font-size: 4vh;
+
+		SPAN {
+			color: #FF7;
+		}
+	}
+
+	/*---------------------------------------------------------------------------*/
+	/* Title Screen Animation */
+	/*---------------------------------------------------------------------------*/
+
+	.screen_title {
+		overflow: hidden;
+		img {
+			position: absolute;
+			border: 1px solid black;
+		}
+
+		.info {
+			@include border;
+			position: fixed;
+			top: 20vw;
+			left: 25vw;
+			width: 50vw;
+			z-index: 100;
+		}
+		.info > div {
+			font-size: 1.5em;
+			opacity: 0.9;
+		}
+
+		.info h1 {
+			opacity: 1.0;
+			text-align: center;
+		}
+	}
+
+
+	/*---------------------------------------------------------------------------*/
+	/* Playlist */
+	/*---------------------------------------------------------------------------*/
+
+	.screen_preview {
+		font-size: 3vh;
+
+		/* main blocks */
+		#playlist {
+			position: absolute;
+			top: 2vh;
+			left: 0vw; // something else is adding left-padding to the playlist...
+			right: 2vw;
+
+			/* playlist detail */
+			li {
+				position: relative;
+				list-style-type: none;
+				margin-bottom: 2vh;
+				@include border;
+				height: 12vh;
+				width: 59vw;
+			}
+			li:nth-child(1) {
+				width: auto;
+				height: 22vh;
+				font-size: 2em;
+			}
+			li:nth-child(1) .time {
+				color: rgba(0,0,0,0);
+				text-shadow: none;
+			}
+			li:nth-child(1) .time::before {
+				content: "You're up!";
+				color: #ff0;
+			}
+			li:nth-child(2) .time {
+				color: rgba(0,0,0,0);
+				text-shadow: none;
+			}
+			li:nth-child(2) .time::before {
+				content: "Nearly there!";
+				color: #aa0;
+			}
+			img {display: none;}
+
+			li {
+				p {
+					position: absolute;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+				.performer {
+					left: 1vw;
+					top: 1vh;
+					width: calc(35% - 1vw);
+					font-size: 1.8em;
+					text-overflow: clip;
+				}
+				.time {
+					left: 1vw;
+					bottom: 1vh;
+					width: calc(35% - 1vw);
+					color: #777;
+					font-size: 0.9em;
+				}
+				.title {
+					top: 1vh;
+					right: 1vw;
+					width: calc(65% - 2vw);
+					font-size: 1.8em;
+				}
+				.from {
+					bottom: 1vh;
+					right: 1vh;
+					width: calc(65% - 2vw);
+					color: #aaa;
+					font-size: 0.9em;
+				}
+			}
+		}
+		#playlist_obscured {
+			position: absolute;
+			bottom: 2vh;
+			right: 1vw;
+			width: 38vw;
+			height: 32vh;
+			text-align: center;
+
+			ul li {
+				display: inline-block;
+				list-style-type: none;
+				margin: 4px;
+				@include miniborder;
+				max-width: 51%;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+		#playlist_obscured::before {
+			content: "Coming Soon: ";
+		}
+
+
+		.preview_holder {
+			@include border;
+			position: absolute;
+			top: 26vh;
+			right: 2vw;
+			height: 40vh;
+			width: 38vw;
+		}
+		video {
+			width: 100%;
+			height: 100%;
+		}
+
+		/*---------------------------------------------------------------------------*/
+		/* Small-screen tweaks */
+		/* Draw a line between 16/10 (widescreen) and 16/12 (4:3) - by default we */
+		/* use the default layout, for display areas closer to 4:3 we override bits */
+		/*---------------------------------------------------------------------------*/
+
+		@media (max-aspect-ratio: 16/11) {
+			#playlist li {
+				width: 60vw;
+			}
+			.preview_holder {
+				width: 37vw;
+				height: 28vh;
+			}
+			#playlist_obscured {
+				width: 37vw;
+				height: 42vh;
+			}
+		}
+	}
+
+
+	/*---------------------------------------------------------------------------*/
+	/* Animation */
+	/*---------------------------------------------------------------------------*/
+
+	@keyframes glow_w {
+		0% {color: #fff;}
+		50% {color: #888;}
+		100% {color: #fff;}
+	}
+	@keyframes glow_y {
+		0% {color: #ff0;}
+		50% {color: #880;}
+		100% {color: #ff0;}
+	}
+	@keyframes glow_g {
+		0% {color: #aaa;}
+		50% {color: #555;}
+		100% {color: #aaa;}
+	}
+	/*#playlist li:nth-child(1) .performer {animation: glow_w 2s infinite; animation-delay: 10s;}*/
+	/*#playlist li:nth-child(1) .title {animation: glow_w 2s infinite; animation-delay: 20s;}*/
+	/*#playlist li:nth-child(1) .from {animation: glow_g 2s infinite; animation-delay: 20s;}*/
+	#playlist li:nth-child(1) .time::before {animation: glow_y 2s infinite;}
+
+	@keyframes slideleft {
+		0% {right: -200vw;}
+		100% {right: 1vw;}
+	}
+	@keyframes slideright {
+		0% {left: -200vw;}
+		100% {left: 1vw;}
+	}
+	#playlist li {animation: slideright 1s forwards; left: -2000px;}
+	#playlist li:nth-child(1) {animation-delay: 0.0s;}
+	#playlist li:nth-child(2) {animation-delay: 0.2s;}
+	#playlist li:nth-child(3) {animation-delay: 0.3s;}
+	#playlist li:nth-child(4) {animation-delay: 0.4s;}
+	#playlist li:nth-child(5) {animation-delay: 0.5s;}
+	#playlist li:nth-child(6) {animation-delay: 0.6s;}
+	#playlist li:nth-child(7) {animation-delay: 0.7s;}
+	#playlist li:nth-child(8) {animation-delay: 0.8s;}
+	#playlist li:nth-child(9) {animation-delay: 0.9s;}
+	.preview_holder {right: -2000px; animation: slideleft 1s forwards; animation-delay: 0.0s;}
+	/*#playlist_obscured {right: -2000px; animation: slideleft 1s forwards; animation-delay: 0.5s;}*/
+	#playlist_obscured::before {right: -2000px; animation: slideleft 1s forwards; animation-delay: 0.5s; position: relative;}
+	#playlist_obscured li {right: -2000px; animation: slideleft 1s forwards; animation-delay: 2.0s; position: relative;}
+	#playlist_obscured li:nth-child(1) {animation-delay: 0.5s;}
+	#playlist_obscured li:nth-child(2) {animation-delay: 0.6s;}
+	#playlist_obscured li:nth-child(3) {animation-delay: 0.7s;}
+	#playlist_obscured li:nth-child(4) {animation-delay: 0.8s;}
+	#playlist_obscured li:nth-child(5) {animation-delay: 0.9s;}
+	#playlist_obscured li:nth-child(6) {animation-delay: 1.0s;}
+	#playlist_obscured li:nth-child(7) {animation-delay: 1.1s;}
+	#playlist_obscured li:nth-child(8) {animation-delay: 1.2s;}
+	#playlist_obscured li:nth-child(9) {animation-delay: 1.3s;}
+	#playlist_obscured li:nth-child(10) {animation-delay: 1.4s;}
+	#playlist_obscured li:nth-child(11) {animation-delay: 1.5s;}
+	#playlist_obscured li:nth-child(12) {animation-delay: 1.6s;}
+	#playlist_obscured li:nth-child(13) {animation-delay: 1.7s;}
+
+	@keyframes slideup {
+		0% {bottom: -2000px;}
+		50% {bottom: -2000px;}
+		100% {bottom: 1vh;}
+	}
+	.join_info {bottom: -2000px; animation: slideup 4s forwards;}
+
+
+	/*---------------------------------------------------------------------------*/
+	/* Podium Mode */
+	/*---------------------------------------------------------------------------*/
+
+	.screen_podium {
+		text-align: center;
+
+		H1 {
+			position: absolute;
+			top: 1vh;
+			left: 1vw;
+			right: 1vw;
+			height: 20vh;
+			font-size: 12vh;
+
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			@include border;
+		}
+
+		.lyrics {
+			@include border;
+			//background-size: cover;
+			position: absolute;
+			top: 22vh;
+			left: 1vw;
+			right: 1vw;
+			bottom: 16vh;
+			font-size: 7vh;
+			OL {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				overflow: hidden;
+				LI {
+					text-align: left;
+					color: #880;
+				}
+				LI:nth-child(1) {color: gray;}
+				LI:nth-child(2) {color: white;}
+			}
+		}
+
+		DIV.startButton,
+		DIV.progressBar {
+			position: absolute;
+			bottom: 1vh;
+			left: 1vw;
+			right: 1vw;
+			height: 14vh;
+			font-size: 7vh;
+			@include border;
+			padding-top: 0;
+			background: linear-gradient(
+				90deg,
+				rgba($DARK, 0.5) 0,
+				$LIGHT 50%,
+				rgba($DARK, 0.5) 50%
+			);
+			background-size: 200% 100%;
+			SMALL {
+				font-size: 3vh;
+				display: block;
+				padding-bottom: 1vh;
+			}
+		}
+		DIV.startButton {
+			SPAN {animation: glow_y 2s infinite;}
+		}
+	}
+}
