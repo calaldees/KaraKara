@@ -60,7 +60,7 @@ function random_track() {
                 "id": 3,
                 "tags": {
                     "title": "Radical Dreamers",
-                    "from": "Chronos Cross",
+                    "from": "Chrono Cross",
                     "artist": "An Artist",
                     "contributor": "choco"
                 },
