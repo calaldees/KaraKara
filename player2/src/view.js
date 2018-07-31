@@ -66,13 +66,18 @@ const VideoScreen = ({state, actions}) => (
         <div id="seekbar" style={{
             left: ((state.progress / state.queue[0].track.duration) * 100) + "%"
         }} />
-        <div id="pimpkk">
+        <div id="pimpkk" className="pimp">
             KaraKara
         </div>
-        <div id="pimpsong">
+        <div id="pimpsong" className="pimp">
             {state.queue[0].track.tags.title}
             <br/>Performed by {state.queue[0].performer_name}
         </div>
+        {/* too much on screen at once?
+        <div id="pimpcontributor" className="pimp">
+            Contributed by {state.queue[0].track.tags.contributor}
+        </div>
+        */}
     </div>
 );
 

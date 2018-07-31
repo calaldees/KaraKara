@@ -26,11 +26,14 @@ function random_track() {
                 "id": 1,
                 "tags": {
                     "title": "OP",
-                    "from": "Adventure Time"
+                    "from": "Adventure Time",
+                    "artist": "An Artist",
+                    "contributor": "choco"
                 },
                 "attachments": [
                     {"type": "video", "location": "adv.mp4"},
                     {"type": "preview", "location": "adv-pre.mp4"},
+                    {"type": "srt", "location": "adv.srt"},
                     {"type": "thumbnail", "location": "adv.jpg"}
                 ],
                 "duration": 24,
@@ -40,11 +43,14 @@ function random_track() {
                 "id": 2,
                 "tags": {
                     "title": "The Only Thing I Know For Real",
-                    "from": "Metal Gear Rising: Revengeance"
+                    "from": "Metal Gear Rising: Revengeance",
+                    "artist": "An Artist",
+                    "contributor": "choco"
                 },
                 "attachments": [
                     {"type": "video", "location": "mgr.mp4"},
                     {"type": "preview", "location": "mgr-pre.mp4"},
+                    {"type": "srt", "location": "mgr.srt"},
                     {"type": "thumbnail", "location": "mgr.jpg"}
                 ],
                 "duration": 145,
@@ -54,11 +60,14 @@ function random_track() {
                 "id": 3,
                 "tags": {
                     "title": "Radical Dreamers",
-                    "from": "Chronos Cross"
+                    "from": "Chronos Cross",
+                    "artist": "An Artist",
+                    "contributor": "choco"
                 },
                 "attachments": [
                     {"type": "video", "location": "rad.mp4"},
                     {"type": "preview", "location": "rad-pre.mp4"},
+                    {"type": "srt", "location": "rad.srt"},
                     {"type": "thumbnail", "location": "rad.jpg"}
                 ],
                 "duration": 279,

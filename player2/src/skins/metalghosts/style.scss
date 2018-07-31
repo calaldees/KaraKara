@@ -329,10 +329,13 @@ $LIGHT: #29EDF2;
 
 	@keyframes slideup {
 		0% {bottom: -2000px;}
-		50% {bottom: -2000px;}
 		100% {bottom: 1vh;}
 	}
-	.join_info {bottom: -2000px; animation: slideup 4s forwards;}
+	.join_info {
+		bottom: -2000px;
+		animation-delay: 1s;
+		animation: slideup 2s forwards;
+	}
 
 
 	/*---------------------------------------------------------------------------*/
@@ -360,19 +363,29 @@ $LIGHT: #29EDF2;
 			width: 4px;
 		}
 
-		#pimpkk {
-			font-size: 10vh;
+		.pimp {
 			position: absolute;
-			top: 5vh;
-			right: -200vw;
-			animation: popright 5s alternate;
 			animation-iteration-count: 2;
+			animation-direction: alternate;
+			animation-duration: 5s;
 			text-shadow:
 							-1px -1px 0 #000,
 							1px -1px 0 #000,
 							-1px 1px 0 #000,
 							1px 1px 0 #000,
 							0 0 5vh #000;
+		}
+		#pimpkk {
+			font-size: 10vh;
+			top: 5vh;
+			right: -200vw;
+			animation-name: popright;
+		}
+		#pimpcontributor {
+			font-size: 5vh;
+			bottom: 5vh;
+			right: -200vw;
+			animation-name: popright;
 		}
 		@keyframes popright {
 			0% {right: -200vw;}
@@ -383,17 +396,9 @@ $LIGHT: #29EDF2;
 
 		#pimpsong {
 			font-size: 5vh;
-			position: absolute;
 			bottom: 5vh;
 			left: -200vw;
-			animation: popleft 5s alternate;
-			animation-iteration-count: 2;
-			text-shadow:
-							-1px -1px 0 #000,
-							1px -1px 0 #000,
-							-1px 1px 0 #000,
-							1px 1px 0 #000,
-							0 0 5vh #000;
+			animation-name: popleft;
 		}
 		@keyframes popleft {
 			0% {left: -200vw;}
