@@ -26,7 +26,7 @@ const PreviewScreen = ({state, actions}) => (
             <video src={get_attachment(state.queue[0].track, 'video')}
                    preload={"auto"} muted={true} style={{display: "none"}} />
         </div>
-        <div id="playlist">
+        <div id="playlist" key={"playlist"}>
             <ol>
                 {state.queue.slice(0, show_tracks).map((item) =>
                     <li key={item.time_touched}>
@@ -39,7 +39,7 @@ const PreviewScreen = ({state, actions}) => (
             </ol>
         </div>
         {state.queue.length > show_tracks &&
-        <div id="playlist_obscured">
+        <div id="playlist_obscured" key={"playlist_obscured"}>
             <ul>
                 {state.queue.slice(show_tracks).map((item) =>
                     <li key={item.time_touched}>{item.performer_name}</li>)}
@@ -59,9 +59,20 @@ const PreviewScreen = ({state, actions}) => (
 const VideoScreen = ({state, actions}) => (
     <div className={"screen_video"}>
         <video src={get_attachment(state.queue[0].track, 'video')}
-               autoPlay={true} onEnded={() => actions.dequeue()}
+               autoPlay={true}
+               ontimeupdate={(e) => actions.update_progress(e.target.currentTime)}
+               onended={() => actions.dequeue()}
         />
-        <input id="seekbar" type="range" value="0"/>
+        <div id="seekbar" style={{
+            left: ((state.progress / state.queue[0].track.duration) * 100) + "%"
+        }} />
+        <div id="pimpkk">
+            KaraKara
+        </div>
+        <div id="pimpsong">
+            {state.queue[0].track.tags.title}
+            <br/>Performed by {state.queue[0].performer_name}
+        </div>
     </div>
 );
 

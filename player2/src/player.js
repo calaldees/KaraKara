@@ -58,53 +58,55 @@ let socket;
 let socket_retry_interval = null;
 function setup_websocket() {
     const settings = player.get_state().settings;
-    if (!settings['karakara.websocket.port'] && !settings['karakara.websocket.path']) {
+    const ws_path = settings['karakara.websocket.path'];
+    const ws_port = settings['karakara.websocket.port'];
+
+    if (!ws_port && !ws_path) {
         console.error("setup_websocket", "Websocket port or path not specified - remote control disabled");
         return;
     }
 
-    let websocket_url = (IS_SECURE ? 'wss://' : 'ws://') + HOSTNAME;
-    if (settings['karakara.websocket.path']) {
-        websocket_url += settings['karakara.websocket.path'];
-    } else {
-        websocket_url += ":"+settings['karakara.websocket.port']+"/";
-    }
+    const websocket_url = (
+        (document.location.protocol === "https:" ? 'wss://' : 'ws://') +
+        document.location.hostname +
+        (ws_port ? ":" + ws_port : "") +
+        (ws_path ? ws_path : "")
+    );
     console.log("setup_websocket", websocket_url);
 
     socket = new WebSocket(websocket_url);
-    socket.onopen = function(){ // Authenicate client with session key on socket connect
-        const session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];  // TODO - replace with use of settings['session_key'] or server could just use the actual http-header
+    socket.onopen = function() {
+        // Authenticate client with session key on socket connect
+        // TODO - replace with use of settings['session_key'] or server could
+        // just use the actual http-header
+        const session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];
         socket.send(session_key);
-        $('body').removeClass('websocket_disconnected');
-        console.log("Websocket: Connected");
+        player.set_connected(true);
         if (socket_retry_interval) {
             clearInterval(socket_retry_interval);
             socket_retry_interval = null;
         }
-        stop_queue_poll();
-        if (screens.current == 'video') {
-            console.log("auto play video on websocket reconnection");
-            get_video().play();
-            // TODO: play is not quite perfect as the video resets
-        }
-        else {
-            update_playlist();
-        }
-
     };
-    socket.onclose  = function() {
+    socket.onclose = function() {
         socket = null;
-        $('body').addClass('websocket_disconnected');
-        console.log("Websocket: Disconnected");
+        player.set_connected(false);
         if (!socket_retry_interval) {
-            socket_retry_interval = setInterval(setup_websocket,settings["karakara.websocket.disconnected_retry_interval"]*1000);
+            socket_retry_interval = setInterval(
+                setup_websocket,
+                settings["karakara.websocket.disconnected_retry_interval"]*1000
+            );
         }
-        start_queue_poll();
     };
     socket.onmessage = function(msg) {
         const cmd = $.trim(msg.data);
         console.log('Websocket: Remote command: '+cmd);
+        const commands = {
+            "skip": player.dequeue,
+            "play": player.play,
+            "stop": player.stop,
+        };
         if (cmd in commands) {commands[cmd]();}
+        else {console.log("unknown command: " + cmd)}
     };
 }
 
@@ -134,7 +136,6 @@ document.onkeydown = function(e) {
         case KEYCODE.LEFT     : vid_seek_backwards();break;
         case KEYCODE.RIGHT    : vid_seek_forwards(); break;
         case KEYCODE.SPACE    : vid_pause(); break;
-        case KEYCODE.T        : player.update_progress(player.get_state().progress + 1); break; // add
         default: handled = false;
     }
     if (handled) {

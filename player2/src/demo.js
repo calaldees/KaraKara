@@ -21,32 +21,50 @@ for(let i=0; i<lyrics_lines.length; i++) {
 
 function random_track() {
     return {
-        "track": {
-            "id": 2,
-            "tags": {
-                "title": choose(["Hello Song", "Let's Get To Burning", "Random Title #3", "The Song of My People", "Hello Song with a really long title: The Song of the Lengthening Words"]),
-                "from": choose(["Animu", "That Show with the Things", "Demo Game", "Animu with a stupendously long name: The sequelising, the subtitle"])
+        "track": choose([
+            {
+                "id": 1,
+                "tags": {
+                    "title": "OP",
+                    "from": "Adventure Time"
+                },
+                "attachments": [
+                    {"type": "video", "location": "adv.mp4"},
+                    {"type": "preview", "location": "adv-pre.mp4"},
+                    {"type": "thumbnail", "location": "adv.jpg"}
+                ],
+                "duration": 24,
+                "lyrics": lyrics,
             },
-            "attachments": choose([
-                [
-                    {"type": "video", "location": "moo1.webm"},
-                    {"type": "preview", "location": "moo1.webm"},
-                    {"type": "thumbnail", "location": "moo1.jpg"}
+            {
+                "id": 2,
+                "tags": {
+                    "title": "The Only Thing I Know For Real",
+                    "from": "Metal Gear Rising: Revengeance"
+                },
+                "attachments": [
+                    {"type": "video", "location": "mgr.mp4"},
+                    {"type": "preview", "location": "mgr-pre.mp4"},
+                    {"type": "thumbnail", "location": "mgr.jpg"}
                 ],
-                [
-                    {"type": "video", "location": "moo2.webm"},
-                    {"type": "preview", "location": "moo2.webm"},
-                    {"type": "thumbnail", "location": "moo2.jpg"}
+                "duration": 145,
+                "lyrics": lyrics,
+            },
+            {
+                "id": 3,
+                "tags": {
+                    "title": "Radical Dreamers",
+                    "from": "Chronos Cross"
+                },
+                "attachments": [
+                    {"type": "video", "location": "rad.mp4"},
+                    {"type": "preview", "location": "rad-pre.mp4"},
+                    {"type": "thumbnail", "location": "rad.jpg"}
                 ],
-                [
-                    {"type": "video", "location": "moo3.webm"},
-                    {"type": "preview", "location": "moo3.webm"},
-                    {"type": "thumbnail", "location": "moo3.jpg"}
-                ],
-            ]),
-            "duration": choose([10, 20, 30, 12.34]),
-            "lyrics": lyrics,
-        },
+                "duration": 279,
+                "lyrics": lyrics,
+            },
+        ]),
         "performer_name": choose(["Vanilla", "Chocola", "Mint", "Coconut", "Cinamon", "Azuki", "Maple", "ReallyLongBadgeNameGuy"]),
         "total_duration": choose([90, 120, 180, 234]),
         "time_touched": ""+Math.random()

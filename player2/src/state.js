@@ -26,6 +26,7 @@ const state = {
         "QUEUE_ID": "minami",
     },
     progress: 0,
+    connected: false,
 };
 
 const actions = {
@@ -37,6 +38,7 @@ const actions = {
     settings: value => state => ({ settings: value }),
     get_state: () => state => state,
     update_progress: value => state => ({ progress: value }),
+    set_connected: value => state => ({ connected: value }),
 };
 
 export {state, actions};

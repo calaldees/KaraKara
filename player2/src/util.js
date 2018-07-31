@@ -14,7 +14,7 @@ function timedelta_str(timedelta) {
 function get_attachment(track, type) {
     for(let i=0; i<track.attachments.length; i++) {
         if(track.attachments[i].type === type) {
-            return "./files/" + track.attachments[i].location;
+            return "https://files.shishnet.org/karakara-demo/" + track.attachments[i].location;
         }
     }
     return "";
