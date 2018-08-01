@@ -51,7 +51,12 @@ const actions = {
 
     check_queue: () => (state, actions) => {
         api(state, "queue_items", function(data) {
-            actions.set_queue(data.queue);
+            function merge_lyrics(item) {
+                item.track.lyrics = get_lyrics(state, item.track);
+                return item;
+            }
+            let queue_with_lyrics = data.queue.map((item) => merge_lyrics(item));
+            actions.set_queue(queue_with_lyrics);
         });
     },
     set_queue: value => () => ({ queue: value }),
