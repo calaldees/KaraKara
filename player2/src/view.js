@@ -4,7 +4,33 @@ const show_tracks = 5;
 
 
 /* ====================================================================
-Rendering
+Common components
+==================================================================== */
+
+function _lineStyle(item, state) {
+    const ts = state.progress * 1000;
+    if(!state.playing) return "present";
+    if(item.text === "-") return "past";
+    if(item.start < ts && item.end > ts) return "present";
+    if(item.end < ts) return "past";
+    if(item.start > ts) return "future";
+}
+
+const Lyrics = ({state}) => (
+    <div className={"lyrics"}>
+        <ol>
+            {state.queue[0].track.lyrics.map((item) =>
+                <li key={item.start} className={_lineStyle(item, state)}>
+                    <span>{item.text}</span>
+                </li>
+            )}
+        </ol>
+    </div>
+);
+
+
+/* ====================================================================
+Screens
 ==================================================================== */
 
 const TitleScreen = ({state, actions}) => (
@@ -78,29 +104,19 @@ const VideoScreen = ({state, actions}) => (
             Contributed by {state.queue[0].track.tags.contributor}
         </div>
         */}
+        {state.settings["karakara.player.subs_on_screen"] ?
+            <Lyrics state={state} /> :
+            null
+        }
+
     </div>
 );
-
-function _lineStyle(item, state) {
-    const ts = state.progress * 1000;
-    if(!state.playing) return "present";
-    if(item.text === "-") return "past";
-    if(item.start < ts && item.end > ts) return "present";
-    if(item.end < ts) return "past";
-    if(item.start > ts) return "future";
-}
 
 const PodiumScreen = ({state, actions}) => (
     <div className={"screen_podium"}>
         <h1>{state.queue[0].performer_name} - {state.queue[0].track.tags.title}</h1>
 
-        <div className={"lyrics"}>
-            <ol>
-                {state.queue[0].track.lyrics.map((item) =>
-                    <li key={item.start} className={_lineStyle(item, state)}>{item.text}</li>
-                )}
-            </ol>
-        </div>
+        <Lyrics state={state} />
 
         {state.playing ?
             <div className={"progressBar"}
@@ -126,13 +142,22 @@ const PodiumScreen = ({state, actions}) => (
     </div>
 );
 
+
+/* ====================================================================
+Decide which screen to use based on current state
+==================================================================== */
+
 function view(state, actions) {
     let screen = <div>Unknown state :(</div>;
 
-    if(window.location.hash === "#podium") screen = <PodiumScreen state={state} actions={actions} />;
-    else if(state.queue.length === 0 && !state.playing) screen = <TitleScreen state={state} actions={actions} />;
-    else if(state.queue.length > 0 && !state.playing) screen = <PreviewScreen state={state} actions={actions} />;
-    else if(state.playing) screen = <VideoScreen state={state} actions={actions} />;
+    if(window.location.hash === "#podium")
+        screen = <PodiumScreen state={state} actions={actions} />;
+    else if(state.queue.length === 0 && !state.playing)
+        screen = <TitleScreen state={state} actions={actions} />;
+    else if(state.queue.length > 0 && !state.playing)
+        screen = <PreviewScreen state={state} actions={actions} />;
+    else if(state.playing)
+        screen = <VideoScreen state={state} actions={actions} />;
 
     return <div className={"theme-" + state.settings["karakara.player.theme"]}>
         {screen}

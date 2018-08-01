@@ -360,6 +360,7 @@ $LIGHT: #29EDF2;
 			height: 10px;
 			background: yellow;
 			border: 1px solid black;
+			border-bottom: 0;
 			width: 4px;
 		}
 
@@ -405,6 +406,22 @@ $LIGHT: #29EDF2;
 			20% {left: -200vw;}
 			40% {left: 5vw;}
 			100% {left: 5vw;}
+		}
+
+		.lyrics OL {
+			position: absolute;
+			top: 80vh;
+			font-size: 5vh;
+			width: 100%;
+			bottom: 2vh;
+			display: table;
+			LI {text-align: center; display: none;}
+			.past {color: gray;}
+			.present {color: white;}
+			.future {color: #880;}
+			.present,
+			.present + .future {display: block;}
+			LI SPAN {background: black; padding: 0 1vw;}
 		}
 	}
 
