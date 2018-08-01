@@ -15,7 +15,6 @@ const state = {
         "karakara.player.video.skip.seconds"  : 20,
         "karakara.player.autoplay"            : 30, // Autoplay after X seconds
         "karakara.player.subs_on_screen"      : true, // Set false if using podium
-        "karakara.player.files"               : "/files/",
         "karakara.websocket.path"             : null,
         "karakara.websocket.port"             : null,
         "karakara.event.end"                  : null,
@@ -40,11 +39,7 @@ const actions = {
 
     check_settings: () => (state, actions) => {
         api(state, "settings", function(data) {
-            let new_settings = state.settings;
-            for(let key in data.settings) {
-                new_settings[key] = data.settings[key];
-            }
-            actions.set_settings(new_settings);
+            actions.set_settings(Object.assign(state.settings, data.settings));
         });
     },
     set_settings: value => () => ({ settings: value }),
@@ -71,11 +66,11 @@ const actions = {
     },
     seek_forwards: value => (state, actions) => {
         const video = document.getElementsByTagName("video")[0];
-        if(video) video.currentTime = Math.min(video.currentTime + state.settings["karakara.player.video.skip.seconds"], video.duration);
+        if(video) video.currentTime += state.settings["karakara.player.video.skip.seconds"];
     },
     seek_backwards: value => (state, actions) => {
         const video = document.getElementsByTagName("video")[0];
-        if(video) video.currentTime = Math.max(video.currentTime - state.settings["karakara.player.video.skip.seconds"], 0);
+        if(video) video.currentTime -= state.settings["karakara.player.video.skip.seconds"];
     },
 };
 

@@ -392,17 +392,14 @@ $LIGHT: #29EDF2;
 
 		.lyrics OL {
 			position: absolute;
-			top: 80vh;
-			font-size: 5vh;
+			bottom: 7vh;
+			font-size: 7vh;
 			width: 100%;
-			bottom: 2vh;
-			display: table;
 			LI {text-align: center; display: none;}
 			.past {color: gray;}
 			.present {color: white;}
 			.future {color: #880;}
-			.present,
-			.present + .future {display: block;}
+			.present, .present + .future {display: block;}
 			LI SPAN {background: black; padding: 0 1vw;}
 		}
 	}
