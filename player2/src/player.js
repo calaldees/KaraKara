@@ -5,36 +5,9 @@ import { view } from "./view.js";
 const player = app(state, actions, view, document.body);
 
 
-/* ====================================================================
-Video controls, bypassing app state
-==================================================================== */
-
-function _get_video() {
-    return document.getElementsByTagName("video")[0];
-}
-function vid_pause() {
-    const video = _get_video();
-    if (!video) {return;}
-    if (video.paused) {video.play();}
-    else              {video.pause();}
-}
-function vid_seek_forwards() {
-    const settings = player.get_state().settings;
-    const video = _get_video();
-    if (!video) {return;}
-    video.currentTime = Math.min(video.currentTime + settings["karakara.player.video.skip.seconds"], video.duration);
-}
-function vid_seek_backwards() {
-    const settings = player.get_state().settings;
-    const video = _get_video();
-    if (!video) {return;}
-    video.currentTime = Math.max(video.currentTime - settings["karakara.player.video.skip.seconds"], 0);
-}
-
-
-/* ====================================================================
-Network controls
-==================================================================== */
+// ====================================================================
+// Network controls
+// ====================================================================
 
 // TODO: poll main.setQueue(getJson("/api/queue.json"))
 // TODO: onended = dequeue() + report completion to server
@@ -104,6 +77,12 @@ function setup_websocket() {
             "skip": player.dequeue,
             "play": player.play,
             "stop": player.stop,
+            "pause": player.pause,
+            "seek_forwards": player.seek_forwards,
+            "seek_backwards": player.seek_backwards,
+            "ended": player.dequeue,
+            // "queue_updated": function() {}, // TODO
+            // "settings": function() {},  // TODO
         };
         if (cmd in commands) {commands[cmd]();}
         else {console.log("unknown command: " + cmd)}
@@ -111,9 +90,9 @@ function setup_websocket() {
 }
 
 
-/* ====================================================================
-Local controls
-==================================================================== */
+// ====================================================================
+// Local controls
+// ====================================================================
 
 const KEYCODE = {
     BACKSPACE: 8,
@@ -133,15 +112,20 @@ document.onkeydown = function(e) {
         case KEYCODE.A        : player.enqueue(); break; // add
         case KEYCODE.ENTER    : player.play(); break;
         case KEYCODE.ESCAPE   : player.stop(); break;
-        case KEYCODE.LEFT     : vid_seek_backwards();break;
-        case KEYCODE.RIGHT    : vid_seek_forwards(); break;
-        case KEYCODE.SPACE    : vid_pause(); break;
+        case KEYCODE.LEFT     : player.seek_backwards();break;
+        case KEYCODE.RIGHT    : player.seek_forwards(); break;
+        case KEYCODE.SPACE    : player.pause(); break;
         default: handled = false;
     }
     if (handled) {
         e.preventDefault();
     }
 };
+
+
+// ====================================================================
+// Auto-play for podium mode
+// ====================================================================
 
 if(window.location.hash === "#podium") {
     const FPS = 5;

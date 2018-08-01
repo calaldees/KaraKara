@@ -3,9 +3,9 @@ import { timedelta_str, get_attachment, s_to_mns } from "./util.js";
 const show_tracks = 5;
 
 
-/* ====================================================================
-Common components
-==================================================================== */
+// ====================================================================
+// Common components
+// ====================================================================
 
 function _lineStyle(item, state) {
     const ts = state.progress * 1000;
@@ -29,13 +29,15 @@ const Lyrics = ({state}) => (
 );
 
 
-/* ====================================================================
-Screens
-==================================================================== */
+// ====================================================================
+// Screens
+// ====================================================================
 
 const TitleScreen = ({state, actions}) => (
     <div className={"screen_title"}>
-        <div className="info"><div><h1>{state.settings["karakara.player.title"]}</h1></div></div>
+        <div className="info"><div>
+            <h1>{state.settings["karakara.player.title"]}</h1>
+        </div></div>
         <div className="join_info">
             Join at <span>{state.settings["HOSTNAME"]}</span> -
             Queue is <span>{state.settings["QUEUE_ID"]}</span>
@@ -46,17 +48,17 @@ const TitleScreen = ({state, actions}) => (
 const PreviewScreen = ({state, actions}) => (
     <div className={"screen_preview"}>
         <div className="preview_holder">
-            <video src={get_attachment(state.queue[0].track, 'preview')}
-                   poster={get_attachment(state.queue[0].track, 'thumbnail')}
+            <video src={get_attachment(state, state.queue[0].track, 'preview')}
+                   poster={get_attachment(state, state.queue[0].track, 'thumbnail')}
                    autoPlay={true} loop={true} muted={true} />
-            <video src={get_attachment(state.queue[0].track, 'video')}
+            <video src={get_attachment(state, state.queue[0].track, 'video')}
                    preload={"auto"} muted={true} style={{display: "none"}} />
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>
                 {state.queue.slice(0, show_tracks).map((item) =>
                     <li key={item.time_touched}>
-                        <img src={get_attachment(item.track, 'image')} />
+                        <img src={get_attachment(state, item.track, 'image')} />
                         <p className='title'>{item.track.tags.title}</p>
                         <p className='from'>{item.track.tags.from}</p>
                         <p className='performer'>{item.performer_name}</p>
@@ -84,7 +86,7 @@ const PreviewScreen = ({state, actions}) => (
 
 const VideoScreen = ({state, actions}) => (
     <div className={"screen_video"}>
-        <video src={get_attachment(state.queue[0].track, 'video')}
+        <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
                ontimeupdate={(e) => actions.update_progress(e.target.currentTime)}
                onended={() => actions.dequeue()}
@@ -127,15 +129,15 @@ const PodiumScreen = ({state, actions}) => (
                     {' '}/{' '}
                     {s_to_mns(state.queue[0].track.duration)}
                 )</small>
-            </div>
-            :
+            </div> :
             <div className={"startButton"} onclick={() => actions.play()}
                  style={{"background-position": (100 - (state.progress / state.settings["karakara.player.autoplay"] * 100))+"%"}}>
                 <span>
                     Press to Start
                     {state.settings["karakara.player.autoplay"] === 0 ?
                         <small>(autoplay disabled)</small> :
-                        <small>(autoplay in {Math.ceil(state.settings["karakara.player.autoplay"] - state.progress)} seconds)</small>}
+                        <small>(autoplay in {Math.ceil(state.settings["karakara.player.autoplay"] - state.progress)} seconds)</small>
+                    }
                 </span>
             </div>
         }
@@ -143,9 +145,9 @@ const PodiumScreen = ({state, actions}) => (
 );
 
 
-/* ====================================================================
-Decide which screen to use based on current state
-==================================================================== */
+// ====================================================================
+// Decide which screen to use based on current state
+// ====================================================================
 
 function view(state, actions) {
     let screen = <div>Unknown state :(</div>;
