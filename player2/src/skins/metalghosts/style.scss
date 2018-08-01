@@ -83,7 +83,7 @@ $LIGHT: #29EDF2;
 		0% {bottom: -2000px;}
 		100% {bottom: 1vh;}
 	}
-	.join_info {
+	#join_info {
 		position: absolute;
 		left: 10vw;
 		right: 10vw;
@@ -95,8 +95,9 @@ $LIGHT: #29EDF2;
 		animation-delay: 1s;
 		animation: slideup 2s forwards;
 
-		SPAN {
+		STRONG {
 			color: #FF7;
+			font-weight: normal;
 		}
 	}
 
@@ -118,21 +119,14 @@ $LIGHT: #29EDF2;
 			border: 1px solid black;
 		}
 
-		.info {
+		H1 {
 			@include border;
 			position: fixed;
 			top: 20vw;
 			left: 25vw;
 			width: 50vw;
 			z-index: 100;
-		}
-		.info > div {
-			font-size: 1.5em;
-			opacity: 0.9;
-		}
-
-		.info h1 {
-			opacity: 1.0;
+			font-size: 10vh;
 			text-align: center;
 		}
 	}

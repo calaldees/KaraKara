@@ -1,5 +1,5 @@
 import { h } from "hyperapp";  // JSX will be turned into h by rollup
-import { timedelta_str, get_attachment, s_to_mns } from "./util.js";
+import { timedelta_str, get_attachment, s_to_mns, get_hostname, get_queue_id } from "./util.js";
 const show_tracks = 5;
 
 
@@ -35,12 +35,10 @@ const Lyrics = ({state}) => (
 
 const TitleScreen = ({state, actions}) => (
     <div className={"screen_title"}>
-        <div className="info"><div>
-            <h1>{state.settings["karakara.player.title"]}</h1>
-        </div></div>
-        <div className="join_info">
-            Join at <span>{state.settings["HOSTNAME"]}</span> -
-            Queue is <span>{state.settings["QUEUE_ID"]}</span>
+        <h1>{state.settings["karakara.player.title"]}</h1>
+        <div id="join_info">
+            Join at <strong>{get_hostname()}</strong> -
+            Queue is <strong>{get_queue_id()}</strong>
         </div>
     </div>
 );
@@ -59,8 +57,8 @@ const PreviewScreen = ({state, actions}) => (
                 {state.queue.slice(0, show_tracks).map((item) =>
                     <li key={item.time_touched}>
                         <img src={get_attachment(state, item.track, 'image')} />
-                        <p className='title'>{item.track.tags.title}</p>
-                        <p className='from'>{item.track.tags.from}</p>
+                        <p className='title'>{item.track.tags.title[0]}</p>
+                        <p className='from'>{item.track.tags.from[0]}</p>
                         <p className='performer'>{item.performer_name}</p>
                         <p className='time'><span>{timedelta_str(item.total_duration*1000)}</span></p>
                     </li>)}
@@ -76,10 +74,12 @@ const PreviewScreen = ({state, actions}) => (
         }
 
         {/* key= to make sure this element stays put while the above may disappear */}
-        <div className="join_info" key={"join_info"}>
-            Join at <span>{state.settings["HOSTNAME"]}</span> -
-            Queue is <span>{state.settings["QUEUE_ID"]}</span>
-            <br/>Event ends at <span>{state.settings["karakara.event.end"]}</span>
+        <div id="join_info" key={"join_info"}>
+            Join at <strong>{get_hostname()}</strong> -
+            Queue is <strong>{get_queue_id()}</strong>
+            {state.settings["karakara.event.end"] &&
+                <span><br/>Event ends at <strong>{state.settings["karakara.event.end"]}</strong></span>
+            }
         </div>
     </div>
 );
@@ -88,7 +88,7 @@ const VideoScreen = ({state, actions}) => (
     <div className={"screen_video"}>
         <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
-               ontimeupdate={(e) => actions.update_progress(e.target.currentTime)}
+               ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
                onended={() => actions.dequeue()}
         />
         <div id="seekbar" style={{
@@ -98,12 +98,12 @@ const VideoScreen = ({state, actions}) => (
             KaraKara
         </div>
         <div id="pimpsong" className="pimp">
-            {state.queue[0].track.tags.title}
+            {state.queue[0].track.tags.title[0]}
             <br/>Performed by {state.queue[0].performer_name}
         </div>
         {/* too much on screen at once?
         <div id="pimpcontributor" className="pimp">
-            Contributed by {state.queue[0].track.tags.contributor}
+            Contributed by {state.queue[0].track.tags.contributor[0]}
         </div>
         */}
         {state.settings["karakara.player.subs_on_screen"] ?
@@ -116,7 +116,7 @@ const VideoScreen = ({state, actions}) => (
 
 const PodiumScreen = ({state, actions}) => (
     <div className={"screen_podium"}>
-        <h1>{state.queue[0].performer_name} - {state.queue[0].track.tags.title}</h1>
+        <h1>{state.queue[0].performer_name} - {state.queue[0].track.tags.title[0]}</h1>
 
         <Lyrics state={state} />
 

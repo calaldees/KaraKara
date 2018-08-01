@@ -17,11 +17,13 @@
         "babel-core": "latest",
         "babel-preset-env": "latest",
         "babel-plugin-external-helpers": "latest",
-        "js-beautify": "^1.7.5",
+        "js-beautify": "^1.7.5"
+    },
+    "dependencies": {
+        "xhr": "latest",
         "subtitle": "latest",
         "hyperapp": "^1.2.8"
     },
-    "dependencies": {},
     "scripts": {
         "build": "rollup -c",
         "watch": "rollup -c -w",

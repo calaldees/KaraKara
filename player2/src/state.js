@@ -1,4 +1,4 @@
-import {random_track} from "./demo";
+import {get_lyrics, api} from "./util";
 
 
 // ====================================================================
@@ -20,9 +20,7 @@ const state = {
         "karakara.websocket.path"             : null,
         "karakara.websocket.port"             : null,
         "karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
-        "karakara.event.end": null,
-        "HOSTNAME": document.location.hostname,
-        "QUEUE_ID": null,
+        "karakara.event.end"                  : null,
     },
 
     // playlist screen
@@ -35,14 +33,30 @@ const state = {
 
 const actions = {
     dequeue: () => state => ({ queue: state.queue.slice(1), playing: false, progress: 0 }),
-    enqueue: () => state => ({ queue: state.queue.concat(random_track()) }),
+    // enqueue: () => state => ({ queue: state.queue.concat(random_track()) }),
     play: () => () => ({ playing: true, progress: 0 }),
     stop: () => () => ({ playing: false, progress: 0 }),
-    queue_updated: value => () => ({ queue: value }),
-    settings: value => () => ({ settings: value }),
     get_state: () => state => state,
-    update_progress: value => () => ({ progress: value }),
+    set_progress: value => () => ({ progress: value }),
     set_connected: value => () => ({ connected: value }),
+
+    check_settings: () => (state, actions) => {
+        api(state, "settings", function(data) {
+            let new_settings = state.settings;
+            for(let key in data.settings) {
+                new_settings[key] = data.settings[key];
+            }
+            actions.set_settings(new_settings);
+        });
+    },
+    set_settings: value => () => ({ settings: value }),
+
+    check_queue: () => (state, actions) => {
+        api(state, "queue_items", function(data) {
+            actions.set_queue(data.queue);
+        });
+    },
+    set_queue: value => () => ({ queue: value }),
 
     // These are a bit messier because the VIDEO object
     // state is separated from the application state :(
@@ -61,22 +75,5 @@ const actions = {
         if(video) video.currentTime = Math.max(video.currentTime - state.settings["karakara.player.video.skip.seconds"], 0);
     },
 };
-
-
-// ====================================================================
-// populate some demo state if we're running from a local file
-// ====================================================================
-
-if(document.location.protocol === "file:") {
-    state.queue = [
-        random_track(), random_track(), random_track(),
-        random_track(), random_track(), random_track(),
-        random_track(), random_track(), random_track(),
-    ];
-    state.settings["karakara.player.files"] = "https://files.shishnet.org/karakara-demo/";
-    state.settings["karakara.event.end"] = "midnight";
-    state.settings["HOSTNAME"] = "karakara.org.uk";
-    state.settings["QUEUE_ID"] = "minami";
-}
 
 export {state, actions};
