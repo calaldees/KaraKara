@@ -432,7 +432,6 @@ $LIGHT: #29EDF2;
 
 		.lyrics {
 			@include border;
-			//background-size: cover;
 			position: absolute;
 			top: 22vh;
 			left: 1vw;
@@ -441,17 +440,15 @@ $LIGHT: #29EDF2;
 			font-size: 7vh;
 			OL {
 				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
+				top: 2vh;
+				left: 2vw;
+				right: 2vw;
+				bottom: 2vh;
 				overflow: hidden;
-				LI {
-					text-align: left;
-					color: #880;
-				}
-				LI:nth-child(1) {color: gray;}
-				LI:nth-child(2) {color: white;}
+				LI {text-align: left;}
+				.past {color: gray; display: none;}
+				.present {color: white;}
+				.future {color: #880;}
 			}
 		}
 

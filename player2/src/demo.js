@@ -1,22 +1,19 @@
+import Subtitle from 'subtitle';
+
 function choose(choices) {
     const index = Math.floor(Math.random() * choices.length);
     return choices[index];
 }
 
-const lyrics_lines = ("habatake sora e  takaku maiagare \n" +
-    "RESUKYUU FAIAA GO! isoge!\n" +
-    "hashiridase  yami o tsukinukero  RESUKYUU  yonde'ru ze \n" +
-    "mukaikaze ni  kao o agero  soshite  me o hirake\n" +
-    "dakishimero  chiisana sakebi o  RESUKYUU bokura wa ima \n" +
-    "ai no tame  hitotsu ni nareru hazu sa\n" +
-    "dakara motto motto  sou sa motto motto \n" +
-    "tamashii yusaburu omoi  tokihanate \n" +
-    "dakara motto motto  sou sa motto motto \n" +
-    "WAN TSUU SURII  WAN TSUU SURII \n" +
-    "bakuretsuteki ni BAANINGU SOURU\n").split("\n");
-let lyrics = [];
-for(let i=0; i<lyrics_lines.length; i++) {
-    lyrics.push([(i+1)*3, lyrics_lines[i]]);
+function get_lyrics(srt) {
+    let xhr = new XMLHttpRequest();
+    let data = "";
+    xhr.open('GET', "https://files.shishnet.org/karakara-demo/"+srt, false);
+    xhr.onload = function(e) {
+        data = e.target.responseText;
+    };
+    xhr.send();
+    return Subtitle.parse(data);
 }
 
 function random_track() {
@@ -37,7 +34,7 @@ function random_track() {
                     {"type": "thumbnail", "location": "adv.jpg"}
                 ],
                 "duration": 24,
-                "lyrics": lyrics,
+                "lyrics": get_lyrics("adv.srt"),
             },
             {
                 "id": 2,
@@ -54,7 +51,7 @@ function random_track() {
                     {"type": "thumbnail", "location": "mgr.jpg"}
                 ],
                 "duration": 145,
-                "lyrics": lyrics,
+                "lyrics": get_lyrics("mgr.srt"),
             },
             {
                 "id": 3,
@@ -71,7 +68,7 @@ function random_track() {
                     {"type": "thumbnail", "location": "rad.jpg"}
                 ],
                 "duration": 279,
-                "lyrics": lyrics,
+                "lyrics": get_lyrics("rad.srt"),
             },
         ]),
         "performer_name": choose(["Vanilla", "Chocola", "Mint", "Coconut", "Cinamon", "Azuki", "Maple", "ReallyLongBadgeNameGuy"]),

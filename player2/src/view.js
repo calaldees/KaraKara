@@ -81,15 +81,23 @@ const VideoScreen = ({state, actions}) => (
     </div>
 );
 
+function _lineStyle(item, state) {
+    const ts = state.progress * 1000;
+    if(!state.playing) return "present";
+    if(item.text === "-") return "past";
+    if(item.start < ts && item.end > ts) return "present";
+    if(item.end < ts) return "past";
+    if(item.start > ts) return "future";
+}
+
 const PodiumScreen = ({state, actions}) => (
     <div className={"screen_podium"}>
         <h1>{state.queue[0].performer_name} - {state.queue[0].track.tags.title}</h1>
 
         <div className={"lyrics"}>
             <ol>
-                {[''].concat(state.queue[0].track.lyrics).map((item) =>
-                    (!state.playing || item[0] >= state.progress) ?
-                        <li key={item[0]}>{item[1]}</li> : null
+                {state.queue[0].track.lyrics.map((item) =>
+                    <li key={item.start} className={_lineStyle(item, state)}>{item.text}</li>
                 )}
             </ol>
         </div>

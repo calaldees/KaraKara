@@ -3,7 +3,7 @@ import postcss from 'rollup-plugin-postcss'
 import jsx from 'rollup-plugin-jsx';
 import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
-// import commonjs from 'rollup-plugin-commonjs';
+import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
 
 import glob from 'glob';
@@ -39,7 +39,9 @@ export default {
             exclude: 'node_modules/**'
         }),
         resolve(),
-        //commonjs(),
+        commonjs({namedExports: {
+                'node_modules/subtitle/dist/subtitle.bundle.js': ['Subtitle'],
+            }}),
         production && uglify(), // minify, but only in production
     ]
 };

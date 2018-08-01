@@ -18,6 +18,7 @@
         "babel-preset-env": "latest",
         "babel-plugin-external-helpers": "latest",
         "js-beautify": "^1.7.5",
+        "subtitle": "latest",
         "hyperapp": "^1.2.8"
     },
     "dependencies": {},
