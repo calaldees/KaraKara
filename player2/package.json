@@ -20,9 +20,10 @@
         "js-beautify": "^1.7.5"
     },
     "dependencies": {
-        "xhr": "latest",
+        "hyperapp": "^1.2.8",
+        "reconnecting-websocket": "^3.2.2",
         "subtitle": "latest",
-        "hyperapp": "^1.2.8"
+        "xhr": "latest"
     },
     "scripts": {
         "build": "rollup -c",

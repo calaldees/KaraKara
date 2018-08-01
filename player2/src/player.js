@@ -1,4 +1,5 @@
 import { app } from "hyperapp";
+import ReconnectingWebSocket from "reconnecting-websocket";
 import { state, actions } from "./state";
 import { view } from "./view";
 import { get_protocol, get_hostname } from "./util";
@@ -19,8 +20,6 @@ player.check_queue();
 // ====================================================================
 
 // TODO: onended = dequeue() + report completion to server
-let socket;
-let socket_retry_interval = null;
 function setup_websocket() {
     const settings = player.get_state().settings;
     const ws_path = settings['karakara.websocket.path'];
@@ -39,7 +38,7 @@ function setup_websocket() {
     );
     console.log("setup_websocket", websocket_url);
 
-    socket = new WebSocket(websocket_url);
+    const socket = new ReconnectingWebSocket(websocket_url);
     socket.onopen = function() {
         // Authenticate client with session key on socket connect
         // TODO - replace with use of settings['session_key'] or server could
@@ -51,20 +50,9 @@ function setup_websocket() {
         // sync for the websocket to send incremental updates
         player.check_settings();
         player.check_queue();
-        if (socket_retry_interval) {
-            clearInterval(socket_retry_interval);
-            socket_retry_interval = null;
-        }
     };
     socket.onclose = function() {
-        socket = null;
         player.set_connected(false);
-        if (!socket_retry_interval) {
-            socket_retry_interval = setInterval(
-                setup_websocket,
-                settings["karakara.websocket.disconnected_retry_interval"]*1000
-            );
-        }
     };
     socket.onmessage = function(msg) {
         const cmd = $.trim(msg.data);
@@ -83,6 +71,7 @@ function setup_websocket() {
         if (cmd in commands) {commands[cmd]();}
         else {console.log("unknown command: " + cmd)}
     };
+    return socket;
 }
 
 

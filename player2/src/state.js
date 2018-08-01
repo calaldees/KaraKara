@@ -13,13 +13,11 @@ const state = {
         "karakara.player.theme"               : "metalghosts",
         "karakara.player.video.preview_volume":  0.2,
         "karakara.player.video.skip.seconds"  : 20,
-        "karakara.player.queue.update_time"   :  3 , //Seconds to poll server
         "karakara.player.autoplay"            : 30, // Autoplay after X seconds
         "karakara.player.subs_on_screen"      : true, // Set false if using podium
         "karakara.player.files"               : "/files/",
         "karakara.websocket.path"             : null,
         "karakara.websocket.port"             : null,
-        "karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
         "karakara.event.end"                  : null,
     },
 
