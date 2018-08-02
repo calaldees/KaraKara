@@ -152,13 +152,13 @@ const PodiumScreen = ({state, actions}) => (
 function view(state, actions) {
     let screen = <div>Unknown state :(</div>;
 
-    if(window.location.hash === "#podium")
-        screen = <PodiumScreen state={state} actions={actions} />;
-    else if(state.queue.length === 0 && !state.playing)
+    if(state.queue.length === 0)
         screen = <TitleScreen state={state} actions={actions} />;
+    else if(window.location.hash === "#podium")
+        screen = <PodiumScreen state={state} actions={actions} />;
     else if(state.queue.length > 0 && !state.playing)
         screen = <PreviewScreen state={state} actions={actions} />;
-    else if(state.playing)
+    else if(state.queue.length > 0 && state.playing)
         screen = <VideoScreen state={state} actions={actions} />;
 
     return <div className={"theme-" + state.settings["karakara.player.theme"]}>
