@@ -7,7 +7,7 @@ zope.sqlalchemy
 transaction
 waitress
 beautifulsoup4
-py-postgresq
+py-postgresql
 python-dateutil
 dogpile.cache
 requests
@@ -19,6 +19,7 @@ oauth2client
 pytest
 webtest
 #pycrypto  # Considering this inclusion for encrypted cookies
+decorator
 
 git+https://github.com/calaldees/libs.git@master#egg=calaldees
 

@@ -10,9 +10,9 @@ from pyramid.events import subscriber
 
 from sqlalchemy.orm import joinedload, undefer
 
-from calaldees..misc import backup, first
-from calaldees..pyramid_helpers import get_setting
-from calaldees..pyramid_helpers.views.upload import EventFileUploaded
+from calaldees.misc import backup, first
+from calaldees.pyramid_helpers import get_setting
+from calaldees.pyramid_helpers.views.upload import EventFileUploaded
 
 from ..model import DBSession
 from ..model.model_tracks import Track

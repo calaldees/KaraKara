@@ -3,7 +3,7 @@ def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
 
-from calaldees..misc import substring_in
+from calaldees.misc import substring_in
 
 from . import admin_rights
 

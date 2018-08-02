@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from calaldees..social.social_login import SocialLogin
+from calaldees.social.social_login import SocialLogin
 
 import logging
 log = logging.getLogger(__name__)

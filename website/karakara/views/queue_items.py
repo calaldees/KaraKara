@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.view import view_config
 
-from calaldees..misc import now, subdict
+from calaldees.misc import now, subdict
 
 from . import web, action_ok, action_error, etag_decorator, cache_manager, method_delete_router, method_put_router, is_admin, modification_action, admin_only
 

@@ -1,7 +1,7 @@
 import httpagentparser
 
 from pyramid.events import subscriber
-from calaldees..pyramid_helpers.events import SessionCreated
+from calaldees.pyramid_helpers.events import SessionCreated
 
 
 known_ip_address = set()

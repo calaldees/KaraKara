@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from calaldees..misc import convert_str
+from calaldees.misc import convert_str
 
 from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router, is_admin
 

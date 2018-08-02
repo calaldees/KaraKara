@@ -11,7 +11,7 @@ import json
 from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
 
-from calaldees..misc import now, json_object_handler
+from calaldees.misc import now, json_object_handler
 
 from karakara.model.model_queue import QueueItem
 from karakara.model.model_priority_token import PriorityToken

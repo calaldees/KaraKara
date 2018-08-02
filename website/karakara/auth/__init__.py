@@ -1,4 +1,4 @@
-from calaldees..social._login import IUserStore
+from calaldees.social._login import IUserStore
 
 from sqlalchemy.orm.exc import NoResultFound
 

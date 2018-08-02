@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.traversal import resource_path
 
-from calaldees..misc import subdict, first
+from calaldees.misc import subdict, first
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only, cache_manager
 #from ._logic import queue_item_for_track

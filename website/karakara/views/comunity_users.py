@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from calaldees..misc import convert_str
+from calaldees.misc import convert_str
 from . import action_ok, action_error, comunity_only
 
 from ..model import DBSession

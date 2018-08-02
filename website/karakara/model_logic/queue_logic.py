@@ -4,7 +4,7 @@ from pyramid.decorator import reify
 from sqlalchemy import or_, and_
 from sqlalchemy.orm.exc import NoResultFound
 
-from calaldees..misc import now
+from calaldees.misc import now
 
 from . import QUEUE_DUPLICATE, TOKEN_ISSUE_ERROR
 

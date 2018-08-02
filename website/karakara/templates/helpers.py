@@ -7,7 +7,7 @@ import logging
 
 import pyramid.traversal
 
-from calaldees..misc import get_fileext, substring_in, first
+from calaldees.misc import get_fileext, substring_in, first
 
 from karakara.traversal import TraversalGlobalRootFactory
 

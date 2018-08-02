@@ -51,16 +51,17 @@ help:
 	# insert_random_tracks            -- insert random named tracks for dev/testing
 	#
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
-	# Dpendencies - make python3-setuptools python3-dev python-virtualenv curl
+	# Dpendencies - make python3-dev curl
 
 
 # Installation -----------------------------------------------------------------
 
-#python-virtualenv python3-setuptools python3-dev curl
+#python3-dev curl
 
 .PRECIOUS: $(ENV)
 $(ENV):
-	virtualenv --no-site-packages -p python$(PYTHON_VERSION) $(ENV)
+	python$(PYTHON_VERSION) -m venv $(ENV)
+	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.pip
 
 # Experiments
@@ -87,7 +88,7 @@ $(EXTERNAL_PATH):
 .PHONY: dependency_download
 dependency_download: $(ENV)
 	# Trigger dependency check on every startup
-	$(PYTHON) -m calaldees.apps.dependency_fetcher dependency_fetcher.json --tracker $(EXTERNAL_PATH) --destination_path $(EXTERNAL_PATH)
+	$(PYTHON) -m calaldees.apps.dependency_fetcher dependency_fetcher.json --tracker $(EXTERNAL_PATH)/tracker.json --destination_path $(EXTERNAL_PATH)
 
 .PHONY: install
 install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO dependency_download $(LOCALE_PATH)/karakara.pot $(DATABASE_DEV) upload_paths

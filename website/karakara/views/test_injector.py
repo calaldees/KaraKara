@@ -3,7 +3,7 @@ import random
 from pyramid.view import view_config
 from pyramid.request import Request
 
-from calaldees..misc import random_string
+from calaldees.misc import random_string
 
 from . import web, action_ok, admin_only
 

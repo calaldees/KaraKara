@@ -2,12 +2,12 @@
 from datetime import timedelta
 from decorator import decorator
 
-from calaldees..misc import decorator_combine, normalize_datetime
+from calaldees.misc import decorator_combine, normalize_datetime
 
-from calaldees..pyramid_helpers import request_from_args, mark_external_request, method_delete_router, method_put_router, gzip
-from calaldees..pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default
-from calaldees..pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, patch_cache_bucket_decorator
-from calaldees..pyramid_helpers.auto_format2 import action_ok, action_error
+from calaldees.pyramid_helpers import request_from_args, mark_external_request, method_delete_router, method_put_router, gzip
+from calaldees.pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default
+from calaldees.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, patch_cache_bucket_decorator
+from calaldees.pyramid_helpers.auto_format2 import action_ok, action_error
 
 from karakara.model import commit
 

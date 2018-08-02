@@ -9,7 +9,7 @@ __all__ = [
 
 import copy
 
-from calaldees..misc import now
+from calaldees.misc import now
 
 
 class PriorityToken(Base):

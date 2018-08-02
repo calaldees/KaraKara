@@ -3,9 +3,9 @@ import json
 import contextlib
 from unittest.mock import patch
 
-from calaldees..misc import first
-from calaldees..social._login import ILoginProvider, ProviderToken
-from calaldees..test import MultiMockOpen
+from calaldees.misc import first
+from calaldees.social._login import ILoginProvider, ProviderToken
+from calaldees.test import MultiMockOpen
 
 from karakara.views.comunity import ComunityTrack
 from karakara.model import DBSession, commit

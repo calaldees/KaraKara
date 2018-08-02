@@ -1,6 +1,6 @@
 #from pyramid.view import view_config
 
-from calaldees..misc import strip_non_base_types
+from calaldees.misc import strip_non_base_types
 from . import web, action_ok, action_error
 
 from ..model import DBSession
