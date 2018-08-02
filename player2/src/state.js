@@ -8,6 +8,7 @@ import {get_lyrics, api} from "./util";
 const state = {
     // global app bits
     connected: false,
+    clicked: false,
     settings: {
         "karakara.player.title"               : "KaraKara",
         "karakara.player.theme"               : "metalghosts",
@@ -57,6 +58,7 @@ const actions = {
     set_socket: value => () => ({ socket: value }),
     set_progress: value => () => ({ progress: value }),
     set_connected: value => () => ({ connected: value }),
+    click: () => () => ({ clicked: true }),
 
     // Tell the network as a whole what to do. We could
     // react to these signals immediately, but by sending

@@ -70,3 +70,11 @@ npm run watch    # auto-compile on changes
 - Lyrics embedded in the queue.json would be wonderful, so
   that we don't need to go and fetch and parse the .srt for
   ourselves for every song for every queue update...
+- Chrome blocks auto-playing videos with sound by default,
+  we need to have some form of user interaction first (the
+  "Click to Activate" screen). But if the user repeatedly
+  interacts with a site, chrome will eventually remember
+  and stop blocking. It would be nice to try auto-playing
+  a video with sound, and then only show the CTA screen if
+  autoplay fails, so that regular users can get straight
+  into the action.

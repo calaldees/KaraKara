@@ -33,6 +33,12 @@ const Lyrics = ({state}) => (
 // Screens
 // ====================================================================
 
+const ClickScreen = ({state, actions}) => (
+    <div className={"screen_title"}>
+        <h1 onclick={() => actions.click()}>Click to Activate</h1>
+    </div>
+);
+
 const TitleScreen = ({state, actions}) => (
     <div className={"screen_title"}>
         <h1>{state.settings["karakara.player.title"]}</h1>
@@ -48,7 +54,9 @@ const PreviewScreen = ({state, actions}) => (
         <div className="preview_holder">
             <video src={get_attachment(state, state.queue[0].track, 'preview')}
                    poster={get_attachment(state, state.queue[0].track, 'thumbnail')}
-                   autoPlay={true} loop={true} muted={true} />
+                   autoPlay={true}
+                   onloadstart={e => {e.target.volume = state.settings["karakara.player.video.preview_volume"]}}
+                   loop={true} />
             <video src={get_attachment(state, state.queue[0].track, 'video')}
                    preload={"auto"} muted={true} style={{display: "none"}} />
         </div>
@@ -152,7 +160,9 @@ const PodiumScreen = ({state, actions}) => (
 function view(state, actions) {
     let screen = <div>Unknown state :(</div>;
 
-    if(state.queue.length === 0)
+    if(!state.clicked)
+        screen = <ClickScreen state={state} actions={actions} />;
+    else if(state.queue.length === 0)
         screen = <TitleScreen state={state} actions={actions} />;
     else if(window.location.hash === "#podium")
         screen = <PodiumScreen state={state} actions={actions} />;
