@@ -73,7 +73,7 @@ function get_hostname() {
     else return document.location.hostname;
 }
 function get_queue_id() {
-    if(document.location.protocol === "file:") return "shish";
+    if(document.location.protocol === "file:") return "demo";
     else return getUrlParameter("queue_id");
 }
 
