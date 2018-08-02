@@ -30,7 +30,6 @@ SETTINGS_TYPE_MAPPING = {
     'karakara.player.video.preview_volume': 'float',
     'karakara.player.video.skip.seconds': 'int',
     'karakara.player.queue.update_time': 'timedelta',
-    'karakara.player.help.timeout': 'int',
 
     'karakara.queue.group.split_markers': 'timedelta',
     'karakara.queue.track.padding': 'timedelta',
@@ -66,7 +65,6 @@ DEFAULT_SETTINGS = {
     'karakara.player.video.preview_volume': 0.10,
     'karakara.player.video.skip.seconds': 20,
     'karakara.player.queue.update_time': '0:00:03',
-    'karakara.player.help.timeout': 2,
 
     'karakara.queue.group.split_markers': '[0:15:00, 0:30:00]',
     'karakara.queue.track.padding': '0:00:60',

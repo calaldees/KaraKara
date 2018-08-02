@@ -71,8 +71,6 @@ System Operation
 * `karakara.player.queue.update_time` (timedelta)
   * The time between poll refreshes.
   * Not used in normal operation as the projector will have a websocket connection.
-* `karakara.player.help.timeout` (int)
-  * Time in seconds for the popup help to display when the mouse is moved
 * `karakara.websocket.disconnected_retry_interval` (int)
   * Number of seconds to attempt a websocket reconnect if the connection fails
 

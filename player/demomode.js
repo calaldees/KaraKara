@@ -33,7 +33,6 @@ var demo_settings = {
 			"karakara.websocket.disconnected_retry_interval": 10,
 			"karakara.player.video.preview_volume": 10,
 			"karakara.player.video.skip.seconds": 10,
-			"karakara.player.help.timeout": 0  // help disabled
 		}
 	},
 	"identity": {

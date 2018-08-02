@@ -10,7 +10,6 @@ var SETTINGS_DEFAULT = {
 	"karakara.player.video.preview_volume":  0.2,
 	"karakara.player.video.skip.seconds"  : 20,
 	"karakara.player.queue.update_time"   :  3 , //Seconds to poll server
-	"karakara.player.help.timeout"        :  2,
 	"karakara.websocket.path"             : null,
 	"karakara.websocket.port"             : null,
 	"karakara.websocket.disconnected_retry_interval": 5, // Seconds to retry websocket in the event of disconnection
@@ -587,16 +586,6 @@ function attach_events() {
 		if (e.which in KEYCODE) {
 			e.preventDefault();
 		}
-	});
-	// Help Popup
-	$(document).on('mousemove', function(e) {
-		if (!settings["karakara.player.help.timeout"]) {return;}
-		if (mousemove_timeout) {
-			clearTimeout(mousemove_timeout);
-			mousemove_timeout = null;
-		}
-		mousemove_timeout = setTimeout(function(){$('body').removeClass('show_help');}, settings["karakara.player.help.timeout"]*1000);
-		$('body').addClass('show_help');
 	});
 }
 
