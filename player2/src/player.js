@@ -8,14 +8,6 @@ const player = app(state, actions, view, document.body);
 
 
 // ====================================================================
-// Initial connect & sync
-// ====================================================================
-
-player.check_settings();
-player.check_queue();
-
-
-// ====================================================================
 // Network controls
 // ====================================================================
 
@@ -55,7 +47,7 @@ function setup_websocket() {
         player.set_connected(false);
     };
     socket.onmessage = function(msg) {
-        const cmd = $.trim(msg.data);
+        const cmd = msg.data.trim();
         console.log('Websocket: Remote command: '+cmd);
         const commands = {
             "skip": player.dequeue,
@@ -73,6 +65,7 @@ function setup_websocket() {
     };
     return socket;
 }
+player.set_socket(setup_websocket());
 
 
 // ====================================================================
@@ -89,7 +82,6 @@ document.onkeydown = function(e) {
         case "ArrowLeft"  : player.seek_backwards(); break;
         case "ArrowRight" : player.seek_forwards(); break;
         case "Space"      : player.pause(); break;
-        case "u"          : player.check_settings(); player.check_queue(); break; // update
         default: handled = false;
     }
     if (handled) {
@@ -107,13 +99,14 @@ if(window.location.hash === "#podium") {
     setInterval(
         function() {
             let state = player.get_state();
+            if(state.paused) return;
             if(!state.playing) {
                 if(state.settings["karakara.player.autoplay"] === 0) return;
-                if(state.progress >= state.settings["karakara.player.autoplay"]) {player.play();}
+                if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send_play();}
                 else {player.set_progress(state.progress + 1/FPS);}
             }
             else {
-                if(state.progress >= state.queue[0].track.duration) {player.stop();}
+                if(state.progress >= state.queue[0].track.duration) {player.dequeue();}
                 else {player.set_progress(state.progress + 1/FPS);}
             }
         },

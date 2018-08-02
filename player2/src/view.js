@@ -89,7 +89,7 @@ const VideoScreen = ({state, actions}) => (
         <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
                ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
-               onended={() => actions.dequeue()}
+               onended={() => actions.send_ended()}
         />
         <div id="seekbar" style={{
             left: ((state.progress / state.queue[0].track.duration) * 100) + "%"
@@ -130,7 +130,7 @@ const PodiumScreen = ({state, actions}) => (
                     {s_to_mns(state.queue[0].track.duration)}
                 )</small>
             </div> :
-            <div className={"startButton"} onclick={() => actions.play()}
+            <div className={"startButton"} onclick={() => actions.send_play()}
                  style={{"background-position": (100 - (state.progress / state.settings["karakara.player.autoplay"] * 100))+"%"}}>
                 <span>
                     Press to Start

@@ -15,27 +15,55 @@ const state = {
         "karakara.player.video.skip.seconds"  : 20,
         "karakara.player.autoplay"            : 30, // Autoplay after X seconds
         "karakara.player.subs_on_screen"      : true, // Set false if using podium
-        "karakara.websocket.path"             : null,
+        "karakara.websocket.path"             : "/ws/",
         "karakara.websocket.port"             : null,
         "karakara.event.end"                  : null,
     },
+    socket: null,
 
     // playlist screen
     queue: [],
 
     // video screen
     playing: false,
+    paused: false,
     progress: 0,
 };
 
 const actions = {
-    dequeue: () => state => ({ queue: state.queue.slice(1), playing: false, progress: 0 }),
-    // enqueue: () => state => ({ queue: state.queue.concat(random_track()) }),
-    play: () => () => ({ playing: true, progress: 0 }),
-    stop: () => () => ({ playing: false, progress: 0 }),
+    dequeue: () => state => ({
+        // remove the first song
+        queue: state.queue.slice(1),
+        // and stop playing (same as .stop(), but we
+        // want to do it all in a single state update
+        // to avoid rendering an incomplete state)
+        playing: false,
+        paused: false,
+        progress: 0,
+    }),
+    play: () => (state) => ({
+        playing: true,
+        // if we're already playing, leave the state alone;
+        // if we're starting a new song, start it un-paused from 0s
+        paused: state.playing ? state.paused : false,
+        progress: state.playing ? state.progress : 0,
+    }),
+    stop: () => () => ({
+        playing: false,
+        paused: false,
+        progress: 0,
+    }),
     get_state: () => state => state,
+    set_socket: value => () => ({ socket: value }),
     set_progress: value => () => ({ progress: value }),
     set_connected: value => () => ({ connected: value }),
+
+    // Tell the network as a whole what to do. We could
+    // react to these signals immediately, but by sending
+    // them remotely and waiting for a response, all the
+    // clients can be more in sync.
+    send_play: value => (state, actions) => {state.socket.send("play");},
+    send_ended: value => (state, actions) => {state.socket.send("ended");},
 
     check_settings: () => (state, actions) => {
         api(state, "settings", function(data) {
@@ -60,17 +88,23 @@ const actions = {
     // state is separated from the application state :(
     pause: value => (state, actions) => {
         const video = document.getElementsByTagName("video")[0];
-        if (!video) {return;}
-        if (video.paused) {video.play();}
-        else              {video.pause();}
+        if (video) {
+            if (state.paused) {video.play();}
+            else              {video.pause();}
+        }
+        return { paused: !state.paused };
     },
     seek_forwards: value => (state, actions) => {
+        const skip = state.settings["karakara.player.video.skip.seconds"];
         const video = document.getElementsByTagName("video")[0];
-        if(video) video.currentTime += state.settings["karakara.player.video.skip.seconds"];
+        if(video) video.currentTime += skip;
+        return { progress: state.progress + skip };
     },
     seek_backwards: value => (state, actions) => {
+        const skip = state.settings["karakara.player.video.skip.seconds"];
         const video = document.getElementsByTagName("video")[0];
-        if(video) video.currentTime -= state.settings["karakara.player.video.skip.seconds"];
+        if(video) video.currentTime -= skip;
+        return { progress: state.progress - skip };
     },
 };
 
