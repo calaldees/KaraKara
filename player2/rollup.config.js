@@ -9,11 +9,6 @@ import { uglify } from 'rollup-plugin-uglify';
 import glob from 'glob';
 let styles = glob.sync("src/**/*.scss").map(a => "./" + a);
 
-// `npm run build` -> `production` is true
-// `npm run dev` -> `production` is false
-const production = !process.env.ROLLUP_WATCH;
-
-
 export default {
     input: ['./src/player.js'].concat(styles),
     output: {
@@ -42,6 +37,6 @@ export default {
         commonjs({namedExports: {
                 'node_modules/subtitle/dist/subtitle.bundle.js': ['Subtitle'],
             }}),
-        production && uglify(), // minify, but only in production
+        uglify(),
     ]
 };
