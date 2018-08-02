@@ -32,16 +32,16 @@ function setup_websocket() {
 
     const socket = new ReconnectingWebSocket(websocket_url);
     socket.onopen = function() {
-        // Authenticate client with session key on socket connect
-        // TODO - replace with use of settings['session_key'] or server could
-        // just use the actual http-header
-        const session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];
-        socket.send(session_key);
         player.set_connected(true);
         // now that we're connected, make sure state is in
         // sync for the websocket to send incremental updates
         player.check_settings();
         player.check_queue();
+        // Authenticate client with session key on socket connect
+        // TODO - replace with use of settings['session_key'] or server could
+        // just use the actual http-header
+        const session_key = document.cookie.match(/karakara_session=([^;\s]+)/)[1];
+        socket.send(session_key);
     };
     socket.onclose = function() {
         player.set_connected(false);

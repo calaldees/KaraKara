@@ -63,6 +63,12 @@ function get_lyrics(state, track) {
     return Subtitle.parse(data);
 }
 
+// get a tag if it is defined, else blank
+function get_tag(tag) {
+    if(tag) return tag[0];
+    else return "";
+}
+
 // figure out where our server is, accounting for local file:// mode
 function get_protocol() {
     if(document.location.protocol === "file:") return "https:";
@@ -80,11 +86,11 @@ function get_queue_id() {
 //http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
 // TODO: ES6 this
 function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) {
+    const sPageURL = window.location.search.substring(1);
+    const sURLVariables = sPageURL.split('&');
+    for (let i = 0; i < sURLVariables.length; i++) {
+        let sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] === sParam) {
             return decodeURIComponent(sParameterName[1]);
         }
     }
@@ -94,6 +100,7 @@ function getUrlParameter(sParam) {
 export {
     timedelta_str,
     get_attachment,
+    get_tag,
     s_to_mns,
     get_hostname,
     get_queue_id,
