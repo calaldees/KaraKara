@@ -156,7 +156,12 @@ def main(global_config, **settings):
     if config.registry.settings.get('karakara.websocket.port'):
         def authenticator(key):
             """Only admin authenticated keys can connect to the websocket"""
-            request = pyramid.request.Request({'HTTP_COOKIE':'{0}={1}'.format(config.registry.settings['session.cookie_name'],key)})
+            cookie_name = config.registry.settings['session.cookie_name']
+            if cookie_name in key:
+                cookie = key
+            else:
+                cookie = '{0}={1}'.format(cookie_name, key)
+            request = pyramid.request.Request({'HTTP_COOKIE': cookie})
             session_data = session_factory(request)
             return session_data and session_data.get('admin')
         def _int_or_none(setting_key):
