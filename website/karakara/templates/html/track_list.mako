@@ -13,6 +13,12 @@
         <table>
             <thead>
                 <tr>
+                    <td class="instructions" colspan="${len(fields)}">
+                        Join at <strong>${request.domain}</strong> -
+                        Queue is <strong>${request.context.queue_id}</strong>
+                    </td>
+                </tr>
+                <tr>
                     % for field in fields:
                     <th>${field}</th>
                     % endfor
