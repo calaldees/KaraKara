@@ -13,19 +13,33 @@
         <table>
             <thead>
                 <tr>
-                    % for field in fields:
-                    <th>${field}</th>
-                    % endfor
+                % for column in fields:
+                    <th>
+                        % for n, field in enumerate(column.split("-")):
+                            % if n > 0:
+                                -
+                            % endif
+                            ${field}
+                        % endfor
+                    </th>
+                % endfor
                 </tr>
             </thead>
             <tbody>
-        % for track in data.get('list',[]):
-<tr>\
-                % for field in fields:
-<td class="col_${field}">${track.get(field,'') or h.tag_hireachy(track['tags'], field) }</td>\
+            % for track in data.get('list',[]):
+                <tr>\
+                % for column in fields:
+                    <td class="col_${column}">
+                    % for n, field in enumerate(column.split("-")):
+                        % if n > 0:
+                            -
+                        % endif
+                        ${track.get(field,'') or h.tag_hireachy(track['tags'], field)}
+                    % endfor
+                    </td>\
                 % endfor
-</tr>
-        % endfor
+                </tr>
+            % endfor
             </tbody>
         </table>
     </body>
