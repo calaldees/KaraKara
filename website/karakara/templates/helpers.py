@@ -54,7 +54,7 @@ def paths_for_queue(queue_id):
     return {
         **{
             'queue': pyramid.traversal.resource_path(queue_context),
-            'player': f'/player/player.html?queue_id={queue_context.id}',
+            'player': f'/player2/index.html#queue_id={queue_context.id}',
         },
         **{
             route_name: pyramid.traversal.resource_path(queue_context[route_name])
