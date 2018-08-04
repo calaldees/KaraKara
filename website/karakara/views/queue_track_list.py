@@ -66,6 +66,8 @@ def track_list_all(request):
     short_id_length = request.queue.settings.get('karakara.print_tracks.short_id_length', 6)
     for track in track_list:
         track['id_short'] = track['id'][:short_id_length]
+        if track['tags'].get('vocaltrack') == ["off"]:
+            track['title'] += " (Karaoke Ver)"
 
     # Sort track list
     #  this needs to be handled at the python layer because the tag logic is fairly compicated

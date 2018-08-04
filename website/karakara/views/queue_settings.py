@@ -89,7 +89,7 @@ DEFAULT_SETTINGS = {
     'karakara.search.list.alphabetical.threshold': 90,
     'karakara.search.list.alphabetical.tags': '[from, artist]',
 
-    'karakara.print_tracks.fields': '[category, from, use, title, artist, vocaltrack, length]',
+    'karakara.print_tracks.fields': '[category, from, use, title, artist, length]',
     'karakara.print_tracks.short_id_length': 4,
 
     'karakara.event.end': '',
