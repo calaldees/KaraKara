@@ -426,7 +426,7 @@ $LIGHT: #29EDF2;
 			@include border;
 		}
 
-		.lyrics {
+		.lyrics, .preview_holder {
 			@include border;
 			position: absolute;
 			top: 22vh;
@@ -445,6 +445,11 @@ $LIGHT: #29EDF2;
 				.past {color: gray; display: none;}
 				.present {color: white;}
 				.future {color: #880;}
+			}
+			VIDEO {
+				width: 100%;
+				height: 100%;
+				background: black;
 			}
 		}
 

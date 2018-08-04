@@ -54,13 +54,13 @@ function get_attachment(state, track, type) {
 // get_attachment(srt) + parse SRT file
 function get_lyrics(state, track) {
     let xhr = new XMLHttpRequest();
-    let data = "";
+    let data = null;
     xhr.open('GET', get_attachment(state, track, "srt"), false);
     xhr.onload = function(e) {
         data = e.target.responseText;
     };
     xhr.send();
-    return Subtitle.parse(data);
+    return data ? Subtitle.parse(data) : null;
 }
 
 // get a tag if it is defined, else blank

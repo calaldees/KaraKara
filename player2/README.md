@@ -61,9 +61,6 @@ npm run watch    # auto-compile on changes
   - Also on the server side? Client should specify *which*
     track has ended, so the server can ignore that message
     if the track in question has already gone?
-- Are there any hardsub-only songs, without .srt files? For
-  those, the podium should display the video instead of an
-  empty lyric sheet
 - Lyrics embedded in the queue.json would be wonderful, so
   that we don't need to go and fetch and parse the .srt for
   ourselves for every song for every queue update...

@@ -114,7 +114,7 @@ const VideoScreen = ({state, actions}) => (
             Contributed by {get_tag(state.queue[0].track.tags.contributor)}
         </div>
         */}
-        {state.settings["karakara.player.subs_on_screen"] ?
+        {(state.settings["karakara.player.subs_on_screen"] && state.queue[0].track.lyrics) ?
             <Lyrics state={state} /> :
             null
         }
@@ -126,7 +126,20 @@ const PodiumScreen = ({state, actions}) => (
     <div className={"screen_podium"}>
         <h1>{state.queue[0].performer_name} - {get_tag(state.queue[0].track.tags.title)}</h1>
 
-        <Lyrics state={state} />
+        {/*
+        if we have lyrics, show them, else show the video,
+        give the video key=playing so that it creates a new
+        object when switching from preview to play
+         */}
+        {state.queue[0].track.lyrics ?
+            <Lyrics state={state} /> :
+            <div className="preview_holder">
+                <video src={get_attachment(state, state.queue[0].track, 'video')}
+                       autoPlay={true} muted={!state.playing}
+                       key={state.playing}
+                />
+            </div>
+        }
 
         {state.playing ?
             <div className={"progressBar"}
@@ -173,7 +186,7 @@ function view(state, actions) {
 
     return <div className={"theme-" + state.settings["karakara.player.theme"]}>
         {screen}
-    </div>
+    </div>;
 }
 
 export { view };
