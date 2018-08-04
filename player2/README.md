@@ -61,9 +61,6 @@ npm run watch    # auto-compile on changes
   - Also on the server side? Client should specify *which*
     track has ended, so the server can ignore that message
     if the track in question has already gone?
-- Get the auth token from the HTTP header, because when doing
-  CORS the client can't actually see the cookie that it needs
-  to send to the websocket server
 - Are there any hardsub-only songs, without .srt files? For
   those, the podium should display the video instead of an
   empty lyric sheet
