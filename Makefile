@@ -70,10 +70,11 @@ install: .env
 # Test ------------------------------------------------------------------------
 
 .PHONY: test
-test:
-	for project in $(PROJECTS); do \
-		$(MAKE) test --no-keep-going --directory $$project ; \
-	done
+test: .env
+	docker-compose --file .\docker-compose.pytest.yml run test_web
+	#for project in $(PROJECTS); do \
+	#	$(MAKE) test --no-keep-going --directory $$project ; \
+	#done
 
 # Cloc ------------------------------------------------------------------------
 
