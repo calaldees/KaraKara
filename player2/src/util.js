@@ -1,14 +1,16 @@
 import Subtitle from 'subtitle';
 import xhr from 'xhr';
+const queryString = require('query-string');
 
 // GET /queue/${queue_id}/${url}.json
-function api(state, url, callback) {
+function api(state, method, url, params, callback) {
     xhr({
-        method: "GET",
+        method: method,
         uri: (
             "https://" + get_hostname() +
             "/queue/" + get_queue_id() + "/" +
-            url + ".json"
+            url + ".json" +
+            "?" + queryString.stringify(params)
         ),
         useXDR: true,  // cross-domain, so file:// can reach karakara.org.uk
         json: true,
@@ -80,21 +82,7 @@ function get_hostname() {
 }
 function get_queue_id() {
     if(document.location.protocol === "file:") return "demo";
-    else return getUrlParameter("queue_id");
-}
-
-//http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
-// TODO: ES6 this
-function getUrlParameter(sParam) {
-    const sPageURL = window.location.search.substring(1);
-    const sURLVariables = sPageURL.split('&');
-    for (let i = 0; i < sURLVariables.length; i++) {
-        let sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] === sParam) {
-            return decodeURIComponent(sParameterName[1]);
-        }
-    }
-    return '';
+    else return queryString.parse(location.search)["queue_id"];
 }
 
 export {

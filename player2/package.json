@@ -23,6 +23,7 @@
         "hyperapp": "^1.2.8",
         "reconnecting-websocket": "^3.2.2",
         "subtitle": "latest",
+        "query-string": "latest",
         "xhr": "latest"
     },
     "scripts": {
