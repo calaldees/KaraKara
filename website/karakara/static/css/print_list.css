@@ -1,6 +1,13 @@
+@page {
+    size: landscape;
+}
 html {
     font-family: sans-serif;
     padding: 0.5em;
+}
+body {
+    column-count: 2;
+    column-rule: 1px solid black;
 }
 table {
     font-size: 8px;
