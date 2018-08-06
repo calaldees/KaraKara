@@ -31,3 +31,8 @@ th {
 td.col_id_short {
     text-transform:none;
 }
+td.instructions {
+    text-transform: none;
+    text-align: center;
+    font-size: 2em;
+}
