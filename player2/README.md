@@ -57,10 +57,6 @@ npm run watch    # auto-compile on changes
 
 ## High-level TODO List:
 
-- Ensure that repeated "ended" signals are only handled once
-  - Also on the server side? Client should specify *which*
-    track has ended, so the server can ignore that message
-    if the track in question has already gone?
 - Lyrics embedded in the queue.json would be wonderful, so
   that we don't need to go and fetch and parse the .srt for
   ourselves for every song for every queue update...
