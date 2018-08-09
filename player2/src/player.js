@@ -5,6 +5,7 @@ import { view } from "./view";
 import { get_protocol, get_hostname } from "./util";
 
 const player = app(state, actions, view, document.body);
+window.player = player; // make this global for debugging
 
 
 // ====================================================================
