@@ -1,5 +1,6 @@
 import { app } from "hyperapp";
 import ReconnectingWebSocket from "reconnecting-websocket";
+
 import { state, actions } from "./state";
 import { view } from "./view";
 import { get_protocol, get_hostname } from "./util";

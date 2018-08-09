@@ -6,10 +6,15 @@ lyrics and a "start" button)
 
 ## TL;DR:
 
-Player2 comes pre-built with compiled files in /lib, just visit
-`index.html`. There are two parameters: `?queue_id=XXX` tells
-P2 which queue to monitor from the server, and `#podium` will
-display the singer view instead of the playlist view.
+```
+npm install      # install build toolchain
+npm run build    # compile src/* to dist/*
+```
+
+Visit the player at
+`http://localhost/player2/index.html?queue_id=my_queue`
+
+Add `#podium` to the end of the URL to get the singer view.
 
 ## New Features Since Player1:
 
@@ -37,7 +42,6 @@ If you want to develop new features:
 
 ```
 npm install      # install build toolchain
-npm run build    # compile src/* to lib/*
 npm run watch    # auto-compile on changes
 ```
 

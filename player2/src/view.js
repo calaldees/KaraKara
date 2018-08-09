@@ -1,5 +1,7 @@
-import { h } from "hyperapp";  // JSX will be turned into h by rollup
+import { h } from "hyperapp";  // JSX will be turned into "h" by rollup
+
 import { timedelta_str, get_attachment, get_tag, s_to_mns, get_hostname, get_queue_id } from "./util.js";
+
 const show_tracks = 5;
 
 
@@ -8,7 +10,7 @@ const show_tracks = 5;
 // ====================================================================
 
 function _lineStyle(item, state) {
-    const ts = state.progress * 1000;
+    const ts = state.progress;
     if(!state.playing) return "present";
     if(item.text === "-") return "past";
     if(item.start < ts && item.end > ts) return "present";
@@ -20,7 +22,7 @@ const Lyrics = ({state}) => (
     <div className={"lyrics"}>
         <ol>
             {state.queue[0].track.lyrics.map((item) =>
-                <li key={item.start} className={_lineStyle(item, state)}>
+                <li key={item.id} className={_lineStyle(item, state)}>
                     <span>{item.text}</span>
                 </li>
             )}

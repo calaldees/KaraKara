@@ -1,4 +1,4 @@
-import Subtitle from 'subtitle';
+import parseSRT from 'parse-srt';
 import xhr from 'xhr';
 import queryString from 'query-string';
 
@@ -70,7 +70,7 @@ function get_lyrics(state, track) {
         data = e.target.responseText;
     };
     xhr.send();
-    return data ? Subtitle.parse(data) : null;
+    return data ? parseSRT(data) : null;
 }
 
 // get a tag if it is defined, else blank

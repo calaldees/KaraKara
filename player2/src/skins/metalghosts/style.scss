@@ -4,7 +4,7 @@ $LIGHT: #29EDF2;
 
 @font-face {
 	font-family: metalghosts;
-	src: url('../src/skins/metalghosts/Xolonium-Regular.ttf');
+	src: url('Xolonium-Regular.ttf');
 	font-weight:400;
 }
 @mixin border {
@@ -40,8 +40,8 @@ $LIGHT: #29EDF2;
 	/*---------------------------------------------------------------------------*/
 
 	background:
-		url('../src/skins/metalghosts/background.png'),
-		url('../src/skins/metalghosts/perlin.jpg');
+		url('background.png'),
+		url('perlin.jpg');
 	background-size: cover, 200% 200%;
 	animation: bgscroll 30s linear infinite;
 
