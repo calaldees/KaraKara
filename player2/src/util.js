@@ -1,22 +1,30 @@
 import Subtitle from 'subtitle';
 import xhr from 'xhr';
-const queryString = require('query-string');
+import queryString from 'query-string';
 
 // GET /queue/${queue_id}/${url}.json
 function api(state, method, url, params, callback) {
+    const uri = (
+        "https://" + get_hostname() +
+        "/queue/" + get_queue_id() + "/" +
+        url + ".json" +
+        "?" + queryString.stringify(params)
+    );
     xhr({
         method: method,
-        uri: (
-            "https://" + get_hostname() +
-            "/queue/" + get_queue_id() + "/" +
-            url + ".json" +
-            "?" + queryString.stringify(params)
-        ),
+        uri: uri,
         useXDR: true,  // cross-domain, so file:// can reach karakara.org.uk
         json: true,
     }, function (err, resp, body) {
-        if(resp.statusCode === 200) callback(body.data);
-        else console.log(err, resp, body);
+        console.groupCollapsed("api(" + uri + ")");
+        if(resp.statusCode === 200) {
+            console.log(body.data);
+            callback(body.data);
+        }
+        else {
+            console.log(err, resp, body);
+        }
+        console.groupEnd();
     })
 
 }
