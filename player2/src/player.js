@@ -12,8 +12,7 @@ window.player = player; // make this global for debugging
 // Network controls
 // ====================================================================
 
-// TODO: onended = dequeue() + report completion to server
-function setup_websocket() {
+function create_websocket() {
     const settings = player.get_state().settings;
     const ws_path = settings['karakara.websocket.path'];
     const ws_port = settings['karakara.websocket.port'];
@@ -33,18 +32,21 @@ function setup_websocket() {
 
     const socket = new ReconnectingWebSocket(websocket_url);
     socket.onopen = function() {
+        console.log("websocket_onopen()");
         player.set_connected(true);
+        // player.send("ping"); // auth doesn't actually happen until the first packet
         // now that we're connected, make sure state is in
         // sync for the websocket to send incremental updates
         player.check_settings();
         player.check_queue();
     };
     socket.onclose = function() {
+        console.log("websocket_onclose()");
         player.set_connected(false);
     };
     socket.onmessage = function(msg) {
         const cmd = msg.data.trim();
-        console.log('Websocket: Remote command: '+cmd);
+        console.log("websocket_onmessage("+ cmd +")");
         const commands = {
             "skip": player.dequeue,
             "play": player.play,
@@ -61,7 +63,7 @@ function setup_websocket() {
     };
     return socket;
 }
-player.set_socket(setup_websocket());
+player.set_socket(create_websocket());
 
 
 // ====================================================================
@@ -98,7 +100,7 @@ if(window.location.hash === "#podium") {
             if(state.paused) return;
             if(!state.playing) {
                 if(state.settings["karakara.player.autoplay"] === 0) return;
-                if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send_play();}
+                if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send("play");}
                 else {player.set_progress(state.progress + 1/FPS);}
             }
             else {
