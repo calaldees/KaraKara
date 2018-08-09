@@ -12,9 +12,9 @@ npm run build    # compile src/* to dist/*
 ```
 
 Visit the player at
-`http://localhost/player2/index.html?queue_id=my_queue`
+`http://localhost/player2/index.html#queue_id=my_queue`
 
-Add `#podium` to the end of the URL to get the singer view.
+Add `&podium` to the end of the URL to get the singer view.
 
 ## New Features Since Player1:
 
@@ -44,6 +44,10 @@ If you want to develop new features:
 npm install      # install build toolchain
 npm run watch    # auto-compile on changes
 ```
+
+Also you can add `&hostname=...` to the URL to specify a
+particular karakara server (defaults to `karakara.org.uk` if
+you open index.html from the local hard drive)
 
 ## Developer Notes:
 

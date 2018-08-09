@@ -1,5 +1,6 @@
 import { app } from "hyperapp";
 import ReconnectingWebSocket from "reconnecting-websocket";
+import queryString from 'query-string';
 
 import { state, actions } from "./state";
 import { view } from "./view";
@@ -93,7 +94,7 @@ document.onkeydown = function(e) {
 // Auto-play for podium mode
 // ====================================================================
 
-if(window.location.hash === "#podium") {
+if(queryString.parse(location.hash).podium) {
     const FPS = 5;
     setInterval(
         function() {

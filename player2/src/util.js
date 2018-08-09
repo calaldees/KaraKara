@@ -85,12 +85,14 @@ function get_protocol() {
     else return document.location.protocol;
 }
 function get_hostname() {
-    if(document.location.protocol === "file:") return "karakara.org.uk";
+    const specified = queryString.parse(location.hash).hostname;
+    if(specified) return specified;
+    else if(document.location.protocol === "file:") return "karakara.org.uk";
     else return document.location.hostname;
 }
 function get_queue_id() {
-    if(document.location.protocol === "file:") return "demo";
-    else return queryString.parse(location.search)["queue_id"];
+    const specified = queryString.parse(location.hash).queue_id;
+    return specified ? specified : "demo";
 }
 
 export {
