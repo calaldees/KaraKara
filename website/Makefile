@@ -124,9 +124,9 @@ $(CONFIG_PATH)/production.inidiff:
 	cp $(CONFIG_SOURCE_PATH)/production.inidiff.dist $@
 .PHONY: ini_test ini_production
 ini_test: clean_ini $(INI_DEV) $(CONFIG_PATH)/test.inidiff
-	$(PYTHON) $(EXTERNAL_PATH)/lib/make_ini.py $(INI_DEV) $(CONFIG_PATH)/test.inidiff $(INI_TEST)
+	$(PYTHON) -m calaldees.apps.make_ini $(INI_DEV) $(CONFIG_PATH)/test.inidiff $(INI_TEST)
 ini_production: clean_ini $(INI_DEV) $(CONFIG_PATH)/production.inidiff
-	$(PYTHON) $(EXTERNAL_PATH)/lib/make_ini.py $(INI_DEV) $(CONFIG_PATH)/production.inidiff $(INI_PROD)
+	$(PYTHON) -m calaldees.apps.make_ini $(INI_DEV) $(CONFIG_PATH)/production.inidiff $(INI_PROD)
 
 $(CONFIG_PATH)/search_config.json:
 	cp config/search_config.json.dist $@
@@ -170,7 +170,7 @@ shell_production: ini_production
 # Test -------------------------------------------------------------------------
 .PHONY: test test_crawl
 
-test: $(DATABASE_DEV) ini_test
+test: install $(DATABASE_DEV) ini_test
 	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# --capture=sys
 
