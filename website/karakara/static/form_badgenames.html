@@ -11,35 +11,25 @@
 	<body>
 		<script type="text/javascript">
 
-			function getUrlParameter(sParam) {
-				//http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
-				// TODO: ES6 this
-				var sPageURL = window.location.search.substring(1);
-				var sURLVariables = sPageURL.split('&');
-				for (var i = 0; i < sURLVariables.length; i++) {
-					var sParameterName = sURLVariables[i].split('=');
-					if (sParameterName[0] == sParam) {
-						return decodeURIComponent(sParameterName[1]);
-					}
-				}
-				return '';
-			}
-
 			function _submit() {
+				const urlParams = new URLSearchParams(window.location.search);
+
 				const badgenames = document.getElementById("badgenames").value.split("\n").map((x)=>x.trim());
 
 				const xhttp = new XMLHttpRequest();
-				var queue_settings_url = getUrlParameter('queue_settings_url');
-				xhttp.open("POST", queue_settings_url, false);
+				const url = `${urlParams.get('queue_settings_url')}`;  //.json
+				console.log(url);
+				xhttp.open("PUT", url, false);
 
-				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xhttp.send("method=PUT&karakara.queue.add.valid_performer_names="+encodeURI("["+badgenames.join(', ')+"]"));
+				// TODO: Replace form-urlencoded with json. We have a bug where this form submit breaks with '&' in usernames
+				//xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				//xhttp.send("method=PUT&karakara.queue.add.valid_performer_names="+encodeURI("["+badgenames.join(', ')+"]"));
 
-				//xhttp.setRequestHeader("Content-type", "application/json");
-				//xhttp.send(JSON.stringify({
-				//	"method": "PUT",
-				//	"karakara.queue.add.valid_performer_names": badgenames,
-				//}));
+				xhttp.setRequestHeader("Content-type", "application/json");
+				xhttp.send(JSON.stringify({
+					"method": "PUT",
+					"karakara.queue.add.valid_performer_names": badgenames,
+				}));
 
 				if (xhttp.status >= 200 && xhttp.status <= 299) {
 					alert('Updated OK');
