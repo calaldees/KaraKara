@@ -2,14 +2,14 @@ import sys
 import re
 import operator
 
-from libs.misc import postmortem, file_extension_regex, fast_scan_regex_filter
-from libs.file import FolderStructure
+from calaldees.misc import postmortem, file_extension_regex, fast_scan_regex_filter
+from calaldees.file import FolderStructure
 from clint.textui.progress import bar as progress_bar
 
 from processmedia_libs import ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
 from processmedia_libs.meta_manager import MetaManager
-from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
+from processmedia_calaldees.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
@@ -111,4 +111,4 @@ def scan_media(**kwargs):
 
 if __name__ == "__main__":
     from _main import main
-    main('scan_media', scan_media, mtime_path='source', version=VERSION)
+    main('scan_media', scan_media, folder_type_to_derive_mtime='source', version=VERSION)

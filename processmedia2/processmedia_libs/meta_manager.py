@@ -3,7 +3,7 @@ import json
 import time
 import re
 
-from libs.misc import fast_scan, freeze
+from calaldees.misc import fast_scan, freeze
 
 import logging
 log = logging.getLogger(__name__)

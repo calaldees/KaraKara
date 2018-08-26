@@ -3,7 +3,7 @@ import os.path
 
 import yaml
 
-from libs.misc import file_extension_regex, duplicates
+from calaldees.misc import file_extension_regex, duplicates
 
 from . import EXTS
 

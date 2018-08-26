@@ -4,8 +4,8 @@ import sys
 import fcntl
 import os
 
-from libs.misc import postmortem
-from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
+from calaldees.misc import postmortem
+from processmedia_calaldees.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 import logging.config
@@ -14,9 +14,11 @@ log = logging.getLogger(__name__)
 
 DEFAULT_VERSION = '0.0.0'
 
-DEFAULT_LOCKFILE = '.lock'
-DEFAULT_CONFIG_FILENAME = 'config.json'
-DEFAULT_LOGGINGCONF = 'logging.json'
+DEFAULT_DATA_PATH = 'data'
+DEFAULT_LOCKFILE = os.path.join(DEFAULT_DATA_PATH, '.lock')
+DEFAULT_CONFIG_FILENAME = os.path.join(DEFAULT_DATA_PATH, 'config.json')
+DEFAULT_LOGGINGCONF = os.path.join(DEFAULT_DATA_PATH, 'logging.json')
+DEFAULT_MTIME_STORE_PATH = os.path.join(DEFAULT_DATA_PATH, 'mtimes.json')
 
 
 def main(
@@ -27,7 +29,7 @@ def main(
         version=DEFAULT_VERSION,
         description='',
         epilog='',
-        mtime_path=None,
+        folder_type_to_derive_mtime=None,
         lock=True,  # True = Exclusive execution. No other processmedia task can run while exclusive lock is on.
 ):
 
@@ -43,9 +45,12 @@ def main(
     parser.add_argument('--path_meta', action='store', help='')
 
     parser.add_argument('--force', action='store_true', help='ignore mtime optimisation check')
-    parser.add_argument('--pdb', action='store_true', help='drop into pdb on fail')
+
     parser.add_argument('--loggingconf', action='store', help='logfilename', default=DEFAULT_LOGGINGCONF)
     parser.add_argument('--lockfile', action='store', help='lockfilename, to ensure multiple encoders do not operate at once', default=DEFAULT_LOCKFILE)
+    parser.add_argument('--mtime_store_path', action='store', help='optimisation file that tracks the last time processing was done on a folder.', default=DEFAULT_MTIME_STORE_PATH)
+
+    parser.add_argument('--postmortem', action='store_true', help='drop into pdb on fail')
     parser.add_argument('--version', action='version', version=version)
 
     additional_arguments_function(parser)
@@ -69,21 +74,25 @@ def main(
     with open(kwargs['loggingconf'], 'rt') as filehandle:
         logging.config.dictConfig(json.load(filehandle))
 
-    # Optimisation to abort early if files to process have not chnaged since last time
-    if mtime_path:
-        fileset_monitor = FilesetChangeMonitor(path=kwargs['path_{}'.format(mtime_path)], name=name)
+    # Optimisation to abort early if files to process have not changed since last time
+    if folder_type_to_derive_mtime:
+        fileset_monitor = FilesetChangeMonitor(
+            mtime_store_path=kwargs['mtime_store_path'],
+            path=kwargs[f'path_{folder_type_to_derive_mtime}'],
+            name=name,
+        )
         if not kwargs.get('force') and not fileset_monitor.has_changed:
-            exit_message = "{} has not updated since last successful scan. Aborting. use `--force` to bypass this check".format(mtime_path)
+            exit_message = f'{folder_type_to_derive_mtime} has not updated since last successful scan. Aborting. use `--force` to bypass this check'
             sys.exit(exit_message)
 
     # Run main func (maybe with debugging)
-    if kwargs.get('pdb'):
+    if kwargs.get('postmortem'):
         return_value = postmortem(main_function, **kwargs)
     else:
         return_value = main_function(**kwargs)
 
     # Record optimisation
-    if mtime_path and not kwargs.get('force'):
+    if folder_type_to_derive_mtime and not kwargs.get('force'):
         fileset_monitor.has_changed = True
 
     main_function.calling_kwargs = kwargs

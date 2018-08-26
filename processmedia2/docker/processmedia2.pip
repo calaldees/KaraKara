@@ -1,0 +1,10 @@
+pyyaml
+dateutils
+clint
+chardet
+
+pytest
+pillow
+pytesseract
+
+git+https://github.com/calaldees/libs.git@master#egg=calaldees

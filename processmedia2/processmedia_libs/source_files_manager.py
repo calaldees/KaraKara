@@ -1,7 +1,7 @@
 import os
 from collections import ChainMap
 
-from libs.misc import file_ext, first
+from calaldees.misc import file_ext, first
 
 from . import EXTS
 

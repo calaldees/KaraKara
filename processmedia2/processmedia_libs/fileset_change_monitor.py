@@ -2,14 +2,14 @@ import os
 import json
 from functools import lru_cache
 
-from libs.misc import fast_scan
+from calaldees.misc import fast_scan
 
-MTIME_STORE_FILENAME = 'mtimes.json'
 
 
 class FilesetChangeMonitor(object):
 
-    def __init__(self, path, name):
+    def __init__(self, mtime_store_path, path, name):
+        self.mtime_store_path = mtime_store_path
         self.path = path
         self.name = name
 
@@ -28,10 +28,6 @@ class FilesetChangeMonitor(object):
             return len(mtimes) + max(mtimes)
         except ValueError:
             return 0
-
-    @property
-    def mtime_store_path(self):
-        return MTIME_STORE_FILENAME  # os.path.join(self.path, MTIME_STORE_FILENAME)
 
     @property
     def mtime_store(self):

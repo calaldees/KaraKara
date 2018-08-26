@@ -5,12 +5,12 @@ import json
 
 from clint.textui.progress import bar as progress_bar
 
-from libs.misc import postmortem, fast_scan, epoc, first
+from calaldees.misc import postmortem, fast_scan, epoc, first
 from processmedia_libs import PENDING_ACTION
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
-from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
+from processmedia_calaldees.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
@@ -179,7 +179,7 @@ def additional_arguments(parser):
 if __name__ == "__main__":
     from _main import main
     stats = main(
-        'import_media', import_media, mtime_path='meta',
+        'import_media', import_media, folder_type_to_derive_mtime='meta',
         additional_arguments_function=additional_arguments,
     )
     pprint({k: len(v) if len(v) > import_media.calling_kwargs['stat_limit'] else v for k, v in stats.items()})

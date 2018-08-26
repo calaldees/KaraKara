@@ -1,7 +1,7 @@
 {
     "version": 1,
     "disable_existing_loggers": false,
-    
+
     "formatters": {
         "simple": {
             "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -23,7 +23,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filename": "logs/processmedia.log",
+            "filename": "data/logs/processmedia.log",
             "maxBytes": 102400,
             "backupCount": 3,
             "encoding": "utf8"

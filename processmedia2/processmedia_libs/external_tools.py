@@ -17,7 +17,7 @@ except ImportError:
     Image = None
     log.error('Unable to import PIL (Python image library) - try installing Pillow')
 
-from libs.misc import cmd_args, color_close
+from calaldees.misc import cmd_args, color_close
 
 
 CRFFactorItem = namedtuple('CRFFactorItem', ['crf', 'pixels'])
@@ -25,11 +25,11 @@ CRFFactor = namedtuple('CRFFactor', ['lower', 'upper'])
 
 CONFIG = {
     'threads': 2,
-    'process_timeout_seconds': 60 * 30,  # There are some HUGE videos ... this timeout should be dramaticaly reduced when we've cleared out the crud
+    'process_timeout_seconds': 60 * 30,  # There are some HUGE videos ... this timeout should be dramatically reduced when we've cleared out the crud
     'log_level': 'warning',
     'h264_codec': 'libx264',  # 'libx264',  # 'h264',
     'preview_width': 320,
-    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhear to this and need correction.
+    'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
     'crf_factor': CRFFactor(CRFFactorItem(35, int(math.sqrt(320*240))), CRFFactorItem(45, int(math.sqrt(1280*720)))),
 }
 CONFIG.update({
@@ -87,17 +87,6 @@ ENCODE_VIDEO_COMMON_ARGS = cmd_args(
     loglevel=CONFIG['log_level'],
     y=None,
 )
-
-
-def check_tools():
-    """
-    Assert exteranl dependeycs
-    """
-    # check ffmpeg (with dependencys)
-    # check sox
-    # check jpegoptim
-    # check (h264 or libx264)?
-    pass
 
 
 CommandResult = namedtuple('CommandResult', ('success', 'result'))
@@ -272,7 +261,7 @@ def extract_image(source, destination, time=0.2):
             ),
             destination,
         ),
-        lambda: (os.path.exists(destination), 'expected destiantion image file was not generated (video source may be damaged) {0}'.format(source)),
+        lambda: (os.path.exists(destination), 'expected destination image file was not generated (video source may be damaged) {0}'.format(source)),
         lambda: _run_tool(
             'jpegoptim',
             #'--size={}'.format(CONFIG['jpegoptim']['target_size_k']),
@@ -295,7 +284,7 @@ def get_frame_from_video(url, time="00:00:10"):
 
     time string format - hh:mm:ss[.xxx]
 
-    Gets Image progressivly - Largers times read linearly from the beggining of the file
+    Gets Image progressively - Larger times read linearly from the beginning of the file
 
     >>> color_close((255, 0, 0), get_frame_from_video('tests/source/test1.mp4', 0).getpixel((0,0)))
     True

@@ -6,14 +6,14 @@ import random
 
 from clint.textui.progress import bar as progress_bar
 
-from libs.misc import postmortem, hashfile, freeze, first, file_ext
-from libs.file import FolderStructure
+from calaldees.misc import postmortem, hashfile, freeze, first, file_ext
+from calaldees.file import FolderStructure
 
 from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
-from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
+from processmedia_calaldees.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
@@ -363,7 +363,7 @@ def process_arguments(kwargs):
 if __name__ == "__main__":
     from _main import main
     main(
-        'encode_media', encode_media, mtime_path='meta', version=VERSION,
+        'encode_media', encode_media, folder_type_to_derive_mtime='meta', version=VERSION,
         additional_arguments_function=additional_arguments,
         additional_arguments_processing_function=process_arguments,
     )

@@ -1,9 +1,9 @@
 .PHONY: help
 help:
 	# Usage: make <target>, where target is
-	# install        -- Install os dependencys and setup python virtualenv
-	# install_env    --   just install python virtualenv
-	# run            -- Alias for 'scan + encode + import_media'
+	# install        -- just install python virtualenv
+	# install_os     -- Install os dependencys and setup python virtualenv
+	# run            -- Alias for 'install + scan + encode + import_media'
 	#
 	# scan           -- Scan source media folder + create metadata cache
 	# encode         -- Perform video encoding on required items
@@ -20,21 +20,27 @@ help:
 OS:=$(shell uname -s)
 LINUX_DISTRO:=$(shell lsb_release -a 2> /dev/null | grep "Distributor ID:" | sed 's|.*:.\(.*\)|\1|')
 
-PYTHON_VERSION:=3.6
-DEPENDENCIES_PYTHON:=dependencies.python.txt
+PYTHON_VERSION:=3.7
+DEPENDENCIES_PYTHON:=docker/processmedia2.pip
 DEPENDENCIES_APT:=dependencies.apt.txt
 DEPENDENCIES_BREW:=dependencies.brew.txt
 
-ENV:=_env
-PYTHON:=$(ENV)/bin/python$(PYTHON_VERSION)
-PIP:=$(ENV)/bin/pip$(PYTHON_VERSION)
-PYTEST:=$(ENV)/bin/py.test
+WRITE_PATH=data
+
+CONFIG_PATH=$(WRITE_PATH)/config
+LOG_PATH=$(WRITE_PATH)/logs
+ENV=$(WRITE_PATH)/_env
+PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
+PYTHON=$(PYTHONPATH_ENV)/bin/python$(PYTHON_VERSION)
+PIP=$(ENV)/bin/pip$(PYTHON_VERSION)
+PYTEST=$(PYTHONPATH_ENV)/bin/py.test
+
 
 
 # Installation -----------------------------------------------------------------
-.PHONY: install install_env
-install: install_$(OS) install_env
-install_env: $(ENV) libs config.json logging.json logs
+.PHONY: install install_os
+install_os: install_$(OS) install
+install: $(ENV) config.json logging.json logs
 
 # OSX ----
 .PHONY: has-brew install_Darwin upgrade_Darwin
@@ -61,10 +67,6 @@ apt-upgrade:
 	# TODO: install upgraded apt versions
 
 # Python/Virtualenv ----
-.PHONY: has-python3
-has-python3:
-	which python3
-	which virtualenv
 .PRECIOUS: $(ENV)
 $(ENV):
 	virtualenv --no-site-packages -p python$(PYTHON_VERSION) $(ENV)
@@ -73,19 +75,6 @@ $(ENV):
 .PHONY: upgrade
 upgrade:
 	$(PIP) install -r $(DEPENDENCIES_PYTHON) --upgrade
-
-# Link local libs ----
-libs:
-	mkdir -p libs
-	touch libs/__init__.py
-	cd libs && \
-	if [ -d ../../../libs/ ] ; then \
-		ln -s ../../../libs/python3/lib/misc.py                            misc.py                  ;\
-		ln -s ../../../libs/python3/lib/file.py                            file.py                  ;\
-	else \
-		wget -cq https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/misc.py        ;\
-		wget -cq https://raw.githubusercontent.com/calaldees/libs/master/python3/lib/file.py        ;\
-	fi
 
 
 # Config -----------------------------------------------------------------------
@@ -121,15 +110,15 @@ import_media_production_api:
 .PHONY: test
 test:
 	$(MAKE) all --directory tests/source
-	PYTHONPATH=./ $(PYTEST) processmedia_libs libs tests --doctest-modules --pdb
+	$(PYTEST) processmedia_libs tests --doctest-modules
 
 .PHONY: cloc
 cloc:
-	cloc --exclude-dir=$(ENV),libs ./
+	cloc --exclude-dir=$(ENV) ./
 
 # Clean ------------------------------------------------------------------------
 
 .PHONY: clean
 clean:
-	rm -rf .cache .pytest_cache __pycache__ $(ENV) libs config.json logging.json logs mtimes.json
+	rm -rf .cache .pytest_cache __pycache__ $(ENV) config.json logging.json logs mtimes.json
 	$(MAKE) clean --directory tests/source

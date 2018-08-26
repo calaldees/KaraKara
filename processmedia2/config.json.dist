@@ -3,6 +3,7 @@
     "path_meta": "../mediaserver/www/meta/",
     "path_processed": "../mediaserver/www/processed/",
     "api_host": "localhost:6543",
-    "loggingconf": "logging.json",
-    "lockfile": ".lock"
+    "loggingconf": "data/logging.json",
+    "lockfile": "data/.lock",
+    "mtime_store_path": "data/mtimes.json"
 }

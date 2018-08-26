@@ -3,7 +3,7 @@
 import pytest
 from collections import defaultdict
 
-from libs.misc import flatten, freeze
+from calaldees.misc import flatten, freeze
 
 from import_media import import_media
 

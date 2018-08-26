@@ -4,7 +4,7 @@ import os
 import re
 from collections import defaultdict, namedtuple
 
-from libs.misc import flatten
+from calaldees.misc import flatten
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
