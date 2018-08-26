@@ -25,9 +25,9 @@ services:
         links:
             - postgres
         volumes:
-            - ${PATH_HOST_MEDIA}:${PATH_HOST_MEDIA}:ro
-            - ${PATH_HOST_MEDIA}/source:${PATH_HOST_MEDIA}/source:rw  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ./:${PATH_CONTAINER_REPO}:ro
+            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            - ${PATH_HOST_MEDIA}/source:${PATH_CONTAINER_MEDIA}/source:rw  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - website_data_1:${PATH_CONTAINER_WEBSITE}/data:rw
             - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info:rw
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
@@ -51,8 +51,8 @@ services:
             - "${PORT_NGINX}:${PORT_NGINX}"
         volumes:
             - ./docker/nginx.conf:/tmp/nginx.conf:ro
-            - ${PATH_HOST_MEDIA}:${PATH_HOST_MEDIA}:ro
             - ./:${PATH_CONTAINER_REPO}:ro
+            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
             - website_data_1:${PATH_CONTAINER_WEBSITE}/data:ro
         links:
             - website
