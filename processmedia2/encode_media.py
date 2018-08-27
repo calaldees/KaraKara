@@ -10,7 +10,7 @@ from calaldees.misc import postmortem, hashfile, freeze, first, file_ext
 from calaldees.file import FolderStructure
 
 from processmedia_libs import EXTS, PENDING_ACTION
-from processmedia_libs import external_tools
+from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
@@ -73,9 +73,12 @@ class Encoder(object):
     """
     """
 
-    def __init__(self, meta_manager=None, pdb=False, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+    def __init__(self, meta_manager=None, postmortem=False, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
-        self.pdb = pdb
+        self.pdb = postmortem
+        self.external_tools = ProcessMediaFilesWithExternalTools(
+            **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_sox', 'cmd_jpegoptim') and v}
+        )
 
     def encode(self, name):
         """
@@ -110,7 +113,7 @@ class Encoder(object):
         source_image = m.source_files['image'].get('absolute')
         if source_image:
             source_details.update({
-                k: v for k, v in external_tools.probe_media(source_image).items()
+                k: v for k, v in self.external_tools.probe_media(source_image).items()
                 if k in ('width', 'height')
             })
 
@@ -118,14 +121,14 @@ class Encoder(object):
         source_audio = m.source_files['audio'].get('absolute')
         if source_audio:
             source_details.update({
-                k: v for k, v in external_tools.probe_media(source_audio).items()
+                k: v for k, v in self.external_tools.probe_media(source_audio).items()
                 if k in ('duration',)
             })
 
         # Probe Video
         source_video = m.source_files['video'].get('absolute')
         if source_video:
-            source_details.update(external_tools.probe_media(source_video))
+            source_details.update(self.external_tools.probe_media(source_video))
 
         m.source_details.update(source_details)
 
@@ -161,7 +164,7 @@ class Encoder(object):
             # 2.a) Convert Image to Video
             if m.source_files['image'] and not absolute_video_to_encode:
                 absolute_video_to_encode = os.path.join(tempdir, 'image.mp4')
-                external_tools.encode_image_to_video(
+                self.external_tools.encode_image_to_video(
                     source=m.source_files['image']['absolute'],
                     destination=absolute_video_to_encode,
                     **m.source_details
@@ -202,13 +205,13 @@ class Encoder(object):
             # 3.) Encode
             encode_steps = (
                 # 3.a) Render audio and normalize
-                lambda: external_tools.encode_audio(
+                lambda: self.external_tools.encode_audio(
                     source=m.source_files['audio'].get('absolute') or m.source_files['video'].get('absolute'),
                     destination=os.path.join(tempdir, 'audio.wav'),
                 ),
 
                 # 3.b) Render video with subtitles and mux new audio.
-                lambda: external_tools.encode_video(
+                lambda: self.external_tools.encode_video(
                     video_source=absolute_video_to_encode,
                     audio_source=os.path.join(tempdir, 'audio.wav'),
                     subtitle_source=absolute_ssa_to_encode,
@@ -272,7 +275,7 @@ class Encoder(object):
 
         with tempfile.TemporaryDirectory() as tempdir:
             preview_file = os.path.join(tempdir, 'preview.mp4')
-            encode_success, cmd_result = external_tools.encode_preview_video(
+            encode_success, cmd_result = self.external_tools.encode_preview_video(
                 source=source_file.absolute,
                 destination=preview_file,
             )
@@ -320,7 +323,7 @@ class Encoder(object):
         with tempfile.TemporaryDirectory() as tempdir:
             for index, time in enumerate(times):
                 image_file = os.path.join(tempdir, '{}.jpg'.format(index))
-                encode_succes, cmd_result = external_tools.extract_image(source=source_file_absolute, destination=image_file, time=time)
+                encode_succes, cmd_result = self.external_tools.extract_image(source=source_file_absolute, destination=image_file, time=time)
                 if not encode_succes:
                     if self.pdb:
                         import pdb ; pdb.set_trace()

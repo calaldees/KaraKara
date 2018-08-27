@@ -9,4 +9,4 @@ services:
       - .:/processmedia2:ro
     working_dir: /processmedia2
     #command: python3
-    command: pytest processmedia_libs tests --doctest-modules
+    command: pytest processmedia_libs tests --doctest-modules --pdb -x

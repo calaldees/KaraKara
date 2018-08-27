@@ -19,6 +19,11 @@ DEFAULT_LOCKFILE = os.path.join(DEFAULT_DATA_PATH, '.lock')
 DEFAULT_CONFIG_FILENAME = os.path.join(DEFAULT_DATA_PATH, 'config.json')
 DEFAULT_LOGGINGCONF = os.path.join(DEFAULT_DATA_PATH, 'logging.json')
 DEFAULT_MTIME_STORE_PATH = os.path.join(DEFAULT_DATA_PATH, 'mtimes.json')
+DEFAULT_CMD_FFMPEG = ('nice', 'ffmpeg')
+
+
+def parser_cmd_to_tuple(cmd):
+    return tuple(filter(None, cmd.split(' ')))
 
 
 def main(
@@ -49,6 +54,8 @@ def main(
     parser.add_argument('--loggingconf', action='store', help='logfilename', default=DEFAULT_LOGGINGCONF)
     parser.add_argument('--lockfile', action='store', help='lockfilename, to ensure multiple encoders do not operate at once', default=DEFAULT_LOCKFILE)
     parser.add_argument('--mtime_store_path', action='store', help='optimisation file that tracks the last time processing was done on a folder.', default=DEFAULT_MTIME_STORE_PATH)
+
+    parser.add_argument('--cmd_ffmpeg', action='store', type=parser_cmd_to_tuple, help='cmd for ffmpeg', default=DEFAULT_CMD_FFMPEG)
 
     parser.add_argument('--postmortem', action='store_true', help='drop into pdb on fail')
     parser.add_argument('--version', action='version', version=version)

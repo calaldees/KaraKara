@@ -6,7 +6,7 @@ import pytesseract
 from PIL import Image
 
 from calaldees.misc import color_distance, color_close, flatten
-from processmedia_libs.external_tools import probe_media, get_frame_from_video, CONFIG as ENCODE_CONFIG
+
 import processmedia_libs.subtitle_processor as subtitle_processor
 from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES, MockEncodeExternalCalls
 

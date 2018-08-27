@@ -2,6 +2,7 @@ import os
 import tempfile
 import json
 from pathlib import Path
+from shutil import copyfile
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
@@ -25,7 +26,7 @@ class ProcessMediaTestManager(object):
 
     def _link_source_files(self):
         for f in self.source_files:
-            os.link(
+            copyfile(  #os.link(  # linking would be better, but this cannot be done across device boundaries
                 os.path.join(SOURCE_PATH, f),
                 os.path.join(self.path_source, f)
             )
@@ -119,8 +120,9 @@ class ProcessMediaTestManager(object):
 
 
 from unittest.mock import patch
-import processmedia_libs.external_tools
+#from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 from pathlib import Path
+
 
 class MockEncodeExternalCalls(object):
 
@@ -146,7 +148,7 @@ class MockEncodeExternalCalls(object):
         self.patchers.clear()
         self.patchers.update({
             method_name: patch.object(
-                processmedia_libs.external_tools,
+                'processmedia_libs.external_tools.ProcessMediaFilesWithExternalTools',
                 method_name,
                 wraps=mock_return
             )

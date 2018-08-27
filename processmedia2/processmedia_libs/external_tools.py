@@ -58,6 +58,7 @@ class ProcessMediaFilesWithExternalTools():
             },
             **config,
         }
+        import pdb ; pdb.set_trace()
         self.config.update({
             'vf_for_preview': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(self.config['preview_width'])    # scale=w='min(500, iw*3/2):h=-1'
         })
@@ -121,7 +122,7 @@ class ProcessMediaFilesWithExternalTools():
         if not source:
             return {}
         cmd_success, cmd_result = self._run_tool(
-            *self.config['cmd_ffprobe']
+            *self.config['cmd_ffprobe'],
             source
         )
         result = (cmd_result.stdout + cmd_result.stderr).decode('utf-8', 'ignore')
