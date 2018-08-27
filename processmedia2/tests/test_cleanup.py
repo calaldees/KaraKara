@@ -1,10 +1,8 @@
 import os.path
 from itertools import chain
 
-from ._base import ProcessMediaTestManager
 
-
-def test_cleanup_media():
+def test_cleanup_media(ProcessMediaTestManager):
 
     def make_hash_dict(name):
         return {

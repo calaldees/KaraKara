@@ -1,9 +1,7 @@
 import os
 
-from ._base import ProcessMediaTestManager
 
-
-def test_scan_grouping(TEST1_VIDEO_FILES, TEST2_AUDIO_FILES):
+def test_scan_grouping(ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES - {'test2.txt'}) as scan:
         scan.scan_media()
         meta = scan.meta

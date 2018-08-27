@@ -1,3 +1,6 @@
+# depricated
+# Makefile is depricated because the test suite should be able to generate this itself
+
 all: test1.mp4 test2.ogg
 
 test1.mp4:
