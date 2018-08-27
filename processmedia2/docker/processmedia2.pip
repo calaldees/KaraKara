@@ -4,6 +4,7 @@ clint
 chardet
 
 pytest
+pytest-variables
 pillow
 pytesseract
 

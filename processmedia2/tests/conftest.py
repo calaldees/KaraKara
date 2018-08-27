@@ -2,8 +2,8 @@ import pytest
 
 import os
 import tempfile
-import partial
 import shutil
+from functools import partial
 
 
 from ._base import ProcessMediaTestManagerBase
@@ -19,12 +19,13 @@ def TEST2_AUDIO_FILES():
     return set(('test2.ogg', 'test2.png', 'test2.ssa', 'test2.txt'))
 
 
+@pytest.fixture(scope="session")
 def path_source_in_repo():
     return 'tests/source'
 
 
 @pytest.fixture(scope="session")
-def path_source_reference(path_source_in_repo):
+def path_source_reference(path_source_in_repo, variables):
     tempdir = tempfile.TemporaryDirectory()
 
     # Copy over media in repo to temp folder (this allows symlinking later)
@@ -45,6 +46,6 @@ def path_source_reference(path_source_in_repo):
     tempdir.cleanup()
 
 
-@pytest.fixture(scope="test")
+@pytest.fixture()
 def ProcessMediaTestManager(path_source_reference):
     return partial(ProcessMediaTestManagerBase, path_source_reference)
