@@ -1,5 +1,6 @@
 import pytest
 import os
+from io import BytesIO
 
 import pytesseract
 from PIL import Image
@@ -18,6 +19,18 @@ COLOR_BLUE = (0, 0, 255)
 COLOR_MAGENTA = (255, 0, 255)
 
 SAMPLE_COORDINATE = (100, 100)
+
+
+def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
+    """
+    FFMpeg | pipe stdout -> PIL.Image (from stringbuffer)
+
+    time string format - hh:mm:ss[.xxx]
+
+    Gets Image progressively - Larger times read linearly from the beginning of the file
+    """
+    cmd = f"""{ffmpeg_cmd} -loglevel quiet -i "{url}" -ss {time} -vframes 1 -f image2 pipe: """
+    return Image.open(BytesIO(subprocess.check_output(cmd, stderr=subprocess.PIPE, shell=True)))
 
 
 def test_encode_video_simple():
