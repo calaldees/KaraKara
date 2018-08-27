@@ -1,16 +1,16 @@
 import os
 
-from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
+from ._base import ProcessMediaTestManager
 
 
-def test_scan_grouping():
+def test_scan_grouping(TEST1_VIDEO_FILES, TEST2_AUDIO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES - {'test2.txt'}) as scan:
         scan.scan_media()
         meta = scan.meta
         assert set(meta['test1.json']['scan'].keys()) == {'test1.mp4', 'test1.srt', 'test1.txt'}, \
-            'test1 source files were not grouped effectivly'
+            'test1 source files were not grouped effectively'
         assert set(meta['test2.json']['scan'].keys()) == {'test2.ogg', 'test2.png', 'test2.ssa'}, \
-            'test2 source files were not grouped effectivly'
+            'test2 source files were not grouped effectively'
 
         # If a file is renamed - it is searched and re-associated with the original group even if it's name does not match anymore
         subtitle_hash = meta['test1.json']['scan']['test1.srt']['hash']
@@ -20,7 +20,7 @@ def test_scan_grouping():
         assert meta['test1.json']['scan']['testX.srt']['hash'] == subtitle_hash, \
             'File was renamed, but he hash should be the same'
 
-        # Modify the reassociated file - the file should have it's hash updated and not be dissassociated
+        # Modify the re-associated file - the file should have it's hash updated and not be disassociated
         subtitle_file = os.path.join(scan.path_source, 'testX.srt')
         with open(subtitle_file, 'r') as subtitle_filehandle:
             subtitles = subtitle_filehandle.read()

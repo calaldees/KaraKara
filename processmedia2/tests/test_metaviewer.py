@@ -1,11 +1,11 @@
 import pytest
 
-from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES
+from ._base import ProcessMediaTestManager
 
 from metaviewer import MetaViewer
 
 
-def test_metaviewer():
+def test_metaviewer(TEST1_VIDEO_FILES, TEST2_AUDIO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         metaviewer = MetaViewer(path_meta=manager.path_meta, path_processed=manager.path_processed, path_source=manager.path_source)
 

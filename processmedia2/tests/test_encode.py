@@ -8,7 +8,7 @@ from PIL import Image
 from calaldees.misc import color_distance, color_close, flatten
 
 import processmedia_libs.subtitle_processor as subtitle_processor
-from ._base import ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FILES, MockEncodeExternalCalls
+from ._base import ProcessMediaTestManager, MockEncodeExternalCalls
 
 COLOR_SUBTITLE_CURRENT = (255, 255, 0)
 COLOR_SUBTITLE_NEXT = (255, 255, 255)
@@ -33,7 +33,7 @@ def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
     return Image.open(BytesIO(subprocess.check_output(cmd, stderr=subprocess.PIPE, shell=True)))
 
 
-def test_encode_video_simple():
+def test_encode_video_simple(TEST1_VIDEO_FILES):
     """
     Test normal video + subtitles encode flow
     Thubnail images and preview videos should be generated
@@ -85,7 +85,7 @@ def test_encode_video_simple():
         assert video_details['width'] > ENCODE_CONFIG['preview_width'], 'Main video should be greater than preview video size'
 
 
-def test_encode_incomplete():
+def test_encode_incomplete(TEST2_AUDIO_FILES):
     """
     Incomplete source set cannot be processed
     """
@@ -97,7 +97,7 @@ def test_encode_incomplete():
         assert not processed_files
 
 
-def test_encode_audio_simple():
+def test_encode_audio_simple(TEST2_AUDIO_FILES):
     """
     Check audio + image encoding
     """
@@ -124,7 +124,7 @@ def test_encode_audio_simple():
             assert color_close(color, Image.open(processed_files['image{}'.format(image_num+1)].absolute).getpixel(SAMPLE_COORDINATE))
 
 
-def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
+def test_source_with_nosubs_will_still_create_empty_processed_srt_file(TEST1_VIDEO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
         manager.scan_media()
         os.remove(os.path.join(manager.path_source, 'test1.srt'))
@@ -149,7 +149,7 @@ def test_source_with_nosubs_will_still_create_empty_processed_srt_file():
         os.path.exists(manager.get('test1').processed_files['srt'].absolute)
 
 
-def test_skip_encoding_step_if_processed_file_present():
+def test_skip_encoding_step_if_processed_file_present(TEST1_VIDEO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
 
         manager.scan_media()

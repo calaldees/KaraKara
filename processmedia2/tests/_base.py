@@ -13,9 +13,6 @@ from cleanup_media import cleanup_media
 
 SOURCE_PATH = 'tests/source/'
 
-TEST1_VIDEO_FILES = set(('test1.mp4', 'test1.srt', 'test1.txt'))
-TEST2_AUDIO_FILES = set(('test2.ogg', 'test2.png', 'test2.ssa', 'test2.txt'))
-
 
 # Utils ------------------------------------------------------------------------
 
