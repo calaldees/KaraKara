@@ -1,0 +1,12 @@
+version: '3.6'
+
+services:
+  processmedia2:
+    build:
+      context: ./docker
+      dockerfile: processmedia2.base.dockerfile
+    volumes:
+      - .:/processmedia2:ro
+    working_dir: /processmedia2
+    #command: python3
+    command: pytest processmedia_libs tests --doctest-modules

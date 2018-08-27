@@ -5,7 +5,7 @@ import fcntl
 import os
 
 from calaldees.misc import postmortem
-from processmedia_calaldees.fileset_change_monitor import FilesetChangeMonitor
+from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 import logging.config

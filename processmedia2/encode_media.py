@@ -13,7 +13,7 @@ from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs import external_tools
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
-from processmedia_calaldees.fileset_change_monitor import FilesetChangeMonitor
+from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
