@@ -3,11 +3,45 @@ import pytest
 import os
 import tempfile
 import shutil
+import re
 from functools import partial
 
 
 from ._base import ProcessMediaTestManagerBase
 
+
+# pytest-variables extension ---------------------------------------------------
+
+#pytest_plugins = [
+#    'variables',
+#]
+
+def pytest_addoption(parser):
+    group = parser.getgroup('debugconfig')
+    group.addoption(
+        '--variable',
+        action='append',
+        default=[],
+        #metavar='path',
+        help='Add individual variable by commandline'
+    )
+
+@pytest.hookimpl(trylast=True)
+def pytest_configure(config):
+    assert hasattr(config, '_variables'), 'pytest-variables plugin should be installed'
+    config._variables.update(dict(
+        re.match(r'(.*?)=(.*)', variable).groups()
+        for variable in config.getoption('variable')
+    ))
+
+
+# Utils ------------------------------------------------------------------------
+
+def parser_cmd_to_tuple(cmd):
+    return tuple(filter(None, cmd.split(' ')))
+
+
+# Fixtures ---------------------------------------------------------------------
 
 @pytest.fixture(scope="session")
 def TEST1_VIDEO_FILES():

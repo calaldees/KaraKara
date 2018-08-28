@@ -1,12 +1,18 @@
 version: '3.6'
 
 services:
+
+  ffmpeg:
+    image: jrottenberg/ffmpeg
+
   processmedia2:
     build:
       context: ./docker
       dockerfile: processmedia2.base.dockerfile
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - .:/processmedia2:ro
     working_dir: /processmedia2
     #command: python3
-    command: pytest processmedia_libs tests --doctest-modules --variables config.json --pdb -x
+    command: pytest processmedia_libs tests --doctest-modules --variables config.json --variable cmd_ffmpeg="docker run --rm jrottenberg/ffmpeg" --pdb -x
+    # -v {path_media}:{path_media}:ro

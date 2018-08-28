@@ -31,6 +31,10 @@ def crf_from_res(width=320, height=240, crf=DEFAULT_CRF_FACTOR, **kwargs):
     return int(((crf.upper.crf - crf.lower.crf) * factor) + crf.lower.crf)
 
 
+def parser_cmd_to_tuple(cmd):
+    return tuple(filter(None, cmd.split(' ')))
+
+
 class ProcessMediaFilesWithExternalTools():
     def __init__(self, **config):
         """
@@ -59,6 +63,7 @@ class ProcessMediaFilesWithExternalTools():
             **config,
         }
         import pdb ; pdb.set_trace()
+        # parse cmd_xxx into tuples
         self.config.update({
             'vf_for_preview': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(self.config['preview_width'])    # scale=w='min(500, iw*3/2):h=-1'
         })
