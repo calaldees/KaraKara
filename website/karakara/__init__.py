@@ -253,6 +253,7 @@ def main(global_config, **settings):
     config.add_static_view(name='ext', path=settings_path('static.externals'))  # cache_max_age=3600
     config.add_static_view(name='static', path=settings_path('static.assets'))  # cache_max_age=3600
     config.add_static_view(name='player', path=settings_path('static.player'))
+    config.add_static_view(name='player2', path=settings_path('static.player2'))
 
     # AllanC - it's official ... static route setup and generation is a mess in pyramid
     #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
