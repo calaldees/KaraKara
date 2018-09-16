@@ -5,10 +5,10 @@ import queryString from 'query-string';
 // GET /queue/${queue_id}/${url}.json
 function api(state, method, url, params, callback) {
     const uri = (
-        "https://" + get_hostname() +
+        get_protocol() + "//" + get_hostname() +
         "/queue/" + get_queue_id() + "/" +
         url + ".json" +
-        "?" + queryString.stringify(params)
+        (params ? "?" + queryString.stringify(params) : "")
     );
     xhr({
         method: method,

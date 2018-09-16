@@ -17,7 +17,7 @@ const state = {
         "karakara.player.autoplay"            : 30, // Autoplay after X seconds
         "karakara.player.subs_on_screen"      : true, // Set false if using podium
         "karakara.websocket.path"             : "/ws/",
-        "karakara.websocket.port"             : null,
+        "karakara.websocket.port"             : 9873,
         "karakara.event.end"                  : null,
     },
     socket: null,
