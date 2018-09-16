@@ -1,5 +1,7 @@
 import functools
 
+from calaldees.misc import _string_list_format_hack
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -27,14 +29,7 @@ class temporary_settings:
         return None
 
     def __exit__(self, type, value, traceback):
-        def empty_list_hack(value):
-            # Hack to fix reverting to empty list
-            #if value == []:
-            #    return '[]'
-            if isinstance(value, (list, tuple)):
-                return f"[{', '.join(map(str,value))}]"
-            return value
-        self.app.put(self.settings_url, {k: empty_list_hack(v) for k, v in self.settings_original_values.items()})
+        self.app.put(self.settings_url, {k: _string_list_format_hack(v) for k, v in self.settings_original_values.items()})
         log.debug(f'Temporay setting {self.settings_dict} reverted to {self.settings_original_values}')
         # TODO: Research needed; Consider correct handling of exceptions as they propergate up
         # Next line can be removed for perfomance once this test method is verifyed as working under all conditions

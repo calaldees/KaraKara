@@ -479,7 +479,7 @@ def test_event_end(app, queue, queue_manager, tracks):
 
 
 @with_settings(settings={
-    'karakara.event.start': str(now() - datetime.timedelta(minutes=0, seconds=30)),
+    'karakara.event.start': str(now() + datetime.timedelta(minutes=0, seconds=30)),
 })
 def test_event_start(app, queue, queue_manager, tracks):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1', expect_errors=True)

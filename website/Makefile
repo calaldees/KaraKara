@@ -1,7 +1,7 @@
 OS = $(shell uname -s)
 
 PROJECT=karakara
-PYTHON_VERSION:=3.6
+PYTHON_VERSION:=3.7
 
 CONFIG_SOURCE_PATH=config
 
@@ -51,16 +51,17 @@ help:
 	# insert_random_tracks            -- insert random named tracks for dev/testing
 	#
 	# Typical first use should be: setup, init_db, import_tracks_local_filesystem, run
-	# Dpendencies - make python3-dev curl
+	# Dpendencies - make python3-dev (pip3 install venv)
 
 
 # Installation -----------------------------------------------------------------
 
 #python3-dev curl
 
-.PRECIOUS: $(ENV)
+#.PRECIOUS: $(ENV)
 $(ENV):
 	python$(PYTHON_VERSION) -m venv $(ENV)
+	#virtualenv -p python$(PYTHON_VERSION) $(ENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.pip
 

@@ -1,6 +1,8 @@
+from collections import ChainMap
+
 from pyramid.view import view_config
 
-from calaldees.misc import convert_str
+from calaldees.misc import convert_str, _string_list_format_hack
 
 from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router, is_admin
 
@@ -171,7 +173,10 @@ def queue_settings_view_put(request):
             return False
 
     error_messages = []
-    for key, value in request.params.items():
+    for key, value in ChainMap(
+        request.params,
+        request.json if request.content_type == "application/json" else {}  # request.params does not include json content
+    ).items():
         if (
             (not key.startswith(SETTING_IDENTIFIER)) or  # Drop random other fields (like 'format' or 'method')
             (key in REGISTRY_SETTINGS_PASSTHROUGH) or  # These are not editable settings for the queue, they are global and cannot be set
@@ -179,6 +184,10 @@ def queue_settings_view_put(request):
         ):
             continue
         if is_valid(key, value):
+            if not isinstance(value, str):
+                # when submitting json, some values may not be strings.
+                # We have to use our own string format for lists- not ideal
+                value = _string_list_format_hack(value)
             get_or_create_queue_settings_obj(key).value = value
         else:
             error_messages.append(f'{key}:{value} is not valid')
