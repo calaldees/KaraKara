@@ -42,31 +42,12 @@ $LIGHT: #29EDF2;
 	background:
 		url('background.png'),
 		url('perlin.jpg');
-	background-size: cover, 200% 200%;
-	animation: bgscroll 30s linear infinite;
+	background-size: cover, 100% 200%;
+	animation: bgscroll 10s linear infinite;
 
 	@keyframes bgscroll {
-		0% {background-position: 0 0, 50% 100%;}
-		5% {background-position: 0 0, 65% 97%;}
-		10% {background-position: 0 0, 79% 90%;}
-		15% {background-position: 0 0, 90% 79%;}
-		20% {background-position: 0 0, 97% 65%;}
-		25% {background-position: 0 0, 100% 50%;}
-		30% {background-position: 0 0, 97% 34%;}
-		35% {background-position: 0 0, 90% 20%;}
-		40% {background-position: 0 0, 79% 9%;}
-		45% {background-position: 0 0, 65% 2%;}
-		50% {background-position: 0 0, 50% 0;}
-		55% {background-position: 0 0, 34% 2%;}
-		60% {background-position: 0 0, 20% 9%;}
-		65% {background-position: 0 0, 9% 20%;}
-		70% {background-position: 0 0, 2% 34%;}
-		75% {background-position: 0 0, 0 49%;}
-		80% {background-position: 0 0, 2% 65%;}
-		85% {background-position: 0 0, 9% 79%;}
-		90% {background-position: 0 0, 20% 90%;}
-		95% {background-position: 0 0, 34% 97%;}
-		100% {background-position: 0 0, 49% 100%;}
+		0% {background-position: 0 0, 0 0;}
+		100% {background-position: 0 0, 0 100%;}
 	}
 
 	/*---------------------------------------------------------------------------*/
