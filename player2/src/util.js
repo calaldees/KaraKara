@@ -48,12 +48,16 @@ function s_to_mns(t) {
     return Math.floor(t/60) + ":" + (Math.floor(t%60)+"").padStart(2, "0");
 }
 
+function get_file_root() {
+    return get_protocol() + "//" + get_hostname() + "/files/";
+}
+
 // find the path from the player to the media file
 function get_attachment(state, track, type) {
     for(let i=0; i<track.attachments.length; i++) {
         if(track.attachments[i].type === type) {
             return (
-                get_protocol() + "//" + get_hostname() + "/files/" +
+                get_file_root() +
                 track.attachments[i].location
             );
         }
@@ -104,5 +108,6 @@ export {
     get_queue_id,
     get_lyrics,
     api,
-    get_protocol
+    get_protocol,
+    get_file_root
 };

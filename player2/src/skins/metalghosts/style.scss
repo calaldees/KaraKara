@@ -129,6 +129,24 @@ $LIGHT: #29EDF2;
 			font-size: 10vh;
 			text-align: center;
 		}
+
+		@keyframes rain {
+			0% {top: -20vh;}
+			100% {top: 100vh;}
+		}
+		@keyframes rotate1 {
+			0% {transform:rotate(0deg);}
+			100% {transform:rotate(360deg);}
+		}
+		IMG {
+			top: -20vh;
+			max-width: 20vw;
+			max-height: 20vh;
+			height: auto;
+			width: auto;
+			animation: rain 10s linear infinite, rotate1 10s linear infinite;
+		}
+		IMG:nth-child(odd) {animation-direction: normal, reverse;}
 	}
 
 

@@ -1,6 +1,14 @@
 import { h } from "hyperapp";  // JSX will be turned into "h" by rollup
 
-import { timedelta_str, get_attachment, get_tag, s_to_mns, get_hostname, get_queue_id } from "./util.js";
+import {
+    timedelta_str,
+    get_attachment,
+    get_tag,
+    s_to_mns,
+    get_hostname,
+    get_queue_id,
+    get_file_root
+} from "./util.js";
 
 const show_tracks = 5;
 
@@ -43,6 +51,16 @@ const ClickScreen = ({state, actions}) => (
 
 const TitleScreen = ({state, actions}) => (
     <div className={"screen_title"}>
+        <div id={"splash"}>
+            {state.images.map((item) =>
+                <img
+                    src={get_file_root() + item.filename}
+                    style={{
+                        animationDelay: Math.random() * 10 + "s",
+                        left: (item.x * 90) + "vw",
+                    }}
+                />)}
+        </div>
         <h1>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
             Join at <strong>{get_hostname()}</strong> -
