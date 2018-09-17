@@ -7,6 +7,7 @@
     },
     "dependencies": {
         "hyperapp": "^1.2.8",
+        "parcel": "^1.9.7",
         "parse-srt": "^1.0.0-alpha",
         "query-string": "^6.1.0",
         "reconnecting-websocket": "^3.2.2",
@@ -15,5 +16,7 @@
     "scripts": {
         "build": "parcel build --public-url . src/index.html",
         "watch": "parcel watch --public-url . src/index.html --hmr-hostname localhost"
-    }
+    },
+    "repository": "https://github.com/calaldees/KaraKara/",
+    "license": "GPL-3.0-only"
 }
