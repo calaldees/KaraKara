@@ -205,6 +205,7 @@ function view(state, actions) {
         screen = <VideoScreen state={state} actions={actions} />;
 
     return <div className={"theme-" + state.settings["karakara.player.theme"]}>
+        {state.connected ? null : <h1 id="error">Not Connected To Server</h1>}
         {screen}
     </div>;
 }

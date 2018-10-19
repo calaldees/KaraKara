@@ -88,6 +88,14 @@ $LIGHT: #29EDF2;
 		100% {color: #ff0;}
 	}
 
+	#error {
+		color: red;
+		z-index: 9999;
+		position: absolute;
+		width: 100%;
+		text-align: center;
+	}
+
 
 	/*---------------------------------------------------------------------------*/
 	/* Title Screen Animation */
