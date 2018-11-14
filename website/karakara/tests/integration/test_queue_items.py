@@ -9,7 +9,7 @@ import bs4
 def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
-from calaldees.misc import now
+from calaldees.date_tools import now
 
 from . import admin_rights, with_settings, temporary_settings, websocket_message_queue
 

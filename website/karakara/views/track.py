@@ -4,10 +4,9 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.traversal import resource_path
 
-from calaldees.misc import subdict, first
+from calaldees.data import first, subdict
 
 from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only, cache_manager
-#from ._logic import queue_item_for_track
 
 from ..model import DBSession
 from ..model.actions import get_track_dict_full

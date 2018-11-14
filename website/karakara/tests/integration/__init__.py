@@ -1,6 +1,6 @@
 import functools
 
-from calaldees.misc import _string_list_format_hack
+from calaldees.string_convert import _string_list_format_hack
 
 import logging
 log = logging.getLogger(__name__)
