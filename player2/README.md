@@ -6,10 +6,15 @@ lyrics and a "start" button)
 
 ## TL;DR:
 
-Player2 comes pre-built with compiled files in /lib, just visit
-`index.html`. There are two parameters: `?queue_id=XXX` tells
-P2 which queue to monitor from the server, and `#podium` will
-display the singer view instead of the playlist view.
+```
+npm install      # install build toolchain
+npm run build    # compile src/* to dist/*
+```
+
+Visit the player at
+`http://localhost/player2/index.html#queue_id=my_queue`
+
+Add `&podium` to the end of the URL to get the singer view.
 
 ## New Features Since Player1:
 
@@ -37,9 +42,12 @@ If you want to develop new features:
 
 ```
 npm install      # install build toolchain
-npm run build    # compile src/* to lib/*
 npm run watch    # auto-compile on changes
 ```
+
+Also you can add `&hostname=...` to the URL to specify a
+particular karakara server (defaults to `karakara.org.uk` if
+you open index.html from the local hard drive)
 
 ## Developer Notes:
 
@@ -57,13 +65,6 @@ npm run watch    # auto-compile on changes
 
 ## High-level TODO List:
 
-- Ensure that repeated "ended" signals are only handled once
-  - Also on the server side? Client should specify *which*
-    track has ended, so the server can ignore that message
-    if the track in question has already gone?
-- Are there any hardsub-only songs, without .srt files? For
-  those, the podium should display the video instead of an
-  empty lyric sheet
 - Lyrics embedded in the queue.json would be wonderful, so
   that we don't need to go and fetch and parse the .srt for
   ourselves for every song for every queue update...

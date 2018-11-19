@@ -3,7 +3,8 @@ import json
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from calaldees.misc import now, json_object_handler
+from calaldees.date_tools import now
+from calaldees.json import json_object_handler
 
 from karakara.model import DBSession
 from karakara.model.model_priority_token import PriorityToken

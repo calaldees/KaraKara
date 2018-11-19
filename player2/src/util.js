@@ -1,20 +1,30 @@
-import Subtitle from 'subtitle';
+import parseSRT from 'parse-srt';
 import xhr from 'xhr';
+import queryString from 'query-string';
 
 // GET /queue/${queue_id}/${url}.json
-function api(state, url, callback) {
+function api(state, method, url, params, callback) {
+    const uri = (
+        get_protocol() + "//" + get_hostname() +
+        "/queue/" + get_queue_id() + "/" +
+        url + ".json" +
+        (params ? "?" + queryString.stringify(params) : "")
+    );
     xhr({
-        method: "GET",
-        uri: (
-            "https://" + get_hostname() +
-            "/queue/" + get_queue_id() + "/" +
-            url + ".json"
-        ),
+        method: method,
+        uri: uri,
         useXDR: true,  // cross-domain, so file:// can reach karakara.org.uk
         json: true,
     }, function (err, resp, body) {
-        if(resp.statusCode === 200) callback(body.data);
-        else console.log(err, resp, body);
+        console.groupCollapsed("api(" + uri + ")");
+        if(resp.statusCode === 200) {
+            console.log(body.data);
+            callback(body.data);
+        }
+        else {
+            console.log(err, resp, body);
+        }
+        console.groupEnd();
     })
 
 }
@@ -38,12 +48,16 @@ function s_to_mns(t) {
     return Math.floor(t/60) + ":" + (Math.floor(t%60)+"").padStart(2, "0");
 }
 
+function get_file_root() {
+    return get_protocol() + "//" + get_hostname() + "/files/";
+}
+
 // find the path from the player to the media file
 function get_attachment(state, track, type) {
     for(let i=0; i<track.attachments.length; i++) {
         if(track.attachments[i].type === type) {
             return (
-                get_protocol() + "//" + get_hostname() + "/files/" +
+                get_file_root() +
                 track.attachments[i].location
             );
         }
@@ -54,13 +68,13 @@ function get_attachment(state, track, type) {
 // get_attachment(srt) + parse SRT file
 function get_lyrics(state, track) {
     let xhr = new XMLHttpRequest();
-    let data = "";
+    let data = null;
     xhr.open('GET', get_attachment(state, track, "srt"), false);
     xhr.onload = function(e) {
         data = e.target.responseText;
     };
     xhr.send();
-    return Subtitle.parse(data);
+    return data ? parseSRT(data) : null;
 }
 
 // get a tag if it is defined, else blank
@@ -75,26 +89,14 @@ function get_protocol() {
     else return document.location.protocol;
 }
 function get_hostname() {
-    if(document.location.protocol === "file:") return "karakara.org.uk";
+    const specified = queryString.parse(location.hash).hostname;
+    if(specified) return specified;
+    else if(document.location.protocol === "file:") return "karakara.org.uk";
     else return document.location.hostname;
 }
 function get_queue_id() {
-    if(document.location.protocol === "file:") return "demo";
-    else return getUrlParameter("queue_id");
-}
-
-//http://stackoverflow.com/questions/19491336/get-url-parameter-jquery
-// TODO: ES6 this
-function getUrlParameter(sParam) {
-    const sPageURL = window.location.search.substring(1);
-    const sURLVariables = sPageURL.split('&');
-    for (let i = 0; i < sURLVariables.length; i++) {
-        let sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] === sParam) {
-            return decodeURIComponent(sParameterName[1]);
-        }
-    }
-    return '';
+    const specified = queryString.parse(location.hash).queue_id;
+    return specified ? specified : "demo";
 }
 
 export {
@@ -106,5 +108,6 @@ export {
     get_queue_id,
     get_lyrics,
     api,
-    get_protocol
+    get_protocol,
+    get_file_root
 };

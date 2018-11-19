@@ -10,7 +10,8 @@ from pyramid.events import subscriber
 
 from sqlalchemy.orm import joinedload, undefer
 
-from calaldees.misc import backup, first
+from calaldees.data import first
+from calaldees.files.backup import backup
 from calaldees.pyramid_helpers import get_setting
 from calaldees.pyramid_helpers.views.upload import EventFileUploaded
 

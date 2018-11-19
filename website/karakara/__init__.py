@@ -13,7 +13,11 @@ from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to 
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
 # External Imports
-from calaldees.misc import convert_str_with_type, read_json, extract_subkeys, json_serializer, file_scan, now, json_string, postmortem
+from calaldees.string_convert import convert_str_with_type
+from calaldees.data import extract_subkeys
+from calaldees.json import read_json, json_serializer, json_string
+from calaldees.date_tools import now
+from calaldees.debug import postmortem
 from calaldees.pyramid_helpers.cache_manager import setup_pyramid_cache_manager
 from calaldees.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from calaldees.pyramid_helpers.session_identity2 import session_identity
@@ -253,6 +257,7 @@ def main(global_config, **settings):
     config.add_static_view(name='ext', path=settings_path('static.externals'))  # cache_max_age=3600
     config.add_static_view(name='static', path=settings_path('static.assets'))  # cache_max_age=3600
     config.add_static_view(name='player', path=settings_path('static.player'))
+    config.add_static_view(name='player2', path=settings_path('static.player2'))
 
     # AllanC - it's official ... static route setup and generation is a mess in pyramid
     #config.add_static_view(name=settings["static.media" ], path="karakara:media" )

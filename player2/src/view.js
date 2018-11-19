@@ -1,5 +1,15 @@
-import { h } from "hyperapp";  // JSX will be turned into h by rollup
-import { timedelta_str, get_attachment, get_tag, s_to_mns, get_hostname, get_queue_id } from "./util.js";
+import { h } from "hyperapp";  // JSX will be turned into "h" by rollup
+
+import {
+    timedelta_str,
+    get_attachment,
+    get_tag,
+    s_to_mns,
+    get_hostname,
+    get_queue_id,
+    get_file_root
+} from "./util.js";
+
 const show_tracks = 5;
 
 
@@ -8,7 +18,7 @@ const show_tracks = 5;
 // ====================================================================
 
 function _lineStyle(item, state) {
-    const ts = state.progress * 1000;
+    const ts = state.progress;
     if(!state.playing) return "present";
     if(item.text === "-") return "past";
     if(item.start < ts && item.end > ts) return "present";
@@ -20,7 +30,7 @@ const Lyrics = ({state}) => (
     <div className={"lyrics"}>
         <ol>
             {state.queue[0].track.lyrics.map((item) =>
-                <li key={item.start} className={_lineStyle(item, state)}>
+                <li key={item.id} className={_lineStyle(item, state)}>
                     <span>{item.text}</span>
                 </li>
             )}
@@ -41,6 +51,16 @@ const ClickScreen = ({state, actions}) => (
 
 const TitleScreen = ({state, actions}) => (
     <div className={"screen_title"}>
+        <div id={"splash"}>
+            {state.images.map((item) =>
+                <img
+                    src={get_file_root() + item.filename}
+                    style={{
+                        animationDelay: Math.random() * 10 + "s",
+                        left: (item.x * 90) + "vw",
+                    }}
+                />)}
+        </div>
         <h1>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
             Join at <strong>{get_hostname()}</strong> -
@@ -97,7 +117,7 @@ const VideoScreen = ({state, actions}) => (
         <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
                ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
-               onended={() => actions.send_ended()}
+               onended={() => actions.send_ended("ended")}
         />
         <div id="seekbar" style={{
             left: ((state.progress / state.queue[0].track.duration) * 100) + "%"
@@ -114,7 +134,7 @@ const VideoScreen = ({state, actions}) => (
             Contributed by {get_tag(state.queue[0].track.tags.contributor)}
         </div>
         */}
-        {state.settings["karakara.player.subs_on_screen"] ?
+        {(state.settings["karakara.player.subs_on_screen"] && state.queue[0].track.lyrics) ?
             <Lyrics state={state} /> :
             null
         }
@@ -126,7 +146,20 @@ const PodiumScreen = ({state, actions}) => (
     <div className={"screen_podium"}>
         <h1>{state.queue[0].performer_name} - {get_tag(state.queue[0].track.tags.title)}</h1>
 
-        <Lyrics state={state} />
+        {/*
+        if we have lyrics, show them, else show the video,
+        give the video key=playing so that it creates a new
+        object when switching from preview to play
+         */}
+        {state.queue[0].track.lyrics ?
+            <Lyrics state={state} /> :
+            <div className="preview_holder">
+                <video src={get_attachment(state, state.queue[0].track, 'video')}
+                       autoPlay={true} muted={!state.playing}
+                       key={state.playing}
+                />
+            </div>
+        }
 
         {state.playing ?
             <div className={"progressBar"}
@@ -138,7 +171,7 @@ const PodiumScreen = ({state, actions}) => (
                     {s_to_mns(state.queue[0].track.duration)}
                 )</small>
             </div> :
-            <div className={"startButton"} onclick={() => actions.send_play()}
+            <div className={"startButton"} onclick={() => actions.send("play")}
                  style={{"background-position": (100 - (state.progress / state.settings["karakara.player.autoplay"] * 100))+"%"}}>
                 <span>
                     Press to Start
@@ -172,8 +205,9 @@ function view(state, actions) {
         screen = <VideoScreen state={state} actions={actions} />;
 
     return <div className={"theme-" + state.settings["karakara.player.theme"]}>
+        {state.connected ? null : <h1 id="error">Not Connected To Server</h1>}
         {screen}
-    </div>
+    </div>;
 }
 
 export { view };
