@@ -2,7 +2,7 @@ import os
 import json
 from functools import lru_cache
 
-from calaldees.misc import fast_scan
+from calaldees.files.scan import fast_scan
 
 
 

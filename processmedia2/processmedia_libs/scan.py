@@ -3,7 +3,8 @@ import os.path
 
 import yaml
 
-from calaldees.misc import file_extension_regex, duplicates
+from calaldees.data import duplicates
+from calaldees.exts import file_extension_regex
 
 from . import EXTS
 

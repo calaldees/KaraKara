@@ -2,8 +2,10 @@ import sys
 import re
 import operator
 
-from calaldees.misc import postmortem, file_extension_regex, fast_scan_regex_filter
-from calaldees.file import FolderStructure
+from calaldees.debug import postmortem
+from calaldees.exts import file_extension_regex
+from calaldees.files.scan import fast_scan_regex_filter
+from calaldees.folder_structure import FolderStructure
 from clint.textui.progress import bar as progress_bar
 
 from processmedia_libs import ALL_EXTS

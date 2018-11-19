@@ -6,8 +6,10 @@ import random
 
 from clint.textui.progress import bar as progress_bar
 
-from calaldees.misc import postmortem, hashfile, freeze, first, file_ext
-from calaldees.file import FolderStructure
+from calaldees.debug import postmortem
+from calaldees.data import freeze, first
+from calaldees.exts import file_ext
+from calaldees.folder_structure import FolderStructure
 
 from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools

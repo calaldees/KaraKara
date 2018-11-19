@@ -5,7 +5,8 @@ from io import BytesIO
 import pytesseract
 from PIL import Image
 
-from calaldees.misc import color_distance, color_close, flatten
+from calaldees.data import flatten
+from calaldees.color import color_distance, color_close
 
 import processmedia_libs.subtitle_processor as subtitle_processor
 from ._base import MockEncodeExternalCalls

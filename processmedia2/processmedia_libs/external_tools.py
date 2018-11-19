@@ -8,7 +8,7 @@ import json
 from collections import namedtuple
 import subprocess
 
-from calaldees.misc import cmd_args
+from calaldees.shell import cmd_args
 
 
 # Experiments for ConstantRateFactor for videos

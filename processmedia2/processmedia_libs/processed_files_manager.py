@@ -2,7 +2,7 @@ import os
 import shutil
 import hashlib
 from collections import namedtuple, defaultdict
-from calaldees.misc import fast_scan
+from calaldees.files.scan import fast_scan
 
 ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_group', 'dict_key', 'attachment_type', 'ext', 'salt'))
 

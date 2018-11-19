@@ -5,9 +5,12 @@ import json
 
 from clint.textui.progress import bar as progress_bar
 
-from calaldees.misc import postmortem, fast_scan, epoc, first
-from processmedia_libs import PENDING_ACTION
+from calaldees.data import first
+from calaldees.debug import postmortem
+from calaldees.files.scan import fast_scan
+from calaldees.date_tools import epoc
 
+from processmedia_libs import PENDING_ACTION
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
