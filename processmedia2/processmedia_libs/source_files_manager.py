@@ -2,7 +2,7 @@ import os
 from collections import ChainMap
 
 from calaldees.data import first
-from calaldees.exts import file_ext
+from calaldees.files.exts import file_ext
 
 from . import EXTS
 

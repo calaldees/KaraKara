@@ -8,8 +8,8 @@ from clint.textui.progress import bar as progress_bar
 
 from calaldees.debug import postmortem
 from calaldees.data import freeze, first
-from calaldees.exts import file_ext
-from calaldees.folder_structure import FolderStructure
+from calaldees.files.folder_structure import FolderStructure
+from calaldees.files.exts import file_ext
 
 from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools

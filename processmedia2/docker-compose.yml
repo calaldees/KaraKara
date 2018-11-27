@@ -14,5 +14,17 @@ services:
       - .:/processmedia2:ro
     working_dir: /processmedia2
     #command: python3
-    command: pytest processmedia_libs tests --doctest-modules --variables config.json --variable cmd_ffmpeg="docker run --rm jrottenberg/ffmpeg" --pdb -x
+    command: [
+      'pytest',
+      'processmedia_libs',
+      'tests',
+      '--doctest-modules',
+      #'--variables config.json',
+      '--variable', 'cmd_ffmpeg="docker run --rm jrottenberg/ffmpeg"',
+      '--pdb',
+      '-x',
+    ]
     # -v {path_media}:{path_media}:ro
+
+# docker-compose run --rm processmedia2 bash
+# docker run -it --rm --entrypoint bash -v //C//Users/calal/code/personal/KaraKara/processmedia2/tests/source:/tmp/workdir jrottenberg/ffmpeg

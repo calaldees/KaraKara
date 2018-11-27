@@ -3,9 +3,9 @@ import re
 import operator
 
 from calaldees.debug import postmortem
-from calaldees.exts import file_extension_regex
+from calaldees.files.exts import file_extension_regex
 from calaldees.files.scan import fast_scan_regex_filter
-from calaldees.folder_structure import FolderStructure
+from calaldees.files.folder_structure import FolderStructure
 from clint.textui.progress import bar as progress_bar
 
 from processmedia_libs import ALL_EXTS
