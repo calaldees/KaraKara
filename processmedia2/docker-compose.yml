@@ -12,6 +12,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/processmedia2:ro
+    environment:
+      PATH_HOST: $PATH_HOST
     working_dir: /processmedia2
     #command: python3
     command: [
