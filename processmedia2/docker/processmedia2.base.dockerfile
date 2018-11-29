@@ -1,8 +1,13 @@
 FROM ubuntu:latest
 
+COPY --from=jrottenberg/ffmpeg /usr/local /usr/local
+
 RUN apt-get update && apt-get install -y \
-    docker.io \
+    git \
     python3-pip \
+    jpegoptim \
+    tesseract-ocr-eng \
+    sox \
 && apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt
 RUN pip3 install --upgrade pip setuptools
 

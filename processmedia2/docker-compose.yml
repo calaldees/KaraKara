@@ -1,5 +1,8 @@
 version: '3.6'
 
+volumes:
+  processmedia2_data:
+
 services:
 
   ffmpeg:
@@ -11,9 +14,18 @@ services:
       dockerfile: processmedia2.base.dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      #- processmedia2_data:/processmedia2/data
       - .:/processmedia2:ro
+      # osx and linux can mount absolute paths in the same place - making containers consistent - windows this cant be done - this is my best attempt at a readable solution
+      #- ${PATH_HOST_source}:/PATH_HOST_source:ro
+      #- ${PATH_HOST_meta}:/PATH_HOST_meta:rw
+      #- ${PATH_HOST_processed}:/PATH_HOST_processed:rw
     environment:
-      PATH_HOST: $PATH_HOST
+      PATH_HOST_REPO: $PATH_HOST
+      #PATH_HOST_TEMP: ${HOME}/temp
+      #PATH_HOST_source: ${PATH_HOST_source}
+      #PATH_HOST_meta: ${PATH_HOST_meta}
+      #PATH_HOST_processed: ${PATH_HOST_processed}
     working_dir: /processmedia2
     #command: python3
     command: [
