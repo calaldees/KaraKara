@@ -6,7 +6,6 @@ import random
 
 from clint.textui.progress import bar as progress_bar
 
-from calaldees.debug import postmortem
 from calaldees.data import freeze, first
 from calaldees.files.folder_structure import FolderStructure
 from calaldees.files.exts import file_ext

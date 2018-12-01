@@ -1,11 +1,8 @@
 import json
 
-from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 
-
-def test_probe_media():
-    raise NotImplementedError()
-    external_tools = ProcessMediaFilesWithExternalTools()
+def test_probe_media(external_tools):
+    #raise NotImplementedError()
     assert json.dumps(external_tools.probe_media('tests/source/test1.mp4'), sort_keys=True) == '{"audio": {"bitrate": "2", "format": "aac", "sample_rate": "44100"}, "duration": 30.02, "height": 480, "width": 640}'
 
 

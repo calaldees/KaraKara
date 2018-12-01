@@ -4,6 +4,7 @@ import os
 import tempfile
 import shutil
 import re
+import subprocess
 from functools import partial
 
 
@@ -60,26 +61,39 @@ def path_source_in_repo():
 
 @pytest.fixture(scope="session")
 def path_source_reference(path_source_in_repo, variables):
+    """
+    Copy over media in repo to temp folder (this allows symlinking later)
+    Some files are missing from the source set and need to be derived when this fixture is called
+    """
     tempdir = tempfile.TemporaryDirectory()
 
-    # Copy over media in repo to temp folder (this allows symlinking later)
     test_media_filenames = set(os.listdir(path_source_in_repo))
     for filename in test_media_filenames:
         shutil.copy2(os.path.join(path_source_in_repo, filename), os.path.join(tempdir.name, filename))
 
     # Derive other test media
     if 'test1.mp4' not in test_media_filenames:
-        #ffmpeg -f image2 -framerate 0.1 -i test1_%03d.png -f lavfi -i anullsrc -shortest -c:a aac -strict experimental -r 10 -s 640x480 test1.mp4
-        raise NotImplementedError()
+        # TODO: use `variables` to aquire `cmd_ffmpeg`
+        cmd = ('ffmpeg', '-f', 'image2', '-framerate', '0.1', '-i', os.path.join(path_source_in_repo, 'test1_%03d.png'), '-f', 'lavfi', '-i', 'anullsrc', '-shortest', '-c:a', 'aac', '-strict', 'experimental', '-r', '10', '-s', '640x480', os.path.join(tempdir.name, 'test1.mp4'))
+        cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+        assert os.path.isfile(os.path.join(tempdir.name, 'test1.mp4'))
 
     if 'test2.ogg' not in test_media_filenames:
-        #sox -n -r 44100 -c 2 -L test2.ogg trim 0.0 15.000
-        raise NotImplementedError()
+        # TODO: use `variables` to aquire `cmd_sox`
+        cmd = ('sox', '-n', '-r', '44100', '-c', '2', '-L', os.path.join(tempdir.name, 'test2.ogg'), 'trim', '0.0', '15.000')
+        cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+        assert os.path.isfile(os.path.join(tempdir.name, 'test2.ogg'))
 
-    yield tempdir
+    yield tempdir.name
     tempdir.cleanup()
 
 
 @pytest.fixture()
 def ProcessMediaTestManager(path_source_reference):
     return partial(ProcessMediaTestManagerBase, path_source_reference)
+
+
+@pytest.fixture()
+def external_tools():
+    from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
+    return ProcessMediaFilesWithExternalTools()

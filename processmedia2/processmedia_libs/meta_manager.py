@@ -78,7 +78,7 @@ class MetaManager(object):
     @property
     def files(self):
         # wha? (mtime == None or f.stat().st_mtime >= mtime)
-        return fast_scan(self.path, search_filter=lambda f: f.name.endswith('.json'))
+        return fast_scan(self.path, search_filter=lambda f: f.endswith('.json'))
 
     @property
     def source_hashs(self):

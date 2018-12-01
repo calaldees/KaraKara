@@ -7,8 +7,10 @@ import os.path
 import json
 from collections import namedtuple
 import subprocess
+from functools import partial
 
 from calaldees.shell import cmd_args
+cmd_args = partial(cmd_args, FLAG_PREFIX='-')
 
 
 # Experiments for ConstantRateFactor for videos
@@ -62,8 +64,9 @@ class ProcessMediaFilesWithExternalTools():
             },
             **config,
         }
-        import pdb ; pdb.set_trace()
         # parse cmd_xxx into tuples
+        for key in ('cmd_ffmpeg', 'cmd_ffprobe', 'cmd_jpegoptim', 'cmd_sox'):
+            self.config[key] = tuple(self.config[key].split(' ')) if isinstance(self.config[key], str) else self.config[key]
         self.config.update({
             'vf_for_preview': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(self.config['preview_width'])    # scale=w='min(500, iw*3/2):h=-1'
         })
@@ -73,48 +76,49 @@ class ProcessMediaFilesWithExternalTools():
                 loglevel=self.config['log_level'],
                 y=None,
             ),
-            'encode_image_to_video': cmd_args({
-                'vcodec': self.config['h264_codec'],
-                'r': 5,  # 5 fps
-                'bf': 0,  # wha dis do?
-                'qmax': 1,  # wha dis do?
-                'vf': self.config['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
-                'threads': self.config['threads'],
-            }),
-            'extract_audio': cmd_args({
-                'vcodec': 'none',
-                'ac': 2,
-                'ar': 44100,
-            }),
-            'encode_video': cmd_args({
+            'encode_image_to_video': cmd_args(
+                vcodec=self.config['h264_codec'],
+                r=5,  # 5 fps
+                bf=0,  # wha dis do?
+                qmax=1,  # wha dis do?
+                vf=self.config['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
+                threads=self.config['threads'],
+            ),
+            'extract_audio': cmd_args(
+                vcodec='none',
+                ac=2,
+                ar=44100,
+            ),
+            'encode_video': cmd_args(
                 # preset='slow',
-                'vcodec': self.config['h264_codec'],
-                'crf': 21,
-                'maxrate': '1500k',
-                'bufsize': '2500k',
+                vcodec=self.config['h264_codec'],
+                crf=21,
+                maxrate='1500k',
+                bufsize='2500k',
 
-                'acodec': 'aac',
-                'strict': 'experimental',
-                'ab': '196k',
-                'threads': self.config['threads'],
-            }),
-            'encode_preview': cmd_args({
-                'vcodec': self.config['h264_codec'],
-                'crf': 34,
-                'vf': self.config['vf_for_preview'],
-                'acodec': 'aac',  # libfdk_aac
-                'strict': 'experimental',
-                'ab': '48k',
-                'threads': self.config['threads'],
+                acodec='aac',
+                strict='experimental',
+                ab='196k',
+                threads=self.config['threads'],
+            ),
+            'encode_preview': cmd_args(
+                vcodec=self.config['h264_codec'],
+                crf=34,
+                vf=self.config['vf_for_preview'],
+                acodec='aac',  # libfdk_aac
+                strict='experimental',
+                ab='48k',
+                threads=self.config['threads'],
                 #'profile:a': 'aac_he_v1',
                 #ac=1,
-            }),
+            ),
         })
 
     CommandResult = namedtuple('CommandResult', ('success', 'result'))
     def _run_tool(self, *args, **kwargs):
         cmd = cmd_args(*args, **kwargs)
         log.debug(cmd)
+        #import pdb ; pdb.set_trace()
         cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=self.config['process_timeout_seconds'])
         if cmd_result.returncode != 0:
             log.error(cmd_result)
@@ -161,7 +165,7 @@ class ProcessMediaFilesWithExternalTools():
         TODO: use same codec as encode_video
         """
         log.debug('encode_image_to_video - %s', os.path.basename(source))
-        _run_tool(
+        self._run_tool(
             *self.config['ffmpeg_base_args'],
             '-loop', '1',
             '-i', source,
@@ -180,7 +184,7 @@ class ProcessMediaFilesWithExternalTools():
         if subtitle_source:
             filters.append(f'subtitles={subtitle_source}')
 
-        return _run_tool(
+        return self._run_tool(
             *self.config['ffmpeg_base_args'],
             '-i', video_source,
             '-i', audio_source,
@@ -202,13 +206,13 @@ class ProcessMediaFilesWithExternalTools():
         path = os.path.dirname(destination)
 
         cmds = (
-            lambda: _run_tool(
+            lambda: self._run_tool(
                 *self.config['ffmpeg_base_args'],
                 '-i', source,
                 *self.config['extract_audio'],
                 os.path.join(path, 'audio_raw.wav'),
             ),
-            lambda: _run_tool(
+            lambda: self._run_tool(
                 *self.config['cmd_sox'],
                 os.path.join(path, 'audio_raw.wav'),
                 #os.path.join(path, 'audio_norm.wav'),
@@ -235,7 +239,7 @@ class ProcessMediaFilesWithExternalTools():
         #crf = crf_from_res(**probe_media(source))
         #log.debug('crf: %s', crf)
 
-        return _run_tool(
+        return self._run_tool(
             *self.config['ffmpeg_base_args'],
             '-i', source,
             *self.config['encode_preview'],
@@ -247,7 +251,7 @@ class ProcessMediaFilesWithExternalTools():
         log.debug('extract_image - %s', os.path.basename(source))
 
         cmds = (
-            lambda: _run_tool(
+            lambda: self._run_tool(
                 *self.config['ffmpeg_base_args'],
                 '-i', source,
                 *cmd_args(
@@ -259,7 +263,7 @@ class ProcessMediaFilesWithExternalTools():
                 destination,
             ),
             lambda: (os.path.exists(destination), 'expected destination image file was not generated (video source may be damaged) {0}'.format(source)),
-            lambda: _run_tool(
+            lambda: self._run_tool(
                 *self.config['cmd_jpegoptim'],
                 #'--size={}'.format(CONFIG['jpegoptim']['target_size_k']),
                 '--strip-all',

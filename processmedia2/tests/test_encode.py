@@ -1,5 +1,6 @@
 import pytest
 import os
+import subprocess
 from io import BytesIO
 
 import pytesseract
@@ -34,7 +35,7 @@ def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
     return Image.open(BytesIO(subprocess.check_output(cmd, stderr=subprocess.PIPE, shell=True)))
 
 
-def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES):
+def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES, external_tools):
     """
     Test normal video + subtitles encode flow
     Thubnail images and preview videos should be generated
@@ -79,11 +80,11 @@ def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES):
         for image_num, color in enumerate((COLOR_RED, COLOR_GREEN, COLOR_GREEN, COLOR_BLUE)):
             assert color_close(color, Image.open(processed_files['image{}'.format(image_num+1)].absolute).getpixel(SAMPLE_COORDINATE))
 
-        video_details = probe_media(video_file)
-        preview_details = probe_media(preview_file)
+        video_details = external_tools.probe_media(video_file)
+        preview_details = external_tools.probe_media(preview_file)
         assert abs(video_details['duration'] - preview_details['duration']) < 0.5, 'Main video and Preview video should be the same duration'
-        assert preview_details['width'] == ENCODE_CONFIG['preview_width'], 'Preview video should match expected output size'
-        assert video_details['width'] > ENCODE_CONFIG['preview_width'], 'Main video should be greater than preview video size'
+        assert preview_details['width'] == external_tools.config['preview_width'], 'Preview video should match expected output size'
+        assert video_details['width'] > external_tools.config['preview_width'], 'Main video should be greater than preview video size'
 
 
 def test_encode_incomplete(ProcessMediaTestManager, TEST2_AUDIO_FILES):
