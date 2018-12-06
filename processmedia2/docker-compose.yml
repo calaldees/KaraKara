@@ -32,12 +32,11 @@ services:
       'processmedia_libs',
       'tests',
       '--doctest-modules',
-      #'--variables config.docker.json',
-      #'--variable', 'cmd_ffmpeg="docker run --rm jrottenberg/ffmpeg"',
       '--pdb',
       '-x',
+      #'-k', 'test_get_image_from_video'
     ]
-    # 'make' 'test'
+    #command: ['make', 'test']
 
 # docker-compose run --rm processmedia2 bash
 # docker run -it --rm --entrypoint bash -v //C//Users/calal/code/personal/KaraKara/processmedia2/tests/source:/tmp/workdir jrottenberg/ffmpeg

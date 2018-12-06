@@ -5,6 +5,7 @@ from pathlib import Path
 #from shutil import copyfile
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
+from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 
 from scan_media import scan_media
 from encode_media import encode_media, Encoder
@@ -146,7 +147,8 @@ class MockEncodeExternalCalls(object):
         self.patchers.clear()
         self.patchers.update({
             method_name: patch.object(
-                'processmedia_libs.external_tools.ProcessMediaFilesWithExternalTools',
+                #'processmedia_libs.external_tools.ProcessMediaFilesWithExternalTools',
+                ProcessMediaFilesWithExternalTools,
                 method_name,
                 wraps=mock_return
             )

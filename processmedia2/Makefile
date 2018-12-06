@@ -109,7 +109,7 @@ import_media_production_api:
 # Test -------------------------------------------------------------------------
 .PHONY: test
 test:
-	$(MAKE) all --directory tests/source
+	#$(MAKE) all --directory tests/source
 	$(PYTEST) processmedia_libs tests --doctest-modules
 
 .PHONY: cloc
@@ -121,4 +121,4 @@ cloc:
 .PHONY: clean
 clean:
 	rm -rf .cache .pytest_cache __pycache__ $(ENV) config.json logging.json logs mtimes.json
-	$(MAKE) clean --directory tests/source
+	#$(MAKE) clean --directory tests/source
