@@ -20,22 +20,25 @@ services:
       #- ${PATH_HOST_source}:/PATH_HOST_source:ro
       #- ${PATH_HOST_meta}:/PATH_HOST_meta:rw
       #- ${PATH_HOST_processed}:/PATH_HOST_processed:rw
-    #environment:
+    environment:
+      KARAKARA_PROCESSMEDIA2_ENABLED: ${KARAKARA_PROCESSMEDIA2_ENABLED:-true}
+      KARAKARA_RESCAN_INTERVAL_SECONDS: 600
+      KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
+      KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
     #  PATH_HOST_REPO: $PATH_HOST
       #PATH_HOST_TEMP: ${HOME}/temp
       #PATH_HOST_source: ${PATH_HOST_source}
       #PATH_HOST_meta: ${PATH_HOST_meta}
       #PATH_HOST_processed: ${PATH_HOST_processed}
-    #command: python3
-    command: [
-      'pytest',
-      'processmedia_libs',
-      'tests',
-      '--doctest-modules',
-      '--pdb',
-      '-x',
-      #'-k', 'test_get_image_from_video'
-    ]
+    # command: [
+    #   'pytest',
+    #   'processmedia_libs',
+    #   'tests',
+    #   '--doctest-modules',
+    #   '--pdb',
+    #   '-x',
+    #   #'-k', 'test_get_image_from_video'
+    # ]
     #command: ['make', 'test']
 
 # docker-compose run --rm processmedia2 bash
