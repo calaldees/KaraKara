@@ -15,7 +15,11 @@ COPY processmedia2.pip requirements.pip
 RUN pip3 install -r requirements.pip
 
 WORKDIR /processmedia2
-CMD ["/processmedia2/docker-compose.yml.processmedia2.sh"]
+
+#COPY --from=krallin/ubuntu-tini /usr/local/bin/tini /usr/local/bin/tini
+#ENTRYPOINT ["/usr/local/bin/tini", "--", "/processmedia2/docker-compose.yml.processmedia2.sh"]
+#https://github.com/docker-library/mysql/issues/47#issuecomment-140339288
+CMD /processmedia2/docker-compose.yml.processmedia2.sh
 
 # docker build -t processmedia2:latest --file .\processmedia2.base.dockerfile .
 # docker run -it --rm -v ../:/processmedia2:ro -v /var/run/docker.sock:/var/run/docker.sock docker.io processmedia2:latest
