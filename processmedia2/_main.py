@@ -5,6 +5,7 @@ import fcntl
 import os
 
 from calaldees.debug import postmortem
+from calaldees.environ import get_env
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
@@ -69,6 +70,10 @@ def main(
     with open(kwargs['config'], 'rt') as config_filehandle:
         config = json.load(config_filehandle)
         kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
+
+    # Format all strings with string formatter/replacer - this overlays ENV variables too
+    for k in kwargs.keys():
+        kwargs[k] = get_env(k, _environ_templates=kwargs)
 
     if lock:
         try:

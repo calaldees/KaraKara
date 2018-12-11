@@ -5,30 +5,27 @@ volumes:
 
 services:
 
-  #ffmpeg:
-  #  image: jrottenberg/ffmpeg
-
   processmedia2:
     build:
       context: ./docker
       dockerfile: processmedia2.base.dockerfile
+    environment:
+        - PATH_HOST_source
+        - PATH_HOST_meta
+        - PATH_HOST_processed
+    env_file:
+        - .env
     volumes:
-      #- /var/run/docker.sock:/var/run/docker.sock
       - .:/processmedia2:ro
       - processmedia2_data:/processmedia2/data
-      - ${PATH_HOST_source}:/media/source:ro
-      - ${PATH_HOST_meta}:/media/meta:rw
-      - ${PATH_HOST_processed}:/media/processed:rw
+      - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
+      - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
+      - ${PATH_HOST_processed}:${PATH_CONTAINER_MEDIA}/processed:rw
     environment:
       KARAKARA_PROCESSMEDIA2_ENABLED: ${KARAKARA_PROCESSMEDIA2_ENABLED:-true}
       KARAKARA_RESCAN_INTERVAL_SECONDS: 600
       KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
       KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
-    #  PATH_HOST_REPO: $PATH_HOST
-      #PATH_HOST_TEMP: ${HOME}/temp
-      #PATH_HOST_source: ${PATH_HOST_source}
-      #PATH_HOST_meta: ${PATH_HOST_meta}
-      #PATH_HOST_processed: ${PATH_HOST_processed}
     command: ./docker-compose.yml.processmedia2.sh
     # command: [
     #   'pytest',
