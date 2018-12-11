@@ -15,11 +15,13 @@ log = logging.getLogger(__name__)
 DEFAULT_VERSION = '0.0.0'
 
 DEFAULT_DATA_PATH = 'data'
-DEFAULT_LOCKFILE = os.path.join(DEFAULT_DATA_PATH, '.lock')
-DEFAULT_CONFIG_FILENAME = os.path.join(DEFAULT_DATA_PATH, 'config.json')
-DEFAULT_LOGGINGCONF = os.path.join(DEFAULT_DATA_PATH, 'logging.json')
-DEFAULT_MTIME_STORE_PATH = os.path.join(DEFAULT_DATA_PATH, 'mtimes.json')
-DEFAULT_CMD_FFMPEG = 'nice ffmpeg'
+DEFAULT_kwargs = {
+    'config': os.path.join(DEFAULT_DATA_PATH, 'config.json'),
+    'lockfile': os.path.join(DEFAULT_DATA_PATH, '.lock'),
+    'loggingconf': os.path.join(DEFAULT_DATA_PATH, 'logging.json'),
+    'mtime_store_path': os.path.join(DEFAULT_DATA_PATH, 'mtimes.json'),
+    'cmd_ffmpeg': 'nice ffmpeg',
+}
 
 
 def main(
@@ -39,7 +41,7 @@ def main(
         description=description,
         epilog=epilog,
     )
-    parser.add_argument('--config', action='store', help='', default=DEFAULT_CONFIG_FILENAME)
+    parser.add_argument('--config', action='store', help=f" default:{DEFAULT_kwargs['config']}")
 
     parser.add_argument('--path_source', action='store', help='')
     parser.add_argument('--path_processed', action='store', help='')
@@ -47,17 +49,20 @@ def main(
 
     parser.add_argument('--force', action='store_true', help='ignore mtime optimisation check')
 
-    parser.add_argument('--loggingconf', action='store', help='logfilename', default=DEFAULT_LOGGINGCONF)
-    parser.add_argument('--lockfile', action='store', help='lockfilename, to ensure multiple encoders do not operate at once', default=DEFAULT_LOCKFILE)
-    parser.add_argument('--mtime_store_path', action='store', help='optimisation file that tracks the last time processing was done on a folder.', default=DEFAULT_MTIME_STORE_PATH)
+    parser.add_argument('--loggingconf', action='store', help=f" default:{DEFAULT_kwargs['loggingconf']}")
+    parser.add_argument('--lockfile', action='store', help=f"lockfilename, to ensure multiple encoders do not operate at once. default:{DEFAULT_kwargs['lockfile']}")
+    parser.add_argument('--mtime_store_path', action='store', help=f"optimisation file that tracks the last time processing was done on a folder. default:{DEFAULT_kwargs['mtime_store_path']}")
 
-    parser.add_argument('--cmd_ffmpeg', action='store', help='cmd for ffmpeg', default=DEFAULT_CMD_FFMPEG)  # TODO: is this needed? It was a consideration for containerisation, but the container contains the relevent binarys now
+    parser.add_argument('--cmd_ffmpeg', action='store', help=f"cmd for ffmpegdefault:{DEFAULT_kwargs['cmd_ffmpeg']}")  # TODO: is this needed? It was a consideration for containerisation, but the container contains the relevent binarys now
 
     parser.add_argument('--postmortem', action='store_true', help='drop into pdb on fail')
     parser.add_argument('--version', action='version', version=version)
 
     additional_arguments_function(parser)
-    kwargs = vars(parser.parse_args())
+    kwargs = {
+        **DEFAULT_kwargs,
+        **vars(parser.parse_args())
+    }
     additional_arguments_processing_function(kwargs)
 
     # Overlay config.json defaults

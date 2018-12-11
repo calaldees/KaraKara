@@ -1,0 +1,13 @@
+{
+    "postmortem": true,
+
+    "api_host": "TODO_NEEDS_CONTAINER_NAME:6543",
+
+    "loggingconf": "logging.json.dist",
+    "lockfile": "data/.lock",
+    "mtime_store_path": "data/mtimes.json",
+
+    "path_source": "/media/source",
+    "path_meta": "/media/meta",
+    "path_processed": "/media/processed"
+}

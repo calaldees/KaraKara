@@ -13,13 +13,12 @@ services:
       context: ./docker
       dockerfile: processmedia2.base.dockerfile
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      #- processmedia2_data:/processmedia2/data
+      #- /var/run/docker.sock:/var/run/docker.sock
       - .:/processmedia2:ro
-      # osx and linux can mount absolute paths in the same place - making containers consistent - windows this cant be done - this is my best attempt at a readable solution
-      #- ${PATH_HOST_source}:/PATH_HOST_source:ro
-      #- ${PATH_HOST_meta}:/PATH_HOST_meta:rw
-      #- ${PATH_HOST_processed}:/PATH_HOST_processed:rw
+      - processmedia2_data:/processmedia2/data
+      - ${PATH_HOST_source}:/media/source:ro
+      - ${PATH_HOST_meta}:/media/meta:rw
+      - ${PATH_HOST_processed}:/media/processed:rw
     environment:
       KARAKARA_PROCESSMEDIA2_ENABLED: ${KARAKARA_PROCESSMEDIA2_ENABLED:-true}
       KARAKARA_RESCAN_INTERVAL_SECONDS: 600
@@ -30,6 +29,7 @@ services:
       #PATH_HOST_source: ${PATH_HOST_source}
       #PATH_HOST_meta: ${PATH_HOST_meta}
       #PATH_HOST_processed: ${PATH_HOST_processed}
+    command: ./docker-compose.yml.processmedia2.sh
     # command: [
     #   'pytest',
     #   'processmedia_libs',

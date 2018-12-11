@@ -8,3 +8,5 @@ logging.json
 mtimes.json
 *.log
 logs
+
+data/
