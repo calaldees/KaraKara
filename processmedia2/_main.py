@@ -6,6 +6,7 @@ import os
 
 from calaldees.debug import postmortem
 from calaldees.environ import get_env
+from calaldees.data import merge_dicts
 from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
@@ -60,20 +61,26 @@ def main(
     parser.add_argument('--version', action='version', version=version)
 
     additional_arguments_function(parser)
-    kwargs = {
-        **DEFAULT_kwargs,
-        **vars(parser.parse_args())
-    }
-    additional_arguments_processing_function(kwargs)
+    kwargs_cmd = vars(parser.parse_args())
+    kwargs = merge_dicts(
+        DEFAULT_kwargs,
+        kwargs_cmd,
+    )
 
     # Overlay config.json defaults
-    with open(kwargs['config'], 'rt') as config_filehandle:
-        config = json.load(config_filehandle)
-        kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
+    if kwargs_cmd.get('config') and not os.path.isfile(kwargs['config']):
+        raise Exception(f"config file does not exist {kwargs['config']}")
+    if os.path.isfile(kwargs['config']):
+        with open(kwargs['config'], 'rt') as config_filehandle:
+            config = json.load(config_filehandle)
+            kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
 
     # Format all strings with string formatter/replacer - this overlays ENV variables too
     for k in kwargs.keys():
         kwargs[k] = get_env(k, _environ_templates=kwargs)
+
+    # Process str values into other data types
+    additional_arguments_processing_function(kwargs)
 
     if lock:
         try:
