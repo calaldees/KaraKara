@@ -62,22 +62,24 @@ def main(
 
     additional_arguments_function(parser)
     kwargs_cmd = vars(parser.parse_args())
-    kwargs = merge_dicts(
-        DEFAULT_kwargs,
-        kwargs_cmd,
-    )
 
-    # Overlay config.json defaults
-    if kwargs_cmd.get('config') and not os.path.isfile(kwargs['config']):
-        raise Exception(f"config file does not exist {kwargs['config']}")
-    if os.path.isfile(kwargs['config']):
-        with open(kwargs['config'], 'rt') as config_filehandle:
+    # Read config.json values
+    if kwargs_cmd.get('config') and not os.path.isfile(kwargs_cmd['config']):
+        raise Exception(f"config file does not exist {kwargs_cmd['config']}")
+    config_filename = kwargs_cmd.get('config', DEFAULT_kwargs['config'])
+    if os.path.isfile(config_filename):
+        with open(config_filename, 'rt') as config_filehandle:
             config = json.load(config_filehandle)
-            kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
+            #kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
+
+    # Merge kwargs in order of precidence
+    kwargs = merge_dicts(DEFAULT_kwargs, config, kwargs_cmd)
 
     # Format all strings with string formatter/replacer - this overlays ENV variables too
+    #kwargs_templates = {k: v for k, v in kwargs.items() if v != None}
     for k in kwargs.keys():
-        kwargs[k] = get_env(k, _environ_templates=kwargs)
+        if isinstance(kwargs[k], str):
+            kwargs[k] = kwargs[k].format(**os.environ, **kwargs)
 
     # Process str values into other data types
     additional_arguments_processing_function(kwargs)

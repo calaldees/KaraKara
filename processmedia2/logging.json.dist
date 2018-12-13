@@ -23,7 +23,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filename": "data/logs/processmedia.log",
+            "filename": "data/processmedia.log",
             "maxBytes": 102400,
             "backupCount": 3,
             "encoding": "utf8"

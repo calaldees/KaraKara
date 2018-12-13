@@ -18,6 +18,7 @@ function run() {
 
 while [ "${KARAKARA_PROCESSMEDIA2_ENABLED:-true}" == "true" ]; do
     run || true
+    echo "sleep ..."
     sleep ${KARAKARA_RESCAN_INTERVAL_SECONDS:-600}
     test $? -gt 128 && exit 0  # https://unix.stackexchange.com/questions/42287/terminating-an-infinite-loop
 done

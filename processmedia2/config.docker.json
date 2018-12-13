@@ -1,6 +1,4 @@
 {
-    "postmortem": true,
-
     "api_host": "TODO_NEEDS_CONTAINER_NAME:6543",
 
     "loggingconf": "logging.json.dist",

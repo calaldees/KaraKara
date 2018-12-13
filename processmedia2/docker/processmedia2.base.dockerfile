@@ -16,7 +16,7 @@ RUN pip3 install -r requirements.pip
 
 WORKDIR /processmedia2
 
-RUN mkdir -p /media/source /media/meta /media/processed && chmod -R 777 /media/
+#RUN mkdir -p /media/source /media/meta /media/processed && chmod -R 777 /media/
 
 #COPY --from=krallin/ubuntu-tini /usr/local/bin/tini /usr/local/bin/tini
 #ENTRYPOINT ["/usr/local/bin/tini", "--", "/processmedia2/docker-compose.yml.processmedia2.sh"]
