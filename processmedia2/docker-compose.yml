@@ -10,7 +10,7 @@ services:
       context: ./docker
       dockerfile: processmedia2.base.dockerfile
     env_file:
-        - .env
+      - .env
     volumes:
       - .:/processmedia2:ro
       - processmedia2_data:/processmedia2/data

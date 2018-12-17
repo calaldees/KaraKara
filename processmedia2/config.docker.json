@@ -7,7 +7,7 @@
     "path_meta": "{PATH_CONTAINER_MEDIA}/meta",
     "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
 
-    "api_host": "${KARAKARA_CONTAINER_NAME_website}:${PORT_WEBSITE}",
+    "api_host": "{KARAKARA_CONTAINER_NAME_website}:{PORT_WEBSITE}",
 
     "process_order_function": "random",
     "disable_meta_write_safety": true

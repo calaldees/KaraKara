@@ -4,14 +4,14 @@ volumes:
     website_db:
     website_data_1:
     website_data_2:
+    processmedia2_data:
 
 services:
 
     website:
         build:
-            context: ./docker
-            dockerfile: python.Dockerfile
-            #image: python3_virtualenv
+            context: ./docker/website
+            dockerfile: website.Dockerfile
         env_file:
             - .env
         expose:
@@ -26,8 +26,8 @@ services:
             - postgres
         volumes:
             - ./:${PATH_CONTAINER_REPO}:ro
-            - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
-            - ${PATH_HOST_MEDIA}/source:${PATH_CONTAINER_MEDIA}/source:rw  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
+            #- ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+            #- ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - website_data_1:${PATH_CONTAINER_WEBSITE}/data:rw
             - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info:rw
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
@@ -59,3 +59,36 @@ services:
         links:
             - website
         command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+
+    processmedia2:
+        build:
+            context: docker/processmedia2/docker
+            dockerfile: processmedia2.base.dockerfile
+        env_file:
+            - .env
+        volumes:
+            - ./processmedia2:/processmedia2:ro
+            - processmedia2_data:/processmedia2/data
+            - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
+            - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
+            - ${PATH_HOST_processed}:${PATH_CONTAINER_MEDIA}/processed:rw
+        environment:
+            KARAKARA_PROCESSMEDIA2_ENABLED: ${KARAKARA_PROCESSMEDIA2_ENABLED:-true}
+            KARAKARA_RESCAN_INTERVAL_SECONDS: 600
+            KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
+            KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
+            KARAKARA_CONTAINER_NAME_website: 'website'
+        command: ./docker-compose.yml.processmedia2.sh
+        # command: [
+        #   'pytest',
+        #   'processmedia_libs',
+        #   'tests',
+        #   '--doctest-modules',
+        #   '--pdb',
+        #   '-x',
+        #   #'-k', 'test_get_image_from_video'
+        # ]
+        #command: ['make', 'test']
+
+# docker-compose run --rm processmedia2 bash
+# docker run -it --rm --entrypoint bash -v //C//Users/calal/code/personal/KaraKara/processmedia2/tests/source:/tmp/workdir jrottenberg/ffmpeg

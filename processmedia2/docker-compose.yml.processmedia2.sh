@@ -11,8 +11,8 @@ function run() {
     python3 encode_media.py  --config ${KARAKARA_PROCESSMEDIA2_CONFIG}
     python3 import_media.py  --config ${KARAKARA_PROCESSMEDIA2_CONFIG} --force
     if [ "${KARAKARA_PROCESSMEDIA2_CLEANUP:-false}" == "true" ]; then
-    echo "cleanup"
-    #python3 cleanup_media.py --config ${KARAKARA_PROCESSMEDIA2_CONFIG}
+        echo "cleanup"
+        python3 cleanup_media.py --config ${KARAKARA_PROCESSMEDIA2_CONFIG}
     fi
 }
 
