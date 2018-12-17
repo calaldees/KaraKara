@@ -51,14 +51,20 @@ class MetaManager(object):
         if not metafile.has_updated():
             return
 
-        # If meta file modifyed since scan - abort
-        if os.path.exists(filepath) and os.stat(filepath).st_mtime != self._meta_timestamps[name]:
-            log.warning('Refusing to save changes. %s has been updated by another application', filepath)
-            return
+        # If meta file modified since scan - abort
+        _check_meta_mtime_safety = False
+        if _check_meta_mtime_safety and os.path.exists(filepath):
+            mtime_expected = self._meta_timestamps[name]
+            mtime_current = os.stat(filepath).st_mtime
+            if mtime_current != mtime_expected:
+                log.warning(f'Refusing to save changes. {filepath} has been updated by another application. Expected mtime of {mtime_expected} but got {mtime_current}')
+                return
 
+        #log.info(f'meta saving {name} - before mtime {os.stat(filepath).st_mtime}')
         with open(self._filepath(name), 'w') as destination:
             json.dump(metafile.data, destination)
         self._meta_timestamps[name] = os.stat(filepath).st_mtime
+        log.info(f'meta saved {name} - after mtime {self._meta_timestamps[name]}')
 
     def delete(self, name):
         try:

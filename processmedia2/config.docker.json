@@ -1,11 +1,14 @@
 {
-    "api_host": "TODO_NEEDS_CONTAINER_NAME:6543",
-
     "loggingconf": "logging.json.dist",
     "lockfile": "data/.lock",
     "mtime_store_path": "data/mtimes.json",
 
     "path_source": "{PATH_CONTAINER_MEDIA}/source",
     "path_meta": "{PATH_CONTAINER_MEDIA}/meta",
-    "path_processed": "{PATH_CONTAINER_MEDIA}/processed"
+    "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
+
+    "api_host": "${KARAKARA_CONTAINER_NAME_website}:${PORT_WEBSITE}",
+
+    "process_order_function": "random",
+    "disable_meta_write_safety": true
 }

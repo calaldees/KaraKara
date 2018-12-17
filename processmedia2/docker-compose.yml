@@ -9,10 +9,6 @@ services:
     build:
       context: ./docker
       dockerfile: processmedia2.base.dockerfile
-    environment:
-        - PATH_HOST_source
-        - PATH_HOST_meta
-        - PATH_HOST_processed
     env_file:
         - .env
     volumes:
@@ -26,6 +22,7 @@ services:
       KARAKARA_RESCAN_INTERVAL_SECONDS: 600
       KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
       KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
+      KARAKARA_CONTAINER_NAME_website: 'website'
     command: ./docker-compose.yml.processmedia2.sh
     # command: [
     #   'pytest',

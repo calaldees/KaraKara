@@ -111,6 +111,15 @@ def scan_media(**kwargs):
     meta.save_all()
 
 
+# Main -------------------------------------------------------------------------
+
+def additional_arguments(parser):
+    parser.add_argument('--disable_meta_write_safety', action='store_true', help="To prevent multiple process's conflicting. We keep track of meta/*.json file mtimes. If these files are modified by another process, we defensively don't overwrite these changes. This option is require by windows docker volumes mounts as the files take time to propergate to the windows filesystem and this upsets defensive mtime protection", default=False)
+
+
 if __name__ == "__main__":
     from _main import main
-    main('scan_media', scan_media, folder_type_to_derive_mtime='source', version=VERSION)
+    main(
+        'scan_media', scan_media, folder_type_to_derive_mtime='source', version=VERSION,
+        additional_arguments_function=additional_arguments,
+    )
