@@ -1,13 +1,14 @@
 FROM python:3-alpine
 
+# Upgrade python tools
+RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
+
 #RUN apt-get update && apt-get install -y \
-RUN apk --update --no-cache add \
+RUN apk --no-cache add \
     nano \
     curl \
     less \
     make \
     git \
-&& rm -rf /var/lib/apt/lists/* && rm -rf /var/cache/apk/*
+&& true
 #&& apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt
-
-RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
