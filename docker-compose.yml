@@ -38,7 +38,7 @@ services:
         env_file:
             - .env
         ports:
-            - "${PORT_NGINX}:80"
+            - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
             - ${PATH_HOST_processed}:/media/processed:rw
         links:
