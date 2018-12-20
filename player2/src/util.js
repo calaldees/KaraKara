@@ -83,7 +83,11 @@ function get_tag(tag) {
     else return "";
 }
 
-// figure out where our server is, accounting for local file:// mode
+// figure out where our server is, accounting for three use-cases:
+// - stand-alone file:// mode
+// - development http:// mode
+// - production https:// mode
+// and allow manual overrides where appropriate
 function get_protocol() {
     if(document.location.protocol === "file:") return "https:";
     else return document.location.protocol;
