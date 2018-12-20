@@ -52,7 +52,7 @@ static.externals = data/externals/static
 static.player = ../player
 static.player2 = ../player2/dist
 
-static.processmedia2.config = ../processmedia2/config.json -> jsonfile
+static.processmedia2.config = processmedia_config.json -> jsonfile
 static.processmedia2.log = ../processmedia2/logs/processmedia.log
 static.backup = data/backup
 
