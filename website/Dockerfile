@@ -16,7 +16,7 @@ RUN pip3 install --upgrade pip setuptools virtualenv
 WORKDIR /app
 RUN virtualenv data/_env
 COPY requirements.pip /tmp/requirements.pip
-RUN /app/data/_env/bin/pip3 install -r /tmp/requirements.pip
+RUN data/_env/bin/pip3 install -r /tmp/requirements.pip
 
 COPY . /app
 RUN make install
