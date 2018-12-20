@@ -63,17 +63,6 @@ ${video(track)}
                 <input type='hidden' name='track_id'       value='${track['id']}' />
                 <input type='submit' name='submit_'        value='Queue Track'   />
             </form>
-            <script>
-                function store_performer_name(args) {
-                    $.cookie('last_performer_name', {value:$("#input_performer_name").val()}, {path:'/'});
-                }
-                $(document).ready(function() {
-                    var last_performer_name_cookie = $.cookie("last_performer_name");
-                    if (last_performer_name_cookie) {
-                        $('#input_performer_name').val(last_performer_name_cookie.value || "");
-                    }
-                });
-            </script>
         % endif
     % endif
 </div>

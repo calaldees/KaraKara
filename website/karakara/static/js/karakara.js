@@ -39,9 +39,18 @@ function update_priority_token_feedback() {
     }
 }
 
+function store_performer_name(args) {
+	$.cookie('last_performer_name', {value:$("#input_performer_name").val()}, {path:'/'});
+}
+
 $(document).ready(function() {
     if (priority_token_cookie) {
         interval_id = setInterval(update_priority_token_feedback, 1000);
         update_priority_token_feedback();
     }
+
+	var last_performer_name_cookie = $.cookie("last_performer_name");
+	if (last_performer_name_cookie) {
+		$('#input_performer_name').val(last_performer_name_cookie.value || "");
+	}
 });

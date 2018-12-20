@@ -35,6 +35,9 @@ msgstr "Remove"
 msgid "mobile.home.input_queue_label"
 msgstr "Queue to join"
 
+msgid "mobile.home.input_performer_name_label"
+msgstr "Badge name"
+
 #: karakara/templates/html/queue_home.mako:35
 msgid "mobile.home.search_tags"
 msgstr "Explore tracks"
