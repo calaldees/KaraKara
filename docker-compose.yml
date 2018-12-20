@@ -67,14 +67,14 @@ services:
 
     processmedia2:
         build:
-            context: docker/processmedia2
-            dockerfile: processmedia2.base.dockerfile
+            context: ./processmedia2
+            dockerfile: Dockerfile
         links:
             - website
         env_file:
             - .env
         volumes:
-            - ./processmedia2:/processmedia2:ro
+            #- ./processmedia2:/processmedia2:ro
             - processmedia2_data:/processmedia2/data
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
             - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
