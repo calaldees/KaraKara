@@ -94,6 +94,12 @@ function get_hostname() {
     else if(document.location.protocol === "file:") return "karakara.org.uk";
     else return document.location.hostname;
 }
+function get_ws_port() {
+    const specified = queryString.parse(location.hash).ws_port;
+    if(specified) return ":" + specified;
+    else if(document.location.protocol === "http:") return ":9873";
+    else return "";
+}
 function get_queue_id() {
     const specified = queryString.parse(location.hash).queue_id;
     return specified ? specified : "demo";
@@ -104,6 +110,7 @@ export {
     get_attachment,
     get_tag,
     s_to_mns,
+    get_ws_port,
     get_hostname,
     get_queue_id,
     get_lyrics,
