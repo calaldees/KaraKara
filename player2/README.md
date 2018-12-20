@@ -7,12 +7,12 @@ lyrics and a "start" button)
 ## TL;DR:
 
 ```
-npm install      # install build toolchain
-npm run build    # compile src/* to dist/*
+docker build -t kk-player2 .
+docker run --rm -p 0.0.0.0:8423:1234 -ti kk-player2
 ```
 
 Visit the player at
-`http://localhost/player2/index.html#queue_id=my_queue`
+`http://localhost:8423/#queue_id=my_queue`
 
 Add `&podium` to the end of the URL to get the singer view.
 
@@ -38,11 +38,11 @@ Add `&podium` to the end of the URL to get the singer view.
 
 ## Dev Setup:
 
-If you want to develop new features:
+If you want to develop new features, you can supply your own source code:
 
 ```
-npm install      # install build toolchain
-npm run watch    # auto-compile on changes
+docker build -t kk-player2 .
+docker run --rm -p 0.0.0.0:8423:1234 -v $(pwd)/src:/app/src -ti kk-player2
 ```
 
 Also you can add `&hostname=...` to the URL to specify a
