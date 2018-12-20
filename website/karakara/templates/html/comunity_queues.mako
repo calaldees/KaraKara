@@ -44,7 +44,7 @@
                 </a>
             </td>
             <td>
-                <a href="${paths['player']}">
+                <a href="${paths['player']}#queue_id=${queue['id']}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span>
                         ${_('player')}

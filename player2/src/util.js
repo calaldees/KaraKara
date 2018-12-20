@@ -83,7 +83,11 @@ function get_tag(tag) {
     else return "";
 }
 
-// figure out where our server is, accounting for local file:// mode
+// figure out where our server is, accounting for three use-cases:
+// - stand-alone file:// mode
+// - development http:// mode
+// - production https:// mode
+// and allow manual overrides where appropriate
 function get_protocol() {
     if(document.location.protocol === "file:") return "https:";
     else return document.location.protocol;
@@ -93,6 +97,12 @@ function get_hostname() {
     if(specified) return specified;
     else if(document.location.protocol === "file:") return "karakara.org.uk";
     else return document.location.hostname;
+}
+function get_ws_port() {
+    const specified = queryString.parse(location.hash).ws_port;
+    if(specified) return ":" + specified;
+    else if(document.location.protocol === "http:") return ":9873";
+    else return "";
 }
 function get_queue_id() {
     const specified = queryString.parse(location.hash).queue_id;
@@ -104,6 +114,7 @@ export {
     get_attachment,
     get_tag,
     s_to_mns,
+    get_ws_port,
     get_hostname,
     get_queue_id,
     get_lyrics,

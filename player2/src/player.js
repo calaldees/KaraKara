@@ -4,7 +4,7 @@ import queryString from 'query-string';
 
 import { state, actions } from "./state";
 import { view } from "./view";
-import { get_protocol, get_hostname } from "./util";
+import {get_protocol, get_hostname, get_ws_port, get_queue_id} from "./util";
 
 const player = app(state, actions, view, document.body);
 window.player = player; // make this global for debugging
@@ -15,20 +15,10 @@ window.player = player; // make this global for debugging
 // ====================================================================
 
 function create_websocket() {
-    const settings = player.get_state().settings;
-    const ws_path = settings['karakara.websocket.path'];
-    const ws_port = 9873; //settings['karakara.websocket.port'];
-
-    if (!ws_port && !ws_path) {
-        console.error("setup_websocket", "Websocket port or path not specified - remote control disabled");
-        return;
-    }
-
     const websocket_url = (
         (get_protocol() === "http:" ? 'ws://' : 'wss://') +
-        get_hostname() +
-        (ws_port ? ":" + ws_port : "") +
-        (ws_path ? ws_path : "")
+        get_hostname() + get_ws_port() +
+        "/ws/?queue_id=" + get_queue_id()
     );
     console.log("setup_websocket", websocket_url);
 
