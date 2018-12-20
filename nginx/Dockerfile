@@ -1,3 +1,7 @@
 FROM nginx:mainline-alpine
+EXPOSE 80
+VOLUME /media/processed
+
 COPY . /app
-CMD /bin/sh -c "DOLLAR='$$' envsubst < /app/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+RUN cp /app/nginx.conf /etc/nginx/nginx.conf
+CMD nginx -g 'daemon off;'

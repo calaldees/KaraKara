@@ -18,7 +18,8 @@ function create_websocket() {
     const websocket_url = (
         (get_protocol() === "http:" ? 'ws://' : 'wss://') +
         get_hostname() + get_ws_port() +
-        "/ws/?queue_id=" + get_queue_id()
+        "/ws/"
+		// "?queue_id=" + get_queue_id()
     );
     console.log("setup_websocket", websocket_url);
 

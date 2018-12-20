@@ -2,8 +2,6 @@ version: '3.5'
 
 volumes:
     website_db:
-    website_data_1:
-    website_data_2:
     processmedia2_data:
 
 services:
@@ -14,26 +12,13 @@ services:
             dockerfile: Dockerfile
         env_file:
             - .env
-        expose:
-            - ${PORT_WEBSITE}
-            - ${KARAKARA_WEBSOCKET_PORT}
-        # These can be made public for debugging
-        #ports:
-        #    - ${KARAKARA_WEBSOCKET_PORT}:${KARAKARA_WEBSOCKET_PORT}
-        #    - ${PORT_WEBSITE}:${PORT_WEBSITE}
-        environment:
-            - PORT_WEBSITE
-            - KARAKARA_WEBSOCKET_PORT
         links:
             - postgres
         #volumes:
             #- ./:${PATH_CONTAINER_REPO}:ro
             #- ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
             #- ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
-            #- website_data_1:${PATH_CONTAINER_WEBSITE}/data:rw
-            #- website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info:rw
             #- ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
-            #- ./production.inidiff:${PATH_CONTAINER_WEBSITE}/data/config/production.inidiff:ro  # Use .env vars with KARAKARA_SETTINGS_KEY=[00:01:00, 00:02:00] -> timedelta instead
 
     player2:
         build:
@@ -50,17 +35,12 @@ services:
         build:
             context: ./nginx
             dockerfile: Dockerfile
-        environment:
-            - PORT_NGINX
-            - PORT_WEBSITE
         env_file:
             - .env
         ports:
-            - "${PORT_NGINX}:${PORT_NGINX}"
+            - "${PORT_NGINX}:80"
         volumes:
-            - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
-            - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
-            - ${PATH_HOST_processed}:${PATH_CONTAINER_MEDIA}/processed:rw
+            - ${PATH_HOST_processed}:/media/processed:rw
         links:
             - website
             - player2
