@@ -1,5 +1,5 @@
 {
-    "api_host": "localhost:6543",
+    "api_host": "website:6543",
 
     "loggingconf": "data/logging.json",
     "lockfile": "data/.lock",
