@@ -4,19 +4,15 @@ KaraKara README
 Installation
 ------------
 
-Linux - ubuntu
-
-git clone git://github.com/calaldees/KaraKara.git && cd KaraKara/website && make test && make run
+* git clone git://github.com/calaldees/KaraKara.git
+* cd KaraKara/website
 
 
 Getting Started
 ---------------
 
-Linux
-git clone <git repo>
-make install
-make run
-http://localhost:6543/
+* docker run --rm -p 0.0.0.0:6543:6543 -p 0.0.0.0:9873:9873 -t $(docker build -q .)
+* open http://localhost:6543/
 
 
 Features

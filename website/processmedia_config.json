@@ -1,0 +1,16 @@
+{
+    "api_host": "website:6543",
+
+    "loggingconf": "data/logging.json",
+    "lockfile": "data/.lock",
+    "mtime_store_path": "data/mtimes.json",
+
+    "path_source": "../mediaserver/www/files/",
+    "path_meta": "../mediaserver/www/meta/",
+    "path_processed": "../mediaserver/www/processed/",
+
+    "cmd_ffmpeg": "fmpeg",
+    "cmd_sox": "sox",
+    "cmd_ffprobe": "ffprobe",
+    "cmd_jepgoptim": "jepgoptim"
+}

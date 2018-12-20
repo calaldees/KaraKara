@@ -10,8 +10,8 @@ services:
 
     website:
         build:
-            context: ./docker/website
-            dockerfile: website.Dockerfile
+            context: ./website
+            dockerfile: Dockerfile
         env_file:
             - .env
         expose:
@@ -24,15 +24,14 @@ services:
             - KARAKARA_WEBSOCKET_PORT
         links:
             - postgres
-        volumes:
-            - ./:${PATH_CONTAINER_REPO}:ro
+        #volumes:
+            #- ./:${PATH_CONTAINER_REPO}:ro
             #- ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
             #- ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
-            - website_data_1:${PATH_CONTAINER_WEBSITE}/data:rw
-            - website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info:rw
-            - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
+            #- website_data_1:${PATH_CONTAINER_WEBSITE}/data:rw
+            #- website_data_2:${PATH_CONTAINER_WEBSITE}/KaraKara.egg-info:rw
+            #- ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
             #- ./production.inidiff:${PATH_CONTAINER_WEBSITE}/data/config/production.inidiff:ro  # Use .env vars with KARAKARA_SETTINGS_KEY=[00:01:00, 00:02:00] -> timedelta instead
-        command: make run_production --directory ${PATH_CONTAINER_WEBSITE}
 
     player2:
         build:
@@ -56,11 +55,11 @@ services:
             - "${PORT_NGINX}:${PORT_NGINX}"
         volumes:
             - ./docker/nginx.conf:/tmp/nginx.conf:ro
-            - ./:${PATH_CONTAINER_REPO}:ro
+            #- ./:${PATH_CONTAINER_REPO}:ro
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
             - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
             - ${PATH_HOST_processed}:${PATH_CONTAINER_MEDIA}/processed:rw
-            - website_data_1:${PATH_CONTAINER_WEBSITE}/data:ro
+            #- website_data_1:${PATH_CONTAINER_WEBSITE}/data:ro
         links:
             - website
             - player2
