@@ -1,13 +1,14 @@
 {
     "name": "karakara-player",
-    "devDependencies": {
-        "babel-plugin-external-helpers": "^6.22.0",
-        "node-sass": "^4.9.3",
-        "parcel-bundler": "^1.9.7"
-    },
     "dependencies": {
+        "babel-core": "^6.26.3",
+        "babel-plugin-external-helpers": "^6.22.0",
+        "babel-preset-env": "^1.7.0",
+        "babel-plugin-transform-react-jsx": "^6.24.1",
         "hyperapp": "^1.2.8",
-        "parcel": "^1.9.7",
+        "node-sass": "^4.9.3",
+        "parcel": "^1.11.0",
+        "parcel-bundler": "^1.9.7",
         "parse-srt": "^1.0.0-alpha",
         "query-string": "^6.1.0",
         "reconnecting-websocket": "^3.2.2",

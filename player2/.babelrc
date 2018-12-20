@@ -8,7 +8,8 @@
     ]
   ],
   "plugins": [
-    "external-helpers"
+    "external-helpers",
+    "transform-react-jsx"
   ]
 }
 
