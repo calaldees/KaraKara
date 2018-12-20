@@ -64,6 +64,8 @@ services:
         build:
             context: docker/processmedia2/docker
             dockerfile: processmedia2.base.dockerfile
+        links:
+            - website
         env_file:
             - .env
         volumes:
