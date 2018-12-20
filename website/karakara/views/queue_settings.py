@@ -2,7 +2,7 @@ from collections import ChainMap
 
 from pyramid.view import view_config
 
-from calaldees.misc import convert_str, _string_list_format_hack
+from calaldees.string_convert import convert_str, _string_list_format_hack
 
 from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router, is_admin
 

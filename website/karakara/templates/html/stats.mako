@@ -4,10 +4,10 @@
 
 	import datetime
 	from collections import namedtuple
-	from calaldees.misc import epoc, now
+	from calaldees.date_tools import epoc, now
 
 	munin_graph_path = '/munin/munin-cgi-graph/localdomain/localhost.localdomain/'
-	
+
 	Size = namedtuple('Size', ['x','y'])
 	graph_size = Size(400, 200)
 	graph_types = (

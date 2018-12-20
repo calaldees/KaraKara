@@ -60,10 +60,14 @@ help:
 
 #.PRECIOUS: $(ENV)
 $(ENV):
-	python$(PYTHON_VERSION) -m venv $(ENV)
-	#virtualenv -p python$(PYTHON_VERSION) $(ENV)
+	#python$(PYTHON_VERSION) -m virtualenv $(ENV)
+	virtualenv -p python$(PYTHON_VERSION) $(ENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.pip
+dev_libs:
+	# Link local calaldees library for debugging
+	$(PIP) install --editable ../../libs/
+
 
 # Experiments
 #env/bin/node: env

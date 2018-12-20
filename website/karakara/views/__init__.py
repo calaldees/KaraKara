@@ -2,7 +2,8 @@
 from datetime import timedelta
 from decorator import decorator
 
-from calaldees.misc import decorator_combine, normalize_datetime
+from calaldees.date_tools import normalize_datetime
+from calaldees.decorator import decorator_combine
 
 from calaldees.pyramid_helpers import request_from_args, mark_external_request, method_delete_router, method_put_router, gzip
 from calaldees.pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default

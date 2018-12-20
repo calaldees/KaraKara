@@ -11,7 +11,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from pyramid.traversal import resource_path
 
-from calaldees.misc import update_dict
+from calaldees.data import update_dict
 #from calaldees.pyramid_helpers.auto_format import registered_formats
 
 from . import web, cache, etag, action_ok, cache_manager # generate_cache_key,

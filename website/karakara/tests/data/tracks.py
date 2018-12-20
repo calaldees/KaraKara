@@ -1,9 +1,10 @@
 ## -*- coding: utf-8 -*-
 
 import pytest
+import random
 from collections import namedtuple
 
-from calaldees.misc import random_string, random
+from calaldees.string_tools import random_string
 
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
