@@ -8,11 +8,11 @@ lyrics and a "start" button)
 
 ```
 docker build -t kk-player2 .
-docker run --rm -p 0.0.0.0:8423:1234 -ti kk-player2
+docker run --rm -p 1234:1234 -ti kk-player2
 ```
 
 Visit the player at
-`http://localhost:8423/#queue_id=my_queue`
+`http://localhost:1234/#queue_id=my_queue`
 
 Add `&podium` to the end of the URL to get the singer view.
 
@@ -42,7 +42,7 @@ If you want to develop new features, you can supply your own source code:
 
 ```
 docker build -t kk-player2 .
-docker run --rm -p 0.0.0.0:8423:1234 -v $(pwd)/src:/app/src -ti kk-player2
+docker run --rm -p 1234:1234 -v $(pwd)/src:/app/src -ti kk-player2
 ```
 
 Or if you have npm installed and want to use local files rather than docker,
