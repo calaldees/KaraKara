@@ -68,7 +68,7 @@ services:
 
     processmedia2:
         build:
-            context: docker/processmedia2/docker
+            context: docker/processmedia2
             dockerfile: processmedia2.base.dockerfile
         links:
             - website
