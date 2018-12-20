@@ -45,6 +45,13 @@ docker build -t kk-player2 .
 docker run --rm -p 0.0.0.0:8423:1234 -v $(pwd)/src:/app/src -ti kk-player2
 ```
 
+Or if you have npm installed and want to use local files rather than docker,
+
+```
+npm install
+npm run watch
+```
+
 Also you can add `&hostname=...` to the URL to specify a
 particular karakara server (defaults to `karakara.org.uk` if
 you open index.html from the local hard drive)
