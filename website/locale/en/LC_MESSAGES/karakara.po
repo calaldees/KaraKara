@@ -39,7 +39,7 @@ msgid "mobile.home.join_label"
 msgstr "Join"
 
 msgid "mobile.home.input_performer_name_label"
-msgstr "Badge name"
+msgstr "Badge Name"
 
 #: karakara/templates/html/queue_home.mako:35
 msgid "mobile.home.search_tags"
