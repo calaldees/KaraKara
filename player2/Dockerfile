@@ -1,8 +1,9 @@
 FROM node:11-alpine
 EXPOSE 80
+HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/ || exit 1
 
 # npm uses lscpu
-RUN apk --no-cache add util-linux
+RUN apk --no-cache add util-linux curl
 
 # this takes ages, so do it in advance
 COPY package.json package-lock.json /app/

@@ -3,14 +3,13 @@ include .env._rsync
 
 SHELL := $(SHELL) -e
 ENV:=_env
-PROJECTS = processmedia2 website player mediaserver admindashboard
+PROJECTS = processmedia2 website admindashboard
 
 
 .PHONY: help
 help:
 	# Karakara - Karaoke event system
 	#  (propergate to all projects)
-	#   install
 	#   test
 	#   clean
 	#
@@ -28,13 +27,9 @@ help:
 # Docker ----------------------------------------------------------------------
 
 docker_build: .env
-	# fix for docker file order - https://stackoverflow.com/questions/37883895/can-i-have-a-writable-docker-volume-mounted-under-a-read-only-volume
-	mkdir -p website/data
-	mkdir -p website/KaraKara.egg-info
-	#
 	docker-compose build
 docker_install:
-	docker-compose run --rm website $(PATH_CONTAINER_SCRIPTS)/_install.sh
+	docker-compose run --rm website /app/_install.sh
 docker_shell:
 	docker-compose run --rm --service-ports website /bin/bash
 	# Import comunity user notes
@@ -59,22 +54,11 @@ rsync_local_push:
 	rsync $(RSYNC_LOCAL)/meta/ $(RSYNC_LOCAL_TARGET)/meta/ $(RSYNC_ARGS) --delete-after
 	rsync $(RSYNC_LOCAL)/processed/ $(RSYNC_LOCAL_TARGET)/processed/ $(RSYNC_ARGS) --delete-after
 
-# Install ---------------------------------------------------------------------
-
-.PHONY: install
-install: .env
-	for project in $(PROJECTS); do \
-		$(MAKE) install --no-keep-going --directory $$project ; \
-	done
-
 # Test ------------------------------------------------------------------------
 
 .PHONY: test
 test: .env
 	docker-compose --file .\docker-compose.pytest.yml run test_web
-	#for project in $(PROJECTS); do \
-	#	$(MAKE) test --no-keep-going --directory $$project ; \
-	#done
 
 # Cloc ------------------------------------------------------------------------
 

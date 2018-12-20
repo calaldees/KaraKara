@@ -1,4 +1,8 @@
 FROM ubuntu:latest
+VOLUME /media/source
+VOLUME /media/meta
+VOLUME /media/processed
+HEALTHCHECK --interval=1m --timeout=3s CMD touch -d"-30min" /tmp/marker && [ /processmedia2/.heartbeat -nt /tmp/marker ]
 
 COPY --from=jrottenberg/ffmpeg /usr/local /usr/local
 
@@ -25,7 +29,7 @@ COPY ./ ./
 #COPY --from=krallin/ubuntu-tini /usr/local/bin/tini /usr/local/bin/tini
 #ENTRYPOINT ["/usr/local/bin/tini", "--", "/processmedia2/docker-compose.yml.processmedia2.sh"]
 #https://github.com/docker-library/mysql/issues/47#issuecomment-140339288
-#CMD /processmedia2/docker-compose.yml.processmedia2.sh
+#CMD /processmedia2/processmedia2.sh
 
 # docker build -t processmedia2:latest --file .\processmedia2.base.dockerfile .
 # docker run -it --rm -v ../:/processmedia2:ro -v /var/run/docker.sock:/var/run/docker.sock docker.io processmedia2:latest

@@ -5,7 +5,6 @@ volumes:
     processmedia2_data:
 
 services:
-
     website:
         build:
             context: ./website
@@ -15,21 +14,31 @@ services:
         links:
             - postgres
         #volumes:
-            #- ./:${PATH_CONTAINER_REPO}:ro
-            #- ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
-            #- ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
-            #- ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
+        #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
+        #    - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
+        #    - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
+        #    - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
+
+    player:
+        build:
+            context: ./player
+            dockerfile: Dockerfile
+        #volumes:
+        #    - ./player:/app  # Un-comment to use local source rather than built-in source
 
     player2:
         build:
             context: ./player2
             dockerfile: Dockerfile
+        #volumes:
+        #    - ./player2/src:/app/src  # Un-comment to use local source rather than built-in source
 
     postgres:
-        image: postgres:9-alpine
+        build:
+            context: ./postgres
+            dockerfile: Dockerfile
         volumes:
             - website_db:/var/lib/postgresql
-            - ./docker/postgres:/docker-entrypoint-initdb.d:ro
 
     nginx:
         build:
@@ -43,6 +52,7 @@ services:
             - ${PATH_HOST_processed}:/media/processed:rw
         links:
             - website
+            - player
             - player2
 
     processmedia2:
@@ -65,7 +75,7 @@ services:
             KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
             KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
             KARAKARA_CONTAINER_NAME_website: 'website'
-        command: ./docker-compose.yml.processmedia2.sh
+        command: ./processmedia2.sh
         # command: [
         #   'pytest',
         #   'processmedia_libs',

@@ -1,4 +1,5 @@
 FROM python:3-alpine
+HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ || exit 1
 
 # Upgrade python tools
 RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
