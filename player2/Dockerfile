@@ -1,4 +1,4 @@
-FROM node:11
+FROM node:11-alpine
 EXPOSE 8080
 
 # this takes ages, so do it in advance
