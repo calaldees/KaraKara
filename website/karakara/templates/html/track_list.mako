@@ -8,6 +8,12 @@
     <body>
         ##<h1>Tracks All</h1>
         <%
+            short_fields = {
+                "id_short": "ID",
+                "category": "Cat",
+                "vocaltrack": "Vocal",
+                "length": "Len",
+            }
             fields = ['id_short'] + request.queue.settings.get('karakara.print_tracks.fields',[])
         %>
         <table>
@@ -20,7 +26,7 @@
                 </tr>
                 <tr>
                     % for field in fields:
-                    <th>${field}</th>
+                    <th>${short_fields.get(field, field)}</th>
                     % endfor
                 </tr>
             </thead>
