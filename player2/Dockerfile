@@ -1,5 +1,5 @@
 FROM node:11-alpine
-EXPOSE 8080
+EXPOSE 1234
 
 # this takes ages, so do it in advance
 COPY package.json package-lock.json /app/

@@ -16,9 +16,11 @@ services:
             - .env
         expose:
             - ${PORT_WEBSITE}
-        ports:
-            - ${KARAKARA_WEBSOCKET_PORT}:${KARAKARA_WEBSOCKET_PORT}
-            #- ${PORT_WEBSITE}:${PORT_WEBSITE}
+            - ${KARAKARA_WEBSOCKET_PORT}
+        # These can be made public for debugging
+        #ports:
+        #    - ${KARAKARA_WEBSOCKET_PORT}:${KARAKARA_WEBSOCKET_PORT}
+        #    - ${PORT_WEBSITE}:${PORT_WEBSITE}
         environment:
             - PORT_WEBSITE
             - KARAKARA_WEBSOCKET_PORT
@@ -45,7 +47,9 @@ services:
             - ./docker/postgres:/docker-entrypoint-initdb.d:ro
 
     nginx:
-        image: nginx:mainline-alpine
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
         environment:
             - PORT_NGINX
             - PORT_WEBSITE
@@ -54,16 +58,12 @@ services:
         ports:
             - "${PORT_NGINX}:${PORT_NGINX}"
         volumes:
-            - ./docker/nginx.conf:/tmp/nginx.conf:ro
-            #- ./:${PATH_CONTAINER_REPO}:ro
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
             - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
             - ${PATH_HOST_processed}:${PATH_CONTAINER_MEDIA}/processed:rw
-            #- website_data_1:${PATH_CONTAINER_WEBSITE}/data:ro
         links:
             - website
             - player2
-        command: /bin/sh -c "DOLLAR='$$' envsubst < /tmp/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
 
     processmedia2:
         build:
