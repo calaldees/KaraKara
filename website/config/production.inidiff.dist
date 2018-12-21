@@ -19,6 +19,8 @@ karakara.player.title = KaraKara (Beta)
 
 karakara.template.title = KaraKara (Beta)
 
+static.processmedia2.log = /logs/processmedia2-app.log
+
 api.search.max_age = 3600 -> int
 
 server.gzip         = False -> bool
@@ -38,4 +40,4 @@ handlers = logfile
 level = DEBUG
 
 [handler_logfile]
-args = ('data/logs/production.log',)
+args = ('/logs/website-app.log',)
