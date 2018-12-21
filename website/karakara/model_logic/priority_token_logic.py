@@ -25,7 +25,7 @@ class PriorityTokenManager():
 
     @property
     def user_id(self):
-        return self.request.session['id']
+        return self.request.session_identity['id']
 
     def issue(self):
         priority_window = self.settings.get('karakara.queue.add.limit.priority_window')

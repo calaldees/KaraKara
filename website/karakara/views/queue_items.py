@@ -251,7 +251,7 @@ def queue_item_add(request):
     if is_admin(request) and queue_item.session_owner:
         pass
     else:
-        queue_item.session_owner = request.session['id']
+        queue_item.session_owner = request.session_identity['id']
 
     DBSession.add(queue_item)
     _log_event(status='ok', queue_id=queue_item.queue_id, track_id=queue_item.track_id, performer_name=queue_item.performer_name)
@@ -359,7 +359,7 @@ def queue_item_update(request):
     if not queue_item:
         _log_event(status='reject', reason='invalid.queue_item.id', queue_item_id=queue_item_id)
         raise action_error(message='invalid queue_item.id', code=404)
-    if not is_admin(request) and queue_item.session_owner != request.session['id']:
+    if not is_admin(request) and queue_item.session_owner != request.session_identity['id']:
         _log_event(status='reject', reason='not_owner', track_id=queue_item.track_id)
         raise action_error(
             message=_(
