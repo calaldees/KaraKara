@@ -1,66 +1,21 @@
-System Setup
-============
+Queue Settings
+==============
 
-This documentation is designed to inform a user how to setup a karaoke event
-system from scratch. Technical developer documentation about each component
-can be found with each component.
-
-The goals of KaraKara:
-
-* Provide users with an accessible web interface to:
-  * Prepare/encode video/subtitles/images (referred to as 'datasets')
-  * Run a karaoke event.
-* Support a community of video contributors.
-
-
-Machine setup
--------------
-
-This project is built on top of linux based open source tools.
-Windows operating systems users can run an automated virtual linux machine after
-installing a few tools.
-
-*Windows and Mac can be used for `localhost` trials but would not be suitable for a live deployment*
-
-### Linux Setup ###
-
-
-Preparing a Dataset
--------------------
-
-This section describes how to subtitle a track and prepare it for use with the
-system. These instructions provide links to pre-constructed videos and subtile
-files to get you started.
-
-
-Event Setup
------------
-
-* Server setup
-* Router setup
-
-
-System Operation
-----------------
-
-### Settings ###
-
-
-#### Event ####
+## Event ##
 
 * `karakara.event.end` (datetime)
   * Will prevent tracks being queued past the stated endtime.
   * This prevent 20+ tracks being in the queue when an organizer turns off the projector and says 'Shows over' and thus leaving many disappointed attendees.
   * Strongly recommended this is always set for each event.
 
-#### Features ####
+## Features ##
 
 * `karakara.faves.enabled` (bool)
   * Allow a 'favorate' button on each track.
   * Once a user has favorited at least one track, a new option becomes available on the main menu. A list of the favorited tracks.
   * By default this is `False` as this is an additional complication for the users with no real long term benefit for a short event.
 
-#### Projector Interface (player) #####
+## Projector Interface (player) ###
 
 * `karakara.player.title`
   * The title displayed on the projector interface
@@ -74,7 +29,7 @@ System Operation
 * `karakara.websocket.disconnected_retry_interval` (int)
   * Number of seconds to attempt a websocket reconnect if the connection fails
 
-#### Queue Management ####
+## Queue Management ##
 
 * `karakara.queue.group.split_markers` (list of timedelta)
   * An array of timedeltas to split/obscure tracks
@@ -122,7 +77,7 @@ System Operation
   * If attendees have badge names to to identify themselves. This prevents the users queuing tracks as 'bob' then just using 'bob2' and 'bob3' to queue as many tracks as they please.
   * All validation is done case insensitively.
 
-#### Mobile Interface ####
+## Mobile Interface ##
 
 * `karakara.system.user.readonly` (bool)
   * Mobile clients can browse but not queue tracks.
@@ -136,7 +91,7 @@ System Operation
   * If present, will disable the mobile client interface and replace it with this message for all users.
   * This is used to still have the admin/projector functionally accessible via the wireless but do not permit any more user access.
 
-#### Search ####
+### Search ###
 
 * `karakara.search.view.config` (json_filename)
   * A flexible system to customize how tags are browsed
@@ -193,9 +148,3 @@ System Operation
 * `karakara.print_tracks.fields` (list)
   * A list of fields to display when printing the tracklist
   * `[category, from, use, title, artist]`
-
-
-#### System ####
-
-* `karakara.websocket.port` (int)
-  * For sysadmins and server setup

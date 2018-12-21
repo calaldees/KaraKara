@@ -10,6 +10,7 @@ Karaoke Event System - hosted at [karakara.org.uk](http://karakara.org.uk/)
 
 [![Build Status](https://travis-ci.org/calaldees/KaraKara.svg?branch=master)](https://travis-ci.org/calaldees/KaraKara)
 
+
 Overview of a karaoke event
 ---------------------------
 
@@ -21,7 +22,8 @@ Admins can walk around the room, remotely controlling when tracks are played ful
 
 (When the project was started we could not rely on a venues reliable free wifi and 4g didnt exist. A pysical server and wireless router were needed in the room. Since then the project has evolved to be 'Karaoke as a service' run on an external webserver.)
 
-###Headline Feature Descriptions
+
+### Headline Feature Descriptions ###
 
 * Track tagging with multiple exploration paths
     * Rather than just browsing tracks by title, tracks are surfaceable via different routes because they are tagged. e.g:
@@ -67,23 +69,9 @@ Admins can walk around the room, remotely controlling when tracks are played ful
 Local Machine Setup
 -------------------
 
-_WARNING: out of date instructions_
-
-* Copy video dataset OR Process video dataset from avi/mpg/srt/png/mp3 files with processmedia
-* Option 1 - Docker (Linux/Mac/Windows)
-    1. Prerequesites
-        * `docker`, `docker-compose`, `docker-machine` (osx)
-    2. `make docker_build && docker_install && make docker_up`
-    5. view <http://localhost:8080/> and <http://localhost:8080/player/player.html>
-        * *bug: for player interface: navigate from http://localhost:8080/admin -> 'home' -> 'player interface' to ensure the cookie is created correctly*
-
-* Option 2 - Linux/Mac (native with sqllite dev db)
-    1. Prerequesites
-        * Linux: `apt-get install git python3 curl make virtualenv`
-        * Mac: install `brew`, `brew install git python3`
-    2. __Optional local libs for dev__ `git clone git@github.com:calaldees/libs.git`
-    3. `git clone https://github.com/calaldees/KaraKara.git && cd KaraKara/website && make install && make test && make import_tracks_dev && make run && python -m webbrowser -t "http://localhost:6543/" `
-    4. View <http://localhost:6543/> and <http://localhost:6543/player/player.html>
+```bash
+    docker-compose up
+```
 
 
 Core components
@@ -115,15 +103,14 @@ Core components
       * preview high and low res encoded videos
       * tag videos
       * edit subtitles
-* player - html5 event display player (currently only designed / tested in Chrome)
+* player2 - html5 event display player
   * Looks at website / queue api
-  * Streams final video from mediaserver in fullscreen mode.
+  * Streams final video from `nginx` in fullscreen mode.
   * Can be controlled via hotkeys or remotely with websockets
+    * `s` skip
+    * `enter` play
   * Automatically updates track list when the queue is changed.
   * Queue order is obscured passed a configurable time
 * admindashboard
   * Logstash data importer for json event logs from `website`
   * HTML5/js app to visulise event data from elasticsearch
-
-
-[Additional SystemSetup documentation](SystemSetup.md)

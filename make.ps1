@@ -10,6 +10,5 @@ if ($target -eq "install" ) {
 }
 
 if ($target -eq "run") {
-    # dev local mount
-    docker-compose --file docker-compose.yml --file processmedia2/docker-compose.yml up
+
 }
