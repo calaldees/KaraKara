@@ -6,9 +6,9 @@
 
 
 <%def name="body()">
-    <h1>Queues</h1>
+    <h1>Rooms</h1>
 
-    <p>INCOMPLETE FEATURE: Even though the foundation for multiple queues are in place. Only ONE queue can be used at a time.</p>
+    <p>INCOMPLETE FEATURE: Even though the foundation for multiple rooms are in place. Only ONE room can be used at a time.</p>
 
     <form action="" method="POST">
         <label for="input_queue_id">Name</label><input id="input_queue_id" type="text" name="queue_id"/>
@@ -44,7 +44,7 @@
                 </a>
             </td>
             <td>
-                <a href="${paths['player']}#queue_id=${queue['id']}">
+                <a href="${paths['player']}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-blackboard" aria-hidden="true"></span>
                         ${_('player')}

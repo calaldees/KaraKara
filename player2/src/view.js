@@ -64,7 +64,7 @@ const TitleScreen = ({state, actions}) => (
         <h1>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
             Join at <strong>{get_hostname()}</strong> -
-            Queue is <strong>{get_queue_id()}</strong>
+            Room Name is <strong>{get_queue_id()}</strong>
         </div>
     </div>
 );
@@ -104,7 +104,7 @@ const PreviewScreen = ({state, actions}) => (
         {/* key= to make sure this element stays put while the above may disappear */}
         <div id="join_info" key={"join_info"}>
             Join at <strong>{get_hostname()}</strong> -
-            Queue is <strong>{get_queue_id()}</strong>
+            Room Name is <strong>{get_queue_id()}</strong>
             {state.settings["karakara.event.end"] &&
                 <span><br/>Event ends at <strong>{state.settings["karakara.event.end"]}</strong></span>
             }

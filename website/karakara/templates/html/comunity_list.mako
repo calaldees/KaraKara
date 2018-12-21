@@ -19,7 +19,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 %>
 
 <%def name="body()">
-	<h2>tracks</h2>
+	<h2>Tracks</h2>
 
 	<p>Filter: <input id="track_filter_input" type="text" name="search" size="50"/></p>
 	<script type="text/javascript">{

@@ -33,7 +33,7 @@ msgstr "Remove"
 #: karakara/templates/html/home.mako:4
 
 msgid "mobile.home.input_queue_label"
-msgstr "Queue Name"
+msgstr "Room Name"
 
 msgid "mobile.home.join_label"
 msgstr "Join"
