@@ -1,5 +1,6 @@
 FROM nginx:mainline-alpine
 EXPOSE 80
+VOLUME /logs
 VOLUME /media/processed
 HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/files/ || exit 1
 

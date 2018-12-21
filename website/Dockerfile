@@ -1,4 +1,7 @@
 FROM python:3-alpine
+EXPOSE 6543
+EXPOSE 9873
+VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ || exit 1
 
 # Upgrade python tools
@@ -11,10 +14,6 @@ RUN apk --no-cache add \
     make \
     git \
 && true
-
-# http, websocket
-EXPOSE 6543
-EXPOSE 9873
 
 # copy just this file by itself, so that we only re-run this
 # step when this file changes, not when *anything* changes
