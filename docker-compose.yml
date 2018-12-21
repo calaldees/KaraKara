@@ -3,6 +3,7 @@ version: '3.5'
 volumes:
     website_db:
     processmedia2_data:
+    logs:
 
 services:
     website:
@@ -13,7 +14,8 @@ services:
             - .env
         links:
             - postgres
-        #volumes:
+        volumes:
+            - logs:/logs
         #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
         #    - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
         #    - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
@@ -23,14 +25,16 @@ services:
         build:
             context: ./player
             dockerfile: Dockerfile
-        #volumes:
+        volumes:
+            - logs:/logs
         #    - ./player:/app  # Un-comment to use local source rather than built-in source
 
     player2:
         build:
             context: ./player2
             dockerfile: Dockerfile
-        #volumes:
+        volumes:
+            - logs:/logs
         #    - ./player2/src:/app/src  # Un-comment to use local source rather than built-in source
 
     postgres:
@@ -38,6 +42,7 @@ services:
             context: ./postgres
             dockerfile: Dockerfile
         volumes:
+            - logs:/logs
             - website_db:/var/lib/postgresql
 
     nginx:
@@ -49,6 +54,7 @@ services:
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
+            - logs:/logs
             - ${PATH_HOST_processed}:/media/processed:rw
         links:
             - website
@@ -64,6 +70,7 @@ services:
         env_file:
             - .env
         volumes:
+            - logs:/logs
             #- ./processmedia2:/processmedia2:ro
             - processmedia2_data:/processmedia2/data
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
@@ -75,7 +82,6 @@ services:
             KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
             KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
             KARAKARA_CONTAINER_NAME_website: 'website'
-        command: ./processmedia2.sh
         # command: [
         #   'pytest',
         #   'processmedia_libs',

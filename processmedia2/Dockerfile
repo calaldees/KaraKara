@@ -1,4 +1,5 @@
 FROM ubuntu:latest
+VOLUME /logs
 VOLUME /media/source
 VOLUME /media/meta
 VOLUME /media/processed
@@ -23,6 +24,7 @@ RUN pip3 install -r requirements.pip
 WORKDIR /processmedia2
 
 COPY ./ ./
+CMD ./processmedia2.sh
 
 
 
