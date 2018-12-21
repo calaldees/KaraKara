@@ -131,7 +131,7 @@ def import_media(**kwargs):
     tracks_to_add = []
     track_ids_to_delete = []
 
-    log.info('Importing tracks - Existing:{} Processed{}'.format(len(existing_track_ids), len(processed_track_ids)))  # TODO: replace with formatstring
+    log.info('Importing tracks - Existing:{} Processed:{}'.format(len(existing_track_ids), len(processed_track_ids)))  # TODO: replace with formatstring
     for name in progress_bar(meta_manager.meta.keys()):
         try:
             track = generate_track_dict(name)
