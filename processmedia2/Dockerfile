@@ -2,7 +2,9 @@ FROM ubuntu:latest
 VOLUME /media/source
 VOLUME /media/meta
 VOLUME /media/processed
-HEALTHCHECK --interval=1m --timeout=3s CMD touch -d"-30min" /tmp/marker && [ /processmedia2/.heartbeat -nt /tmp/marker ]
+
+# It is possible that encoding could really take more than 30 mins
+# HEALTHCHECK --interval=1m --timeout=3s CMD touch -d"-30min" /tmp/marker && [ /processmedia2/.heartbeat -nt /tmp/marker ]
 
 COPY --from=jrottenberg/ffmpeg /usr/local /usr/local
 
