@@ -13,6 +13,8 @@ services:
             - .env
         links:
             - postgres
+        ports:
+            - "127.0.0.1:8821:9873"  # this should go via nginx rather than being directly exposed...
         #volumes:
         #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
         #    - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
