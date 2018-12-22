@@ -69,13 +69,15 @@ Admins can walk around the room, remotely controlling when tracks are played ful
 Local Machine Setup
 -------------------
 
-```bash
-    docker-compose up
+```console
+$ docker-compose up
 ```
 
 
 Core components
 ---------------
+
+![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/images/architecture.png)
 
 * processmedia2
   * Takes folders of source data (video, image+mp3, subtitles)
@@ -85,7 +87,7 @@ Core components
       * Currently just mp4 but could support other formats in future.
   * Thumbnail images
       * Each video has 4 images taken at even intervals
-  * Srt output
+  * SRT subtitles
       * regardless of input format, a normalised srt will be created for each video
   * JSON metadata
       * Once scanned, each item will have JSON data containing the hashes of
@@ -109,8 +111,12 @@ Core components
   * Can be controlled via hotkeys or remotely with websockets
     * `s` skip
     * `enter` play
+    * `escape` stop
+    * `left` seek backwards
+    * `right` seek forwards
+    * `space` pause
   * Automatically updates track list when the queue is changed.
-  * Queue order is obscured passed a configurable time
+  * Queue order is obscured past a configurable time
 * admindashboard
-  * Logstash data importer for json event logs from `website`
-  * HTML5/js app to visulise event data from elasticsearch
+  * Logstash data importer for event logs from the other containers
+  * HTML5/js app to visualise event data from elasticsearch
