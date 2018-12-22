@@ -38,6 +38,15 @@ const Lyrics = ({state}) => (
     </div>
 );
 
+const AutoplayCountdown = ({state, show_if_disabled}) => (
+    state.settings["karakara.player.autoplay"] === 0 ?
+        (show_if_disabled ?
+            <small>(autoplay disabled)</small> :
+            null
+        ) :
+        <small>(autoplay in {Math.ceil(state.settings["karakara.player.autoplay"] - state.progress)} seconds)</small>
+);
+
 
 // ====================================================================
 // Screens
@@ -72,13 +81,14 @@ const TitleScreen = ({state, actions}) => (
 const PreviewScreen = ({state, actions}) => (
     <div className={"screen_preview"}>
         <div className="preview_holder">
+            <video src={get_attachment(state, state.queue[0].track, 'video')}
+                   preload={"auto"} muted={true} style={{display: "none"}} />
             <video src={get_attachment(state, state.queue[0].track, 'preview')}
                    poster={get_attachment(state, state.queue[0].track, 'thumbnail')}
                    autoPlay={true}
                    onloadstart={e => {e.target.volume = state.settings["karakara.player.video.preview_volume"]}}
                    loop={true} />
-            <video src={get_attachment(state, state.queue[0].track, 'video')}
-                   preload={"auto"} muted={true} style={{display: "none"}} />
+            <AutoplayCountdown state={state} show_if_disabled={false} />
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>
@@ -175,10 +185,7 @@ const PodiumScreen = ({state, actions}) => (
                  style={{"background-position": (100 - (state.progress / state.settings["karakara.player.autoplay"] * 100))+"%"}}>
                 <span>
                     Press to Start
-                    {state.settings["karakara.player.autoplay"] === 0 ?
-                        <small>(autoplay disabled)</small> :
-                        <small>(autoplay in {Math.ceil(state.settings["karakara.player.autoplay"] - state.progress)} seconds)</small>
-                    }
+                    <AutoplayCountdown state={state} show_if_disabled={true}/>
                 </span>
             </div>
         }

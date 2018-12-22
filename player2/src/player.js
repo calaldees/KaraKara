@@ -85,22 +85,25 @@ document.onkeydown = function(e) {
 // Auto-play for podium mode
 // ====================================================================
 
-if(queryString.parse(location.hash).podium) {
-    const FPS = 5;
-    setInterval(
-        function() {
-            let state = player.get_state();
-            if(state.paused) return;
-            if(!state.playing) {
-                if(state.settings["karakara.player.autoplay"] === 0) return;
-                if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send("play");}
-                else {player.set_progress(state.progress + 1/FPS);}
-            }
-            else {
-                if(state.progress >= state.queue[0].track.duration) {player.dequeue();}
-                else {player.set_progress(state.progress + 1/FPS);}
-            }
-        },
-        1000/FPS
-    );
-}
+const FPS = 5;
+setInterval(
+    function() {
+        let state = player.get_state();
+        if(state.paused || !state.audio_allowed) return;
+
+        // if we're waiting for a track to start, and autoplay
+        // is enabled, show a countdown
+        if(!state.playing && state.settings["karakara.player.autoplay"] !== 0) {
+            if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send("play");}
+            else {player.set_progress(state.progress + 1/FPS);}
+        }
+
+        // if we're playing, but we don't have a video,
+        // let's simulate video progress happening
+        if(state.playing && queryString.parse(location.hash).podium) {
+            if(state.progress >= state.queue[0].track.duration) {player.dequeue();}
+            else {player.set_progress(state.progress + 1/FPS);}
+        }
+    },
+    1000/FPS
+);

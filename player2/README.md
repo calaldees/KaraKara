@@ -58,12 +58,6 @@ you open index.html from the local hard drive)
 
 ## Developer Notes:
 
-- When in auto-play mode, the podium is the source of truth
-  for hitting "play" (what do we do if we only have admin +
-  big screen, no podium? Should both interfaces have a timer
-  and both send the "play" signal, and we rely on deduping?
-  The big screen should be delayed a couple of seconds to
-  give a laggy podium a chance to go first)
 - The big screen is the source of truth for "track ended",
   who will send that message to the server. The podium will
   automatically move to the next track in the list and
