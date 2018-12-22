@@ -8,7 +8,7 @@ import {get_lyrics, api} from "./util";
 const state = {
     // global app bits
     connected: false,
-    clicked: false,
+    audio_allowed: (new AudioContext()).state === "running",
     settings: {
         "karakara.player.title"               : "KaraKara",
         "karakara.player.theme"               : "metalghosts",
@@ -36,7 +36,7 @@ const actions = {
     // this has nothing to do with the player, we just need
     // to make sure that the user has clicked in order for
     // chrome to allow auto-play.
-    click: () => () => ({ clicked: true }),
+    click: () => () => ({ audio_allowed: true }),
 
     // general application state
     get_state: () => state => state,

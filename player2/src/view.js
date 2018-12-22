@@ -193,7 +193,7 @@ const PodiumScreen = ({state, actions}) => (
 function view(state, actions) {
     let screen = <div>Unknown state :(</div>;
 
-    if(!state.clicked)
+    if(!state.audio_allowed)
         screen = <ClickScreen state={state} actions={actions} />;
     else if(state.queue.length === 0)
         screen = <TitleScreen state={state} actions={actions} />;
