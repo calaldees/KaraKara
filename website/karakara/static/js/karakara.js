@@ -40,7 +40,7 @@ function update_priority_token_feedback() {
 }
 
 function store_performer_name(args) {
-	$.cookie('last_performer_name', {value:$("#input_performer_name").val()}, {path:'/'});
+	$.cookie('performer_name', $("#input_performer_name").val(), {path:'/'});
 }
 
 $(document).ready(function() {
@@ -49,8 +49,8 @@ $(document).ready(function() {
         update_priority_token_feedback();
     }
 
-	var last_performer_name_cookie = $.cookie("last_performer_name");
+	var last_performer_name_cookie = $.cookie("performer_name");
 	if (last_performer_name_cookie) {
-		$('#input_performer_name').val(last_performer_name_cookie.value || "");
+		$('#input_performer_name').val(last_performer_name_cookie || "");
 	}
 });
