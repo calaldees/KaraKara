@@ -16,7 +16,7 @@
     },
     "scripts": {
         "build": "parcel build --public-url . src/index.html",
-        "watch": "parcel watch --public-url . src/index.html --hmr-hostname localhost",
+        "watch": "parcel watch --public-url . src/index.html --no-hmr",
         "serve": "parcel serve src/index.html --no-hmr"
     },
     "repository": "https://github.com/calaldees/KaraKara/",
