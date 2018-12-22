@@ -1,0 +1,3 @@
+FROM alpine
+EXPOSE 80
+VOLUME /logs
