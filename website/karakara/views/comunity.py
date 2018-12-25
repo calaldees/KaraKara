@@ -18,7 +18,7 @@ from calaldees.pyramid_helpers.views.upload import EventFileUploaded
 from ..model import DBSession
 from ..model.model_tracks import Track
 
-from . import action_ok, action_error, cache_manager, comunity_only, is_comunity
+from . import action_ok, action_error, comunity_only, is_comunity
 
 #from ..views.track import invalidate_track
 from ..templates import helpers as h
@@ -74,7 +74,7 @@ def acquire_cache_bucket_func(request):
         _id = request.context.id
     except:
         _id = ''
-    return cache_manager.get(f'comunity-{request.context.__name__}-{request.last_track_db_update}-{is_comunity(request)}-{_id}')
+    return request.cache_manager.get(f'comunity-{request.context.__name__}-{request.last_track_db_update}-{is_comunity(request)}-{_id}')
 
 
 

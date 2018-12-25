@@ -9,7 +9,7 @@ from pyramid.view import view_config
 from calaldees.date_tools import now
 from calaldees.data import subdict
 
-from . import web, action_ok, action_error, etag_decorator, cache_manager, method_delete_router, method_put_router, is_admin, modification_action, admin_only
+from . import web, action_ok, action_error, etag_decorator,  method_delete_router, method_put_router, is_admin, modification_action, admin_only
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueItem
@@ -35,11 +35,11 @@ log = logging.getLogger(__name__)
 #cache_manager.get('queue_items').register_invalidate_callback(socket_update_queue_items_event, ('request', ))
 
 def acquire_cache_bucket_func(request):
-    return cache_manager.get(f'queue-{request.context.queue_id}')
+    return request.cache_manager.get(f'queue-{request.context.queue_id}')
 
 def invalidate_cache(request, track_id):
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
-    cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
+    request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
     # TODO: This needs to incorporate the alert for the specific queue_id
     request.send_websocket_message('queue_updated')
 

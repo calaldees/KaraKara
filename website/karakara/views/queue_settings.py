@@ -4,7 +4,7 @@ from pyramid.view import view_config
 
 from calaldees.string_convert import convert_str, _string_list_format_hack
 
-from . import action_ok, action_error, cache_manager, patch_cache_bucket_decorator, method_delete_router, method_put_router, is_admin
+from . import action_ok, action_error, method_delete_router, method_put_router, is_admin
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueSetting
@@ -106,7 +106,7 @@ SETTING_IDENTIFIER_PRIVATE = f'{SETTING_IDENTIFIER}.private'  # Possibly replace
 
 
 def acquire_cache_bucket_func(request):
-    return cache_manager.get(f'queue-settings-{request.context.queue_id}')
+    return request.cache_manager.get(f'queue-settings-{request.context.queue_id}')
 
 
 @view_config(

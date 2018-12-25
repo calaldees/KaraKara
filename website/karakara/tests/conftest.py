@@ -89,6 +89,11 @@ def commit(request, DBSession):
     return commit
 
 
+@pytest.fixture(scope="session")
+def cache_store(request, app):
+    return app.app.registry.settings['cache.store']
+
+
 @pytest.fixture()
 def registry_settings(request, app):
     """

@@ -6,7 +6,7 @@ from pyramid.traversal import resource_path
 
 from calaldees.data import first, subdict
 
-from . import web, action_ok, action_error, etag_decorator, cache_none, generate_cache_key, admin_only, cache_manager
+from . import web, action_ok, action_error, etag_decorator, generate_cache_key, admin_only, cache_none
 
 from ..model import DBSession
 from ..model.actions import get_track_dict_full
@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 #    ])
 
 def acquire_cache_bucket_func(request):
-    return cache_manager.get(f'queue-{request.context.queue_id}-track-{request.context.id}')
+    return request.cache_manager.get(f'queue-{request.context.queue_id}-track-{request.context.id}')
 
 #-------------------------------------------------------------------------------
 # Track
@@ -93,7 +93,7 @@ def track_view(request):
             return cache_none
 
     def get_track_and_queued_dict(id):
-        track = cache_manager.get(f'''track_dict-{id}-{request.registry.settings['karakara.tracks.version']}''').get_or_create(lambda: get_track_dict(id))
+        track = request.cache_manager.get(f'''track_dict-{id}-{request.registry.settings['karakara.tracks.version']}''').get_or_create(lambda: get_track_dict(id))
         if not track:
             return cache_none
         log.debug(f'cache gen - track_queue_dict for {id}')

@@ -176,7 +176,7 @@ shell_production: ini_production
 .PHONY: test test_crawl
 
 test: install $(DATABASE_DEV) ini_test
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x
 	# --capture=sys
 
 test_crawl: ini_test

@@ -14,7 +14,7 @@ from pyramid.traversal import resource_path
 from calaldees.data import update_dict
 #from calaldees.pyramid_helpers.auto_format import registered_formats
 
-from . import web, cache_store, etag, action_ok, cache_manager # generate_cache_key,
+from . import web, etag, action_ok  # generate_cache_key,
 
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -35,7 +35,7 @@ search_config = {}
 def acquire_cache_bucket_func(request):
     search_params = _get_search_params_from_request(request)
     request.log_event(tags=search_params.tags, keywords=search_params.keywords)
-    return cache_manager.get(
+    return request.cache_manager.get(
         '-'.join(map(str, {
             'context_name': request.context.__name__,
             'queue_id': request.context.queue_id,
@@ -107,8 +107,11 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
 
 #-------------------------------------------------------------------------------
 
-@cache_store.cache_on_arguments()
-def _search(*search_params):
+#@cache_store.cache_on_arguments()
+def _search(request, *search_params):
+    # HACK - horrible use of cache store to replace global decorator that was here before. Seems to work - Can sombody make this better please
+    return request.registry.settings['cache.store'].cache_on_arguments()(__search)(*search_params)
+def __search(*search_params):
     """
     The base call for API methods 'list' and 'tags'
 
@@ -181,7 +184,7 @@ def tags(request):
     """
     request.add_response_callback(response_callback_search_max_age)
 
-    action_return = _search(*_get_search_params_from_request(request))
+    action_return = _search(request, *_get_search_params_from_request(request))
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
@@ -276,7 +279,7 @@ def list(request):
     request.add_response_callback(response_callback_search_max_age)
 
     def get_list():
-        action_return = _search(*_get_search_params_from_request(request))
+        action_return = _search(request, *_get_search_params_from_request(request))
         log.debug('cache gen - get_list')
 
         _trackids = action_return['data']['trackids']

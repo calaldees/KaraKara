@@ -89,7 +89,7 @@ login.provider.enabled = []
 # Cache ------------------------------------------------------------------------
 
 cache.backend = dogpile.cache.memory
-cache.backend.params = {}
+cache.backend.arguments = {}
 
 
 # Python Server ----------------------------------------------------------------

@@ -3,6 +3,7 @@ import re
 import operator
 import random
 from functools import partial
+from datetime import timedelta
 
 # Pyramid imports
 import pyramid.events
@@ -12,13 +13,15 @@ import pyramid.traversal
 from pyramid.session import SignedCookieSessionFactory  # TODO: should needs to be replaced with an encrypted cookie or a hacker at an event may be able to intercept other users id's
 from pyramid.i18n import get_localizer, TranslationStringFactory
 
+import dogpile.cache
+
 # External Imports
 from calaldees.string_convert import convert_str_with_type
 from calaldees.data import extract_subkeys
 from calaldees.json import read_json, json_serializer, json_string
-from calaldees.date_tools import now
+from calaldees.date_tools import now, normalize_datetime
 from calaldees.debug import postmortem
-from calaldees.pyramid_helpers.cache_manager import setup_pyramid_cache_manager
+from calaldees.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, setup_pyramid_cache_manager
 from calaldees.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from calaldees.pyramid_helpers.session_identity2 import session_identity
 from calaldees.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
@@ -29,7 +32,7 @@ from .traversal import TraversalGlobalRootFactory
 from .templates import helpers as template_helpers
 from .auth import ComunityUserStore, NullComunityUserStore
 # SQLAlchemy imports
-from .model import init_DBSession
+from .model import init_DBSession, commit
 
 
 import logging
@@ -237,12 +240,40 @@ def main(global_config, **settings):
         with patch.object(request, 'cache_bucket', _cache_bucket):
             assert request.cache_bucket == _cache_bucket
             return view_callable(request)['data']
-
     config.add_request_method(call_sub_view)
-
 
     from .model_logic.queue_logic import QueueLogic
     config.add_request_method(QueueLogic, 'queue', reify=True)
+
+
+    # Request addition - Cache -------------------------------------------------
+
+    def _cache_key_etag_expire(request):
+        cache_bust = request.registry.settings.get('server.etag.cache_buster', '')
+        etag_expire = normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime()
+        return f'{cache_bust}-{etag_expire}'
+    def _cache_key_identity_admin(request):
+        if request.session.peek_flash():
+            raise LookupError  # Response is not cacheable/indexable if there is a custom flash message
+        #return is_admin(request)
+        return request.session_identity['admin']
+
+    cache_store = dogpile.cache.make_region().configure(
+        backend='dogpile.cache.memory',
+        expiration_time=timedelta(hours=1),
+    )
+    config.registry.settings['cache.store'] = cache_store  # accessible for tests
+    cache_manager = CacheManager(
+        cache_store=cache_store,
+        default_cache_key_generators=(
+            CacheFunctionWrapper(_cache_key_etag_expire, ('request', )),
+            CacheFunctionWrapper(_cache_key_identity_admin, ('request', )),
+        ),
+        default_invalidate_callbacks=(
+            CacheFunctionWrapper(commit, ()),
+        )
+    )
+    config.add_request_method(lambda request, *args: cache_manager, name='cache_manager', property=True)
 
 
     # Routes -------------------------------------------------------------------

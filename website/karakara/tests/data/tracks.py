@@ -10,9 +10,6 @@ from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
 from karakara.model.model_tracks import Track, Attachment
 
-from karakara.views import cache_store
-
-
 AttachmentDescription = namedtuple('AttachmentDescription', ('location', 'type'))
 
 
@@ -80,7 +77,7 @@ def attachments(request):
 
 
 @pytest.fixture(scope="session")
-def tracks(request, DBSession, commit, tags, attachments):
+def tracks(request, DBSession, commit, tags, attachments, cache_store):
     """
     4 test tracks with various unicode characters, lyrics, attachments, tags
     """
@@ -147,7 +144,7 @@ def tracks(request, DBSession, commit, tags, attachments):
 
 
 @pytest.fixture(scope="function")
-def tracks_volume(request):
+def tracks_volume(request, cache_store):
     """
     Create 15 random tracks to assert larger list
     """

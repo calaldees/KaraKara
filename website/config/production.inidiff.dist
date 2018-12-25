@@ -33,7 +33,7 @@ session.secret   = change_me
 
 
 cache.backend = dogpile.cache.redis
-cache.backend.params = {}
+cache.backend.arguments = {}
 
 
 
