@@ -14,8 +14,11 @@ services:
         env_file:
             - .env
         environment:
-            - CACHE_BACKEND: dogpile.cache.redis
-            - CACHE_BACKEND_ARGUMENTS: '{"host": "redis", "port": 6379} -> json'
+            STATIC_PROCESSMEDIA2_LOG: /logs/processmedia2-app.log
+            SQLALCHEMY_URL: postgresql+pypostgresql://karakara:karakara@postgres/karakara
+            CACHE_BACKEND: dogpile.cache.redis
+            CACHE_BACKEND_ARGUMENTS: '{"host": "redis", "port": 6379} -> json'
+            SESSION_SECRET: change_me
         links:
             - postgres
             - redis
