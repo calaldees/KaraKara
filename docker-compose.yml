@@ -6,14 +6,19 @@ volumes:
     logs:
 
 services:
+
     website:
         build:
             context: ./website
             dockerfile: Dockerfile
         env_file:
             - .env
+        environment:
+            - CACHE_BACKEND: dogpile.cache.redis
+            - CACHE_BACKEND_ARGUMENTS: '{"host": "redis", "port": 6379} -> json'
         links:
             - postgres
+            - redis
         volumes:
             - logs:/logs
         #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
@@ -44,6 +49,11 @@ services:
         volumes:
             - logs:/logs
             - website_db:/var/lib/postgresql
+
+    redis:
+        image: redis
+        expose:
+            - 6379
 
     nginx:
         build:
