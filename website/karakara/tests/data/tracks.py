@@ -10,7 +10,7 @@ from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
 from karakara.model.model_tracks import Track, Attachment
 
-from karakara.views import cache
+from karakara.views import cache_store
 
 
 AttachmentDescription = namedtuple('AttachmentDescription', ('location', 'type'))
@@ -142,7 +142,7 @@ def tracks(request, DBSession, commit, tags, attachments):
     request.addfinalizer(finalizer)
 
     commit()
-    cache.invalidate()
+    cache_store.invalidate()
     return mock_tracks
 
 
@@ -160,7 +160,7 @@ def tracks_volume(request):
     request.addfinalizer(finalizer)
 
     commit()
-    cache.invalidate()
+    cache_store.invalidate()
     return mock_tracks
 
 

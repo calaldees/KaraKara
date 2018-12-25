@@ -41,8 +41,6 @@ cache_store = dogpile.cache.make_region().configure(
     expiration_time=timedelta(hours=1),
 )
 
-cache = cache_store  # TODO: remove passing alias DEPRICATED!
-
 
 #-------------------------------------------------------------------------------
 # Cache Management

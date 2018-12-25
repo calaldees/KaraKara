@@ -6,7 +6,7 @@ from pyramid.traversal import resource_path
 
 from calaldees.data import first, subdict
 
-from . import web, action_ok, action_error, etag_decorator, cache, cache_none, generate_cache_key, admin_only, cache_manager
+from . import web, action_ok, action_error, etag_decorator, cache_none, generate_cache_key, admin_only, cache_manager
 
 from ..model import DBSession
 from ..model.actions import get_track_dict_full

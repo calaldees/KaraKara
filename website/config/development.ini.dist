@@ -86,6 +86,11 @@ login.google.client_secret_file =
 
 login.provider.enabled = []
 
+# Cache ------------------------------------------------------------------------
+
+cache.backend = dogpile.cache.memory
+cache.backend.params = {}
+
 
 # Python Server ----------------------------------------------------------------
 server.gzip         = False -> bool

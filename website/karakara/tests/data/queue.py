@@ -5,7 +5,7 @@ import pytest
 from karakara.model import DBSession, commit
 from karakara.model.model_queue import Queue, QueueSetting
 
-from karakara.views import cache
+from karakara.views import cache_store
 
 
 @pytest.yield_fixture(scope='session')
@@ -22,6 +22,6 @@ def queue(request, DBSession, commit):
     DBSession.add(queue_setting)
 
     commit()
-    cache.invalidate()
+    cache_store.invalidate()
     yield QUEUE_ID
     DBSession.delete(queue)

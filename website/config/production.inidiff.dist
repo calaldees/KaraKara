@@ -32,6 +32,11 @@ sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@postgres/karakara
 session.secret   = change_me
 
 
+cache.backend = dogpile.cache.redis
+cache.backend.params = {}
+
+
+
 [logger_root]
 level = INFO
 handlers = logfile

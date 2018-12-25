@@ -14,7 +14,7 @@ from pyramid.traversal import resource_path
 from calaldees.data import update_dict
 #from calaldees.pyramid_helpers.auto_format import registered_formats
 
-from . import web, cache, etag, action_ok, cache_manager # generate_cache_key,
+from . import web, cache_store, etag, action_ok, cache_manager # generate_cache_key,
 
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -107,8 +107,8 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
 
 #-------------------------------------------------------------------------------
 
-@cache.cache_on_arguments()
-def _search(search_params):
+@cache_store.cache_on_arguments()
+def _search(*search_params):
     """
     The base call for API methods 'list' and 'tags'
 
@@ -181,7 +181,7 @@ def tags(request):
     """
     request.add_response_callback(response_callback_search_max_age)
 
-    action_return = _search(_get_search_params_from_request(request))
+    action_return = _search(*_get_search_params_from_request(request))
 
     tags             = action_return['data']['tags']
     keywords         = action_return['data']['keywords']
@@ -276,7 +276,7 @@ def list(request):
     request.add_response_callback(response_callback_search_max_age)
 
     def get_list():
-        action_return = _search(_get_search_params_from_request(request))
+        action_return = _search(*_get_search_params_from_request(request))
         log.debug('cache gen - get_list')
 
         _trackids = action_return['data']['trackids']
