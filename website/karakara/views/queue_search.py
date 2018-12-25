@@ -109,8 +109,8 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
 
 #@cache_store.cache_on_arguments()
 def _search(request, *search_params):
-    # HACK - horrible use of cache store to replace global decorator that was here before. Seems to work - Can sombody make this better please
-    return request.registry.settings['cache.store'].cache_on_arguments()(__search)(*search_params)
+    #return request.registry.settings['cache.store'].cache_on_arguments()(__search)(*search_params)
+    return request.registry.settings['cache.store'].get_or_create('-'.join((__name__, ) + tuple(map(str, search_params))), lambda: __search(*search_params))
 def __search(*search_params):
     """
     The base call for API methods 'list' and 'tags'
