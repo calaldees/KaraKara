@@ -11,7 +11,6 @@ LOG_PATH=$(WRITE_PATH)/logs
 EXTERNAL_PATH=$(WRITE_PATH)/externals
 UPLOAD_PATH=$(WRITE_PATH)/upload
 LOCALE_PATH=$(WRITE_PATH)/locale
-DATABASE_PATH=$(WRITE_PATH)/database
 #DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
 ENV=$(WRITE_PATH)/_env
 PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
@@ -25,9 +24,6 @@ INI_DEV  = $(CONFIG_PATH)/development.ini
 INI_TEST = $(CONFIG_PATH)/test.ini
 INI_PROD = $(CONFIG_PATH)/production.ini
 STATIC_FILE_PATH = ../mediaserver/www/files
-
-# this must match development.ini path
-DATABASE_DEV=$(DATABASE_PATH)/test.db
 
 #PATH_LOCAL_LIBS:=../../libs/python3
 #PATH_REMOTE_LIBS:=https://raw.githubusercontent.com/calaldees/libs/master/python3
@@ -96,24 +92,7 @@ dependency_download: $(ENV)
 	$(PYTHON) -m calaldees.apps.dependency_fetcher dependency_fetcher.json --tracker $(EXTERNAL_PATH)/tracker.json --destination_path $(EXTERNAL_PATH)
 
 .PHONY: install
-install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO dependency_download $(LOCALE_PATH)/karakara.pot $(DATABASE_DEV) upload_paths
-
-
-# Databases --------------------------------------------------------------------
-
-$(DATABASE_DEV):
-	mkdir -p $(DATABASE_PATH)
-	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_DEV) --init_func $(PROJECT).model.init_data:init_data
-	#env/bin/populate_KaraKara $(INI_DEV)
-
-.PHONY: init_db_production
-init_db_production: ini_production
-	$(PYTHON) -m$(PROJECT).model.setup --config_uri $(INI_PROD) --init_func $(PROJECT).model.init_data:init_data
-#init_db_test: init_db
-#	env/bin/python -m$(PROJECT).model.setup --config_uri development.ini --init_func $(PROJECT).tests.init_data:init_random_data
-
-#	cd website ; env/bin/python -mkarakara.model.setup --config_uri production.ini --init_func karakara.model.init_data:init_data
-#	cd website ; env/bin/python -mkarakara.scripts.insert_random_tracks 1200 --config=production.ini
+install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO dependency_download $(LOCALE_PATH)/karakara.pot upload_paths
 
 
 # Ini files --------------------------------------------------------------------
@@ -175,7 +154,7 @@ shell_production: ini_production
 # Test -------------------------------------------------------------------------
 .PHONY: test test_crawl
 
-test: install $(DATABASE_DEV) ini_test
+test: install ini_test
 	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# --capture=sys
 

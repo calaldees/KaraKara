@@ -32,7 +32,7 @@ from .traversal import TraversalGlobalRootFactory
 from .templates import helpers as template_helpers
 from .auth import ComunityUserStore, NullComunityUserStore
 # SQLAlchemy imports
-from .model import init_DBSession, commit
+from .model import init_DBSession, init_DBSession_tables, commit
 
 
 import logging
@@ -49,6 +49,9 @@ def main(global_config, **settings):
 
     # Db
     init_DBSession(settings)
+    from .model.init_data import init_initial_tags
+    init_DBSession_tables()
+    #import pdb ; pdb.set_trace()
 
     # Pyramid Global Settings
     config = pyramid.config.Configurator(settings=settings, root_factory=TraversalGlobalRootFactory)  # , autocommit=True

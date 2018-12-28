@@ -48,18 +48,14 @@ def app_ini(request, ini_file):
 
 
 @pytest.fixture(scope="session")
-def app(request, app_ini):
+def app(request, app_ini, DBSession):
     """
     Start KaraKara application
     """
     from webtest import TestApp
     from karakara import main as karakara_main
 
-    #print('setup WebApp')
     app = TestApp(karakara_main({}, **app_ini))
-
-    from karakara.model.init_data import init_data
-    init_data()
 
     def finalizer():
         #print('tearDown WebApp')
@@ -70,13 +66,16 @@ def app(request, app_ini):
 
 
 @pytest.fixture(scope="session")
-def DBSession(request, app):
+def DBSession(request, app_ini):
     """
-    Aquire DBSession from WebTest App
-    The WSGI app has already been started,
-    we can import the session safly knowing it has been setup
+    Init/Clear database
     """
-    from karakara.model import DBSession
+
+    from karakara.model import DBSession, init_DBSession, init_DBSession_tables, clear_DBSession_tables
+    init_DBSession(app_ini)
+    clear_DBSession_tables()
+    init_DBSession_tables()
+
     return DBSession
 
 

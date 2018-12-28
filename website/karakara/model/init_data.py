@@ -3,8 +3,9 @@ Init KaraKara base tables
 This should by convention be separate to the DBSession as this imports Model objects
 and therefore binding to Base
 """
+from sqlalchemy import event
 
-from . import DBSession, init_db, commit
+from . import DBSession, commit
 
 
 import logging
@@ -16,7 +17,7 @@ log = logging.getLogger(__name__)
 
 # The DB modules imported here will be created as part of the blank database.
 # If you add a new model ensure it ia added here
-# Note: you may see pyflakes 'not used' errors here. This is nessisary! the import registers them with the model
+# Note: you may see pyflakes 'not used' errors here. This is necessary! the import registers them with the model
 from .model_tracks import Track, Tag
 from .model_queue import QueueItem
 #from .model_feedback import Feedback  # Depricated until we can replace it with 'messaging'
@@ -32,10 +33,11 @@ from .actions import get_tag
 # Init Base Data
 #-------------------------------------------------------------------------------
 
-def init_data():
-    init_db()  # Clear current DB and Create Blank Tables
+@event.listens_for(Tag.__table__, 'after_create')
+def init_initial_tags(*args, **kwargs):
+    #init_db()  # Clear current DB and Create Blank Tables
 
-    log.info("Populating tables with base data")
+    log.info("Populating Tag with initial data")
 
     base_tags = [
         'category:anime',

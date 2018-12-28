@@ -1,5 +1,5 @@
 __all__ = [
-    "DBSession", "Base", "init_DBSession", "init_db", "commit"
+    "DBSession", "Base", "init_DBSession", "init_DBSession_tables", "clear_DBSession_tables", "commit"
     "JSONEncodedDict",
 ]
 
@@ -28,6 +28,13 @@ def init_DBSession(settings):
     Import the files with your datamodel, before calling this.
     Upon this call is the SQLa tables are build/linked
     """
+    import os
+    from pathlib import Path
+    SQLALCHEMY_URL_PREFIX_SQLITE = 'sqlite:///'
+    if settings['sqlalchemy.url'].startswith(SQLALCHEMY_URL_PREFIX_SQLITE):
+        folder_database = Path(settings['sqlalchemy.url'].replace(SQLALCHEMY_URL_PREFIX_SQLITE, '')).parent
+        os.makedirs(folder_database, exist_ok=True)
+
     global engine
     from sqlalchemy import engine_from_config
     engine = engine_from_config(settings, 'sqlalchemy.')
@@ -40,17 +47,18 @@ def init_DBSession(settings):
     #return DBSession.configure(bind=connection), transaction
     #transaction.rollback() # can roll back with
 
-def init_db():
+def init_DBSession_tables():
     """
     Clears and Creates all DB tables associated with Base
 
     To be called AFTER init_DBSession
     """
-    log.info("Drop all existing tables")
-    Base.metadata.drop_all(bind=DBSession.bind, checkfirst=True)
-    log.info("Create all tables bound to Base")
-    Base.metadata.create_all(bind=DBSession.bind) #, checkfirst=True
+    log.info("Create all tables (if needed) that are bound to DeclarativeBase")
+    Base.metadata.create_all(bind=DBSession.bind, checkfirst=True)
 
+def clear_DBSession_tables():
+    log.info("Drop all tables that are bound to DeclarativeBase")
+    Base.metadata.drop_all(bind=DBSession.bind, checkfirst=True)
 
 
 #-------------------------------------------------------------------------------
