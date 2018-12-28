@@ -30,16 +30,16 @@ class TrackMissingProcessedFiles(Exception):
 
 
 def _track_api(host, data={}, method='GET'):
-    return json.loads(
+    return json.load(
         urllib.request.urlopen(
             urllib.request.Request(
-                'http://{host}/track_import?format=json'.format(host=host),  # TODO: replace with formatstring
+                f'http://{host}/track_import?format=json',
                 data=json.dumps(data).encode('utf8'),
                 headers={'content-type': 'application/json'},
                 method=method,
             ),
             #timeout=120,
-        ).read().decode('utf8')  # .decode() is uneeded in python3.6 and can be removed later  # https://docs.python.org/3/library/json.html#json.loads
+        )
     )
 
 
