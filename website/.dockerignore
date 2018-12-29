@@ -1,4 +1,4 @@
 data/
 KaraKara.egg-info/
-*.py[co]
-__pycache__
+**/*.py[co]
+**/__pycache__

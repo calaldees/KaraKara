@@ -4,11 +4,11 @@
 **/.pytest_cache
 *.log
 *.pid
-*.py[oc]
-*.cache
+**/*.py[oc]
+**/*.cache
 **/~
 hash_cache.pickle
-*.egg-info
+**/*.egg-info
 **/_env
 **/.swp
 

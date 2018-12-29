@@ -9,14 +9,8 @@ PROJECTS = processmedia2 website admindashboard
 .PHONY: help
 help:
 	# Karakara - Karaoke event system
-	#  (propergate to all projects)
-	#   test
-	#   clean
 	#
-	#  (top level)
-	#   docker_build -> docker_install -> docker_up
-	#   rsync_pull
-	#   cloc
+	# This Makefile is being reconsidered - try `docker-compose up`
 
 
 .env:
@@ -28,14 +22,12 @@ help:
 
 docker_build: .env
 	docker-compose build
-docker_install:
-	docker-compose run --rm website /app/_install.sh
-docker_shell:
+docker_shell_website:
 	docker-compose run --rm --service-ports website /bin/bash
 	# Import comunity user notes
 	#docker-compose run -v ~/karakara_users.sql:/data/karakara_users.sql:ro postgres /bin/bash
 	#  psql -h postgres -U karakara karakara -f /data/karakara_users.sql
-docker_exec:
+docker_exec_website:
 	docker-compose exec website /bin/bash
 docker_up:
 	docker-compose up
@@ -58,13 +50,14 @@ rsync_local_push:
 
 .PHONY: test
 test: .env
-	docker-compose --file .\docker-compose.pytest.yml run test_web
+	docker-compose --file docker-compose.yml --file docker-compose.test.yml run --no-deps --rm website
+	docker-compose --file docker-compose.yml --file docker-compose.test.yml run --no-deps --rm processmedia2
 
 # Cloc ------------------------------------------------------------------------
 
 .PHONY: cloc
 cloc:
-	cloc --exclude-dir=$(ENV),libs ./
+	cloc --vcs=git
 
 # Clean ------------------------------------------------------------------------
 
@@ -78,4 +71,3 @@ clean: clean_osx_cancer docker_clean
 	for project in $(PROJECTS); do \
 		$(MAKE) clean --directory $$project ; \
 	done
-

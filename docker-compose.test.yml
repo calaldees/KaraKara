@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+
+    website:
+      # docker-compose --file docker-compose.yml  --file docker-compose.test.yml run --no-deps --rm website
+      command: make test
+
+    processmedia2:
+      # docker-compose --file docker-compose.yml  --file docker-compose.test.yml run --no-deps --rm processmedia2
+      command: [
+        'pytest',
+        'processmedia_libs',
+        'tests',
+        '--doctest-modules',
+      ]
