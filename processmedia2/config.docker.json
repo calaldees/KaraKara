@@ -1,6 +1,7 @@
 {
     "loggingconf": "logging.json.dist",
     "lockfile": "data/.lock",
+    "heartbeat_file": "{KARAKARA_PROCESSMEDIA2_HEARTBEAT_FILE}",
     "mtime_store_path": "data/mtimes.json",
 
     "path_source": "{PATH_CONTAINER_MEDIA}/source",

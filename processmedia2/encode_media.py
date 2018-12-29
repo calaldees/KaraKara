@@ -3,6 +3,7 @@
 import os.path
 import tempfile
 import random
+from pathlib import Path
 
 from clint.textui.progress import bar as progress_bar
 
@@ -33,7 +34,7 @@ PROCESS_ORDER_FUNCS = {
     'none': lambda x: x,
 }
 
-def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC] , **kwargs):
+def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC], **kwargs):
     meta_manager = MetaManagerExtended(**kwargs)  #path_meta=kwargs['path_meta'], path_source=kwargs['path_source']
     meta_manager.load_all()
 
@@ -74,12 +75,17 @@ class Encoder(object):
     """
     """
 
-    def __init__(self, meta_manager=None, postmortem=False, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+    def __init__(self, meta_manager=None, postmortem=False, heartbeat_file=None, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
         self.pdb = postmortem
         self.external_tools = ProcessMediaFilesWithExternalTools(
             **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_sox', 'cmd_jpegoptim') and v}
         )
+        self._heartbeat_file = Path(heartbeat_file) if heartbeat_file else None
+
+    def heartbeat(self):
+        if self._heartbeat_file:
+            self._heartbeat_file.touch()
 
     def encode(self, name):
         """
@@ -91,10 +97,13 @@ class Encoder(object):
 
         def encode_steps(m):
             yield m.update_source_hashs()
+            self.heartbeat()
             yield self._encode_primary_video_from_meta(m)
+            self.heartbeat()
             yield self._extract_source_details_safeguard(m)
             yield self._encode_srt_from_meta(m)
             yield self._encode_preview_video_from_meta(m)
+            self.heartbeat()
             yield self._encode_images_from_meta(m)
             yield self._process_tags_from_meta(m)
         try:

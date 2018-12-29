@@ -3,6 +3,7 @@ import argparse
 import sys
 import fcntl
 import os
+from pathlib import Path
 
 from calaldees.debug import postmortem
 from calaldees.environ import get_env
@@ -22,6 +23,7 @@ DEFAULT_kwargs = {
     'lockfile': os.path.join(DEFAULT_DATA_PATH, '.lock'),
     'loggingconf': os.path.join(DEFAULT_DATA_PATH, 'logging.json'),
     'mtime_store_path': os.path.join(DEFAULT_DATA_PATH, 'mtimes.json'),
+    'heartbeat_file': os.path.join(DEFAULT_DATA_PATH, '.heartbeat'),
     'cmd_ffmpeg': 'nice ffmpeg',
 }
 
@@ -54,6 +56,7 @@ def main(
     parser.add_argument('--loggingconf', action='store', help=f" default:{DEFAULT_kwargs['loggingconf']}")
     parser.add_argument('--lockfile', action='store', help=f"lockfilename, to ensure multiple encoders do not operate at once. default:{DEFAULT_kwargs['lockfile']}")
     parser.add_argument('--mtime_store_path', action='store', help=f"optimisation file that tracks the last time processing was done on a folder. default:{DEFAULT_kwargs['mtime_store_path']}")
+    parser.add_argument('--heartbeat_file', action='store', help=f"touch this file on each action default:{DEFAULT_kwargs['heartbeat_file']}")
 
     parser.add_argument('--cmd_ffmpeg', action='store', help=f"cmd for ffmpegdefault:{DEFAULT_kwargs['cmd_ffmpeg']}")  # TODO: is this needed? It was a consideration for containerisation, but the container contains the relevent binarys now
 
@@ -95,6 +98,10 @@ def main(
     # Setup logging.json
     with open(kwargs['loggingconf'], 'rt') as filehandle:
         logging.config.dictConfig(json.load(filehandle))
+
+    # Heartbeat
+    if kwargs['heartbeat_file']:
+        Path(kwargs['heartbeat_file']).touch()
 
     # Optimisation to abort early if files to process have not changed since last time
     if folder_type_to_derive_mtime:
