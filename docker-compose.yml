@@ -69,7 +69,7 @@ services:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
             - logs:/logs
-            - ${PATH_HOST_processed}:/media/processed:rw
+            - ${PATH_HOST_processed}:/media/processed:ro
         links:
             - website
             - player
