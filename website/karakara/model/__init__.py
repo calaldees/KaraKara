@@ -28,12 +28,29 @@ def init_DBSession(settings):
     Import the files with your datamodel, before calling this.
     Upon this call is the SQLa tables are build/linked
     """
-    import os
-    from pathlib import Path
-    SQLALCHEMY_URL_PREFIX_SQLITE = 'sqlite:///'
-    if settings['sqlalchemy.url'].startswith(SQLALCHEMY_URL_PREFIX_SQLITE):
-        folder_database = Path(settings['sqlalchemy.url'].replace(SQLALCHEMY_URL_PREFIX_SQLITE, '')).parent
+    import re
+
+    # Make path to sqlite file if required
+    sqlite_url_match = re.match(r'sqlite:///(?P<path>.*)', settings['sqlalchemy.url'])
+    if sqlite_url_match:
+        import os
+        from pathlib import Path
+        folder_database = Path(sqlite_url_match.group('path')).parent
         os.makedirs(folder_database, exist_ok=True)
+
+    # Wait (a short period) for postgres port to open if needed
+    postgres_url_match = re.match(r'postgresql://.*?@(?P<host>.*?):(?P<port>\d{2,6})', settings['sqlalchemy.url'])
+    if postgres_url_match:
+        import socket
+        from calaldees.wait_for import wait_for
+        TIMEOUT = 10
+        socket_host_port_tuple = (postgres_url_match.group('host'), postgres_url_match.group('port'))
+        log.info(f'Waiting for postgresql socket to open at {socket_host_port_tuple} for {TIMEOUT} seconds')
+        wait_for(
+            func_attempt=lambda: socket.create_connection(socket_host_port_tuple, timeout=1),
+            timeout=TIMEOUT,
+            ignore_exceptions=True,
+        )
 
     global engine
     from sqlalchemy import engine_from_config
