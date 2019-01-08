@@ -6,12 +6,12 @@ KARAKARA_PROCESSMEDIA2_CONFIG=${KARAKARA_PROCESSMEDIA2_CONFIG:-config.docker.jso
 
 function run() {
     echo "processmedia2 - $(date)"
-    python3 scan_media.py    --config ${KARAKARA_PROCESSMEDIA2_CONFIG}
     # scan will terminate with `exit 1` if no files have changed
-    python3 encode_media.py  --config ${KARAKARA_PROCESSMEDIA2_CONFIG}
-    python3 import_media.py  --config ${KARAKARA_PROCESSMEDIA2_CONFIG} --force
+    # Attempt to make function exit on failed command - https://stackoverflow.com/a/51913013/3356840
+    python3 scan_media.py    --config ${KARAKARA_PROCESSMEDIA2_CONFIG} && \
+    python3 encode_media.py  --config ${KARAKARA_PROCESSMEDIA2_CONFIG} && \
+    python3 import_media.py  --config ${KARAKARA_PROCESSMEDIA2_CONFIG} --force  && \
     if [ "${KARAKARA_PROCESSMEDIA2_CLEANUP:-false}" == "true" ]; then
-        echo "cleanup"
         python3 cleanup_media.py --config ${KARAKARA_PROCESSMEDIA2_CONFIG}
     fi
 }
