@@ -1,3 +1,4 @@
+import sys
 from pprint import pprint
 from functools import partial
 import urllib.request
@@ -30,17 +31,21 @@ class TrackMissingProcessedFiles(Exception):
 
 
 def _track_api(host, data={}, method='GET'):
-    return json.load(
-        urllib.request.urlopen(
-            urllib.request.Request(
-                f'http://{host}/track_import?format=json',
-                data=json.dumps(data).encode('utf8'),
-                headers={'content-type': 'application/json'},
-                method=method,
-            ),
-            #timeout=120,
+    try:
+        return json.load(
+            urllib.request.urlopen(
+                urllib.request.Request(
+                    f'http://{host}/track_import?format=json',
+                    data=json.dumps(data).encode('utf8'),
+                    headers={'content-type': 'application/json'},
+                    method=method,
+                ),
+                #timeout=120,
+            )
         )
-    )
+    except urllib.error.URLError:
+        log.error(f'Unable to contact {host}')
+        sys.exit(1)
 
 
 def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, existing_track_ids=None):
