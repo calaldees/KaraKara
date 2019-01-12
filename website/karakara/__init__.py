@@ -294,9 +294,9 @@ def main(global_config, **settings):
     config.add_static_view(name='player', path=settings_path('static.player'))
     config.add_static_view(name='player2', path=settings_path('static.player2'))
 
-    # AllanC - it's official ... static route setup and generation is a mess in pyramid
-    #config.add_static_view(name=settings["static.media" ], path="karakara:media" )
-    config.add_static_view(name='files', path=config.registry.settings['static.processmedia2.config']['path_processed'])
+    # If in local dev mode - pyramid webserver should host static files - this path is overridden by nginx in production
+    if config.registry.settings.get('static.path.processed'):
+        config.add_static_view(name='files', path=config.registry.settings['static.path.processed'])
 
     # View Routes
     config.add_route('inject_testdata', '/inject_testdata')

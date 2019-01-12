@@ -31,7 +31,6 @@ log = logging.getLogger(__name__)
 #-------------------------------------------------------------------------------
 
 PATH_BACKUP_KEY = 'static.backup'
-PATH_PROCESSMEDIA2_CONFIG = 'static.processmedia2.config'
 PATH_PROCESSMEDIA2_LOG = 'static.processmedia2.log'
 PATH_UPLOAD_KEY = 'upload.path'
 
@@ -90,7 +89,7 @@ def file_uploaded(event):
     This can be removed.
     """
     upload_path = get_setting(PATH_UPLOAD_KEY)
-    path_source = get_setting(PATH_PROCESSMEDIA2_CONFIG)['path_source']
+    path_source = get_setting('static.path.source')
 
     # Move uploaded files into media path
     uploaded_files = (f for f in os.listdir(upload_path) if os.path.isfile(os.path.join(upload_path, f)))
@@ -124,8 +123,8 @@ class ComunityTrack():
     def factory(cls, track, request):
         return ComunityTrack(
             track=track,
-            path_source=request.registry.settings[PATH_PROCESSMEDIA2_CONFIG]['path_source'],
-            path_meta=request.registry.settings[PATH_PROCESSMEDIA2_CONFIG]['path_meta'],
+            path_source=request.registry.settings['static.path.source'],
+            path_meta=request.registry.settings['static.path.meta'],
             path_backup=request.registry.settings[PATH_BACKUP_KEY],
             open=cls._open
         )

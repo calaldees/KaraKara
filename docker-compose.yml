@@ -19,6 +19,9 @@ services:
             SQLALCHEMY_URL: postgresql+pypostgresql://karakara:karakara@postgres/karakara
             CACHE_BACKEND: dogpile.cache.redis
             CACHE_BACKEND_ARGUMENTS: '{"host": "redis", "port": 6379} -> json'
+            STATIC_PATH_SOURCE: ${PATH_CONTAINER_MEDIA}/source
+            STATIC_PATH_META: ${PATH_CONTAINER_MEDIA}/meta
+            #STATIC_PATH_PROCESSED: "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
             #SESSION_SECRET: change_me
         links:
             - postgres
@@ -26,8 +29,8 @@ services:
         volumes:
             - logs:/logs
         #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
-        #    - ${PATH_HOST_MEDIA}:${PATH_CONTAINER_MEDIA}:ro
-        #    - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
+            - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
+            - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:ro
         #    - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     player:
