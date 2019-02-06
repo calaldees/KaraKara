@@ -100,7 +100,21 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
     for tag in tags_silent_forced:
         query = query.intersect(DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id))
     for tag in tags_silent_hidden:
-        query = query.filter(Track.id.notin_(DBSession.query(Track.id).join(Track.tags).filter(Tag.id == tag.id)))
+        query = query.filter(
+            Track.id.notin_(
+                DBSession.query(Track.id)
+                    .join(
+                        #DBSession.query(Tag).group_by(Tag.parent_id).having(func.count(Tag.parent_id) == 1).subquery(),
+                        # Attempt at allowing trackids.tags with alternate parents to remain in selection
+                        # https://docs.sqlalchemy.org/en/latest/orm/query.html?highlight=join#sqlalchemy.orm.query.Query.join
+                        # See section titled 'Advanced Join Targeting and Adaption'
+                        # https://docs.sqlalchemy.org/en/latest/orm/query.html?highlight=having#sqlalchemy.orm.query.Query.having
+                        # Having can be used with 'count'
+                        Track.tags
+                    )
+                    .filter(Tag.id == tag.id)
+            )
+        )
 
     return query
 
