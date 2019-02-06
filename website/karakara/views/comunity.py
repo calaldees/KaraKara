@@ -133,9 +133,11 @@ class ComunityTrack():
         """
         Not to be called directly - use factory() instead
         """
-        assert path_source
-        assert path_backup
-        assert path_meta
+        #assert path_source  # this heavy assertion was preventing tests from running in dev mode - opted to use a warning instead
+        #assert path_backup
+        #assert path_meta
+        if not path_source:
+            log.warning('path_source should be specified for comunity to function properly - we could be in dev mode without any data')
         self.path_source = path_source
         self.path_meta = path_meta
         self.path_backup = path_backup
