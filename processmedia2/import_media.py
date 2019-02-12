@@ -43,8 +43,8 @@ def _track_api(host, data={}, method='GET'):
                 #timeout=120,
             )
         )
-    except urllib.error.URLError:
-        log.error(f'Unable to contact {host}')
+    except urllib.error.URLError as ex:
+        log.error(f'track_import failure - {host} - {ex} - {data}')
         sys.exit(1)
 
 
