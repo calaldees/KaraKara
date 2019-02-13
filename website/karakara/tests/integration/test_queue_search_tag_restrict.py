@@ -47,6 +47,7 @@ def test_search_tags_silent_forced(app, queue, tracks, tracks_volume):
     with temporary_settings(app, queue, {'karakara.search.tag.silent_hidden': ['category:anime']}):
         assert get_settings()['karakara.search.tag.silent_hidden'] == ['category:anime']
         data = get_search_list_data()
+        assert 't1' in data['trackids']
         assert 't2' not in data['trackids']
         assert len(data['trackids']) == 18
 

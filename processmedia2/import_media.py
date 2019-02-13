@@ -45,6 +45,7 @@ def _track_api(host, data={}, method='GET'):
         )
     except urllib.error.URLError as ex:
         log.error(f'track_import failure - {host} - {ex} - {data}')
+        #if ex.getcode() != 500:  # TODO: continue on 500 (as we don't want to stop the process for a single failed track)
         sys.exit(1)
 
 

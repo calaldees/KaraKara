@@ -88,7 +88,7 @@ def tracks(request, DBSession, commit, tags, attachments, cache_store):
             'tags': [
                 'title      :Test Track 1',
                 #'description:Test track for the KaraKara system with キ',
-                'opening', 'male', 'jp', 'anime', 'jpop', 'series X',
+                'opening', 'male', 'jp', 'category:anime', 'category:jpop', 'series X',
             ],
             'attachments': ['image1', 'preview1', 'processed'],
             'lyrics': 'ここにいくつかのテキストです。',
@@ -100,7 +100,7 @@ def tracks(request, DBSession, commit, tags, attachments, cache_store):
             'tags': [
                 'title      :Test Track 2',
                 #'description:Test track for the KaraKara system with キ'
-                'ending', 'female', 'en', 'anime', 'series X',
+                'ending', 'female', 'en', 'category:anime', 'series X',
             ],
             'attachments': ['image2', 'preview2'],
             'lyrics': 'Line1\nLine2\nLine3\nLine4\näöü"',
