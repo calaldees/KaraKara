@@ -157,7 +157,7 @@ shell_production: ini_production
 test: install ini_test
 	#$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# Temp modification to reporduce failing test
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -k test_search_tags_silent_forced
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# --capture=sys
 
 test_crawl: ini_test
