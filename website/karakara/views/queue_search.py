@@ -100,7 +100,9 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
     tags_silent_hidden, _ = _tag_strings_to_tag_objs(tags_silent_hidden)
 
     for tag in tags_silent_forced:
-        query = query.intersect(DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id))
+        query = query.intersect(
+            DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id)
+        )
     key_tags = attrgetter('parent_id')
     for parent_id, hidden_tags_groupby_parent_id in groupby(sorted(tags_silent_hidden, key=key_tags), key=key_tags):
         hidden_tags_groupby_parent_id = tuple(hidden_tags_groupby_parent_id)
@@ -108,14 +110,17 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
             Track.id.notin_(
                 DBSession.query(Track.id).filter(and_(
                     Track.id.in_(
-                        DBSession.query(Track.id).join(Track.tags).filter(Tag.id.in_(map(attrgetter('id'),hidden_tags_groupby_parent_id)))
+                        DBSession.query(Track.id).join(Track.tags)
+                            .filter(Tag.id.in_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                            .subquery()
                     ),
                     Track.id.notin_(
                         DBSession.query(Track.id).join(Track.tags)
                             .filter(Tag.parent_id == parent_id)
-                            .filter(Tag.id.notin_(map(attrgetter('id'),hidden_tags_groupby_parent_id)))
+                            .filter(Tag.id.notin_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                            .subquery()
                     )
-                ))
+                )).subquery()
             )
             # Track.id.notin_(
             #     DBSession.query(Track.id)
