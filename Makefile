@@ -33,6 +33,8 @@ docker_up:
 	docker-compose up
 docker_stop:
 	docker-compose stop
+pull:
+	git pull && docker-compose stop && docker-compose up --build -d
 
 # Rsync -----------------------------------------------------------------------
 

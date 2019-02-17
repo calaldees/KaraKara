@@ -103,38 +103,34 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
         query = query.intersect(
             DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id)
         )
-    key_tags = attrgetter('parent_id')
+    key_tags = lambda tag: tag.parent_id if tag.parent_id != None else -1
     for parent_id, hidden_tags_groupby_parent_id in groupby(sorted(tags_silent_hidden, key=key_tags), key=key_tags):
-        hidden_tags_groupby_parent_id = tuple(hidden_tags_groupby_parent_id)
-        query = query.filter(
-            Track.id.notin_(
-                DBSession.query(Track.id).filter(and_(
-                    Track.id.in_(
-                        DBSession.query(Track.id).join(Track.tags)
-                            .filter(Tag.id.in_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
-                            .subquery()
-                    ),
-                    Track.id.notin_(
-                        DBSession.query(Track.id).join(Track.tags)
-                            .filter(Tag.parent_id == parent_id)
-                            .filter(Tag.id.notin_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
-                            .subquery()
-                    )
-                )).subquery()
+        if parent_id == -1:
+            query = query.filter(
+                Track.id.notin_(
+                    DBSession.query(Track.id).join(Track.tags)
+                        .filter(Tag.id.in_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                        .subquery()
+                )
             )
-            # Track.id.notin_(
-            #     DBSession.query(Track.id)
-            #         .join(
-            #             #DBSession.query(Tag).group_by(Tag.parent_id).having(func.count(Tag.parent_id) == 1).subquery(),
-            #             # Attempt at allowing trackids.tags with alternate parents to remain in selection
-            #             # https://docs.sqlalchemy.org/en/latest/orm/query.html?highlight=join#sqlalchemy.orm.query.Query.join
-            #             # See section titled 'Advanced Join Targeting and Adaption'
-            #             # https://docs.sqlalchemy.org/en/latest/orm/query.html?highlight=having#sqlalchemy.orm.query.Query.having
-            #             # Having can be used with 'count'
-            #             Track.tags
-            #         )
-            #         .filter(Tag.id == tag.id)
-            # )
+        else:
+            hidden_tags_groupby_parent_id = tuple(hidden_tags_groupby_parent_id)
+            query = query.filter(
+                Track.id.notin_(
+                    DBSession.query(Track.id).filter(and_(
+                        Track.id.in_(
+                            DBSession.query(Track.id).join(Track.tags)
+                                .filter(Tag.id.in_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                                .subquery()
+                        ),
+                        Track.id.notin_(
+                            DBSession.query(Track.id).join(Track.tags)
+                                .filter(Tag.parent_id == parent_id)
+                                .filter(Tag.id.notin_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                                .subquery()
+                        )
+                    )).subquery()
+                )
         )
 
     return query

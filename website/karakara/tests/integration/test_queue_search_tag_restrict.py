@@ -44,8 +44,9 @@ def test_search_tags_silent_forced(app, queue, tracks, tracks_volume):
     #  - t1 and t2 are the only two tracks tags as anime
     #  - t1 has another tag with the same parent 'category' -> category:jpop
     #  - so the only track that should be removed is t2
-    with temporary_settings(app, queue, {'karakara.search.tag.silent_hidden': ['category:anime']}):
-        assert get_settings()['karakara.search.tag.silent_hidden'] == ['category:anime']
+    #  - the tag 'description' is base tag - that has not parent - that is not used in any test data [FRAGILE!]
+    with temporary_settings(app, queue, {'karakara.search.tag.silent_hidden': ['description, category:anime']}):
+        assert get_settings()['karakara.search.tag.silent_hidden'] == ['description', 'category:anime']
         data = get_search_list_data()
         assert 't1' in data['trackids']
         assert 't2' not in data['trackids']
