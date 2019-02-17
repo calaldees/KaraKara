@@ -105,12 +105,12 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
         )
     key_tags = lambda tag: tag.parent_id if tag.parent_id != None else -1
     for parent_id, hidden_tags_groupby_parent_id in groupby(sorted(tags_silent_hidden, key=key_tags), key=key_tags):
-        hidden_tags_groupby_parent_id = tuple(hidden_tags_groupby_parent_id)
+        hidden_tag_ids = tuple(map(attrgetter('id'), hidden_tags_groupby_parent_id))
         if parent_id == -1:
             query = query.filter(
                 Track.id.notin_(
                     DBSession.query(Track.id).join(Track.tags)
-                        .filter(Tag.id.in_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                        .filter(Tag.id.in_(hidden_tag_ids))
                         .subquery()
                 )
             )
@@ -120,13 +120,13 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
                     DBSession.query(Track.id).filter(and_(
                         Track.id.in_(
                             DBSession.query(Track.id).join(Track.tags)
-                                .filter(Tag.id.in_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                                .filter(Tag.id.in_(hidden_tag_ids))
                                 .subquery()
                         ),
                         Track.id.notin_(
                             DBSession.query(Track.id).join(Track.tags)
                                 .filter(Tag.parent_id == parent_id)
-                                .filter(Tag.id.notin_(map(attrgetter('id'), hidden_tags_groupby_parent_id)))
+                                .filter(Tag.id.notin_(hidden_tag_ids))
                                 .subquery()
                         )
                     )).subquery()
