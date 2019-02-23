@@ -127,7 +127,7 @@ const VideoScreen = ({state, actions}) => (
         <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
                ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
-               onended={() => actions.send_ended("ended")}
+               onended={() => actions.send_ended("played")}
         />
         <div id="seekbar" style={{
             left: ((state.progress / state.queue[0].track.duration) * 100) + "%"
