@@ -41,7 +41,7 @@ function create_websocket() {
         const cmd = msg.data.trim();
         console.log("websocket_onmessage("+ cmd +")");
         const commands = {
-            "skip": player.dequeue,
+            "skip": () => {actions.send_ended('skipped'); player.dequeue()},  // Skip action requires the player to send the ended signal to poke the correct api endpoint. THis feel ineligant fix. Advice please.
             "play": player.play,
             "stop": player.stop,
             "pause": player.pause,
