@@ -13,6 +13,8 @@ from calaldees.date_tools import now
 
 from . import admin_rights, with_settings, temporary_settings, websocket_message_queue
 
+from karakara.model.model_queue import QueueItem
+
 
 # Utils ------------------------------------------------------------------------
 
@@ -86,11 +88,13 @@ class QueueManager():
 
 
 @pytest.yield_fixture(scope='function')
-def queue_manager(app, queue):
+def queue_manager(app, queue, DBSession, commit):
     queue_manager = QueueManager(app, queue)
     assert len(queue_manager.items) == 0
     yield queue_manager
-    queue_manager.clear()
+    queue_manager.clear()  # clear is needed because this goes through the api and resets the cache
+    DBSession.query(QueueItem).filter(QueueItem.queue_id == queue).delete()  # Nuke all track items from orbit - normally when tracks are removed they remain in the db with queueitem.status
+    commit()
 
 
 def get_cookie(app, key):
@@ -248,7 +252,8 @@ def test_queue_played(app, queue, queue_manager, tracks):
     # Try to set as 'played' as normal user - and get rejected
     app.cookiejar.clear()  # Loose the cookie so we are not identifyed as the creator of this queue item.
     queue_item_id = queue_manager.items[0]['id']
-    app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
+    response = app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
+    assert response.status_code == 403
     assert len(queue_manager.items) == 1
 
     # As admin player mark track as played
@@ -257,6 +262,17 @@ def test_queue_played(app, queue, queue_manager, tracks):
     # TODO: 'skipped status' needs testing too - maybe query actual db?
 
     assert len(queue_manager.items) == 0
+
+
+def test_queue_update_with_invalid_status(app, queue, queue_manager, tracks, DBSession):
+    queue_manager.add_queue_item(track_id='t1', performer_name='testperformer')
+    assert len(queue_manager.items) == 1
+
+    queue_item_id = queue_manager.items[0]['id']
+
+    response = app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "unknown_test_value", 'format': 'json'}, expect_errors=True)
+    assert response.status_code == 400
+    assert len(queue_manager.items) == 1
 
 
 def test_queue_reorder(app, queue, queue_manager, tracks):

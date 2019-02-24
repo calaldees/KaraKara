@@ -12,7 +12,7 @@ from calaldees.data import subdict
 from . import web, action_ok, action_error, etag_decorator,  method_delete_router, method_put_router, is_admin, modification_action, admin_only
 
 from ..model import DBSession, commit
-from ..model.model_queue import QueueItem
+from ..model.model_queue import QueueItem, _queueitem_statuss
 from ..model.model_tracks import Track
 from ..model.model_priority_token import PriorityToken
 from ..model.actions import get_track
@@ -352,6 +352,9 @@ def queue_item_update(request):
             params[field] = int(params[field])
         except ValueError:
             raise action_error(message='invalid {0}'.format(field), code=404)
+    status = params.get('status')
+    if status and status not in _queueitem_statuss.enums:
+        raise action_error(message=f'invalid queue_item.status {status} - valid values are {_queueitem_statuss.enums}', code=400)
 
     queue_item_id = int(params['queue_item.id'])
     queue_item = DBSession.query(QueueItem).get(queue_item_id)
