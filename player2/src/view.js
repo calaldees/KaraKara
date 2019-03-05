@@ -125,7 +125,7 @@ const PreviewScreen = ({state, actions}) => (
 
 const VideoScreen = ({state, actions}) => (
     <div className={"screen_video"}>
-        <video src={get_attachment(state, state.queue[0].track, 'preview')}
+        <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
                ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
                onended={() => actions.send_ended("played")}
@@ -165,7 +165,7 @@ const PodiumScreen = ({state, actions}) => (
         {state.queue[0].track.lyrics ?
             <Lyrics state={state} /> :
             <div className="preview_holder">
-                <video src={get_attachment(state, state.queue[0].track, 'video')}
+                <video src={get_attachment(state, state.queue[0].track, 'preview')}
                        autoPlay={true} muted={!state.playing}
                        key={state.playing}
                 />
