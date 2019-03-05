@@ -125,7 +125,7 @@ const PreviewScreen = ({state, actions}) => (
 
 const VideoScreen = ({state, actions}) => (
     <div className={"screen_video"}>
-        <video src={get_attachment(state, state.queue[0].track, 'video')}
+        <video src={get_attachment(state, state.queue[0].track, 'preview')}
                autoPlay={true}
                ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
                onended={() => actions.send_ended("played")}

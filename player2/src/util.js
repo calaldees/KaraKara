@@ -109,7 +109,7 @@ function get_queue_id() {
     return specified ? specified : "demo";
 }
 function is_podium() {
-    return Boolean(queryString.parse(location.hash).podium);
+    return queryString.parse(location.hash).podium != undefined;
 }
 
 export {
