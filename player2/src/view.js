@@ -7,6 +7,7 @@ import {
     s_to_mns,
     get_hostname,
     get_queue_id,
+    is_podium,
     get_file_root
 } from "./util.js";
 
@@ -204,7 +205,7 @@ function view(state, actions) {
         screen = <ClickScreen state={state} actions={actions} />;
     else if(state.queue.length === 0)
         screen = <TitleScreen state={state} actions={actions} />;
-    else if(window.location.hash === "#podium")
+    else if(is_podium())
         screen = <PodiumScreen state={state} actions={actions} />;
     else if(state.queue.length > 0 && !state.playing)
         screen = <PreviewScreen state={state} actions={actions} />;

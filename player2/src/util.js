@@ -108,6 +108,9 @@ function get_queue_id() {
     const specified = queryString.parse(location.hash).queue_id;
     return specified ? specified : "demo";
 }
+function is_podium() {
+    return Boolean(queryString.parse(location.hash).podium);
+}
 
 export {
     timedelta_str,
@@ -117,6 +120,7 @@ export {
     get_ws_port,
     get_hostname,
     get_queue_id,
+    is_podium,
     get_lyrics,
     api,
     get_protocol,

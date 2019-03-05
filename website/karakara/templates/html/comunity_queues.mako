@@ -52,6 +52,14 @@
                 </a>
             </td>
             <td>
+                <a href="${paths['podium']}">
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-lamp" aria-hidden="true"></span>
+                        ${_('podium')}
+                    </button>
+                </a>
+            </td>
+            <td>
                 <a href="${paths['track_list']}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
