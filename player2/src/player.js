@@ -97,13 +97,6 @@ setInterval(
             if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send("play");}
             else {player.set_progress(state.progress + 1/FPS);}
         }
-
-        // if we're playing, but we don't have a video,
-        // let's simulate video progress happening
-        if(state.playing && queryString.parse(location.hash).podium) {
-            if(state.progress >= state.queue[0].track.duration) {player.dequeue();}
-            else {player.set_progress(state.progress + 1/FPS);}
-        }
     },
     1000/FPS
 );

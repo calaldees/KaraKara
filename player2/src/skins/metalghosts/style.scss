@@ -435,7 +435,7 @@ $LIGHT: #29EDF2;
 			position: absolute;
 			top: 1vh;
 			left: 1vw;
-			right: 1vw;
+			right: 21vw;
 			height: 20vh;
 			font-size: 12vh;
 
@@ -445,7 +445,7 @@ $LIGHT: #29EDF2;
 			@include border;
 		}
 
-		.lyrics, .preview_holder {
+		.lyrics {
 			@include border;
 			position: absolute;
 			top: 22vh;
@@ -453,6 +453,7 @@ $LIGHT: #29EDF2;
 			right: 1vw;
 			bottom: 16vh;
 			font-size: 7vh;
+
 			OL {
 				position: absolute;
 				top: 2vh;
@@ -465,6 +466,15 @@ $LIGHT: #29EDF2;
 				.present {color: #FF0;}
 				.future {color: white;}
 			}
+		}
+		.preview_holder {
+			@include border;
+			position: absolute;
+			top: 1vh;
+			left: 80vw;
+			right: 1vw;
+			height: 20vh;
+
 			VIDEO {
 				width: 100%;
 				height: 100%;
@@ -497,6 +507,21 @@ $LIGHT: #29EDF2;
 		}
 		DIV.startButton {
 			SPAN {animation: glow_y 2s infinite;}
+		}
+	}
+	.screen_podium.no_lyrics {
+		H1 {
+			right: 1vw;
+		}
+		.preview_holder {
+			top: 22vh;
+			left: 1vw;
+			right: 1vw;
+			bottom: 16vh;
+			height: auto;
+		}
+		.lyrics {
+			display: none;
 		}
 	}
 }

@@ -155,23 +155,21 @@ const VideoScreen = ({state, actions}) => (
 );
 
 const PodiumScreen = ({state, actions}) => (
-    <div className={"screen_podium"}>
+    <div className={"screen_podium" + (state.queue[0].track.lyrics ? "" : " no_lyrics")}>
         <h1>{state.queue[0].performer_name} - {get_tag(state.queue[0].track.tags.title)}</h1>
 
         {/*
-        if we have lyrics, show them, else show the video,
-        give the video key=playing so that it creates a new
+        Give the video key=playing so that it creates a new
         object when switching from preview to play
          */}
-        {state.queue[0].track.lyrics ?
-            <Lyrics state={state} /> :
-            <div className="preview_holder">
-                <video src={get_attachment(state, state.queue[0].track, 'preview')}
-                       autoPlay={true} muted={!state.playing}
-                       key={state.playing}
-                />
-            </div>
-        }
+        <div className="preview_holder">
+            <video src={get_attachment(state, state.queue[0].track, 'video')}
+                   ontimeupdate={(e) => state.playing ? actions.set_progress(e.target.currentTime) : null}
+                   autoPlay={true} muted={!state.playing}
+                   key={state.playing}
+            />
+        </div>
+        <Lyrics state={state} />
 
         {state.playing ?
             <div className={"progressBar"}
