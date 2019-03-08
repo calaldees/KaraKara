@@ -111,6 +111,10 @@ function get_queue_id() {
 function is_podium() {
     return Boolean(queryString.parse(location.hash).podium);
 }
+function get_theme_var() {
+    const v = queryString.parse(location.hash).theme_var;
+    return v ? " var-"+v : "";
+}
 
 export {
     timedelta_str,
@@ -124,5 +128,6 @@ export {
     get_lyrics,
     api,
     get_protocol,
-    get_file_root
+    get_file_root,
+    get_theme_var,
 };

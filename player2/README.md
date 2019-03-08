@@ -35,6 +35,8 @@ Add `&podium` to the end of the URL to get the singer view.
     the `file://` protocol will do a tiny bit of stubbing to
     force `hostname=karakara.org.uk` and `queue_id=demo`,
     and it will talk to the real live server from then on.
+- Theme Variations
+  - eg `theme_var=lite` can be used to disable animations
 
 ## Dev Setup:
 

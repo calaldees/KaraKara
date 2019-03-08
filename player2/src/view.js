@@ -8,7 +8,8 @@ import {
     get_hostname,
     get_queue_id,
     is_podium,
-    get_file_root
+    get_file_root,
+    get_theme_var
 } from "./util.js";
 
 const show_tracks = 5;
@@ -212,7 +213,7 @@ function view(state, actions) {
     else if(state.queue.length > 0 && state.playing)
         screen = <VideoScreen state={state} actions={actions} />;
 
-    return <div className={"theme-" + state.settings["karakara.player.theme"]}>
+    return <div className={"theme-" + state.settings["karakara.player.theme"] + get_theme_var()}>
         {state.connected ? null : <h1 id="error">Not Connected To Server</h1>}
         {screen}
     </div>;
