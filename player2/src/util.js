@@ -89,7 +89,9 @@ function get_tag(tag) {
 // - production https:// mode
 // and allow manual overrides where appropriate
 function get_protocol() {
-    if(document.location.protocol === "file:") return "https:";
+    const specified = queryString.parse(location.hash).protocol;
+    if(specified) return specified;
+    else if(document.location.protocol === "file:") return "https:";
     else return document.location.protocol;
 }
 function get_hostname() {
