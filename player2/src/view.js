@@ -156,7 +156,7 @@ const VideoScreen = ({state, actions}) => (
 
 const PodiumScreen = ({state, actions}) => (
     <div className={"screen_podium" + (state.queue[0].track.lyrics ? "" : " no_lyrics")}>
-        <h1>{state.queue[0].performer_name} - {get_tag(state.queue[0].track.tags.title)}</h1>
+        <h1 onclick={() => document.body.requestFullscreen()}>{state.queue[0].performer_name} - {get_tag(state.queue[0].track.tags.title)}</h1>
 
         {/*
         Give the video key=playing so that it creates a new
