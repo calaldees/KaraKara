@@ -416,8 +416,8 @@ $LIGHT: #29EDF2;
 			width: 100%;
 			LI {text-align: center; display: none;}
 			.past {color: gray;}
-			.present {color: white;}
-			.future {color: #880;}
+			.present {color: #FF0;}
+			.future {color: white;}
 			.present, .present + .future {display: block;}
 			LI SPAN {background: black; padding: 0 1vw;}
 		}
@@ -462,8 +462,8 @@ $LIGHT: #29EDF2;
 				overflow: hidden;
 				LI {text-align: left;}
 				.past {color: gray; display: none;}
-				.present {color: white;}
-				.future {color: #880;}
+				.present {color: #FF0;}
+				.future {color: white;}
 			}
 			VIDEO {
 				width: 100%;
