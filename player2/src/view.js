@@ -72,7 +72,7 @@ const TitleScreen = ({state, actions}) => (
                     }}
                 />)}
         </div>
-        <h1>{state.settings["karakara.player.title"]}</h1>
+        <h1 onclick={() => document.body.requestFullscreen()}>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
             Join at <strong>{get_hostname()}</strong> -
             Room Name is <strong>{get_queue_id()}</strong>
