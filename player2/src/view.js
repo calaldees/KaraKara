@@ -163,7 +163,7 @@ const PodiumScreen = ({state, actions}) => (
         object when switching from preview to play
          */}
         <div className="preview_holder">
-            <video src={get_attachment(state, state.queue[0].track, 'video')}
+            <video src={get_attachment(state, state.queue[0].track, 'preview')}
                    ontimeupdate={(e) => state.playing ? actions.set_progress(e.target.currentTime) : null}
                    onended={() => actions.dequeue()}
                    autoPlay={true} muted={!state.playing}
