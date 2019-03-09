@@ -21,7 +21,7 @@ const show_tracks = 5;
 
 function _lineStyle(item, state) {
     // show subs a little faster, to counteract podium lag
-    const ts = state.progress + state.settings["karakara.podium.lag"];
+    const ts = state.progress + state.settings["karakara.podium.soft_sub_lag"];
     if(!state.playing) return "present";
     if(item.text === "-") return "past";
     if(item.start < ts && item.end > ts) return "present";
