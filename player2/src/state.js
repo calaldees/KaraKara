@@ -107,7 +107,15 @@ const actions = {
             actions.set_queue(queue_with_lyrics);
         });
     },
-    set_queue: value => () => ({ queue: value }),
+    set_queue: value => (state, actions) => {
+        // if the first song in the queue has changed, stop playing
+        if(state.queue.length === 0 || value.length === 0 || state.queue[0].id !== value[0].id) {
+            return { queue: value, playing: false, paused: false, progress: 0 };
+        }
+        else {
+            return { queue: value };
+        }
+    },
     dequeue: () => state => ({
         // remove the first song
         queue: state.queue.slice(1),
