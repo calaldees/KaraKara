@@ -47,7 +47,7 @@ function create_websocket() {
             "pause": player.pause,
             "seek_forwards": player.seek_forwards,
             "seek_backwards": player.seek_backwards,
-            "ended": player.dequeue,
+            "played": player.dequeue,
             "queue_updated": player.check_queue,
             "settings": player.check_settings,
         };
