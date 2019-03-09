@@ -4,7 +4,7 @@ import queryString from 'query-string';
 
 import { state, actions } from "./state";
 import { view } from "./view";
-import {get_protocol, get_hostname, get_ws_port, get_queue_id} from "./util";
+import {get_protocol, get_hostname, get_ws_port, get_queue_id, is_podium} from "./util";
 
 const player = app(state, actions, view, document.body);
 window.player = player; // make this global for debugging
@@ -41,7 +41,9 @@ function create_websocket() {
         const cmd = msg.data.trim();
         console.log("websocket_onmessage("+ cmd +")");
         const commands = {
-            "skip": () => player.send_ended('skipped'),  // Skip action requires the player to send the ended signal to poke the correct api endpoint. This feel ineligant fix. Advice please.
+            // Skip action requires the player to send the ended signal to poke the correct api endpoint.
+            // This feel ineligant fix. Advice please.
+            "skip": () => is_podium() ? null : player.set_track_status('skipped'),
             "play": player.play,
             "stop": player.stop,
             "pause": player.pause,

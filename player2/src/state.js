@@ -17,6 +17,7 @@ const state = {
         "karakara.player.autoplay"            : 0, // Autoplay after X seconds
         "karakara.player.subs_on_screen"      : true, // Set false if using podium
         "karakara.event.end"                  : null,
+        "karakara.podium.video_lag"           : 0.50,  // adjust to get podium and projector in sync
         "karakara.podium.soft_sub_lag"        : 0.35,  // adjust to get soft-subs and hard-subs in sync
     },
     socket: null,
@@ -133,7 +134,7 @@ const actions = {
         console.log("websocket_send("+ value +")");
         state.socket.send(value);
     },
-    send_ended: value => (state, actions) => {
+    set_track_status: value => (state, actions) => {
         actions.dequeue();
         api(state, "PUT", "queue_items", {
             "queue_item.id": state.queue[0].id,
