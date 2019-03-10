@@ -2,6 +2,18 @@ import {get_lyrics, api} from "./util";
 
 
 // ====================================================================
+// State constants
+// ====================================================================
+
+const QueueItemStatus = {
+    PENDING: "pending",
+    PLAYED: "played",
+    SKIPPED: "skipped",
+    REMOVED: "removed",
+};
+
+
+// ====================================================================
 // State and state management functions
 // ====================================================================
 
@@ -147,4 +159,4 @@ const actions = {
     },
 };
 
-export {state, actions};
+export {state, actions, QueueItemStatus};

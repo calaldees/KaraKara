@@ -2,7 +2,7 @@ import { app } from "hyperapp";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import queryString from 'query-string';
 
-import { state, actions } from "./state";
+import { state, actions, QueueItemStatus } from "./state";
 import { view } from "./view";
 import {get_protocol, get_hostname, get_ws_port, get_queue_id, is_podium} from "./util";
 
@@ -50,7 +50,7 @@ function create_websocket() {
         const commands = {
             // Skip action requires the player to send the ended signal to poke the correct api endpoint.
             // This feel ineligant fix. Advice please.
-            "skip": () => is_podium() ? null : player.set_track_status('skipped'),
+            "skip": () => is_podium() ? null : player.set_track_status(QueueItemStatus.SKIPPED),
             "play": player.play,
             "stop": player.stop,
             "pause": player.pause,

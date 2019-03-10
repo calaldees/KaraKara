@@ -11,6 +11,7 @@ import {
     get_file_root,
     get_theme_var
 } from "./util.js";
+import { QueueItemStatus } from './state';
 
 const show_tracks = 5;
 
@@ -130,7 +131,7 @@ const VideoScreen = ({state, actions}) => (
         <video src={get_attachment(state, state.queue[0].track, 'video')}
                autoPlay={true}
                ontimeupdate={(e) => actions.set_progress(e.target.currentTime)}
-               onended={() => actions.set_track_status("played")}
+               onended={() => actions.set_track_status(QueueItemStatus.PLAYED)}
         />
         <div id="seekbar" style={{
             left: ((state.progress / state.queue[0].track.duration) * 100) + "%"

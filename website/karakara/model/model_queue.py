@@ -4,17 +4,23 @@ from sqlalchemy import event, Column, Enum, ForeignKey, String, Unicode, Integer
 from sqlalchemy.orm import relationship, backref, Session
 from sqlalchemy.orm.exc import NoResultFound
 
+import enum
 import copy
 
 import datetime
 now = lambda: datetime.datetime.now()
 
 __all__ = [
-    "QueueItem", "_queueitem_statuss",
+    "QueueItem", "QueueItemStatus",
 ]
 
 
-_queueitem_statuss = Enum("pending", "played", "skipped", "removed", name="status_types")
+class QueueItemStatus(enum.Enum):
+    PENDING = "pending"
+    PLAYED = "played"
+    SKIPPED = "skipped"
+    REMOVED = "removed"
+
 
 
 class Queue(Base):
@@ -72,7 +78,7 @@ class QueueItem(Base):
     time_added = Column(DateTime(), nullable=False, default=now)
     time_touched = Column(DateTime(), nullable=False, default=now)
 
-    status = Column(_queueitem_statuss, nullable=False, default="pending")
+    status = Column(Enum(QueueItemStatus, name="status_types"), nullable=False, default="pending")
 
     # AllanC - there is no linking of the models now. Track and Queue are linked at an API level and can be in two separate DB's
     #track           = relationship("Track", backref=backref('queued')) # # AllanC - this makes the queue aware of the track and tightens coupleling ... ultimatelty the que and tracks should be in differnt db's but then the sqla links wont function ... think neo!!
@@ -92,7 +98,7 @@ class QueueItem(Base):
 
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-            'status': None,
+            'status': lambda item: item.status.value,
             'session_owner': None,
             #'track'       : lambda queue_item: queue_item.track.to_dict(include_fields='attachments'),
             #'image'       : lambda queue_item: single_image(queue_item),    # AllanC - if you use this ensure you have setup eager loading on your query

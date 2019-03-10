@@ -12,7 +12,7 @@ from calaldees.data import subdict
 from . import web, action_ok, action_error, etag_decorator,  method_delete_router, method_put_router, is_admin, modification_action, admin_only
 
 from ..model import DBSession, commit
-from ..model.model_queue import QueueItem, _queueitem_statuss
+from ..model.model_queue import QueueItem, QueueItemStatus
 from ..model.model_tracks import Track
 from ..model.model_priority_token import PriorityToken
 from ..model.actions import get_track
@@ -314,7 +314,7 @@ def queue_item_del(request):
         # The impending invalidate_cache() will queue_updated the client queue
 
     #DBSession.delete(queue_item)
-    queue_item.status = request.params.get('status', 'removed')
+    queue_item.status = QueueItemStatus(request.params.get('status', 'removed'))
 
     _log_event(status='ok', track_id=queue_item.track_id, queue_id=queue_item.queue_id)
     #log.info('remove - %s from queue' % (queue_item.track_id))
@@ -352,9 +352,6 @@ def queue_item_update(request):
             params[field] = int(params[field])
         except ValueError:
             raise action_error(message='invalid {0}'.format(field), code=404)
-    status = params.get('status')
-    if status and status not in _queueitem_statuss.enums:
-        raise action_error(message=f'invalid queue_item.status {status} - valid values are {_queueitem_statuss.enums}', code=400)
 
     queue_item_id = int(params['queue_item.id'])
     queue_item = DBSession.query(QueueItem).get(queue_item_id)
@@ -395,6 +392,14 @@ def queue_item_update(request):
             params['queue_weight'] = QueueItem.new_weight(DBSession)
 
     # Update any params to the db
+    if 'status' in params:
+        try:
+            status = QueueItemStatus(params['status'])
+        except:
+            raise action_error(message=f'invalid queue_item.status {params["status"]} - valid values are {QueueItemStatus.__members__}', code=400)
+        queue_item.status = status
+        del params['status']
+
     for key, value in params.items():
         if hasattr(queue_item, key):
             setattr(queue_item, key, value)
