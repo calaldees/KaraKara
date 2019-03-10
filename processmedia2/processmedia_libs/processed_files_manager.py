@@ -59,7 +59,7 @@ class ProcessedFile(object):
 
     @property
     def folder(self):
-        return self.hash[0]
+        return self.hash[0:2]
 
     @property
     def relative(self):
