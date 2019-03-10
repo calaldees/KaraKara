@@ -55,6 +55,7 @@ const actions = {
                     return {
                         filename: fn,
                         x: (n++ / data.images.length),
+                        delay: Math.random() * 10,
                     }
                 }));
             });

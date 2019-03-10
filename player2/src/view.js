@@ -68,7 +68,7 @@ const TitleScreen = ({state, actions}) => (
                 <img
                     src={get_file_root() + item.filename}
                     style={{
-                        animationDelay: Math.random() * 10 + "s",
+                        animationDelay: item.delay + "s",
                         left: (item.x * 90) + "vw",
                     }}
                 />)}
