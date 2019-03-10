@@ -48,6 +48,9 @@ const actions = {
         api(state, "GET", "settings", {}, function(data) {
             actions.set_settings(Object.assign(state.settings, data.settings));
         });
+    },
+    set_settings: value => () => ({ settings: value }),
+    check_images: () => (state, actions) => {
         if(state.images.length === 0) {
             api(state, "GET", "random_images", {count: 25}, function(data) {
                 let n=0;
@@ -61,7 +64,6 @@ const actions = {
             });
         }
     },
-    set_settings: value => () => ({ settings: value }),
     set_images: value => () => ({ images: value }),
 
     // current track controls
