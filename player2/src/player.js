@@ -76,7 +76,6 @@ document.onkeydown = function(e) {
     let handled = true;
     switch (e.key) {
         case "s"          : player.dequeue(); break; // skip
-        //case "a"          : player.enqueue(); break; // add
         case "Enter"      : player.play(); break;
         case "Escape"     : player.stop(); break;
         case "ArrowLeft"  : player.seek_backwards(); break;
