@@ -96,7 +96,7 @@ const PreviewScreen = ({state, actions}) => (
         <div id="playlist" key={"playlist"}>
             <ol>
                 {state.queue.slice(0, show_tracks).map((item) =>
-                    <li key={item.time_touched}>
+                    <li key={item.id}>
                         <img src={get_attachment(state, item.track, 'image')} />
                         <p className='title'>{get_tag(item.track.tags.title)}</p>
                         <p className='from'>{get_tag(item.track.tags.from)}</p>
@@ -109,7 +109,7 @@ const PreviewScreen = ({state, actions}) => (
         <div id="playlist_obscured" key={"playlist_obscured"}>
             <ul>
                 {state.queue.slice(show_tracks).map((item) =>
-                    <li key={item.time_touched}>{item.performer_name}</li>)}
+                    <li key={item.id}>{item.performer_name}</li>)}
             </ul>
         </div>
         }
