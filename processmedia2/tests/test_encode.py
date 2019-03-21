@@ -25,7 +25,7 @@ SAMPLE_COORDINATE = (100, 100)
 
 def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
     """
-    FFMpeg | pipe stdout -> PIL.Image (from stringbuffer)
+    ffmpeg | pipe stdout -> PIL.Image (from stringbuffer)
 
     time string format - hh:mm:ss[.xxx]
 

@@ -173,10 +173,10 @@ class MockEncodeExternalCalls(object):
 
     @staticmethod
     def _mock_command_return_success(*args, **kwargs):
-        if ('destination' in kwargs):
+        if 'destination' in kwargs:
             Path(kwargs['destination']).touch()
-        return (True, 'Mock Success')
+        return True, 'Mock Success'
 
     @staticmethod
     def _mock_command_return_fail(*args, **kwargs):
-        return (False, 'Mock Failure')
+        return False, 'Mock Failure'

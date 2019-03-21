@@ -37,7 +37,7 @@ def parser_cmd_to_tuple(cmd):
     return tuple(filter(None, cmd.split(' ')))
 
 
-class ProcessMediaFilesWithExternalTools():
+class ProcessMediaFilesWithExternalTools:
     def __init__(self, **config):
         """
 

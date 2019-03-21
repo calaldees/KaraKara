@@ -69,7 +69,7 @@ class MetaManager(object):
     def delete(self, name):
         try:
             os.remove(self._filepath(name))
-        except Exception as e:
+        except Exception:
             log.error('Unable to delete missing metafile - How did this happen? {}'.format(self._filepath(name)))
         del self.meta[name]
 

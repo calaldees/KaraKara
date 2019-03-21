@@ -46,12 +46,12 @@ def parser_cmd_to_tuple(cmd):
 
 @pytest.fixture(scope="session")
 def TEST1_VIDEO_FILES():
-    return set(('test1.mp4', 'test1.srt', 'test1.txt'))
+    return {'test1.mp4', 'test1.srt', 'test1.txt'}
 
 
 @pytest.fixture(scope="session")
 def TEST2_AUDIO_FILES():
-    return set(('test2.ogg', 'test2.png', 'test2.ssa', 'test2.txt'))
+    return {'test2.ogg', 'test2.png', 'test2.ssa', 'test2.txt'}
 
 
 @pytest.fixture(scope="session")

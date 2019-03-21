@@ -2,7 +2,7 @@
 help:
 	# Usage: make <target>, where target is
 	# install        -- just install python virtualenv
-	# install_os     -- Install os dependencys and setup python virtualenv
+	# install_os     -- Install os dependencies and setup python virtualenv
 	# run            -- Alias for 'install + scan + encode + import_media'
 	#
 	# scan           -- Scan source media folder + create metadata cache

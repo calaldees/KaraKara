@@ -27,7 +27,7 @@ class MetaViewer(object):
         self.meta_manager = MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)
 
     def get_meta_details(self, name_regex):
-        if (not name_regex):
+        if not name_regex:
             self.meta_manager.load_all()
             meta_items = self.meta_manager.meta_items
         else:

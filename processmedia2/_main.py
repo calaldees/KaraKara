@@ -58,7 +58,8 @@ def main(
     parser.add_argument('--mtime_store_path', action='store', help=f"optimisation file that tracks the last time processing was done on a folder. default:{DEFAULT_kwargs['mtime_store_path']}")
     parser.add_argument('--heartbeat_file', action='store', help=f"touch this file on each action default:{DEFAULT_kwargs['heartbeat_file']}")
 
-    parser.add_argument('--cmd_ffmpeg', action='store', help=f"cmd for ffmpegdefault:{DEFAULT_kwargs['cmd_ffmpeg']}")  # TODO: is this needed? It was a consideration for containerisation, but the container contains the relevent binarys now
+    # TODO: is this needed? It was a consideration for containerisation, but the container has the relevant binaries now
+    parser.add_argument('--cmd_ffmpeg', action='store', help=f"cmd for ffmpegdefault:{DEFAULT_kwargs['cmd_ffmpeg']}")
 
     parser.add_argument('--postmortem', action='store_true', help='drop into pdb on fail')
     parser.add_argument('--version', action='version', version=version)
@@ -67,6 +68,7 @@ def main(
     kwargs_cmd = vars(parser.parse_args())
 
     # Read config.json values
+    config = {}
     if kwargs_cmd.get('config') and not os.path.isfile(kwargs_cmd['config']):
         raise Exception(f"config file does not exist {kwargs_cmd['config']}")
     config_filename = kwargs_cmd.get('config', DEFAULT_kwargs['config'])
@@ -87,12 +89,13 @@ def main(
     # Process str values into other data types
     additional_arguments_processing_function(kwargs)
 
+    lockfile = None
     if lock:
         try:
             lockfile = open(kwargs['lockfile'], 'w')
             fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except IOError:
-            log.warn('Existing process already active. Aborting.')
+            log.warning('Existing process already active. Aborting.')
             sys.exit(0)
 
     # Setup logging.json
@@ -126,7 +129,7 @@ def main(
 
     main_function.calling_kwargs = kwargs
 
-    if lock:
+    if lockfile:
         lockfile.close()
         os.remove(kwargs['lockfile'])
     return return_value

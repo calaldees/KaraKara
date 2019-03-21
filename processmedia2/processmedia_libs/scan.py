@@ -42,12 +42,12 @@ def locate_primary_files(folder_structure, file_regex):
 
 def get_file_collection(folder_structure, primary_file):
     """
-    Collect realated files
+    Collect related files
     """
     folder = folder_structure.get(primary_file.folder)
 
     # File collection always contains the primary file
-    file_collection = set()  # {primary_file, }  # This could be uneeded as the file is added below as well
+    file_collection = set()  # {primary_file, }  # This could be unneeded as the file is added below as well
 
     # Collect files the same name
     file_collection |= {f for f in folder.files if f.file_no_ext == primary_file.file_no_ext}
@@ -60,7 +60,7 @@ def get_file_collection(folder_structure, primary_file):
             for data_filename in _load_yaml(primary_file.absolute)
         }
 
-    # Get tags.txt from differnt folder if importing legacy files
+    # Get tags.txt from different folder if importing legacy files
     if folder.name == 'source' and folder.parent and folder.parent.get('tags.txt'):
         file_collection.add(folder.parent.get('tags.txt'))
 

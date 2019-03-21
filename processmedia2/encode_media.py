@@ -113,7 +113,7 @@ class Encoder(object):
                 except ValueError:
                     pass
                 self.meta_manager.save(name)
-        except Exception as ex:
+        except Exception:
             log.exception('Failed to encode {}'.format(name))
 
     def _update_source_details(self, m):

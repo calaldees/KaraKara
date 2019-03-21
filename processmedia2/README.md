@@ -3,7 +3,7 @@ processmedia2
 
 Encode videos for use with KaraKara.
 
-Efficently monitor and detect changes to source videos, create proccssed media and import into KaraKara track database.
+Efficiently monitor and detect changes to source videos, create processed media and import into KaraKara track database.
 
 Example input
 
@@ -44,11 +44,11 @@ Below describes the intended modes of use
 * Setup a Dropbox/TorrentSync/SyncThing *processed media folder* for your admins/encoders.
 * `make install && make test`
 * edit `config.json` to point to *source*, *meta* and *processed* paths
-* Setup a __cron to `make run` every 10 mins__ (need to think of more efficent way)
+* Setup a __cron to `make run` every 10 minutes__ (need to think of more efficient way)
 
 
-Debuging Tools
---------------
+Debugging Tools
+---------------
 
 * metaviewer
     * `./metaviewer regex_name`

@@ -25,9 +25,9 @@ class TrackNotProcesedException(Exception):
 
 
 class TrackMissingProcessedFiles(Exception):
-    def __init__(self, id, *args, **kwargs):
+    def __init__(self, track_id, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
-        self.id = id
+        self.id = track_id
 
 
 def _track_api(host, data={}, method='GET'):
