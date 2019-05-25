@@ -6,9 +6,9 @@
 
 
 <%def name="body()">
-    <h1>Rooms</h1>
+    <h1>${_('queues').title()}</h1>
 
-    <p>INCOMPLETE FEATURE: Even though the foundation for multiple rooms are in place. Only ONE room can be used at a time.</p>
+    <p>INCOMPLETE FEATURE: Even though the foundation for multiple ${_('queues')} are in place. Only ONE ${_('queue')} can be used at a time.</p>
 
     <form action="" method="POST">
         <label for="input_queue_id">Name</label><input id="input_queue_id" type="text" name="queue_id"/>

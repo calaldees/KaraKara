@@ -21,7 +21,7 @@
                 <tr>
                     <td class="instructions" colspan="${len(fields)}">
                         Join at <strong>${request.domain}</strong> -
-                        Queue is <strong>${request.context.queue_id}</strong>
+                        ${_('queue').title()} is <strong>${request.context.queue_id}</strong>
                     </td>
                 </tr>
                 <tr>
