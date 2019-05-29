@@ -25,7 +25,8 @@ from calaldees.pyramid_helpers.cache_manager import CacheManager, CacheFunctionW
 from calaldees.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from calaldees.pyramid_helpers.session_identity2 import session_identity
 from calaldees.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
-from calaldees.multisocket.auth_echo_server import AuthEchoServerManager
+
+from multisocketServer.server.auth_echo_server import AuthEchoServerManager
 
 # Package Imports
 from .traversal import TraversalGlobalRootFactory

@@ -1,10 +1,9 @@
 import logging
-import json
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from calaldees.date_tools import now
-from calaldees.json import json_object_handler
+from calaldees.json import json_string
 
 from karakara.model import DBSession
 from karakara.model.model_priority_token import PriorityToken
@@ -84,7 +83,7 @@ class PriorityTokenManager():
         priority_token_dict.update({
             'server_datetime': now(),  # The client datetime and server datetime may be out. we need to return the server time so the client can calculate the difference
         })
-        json_cookie = json.dumps(priority_token_dict, default=json_object_handler)
+        json_cookie = json_string(priority_token_dict)
         self.request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))
         #self.request.response.set_cookie(name='priority_token', value=json_cookie, path='/', overwrite=True)  # This method butchers the json and cannot be used
 

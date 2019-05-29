@@ -22,4 +22,4 @@ webtest
 decorator
 
 git+https://github.com/calaldees/libs.git@master#egg=calaldees
-
+git+https://github.com/superLimitBreak/multisocketServer.git@master#egg=multisocketServer
