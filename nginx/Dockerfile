@@ -1,4 +1,4 @@
-FROM nginx:mainline-alpine
+FROM nginx:alpine
 EXPOSE 80
 VOLUME /logs
 VOLUME /media/processed
@@ -8,4 +8,4 @@ RUN apk --no-cache add curl
 
 COPY . /app
 RUN cp /app/nginx.conf /etc/nginx/nginx.conf
-CMD nginx -g 'daemon off;'
+#CMD nginx -g 'daemon off;'
