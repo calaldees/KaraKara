@@ -33,14 +33,6 @@ services:
             - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:ro
         #    - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
-    player:
-        build:
-            context: ./player
-            dockerfile: Dockerfile
-        volumes:
-            - logs:/logs
-        #    - ./player:/app  # Un-comment to use local source rather than built-in source
-
     player2:
         build:
             context: ./player2
@@ -75,7 +67,6 @@ services:
             - ${PATH_HOST_processed}:/media/processed:ro
         links:
             - website
-            - player
             - player2
 
     processmedia2:
