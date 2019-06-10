@@ -18,7 +18,7 @@ import dogpile.cache
 # External Imports
 from calaldees.string_convert import convert_str_with_type
 from calaldees.data import extract_subkeys
-from calaldees.json import read_json, json_serializer, json_string
+from calaldees.json import read_json, PyramidJSONSerializer, json_string
 from calaldees.date_tools import now, normalize_datetime
 from calaldees.debug import postmortem
 from calaldees.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, setup_pyramid_cache_manager
@@ -106,7 +106,7 @@ def main(global_config, **settings):
 
     # Session Manager
     session_settings = extract_subkeys(config.registry.settings, 'session.')
-    session_factory = SignedCookieSessionFactory(serializer=json_serializer, **session_settings)
+    session_factory = SignedCookieSessionFactory(serializer=PyramidJSONSerializer, **session_settings)
     config.set_session_factory(session_factory)
 
     from .model.actions import last_track_db_update
