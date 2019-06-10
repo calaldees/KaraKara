@@ -6,7 +6,7 @@ import urllib.parse
 from itertools import groupby
 from operator import attrgetter
 
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, text
 from sqlalchemy.orm import joinedload, aliased, defer
 
 from pyramid.view import view_config
@@ -270,7 +270,7 @@ def tags(request):
                 join(alias_parent_tag, Tag.parent).\
                 filter(TrackTagMapping.track_id.in_(trackids)).\
                 filter(alias_parent_tag.name.in_(sub_tags_allowed)).\
-                group_by('tag_1.id', alias_parent_tag.name, Tag.id).\
+                group_by(text('tag_1.id'), alias_parent_tag.name, Tag.id).\
                 order_by(alias_parent_tag.name, Tag.name).\
                 options(joinedload(Tag.parent)
             )
