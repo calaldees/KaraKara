@@ -109,6 +109,10 @@ services:
         # ]
         #command: ['make', 'test']
 
+        # Force import
+        #docker-compose exec processmedia2 /bin/bash
+        #root@245ee075bf91:/processmedia2# python3 import_media.py  --config config.docker.json --force
+
     dashboard:
         build:
             context: ./dashboard

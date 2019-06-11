@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from . import action_ok, action_error, comunity_only, method_delete_router
+from . import action_ok, action_error, comunity_only
 
 
 from ..model import DBSession, commit
@@ -47,10 +47,8 @@ def comunity_queue_add(request):
 
 @view_config(
     context='karakara.traversal.ComunityQueueContext',
-    custom_predicates=(
-        method_delete_router,
-        lambda info, request: request.params.get('queue.id')
-    )
+    method_router='DELETE',
+    requires_param='queue.id',
 )
 @comunity_only
 def queue_item_del(request):

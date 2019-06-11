@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from . import action_ok, action_error, comunity_only, is_comunity, method_put_router
+from . import action_ok, action_error, comunity_only, is_comunity
 
 from .queue_settings import queue_settings_view_put, acquire_cache_bucket_func, REGISTRY_SETTINGS_PASSTHROUGH, SETTINGS_ADMIN_EXTRA_EXPOSE
 
@@ -28,7 +28,7 @@ def community_settings_view(request):
     context='karakara.traversal.ComunitySettingsContext',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 #    request_method='POST',
-    custom_predicates=(method_put_router, ),
+    method_router='PUT',
 )
 @comunity_only
 def community_settings_put(request):

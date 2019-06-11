@@ -9,7 +9,7 @@ from pyramid.view import view_config
 from calaldees.date_tools import now
 from calaldees.data import subdict
 
-from . import web, action_ok, action_error, etag_decorator,  method_delete_router, method_put_router, is_admin, modification_action, admin_only
+from . import web, action_ok, action_error, etag_decorator, is_admin, modification_action, admin_only
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueItem, _queueitem_statuss
@@ -271,10 +271,8 @@ def queue_item_add(request):
 @view_config(
     context='karakara.traversal.QueueItemsContext',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
-    custom_predicates=(
-        method_delete_router,
-        lambda info, request: request.params.get('queue_item.id')
-    )
+    method_router='DELETE',
+    requires_param='queue_item.id',
 )
 @modification_action
 def queue_item_del(request):
@@ -330,7 +328,7 @@ def queue_item_del(request):
 #@view_config(route_name='queue', custom_predicates=(method_put_router,))  # request_method='PUT'
 @view_config(
     context='karakara.traversal.QueueItemsContext',
-    custom_predicates=(method_put_router,),
+    method_router='PUT',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
 @modification_action

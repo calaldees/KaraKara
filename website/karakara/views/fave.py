@@ -5,7 +5,7 @@ def view_config(*args, **kwargs):
     return view_config
 from pyramid.httpexceptions import HTTPFound
 
-from . import method_delete_router, action_ok, action_error, request_from_args
+from . import action_ok, action_error, request_from_args
 #from ..templates.helpers import search_url
 
 
@@ -59,8 +59,11 @@ def fave_add(request):
     return action_ok(message='added to faves')
 
 
-@view_config(route_name='fave', custom_predicates=(method_delete_router, lambda info, request: request.params.get('id')))  # request_method='DELETE'
-#@web
+@view_config(
+    route_name='fave',
+    method_router='DELETE',
+    requires_param='id',
+)
 #@faves_enabled
 def fave_del(request):
     """

@@ -4,7 +4,7 @@ from pyramid.view import view_config
 
 from calaldees.string_convert import convert_str, _string_list_format_hack
 
-from . import action_ok, action_error, method_delete_router, method_put_router, is_admin
+from . import action_ok, action_error, is_admin
 
 from ..model import DBSession, commit
 from ..model.model_queue import QueueSetting
@@ -145,7 +145,7 @@ def queue_settings_view(request):
 
 @view_config(
     context='karakara.traversal.QueueSettingsContext',
-    custom_predicates=(method_put_router, ),
+    method_router='PUT',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
 def queue_settings_view_put(request):

@@ -26,6 +26,9 @@ class ComunityUserStore(IUserStore):
         user = ComunityUser()
         user.name = name
         user.email = email
+        # The first user created is always automatically an admin
+        # TODO: A test for this
+        user.approved = False if DBSession.query(ComunityUser).count() else True
 
         user.tokens.append(SocialToken(
             token=provider_token.token,

@@ -6,7 +6,7 @@ from dogpile.cache.api import NO_VALUE as cache_none  # bit of contamination her
 
 from calaldees.decorator import decorator_combine
 
-from calaldees.pyramid_helpers import request_from_args, mark_external_request, method_delete_router, method_put_router, gzip
+from calaldees.pyramid_helpers import request_from_args, mark_external_request, gzip
 from calaldees.pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default
 from calaldees.pyramid_helpers.auto_format2 import action_ok, action_error
 
@@ -20,7 +20,6 @@ log = logging.getLogger(__name__)
 __all__ = [
     'web', 'action_ok', 'action_error',  #'auto_format_output'
     'etag','etag_decorator', #'etag_generate'
-    'method_delete_router', 'method_put_router',
     'cache_none',
     #'max_age',
 ]
