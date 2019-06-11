@@ -21,7 +21,7 @@ from calaldees.data import extract_subkeys
 from calaldees.json import read_json, PyramidJSONSerializer, json_string
 from calaldees.date_tools import now, normalize_datetime
 from calaldees.debug import postmortem
-from calaldees.pyramid_helpers import MethodRouterPredicate
+from calaldees.pyramid_helpers import MethodRouterPredicate, RequiresParamPredicate
 from calaldees.pyramid_helpers.cache_manager import CacheManager, CacheFunctionWrapper, setup_pyramid_cache_manager
 from calaldees.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, post_view_dict_augmentation
 from calaldees.pyramid_helpers.session_identity2 import session_identity
@@ -83,15 +83,6 @@ def main(global_config, **settings):
 
     # GET method to DELETE and PUT via params
     config.add_view_predicate('method_router', MethodRouterPredicate)
-
-    class RequiresParamPredicate(object):
-        def __init__(self, val, config):
-            self.param_name = val
-        def text(self):
-            return f'requires_param = {self.param_name}'
-        phash = text
-        def __call__(self, context_or_info, request):
-            return request.params.get(self.param_name)
     config.add_view_predicate('requires_param', RequiresParamPredicate)
 
     # Session identity
