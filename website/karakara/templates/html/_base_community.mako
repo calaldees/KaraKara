@@ -1,6 +1,6 @@
 <%!
-	login_url = '/comunity/login'
-	logout_url = '/comunity/logout'
+	login_url = '/community/login'
+	logout_url = '/community/logout'
 %>
 
 <%def name="title()"></%def>
@@ -58,21 +58,21 @@
 				</button>
 
 				<!-- Brand Title -->
-				<a href="/comunity" class="navbar-brand">${request.registry.settings.get('comunity.title', 'KaraKara')}</a>
+				<a href="/community" class="navbar-brand">${request.registry.settings.get('community.title', 'KaraKara')}</a>
 			</div>
 
 			<div class="collapse navbar-collapse bs-navbar-collapse">
 				<ul class="nav navbar-nav">
 					##${self.navbar_elements()}
 					% if (identity.get('user') or {}).get('approved'):
-					<li><a href="/comunity/list">Tracks</a></li>
-					##<li><a href="${request.route_path('comunity_upload', spacer='', format='')}">upload</a></li>
+					<li><a href="/community/list">Tracks</a></li>
+					##<li><a href="${request.route_path('community_upload', spacer='', format='')}">upload</a></li>
 					##<li><a href="/search_tags/">MobileBrowse</a></li>
 					##<li><a href="/track_list">PrintableList</a></li>
-					<li><a href="/comunity/queues">${_('Queues').title()}}</a></li>
-					##<li><a href="/comunity/settings">Settings</a></li>
-					<li><a href="/comunity/processmedia_log?levels=WARNING,ERROR">EncodeLog</a></li>
-					<li><a href="/comunity/users">Users</a></li>
+					<li><a href="/community/queues">${_('Queues').title()}}</a></li>
+					##<li><a href="/community/settings">Settings</a></li>
+					<li><a href="/community/processmedia_log?levels=WARNING,ERROR">EncodeLog</a></li>
+					<li><a href="/community/users">Users</a></li>
 					% endif
 					##<li class="active"><a href="#">Link</a></li>
 				</ul>
@@ -126,7 +126,7 @@
 		##<link href="${h.path.external}css/bootstrap-theme.min.css" rel="stylesheet">
 		
 		<!-- Site CSS -->
-		<link href="${h.path.static}css/comunity.css" rel="stylesheet" />
+		<link href="${h.path.static}css/community.css" rel="stylesheet" />
 		
 		<!-- Favicons -->
 		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="${h.path.static}ico/apple-touch-icon-144-precomposed.png">
@@ -149,11 +149,11 @@
 	<script src="${h.path.external}js/vendor/jquery.ui.widget.js"></script>
 	<script src="${h.path.external}js/jquery.iframe-transport.js"></script>
 	<script src="${h.path.external}js/jquery.fileupload.js"></script>
-	<script src="${h.path.static  }js/comunity.js"></script>
+	<script src="${h.path.static  }js/community.js"></script>
 
 	<!-- Javascript programatic inline -->
 	<%
-		js_inlines = h.javascript_inline['comunity']
+		js_inlines = h.javascript_inline['community']
 		if callable(js_inlines):
 			js_inlines = js_inlines(request)
 	%>

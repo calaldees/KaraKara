@@ -32,7 +32,7 @@ from multisocketServer.server.auth_echo_server import AuthEchoServerManager
 # Package Imports
 from .traversal import TraversalGlobalRootFactory
 from .templates import helpers as template_helpers
-from .auth import ComunityUserStore, NullComunityUserStore
+from .auth import CommunityUserStore, NullCommunityUserStore
 # SQLAlchemy imports
 from .model import init_DBSession, init_DBSession_tables, commit
 
@@ -203,8 +203,8 @@ def main(global_config, **settings):
 
     # Login Providers ----------------------------------------------------------
 
-    from .views.comunity_login import social_login
-    social_login.user_store = ComunityUserStore()
+    from .views.community_login import social_login
+    social_login.user_store = CommunityUserStore()
     login_providers = config.registry.settings.get('login.provider.enabled')
     # Facebook
     if 'facebook' in login_providers:
@@ -231,8 +231,8 @@ def main(global_config, **settings):
     if not login_providers and config.registry.settings.get('karakara.server.mode') != 'test':
         # Auto login if no service keys are provided
         social_login.add_login_provider(NullLoginProvider())
-        social_login.user_store = NullComunityUserStore()
-    template_helpers.javascript_inline['comunity'] = social_login.html_includes
+        social_login.user_store = NullCommunityUserStore()
+    template_helpers.javascript_inline['community'] = social_login.html_includes
 
 
     # KaraKara request additions -----------------------------------------------

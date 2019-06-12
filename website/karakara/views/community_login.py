@@ -11,18 +11,18 @@ social_login = SocialLogin()
 
 
 @view_config(
-    context='karakara.traversal.ComunityLoginContext',
+    context='karakara.traversal.CommunityLoginContext',
 )
-def comunity_login(request):  # , login_provider=login_provider, user_store=user_store
+def community_login(request):  # , login_provider=login_provider, user_store=user_store
     if request.session.get('user'):
-        raise HTTPFound(location='/comunity')
+        raise HTTPFound(location='/community')
     return social_login.login(request)
 
 
 @view_config(
-    context='karakara.traversal.ComunityLogoutContext',
+    context='karakara.traversal.CommunityLogoutContext',
 )
-def comunity_logout(request):
+def community_logout(request):
     if not request.session.get('user'):
-        raise HTTPFound(location='/comunity')
+        raise HTTPFound(location='/community')
     return social_login.logout(request)

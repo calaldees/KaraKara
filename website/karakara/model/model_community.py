@@ -9,17 +9,17 @@ import datetime
 now = lambda: datetime.datetime.now()
 
 __all__ = [
-    "ComunityUser",
+    "CommunityUser",
 ]
 
 # This is probably better as a db table
 _provider_types = Enum('facebook', 'google', 'twitter', 'janrain', 'gigya', 'persona', 'test_provider', name='provider_types')
 
 
-class ComunityUser(Base):
+class CommunityUser(Base):
     """
     """
-    __tablename__ = "comunity_user"
+    __tablename__ = "community_user"
 
     id        = Column(Integer(), primary_key=True)
     name      = Column(Unicode(), nullable=True)
@@ -57,7 +57,7 @@ class SocialToken(Base):
     __tablename__ = 'social_token'
 
     id       = Column(Integer(), primary_key=True)
-    user_id  = Column(Integer(), ForeignKey('comunity_user.id'), nullable=False)
+    user_id  = Column(Integer(), ForeignKey('community_user.id'), nullable=False)
     token    = Column(Unicode(), nullable=False, index=True)
     provider = Column(_provider_types, nullable=False)
     data     = Column(JSONEncodedDict(), nullable=False, default={})

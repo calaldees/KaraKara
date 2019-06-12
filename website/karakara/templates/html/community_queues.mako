@@ -1,4 +1,4 @@
-<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_community.mako"/>
 
 <%!
     from urllib.parse import quote_plus
@@ -68,7 +68,7 @@
                 </a>
             </td>
             <td>
-                <a href="/comunity/settings/${queue['id']}">
+                <a href="/community/settings/${queue['id']}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                         ${_('settings')}
@@ -76,7 +76,7 @@
                 </a>
             </td>
             <td>
-                <a href="/comunity/queue_items/${queue['id']}">
+                <a href="/community/queue_items/${queue['id']}">
                     <button type="button" class="btn btn-default">
                         <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                         ${_('queue_items')}

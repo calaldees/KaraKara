@@ -2,7 +2,7 @@ import pytest
 
 from karakara.model import DBSession, commit
 
-from karakara.model.model_comunity import ComunityUser, SocialToken
+from karakara.model.model_community import CommunityUser, SocialToken
 
 
 @pytest.fixture(scope="session")
@@ -11,7 +11,7 @@ def users(request):
     """
     users = []
 
-    user = ComunityUser()
+    user = CommunityUser()
     user.name = 'TestUser'
     user.email = 'tester@karakara.org.uk'
     user.approved = True
@@ -23,7 +23,7 @@ def users(request):
     DBSession.add(user)
     users.append(user)
 
-    user = ComunityUser()
+    user = CommunityUser()
     user.name = 'UnknownUser'
     user.email = 'unknown@karakara.org.uk'
     user.approved = False

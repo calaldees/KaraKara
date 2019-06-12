@@ -1,4 +1,4 @@
-<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_community.mako"/>
 
 <%!
 
@@ -66,7 +66,7 @@ STATUS_TO_BOOTSTRAP_GLYPH_LOOKUP = {
 			% endfor
 		</td>
 		<td>
-			<a href="/comunity/track/${track['id']}" class="modal_track_link">${track['source_filename']}</a>
+			<a href="/community/track/${track['id']}" class="modal_track_link">${track['source_filename']}</a>
 		</td>
 		<td>
 			<%

@@ -23,7 +23,7 @@ from .model_queue import QueueItem
 #from .model_feedback import Feedback  # Depricated until we can replace it with 'messaging'
 from .model_priority_token import PriorityToken
 from .model_message import Message
-from .model_comunity import ComunityUser
+from .model_community import CommunityUser
 
 # db action import
 from .actions import get_tag

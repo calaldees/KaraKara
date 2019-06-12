@@ -1,4 +1,4 @@
-<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_community.mako"/>
 
 <%def name="body()">
     <h2>${data['track']['source_filename']}</h2>

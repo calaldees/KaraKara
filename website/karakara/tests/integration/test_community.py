@@ -7,14 +7,14 @@ from calaldees.data import first
 from calaldees.social._login import ILoginProvider, ProviderToken
 from calaldees.test import MultiMockOpen
 
-from karakara.views.comunity import ComunityTrack
+from karakara.views.community import CommunityTrack
 from karakara.model import DBSession, commit
-from karakara.model.model_comunity import ComunityUser
+from karakara.model.model_community import CommunityUser
 from karakara.model.model_tracks import Track
 
 
 def login(app, name='TestUser'):
-    social_token = DBSession.query(ComunityUser).filter(ComunityUser.name == name).one().tokens[0]
+    social_token = DBSession.query(CommunityUser).filter(CommunityUser.name == name).one().tokens[0]
 
     class MockLoginProvider(ILoginProvider):
         provider_token = ProviderToken(social_token.provider, token=social_token.token, response={})  # this token should match tester@karakara.org.uk
@@ -28,20 +28,20 @@ def login(app, name='TestUser'):
             assert provider_token == self.provider_token
             return social_token.data
 
-    from karakara.views.comunity_login import social_login
+    from karakara.views.community_login import social_login
     with patch.dict(social_login.login_providers, {'test_provider': MockLoginProvider()}):
-        response = app.get('/comunity/login?token=token')
+        response = app.get('/community/login?token=token')
         assert name in response.text
         assert 'MockLoginProvider' in response.text
 
 
 def logout(app):
-    response = app.get('/comunity/logout')
+    response = app.get('/community/logout')
     assert 'login' in response.text.lower()
 
 
 @contextlib.contextmanager
-def comunity_login(app):
+def community_login(app):
     login(app)
     yield
     logout(app)
@@ -51,14 +51,14 @@ def comunity_login(app):
 # Tests ------------------------------------------------------------------------
 
 def test_reject_unapproved(app):
-    response = app.get('/comunity/list', expect_errors=True)
+    response = app.get('/community/list', expect_errors=True)
     assert response.status_code == 403
-    assert 'Approved comunity users only' in response.text
+    assert 'Approved community users only' in response.text
 
 
 def test_list(app, users, tracks):
     login(app)
-    response = app.get('/comunity/list')
+    response = app.get('/community/list')
     for track in tracks:
         DBSession.add(track)  # Hu? why does this need to be attached to the session again?
         assert track.source_filename in response.text
@@ -67,15 +67,15 @@ def test_list(app, users, tracks):
 
 def test_list_invalidate(DBSession, app, users, tracks):
     """
-    The 'comunity_list' view uses cache internally agressivly.
+    The 'community_list' view uses cache internally agressivly.
     The cache is based on the last_update() time of a track.
-    Test is modifying a track in the database causes the comunity_list to
+    Test is modifying a track in the database causes the community_list to
     produce the correct results.
     """
     login(app)
 
-    def get_comunity_track_ids():
-        return {track['id'] for track in app.get('/comunity/list.json').json['data']['tracks']}
+    def get_community_track_ids():
+        return {track['id'] for track in app.get('/community/list.json').json['data']['tracks']}
     def add_track(track_id):
         track = Track()
         track.id = track_id
@@ -84,16 +84,16 @@ def test_list_invalidate(DBSession, app, users, tracks):
     def del_track(track_id):
         DBSession.query(Track).filter(Track.id == track_id).delete()
         commit()
-    ids = get_comunity_track_ids()
+    ids = get_community_track_ids()
     add_track('new')
-    assert ids != get_comunity_track_ids()
+    assert ids != get_community_track_ids()
     del_track('new')
-    assert ids == get_comunity_track_ids()
+    assert ids == get_community_track_ids()
 
     logout(app)
 
 
-def test_comunity_track_render(app, users, tracks):
+def test_community_track_render(app, users, tracks):
     login(app)
 
     # Static file data
@@ -128,12 +128,12 @@ def test_comunity_track_render(app, users, tracks):
     #)
 
     for track_url in (
-            '/comunity/track/t1',
-            '/comunity/track/t1.html',
-            '/comunity/track/t1.html_template',
+            '/community/track/t1',
+            '/community/track/t1.html',
+            '/community/track/t1.html_template',
     ):
         # Make web request
-        with patch.object(ComunityTrack, '_open', multi_mock_open.open):
+        with patch.object(CommunityTrack, '_open', multi_mock_open.open):
             response = app.get(track_url)
 
         # Assert output
@@ -149,16 +149,16 @@ def test_comunity_track_render(app, users, tracks):
 
 
 @pytest.mark.skip('unimplemented')
-def test_comunity_settings(app, tracks, users, settings):
+def test_community_settings(app, tracks, users, settings):
     """
     This is also testing tracks_all heavily in this flow
     """
-    response = app.get('/comunity/settings', expect_errors=True)
+    response = app.get('/community/settings', expect_errors=True)
     assert response.status_code == 403
     login(app)
 
     # Starting assertions
-    response = app.get('/comunity/settings')
+    response = app.get('/community/settings')
     assert 'karakara.search.tag.silent_forced' in response.text
     assert 'karakara.search.tag.silent_hidden' in response.text
     response = app.get('/track_list')
@@ -166,17 +166,17 @@ def test_comunity_settings(app, tracks, users, settings):
     assert 'wildcard' in response.text.lower()
 
     with patch.dict(settings, {'karakara.search.tag.silent_forced': []}):
-        response = app.post('/comunity/settings', {
+        response = app.post('/community/settings', {
             'karakara.search.tag.silent_forced': 'lang:fr',
         })
-        response = app.get('/comunity/settings')
+        response = app.get('/community/settings')
         assert 'lang:fr' in response.text
         response = app.get('/track_list')
         assert 't1' not in response.text.lower()
         assert 'wildcard' in response.text.lower()
 
     with patch.dict(settings, {'karakara.search.tag.silent_hidden': []}):
-        response = app.post('/comunity/settings', {
+        response = app.post('/community/settings', {
             'karakara.search.tag.silent_hidden': 'lang:fr',
         })
         response = app.get('/track_list')
@@ -189,8 +189,8 @@ def test_comunity_settings(app, tracks, users, settings):
     logout(app)
 
 
-def test_comunity_processmedia_logs(app, registry_settings):
-    response = app.get('/comunity/processmedia_log', expect_errors=True)
+def test_community_processmedia_logs(app, registry_settings):
+    response = app.get('/community/processmedia_log', expect_errors=True)
     assert response.status_code == 403
 
     login(app)
@@ -205,9 +205,9 @@ def test_comunity_processmedia_logs(app, registry_settings):
 """
     )
     with patch.dict(registry_settings, {'static.processmedia2.log': 'processmedia.log'}):
-        # rrrrrrr - kind of a hack using ComunityTrack._open .. but it works ..
-        with patch.object(ComunityTrack, '_open', multi_mock_open.open):
-            response = app.get('/comunity/processmedia_log?levels=WARNING,ERROR', expect_errors=True)
+        # rrrrrrr - kind of a hack using CommunityTrack._open .. but it works ..
+        with patch.object(CommunityTrack, '_open', multi_mock_open.open):
+            response = app.get('/community/processmedia_log?levels=WARNING,ERROR', expect_errors=True)
 
     assert 'Info test' not in response.text
     assert 'Warning test' in response.text

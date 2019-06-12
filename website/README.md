@@ -73,8 +73,8 @@ Todo
   * settings
     * some settings need to be renamed/grouped
     * api to return string datatype for simpler user operation
-  * message system to class messages (both comunity and mobile)
-* comunity (!)
+  * message system to class messages (both community and mobile)
+* community (!)
   * social login + user activation
   * tag editor (per track importing)
     * tag warning if missing list
@@ -118,8 +118,8 @@ status_error message style dose not propergate to flash message with format='red
 Starting the player interface directly on the 'player.html' before visiting the normal mobile view fails. This is because the access to .html does not generate a session id and admin mode cannot be aquired
 
 
-Karakara Comunity
-=================
+Karakara Community
+==================
 
 Web interface for managing a closed community to curate the track dataset
 

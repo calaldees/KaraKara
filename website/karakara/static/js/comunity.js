@@ -56,7 +56,7 @@ function init_track_popup(form_selector) {
         });
         
         var form_data = $form.serialize();
-        $.ajax("/comunity/track/"+track_id+".json", {
+        $.ajax("/community/track/"+track_id+".json", {
             type: "POST",
             dataType: "json",
             data: form_data,
@@ -79,7 +79,7 @@ function init_track_popup(form_selector) {
 
 // Login ---------------------------------------------------------------
 
-var currentUserEmail = 'bob@example.com';  // $.cookie('karakara_session').comunity.email; ??
+var currentUserEmail = 'bob@example.com';  // $.cookie('karakara_session').community.email; ??
 
 
 

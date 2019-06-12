@@ -26,7 +26,7 @@ class TraversalGlobalRootFactory(NextContextMixin):
                 QueueContext,
                 #TrackContext,  # Admin only for all tracks
                 #TrackListContext,  # Admin only for all tracks
-                ComunityContext,
+                CommunityContext,
                 TrackImportContext,  # Needs secure permissions
             )
         )
@@ -173,9 +173,9 @@ class TrackListContext(QueueResourceMixin):
         self.__parent__ = parent
 
 
-class ComunityContext(NextContextMixin):
-    __template__ = 'comunity'
-    __name__ = 'comunity'
+class CommunityContext(NextContextMixin):
+    __template__ = 'community'
+    __name__ = 'community'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
@@ -184,46 +184,46 @@ class ComunityContext(NextContextMixin):
         return self.next_context(
             key,
             (
-                ComunityLoginContext,
-                ComunityLogoutContext,
-                ComunityListContext,
-                ComunityTrackContext,
-                ComunityUploadContext,
-                ComunitySettingsContext,
-                ComunityProcessmediaLogContext,
-                ComunityQueueContext,
-                ComunityUsersContext,
-                ComunityQueueItemsContext,
+                CommunityLoginContext,
+                CommunityLogoutContext,
+                CommunityListContext,
+                CommunityTrackContext,
+                CommunityUploadContext,
+                CommunitySettingsContext,
+                CommunityProcessmediaLogContext,
+                CommunityQueueContext,
+                CommunityUsersContext,
+                CommunityQueueItemsContext,
             )
         )
 
 
-class ComunityLoginContext():
-    __template__ = 'comunity_login'
+class CommunityLoginContext():
+    __template__ = 'community_login'
     __name__ = 'login'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
 
 
-class ComunityLogoutContext():
-    __template__ = 'comunity_logout'
+class CommunityLogoutContext():
+    __template__ = 'community_logout'
     __name__ = 'logout'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
 
 
-class ComunityListContext():
-    __template__ = 'comunity_list'
+class CommunityListContext():
+    __template__ = 'community_list'
     __name__ = 'list'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
 
 
-class ComunityTrackContext():
-    __template__ = 'comunity_track'
+class CommunityTrackContext():
+    __template__ = 'community_track'
     __name__ = 'track'
 
     def __init__(self, parent=None, id=None):
@@ -235,11 +235,11 @@ class ComunityTrackContext():
     def __getitem__(self, key):
         if self.id:
             raise KeyError()
-        return ComunityTrackContext(parent=self, id=key)
+        return CommunityTrackContext(parent=self, id=key)
 
 
-class ComunityUploadContext():
-    __template__ = 'comunity_upload'
+class CommunityUploadContext():
+    __template__ = 'community_upload'
     __name__ = 'upload'
 
     def __init__(self, parent=None):
@@ -263,34 +263,34 @@ class QueueIdMixin():
         return self.id
 
 
-class ComunityQueueItemsContext(QueueIdMixin):
-    __template__ = 'comunity_queue_items'
+class CommunityQueueItemsContext(QueueIdMixin):
+    __template__ = 'community_queue_items'
     __name__ = 'queue_items'
 
 
-class ComunitySettingsContext(QueueIdMixin):
-    __template__ = 'comunity_settings'
+class CommunitySettingsContext(QueueIdMixin):
+    __template__ = 'community_settings'
     __name__ = 'settings'
 
 
-class ComunityProcessmediaLogContext():
-    __template__ = 'comunity_processmedia_log'
+class CommunityProcessmediaLogContext():
+    __template__ = 'community_processmedia_log'
     __name__ = 'processmedia_log'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
 
 
-class ComunityQueueContext():
-    __template__ = 'comunity_queues'
+class CommunityQueueContext():
+    __template__ = 'community_queues'
     __name__ = 'queues'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
 
 
-class ComunityUsersContext():
-    __template__ = 'comunity_users'
+class CommunityUsersContext():
+    __template__ = 'community_users'
     __name__ = 'users'
 
     def __init__(self, parent=None):

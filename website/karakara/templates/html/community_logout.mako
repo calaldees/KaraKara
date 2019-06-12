@@ -1,4 +1,4 @@
-<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_community.mako"/>
 
 <%def name="body()">
     <p>Logged out</p>

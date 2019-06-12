@@ -1,10 +1,10 @@
-<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_community.mako"/>
 
 <%def name="body()">
-    <h1>Comunity Login</h1>
+    <h1>community Login</h1>
 
     % if identity.get('user'):
-        <% data['redirect_url'] = '/comunity' %>
+        <% data['redirect_url'] = '/community' %>
     % endif
 
     <ul class="login_providers">

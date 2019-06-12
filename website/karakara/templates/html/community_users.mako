@@ -1,7 +1,7 @@
-<%inherit file="_base_comunity.mako"/>
+<%inherit file="_base_community.mako"/>
 
 <%def name="body()">
-	<h2>Comunity Users</h2>
+	<h2>community Users</h2>
 
 	<script>
 		function submit_approved(that) {

@@ -1,9 +1,9 @@
 from ..model import DBSession, commit
-from ..model.model_comunity import ComunityUser
+from ..model.model_community import CommunityUser
 
 
 def list_pending_users():
-    return [user.email for user in DBSession.query(ComunityUser).filter(ComunityUser.approved==False)]
+    return [user.email for user in DBSession.query(CommunityUser).filter(CommunityUser.approved==False)]
 
 
 def approve_user(email=None, auto_commit=True):
@@ -19,9 +19,9 @@ def approve_user(email=None, auto_commit=True):
 
     User will need to logout and login again once approved
     """
-    query = DBSession.query(ComunityUser)
+    query = DBSession.query(CommunityUser)
     if email:
-        query = query.filter(ComunityUser.email == email)
+        query = query.filter(CommunityUser.email == email)
     for user in query.all():
         user.approved = True
     if auto_commit:

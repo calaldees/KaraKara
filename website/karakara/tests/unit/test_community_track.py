@@ -1,6 +1,6 @@
 import pytest
 
-from karakara.views.comunity import ComunityTrack
+from karakara.views.community import CommunityTrack
 
 STATUS_TAGS = {
     'required': ('title',),
@@ -133,7 +133,7 @@ STATUS_TAGS = {
 
 ])
 def test_track_status(track_dict, expected_status, expected_statuss, expected_messages, func_is_file=None):
-    status_dict = ComunityTrack.track_status(track_dict, status_tags=STATUS_TAGS)
+    status_dict = CommunityTrack.track_status(track_dict, status_tags=STATUS_TAGS)
     assert status_dict['status'] == expected_status
     for expected_status_key in expected_statuss:
         assert expected_status_key in status_dict['status_details']

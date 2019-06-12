@@ -42,7 +42,7 @@ web = decorator_combine(
 def is_admin(request):
     return request.session_identity['admin']
 
-def is_comunity(request):
+def is_community(request):
     return request.session.get('user',{}).get('approved', False)
 
 @decorator
@@ -58,14 +58,14 @@ def admin_only(target, *args, **kwargs):
     return target(*args, **kwargs)
 
 @decorator
-def comunity_only(target, *args, **kwargs):
+def community_only(target, *args, **kwargs):
     """
-    Decorator to restrict view callable to approved comunity users only
+    Decorator to restrict view callable to approved community users only
     todo - use pyramid's security framework
     """
     request = request_from_args(args)
-    if not is_comunity(request):
-        raise action_error(message='Approved comunity users only', code=403)
+    if not is_community(request):
+        raise action_error(message='Approved community users only', code=403)
 
     return target(*args, **kwargs)
 

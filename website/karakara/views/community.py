@@ -18,7 +18,7 @@ from calaldees.pyramid_helpers.views.upload import EventFileUploaded
 from ..model import DBSession
 from ..model.model_tracks import Track
 
-from . import action_ok, action_error, comunity_only, is_comunity
+from . import action_ok, action_error, community_only, is_community
 
 #from ..views.track import invalidate_track
 from ..templates import helpers as h
@@ -55,7 +55,7 @@ def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
 #-------------------------------------------------------------------------------
 # Cache Management
 #-------------------------------------------------------------------------------
-#LIST_CACHE_KEY = 'comunity_list'
+#LIST_CACHE_KEY = 'community_list'
 #list_cache_timestamp = None
 
 #list_version = random.randint(0, 2000000000)
@@ -64,16 +64,16 @@ def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
 #    list_version += 1
 #    cache.delete(LIST_CACHE_KEY)
 #
-#def _generate_cache_key_comunity_list(request):
+#def _generate_cache_key_community_list(request):
 #    global list_version
-#    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_comunity(request))])
+#    return '-'.join([generate_cache_key(request), str(last_update()), str(list_version), str(is_community(request))])
 
 def acquire_cache_bucket_func(request):
     try:
         _id = request.context.id
     except:
         _id = ''
-    return request.cache_manager.get(f'comunity-{request.context.__name__}-{request.last_track_db_update}-{is_comunity(request)}-{_id}')
+    return request.cache_manager.get(f'community-{request.context.__name__}-{request.last_track_db_update}-{is_community(request)}-{_id}')
 
 
 
@@ -106,7 +106,7 @@ def file_uploaded(event):
 # Community Utils
 #-------------------------------------------------------------------------------
 
-class ComunityTrack():
+class CommunityTrack():
     """
     Tracks are more than just a db entry. They have static data files accociated
     with them.
@@ -114,14 +114,14 @@ class ComunityTrack():
     Rather than just changing our own local db, we need to update modify and manage
     these external static files.
 
-    ComunityTrack is an object that wraps a Track with additional methods to
+    CommunityTrack is an object that wraps a Track with additional methods to
     manipulate these files.
     """
     _open = open
 
     @classmethod
     def factory(cls, track, request):
-        return ComunityTrack(
+        return CommunityTrack(
             track=track,
             path_source=request.registry.settings['static.path.source'],
             path_meta=request.registry.settings['static.path.meta'],
@@ -137,7 +137,7 @@ class ComunityTrack():
         #assert path_backup
         #assert path_meta
         if not path_source:
-            log.warning('path_source should be specified for comunity to function properly - we could be in dev mode without any data')
+            log.warning('path_source should be specified for community to function properly - we could be in dev mode without any data')
         self.path_source = path_source
         self.path_meta = path_meta
         self.path_backup = path_backup
@@ -291,31 +291,31 @@ class ComunityTrack():
 #-------------------------------------------------------------------------------
 
 @view_config(
-    context='karakara.traversal.ComunityContext',
+    context='karakara.traversal.CommunityContext',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-def comunity(request):
+def community(request):
     return action_ok()
 
 
 @view_config(
-    context='karakara.traversal.ComunityUploadContext',
+    context='karakara.traversal.CommunityUploadContext',
 )
-def comunity_upload(request):
+def community_upload(request):
     return action_ok()
 
 
 @view_config(
-    context='karakara.traversal.ComunityListContext',
+    context='karakara.traversal.CommunityListContext',
     acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-@comunity_only
-def comunity_list(request):
+@community_only
+def community_list(request):
 
     def _comnunity_list():
 
         def track_dict_to_status(track_dict):
-            track_dict['status'] = ComunityTrack.factory(track_dict, request).status
+            track_dict['status'] = CommunityTrack.factory(track_dict, request).status
             # Flatten tags into a single list
             track_dict['tags_flattened'] = [
                 '{}:{}'.format(parent, tag)
@@ -363,14 +363,14 @@ def comunity_list(request):
 
 
 @view_config(
-    context='karakara.traversal.ComunityTrackContext',
+    context='karakara.traversal.CommunityTrackContext',
     request_method='GET',
     #acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-@comunity_only
-def comunity_track(request):
-    log.debug('comunity_track {}'.format(request.context.id))
-    ctrack = ComunityTrack.factory(request.context.id, request)
+@community_only
+def community_track(request):
+    log.debug('community_track {}'.format(request.context.id))
+    ctrack = CommunityTrack.factory(request.context.id, request)
     return action_ok(data={
         'track': ctrack.track,
         'status': ctrack.status,
@@ -381,13 +381,13 @@ def comunity_track(request):
 
 
 @view_config(
-    context='karakara.traversal.ComunityTrackContext',
+    context='karakara.traversal.CommunityTrackContext',
     request_method='POST',
 )
-@comunity_only
-def comunity_track_update(request):
-    log.debug('comunity_track_update {}'.format(request.context.id))
-    ctrack = ComunityTrack.factory(request.context.id, request)
+@community_only
+def community_track_update(request):
+    log.debug('community_track_update {}'.format(request.context.id))
+    ctrack = CommunityTrack.factory(request.context.id, request)
 
     if 'tag_data' in request.params:
         ctrack.tag_data_raw = request.params['tag_data']
@@ -407,16 +407,16 @@ def comunity_track_update(request):
 
 
 @view_config(
-    context='karakara.traversal.ComunityProcessmediaLogContext',
+    context='karakara.traversal.CommunityProcessmediaLogContext',
 )
-@comunity_only
-def comunity_processmedia_log(request):
+@community_only
+def community_processmedia_log(request):
     LOGFILE = request.registry.settings[PATH_PROCESSMEDIA2_LOG]
     REGEX_LOG_ITEM = re.compile(r'(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<source>.+?) - (?P<loglevel>.+?) - (?P<message>.+?)(\n\d{2}-|$)', flags=re.DOTALL + re.IGNORECASE + re.MULTILINE)
     LEVELS = request.params.get('levels', 'WARNING,ERROR').split(',')
     try:
-        # rrrrrrr - kind of a hack using ComunityTrack._open .. but it works ..
-        with ComunityTrack._open(LOGFILE, 'rt') as filehandle:
+        # rrrrrrr - kind of a hack using CommunityTrack._open .. but it works ..
+        with CommunityTrack._open(LOGFILE, 'rt') as filehandle:
             processmedia_log = [
                 item
                 for item in

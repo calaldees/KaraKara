@@ -24,7 +24,7 @@ docker_build: .env
 	docker-compose build
 docker_shell_website:
 	docker-compose run --rm --service-ports website /bin/bash
-	# Import comunity user notes
+	# Import community user notes
 	#docker-compose run -v ~/karakara_users.sql:/data/karakara_users.sql:ro postgres /bin/bash
 	#  psql -h postgres -U karakara karakara -f /data/karakara_users.sql
 docker_exec_website:

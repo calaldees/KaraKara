@@ -44,7 +44,7 @@
 % endif
 
 % if identity.get('admin', False):
-    ## TODO: Move these links to comunity
+    ## TODO: Move these links to community
     ##<a href="${paths['player']}"           data-role="button" class="admin">${_('mobile.home.player')}</a>
     ##<a href="${paths['track_list']}"       data-role="button" class="admin">${_('mobile.home.track_list')}</a>
     <form action="${paths['track']}"><input type="text" name="track_id" placeholder="${_('mobile.home.track_id')}"/></form>
@@ -54,5 +54,5 @@
     ##<a href="/static/form_badgenames.html?queue_settings_url=${quote_plus(paths['settings'])}" data-role="button" class="admin">${_('mobile.home.badgenames')}</a>
     <a href="${paths['admin']}?password="  data-role="button" class="admin">${_('mobile.home.admin_exit')}</a>
     ##<a href="/inject_testdata"    data-role="button" class="admin">${_('mobile.home.inject_testdata')}</a>
-    ##<a href="/comunity"           data-role="button" class="admin">${_('mobile.home.comunity')}</a>
+    ##<a href="/community"           data-role="button" class="admin">${_('mobile.home.community')}</a>
 % endif

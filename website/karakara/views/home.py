@@ -12,10 +12,10 @@ log = logging.getLogger(__name__)
     context='karakara.traversal.TraversalGlobalRootFactory'
 )
 def home(request):
-    # Short term hack. Do not allow normal root page in commuity mode - redirect to comunity
-    # Need to implement a proper pyramid authorize system when in comunity mode
-    if request.registry.settings.get('karakara.server.mode') == 'comunity':
-        raise HTTPFound(location='/comunity')
+    # Short term hack. Do not allow normal root page in commuity mode - redirect to community
+    # Need to implement a proper pyramid authorize system when in community mode
+    if request.registry.settings.get('karakara.server.mode') == 'community':
+        raise HTTPFound(location='/community')
 
     if request.params.get('queue_id'):
         raise HTTPFound(location=f'/queue/{request.params.get("queue_id", "").lower()}')

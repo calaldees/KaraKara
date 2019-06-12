@@ -3,7 +3,7 @@ from calaldees.social._login import IUserStore
 from sqlalchemy.orm.exc import NoResultFound
 
 from ..model import DBSession, commit
-from ..model.model_comunity import ComunityUser, SocialToken
+from ..model.model_community import CommunityUser, SocialToken
 
 from ..templates import helpers as h
 
@@ -11,11 +11,11 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class ComunityUserStore(IUserStore):
+class CommunityUserStore(IUserStore):
 
     def get_user_from_token(self, provider_token):
         try:
-            return DBSession.query(ComunityUser).join(SocialToken).filter(
+            return DBSession.query(CommunityUser).join(SocialToken).filter(
                 SocialToken.provider == provider_token.provider,
                 SocialToken.token == provider_token.token,
             ).one()
@@ -23,12 +23,12 @@ class ComunityUserStore(IUserStore):
             return None
 
     def create_user(self, provider_token, name=None, email=None, **user_data):
-        user = ComunityUser()
+        user = CommunityUser()
         user.name = name
         user.email = email
         # The first user created is always automatically an admin
         # TODO: A test for this
-        user.approved = False if DBSession.query(ComunityUser).count() else True
+        user.approved = False if DBSession.query(CommunityUser).count() else True
 
         user.tokens.append(SocialToken(
             token=provider_token.token,
@@ -51,7 +51,7 @@ class ComunityUserStore(IUserStore):
         }
 
 
-class NullComunityUserStore(IUserStore):
+class NullCommunityUserStore(IUserStore):
     def get_user_from_token(self, provider_token):
         return True
 

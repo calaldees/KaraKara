@@ -33,9 +33,9 @@ karakara.tcp.port       = -> None
 karakara.search.view.config = data/config/search_config.json
 
 
-# Comunity ---------------------------------------------------------------------
+# Community ---------------------------------------------------------------------
 
-comunity.title = KaraKara.org.uk
+community.title = KaraKara.org.uk
 
 upload.route.uploaded = /uploaded/
 upload.path = data/upload/
