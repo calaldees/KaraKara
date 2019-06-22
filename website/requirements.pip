@@ -1,6 +1,7 @@
 pyramid
 pyramid_tm
 pyramid_mako
+# todo - remove pyramid_debugtoolbar
 pyramid_debugtoolbar
 SQLAlchemy
 zope.sqlalchemy

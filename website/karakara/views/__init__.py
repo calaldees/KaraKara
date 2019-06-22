@@ -45,6 +45,7 @@ def is_admin(request):
 def is_community(request):
     return request.session.get('user',{}).get('approved', False)
 
+# Work to depricate @decorator - heavy dependency not needed
 @decorator
 def admin_only(target, *args, **kwargs):
     """
@@ -57,6 +58,7 @@ def admin_only(target, *args, **kwargs):
 
     return target(*args, **kwargs)
 
+# Work to depricate @decorator - heavy dependency not needed
 @decorator
 def community_only(target, *args, **kwargs):
     """
@@ -69,7 +71,7 @@ def community_only(target, *args, **kwargs):
 
     return target(*args, **kwargs)
 
-
+# Work to depricate @decorator - heavy dependency not needed
 @decorator
 def modification_action(target, *args, **kwargs):
     """
