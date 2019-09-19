@@ -4,10 +4,12 @@ import contextlib
 from unittest.mock import patch
 
 from calaldees.data import first
+from calaldees.string_tools import random_string
 from calaldees.social._login import ILoginProvider, ProviderToken
 from calaldees.test import MultiMockOpen
 
 from karakara.views.community import CommunityTrack
+from karakara.views.community_login import social_login
 from karakara.model import DBSession, commit
 from karakara.model.model_community import CommunityUser
 from karakara.model.model_tracks import Track
@@ -25,10 +27,8 @@ def login(app, name='TestUser'):
             assert request.params.get('token') == 'token'
             return self.provider_token
         def aquire_additional_user_details(self, provider_token):
-            assert provider_token == self.provider_token
-            return social_token.data
+            assert False, 'in normal login flow this should not be called'
 
-    from karakara.views.community_login import social_login
     with patch.dict(social_login.login_providers, {'test_provider': MockLoginProvider()}):
         response = app.get('/community/login?token=token')
         assert name in response.text
@@ -49,6 +49,40 @@ def community_login(app):
 
 
 # Tests ------------------------------------------------------------------------
+
+
+def test_login_new_user(app, users):
+    user_count = DBSession.query(CommunityUser).count()
+
+    class MockLoginProvider(ILoginProvider):
+        def __init__(self, additional_user_details):
+            self.provider_token = ProviderToken('test_provider', token=random_string(), response={})
+            self.additional_user_details = additional_user_details
+        @property
+        def html_include(self):
+            return """"""
+        def verify_cridentials(self, request):
+            assert request.params.get('token') == 'token'
+            return self.provider_token
+        def aquire_additional_user_details(self, provider_token):
+            assert provider_token == self.provider_token
+            return self.additional_user_details
+
+    mock_login_provider = MockLoginProvider({
+        'name': 'NewUser',
+        'email': 'newuser@gmail.com',
+        'avatar_url': 'http://gravatar.com/abcde.png',
+    })
+    with patch.dict(social_login.login_providers, {'test_provider': mock_login_provider}):
+        response = app.get('/community/login?token=token')
+        assert 'NewUser' in response.text
+        assert 'http://gravatar.com/abcde.png' in response.text
+        assert 'glyphicon-warning-sign' in response.text, 'The new user should be waiting for approval'
+
+    assert DBSession.query(CommunityUser).count() == user_count + 1
+
+    logout(app)
+
 
 def test_reject_unapproved(app):
     response = app.get('/community/list', expect_errors=True)
