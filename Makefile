@@ -29,6 +29,8 @@ docker_shell_website:
 	#  psql -h postgres -U karakara karakara -f /data/karakara_users.sql
 docker_exec_website:
 	docker-compose exec website /bin/bash
+docker_exec_psql:
+	docker-compose exec postgres psql karakara --user karakara
 docker_up:
 	docker-compose up
 docker_stop:
