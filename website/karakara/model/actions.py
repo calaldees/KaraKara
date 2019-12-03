@@ -4,7 +4,7 @@ import operator
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
-from . import DBSession
+from . import DBSession, commit
 from .model_tracks import Tag, Track, TrackTagMapping, TrackAttachmentMapping
 from .model_queue import Queue, QueueItem, QueueSetting
 
@@ -69,6 +69,7 @@ def get_tag(tag, parent=None, create_if_missing=False):
     #except NoResultFound as nrf:
         tag_object = Tag(tag, get_tag(parent, create_if_missing=create_if_missing))
         DBSession.add(tag_object)
+        commit()
 
     # Check for single tag colision
     #if parent:

@@ -10,8 +10,12 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 from sqlalchemy.orm             import scoped_session, sessionmaker
-from zope.sqlalchemy            import ZopeTransactionExtension      # AllanC - Apparently, the recomended way to use Pyramid is with a transaction manager
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+DBSession = scoped_session(sessionmaker(autoflush=False))
+
+# Apparently, with Pyramid we need to use a transaction manager
+from zope.sqlalchemy import register
+register(DBSession)
+
 
 engine = None
 

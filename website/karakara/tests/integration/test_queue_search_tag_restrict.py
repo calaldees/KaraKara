@@ -31,20 +31,20 @@ def test_search_tags_silent_forced(app, queue, tracks, tracks_volume):
 
     data = get_search_list_data()
     assert len(data['trackids']) == 19
+    assert {'t1', 't2'} < set(data['trackids'])
 
     # Test silent_forced - restrict down to 'category:anime' tracks
     #  - t1 and t2 are the only two tracks tags as anime
     with temporary_settings(app, queue, {'karakara.search.tag.silent_forced': ['category:anime']}):
         assert get_settings()['karakara.search.tag.silent_forced'] == ['category:anime']
         data = get_search_list_data()
-        assert len(data['trackids']) == 2
-        assert 't1' in data['trackids']
+        assert set(data['trackids']) == {'t1', 't2'}
 
     # Test silent_hidden - hide tracks with tag 'category:anime'
     #  - t1 and t2 are the only two tracks tags as anime
     #  - t1 has another tag with the same parent 'category' -> category:jpop
     #  - so the only track that should be removed is t2
-    #  - the tag 'description' is base tag - that has not parent - that is not used in any test data [FRAGILE!]
+    #  - the tag 'description' is base tag - that has no parent tag - no test data uses 'description' [FRAGILE!]
     with temporary_settings(app, queue, {'karakara.search.tag.silent_hidden': ['description, category:anime']}):
         assert get_settings()['karakara.search.tag.silent_hidden'] == ['description', 'category:anime']
         data = get_search_list_data()

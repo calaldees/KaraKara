@@ -8,7 +8,7 @@ from calaldees.string_tools import random_string
 
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag
-from karakara.model.model_tracks import Track, Attachment
+from karakara.model.model_tracks import Track, Attachment, Tag
 
 AttachmentDescription = namedtuple('AttachmentDescription', ('location', 'type'))
 
@@ -45,6 +45,7 @@ def tags(request):
     #request.addfinalizer(finalizer)
 
     commit()
+    assert DBSession.query(Tag).filter(Tag.name=='from').count() == 1, 'get_tag() should have found a single `from` tag'
     return tags
 
 

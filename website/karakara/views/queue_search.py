@@ -94,21 +94,26 @@ def _tag_strings_to_tag_objs(tags):
 def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersect=Track.id):
     """
     Attempted to extract out track restriction but ended up with a mess.
-    passing differnt obj_intersects is messy and unclear. Poo!
+    passing different obj_intersects is messy and unclear. Poo!
     """
-    tags_silent_forced, _ = _tag_strings_to_tag_objs(tags_silent_forced)
-    tags_silent_hidden, _ = _tag_strings_to_tag_objs(tags_silent_hidden)
 
+    # Forced Tags
+    tags_silent_forced, _ = _tag_strings_to_tag_objs(tags_silent_forced)
     for tag in tags_silent_forced:
         query = query.intersect(
             DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id)
         )
+
+    # Hidden Tags
+    tags_silent_hidden, _ = _tag_strings_to_tag_objs(tags_silent_hidden)
     key_tags = lambda tag: tag.parent_id if tag.parent_id != None else -1
     for parent_id, hidden_tags_groupby_parent_id in groupby(sorted(tags_silent_hidden, key=key_tags), key=key_tags):
         hidden_tag_ids = tuple(map(attrgetter('id'), hidden_tags_groupby_parent_id))
-        if parent_id == -1:
+        if parent_id == -1:  # All hidden_tag_ids are tags without a parent tag
+            # Select every track_id that does not have one of the hidden_tag_ids
             query = query.filter(
                 Track.id.notin_(
+                    # All track_ids with one of the hidden_tag_ids (tags without a parent tag)
                     DBSession.query(Track.id).join(Track.tags)
                         .filter(Tag.id.in_(hidden_tag_ids))
                         .subquery()
@@ -131,7 +136,7 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
                         )
                     )).subquery()
                 )
-        )
+            )
 
     return query
 
