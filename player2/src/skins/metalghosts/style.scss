@@ -5,7 +5,8 @@ $LIGHT: #29EDF2;
 @font-face {
 	font-family: metalghosts;
 	src: url('Xolonium-Regular.ttf');
-	font-weight:400;
+	font-weight: 400;
+	font-display: swap;
 }
 @mixin border {
 	padding: 2vh 2vw;
