@@ -1,14 +1,14 @@
 import parseSRT from 'parse-srt';
 import xhr from 'xhr';
-import queryString from 'query-string';
+import { stringify as queryEncode, parse as queryDecode } from "query-string";
 
 // GET /queue/${queue_id}/${url}.json
-function api(state, method, url, params, callback) {
+export function api(state, method, url, params, callback) {
     const uri = (
         get_protocol() + "//" + get_hostname() +
         "/queue/" + get_queue_id() + "/" +
         url + ".json" +
-        (params ? "?" + queryString.stringify(params) : "")
+        (params ? "?" + queryEncode(params) : "")
     );
     xhr({
         method: method,
@@ -26,11 +26,10 @@ function api(state, method, url, params, callback) {
         }
         console.groupEnd();
     })
-
 }
 
 // turn milliseconds into {X}min / {X}sec
-function timedelta_str(timedelta) {
+export function timedelta_str(timedelta) {
     const seconds_total = Math.floor(timedelta/1000);
     const seconds       = seconds_total % 60;
     const minutes       = Math.floor(seconds_total/60);
@@ -44,16 +43,16 @@ function timedelta_str(timedelta) {
 }
 
 // turn seconds into {MM}:{SS}
-function s_to_mns(t) {
+export function s_to_mns(t) {
     return Math.floor(t/60) + ":" + (Math.floor(t%60)+"").padStart(2, "0");
 }
 
-function get_file_root() {
+export function get_file_root() {
     return get_protocol() + "//" + get_hostname() + "/files/";
 }
 
 // find the path from the player to the media file
-function get_attachment(state, track, type) {
+export function get_attachment(state, track, type) {
     for(let i=0; i<track.attachments.length; i++) {
         if(track.attachments[i].type === type) {
             return (
@@ -66,11 +65,11 @@ function get_attachment(state, track, type) {
 }
 
 // get_attachment(srt) + parse SRT file
-function get_lyrics(state, track) {
+export function get_lyrics(state, track) {
     let xhr = new XMLHttpRequest();
     let data = null;
     xhr.open('GET', get_attachment(state, track, "srt"), false);
-    xhr.onload = function(e) {
+    xhr.onload = function(e: ProgressEvent<XMLHttpRequest>) {
         data = e.target.responseText;
     };
     xhr.send();
@@ -78,7 +77,7 @@ function get_lyrics(state, track) {
 }
 
 // get a tag if it is defined, else blank
-function get_tag(tag) {
+export function get_tag(tag) {
     if(tag) return tag[0];
     else return "";
 }
@@ -88,48 +87,32 @@ function get_tag(tag) {
 // - development http:// mode
 // - production https:// mode
 // and allow manual overrides where appropriate
-function get_protocol() {
-    const specified = queryString.parse(location.hash).protocol;
+export function get_protocol() {
+    const specified = queryDecode(location.hash).protocol;
     if(specified) return specified;
     else if(document.location.protocol === "file:") return "https:";
     else return document.location.protocol;
 }
-function get_hostname() {
-    const specified = queryString.parse(location.hash).hostname;
+export function get_hostname() {
+    const specified = queryDecode(location.hash).hostname;
     if(specified) return specified;
     else if(document.location.protocol === "file:") return "karakara.org.uk";
     else return document.location.hostname;
 }
-function get_ws_port() {
-    const specified = queryString.parse(location.hash).ws_port;
+export function get_ws_port() {
+    const specified = queryDecode(location.hash).ws_port;
     if(specified) return ":" + specified;
     else if(document.location.protocol === "http:") return ":9873";
     else return "";
 }
-function get_queue_id() {
-    const specified = queryString.parse(location.hash).queue_id;
+export function get_queue_id() {
+    const specified = queryDecode(location.hash).queue_id;
     return specified ? specified : "demo";
 }
-function is_podium() {
-    return Boolean(queryString.parse(location.hash).podium);
+export function is_podium() {
+    return Boolean(queryDecode(location.hash).podium);
 }
-function get_theme_var() {
-    const v = queryString.parse(location.hash).theme_var;
+export function get_theme_var() {
+    const v = queryDecode(location.hash).theme_var;
     return v ? " var-"+v : "";
 }
-
-export {
-    timedelta_str,
-    get_attachment,
-    get_tag,
-    s_to_mns,
-    get_ws_port,
-    get_hostname,
-    get_queue_id,
-    is_podium,
-    get_lyrics,
-    api,
-    get_protocol,
-    get_file_root,
-    get_theme_var,
-};

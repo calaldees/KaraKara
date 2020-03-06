@@ -10,7 +10,7 @@ import {
     is_podium,
     get_file_root,
     get_theme_var
-} from "./util.js";
+} from "./util";
 
 const show_tracks = 5;
 
@@ -199,7 +199,7 @@ const PodiumScreen = ({state, actions}) => (
 // Decide which screen to use based on current state
 // ====================================================================
 
-function view(state, actions) {
+export function view(state, actions) {
     let screen = <div>Unknown state :(</div>;
 
     if(!state.audio_allowed)
@@ -218,5 +218,3 @@ function view(state, actions) {
         {screen}
     </div>;
 }
-
-export { view };

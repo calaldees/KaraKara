@@ -20,5 +20,8 @@
         "serve": "parcel serve src/index.html --no-hmr"
     },
     "repository": "https://github.com/calaldees/KaraKara/",
-    "license": "GPL-3.0-only"
+    "license": "GPL-3.0-only",
+    "devDependencies": {
+        "typescript": "^3.8.3"
+    }
 }

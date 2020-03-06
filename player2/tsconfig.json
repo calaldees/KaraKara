@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "lib": ["es2017", "dom"],
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "module": "es6",
+    "moduleResolution": "node",
+    "target": "es6",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "noEmit": true
+  },
+  "include": ["./src/**/*"]
+}

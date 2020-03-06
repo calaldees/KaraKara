@@ -1,13 +1,12 @@
 import { app } from "hyperapp";
 import ReconnectingWebSocket from "reconnecting-websocket";
-import queryString from 'query-string';
 
 import { state, actions } from "./state";
 import { view } from "./view";
 import {get_protocol, get_hostname, get_ws_port, get_queue_id, is_podium} from "./util";
 
 const player = app(state, actions, view, document.body);
-window.player = player; // make this global for debugging
+(window as any).player = player; // make this global for debugging
 
 
 // ====================================================================
