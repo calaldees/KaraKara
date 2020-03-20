@@ -1,0 +1,40 @@
+{
+    "name": "browser2",
+    "dependencies": {
+        "hyperapp": "^2.0.4",
+        "hyperapp-fx": "github:shish/hyperapp-fx#eabef1da8f83ba85af7fda4112be7a11b44e1213",
+        "reconnecting-websocket": "^4.4.0"
+    },
+    "scripts": {
+        "build": "parcel build --public-url . src/index.html --experimental-scope-hoisting",
+        "watch": "parcel watch --public-url . src/index.html",
+        "serve": "parcel serve --port 1234 src/index.html"
+    },
+    "repository": "https://github.com/calaldees/KaraKara/",
+    "license": "GPL-3.0-only",
+    "devDependencies": {
+        "babel-core": "^6.26.3",
+        "node-sass": "^4.12.0",
+        "parcel-bundler": "^1.12.4",
+        "parcel-plugin-imagemin": "^4.0.1",
+        "parcel-plugin-pwa-manifest": "^2.9.2",
+        "typescript": "^3.8.3"
+    },
+    "pwaManifest": {
+        "name": "KaraKara Browser",
+        "shortName": "KaraKara Browser",
+        "startURL": ".",
+        "theme": "#e9e9e9",
+        "display": "standalone",
+        "orientation": "portrait",
+        "generateIconOptions": {
+            "baseIcon": "./src/static/favicon.svg",
+            "sizes": [
+                192,
+                384,
+                512
+            ],
+            "genFavicons": true
+        }
+    }
+}
