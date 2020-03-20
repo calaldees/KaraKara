@@ -1,109 +1,108 @@
-import { app } from "hyperapp";
+/// <reference path='./player.d.ts'/>
+import {app, h} from "hyperapp";
+import {Interval, Keyboard, WebSocketListen} from "hyperapp-fx";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
-import { state, actions } from "./state";
-import { view } from "./view";
-import {get_protocol, get_hostname, get_ws_port, get_queue_id, is_podium} from "./util";
-
-const player = app(state, actions, view, document.body);
-(window as any).player = player; // make this global for debugging
+import {FetchRandomImages} from "./effects";
+import {OnWsCommand, OnCountdown, OnKeyDown, OnWsOpen, OnWsClosed} from "./actions";
+import {TitleScreen, VideoScreen, PodiumScreen, PreviewScreen, SettingsMenu} from "./screens";
+import {http2ws} from "./utils";
 
 
-// ====================================================================
-// Fetch init data
-// ====================================================================
+const state: State = {
+    // global persistent
+    root: "https://karakara.org.uk",
+    queue_id: new URLSearchParams(location.hash.slice(1)).get("queue_id") || "booth",
+    is_podium: Boolean(new URLSearchParams(location.hash.slice(1)).get("podium")),
 
-player.check_images();
+    // global temporary
+    show_settings: false,
+    connected: false,
+    fullscreen: false,
+    audio_allowed: window.AudioContext == undefined || (new AudioContext()).state === "running",
+    settings: {
+        "karakara.player.title"               : "KaraKara",
+        "karakara.player.theme"               : "metalghosts",
+        "karakara.player.video.preview_volume":  0.2,
+        "karakara.player.video.skip.seconds"  : 20,
+        "karakara.player.autoplay"            : 0, // Autoplay after X seconds
+        "karakara.player.subs_on_screen"      : true, // Set false if using podium
+        "karakara.event.end"                  : null,
+        "karakara.podium.video_lag"           : 0.50,  // adjust to get podium and projector in sync
+        "karakara.podium.soft_sub_lag"        : 0.35,  // adjust to get soft-subs and hard-subs in sync
+    },
 
+    // title screen
+    images: [],
 
-// ====================================================================
-// Network controls
-// ====================================================================
+    // playlist screen
+    queue: [],
 
-function create_websocket() {
-    const websocket_url = (
-        (get_protocol() === "http:" ? 'ws://' : 'wss://') +
-        get_hostname() + get_ws_port() +
-        "/ws/"
-		// "?queue_id=" + get_queue_id()
-    );
-    console.log("setup_websocket", websocket_url);
-
-    const socket = new ReconnectingWebSocket(websocket_url);
-    socket.onopen = function() {
-        console.log("websocket_onopen()");
-        player.set_connected(true);
-        // player.send("ping"); // auth doesn't actually happen until the first packet
-        // now that we're connected, make sure state is in
-        // sync for the websocket to send incremental updates
-        player.check_settings();
-        player.check_queue();
-    };
-    socket.onclose = function() {
-        console.log("websocket_onclose()");
-        player.set_connected(false);
-    };
-    socket.onmessage = function(msg) {
-        const cmd = msg.data.trim();
-        console.log("websocket_onmessage("+ cmd +")");
-        const commands = {
-            // Skip action requires the player to send the ended signal to poke the correct api endpoint.
-            // This feel ineligant fix. Advice please.
-            "skip": () => is_podium() ? null : player.set_track_status('skipped'),
-            "play": player.play,
-            "stop": player.stop,
-            "pause": player.pause,
-            "seek_forwards": player.seek_forwards,
-            "seek_backwards": player.seek_backwards,
-            "played": player.dequeue,
-            "queue_updated": player.check_queue,
-            "settings": player.check_settings,
-        };
-        if (cmd in commands) {commands[cmd]();}
-        else {console.log("unknown command: " + cmd)}
-    };
-    return socket;
-}
-player.set_socket(create_websocket());
-
-
-// ====================================================================
-// Local controls
-// ====================================================================
-
-document.onkeydown = function(e) {
-    let handled = true;
-    switch (e.key) {
-        case "s"          : player.dequeue(); break; // skip
-        case "Enter"      : player.play(); break;
-        case "Escape"     : player.stop(); break;
-        case "ArrowLeft"  : player.seek_backwards(); break;
-        case "ArrowRight" : player.seek_forwards(); break;
-        case "Space"      : player.pause(); break;
-        default: handled = false;
-    }
-    if (handled) {
-        e.preventDefault();
-    }
+    // video screen
+    playing: false,
+    paused: false,
+    progress: 0,
 };
 
+function view(state: State) {
+    let screen = <section>Unknown state :(</section>;
 
-// ====================================================================
-// Auto-play
-// ====================================================================
+    if(!state.audio_allowed && !state.is_podium)  // podium doesn't play sound
+        screen = <section key="title" className={"screen_title"}><h1>Click to Activate</h1></section>;
+    else if(state.queue.length === 0)
+        screen = <TitleScreen state={state} />;
+    else if(state.is_podium)
+        screen = <PodiumScreen state={state} />;
+    else if(state.queue.length > 0 && !state.playing)
+        screen = <PreviewScreen state={state} />;
+    else if(state.queue.length > 0 && state.playing)
+        screen = <VideoScreen state={state} />;
 
-const FPS = 5;
-setInterval(
-    function() {
-        let state = player.get_state();
-        if(state.paused || !state.audio_allowed) return;
+    return <body
+        onclick={(state) => ({...state, audio_allowed: true})}
+        ondblclick={(state) => ({...state, show_settings: true})}
+    >
+        <main className={"theme-" + state.settings["karakara.player.theme"]}>
+            {state.connected || <h1 id={"error"}>Not Connected To Server</h1>}
+            {screen}
+        </main>
+        {state.show_settings && <SettingsMenu state={state} />}
+    </body>;
+}
 
-        // if we're waiting for a track to start, and autoplay
-        // is enabled, show a countdown
-        if(!state.playing && state.settings["karakara.player.autoplay"] !== 0) {
-            if(state.progress >= state.settings["karakara.player.autoplay"]) {player.send("play");}
-            else {player.set_progress(state.progress + 1/FPS);}
-        }
-    },
-    1000/FPS
-);
+function subscriptions(state: State) {
+    return [
+        Keyboard({
+            downs: true,
+            action: (_, event) => OnKeyDown(state, event),
+        }),
+        WebSocketListen({
+            url: http2ws(state.root) + "/ws/",
+            open: OnWsOpen,
+            close: OnWsClosed,
+            action: OnWsCommand,
+            error: (state, error) => ({...state}),
+            ws_constructor: ReconnectingWebSocket
+        }),
+        (
+            state.audio_allowed &&
+            !state.paused &&
+            !state.playing &&
+            state.settings["karakara.player.autoplay"] !== 0 &&
+            Interval({
+                every: 200,
+                action: OnCountdown,
+            })
+        ),
+    ];
+}
+
+app({
+    init: [
+        state,
+        FetchRandomImages(state),
+    ],
+    view: view,
+    subscriptions: subscriptions,
+    node: document.body,
+});

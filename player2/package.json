@@ -1,27 +1,44 @@
 {
     "name": "karakara-player",
     "dependencies": {
-        "babel-core": "^6.26.3",
-        "babel-plugin-external-helpers": "^6.22.0",
-        "babel-plugin-transform-react-jsx": "^6.24.1",
-        "babel-preset-env": "^1.7.0",
-        "hyperapp": "^1.2.10",
-        "node-sass": "^4.12.0",
-        "parcel": "^1.12.4",
-        "parcel-bundler": "^1.12.4",
+        "hyperapp": "^2.0.4",
+        "hyperapp-fx": "github:shish/hyperapp-fx#eabef1da8f83ba85af7fda4112be7a11b44e1213",
         "parse-srt": "^1.0.0-alpha",
-        "query-string": "^6.8.3",
-        "reconnecting-websocket": "^3.2.2",
-        "xhr": "^2.5.0"
+        "reconnecting-websocket": "^3.2.2"
     },
     "scripts": {
-        "build": "parcel build --public-url . src/index.html",
-        "watch": "parcel watch --public-url . src/index.html --no-hmr",
-        "serve": "parcel serve src/index.html --no-hmr"
+        "build": "parcel build --public-url . src/index.html --experimental-scope-hoisting",
+        "watch": "parcel watch --public-url . src/index.html",
+        "serve": "parcel serve --port 1235 src/index.html"
     },
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",
     "devDependencies": {
+        "babel-core": "^6.26.3",
+        "babel-plugin-external-helpers": "^6.22.0",
+        "babel-plugin-transform-react-jsx": "^6.24.1",
+        "babel-preset-env": "^1.7.0",
+        "node-sass": "^4.12.0",
+        "parcel-bundler": "^1.12.4",
+        "parcel-plugin-imagemin": "^4.0.1",
+        "parcel-plugin-pwa-manifest": "^2.9.2",
         "typescript": "^3.8.3"
+    },
+    "pwaManifest": {
+        "name": "KaraKara Player",
+        "shortName": "KaraKara Player",
+        "startURL": ".",
+        "theme": "#68c4d6",
+        "display": "standalone",
+        "orientation": "landscape",
+        "generateIconOptions": {
+            "baseIcon": "./src/static/favicon.svg",
+            "sizes": [
+                192,
+                384,
+                512
+            ],
+            "genFavicons": true
+        }
     }
 }
