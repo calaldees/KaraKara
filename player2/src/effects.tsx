@@ -60,7 +60,11 @@ export function SetTrackState(state: State, value: string) {
                 "uncache": new Date().getTime().toString(),
             })
         },
-        action(state, response) {return [state, CheckQueue(state)]},
+        // we could `return [state, CheckQueue(state)]` to check for a new queue
+        // as soon as we've updated the status, but right now the call to
+        // `PUT queue_items.json` will trigger `queue_updated` over the websocket
+        // from the server so we'll check as soon as we see that already.
+        action(state, response) {return state},
         error(state, response) {console.log("Error setting track state:", response); return {...state}}
     });
 }
