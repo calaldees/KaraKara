@@ -1,10 +1,9 @@
-FROM node:11-alpine
+FROM node:11
 EXPOSE 80
 VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/ || exit 1
 
-# npm uses lscpu
-RUN apk --no-cache add util-linux curl git
+RUN apt-get update && apt-get install -y util-linux curl git && rm -rf /var/lib/apt/lists/*
 
 # this takes ages, so do it in advance
 COPY package.json package-lock.json /app/
