@@ -154,11 +154,9 @@ export function Dequeue(state: State): State {
 }
 
 export function MarkTrackPlayed(state: State) {
-    state = Dequeue(state);
-    return [state, SetTrackState(state, "played")];
+    return [Dequeue(state), SetTrackState(state, "played")];
 }
 
 export function MarkTrackSkipped(state: State) {
-    state = Dequeue(state);
-    return [state, SetTrackState(state, "skipped")];
+    return [Dequeue(state), SetTrackState(state, "skipped")];
 }
