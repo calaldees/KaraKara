@@ -4,7 +4,7 @@ VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/ || exit 1
 
 # npm uses lscpu
-RUN apk --no-cache add util-linux curl
+RUN apk --no-cache add util-linux curl git
 
 # this takes ages, so do it in advance
 COPY package.json package-lock.json /app/
