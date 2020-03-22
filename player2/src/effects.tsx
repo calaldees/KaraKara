@@ -19,24 +19,24 @@ export function FetchRandomImages(state: State) {
     return Http({
         url: state.root + "/queue/" + state.queue_id + "/random_images.json?count=25",
         action: SetImages,
-        error: (state, response) => ({...state})
+        error(state, response) {console.log("Error fetching random images:", response); return {...state}}
     });
 }
 
 export function CheckSettings(state: State) {
     return Http({
         url: state.root + "/queue/" + state.queue_id + "/settings.json",
-        action: (state, response) => ({
-            ...state, settings: {...state.settings, ...response.data.settings}
-        }),
-        error: (state, response) => ({...state})
+        action(state, response) {
+            return {...state, settings: {...state.settings, ...response.data.settings}}
+        },
+        error(state, response) {console.log("Error checking settings:", response); return {...state}}
     });
 }
 
 export function CheckQueue(state: State) {
     return Http({
         url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
-        action: function(state, response) {
+        action(state, response) {
             function merge_lyrics(item) {
                 item.track.srt_lyrics = get_lyrics(state, item.track);
                 return item;
@@ -44,21 +44,23 @@ export function CheckQueue(state: State) {
             let queue_with_lyrics = response.data.queue.map((item) => merge_lyrics(item));
             return SetQueue(state, queue_with_lyrics);
         },
-        error: (state, response) => ({...state})
+        error(state, response) {console.log("Error checking queue:", response); return {...state}}
     });
 }
 
 export function SetTrackState(state: State, value: string) {
     return Http({
         url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
-        method: "PUT",
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams({
-            "queue_item.id": state.queue[0].id.toString(),
-            "status": value,
-            "uncache": new Date().getTime().toString(),
-        }),
-        action: (state, response) => [state, CheckQueue],
-        error: (state, response) => ({...state})
+        options: {
+            method: "PUT",
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                "queue_item.id": state.queue[0].id.toString(),
+                "status": value,
+                "uncache": new Date().getTime().toString(),
+            })
+        },
+        action(state, response) {return [state, CheckQueue(state)]},
+        error(state, response) {console.log("Error setting track state:", response); return {...state}}
     });
 }
