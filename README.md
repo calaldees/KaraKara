@@ -77,7 +77,7 @@ $ docker-compose up
 Core components
 ---------------
 
-![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/images/architecture.png)
+![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/docs/architecture.png)
 
 * processmedia2
   * Takes folders of source data (video, image+mp3, subtitles)
