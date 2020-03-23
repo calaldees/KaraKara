@@ -1,12 +1,9 @@
 /// <reference path='./player.d.ts'/>
 import {app, h} from "hyperapp";
-import {Interval, Keyboard, WebSocketListen} from "hyperapp-fx";
-import ReconnectingWebSocket from "reconnecting-websocket";
 
 import {FetchRandomImages} from "./effects";
-import {OnWsCommand, OnCountdown, OnKeyDown, OnWsOpen, OnWsClosed} from "./actions";
-import {TitleScreen, VideoScreen, PodiumScreen, PreviewScreen, SettingsMenu} from "./screens";
-import {http2ws} from "./utils";
+import {PodiumScreen, PreviewScreen, SettingsMenu, TitleScreen, VideoScreen} from "./screens";
+import {getOpenWebSocketListener, IntervalListener, KeyboardListener} from "./subs";
 
 
 const state: State = {
@@ -18,6 +15,7 @@ const state: State = {
     // global temporary
     show_settings: false,
     connected: false,
+    ws_error_count: 0,
     fullscreen: false,
     audio_allowed: window.AudioContext == undefined || (new AudioContext()).state === "running",
     settings: {
@@ -72,27 +70,14 @@ function view(state: State) {
 
 function subscriptions(state: State) {
     return [
-        Keyboard({
-            downs: true,
-            action: (_, event) => OnKeyDown(state, event),
-        }),
-        WebSocketListen({
-            url: http2ws(state.root) + "/ws/",
-            open: OnWsOpen,
-            close: OnWsClosed,
-            action: OnWsCommand,
-            error: (state, error) => ({...state}),
-            ws_constructor: ReconnectingWebSocket
-        }),
+        KeyboardListener,
+        getOpenWebSocketListener(state),
         (
             state.audio_allowed &&
             !state.paused &&
             !state.playing &&
             state.settings["karakara.player.autoplay"] !== 0 &&
-            Interval({
-                every: 200,
-                action: OnCountdown,
-            })
+            IntervalListener
         ),
     ];
 }

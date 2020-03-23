@@ -3,8 +3,7 @@
     "dependencies": {
         "hyperapp": "^2.0.4",
         "hyperapp-fx": "github:shish/hyperapp-fx#eabef1da8f83ba85af7fda4112be7a11b44e1213",
-        "parse-srt": "^1.0.0-alpha",
-        "reconnecting-websocket": "^3.2.2"
+        "parse-srt": "^1.0.0-alpha"
     },
     "scripts": {
         "build": "parcel build --public-url . src/index.html --experimental-scope-hoisting",
@@ -18,7 +17,7 @@
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-plugin-transform-react-jsx": "^6.24.1",
         "babel-preset-env": "^1.7.0",
-        "node-sass": "^4.12.0",
+        "node-sass": "^4.13.1",
         "parcel-bundler": "^1.12.4",
         "parcel-plugin-imagemin": "^4.0.1",
         "parcel-plugin-pwa-manifest": "^2.9.2",

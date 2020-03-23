@@ -2,7 +2,7 @@
  * Actions = things which change the state of the app, normally
  * in response to eg a button press
  */
-import {CheckQueue, CheckSettings, SendCommand, SetTrackState} from "./effects";
+import {SetTrackState} from "./effects";
 
 // App controls
 export function SetPreviewVolume(state: State, event): State {
@@ -17,71 +17,6 @@ export function UpdateProgress(state: State, event): State {
 export function UpdatePodiumProgress(state: State, event): State {
     if(state.playing) return {...state, progress: event.target.currentTime};
     return state;
-}
-
-export function SetImages(state: State, response): State {
-    return {
-        ...state,
-        images: response.data.images.map((fn, n) => ({
-            filename: fn,
-            x: (n / response.data.images.length),
-            delay: Math.random() * 10,
-        }))
-    }
-}
-
-export function OnWsOpen(state: State, _) {
-    return [{...state, connected: true}, CheckSettings(state), CheckQueue(state)];
-}
-
-export function OnWsClosed(state: State, _): State {
-    return {...state, connected: false};
-}
-
-export function OnWsCommand(state: State, msg): State|Array<any> {
-    const cmd = msg.data.trim();
-    console.log("websocket_onmessage("+ cmd +")");
-    switch(cmd) {
-        case "play": return Play(state);
-        case "stop": return Stop(state);
-        case "pause": return Pause(state);
-        case "seek_forwards": return SeekForwards(state, null);
-        case "seek_backwards": return SeekBackwards(state, null);
-        case "played": return Dequeue(state);
-        case "queue_updated": return [state, CheckQueue(state)];
-        case "settings": return [state, CheckSettings(state)];
-        // Only one instance should mark the current track as skipped, to avoid
-        // skipping two tracks
-        case "skip": return state.is_podium ? Dequeue(state) : MarkTrackSkipped(state);
-        default: console.log("unknown command: " + cmd); return state;
-    }
-}
-
-export function OnKeyDown(state: State, event): State {
-    let action = null;
-    switch (event.key) {
-        case "s"          : action = Dequeue; break; // skip
-        case "Enter"      : action = Play; break;
-        case "Escape"     : action = Stop; break;
-        case "ArrowLeft"  : action = SeekBackwards; break;
-        case "ArrowRight" : action = SeekForwards; break;
-        case " "          : action = Pause; break;
-        case "d"          : action = (state) => ({...state, connected: !state.connected}); break;
-    }
-    if (action) {
-        event.preventDefault();
-        return action(state);
-    }
-    return state;
-}
-
-export function OnCountdown(state: State, timestamp) {
-    if(state.progress >= state.settings["karakara.player.autoplay"]) {
-        return [state, SendCommand(state, "play")];
-    }
-    else {
-        return {...state, progress: state.progress + 1/5};
-    }
 }
 
 // Current track controls
