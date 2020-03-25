@@ -1,5 +1,6 @@
 /// <reference path='./player.d.ts'/>
 import {app, h} from "hyperapp";
+import {AutoHistory} from "hyperapp-auto-history";
 
 import {FetchRandomImages} from "./effects";
 import {PodiumScreen, PreviewScreen, SettingsMenu, TitleScreen, VideoScreen} from "./screens";
@@ -9,8 +10,8 @@ import {getOpenWebSocketListener, IntervalListener, KeyboardListener} from "./su
 const state: State = {
     // global persistent
     root: "https://karakara.org.uk",
-    queue_id: new URLSearchParams(location.hash.slice(1)).get("queue_id") || "booth",
-    is_podium: Boolean(new URLSearchParams(location.hash.slice(1)).get("podium")),
+    queue_id: "booth",
+    is_podium: false,
 
     // global temporary
     show_settings: false,
@@ -68,8 +69,16 @@ function view(state: State) {
     </body>;
 }
 
+const HistoryManager = AutoHistory({
+    init: state,
+    push: ["root", "queue_id"],
+    replace: ["is_podium"],
+});
+
 function subscriptions(state: State) {
+    HistoryManager.push_state_if_changed(state);
     return [
+        HistoryManager,
         KeyboardListener,
         getOpenWebSocketListener(state),
         (

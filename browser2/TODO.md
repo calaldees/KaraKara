@@ -1,3 +1,7 @@
+- Lyrics embedded in the queue.json would be wonderful, so
+  that we don't need to go and fetch and parse the .srt for
+  ourselves for every song for every queue update...
+
 identify own tracks properly (by session instead of by name?)
 
 remove own tracks from browser2
