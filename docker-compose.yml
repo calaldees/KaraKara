@@ -42,6 +42,14 @@ services:
             - logs:/logs
         #    - ./player2/src:/app/src  # Un-comment to use local source rather than built-in source
 
+    browser2:
+        build:
+            context: ./browser2
+            dockerfile: Dockerfile
+        volumes:
+            - logs:/logs
+        #    - ./browser2/src:/app/src  # Un-comment to use local source rather than built-in source
+
     postgres:
         build:
             context: ./postgres
@@ -69,6 +77,7 @@ services:
         links:
             - website
             - player2
+            - browser2
 
     processmedia2:
         image: karakara/processmedia2:latest
