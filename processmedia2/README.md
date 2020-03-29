@@ -43,7 +43,7 @@ Below describes the intended modes of use
 * Setup a Dropbox/TorrentSync/SyncThing *source media folder* for your contributors.
 * Setup a Dropbox/TorrentSync/SyncThing *processed media folder* for your admins/encoders.
 * `make install && make test`
-* edit `config.json` to point to *source*, *meta* and *processed* paths
+* Edit `config.json` to point to *source*, *meta* and *processed* paths
 * Setup a __cron to `make run` every 10 minutes__ (need to think of more efficient way)
 
 
