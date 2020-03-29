@@ -13,15 +13,13 @@ Log Input Spec
 --------------
 
 httplogs:
-?
-queue_list?
-
-
+- ?
+- `queue_list`?
 
 Event logs:
-search_tag { ? }
-search_list { keywords, tags }?
-queue_add
-queue_update
-queue_delete
-feedback {contact, message }
+- `search_tag` { ? }
+- `search_list` { keywords, tags }?
+- `queue_add`
+- `queue_update`
+- `queue_delete`
+- `feedback` {contact, message }
