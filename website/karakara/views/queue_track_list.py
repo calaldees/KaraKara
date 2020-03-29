@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from . import web, action_ok, action_error, etag_decorator, generate_cache_key, admin_only
 from .queue_search import _restrict_search
@@ -34,15 +34,23 @@ log = logging.getLogger(__name__)
 #        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
 #    )
 
+def acquire_cache_bucket_func(request):
+    request.log_event()
+    return request.cache_manager.get(
+        '-'.join(map(str, {
+            'context_name': request.context.__name__,
+            'queue_id': request.context.queue_id,
+            'track_version': request.registry.settings['karakara.tracks.version'],
+            'tag.silent_forced': request.registry.settings.get('karakara.search.tag.silent_forced', []),
+            'tag.silent_hidden': request.registry.settings.get('karakara.search.tag.silent_hidden', []),
+        }.values()))
+    )
 
 
 @view_config(
-    context='karakara.traversal.TrackListContext'
-    # TODO: get_cache_bucket_function cache_key
+    context='karakara.traversal.TrackListContext',
+    acquire_cache_bucket_func=acquire_cache_bucket_func,
 )
-#@etag_decorator(track_list_cache_key)
-#@web
-@admin_only
 def track_list_all(request):
     """
     Return a list of every track in the system (typically for printing)
@@ -50,20 +58,23 @@ def track_list_all(request):
     log.info('track_list')
 
     tracks = _restrict_search(
-        DBSession.query(Track).options(
-            joinedload(Track.tags),
-            joinedload('tags.parent'),
-            #defer(Track.lyrics),
-        ),
+        DBSession.query(Track),
         request.queue.settings.get('karakara.search.tag.silent_forced', []),
         request.queue.settings.get('karakara.search.tag.silent_hidden', []),
         obj_intersect=Track,
+    ).options(
+        joinedload(Track.attachments),
+        joinedload(Track.tags),
+        joinedload('tags.parent'),
+        undefer(Track.srt),
     )
-    track_list = [track.to_dict(include_fields='tags') for track in tracks]
+    track_list = [track.to_dict(include_fields=('tags', 'attachments', 'srt')) for track in tracks]
 
-    # The id is very long and not sutable for a printed list.
+    # The id is very long and not suitable for a printed list.
     # We derive a truncated id specially for this printed list
     short_id_length = request.queue.settings.get('karakara.print_tracks.short_id_length', 6)
+
+    # Hack/Patch for title of tracks (could be transferred to browser2? speak to Shish)
     for track in track_list:
         track['id_short'] = track['id'][:short_id_length]
         if track['tags'].get('vocaltrack') == ["off"]:

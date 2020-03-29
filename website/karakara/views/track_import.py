@@ -51,7 +51,7 @@ def track_import_post(request):
         track.id = track_dict['id']
         track.source_filename = track_dict['source_filename']
         track.duration = track_dict['duration']
-        track.lyrics = track_dict['lyrics']
+        track.srt = track_dict['srt']
 
         # Attachments
         for attachment_dict in track_dict['attachments']:

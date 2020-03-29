@@ -40,7 +40,8 @@ class Track(Base):
     tags = relationship("Tag", secondary=TrackTagMapping.__table__)  # , lazy="joined"
     attachments = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     #lyrics = relationship("Lyrics", cascade="all, delete-orphan")
-    lyrics = deferred(Column(UnicodeText(), nullable=True))
+    #lyrics = deferred(Column(UnicodeText(), nullable=True))
+    srt = deferred(Column(UnicodeText(), nullable=True))
 
     time_updated = Column(DateTime(), nullable=False, default=now)
 
@@ -104,7 +105,7 @@ class Track(Base):
             'description' : None,
             'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
             'tags'        : lambda track: track.tags_with_parents_dict(),
-            'lyrics'      : None,
+            'srt'         : None,
             'image'       : None,
             'source_filename': None,
     })
@@ -113,7 +114,7 @@ class Track(Base):
     def before_update_listener(mapper, connection, target):
         """
         TODO: This may not be the whole story ...
-          when tags/lyrics/attachments change then we want this to update as well
+          when tags/srt/attachments change then we want this to update as well
           Investigation needed.
           I think this is irrelevent any change will update the id and a
           new record will be created, so this can never happen.

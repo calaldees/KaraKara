@@ -1,7 +1,7 @@
 OS = $(shell uname -s)
 
 PROJECT=karakara
-PYTHON_VERSION:=3.7
+PYTHON_VERSION:=3.8
 
 CONFIG_SOURCE_PATH=config
 
@@ -15,7 +15,7 @@ LOCALE_PATH=$(WRITE_PATH)/locale
 ENV=$(WRITE_PATH)/_env
 PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
 PYTHON=$(PYTHONPATH_ENV)/bin/python$(PYTHON_VERSION)
-PIP=$(ENV)/bin/pip$(PYTHON_VERSION)
+PIP=$(ENV)/bin/pip-$(PYTHON_VERSION)
 PSERVE=$(PYTHONPATH_ENV)/bin/pserve
 PSHELL=$(PYTHONPATH_ENV)/bin/pshell
 PYTEST=$(PYTHONPATH_ENV)/bin/py.test
@@ -130,7 +130,9 @@ $(WRITE_PATH)/uploaded:
 run: install
 	$(PSERVE) --reload $(INI_DEV)
 
+KARAKARA_CONTAINER_NAME_postgres ?= localhost
 run_production: ini_production
+	timeout 10 sh -c 'until nc -z $$0 $$1; do sleep 1; done' ${KARAKARA_CONTAINER_NAME_postgres} 5432
 	$(PSERVE) $(INI_PROD)
 
 run_socket_server:

@@ -1,3 +1,4 @@
+import re
 import json
 
 
@@ -26,7 +27,11 @@ def test_track_import_delete(app, queue, tracks, registry_settings):
         'id': 'import1',
         'source_filename': 'import1_filename1',
         'duration': 120.0,
-        'lyrics': 'la la la\nle le le',
+        'srt': re.sub(r'^\s*', '', '''
+            1
+            00:00:13,500 --> 00:00:22,343
+            test, it's, ここにいくつかのテキストです。
+        '''),
         'attachments': [
             {'type': 'image', 'location': '/test/import1.jpg'},
         ],
@@ -39,7 +44,7 @@ def test_track_import_delete(app, queue, tracks, registry_settings):
     assert track_version != registry_settings['karakara.tracks.version']
 
     track_import1 = app.get(f'/queue/{queue}/track/import1?format=json').json['data']['track']
-    for key in ('id', 'duration', 'lyrics', 'source_filename'):
+    for key in ('id', 'duration', 'srt', 'source_filename'):
         assert track_import1_source[key] == track_import1[key]
     assert track_import1['title'] == 'Import Test'
     assert '/test/import1.jpg' in (attachment['location'] for attachment in track_import1['attachments'])

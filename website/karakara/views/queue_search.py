@@ -100,6 +100,7 @@ def _restrict_search(query, tags_silent_forced, tags_silent_hidden, obj_intersec
     # Forced Tags
     tags_silent_forced, _ = _tag_strings_to_tag_objs(tags_silent_forced)
     for tag in tags_silent_forced:
+        #query = query.filter(Track.id.in_(
         query = query.intersect(
             DBSession.query(obj_intersect).join(Track.tags).filter(Tag.id == tag.id)
         )
@@ -326,11 +327,11 @@ def list(request):
                                 joinedload(Track.tags),\
                                 joinedload(Track.attachments),\
                                 joinedload('tags.parent'),\
-                                #defer(Track.lyrics),\
+                                #defer(Track.srt),\  # already differed by default in model
                             )
 
         action_return['data'].update({
-            'tracks': [track.to_dict('full', exclude_fields='lyrics,attachments') for track in tracks],
+            'tracks': [track.to_dict('full', exclude_fields='srt,attachments') for track in tracks],
         })
         return action_return
 
