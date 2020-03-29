@@ -23,6 +23,7 @@ services:
             STATIC_PATH_META: ${PATH_CONTAINER_MEDIA}/meta
             #STATIC_PATH_PROCESSED: "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
             #SESSION_SECRET: change_me
+            KARAKARA_CONTAINER_NAME_postgres: 'postgres'
         links:
             - postgres
             - redis
