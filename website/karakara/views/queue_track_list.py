@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from . import web, action_ok, action_error, etag_decorator, generate_cache_key, admin_only
 from .queue_search import _restrict_search
@@ -58,17 +58,17 @@ def track_list_all(request):
     log.info('track_list')
 
     tracks = _restrict_search(
-        DBSession.query(Track).options(
-            joinedload(Track.attachments),
-            joinedload(Track.tags),
-            joinedload('tags.parent'),
-            #defer(Track.lyrics),
-        ),
+        DBSession.query(Track),
         request.queue.settings.get('karakara.search.tag.silent_forced', []),
         request.queue.settings.get('karakara.search.tag.silent_hidden', []),
         obj_intersect=Track,
+    ).options(
+        joinedload(Track.attachments),
+        joinedload(Track.tags),
+        joinedload('tags.parent'),
+        undefer(Track.srt),
     )
-    track_list = [track.to_dict(include_fields=('tags', 'attachments')) for track in tracks]
+    track_list = [track.to_dict(include_fields=('tags', 'attachments', 'srt')) for track in tracks]
 
     # The id is very long and not suitable for a printed list.
     # We derive a truncated id specially for this printed list

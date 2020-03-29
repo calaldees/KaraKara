@@ -29,7 +29,7 @@ def get_track_dict_full(id):
             joinedload(Track.tags),
             joinedload(Track.attachments),
             joinedload('tags.parent'),
-            undefer(Track.lyrics),
+            undefer(Track.srt),
         ).get(id).to_dict('full')
     except AttributeError:
         return None

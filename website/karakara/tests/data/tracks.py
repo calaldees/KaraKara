@@ -1,6 +1,7 @@
 ## -*- coding: utf-8 -*-
 
 import pytest
+import re
 import random
 from collections import namedtuple
 
@@ -80,7 +81,7 @@ def attachments(request):
 @pytest.fixture(scope="session")
 def tracks(request, DBSession, commit, tags, attachments, cache_store):
     """
-    4 test tracks with various unicode characters, lyrics, attachments, tags
+    4 test tracks with various unicode characters, srt, attachments, tags
     """
     tracks_data = [
         {
@@ -92,7 +93,14 @@ def tracks(request, DBSession, commit, tags, attachments, cache_store):
                 'opening', 'male', 'jp', 'category:anime', 'category:jpop', 'series X',
             ],
             'attachments': ['image1', 'preview1', 'processed'],
-            'lyrics': 'ここにいくつかのテキストです。',
+            'srt': re.sub(r'^\s*', '', '''
+                1
+                00:00:13,500 --> 00:00:22,343
+                test, it's, ここにいくつかのテキストです。
+                2
+                00:00:22,343 --> 00:00:25,792
+                second
+            ''', flags=re.MULTILINE),
             'source_filename': 'track1source',
         },
         {
@@ -104,7 +112,14 @@ def tracks(request, DBSession, commit, tags, attachments, cache_store):
                 'ending', 'female', 'en', 'category:anime', 'series X',
             ],
             'attachments': ['image2', 'preview2'],
-            'lyrics': 'Line1\nLine2\nLine3\nLine4\näöü"',
+            'srt': re.sub(r'^\s*', '', '''
+                1
+                00:00:13,500 --> 00:00:22,343
+                Line1
+                2
+                00:00:22,343 --> 00:00:25,792
+                Line2 äöü
+            ''', flags=re.MULTILINE),
             'source_filename': 'track2source',
         },
         {
@@ -162,7 +177,7 @@ def tracks_volume(request, cache_store):
     return mock_tracks
 
 
-def create_test_track(id=None, duration=None, tags=(), attachments=(), lyrics=None, source_filename=None):
+def create_test_track(id=None, duration=None, tags=(), attachments=(), srt=None, source_filename=None):
 
     def _get_tag(tag):
         return get_tag(tag, create_if_missing=True)
@@ -180,7 +195,7 @@ def create_test_track(id=None, duration=None, tags=(), attachments=(), lyrics=No
         track.tags.append(_get_tag(tag))
     for attachment in attachments:
         track.attachments.append(_get_attachment(attachment))
-    track.lyrics = lyrics or ''
+    track.srt = srt or ''
     track.source_filename = source_filename
 
     DBSession.add(track)

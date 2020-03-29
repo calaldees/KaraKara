@@ -19,9 +19,7 @@ STATUS_TAGS = {
                 'title': ['test title'],
                 'artist': ['test artist'],
             },
-            'lyrics': [
-                {'id': 1, 'lang': 'en', 'content': 'lyric test'}
-            ],
+            'srt': '''FAKE DATA''',
             'duration': 100,
             'attachments': [
                 {'location': '/test/test.jpg'}
@@ -97,7 +95,7 @@ STATUS_TAGS = {
     #  currently func_is_file is not used. The default of 'True' is always present on the defaut implementation
 
 
-    # lyrics missing is an error
+    # srt missing is an error
     (
         {
             'tags': {
@@ -109,9 +107,9 @@ STATUS_TAGS = {
                 {'location': '/test/test.jpg'}
             ],
         },
-        'red',  # Unless explicity stated. Missing lyrics is a BAD thing for a karaoke system
+        'red',  # Unless explicity stated. Missing srt is a BAD thing for a karaoke system
         ('red',),
-        ('lyrics',),
+        ('srt',),
     ),
     # lyric - special case - remove lyric 'missing warning' if hardsubs anaonimus tag is used
     (

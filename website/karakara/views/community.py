@@ -268,13 +268,13 @@ class CommunityTrack():
         flag_tags(status_tags['yellow'], 'yellow')
         flag_tags(status_tags['green'], 'green')
 
-        # Lyrics
-        # Do not do lyric checks if explicity stated they are not required.
+        # srt
+        # Do not do lyric checks if explicitly stated they are not required.
         # Fugly code warning: (Unsure if both of these are needed for the hardsubs check)
         if ('hardsubs' not in track_dict['tags']) and ('hardsubs' not in track_dict['tags'].get(None, [])):
-            lyrics = track_dict.get('lyrics', '')
-            if not lyrics:
-                status_details['red'].append('no lyrics')
+            srt = track_dict.get('srt', '')
+            if not srt:
+                status_details['red'].append('no srt')
 
         return {
             'status_details': status_details,
@@ -324,12 +324,12 @@ def community_list(request):
             ]
             del track_dict['tags']
             del track_dict['attachments']
-            del track_dict['lyrics']
+            del track_dict['srt']
             return track_dict
 
         # Get tracks from db
         tracks = [
-            # , exclude_fields=('lyrics','attachments','image')
+            # , exclude_fields=('srt','attachments','image')
             track_dict_to_status(track.to_dict('full')) \
             for track in DBSession.query(Track) \
                 .order_by(Track.source_filename) \
@@ -337,7 +337,7 @@ def community_list(request):
                     joinedload(Track.tags), \
                     joinedload(Track.attachments), \
                     joinedload('tags.parent'), \
-                    undefer('lyrics'), \
+                    undefer('srt'), \
                 )
         ]
 

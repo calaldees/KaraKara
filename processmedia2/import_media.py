@@ -92,12 +92,20 @@ def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, e
             for processed_file in m.processed_files.values()
         ]
 
-    def _get_lyrics():
+    # lyrics has been depricated and replaced with srt
+    # def _get_lyrics():
+    #     processed_file_srt = m.processed_files.get('srt')
+    #     if not processed_file_srt or not processed_file_srt.exists:
+    #         log.warning('srt file missing unable to import lyrics')
+    #         return
+    #     return "\n".join(subtitle.text for subtitle in subtitle_processor.parse_subtitles(filename=processed_file_srt.absolute))
+    def _get_srt():
         processed_file_srt = m.processed_files.get('srt')
         if not processed_file_srt or not processed_file_srt.exists:
-            log.warning('srt file missing unable to import lyrics')
+            log.warning('srt file missing unable to import srt')
             return
-        return "\n".join(subtitle.text for subtitle in subtitle_processor.parse_subtitles(filename=processed_file_srt.absolute))
+        with open(processed_file_srt.absolute, 'rt', encoding='utf-8', errors='ignore') as srt_file:
+            return srt_file.read()
 
     def _get_tags():
         processed_file_tags = m.processed_files.get('tags')
@@ -108,7 +116,7 @@ def _generate_track_dict(name, meta_manager=None, processed_files_lookup=None, e
         'id': m.source_hash,
         'source_filename': name,
         'duration': m.source_details.get('duration'),
-        'lyrics': _get_lyrics(),
+        'srt': _get_srt(),  #_get_lyrics(),
         'attachments': _get_attachments(),
         'tags': _get_tags(),
     }

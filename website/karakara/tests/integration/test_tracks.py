@@ -31,7 +31,7 @@ def test_track_view_api(app, queue, tracks):
     """
     data = app.get(f'/queue/{queue}/track/t1?format=json').json['data']
     assert data['track']['id'] == 't1'
-    assert 'ここ' in data['track']['lyrics']
+    assert 'ここ' in data['track']['srt']
 
 
 def test_track_unknown(app, queue):

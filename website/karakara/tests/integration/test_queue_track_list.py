@@ -1,6 +1,7 @@
 ## -*- coding: utf-8 -*-
 
 import pytest
+import re
 
 import bs4
 def BeautifulSoup(markup):
@@ -48,6 +49,7 @@ def test_queue_track_list_print_all_api(app, queue, tracks):
     )
     assert 'test track 2' in titles
 
+    # Attachments
     attachments = tuple(
         attachment
         for track in data['list']
@@ -55,6 +57,15 @@ def test_queue_track_list_print_all_api(app, queue, tracks):
     )
     assert len(attachments) > 0
     assert {'image', 'preview', 'video'} == {a['type'] for a in attachments}
+
+    # Subtitles
+    srts = tuple(
+        track['srt']
+        for track in data['list']
+        if track['srt']
+    )
+    for srt in srts:
+        assert re.search(r'^\d{2}:\d{2}:\d{2},\d+ -->', srt, re.MULTILINE)
 
 
 def test_queue_track_list_all_tag_restrict(app, queue, tracks):

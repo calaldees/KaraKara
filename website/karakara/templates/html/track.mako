@@ -31,10 +31,11 @@ ${video(track)}
 <p>${track['description']}</p>
 
 
-% if track.get('lyrics'):
+% if track.get('srt'):
 <!-- Lyrics -->
 <h2>Lyrics</h2>
-    % for line in track['lyrics'].split('\n'):
+    <!-- TODO parse srt lyrics -->
+    % for line in track['srt'].split('\n'):
         <p>${line}</p>
     % endfor
 % endif
