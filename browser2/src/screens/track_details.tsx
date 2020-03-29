@@ -2,6 +2,7 @@ import {h} from "hyperapp";
 import {Screen} from "./base";
 import {get_attachment, title_case} from "../utils";
 import { Http } from "hyperapp-fx";
+import parseSRT from 'parse-srt';
 
 const TrackButtons = ({state, track}: {state: State, track: Track}) => (
     <footer>
@@ -30,9 +31,10 @@ const TrackButtons = ({state, track}: {state: State, track: Track}) => (
     </footer>
 );
 
-// TODO: make this form work
 // TODO: remove self from queue?
 function enqueue(state: State) {
+    let adding_title = title_case(state.track_list[state.track_id].tags["title"][0]);
+    let adding_performer = state.performer_name;
     return [
         {...state, notification: "Adding to queue..."},
         Http({
@@ -45,8 +47,15 @@ function enqueue(state: State) {
                     performer_name: state.performer_name,
                 }),
             },
-            action: (state, response) => ({...state, notification: "Added to queue", action: null}),
-            error: (state, response) => ({...state, notification: "Error adding track to queue"})
+            action: (state, response) => ({
+                ...state,
+                notification: "Added "+adding_title+" ("+adding_performer+") to queue",
+                action: null,
+            }),
+            error: (state, response) => ({
+                ...state,
+                notification: "Error adding track to queue", // response.messages[0],
+            })
         })
     ];
 }
@@ -102,12 +111,11 @@ export const TrackDetails = ({state, track}: {state: State, track: Track}) => (
         </video>
 
         {/* Lyrics */}
-        {track.lyrics ?
+        {track.srt &&
             <div className={"lyrics"}>
                 <h2>Lyrics</h2>
-                {track.lyrics.split("\n").map((x) => (<div>{x}</div>))}
+                {parseSRT(track.srt).map((item) => <div>{item.text}</div>)}
             </div>
-            : null
         }
 
         {/* Tags */}

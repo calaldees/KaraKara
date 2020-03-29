@@ -40,6 +40,7 @@ type Track = {
     description: string,
     attachments: Array<Attachment>,
     lyrics: string,
+    srt: string,
     image: string,
     source_filename: string,
     queue: {

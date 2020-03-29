@@ -2,6 +2,7 @@ import {h} from "hyperapp";
 import {Screen} from "./base";
 import {get_attachment, title_case, shuffle} from "../utils";
 import { Http } from "hyperapp-fx";
+import parseSRT from 'parse-srt';
 
 /*
  * Now Playing
@@ -11,13 +12,13 @@ const NowPlaying = ({state, item}: {state: State, item: QueueItem}) => (
         <h2>Now Playing</h2>
         <ul>
             <QueueItemRender state={state} item={item} />
-            <li>
-                <span class={"lyrics"}>
-                    {state.track_list[item.track.id].lyrics.split("\n").map((x) => (
-                        <div>{x}</div>
-                    ))}
-                </span>
-            </li>
+            {state.track_list[item.track.id].srt &&
+                <li>
+                    <span class={"lyrics"}>
+                        {parseSRT(state.track_list[item.track.id].srt).map((item) => <div>{item.text}</div>)}
+                    </span>
+                </li>
+            }
         </ul>
     </div>
 );

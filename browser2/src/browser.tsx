@@ -17,7 +17,7 @@ const state: State = {
     notification: null,
 
     // login
-    tmp_queue_id: "booth",
+    tmp_queue_id: "test",
     queue_id: null,
     loading: false,
 

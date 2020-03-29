@@ -42,7 +42,7 @@ const GroupedFilterList = ({heading, filters, expanded}) => (
 
 const FilterList = ({heading, filters}) => (
     Object.keys(filters).sort().map((child) => (
-        <AddFilter filter={heading+":"+child} count={filters[child]}>{child}</AddFilter>
+        <AddFilter filter={heading+":"+child} count={filters[child]}>{title_case(child)}</AddFilter>
     ))
 );
 

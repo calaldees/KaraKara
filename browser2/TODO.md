@@ -1,6 +1,4 @@
-- Lyrics embedded in the queue.json would be wonderful, so
-  that we don't need to go and fetch and parse the .srt for
-  ourselves for every song for every queue update...
+One user add two tracks to queue back to back, "error adding to queue" - what error??
 
 identify own tracks properly (by session instead of by name?)
 
