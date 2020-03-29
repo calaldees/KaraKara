@@ -1,7 +1,7 @@
 OS = $(shell uname -s)
 
 PROJECT=karakara
-PYTHON_VERSION:=3.7
+PYTHON_VERSION:=3.8
 
 CONFIG_SOURCE_PATH=config
 
@@ -15,7 +15,7 @@ LOCALE_PATH=$(WRITE_PATH)/locale
 ENV=$(WRITE_PATH)/_env
 PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
 PYTHON=$(PYTHONPATH_ENV)/bin/python$(PYTHON_VERSION)
-PIP=$(ENV)/bin/pip$(PYTHON_VERSION)
+PIP=$(ENV)/bin/pip-$(PYTHON_VERSION)
 PSERVE=$(PYTHONPATH_ENV)/bin/pserve
 PSHELL=$(PYTHONPATH_ENV)/bin/pshell
 PYTEST=$(PYTHONPATH_ENV)/bin/py.test
@@ -157,7 +157,7 @@ shell_production: ini_production
 test: install ini_test
 	#$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# Temp modification to reporduce failing test
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
+	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST) -x --pdb
 	# --capture=sys
 
 test_crawl: ini_test

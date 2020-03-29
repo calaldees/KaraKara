@@ -137,15 +137,18 @@ def obj_to_dict(obj, field_processors):
             #else:
             #    try   : field_value = str(field_value)
             #    except: raise Exception('Object types are not allowed in object dictionaries [%s]' % (field_name, ))
-        
+
         d[field_name] = field_value
     return d
 
+
 def to_dict(self, list_type='default', include_fields=None, exclude_fields=None, master_list_name='full', **kwargs):
     """
-    Because API returns typiacally are dict objects, we need a convenient way to convert all DB objects to dicts
-    
+    Because API returns typically are dict objects, we need a convenient way to convert all DB objects to dicts
+
     list_type = empty | default | full
+
+    TODO: Doctest ...
     """
     # Setup/Copy field list from exisintg list of fields -----------------------
     if list_type == 'empty':
@@ -154,18 +157,19 @@ def to_dict(self, list_type='default', include_fields=None, exclude_fields=None,
         if list_type not in self.__to_dict__:
             raise Exception("unsupported list type")
         fields = copy.copy(self.__to_dict__[list_type])
-    
-    # Import fields from include fields - if present ---------------------------
-    try   : include_fields = [f.strip() for f in include_fields.split(',')]
-    except: pass
-    if hasattr(include_fields, '__iter__'):
-        for field in [field for field in include_fields if field in self.__to_dict__[master_list_name]]:
-            fields[field] = self.__to_dict__[master_list_name][field]
 
-    # Delete exlucded fields from return ---------------------------------------
-    try   : exclude_fields = exclude_fields.split(',')
-    except: pass
-    if hasattr(exclude_fields, '__iter__'):
+    # Import fields from include fields - if present ---------------------------
+    if isinstance(include_fields, str):
+        include_fields = (f.strip() for f in include_fields.split(','))
+    include_fields = tuple(include_fields) if include_fields else ()
+    for field in [field for field in include_fields if field in self.__to_dict__[master_list_name]]:
+        fields[field] = self.__to_dict__[master_list_name][field]
+
+    # Delete excluded fields from return ---------------------------------------
+    if isinstance(exclude_fields, str):
+        exclude_fields = (f.strip() for f in exclude_fields.split(','))
+    exclude_fields = tuple(exclude_fields) if exclude_fields else ()
+    if exclude_fields:
         for field in [field for field in exclude_fields if field in fields]:
             del fields[field]
 
