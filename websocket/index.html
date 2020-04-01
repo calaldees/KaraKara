@@ -4,25 +4,69 @@
     </head>
     <body>
         <h1>Websocket Channel Test</h1>
+        <div>
+            <h2>Links</h2>
+            <ul>
+                <li>join <a href="#test1">test1</a></li>
+                <li>join <a href="#test2">test2</a></li>
+                <li>send via GET <a href="/test1?message=hello">hello</a> to test1</a></li>
+            </ul>
+        </div>
+        <div>
+            <h2>Other Active Channel Sessions</h2>
+            <button id="channels_refresh">Refresh</button>
+            <ul id="channels"></ul>
+        </div>
+        <div>
+            <h2>Message Input</h2>
+            <input id="message" type="text" />
+        </div>
+        <div>
+            <h2>Websocket Log</h2>
+            <textarea id="text" rows="10" cols="80"></textarea>
+        </div>
+        <div>
+            <h2>CURL examples</h2>
 <pre>
 curl http://localhost:9800/test1?message=hello
 curl -H 'Content-Type: application/json' http://localhost:9800/
 curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'message=hello2' http://localhost:9800/test1
 </pre>
-        <ul>
-            <li>join <a href="#test1">test1</a></li>
-            <li>join <a href="#test2">test2</a></li>
-            <li>send via GET <a href="/test1?message=hello">hello</a> to test1</a></li>
-        </ul>
-        <p>
-            <input id="message" type="text" />
-        </p>
-        <p>
-            <textarea id="text" rows="10" cols="80"></textarea>
-        </p>
+        </div>
+
+
         <script>
             const channel = window.location.hash.replace('#','');
             const ws_url = `ws://${window.location.hostname}:9800/${channel}.ws`;
+
+            window.onhashchange = function() {
+                window.location.reload();
+            }
+
+            function getChannelConnections(success) {
+                var xhr = new XMLHttpRequest()
+                xhr.open('GET', '');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState>3 && xhr.status==200) {
+                        success(JSON.parse(xhr.responseText))
+                    };
+                };
+                xhr.send();
+                return xhr;
+            }
+            function refreshChannelList() {
+                const channels_list = document.getElementById('channels');
+                channels_list.innerHTML = '<li>loading...</li>';
+                console.log('refreshChannelList');
+                getChannelConnections((data) => {
+                    channels_list.innerHTML = '';
+                    for (let [channel_name, active_connections] of Object.entries(data.channels)) {
+                        channels_list.innerHTML +=
+                            `<li><a href="#${channel_name}">${channel_name}</a><span>${active_connections}</span></li>`;
+                    }
+                });
+            }
+            document.getElementById('channels_refresh').addEventListener('click', refreshChannelList);
 
             // Form POST message
             const message = document.getElementById('message');
@@ -34,26 +78,35 @@ curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'message=he
             }, true);
             function send_message(message) {
                 console.log('POST', channel, message);
-                xhr = new XMLHttpRequest();
+                const xhr = new XMLHttpRequest();
                 xhr.open('POST', channel);
-	            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	            xhr.send(`message=${encodeURIComponent(message)}`);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.send(`message=${encodeURIComponent(message)}`);
             }
 
             // Websocket log
             const text = document.getElementById('text');
-            text.textContent += `-- ${ws_url}\n`;
-            text.textContent += `-- joining ${channel}\n`;
-            const socket = new WebSocket(ws_url);
-            socket.addEventListener('open', function (event) {
-                text.textContent += `-- connected\n`;
-            });
-            socket.addEventListener('close', function (event) {
-                text.textContent += `-- disconnected\n`;
-            });
-            socket.addEventListener('message', function (event) {
-                text.textContent += `${event.data}\n`;
-            });
+            if (channel) {
+                connectWebsocketToChannel(channel);
+            }
+            else {
+                text.textContent += `-- NO CHANNEL SELECTED\n`;
+            }
+            function connectWebsocketToChannel(channel) {
+                const text = document.getElementById('text');
+                text.textContent += `-- ${ws_url}\n`;
+                text.textContent += `-- joining ${channel}\n`;
+                const socket = new WebSocket(ws_url);
+                socket.addEventListener('open', function (event) {
+                    text.textContent += `-- connected\n`;
+                });
+                socket.addEventListener('close', function (event) {
+                    text.textContent += `-- disconnected\n`;
+                });
+                socket.addEventListener('message', function (event) {
+                    text.textContent += `${event.data}\n`;
+                });
+            }
         </script>
     </body>
 </html>

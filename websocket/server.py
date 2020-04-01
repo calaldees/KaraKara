@@ -19,6 +19,8 @@ class Server():
         ws://host:port/channel_name.ws
         GET /channel_name?message=hello
         POST /channel_name <message=hello>
+        GET / (`index.html` for working examples)
+        GET / (content-type=application/json) = channelConnections
         """
         pass
 
@@ -27,13 +29,7 @@ class Server():
         app = web.Application()
 
         app['channels'] = defaultdict(set)
-        # template_lookup = aiohttp_mako.setup(
-        #     app,
-        #     directories=['.'],
-        #     input_encoding='utf-8',
-        #     output_encoding='utf-8',
-        #     default_filters=['decode.utf8'],
-        # )
+
         with open('index.html', 'rt', encoding='utf-8') as filehandle:
             self.template_index = filehandle.read()
 
@@ -48,7 +44,6 @@ class Server():
         for ws in tuple(chain.from_iterable(app['channels'].values())):
             await ws.close(code=WSCloseCode.GOING_AWAY, message='shutdown')
 
-    #@aiohttp_mako.template('index.html')
     async def handle_index(self, request):
         if request.headers['accept'].startswith('text/html'):
             return web.Response(text=self.template_index, content_type='text/html')
@@ -87,6 +82,8 @@ class Server():
                 await ws.close()
         finally:
             channel.remove(ws)
+            if not channel:
+                del request.app['channels'][channel_name]
         log.info(f'websocket onDisconnected {request.remote=} {channel_name=}')
         return ws
 

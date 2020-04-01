@@ -27,12 +27,23 @@ services:
         links:
             - postgres
             - redis
+            - websocket
         volumes:
             - logs:/logs
         #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:ro
         #    - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
+
+    websocket:
+        image: karakara/websocket:latest
+        build:
+            context: ./websocket
+            dockerfile: Dockerfile
+        volumes:
+            - logs:/logs
+        expose:
+            - 9800
 
     player2:
         build:
@@ -68,6 +79,7 @@ services:
             - ${PATH_HOST_processed}:/media/processed:ro
         links:
             - website
+            - websocket
             - player2
 
     processmedia2:
