@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>Test</title>
+    </head>
+    <body>
+        <h1>Websocket Channel Test</h1>
+<pre>
+curl http://localhost:9800/test1?message=hello
+curl -H 'Content-Type: application/json' http://localhost:9800/
+curl -X POST -H 'Content-Type: application/x-www-form-urlencoded' -d 'message=hello2' http://localhost:9800/test1
+</pre>
+        <ul>
+            <li>join <a href="#test1">test1</a></li>
+            <li>join <a href="#test2">test2</a></li>
+            <li>send via GET <a href="/test1?message=hello">hello</a> to test1</a></li>
+        </ul>
+        <p>
+            <input id="message" type="text" />
+        </p>
+        <p>
+            <textarea id="text" rows="10" cols="80"></textarea>
+        </p>
+        <script>
+            const channel = window.location.hash.replace('#','');
+            const ws_url = `ws://${window.location.hostname}:9800/${channel}.ws`;
+
+            // Form POST message
+            const message = document.getElementById('message');
+            message.addEventListener('keydown', (event)=>{
+                if (event.keyCode==13) {
+                    send_message(message.value);
+                    message.value = "";
+                }
+            }, true);
+            function send_message(message) {
+                console.log('POST', channel, message);
+                xhr = new XMLHttpRequest();
+                xhr.open('POST', channel);
+	            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	            xhr.send(`message=${encodeURIComponent(message)}`);
+            }
+
+            // Websocket log
+            const text = document.getElementById('text');
+            text.textContent += `-- ${ws_url}\n`;
+            text.textContent += `-- joining ${channel}\n`;
+            const socket = new WebSocket(ws_url);
+            socket.addEventListener('open', function (event) {
+                text.textContent += `-- connected\n`;
+            });
+            socket.addEventListener('close', function (event) {
+                text.textContent += `-- disconnected\n`;
+            });
+            socket.addEventListener('message', function (event) {
+                text.textContent += `${event.data}\n`;
+            });
+        </script>
+    </body>
+</html>

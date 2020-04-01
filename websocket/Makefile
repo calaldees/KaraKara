@@ -16,10 +16,10 @@ test:
 	pytest
 
 shell:
-	docker run -it --rm -p ${PORT}:${PORT} --volume ${PWD}:${WORKDIR} --entrypoint /bin/sh ${CONTAINER_TAG}
+	docker run -it --rm -p ${PORT}:${PORT} --volume ${PWD}:${WORKDIR} --no-healthcheck --entrypoint /bin/bash ${CONTAINER_TAG}
 
 run_local:
-	python3 server.py
+	python3 -m aiohttp.web -H 0.0.0.0 -P 9800 server:aiohttp_app
 
 clean:
 	docker rmi ${CONTAINER_TAG}
