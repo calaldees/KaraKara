@@ -69,5 +69,5 @@
     if request.registry.settings['karakara.websocket.path']:
         websocket_path = request.registry.settings['karakara.websocket.path']
     else:
-        websocket_path = f""":{'NotImplementedError'}/"""
+        websocket_path = f""":{request.registry.settings['karakara.websocket.port']}/"""
 %>('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname + '${websocket_path}'</%def>

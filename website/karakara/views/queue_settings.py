@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 REGISTRY_SETTINGS_PASSTHROUGH = {
     'karakara.websocket.path',
+    'karakara.websocket.port',
 }
 
 SETTINGS_ADMIN_EXTRA_EXPOSE = {
