@@ -59,7 +59,7 @@ $(ENV):
 	#python$(PYTHON_VERSION) -m virtualenv $(ENV)
 	virtualenv -p python$(PYTHON_VERSION) $(ENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.pip
+	$(PIP) install -r requirements.txt
 dev_libs:
 	# Link local calaldees library for debugging
 	$(PIP) install --editable ../../libs/
