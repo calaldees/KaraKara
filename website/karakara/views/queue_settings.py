@@ -15,7 +15,6 @@ log = logging.getLogger(__name__)
 # TODO: Translation strings for this file
 
 REGISTRY_SETTINGS_PASSTHROUGH = {
-    'karakara.websocket.port',
     'karakara.websocket.path',
 }
 
