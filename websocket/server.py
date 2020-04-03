@@ -22,7 +22,7 @@ class Server():
         GET / (`index.html` for working examples)
         GET / (content-type=application/json) = channelConnections
         """
-        pass
+        self.echo = kwargs.get('echo', False)
 
     @cached_property
     def app(self):
@@ -78,8 +78,13 @@ class Server():
             async for msg in ws:
                 if msg.type == aiohttp.WSMsgType.ERROR:
                     log.error(ws.exception())
-                await ws.send_str('This service is for listening only - closing connection')
-                await ws.close()
+                elif self.echo:
+                    log.info(f'websocket onMessage {request.remote=} {channel_name=} {msg.data=}')
+                    for client in channel:
+                        await client.send_str(msg.data)
+                else:
+                    await ws.send_str('This service is for listening only - closing connection')
+                    await ws.close()
         finally:
             channel.remove(ws)
             if not channel:
@@ -87,7 +92,25 @@ class Server():
         log.info(f'websocket onDisconnected {request.remote=} {channel_name=}')
         return ws
 
+# Main -------------------------------------------------------------------------
+
+def get_args(argv=None):
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        prog=__name__,
+        description="""?""",
+    )
+
+    parser.add_argument('--echo', action='store_true', help='Echo websocket messages to all clients (default:False)', default=False)
+    parser.add_argument('--log_level', action='store', type=int, help='loglevel of output to stdout', default=logging.WARNING)
+
+    args = parser.parse_args(argv)
+    return vars(args)
+
 
 def aiohttp_app(argv):
     # python3 -m aiohttp.web -H 0.0.0.0 -P 9800 server:aiohttp_app
-    return Server(argv).app
+    options = get_args(argv)
+    logging.basicConfig(level=options['log_level'])  # BROKEN: it works when applied at the module level :(
+    return Server(**options).app

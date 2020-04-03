@@ -66,8 +66,8 @@
 </html>
 
 <%def name="js_websocket_url()"><%
-    if request.registry.settings['karakara.websocket.path']:
-        websocket_path = request.registry.settings['karakara.websocket.path']
-    else:
-        websocket_path = f""":{request.registry.settings['karakara.websocket.port']}/"""
+    websocket_path = ''
+    if not request.registry.settings['karakara.websocket.host']:
+        websocket_path += f""":{request.registry.settings['karakara.websocket.port']}"""
+    websocket_path += f'/{request.queue.id}.ws'
 %>('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname + '${websocket_path}'</%def>

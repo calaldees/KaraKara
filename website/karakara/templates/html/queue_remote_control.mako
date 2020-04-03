@@ -7,9 +7,6 @@
     $(document).ready(function() {
         try {
             socket = new WebSocket(${self.js_websocket_url()});
-            socket.onopen = function(){  //Authenicate client with session key on socket connect
-                socket.send(document.cookie.match(/${request.registry.settings['session.cookie_name']}=([^;\s]+)/)[1]);
-            };
         }
         catch(err) {
             console.error("Websockets not supported. Using request method", err);

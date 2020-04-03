@@ -11,6 +11,7 @@ FROM base as code
 COPY \
     __init__.py \
     server.py \
+    index.html \
 ./
 
 # Test -------------------------------------------------------------------------

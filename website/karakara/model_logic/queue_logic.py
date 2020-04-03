@@ -19,16 +19,20 @@ class QueueLogic():
     def __init__(self, request):
         self.request = request
 
+    @property
+    def id(self):
+        return getattr(self.request.context, 'queue_id', '')
+
     @reify
     def exists(self):
-        if hasattr(self.request.context, 'queue_id'):
-            return DBSession.query(Queue).filter(Queue.id == self.request.context.queue_id).count()
+        if self.id:
+            return DBSession.query(Queue).filter(Queue.id == self.id).count()
         return False
 
     @reify
     def settings(self):
         #if not self.exists:
-        if not hasattr(self.request.context, 'queue_id'):
+        if not self.id:
             return {}
         return self.request.call_sub_view(queue_settings_view, queue_settings_acquire_cache_bucket_func)['settings']
 
@@ -59,7 +63,7 @@ class QueueLogic():
     def _queue_item_base_query(self):
         return (
             DBSession.query(QueueItem)
-            .filter(QueueItem.queue_id == self.request.context.queue_id)
+            .filter(QueueItem.queue_id == self.id)
             .filter(or_(
                 QueueItem.status == 'pending',
                 and_(
