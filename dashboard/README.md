@@ -22,4 +22,4 @@ Event logs:
 - `queue_add`
 - `queue_update`
 - `queue_delete`
-- `feedback` {contact, message }
+- `feedback` { contact, message }

@@ -24,11 +24,6 @@ API
 Todo
 ----
 
-* player
-  * rickroll button
-  * general design
-  * display event endtime (!)
-  * option for high/low video res mode
 * mobile interface
   * general design
   * fix message/token layout issue (!)
