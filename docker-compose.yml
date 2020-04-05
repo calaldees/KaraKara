@@ -24,6 +24,7 @@ services:
             #STATIC_PATH_PROCESSED: "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
             #SESSION_SECRET: change_me
             KARAKARA_CONTAINER_NAME_postgres: 'postgres'
+            KARAKARA_WEBSOCKET_HOST: 'websocket'
         links:
             - postgres
             - redis
