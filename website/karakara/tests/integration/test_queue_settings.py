@@ -14,7 +14,7 @@ def test_queue_settings(app, queue):
     settings = _get_settings()
     assert settings
     assert key not in settings
-    assert 'karakara.websocket.port' in settings, 'Some registry.settings should always propergate through to this output'
+    assert 'karakara.websocket.host' in settings, 'Some registry.settings should always propergate through to this output'
 
     # Settings permissions
     # This is difficult to test as settings endpoint in test mode does not throw a 403

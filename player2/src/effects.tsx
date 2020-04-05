@@ -10,7 +10,7 @@ import {SetQueue} from "./actions";
 export function SendCommand(state: State, command: string) {
     console.log("websocket_send(" + command + ")");
     return WebSocketSend({
-        url: http2ws(state.root) + "/ws/?ws_error_count=" + state.ws_error_count,
+        url: http2ws(state.root) + "/" + state.queue_id +".ws?ws_error_count=" + state.ws_error_count,
         data: command,
     })
 }

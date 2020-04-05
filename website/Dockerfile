@@ -22,8 +22,8 @@ HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ ||
 # step when this file changes, not when *anything* changes
 WORKDIR /app
 RUN virtualenv data/_env
-COPY requirements.pip /tmp/requirements.pip
-RUN data/_env/bin/pip3 install --no-cache-dir -r /tmp/requirements.pip
+COPY requirements.txt /tmp/requirements.txt
+RUN data/_env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt
 
 COPY . /app
 RUN make install

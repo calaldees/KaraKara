@@ -27,12 +27,11 @@ from calaldees.pyramid_helpers.auto_format2 import setup_pyramid_autoformater, p
 from calaldees.pyramid_helpers.session_identity2 import session_identity
 from calaldees.social._login import NullLoginProvider, FacebookLogin, GoogleLogin
 
-from multisocketServer.server.auth_echo_server import AuthEchoServerManager
-
 # Package Imports
 from .traversal import TraversalGlobalRootFactory
 from .templates import helpers as template_helpers
 from .auth import CommunityUserStore, NullCommunityUserStore
+from .websocket import send_websocket_message
 # SQLAlchemy imports
 from .model import init_DBSession, init_DBSession_tables, commit
 
@@ -165,40 +164,7 @@ def main(global_config, **settings):
 
     # WebSocket ----------------------------------------------------------------
 
-    class NullAuthEchoServerManager(object):
-        def recv(self, *args, **kwargs):
-            pass
-    socket_manager = NullAuthEchoServerManager()
-
-    if config.registry.settings.get('karakara.websocket.port'):
-        def authenticator(key):
-            """Only admin authenticated keys can connect to the websocket"""
-            cookie_name = config.registry.settings['session.cookie_name']
-            if cookie_name in key:
-                cookie = key
-            else:
-                cookie = '{0}={1}'.format(cookie_name, key)
-            request = pyramid.request.Request({'HTTP_COOKIE': cookie})
-            session_data = session_factory(request)
-            return session_data and session_data.get('admin')
-        def _int_or_none(setting_key):
-            return int(config.registry.settings.get(setting_key)) if config.registry.settings.get(setting_key) else None
-        try:
-            _socket_manager = AuthEchoServerManager(
-                authenticator=authenticator,
-                websocket_port=_int_or_none('karakara.websocket.port'),
-                tcp_port=_int_or_none('karakara.tcp.port'),
-            )
-            _socket_manager.start()
-            socket_manager = _socket_manager
-        except OSError:
-            log.warn('Unable to setup websocket')
-
-    def send_websocket_message(request, message):
-        # TODO: This will have to be augmented with json and queue_id in future
-        socket_manager.recv(message.encode('utf-8'))  # TODO: ?um? new_line needed?
     config.add_request_method(send_websocket_message)
-    #config.registry['socket_manager'] = socket_manager
 
 
     # Login Providers ----------------------------------------------------------

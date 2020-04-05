@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 
 import datetime
 import json
@@ -11,7 +12,7 @@ def BeautifulSoup(markup):
 
 from calaldees.date_tools import now
 
-from . import admin_rights, with_settings, temporary_settings, websocket_message_queue
+from . import admin_rights, with_settings, temporary_settings
 
 from karakara.model.model_queue import QueueItem
 
@@ -106,7 +107,7 @@ def get_cookie(app, key):
 
 # Tests ------------------------------------------------------------------------
 
-def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_manager, tracks):
+def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_manager, tracks, mock_send_websocket_message):
     """
     View empty queue
     queue a track
@@ -118,9 +119,9 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
     assert 'track 1' not in response.text.lower()
 
     # Queue 'Track 1'
-    with websocket_message_queue() as message_received_queue:
-        queue_manager.add_queue_item(track_id='t1', performer_name='testperformer1')
-        #assert message_received_queue.get(timeout=1) == 'queue_updated'  # TEMP Disable
+    queue_manager.add_queue_item(track_id='t1', performer_name='testperformer1')
+    mock_send_websocket_message.assert_called_once_with(mock.ANY, 'queue_updated')
+    mock_send_websocket_message.reset_mock()
 
     # Check track is in queue list
     response = queue_manager.get_html_response()
@@ -131,22 +132,24 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
     assert 'testperformer1' in response.text.lower()
 
     # Queue 'Track 2'
-    with websocket_message_queue() as message_received_queue:
-        queue_manager.add_queue_item(track_id='t2', performer_name='testperformer2')
-        # assert message_received_queue.get(timeout=1) == 'queue_updated'  # TEMP Disable
+    queue_manager.add_queue_item(track_id='t2', performer_name='testperformer2')
+    mock_send_websocket_message.assert_called_once_with(mock.ANY, 'queue_updated')
+    mock_send_websocket_message.reset_mock()
 
     QueueItemTuple = namedtuple('QueueItemTuple', ('id', 'track_id'))
     queue_item_tuples = [QueueItemTuple(queue_item['id'], queue_item['track_id']) for queue_item in queue_manager.items]
     assert [queue_item_tuple.track_id for queue_item_tuple in queue_item_tuples] == ['t1', 't2']
 
-    with websocket_message_queue() as message_received_queue:
-        # Removing a queue_item fires a websocket updated event
-        queue_manager.del_queue_item(queue_item_id=queue_item_tuples[1].id)
-        #assert message_received_queue.get(timeout=1) == 'queue_updated'  # TEMP Disable
-        # Removing the first queue_item fires an additional `stop` event
-        queue_manager.del_queue_item(queue_item_id=queue_item_tuples[0].id)
-        #assert message_received_queue.get(timeout=1) == 'stop'  # TEMP Disable
-        #assert message_received_queue.get(timeout=1) == 'queue_updated'  # TEMP Disable
+    # Removing a queue_item fires a websocket updated event
+    queue_manager.del_queue_item(queue_item_id=queue_item_tuples[1].id)
+    mock_send_websocket_message.assert_called_once_with(mock.ANY, 'queue_updated')
+    mock_send_websocket_message.reset_mock()
+    # Removing the first queue_item fires an additional `stop` event
+    queue_manager.del_queue_item(queue_item_id=queue_item_tuples[0].id)
+    mock_send_websocket_message.assert_has_calls((
+        mock.call(mock.ANY, 'stop'),
+        mock.call(mock.ANY, 'queue_updated'),
+    ))
 
 
 def test_queue_errors(app, queue, queue_manager, tracks):

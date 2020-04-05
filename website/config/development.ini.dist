@@ -26,9 +26,8 @@ karakara.template.title = KaraKara (Dev)
 
 karakara.websocket.disconnected_retry_interval =  5      -> int
 karakara.faves.enabled                         = False -> bool
-karakara.websocket.path =
-karakara.websocket.port = 9873 -> int
-karakara.tcp.port       = -> None
+karakara.websocket.host =
+karakara.websocket.port = 9800 -> int
 
 karakara.search.view.config = data/config/search_config.json
 

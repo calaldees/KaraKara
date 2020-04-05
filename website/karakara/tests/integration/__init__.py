@@ -79,29 +79,3 @@ def with_settings(method=None, settings={}):
             return_value = method(*args, **kwargs)
         return return_value
     return f
-
-
-import socket
-import contextlib
-from multiprocessing import Process, Queue
-def _connection(message_received_queue):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(("localhost", 9872))
-    while True:
-        data_recv = sock.recv(4098)
-        if not data_recv:
-            break
-        message_received_queue.put(data_recv.decode('utf-8'))
-    sock.close()
-@contextlib.contextmanager
-def websocket_message_queue():
-    message_received_queue = Queue()
-    client_listener_process = Process(target=_connection, args=(message_received_queue,))
-    client_listener_process.daemon = True
-    # TODO: temp disable - threading model changed - will rewite this socket messaging
-    #client_listener_process.start()
-
-    yield message_received_queue
-
-    #client_listener_process.terminate()
-    #client_listener_process.join()

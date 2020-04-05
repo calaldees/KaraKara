@@ -101,3 +101,8 @@ def registry_settings(request, app):
     with patch.dict(settings, {'key': 'value'}):
     """
     return app.app.registry.settings
+
+
+@pytest.fixture(autouse=True)
+def mock_send_websocket_message(mocker):
+    return mocker.patch('karakara.websocket._send_websocket_message')

@@ -59,7 +59,7 @@ $(ENV):
 	#python$(PYTHON_VERSION) -m virtualenv $(ENV)
 	virtualenv -p python$(PYTHON_VERSION) $(ENV)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.pip
+	$(PIP) install -r requirements.txt
 dev_libs:
 	# Link local calaldees library for debugging
 	$(PIP) install --editable ../../libs/
@@ -135,9 +135,6 @@ run_production: ini_production
 	timeout 10 sh -c 'until nc -z $$0 $$1; do sleep 1; done' ${KARAKARA_CONTAINER_NAME_postgres} 5432
 	$(PSERVE) $(INI_PROD)
 
-run_socket_server:
-	$(PYTHON) -m calaldees.socket.multisocket_server
-
 shell:
 	$(PSHELL) $(INI_DEV)
 
@@ -159,7 +156,7 @@ shell_production: ini_production
 test: install ini_test
 	#$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
 	# Temp modification to reporduce failing test
-	$(PYTEST) $(PROJECT) --ini_file=$(INI_TEST)
+	$(PYTEST) --ini_file=$(INI_TEST) $(PROJECT)
 	# --capture=sys
 
 test_crawl: ini_test
