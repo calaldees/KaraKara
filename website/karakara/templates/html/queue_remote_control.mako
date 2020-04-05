@@ -24,6 +24,7 @@
 
     function send(message) {
         if (socket != null) {
+            console.log('send', message);
             socket.send(message);
             return false;
         }
