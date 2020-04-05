@@ -7,6 +7,15 @@
     $(document).ready(function() {
         try {
             socket = new WebSocket(${self.js_websocket_url()});
+            socket.addEventListener('open', function (event) {
+                console.log('open');
+            });
+            socket.addEventListener('close', function (event) {
+                console.log('close');
+            });
+            socket.addEventListener('message', function (event) {
+                console.log('message', event.data);
+            });
         }
         catch(err) {
             console.error("Websockets not supported. Using request method", err);

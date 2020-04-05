@@ -58,6 +58,8 @@ services:
         build:
             context: ./postgres
             dockerfile: Dockerfile
+        environment:
+            POSTGRES_PASSWORD: password
         volumes:
             - logs:/logs
             - website_db:/var/lib/postgresql
