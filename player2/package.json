@@ -9,7 +9,8 @@
     "scripts": {
         "build": "parcel build --public-url . src/index.html --experimental-scope-hoisting",
         "watch": "parcel watch --public-url . src/index.html",
-        "serve": "parcel serve --port 1235 src/index.html"
+        "serve": "parcel serve --port 1235 src/index.html",
+        "format": "prettier --write 'src/**/*.tsx' --tab-width 4 --trailing-comma all"
     },
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",
@@ -22,6 +23,7 @@
         "parcel-bundler": "^1.12.4",
         "parcel-plugin-imagemin": "^4.0.1",
         "parcel-plugin-pwa-manifest": "^2.9.2",
+        "prettier": "^1.19.1",
         "typescript": "^3.8.3"
     },
     "pwaManifest": {

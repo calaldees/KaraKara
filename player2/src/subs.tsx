@@ -1,21 +1,42 @@
-import {Dequeue, MarkTrackSkipped, Pause, Play, SeekBackwards, SeekForwards, Stop} from "./actions";
-import {CheckQueue, CheckSettings, SendCommand} from "./effects";
-import {WebSocketListen, Keyboard, Interval} from "hyperapp-fx";
-import {http2ws} from "./utils";
+import {
+    Dequeue,
+    MarkTrackSkipped,
+    Pause,
+    Play,
+    SeekBackwards,
+    SeekForwards,
+    Stop,
+} from "./actions";
+import { CheckQueue, CheckSettings, SendCommand } from "./effects";
+import { WebSocketListen, Keyboard, Interval } from "hyperapp-fx";
+import { http2ws } from "./utils";
 
 let mySubs = {};
 
 export function getOpenWebSocketListener(state: State): WebSocketListen {
-    let url = http2ws(state.root) + "/" + state.queue_id +".ws?ws_error_count=" + state.ws_error_count;
+    let url =
+        http2ws(state.root) +
+        "/" +
+        state.queue_id +
+        ".ws?ws_error_count=" +
+        state.ws_error_count;
     if (!mySubs[url]) {
         mySubs[url] = WebSocketListen({
             url: url,
             open(state: State) {
-                return [{...state, connected: true}, CheckSettings(state), CheckQueue(state)];
+                return [
+                    { ...state, connected: true },
+                    CheckSettings(state),
+                    CheckQueue(state),
+                ];
             },
             close(state: State) {
                 delete mySubs[url];
-                return {...state, connected: false, ws_error_count: state.ws_error_count + 1};
+                return {
+                    ...state,
+                    connected: false,
+                    ws_error_count: state.ws_error_count + 1,
+                };
             },
             action(state: State, msg: MessageEvent) {
                 const cmd = msg.data.trim();
@@ -40,7 +61,9 @@ export function getOpenWebSocketListener(state: State): WebSocketListen {
                     // Only one instance should mark the current track as skipped, to avoid
                     // skipping two tracks
                     case "skip":
-                        return state.is_podium ? Dequeue(state) : MarkTrackSkipped(state);
+                        return state.is_podium
+                            ? Dequeue(state)
+                            : MarkTrackSkipped(state);
                     default:
                         console.log("unknown command: " + cmd);
                         return state;
@@ -48,11 +71,11 @@ export function getOpenWebSocketListener(state: State): WebSocketListen {
             },
             error(state: State, response) {
                 console.log("Error listening to websocket:", response);
-                return {...state, ws_error_count: state.ws_error_count + 1}
+                return { ...state, ws_error_count: state.ws_error_count + 1 };
             },
         });
     }
-    return mySubs[url]
+    return mySubs[url];
 }
 
 export const KeyboardListener = Keyboard({
@@ -60,22 +83,22 @@ export const KeyboardListener = Keyboard({
     action(state: State, event): State {
         let action = null;
         switch (event.key) {
-            case "s"          :
+            case "s":
                 action = Dequeue;
                 break; // skip
-            case "Enter"      :
+            case "Enter":
                 action = Play;
                 break;
-            case "Escape"     :
+            case "Escape":
                 action = Stop;
                 break;
-            case "ArrowLeft"  :
+            case "ArrowLeft":
                 action = SeekBackwards;
                 break;
-            case "ArrowRight" :
+            case "ArrowRight":
                 action = SeekForwards;
                 break;
-            case " "          :
+            case " ":
                 action = Pause;
                 break;
         }
@@ -93,7 +116,7 @@ export const IntervalListener = Interval({
         if (state.progress >= state.settings["karakara.player.autoplay"]) {
             return [state, SendCommand(state, "play")];
         } else {
-            return {...state, progress: state.progress + 1 / 5};
+            return { ...state, progress: state.progress + 1 / 5 };
         }
     },
 });

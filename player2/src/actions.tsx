@@ -2,20 +2,21 @@
  * Actions = things which change the state of the app, normally
  * in response to eg a button press
  */
-import {SetTrackState} from "./effects";
+import { SetTrackState } from "./effects";
 
 // App controls
 export function SetPreviewVolume(state: State, event): State {
-    event.target.volume = state.settings["karakara.player.video.preview_volume"];
+    event.target.volume =
+        state.settings["karakara.player.video.preview_volume"];
     return state;
 }
 
 export function UpdateProgress(state: State, event): State {
-    return {...state, progress: event.target.currentTime};
+    return { ...state, progress: event.target.currentTime };
 }
 
 export function UpdatePodiumProgress(state: State, event): State {
-    if(state.playing) return {...state, progress: event.target.currentTime};
+    if (state.playing) return { ...state, progress: event.target.currentTime };
     return state;
 }
 
@@ -34,10 +35,13 @@ export function Play(state: State): State {
 export function Pause(state: State): State {
     const video = document.getElementsByTagName("video")[0];
     if (video) {
-        if (state.paused) {video.play();}
-        else              {video.pause();}
+        if (state.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
     }
-    return {...state, paused: !state.paused};
+    return { ...state, paused: !state.paused };
 }
 
 export function Stop(state: State): State {
@@ -46,30 +50,39 @@ export function Stop(state: State): State {
         playing: false,
         paused: false,
         progress: 0,
-    }
+    };
 }
 
 export function SeekForwards(state: State, value): State {
     const skip = value || state.settings["karakara.player.video.skip.seconds"];
     const video = document.getElementsByTagName("video")[0];
-    if(video) video.currentTime += skip;
-    return {...state, progress: state.progress + skip};
+    if (video) video.currentTime += skip;
+    return { ...state, progress: state.progress + skip };
 }
 
 export function SeekBackwards(state: State, value): State {
     const skip = value || state.settings["karakara.player.video.skip.seconds"];
     const video = document.getElementsByTagName("video")[0];
-    if(video) video.currentTime -= skip;
-    return {...state, progress: state.progress - skip};
+    if (video) video.currentTime -= skip;
+    return { ...state, progress: state.progress - skip };
 }
 
 // Playlist controls
 export function SetQueue(state: State, value: Array<QueueItem>): State {
     // if the first song in the queue has changed, stop playing
-    if(state.queue.length === 0 || value.length === 0 || state.queue[0].id !== value[0].id) {
-        return { ...state, queue: value, playing: false, paused: false, progress: 0 };
-    }
-    else {
+    if (
+        state.queue.length === 0 ||
+        value.length === 0 ||
+        state.queue[0].id !== value[0].id
+    ) {
+        return {
+            ...state,
+            queue: value,
+            playing: false,
+            paused: false,
+            progress: 0,
+        };
+    } else {
         return { ...state, queue: value };
     }
 }

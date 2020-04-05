@@ -16,7 +16,7 @@
     "license": "GPL-3.0-only",
     "devDependencies": {
         "babel-core": "^6.26.3",
-        "node-sass": "^4.12.0",
+        "node-sass": "^4.13.1",
         "parcel-bundler": "^1.12.4",
         "parcel-plugin-imagemin": "^4.0.1",
         "parcel-plugin-pwa-manifest": "^2.9.2",
