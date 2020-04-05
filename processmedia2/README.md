@@ -42,9 +42,9 @@ Below describes the intended modes of use
 
 * Setup a Dropbox/TorrentSync/SyncThing *source media folder* for your contributors.
 * Setup a Dropbox/TorrentSync/SyncThing *processed media folder* for your admins/encoders.
-* `make install && make test`
-* Edit `config.json` to point to *source*, *meta* and *processed* paths
-* Setup a __cron to `make run` every 10 minutes__ (need to think of more efficient way)
+* `docker run -v /my/folder:/media/source -v /my/other/folder:/media/processed karakara/processmedia2`
+* The container will then monitor the source folder for any type of media files, and write out
+  karakara-formatted videos in the processed folder.
 
 
 Debugging Tools
