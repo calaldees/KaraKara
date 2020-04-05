@@ -3,7 +3,7 @@ name: Push Websocket
 on:
   push:
     paths:
-    - 'websocker/**'
+    - 'websocket/**'
 
 jobs:
   build:
