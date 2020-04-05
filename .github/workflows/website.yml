@@ -15,6 +15,6 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: karakara/website
-        dockerfile: website/Dockerfile
+        workdir: website
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}

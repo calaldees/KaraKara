@@ -15,6 +15,6 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: karakara/processmedia2
-        dockerfile: processmedia2/Dockerfile
+        workdir: processmedia2
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}

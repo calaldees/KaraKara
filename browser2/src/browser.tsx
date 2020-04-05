@@ -1,10 +1,10 @@
 /// <reference path='./browser.d.ts'/>
-import {app, h} from "hyperapp";
-import {WebSocketListen} from "hyperapp-fx";
+import { app, h } from "hyperapp";
+import { WebSocketListen } from "hyperapp-fx";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
-import {Login, TrackExplorer, TrackDetails, Queue, refresh} from "./screens";
-import {http2ws} from "./utils";
+import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
+import { http2ws } from "./utils";
 
 const state: State = {
     // bump this each time the schema changes to
@@ -42,7 +42,7 @@ const state: State = {
 // Insert a new history entry whenever any of these change
 const nav_state = {
     push: ["queue_id", "screen", "filters", "track_id"],
-    replace: ["search"]
+    replace: ["search"],
 };
 
 /*
@@ -60,16 +60,18 @@ function view(state: State) {
     let body = null;
     if (!state.queue_id) {
         body = <Login state={state} />;
-    }
-    else if (state.screen == "explore") {
+    } else if (state.screen == "explore") {
         if (state.track_id) {
-            body = <TrackDetails state={state} track={state.track_list[state.track_id]} />;
-        }
-        else {
+            body = (
+                <TrackDetails
+                    state={state}
+                    track={state.track_list[state.track_id]}
+                />
+            );
+        } else {
             body = <TrackExplorer state={state} />;
         }
-    }
-    else if (state.screen == "queue") {
+    } else if (state.screen == "queue") {
         body = <Queue state={state} />;
     }
     return <body>{body}</body>;
@@ -77,11 +79,12 @@ function view(state: State) {
 
 function subscriptions(state: State) {
     return [
-        state.queue_id && WebSocketListen({
-            url: http2ws(state.root) + "/" + state.queue_id + ".ws",
-            action: (state, response) => refresh(state),
-            ws_constructor: ReconnectingWebSocket
-        }),
+        state.queue_id &&
+            WebSocketListen({
+                url: http2ws(state.root) + "/" + state.queue_id + ".ws",
+                action: (state, response) => refresh(state),
+                ws_constructor: ReconnectingWebSocket,
+            }),
     ];
 }
 

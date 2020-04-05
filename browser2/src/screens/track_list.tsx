@@ -1,56 +1,112 @@
-import {h} from "hyperapp";
-import {Screen} from "./base";
-import {get_attachment, title_case} from "../utils";
+import { h } from "hyperapp";
+import { Screen } from "./base";
+import { get_attachment, title_case } from "../utils";
 
 /*
  * List individual tracks
  */
-const TrackItem = ({track}: {track: Track}) => (
-    <li className={"track_item"} onclick={(state) => ({...state, track_id: track.id})}>
-        <div class={"thumb"} style={{"background-image": "url(" +get_attachment(track, "image") + ")"}} />
+const TrackItem = ({ track }: { track: Track }) => (
+    <li
+        className={"track_item"}
+        onclick={state => ({ ...state, track_id: track.id })}
+    >
+        <div
+            class={"thumb"}
+            style={{
+                "background-image":
+                    "url(" + get_attachment(track, "image") + ")",
+            }}
+        />
         <span class={"text track_info"}>
-            <span class={"from"}>{title_case((track.tags["from"] || track.tags["artist"])[0])}</span>
-            <br/><span class={"title"}>{title_case(track.tags["title"][0])}</span>
+            <span class={"from"}>
+                {title_case((track.tags["from"] || track.tags["artist"])[0])}
+            </span>
+            <br />
+            <span class={"title"}>{title_case(track.tags["title"][0])}</span>
         </span>
-        <span class={"go_arrow"}><i class={"fas fa-chevron-circle-right"} /></span>
+        <span class={"go_arrow"}>
+            <i class={"fas fa-chevron-circle-right"} />
+        </span>
     </li>
 );
 
 /*
  * List groups of tracks
  */
-const FilterListGroupHeader = ({filter, count, expanded}: {filter: string, count: number, expanded: boolean}, children) => (
-    <li className={"filter_list_group_header"} onClick={(state) => ({...state, expanded: expanded ? null : filter})}>
+const FilterListGroupHeader = (
+    {
+        filter,
+        count,
+        expanded,
+    }: { filter: string; count: number; expanded: boolean },
+    children,
+) => (
+    <li
+        className={"filter_list_group_header"}
+        onClick={state => ({ ...state, expanded: expanded ? null : filter })}
+    >
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
-        <span class={"go_arrow"}><i class={expanded ? "fas fa-minus-circle" : "fas fa-plus-circle"} /></span>
+        <span class={"go_arrow"}>
+            <i
+                class={expanded ? "fas fa-minus-circle" : "fas fa-plus-circle"}
+            />
+        </span>
     </li>
 );
 
-const GroupedFilterList = ({heading, filters, expanded}) => (
-    Object.keys(filters).sort().map((group) => (
-        group == expanded ? (
-            <div class={"filter_list_group"}>
-                <FilterListGroupHeader filter={group} count={Object.keys(filters[group]).length} expanded={true}>{title_case(group)}</FilterListGroupHeader>
-                <FilterList heading={heading} filters={filters[group]} />
-            </div>
-        ) : (
-            <FilterListGroupHeader filter={group} count={Object.keys(filters[group]).length} expanded={false}>{title_case(group)}</FilterListGroupHeader>
-        )
-    ))
-);
+const GroupedFilterList = ({ heading, filters, expanded }) =>
+    Object.keys(filters)
+        .sort()
+        .map(group =>
+            group == expanded ? (
+                <div class={"filter_list_group"}>
+                    <FilterListGroupHeader
+                        filter={group}
+                        count={Object.keys(filters[group]).length}
+                        expanded={true}
+                    >
+                        {title_case(group)}
+                    </FilterListGroupHeader>
+                    <FilterList heading={heading} filters={filters[group]} />
+                </div>
+            ) : (
+                <FilterListGroupHeader
+                    filter={group}
+                    count={Object.keys(filters[group]).length}
+                    expanded={false}
+                >
+                    {title_case(group)}
+                </FilterListGroupHeader>
+            ),
+        );
 
-const FilterList = ({heading, filters}) => (
-    Object.keys(filters).sort().map((child) => (
-        <AddFilter filter={heading+":"+child} count={filters[child]}>{title_case(child)}</AddFilter>
-    ))
-);
+const FilterList = ({ heading, filters }) =>
+    Object.keys(filters)
+        .sort()
+        .map(child => (
+            <AddFilter filter={heading + ":" + child} count={filters[child]}>
+                {title_case(child)}
+            </AddFilter>
+        ));
 
-const AddFilter = ({filter, count}: {filter: string, count: number}, children) => (
-    <li className={"add_filter"} onClick={(state) => ({...state, expanded: null, filters: state.filters.concat([filter])})}>
+const AddFilter = (
+    { filter, count }: { filter: string; count: number },
+    children,
+) => (
+    <li
+        className={"add_filter"}
+        onClick={state => ({
+            ...state,
+            expanded: null,
+            filters: state.filters.concat([filter]),
+        })}
+    >
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
-        <span class={"go_arrow"}><i class={"fas fa-chevron-circle-right"} /></span>
+        <span class={"go_arrow"}>
+            <i class={"fas fa-chevron-circle-right"} />
+        </span>
     </li>
 );
 
@@ -58,19 +114,26 @@ const AddFilter = ({filter, count}: {filter: string, count: number}, children) =
  * Search the full list of all known tracks based on tags + full-text search,
  * return a list of Track objects
  */
-function find_tracks(track_list: Dictionary<Track>, filters: Array<string>, search: string): Array<Track> {
+function find_tracks(
+    track_list: Dictionary<Track>,
+    filters: Array<string>,
+    search: string,
+): Array<Track> {
     let tracks = [];
     tracks: for (let track_id in track_list) {
         let track = track_list[track_id];
         if (filters.length > 0) {
-            for(let filter_n=0; filter_n < filters.length; filter_n++) {
+            for (let filter_n = 0; filter_n < filters.length; filter_n++) {
                 let filter = filters[filter_n].split(":");
                 let filter_key = filter[0];
                 let filter_value = filter[1];
                 if (track.tags[filter_key] == undefined) {
                     continue tracks;
                 }
-                if (track.tags[filter_key].filter((x) => (x == filter_value)).length == 0) {
+                if (
+                    track.tags[filter_key].filter(x => x == filter_value)
+                        .length == 0
+                ) {
                     continue tracks;
                 }
             }
@@ -78,10 +141,10 @@ function find_tracks(track_list: Dictionary<Track>, filters: Array<string>, sear
         if (search != "") {
             search = search.toLowerCase();
             let any_match = false;
-            fts_match: for(let tag in track.tags) {
+            fts_match: for (let tag in track.tags) {
                 if (!track.tags.hasOwnProperty(tag)) continue;
-                for(let i=0; i<track.tags[tag].length; i++) {
-                    if(track.tags[tag][i].toLowerCase().indexOf(search) >= 0) {
+                for (let i = 0; i < track.tags[tag].length; i++) {
+                    if (track.tags[tag][i].toLowerCase().indexOf(search) >= 0) {
                         any_match = true;
                         break fts_match;
                     }
@@ -91,7 +154,7 @@ function find_tracks(track_list: Dictionary<Track>, filters: Array<string>, sear
         }
         tracks.push(track);
     }
-    tracks.sort((a, b) => (a.title > b.title) ? 1 : -1);
+    tracks.sort((a, b) => (a.title > b.title ? 1 : -1));
     return tracks;
 }
 
@@ -196,7 +259,13 @@ function show_list(state: State) {
 
     // If we have a few tracks, just list them
     if (tracks.length < 20) {
-        return <ul>{tracks.map((track) => (<TrackItem track={track} />))}</ul>;
+        return (
+            <ul>
+                {tracks.map(track => (
+                    <TrackItem track={track} />
+                ))}
+            </ul>
+        );
     }
     let all_tags = find_all_tags(tracks);
     let section_names = choose_section_names(state, all_tags);
@@ -217,26 +286,32 @@ function show_list(state: State) {
      * }} />
      */
     let sections = [];
-    for(let i=0; i<section_names.length; i++) {
-        let tag_key = section_names[i];  // eg "vocaltrack"
-        let tag_values = all_tags[tag_key];  // eg {"on": 2003, "off": 255}
+    for (let i = 0; i < section_names.length; i++) {
+        let tag_key = section_names[i]; // eg "vocaltrack"
+        let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
         let filter_list = null;
         if (Object.keys(tag_values).length > 50) {
             let grouped_groups = {};
-            Object.keys(tag_values).forEach(function (x) {
-                if (grouped_groups[x[0]] == undefined) grouped_groups[x[0]] = {};
+            Object.keys(tag_values).forEach(function(x) {
+                if (grouped_groups[x[0]] == undefined)
+                    grouped_groups[x[0]] = {};
                 grouped_groups[x[0]][x] = tag_values[x];
             });
-            filter_list = <GroupedFilterList heading={tag_key} filters={grouped_groups} expanded={state.expanded} />;
-        }
-        else {
+            filter_list = (
+                <GroupedFilterList
+                    heading={tag_key}
+                    filters={grouped_groups}
+                    expanded={state.expanded}
+                />
+            );
+        } else {
             filter_list = <FilterList heading={tag_key} filters={tag_values} />;
         }
         sections.push(
             <div>
                 <h2>{title_case(tag_key)}</h2>
                 <ul>{filter_list}</ul>
-            </div>
+            </div>,
         );
     }
     return sections;
@@ -246,23 +321,30 @@ function back(state: State): State {
     if (state.filters.length > 0) {
         // if we're searching the list, take a step back in the search
         state.filters.pop();
-    }
-    else {
+    } else {
         // if we're at the start of the exploring process and
         // go back, go to the login screen
         state.queue_id = null;
         state.track_list = {};
     }
-    return {...state};
+    return { ...state };
 }
 
-export const TrackExplorer = ({state}: {state: State}) => (
+export const TrackExplorer = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"track_list"}
-        navLeft={<a onclick={back}><i class={"fas fa-2x fa-chevron-circle-left"} /></a>}
+        navLeft={
+            <a onclick={back}>
+                <i class={"fas fa-2x fa-chevron-circle-left"} />
+            </a>
+        }
         title={"Explore Tracks"}
-        navRight={<a onclick={(state) => ({...state, screen: "queue"})}><i class={"fas fa-2x fa-list-ol"} /></a>}
+        navRight={
+            <a onclick={state => ({ ...state, screen: "queue" })}>
+                <i class={"fas fa-2x fa-list-ol"} />
+            </a>
+        }
     >
         {/* Full-text search */}
         <input
@@ -270,18 +352,31 @@ export const TrackExplorer = ({state}: {state: State}) => (
             type={"text"}
             placeholder={"Add search keywords"}
             value={state.search}
-            onInput={(state: State, event: FormInputEvent) => ({
-                ...state, search: event.target.value,
-            } as State)}
+            onInput={(state: State, event: FormInputEvent) =>
+                ({
+                    ...state,
+                    search: event.target.value,
+                } as State)
+            }
         />
 
         {/* List active filters */}
         <div className={"active_filter_list"}>
-            {state.filters.map((filter) => (
-                <a className={"active_filter"}
-                   onclick={(state) => ({...state, expanded: null, filters: state.filters.filter((v) => (v !== filter))})}>
-                    <span class={"remove"}><i class={"fas fa-times-circle"}/></span>
-                    <span class={"name"} title={filter.split(":")[0]}>{filter.split(":")[1]}</span>
+            {state.filters.map(filter => (
+                <a
+                    className={"active_filter"}
+                    onclick={state => ({
+                        ...state,
+                        expanded: null,
+                        filters: state.filters.filter(v => v !== filter),
+                    })}
+                >
+                    <span class={"remove"}>
+                        <i class={"fas fa-times-circle"} />
+                    </span>
+                    <span class={"name"} title={filter.split(":")[0]}>
+                        {filter.split(":")[1]}
+                    </span>
                 </a>
             ))}
         </div>
