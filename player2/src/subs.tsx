@@ -6,7 +6,7 @@ import {http2ws} from "./utils";
 let mySubs = {};
 
 export function getOpenWebSocketListener(state: State): WebSocketListen {
-    let url = http2ws(state.root) + "/ws/?ws_error_count=" + state.ws_error_count;
+    let url = http2ws(state.root) + "/" + state.queue_id +".ws?ws_error_count=" + state.ws_error_count;
     if (!mySubs[url]) {
         mySubs[url] = WebSocketListen({
             url: url,

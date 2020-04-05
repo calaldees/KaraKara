@@ -78,7 +78,7 @@ function view(state: State) {
 function subscriptions(state: State) {
     return [
         state.queue_id && WebSocketListen({
-            url: http2ws(state.root) + "/ws/",
+            url: http2ws(state.root) + "/" + state.queue_id + ".ws",
             action: (state, response) => refresh(state),
             ws_constructor: ReconnectingWebSocket
         }),
