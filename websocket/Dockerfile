@@ -30,8 +30,8 @@ FROM code as production
 ARG PORT=9800
 ENV PORT=9800
 EXPOSE ${PORT}
-ENTRYPOINT ["python3", "-m", "aiohttp.web", "-H", "0.0.0.0", "server:aiohttp_app"]
-CMD ["-P", "9800"]
+ENTRYPOINT ["python3", "-m", "aiohttp.web", "-H", "0.0.0.0", "-P", "9800", "server:aiohttp_app"]
+CMD ["--echo"]
 # Cant use ENV variables in CMD. Maybe we could use ARGS?
 
 # TODO: Healthcheck could actually use Python client to route ping-pong messages?
