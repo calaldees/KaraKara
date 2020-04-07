@@ -1,6 +1,7 @@
 /// <reference path='./browser.d.ts'/>
 import { app, h } from "hyperapp";
 import { WebSocketListen } from "hyperapp-fx";
+import { AutoHistory } from "hyperapp-auto-history";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
@@ -58,7 +59,10 @@ catch(err) {
 
 function view(state: State) {
     let body = null;
-    if (!state.queue_id) {
+    // queue_id can be set from saved state, but then track_list will be empty,
+    // so push the user back to login screen if that happens (can we load the
+    // track list on-demand somehow?)
+    if (state.queue_id === null || Object.keys(state.track_list).length === 0) {
         body = <Login state={state} />;
     } else if (state.screen == "explore") {
         if (state.track_id) {
@@ -77,8 +81,16 @@ function view(state: State) {
     return <body>{body}</body>;
 }
 
+const HistoryManager = AutoHistory({
+    init: state,
+    push: ["root", "queue_id", "filters", "track_id"],
+    replace: ["search"],
+});
+
 function subscriptions(state: State) {
+    HistoryManager.push_state_if_changed(state);
     return [
+        HistoryManager,
         state.queue_id &&
             WebSocketListen({
                 url: http2ws(state.root) + "/" + state.queue_id + ".ws",

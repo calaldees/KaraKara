@@ -2,6 +2,7 @@
     "name": "browser2",
     "dependencies": {
         "hyperapp": "^2.0.4",
+        "hyperapp-auto-history": "^1.0.9",
         "hyperapp-fx": "github:shish/hyperapp-fx#eabef1da8f83ba85af7fda4112be7a11b44e1213",
         "parse-srt": "^1.0.0-alpha",
         "reconnecting-websocket": "^4.4.0"
