@@ -40,23 +40,6 @@ const state: State = {
     bookmarks: [],
 };
 
-// Insert a new history entry whenever any of these change
-const nav_state = {
-    push: ["queue_id", "screen", "filters", "track_id"],
-    replace: ["search"],
-};
-
-/*
-let loaded_state: State = state;
-try {
-    let saved_state = JSON.parse(window.localStorage.getItem("state") || "{}");
-    loaded_state = {...loaded_state, ...saved_state};
-}
-catch(err) {
-    console.log("Error loading state:", err);
-}
-*/
-
 function view(state: State) {
     let body = null;
     // queue_id can be set from saved state, but then track_list will be empty,
