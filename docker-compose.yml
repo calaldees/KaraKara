@@ -6,12 +6,8 @@ volumes:
     logs:
 
 services:
-
     website:
         image: karakara/website:latest
-        build:
-            context: ./website
-            dockerfile: Dockerfile
         env_file:
             - .env
         environment:
@@ -31,41 +27,29 @@ services:
             - websocket
         volumes:
             - logs:/logs
-        #    - ./website:/app:ro  # Un-comment to use local source rather than built-in source
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:ro
         #    - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     websocket:
         image: karakara/websocket:latest
-        build:
-            context: ./websocket
-            dockerfile: Dockerfile
         volumes:
             - logs:/logs
         expose:
             - 9800
 
     player2:
-        build:
-            context: ./player2
-            dockerfile: Dockerfile
+        image: karakara/player2:latest
         volumes:
             - logs:/logs
-        #    - ./player2/src:/app/src  # Un-comment to use local source rather than built-in source
 
     browser2:
-        build:
-            context: ./browser2
-            dockerfile: Dockerfile
+        image: karakara/browser2:latest
         volumes:
             - logs:/logs
-        #    - ./browser2/src:/app/src  # Un-comment to use local source rather than built-in source
 
     postgres:
-        build:
-            context: ./postgres
-            dockerfile: Dockerfile
+        image: karakara/postgres:latest
         environment:
             POSTGRES_PASSWORD: password
         volumes:
@@ -78,9 +62,7 @@ services:
             - 6379
 
     nginx:
-        build:
-            context: ./nginx
-            dockerfile: Dockerfile
+        image: karakara/nginx:latest
         env_file:
             - .env
         ports:
@@ -96,15 +78,11 @@ services:
 
     processmedia2:
         image: karakara/processmedia2:latest
-        build:
-            context: ./processmedia2
-            dockerfile: Dockerfile
         links:
             - website
         env_file:
             - .env
         volumes:
-            #- ./processmedia2:/processmedia2:ro  # Un-comment to use local source rather than built-in source
             - logs:/logs
             - processmedia2_data:/processmedia2/data
             - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
@@ -139,9 +117,7 @@ services:
         #root@245ee075bf91:/processmedia2# python3 import_media.py  --config config.docker.json --force
 
     dashboard:
-        build:
-            context: ./dashboard
-            dockerfile: Dockerfile
+        image: karakara/dashboard:latest
         volumes:
             - logs:/logs
 
