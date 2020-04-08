@@ -15,11 +15,7 @@ let mySubs = {};
 
 export function getOpenWebSocketListener(state: State): WebSocketListen {
     let url =
-        http2ws(state.root) +
-        "/" +
-        state.queue_id +
-        ".ws?ws_error_count=" +
-        state.ws_error_count;
+        http2ws(state.root) + "/" + state.queue_id + ".ws?_=" + state.ws_errors;
     if (!mySubs[url]) {
         mySubs[url] = WebSocketListen({
             url: url,
@@ -35,7 +31,7 @@ export function getOpenWebSocketListener(state: State): WebSocketListen {
                 return {
                     ...state,
                     connected: false,
-                    ws_error_count: state.ws_error_count + 1,
+                    ws_errors: state.ws_errors + 1,
                 };
             },
             action(state: State, msg: MessageEvent) {
@@ -71,7 +67,7 @@ export function getOpenWebSocketListener(state: State): WebSocketListen {
             },
             error(state: State, response) {
                 console.log("Error listening to websocket:", response);
-                return { ...state, ws_error_count: state.ws_error_count + 1 };
+                return { ...state, ws_errors: state.ws_errors + 1 };
             },
         });
     }

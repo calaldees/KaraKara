@@ -16,6 +16,7 @@ const state: State = {
     root: "https://karakara.org.uk",
     screen: "explore",
     notification: null,
+    ws_errors: 0,
 
     // login
     tmp_queue_id: "test",
@@ -70,17 +71,39 @@ const HistoryManager = AutoHistory({
     replace: ["search"],
 });
 
+let mySubs = {};
+
+function getOpenWebSocketListener(state: State): WebSocketListen {
+    let url =
+        http2ws(state.root) + "/" + state.queue_id + ".ws?_=" + state.ws_errors;
+    if (!mySubs[url]) {
+        mySubs[url] = WebSocketListen({
+            url: url,
+            open(state: State) {
+                return refresh(state);
+            },
+            close(state: State) {
+                delete mySubs[url];
+                return {
+                    ...state,
+                    ws_error_count: state.ws_errors + 1,
+                };
+            },
+            action(state: State, msg: MessageEvent) {
+                return refresh(state);
+            },
+            error(state: State, response) {
+                console.log("Error listening to websocket:", response);
+                return { ...state, ws_error_count: state.ws_errors + 1 };
+            },
+        });
+    }
+    return mySubs[url];
+}
+
 function subscriptions(state: State) {
     HistoryManager.push_state_if_changed(state);
-    return [
-        HistoryManager,
-        state.queue_id &&
-            WebSocketListen({
-                url: http2ws(state.root) + "/" + state.queue_id + ".ws",
-                action: (state, response) => refresh(state),
-                ws_constructor: ReconnectingWebSocket,
-            }),
-    ];
+    return [HistoryManager, state.queue_id && getOpenWebSocketListener(state)];
 }
 
 app({

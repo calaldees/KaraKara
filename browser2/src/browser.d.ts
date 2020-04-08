@@ -63,6 +63,7 @@ type State = {
     root: string,
     screen: string,
     notification: string,
+    ws_errors: number,
 
     // login
     tmp_queue_id: string,

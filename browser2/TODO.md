@@ -10,11 +10,7 @@ prompt to install PWA
 
 search by track id
 
-push / pop history
-
 save some state
-- `root` (sessionStorage)
-- `queue_id` (sessionStorage)
 - `performer_name` (localStorage)
 - `version` / `track_list` (localStorage?)
 - `bookmarks` (localStorage)
@@ -32,5 +28,4 @@ notify / block when tracks are already played / already in queue
 New features:
 - enter room password in GUI instead of via cookie?
 - broadcast message
-- websocket endpoint per room
 - notify user via app when their song is up now / next

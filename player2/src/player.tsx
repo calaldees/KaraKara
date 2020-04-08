@@ -25,7 +25,7 @@ const state: State = {
     // global temporary
     show_settings: false,
     connected: false,
-    ws_error_count: 0,
+    ws_errors: 0,
     fullscreen: false,
     audio_allowed:
         window.AudioContext == undefined ||
