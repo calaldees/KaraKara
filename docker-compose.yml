@@ -8,6 +8,9 @@ volumes:
 services:
     website:
         image: karakara/website
+        build:
+            context: ./website
+            dockerfile: Dockerfile
         env_file:
             - .env
         environment:
@@ -33,6 +36,9 @@ services:
 
     websocket:
         image: karakara/websocket
+        build:
+            context: ./websocket
+            dockerfile: Dockerfile
         volumes:
             - logs:/logs
         expose:
@@ -40,16 +46,25 @@ services:
 
     player2:
         image: karakara/player2
+        build:
+            context: ./player2
+            dockerfile: Dockerfile
         volumes:
             - logs:/logs
 
     browser2:
         image: karakara/browser2
+        build:
+            context: ./browser2
+            dockerfile: Dockerfile
         volumes:
             - logs:/logs
 
     postgres:
         image: karakara/postgres
+        build:
+            context: ./postgres
+            dockerfile: Dockerfile
         environment:
             POSTGRES_PASSWORD: password
         volumes:
@@ -63,6 +78,9 @@ services:
 
     nginx:
         image: karakara/nginx
+        build:
+            context: ./nginx
+            dockerfile: Dockerfile
         env_file:
             - .env
         ports:
@@ -78,6 +96,9 @@ services:
 
     processmedia2:
         image: karakara/processmedia2
+        build:
+            context: ./processmedia2
+            dockerfile: Dockerfile
         links:
             - website
         env_file:
@@ -118,6 +139,9 @@ services:
 
     dashboard:
         image: karakara/dashboard
+        build:
+            context: ./dashboard
+            dockerfile: Dockerfile
         volumes:
             - logs:/logs
 
