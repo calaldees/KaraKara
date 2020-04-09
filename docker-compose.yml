@@ -7,7 +7,7 @@ volumes:
 
 services:
     website:
-        image: karakara/website:latest
+        image: karakara/website
         env_file:
             - .env
         environment:
@@ -32,24 +32,24 @@ services:
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     websocket:
-        image: karakara/websocket:latest
+        image: karakara/websocket
         volumes:
             - logs:/logs
         expose:
             - 9800
 
     player2:
-        image: karakara/player2:latest
+        image: karakara/player2
         volumes:
             - logs:/logs
 
     browser2:
-        image: karakara/browser2:latest
+        image: karakara/browser2
         volumes:
             - logs:/logs
 
     postgres:
-        image: karakara/postgres:latest
+        image: karakara/postgres
         environment:
             POSTGRES_PASSWORD: password
         volumes:
@@ -62,7 +62,7 @@ services:
             - 6379
 
     nginx:
-        image: karakara/nginx:latest
+        image: karakara/nginx
         env_file:
             - .env
         ports:
@@ -77,7 +77,7 @@ services:
             - browser2
 
     processmedia2:
-        image: karakara/processmedia2:latest
+        image: karakara/processmedia2
         links:
             - website
         env_file:
@@ -117,7 +117,7 @@ services:
         #root@245ee075bf91:/processmedia2# python3 import_media.py  --config config.docker.json --force
 
     dashboard:
-        image: karakara/dashboard:latest
+        image: karakara/dashboard
         volumes:
             - logs:/logs
 
