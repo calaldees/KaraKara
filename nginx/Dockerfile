@@ -6,6 +6,5 @@ HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/files/ |
 
 RUN apk --no-cache add curl
 
-COPY . /app
-RUN cp /app/nginx.conf /etc/nginx/nginx.conf
-#CMD nginx -g 'daemon off;'
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY www /app/www
