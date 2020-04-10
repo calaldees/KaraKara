@@ -4,11 +4,11 @@
     "heartbeat_file": "data/.heartbeat",
     "mtime_store_path": "data/mtimes.json",
 
-    "path_source": "{PATH_CONTAINER_MEDIA}/source",
-    "path_meta": "{PATH_CONTAINER_MEDIA}/meta",
-    "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
+    "path_source": "/media/source",
+    "path_meta": "/media/meta",
+    "path_processed": "/media/processed",
 
-    "api_host": "{KARAKARA_CONTAINER_NAME_website}:{PORT_WEBSITE}",
+    "api_host": "{KARAKARA_CONTAINER_NAME_website}:6543",
 
     "process_order_function": "random",
     "disable_meta_write_safety": true

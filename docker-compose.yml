@@ -18,9 +18,9 @@ services:
             SQLALCHEMY_URL: postgresql+pypostgresql://karakara:karakara@postgres/karakara
             CACHE_BACKEND: dogpile.cache.redis
             CACHE_BACKEND_ARGUMENTS: '{"host": "redis", "port": 6379} -> json'
-            STATIC_PATH_SOURCE: ${PATH_CONTAINER_MEDIA}/source
-            STATIC_PATH_META: ${PATH_CONTAINER_MEDIA}/meta
-            #STATIC_PATH_PROCESSED: "path_processed": "{PATH_CONTAINER_MEDIA}/processed",
+            STATIC_PATH_SOURCE: /media/source
+            STATIC_PATH_META: /media/meta
+            #STATIC_PATH_PROCESSED: /media/processed
             #SESSION_SECRET: change_me
             KARAKARA_CONTAINER_NAME_postgres: 'postgres'
             KARAKARA_WEBSOCKET_HOST: 'websocket'
@@ -30,8 +30,8 @@ services:
             - websocket
         volumes:
             - logs:/logs
-            - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
-            - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:ro
+            - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
+            - ${PATH_HOST_meta}:/media/meta:ro
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     websocket:
@@ -106,9 +106,9 @@ services:
         volumes:
             - logs:/logs
             - processmedia2_data:/processmedia2/data
-            - ${PATH_HOST_source}:${PATH_CONTAINER_MEDIA}/source:ro
-            - ${PATH_HOST_meta}:${PATH_CONTAINER_MEDIA}/meta:rw
-            - ${PATH_HOST_processed}:${PATH_CONTAINER_MEDIA}/processed:rw
+            - ${PATH_HOST_source}:/media/source:ro
+            - ${PATH_HOST_meta}:/media/meta:rw
+            - ${PATH_HOST_processed}:/media/processed:rw
         environment:
             KARAKARA_PROCESSMEDIA2_ENABLED: ${KARAKARA_PROCESSMEDIA2_ENABLED:-true}
             KARAKARA_RESCAN_INTERVAL_SECONDS: 600
