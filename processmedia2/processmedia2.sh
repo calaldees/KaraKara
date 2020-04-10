@@ -17,9 +17,9 @@ function run() {
 }
 
 while [ "${KARAKARA_PROCESSMEDIA2_ENABLED:-true}" == "true" ]; do
-    touch ${KARAKARA_PROCESSMEDIA2_HEARTBEAT_FILE} || true
+    touch data/.heartbeat || true
     run || true
-    touch ${KARAKARA_PROCESSMEDIA2_HEARTBEAT_FILE} || true
+    touch data/.heartbeat || true
     echo "sleep ..."
     sleep ${KARAKARA_RESCAN_INTERVAL_SECONDS:-600}
     test $? -gt 128 && exit 0  # https://unix.stackexchange.com/questions/42287/terminating-an-infinite-loop

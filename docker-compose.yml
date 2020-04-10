@@ -114,14 +114,7 @@ services:
             KARAKARA_RESCAN_INTERVAL_SECONDS: 600
             KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
             KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
-            KARAKARA_PROCESSMEDIA2_HEARTBEAT_FILE: 'data/.heartbeat'
             KARAKARA_CONTAINER_NAME_website: 'website'
-        healthcheck:
-            # Heartbeat file is defined in environ - as this is configurable the heathcheck did not feel right in the Dockerfile
-            # TODO - can we use $KARAKARA_PROCESSMEDIA2_HEARTBEAT_FILE here?
-            test: touch -d"-30min" /tmp/marker && [ /processmedia2/data/.heartbeat -nt /tmp/marker ]
-            interval: 1m
-            timeout: 3s
         # command: [
         #   'pytest',
         #   'processmedia_libs',
