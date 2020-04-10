@@ -116,7 +116,6 @@ $(CONFIG_PATH)/search_config.json:
 	cp config/search_config.json.dist $@
 
 # Upload paths -----------------------------------------------------------------
-
 .PHONY: upload_paths
 upload_paths: $(WRITE_PATH) $(UPLOAD_PATH) $(WRITE_PATH)/uploaded
 $(UPLOAD_PATH): $(WRITE_PATH)
