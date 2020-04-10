@@ -69,10 +69,23 @@ Admins can walk around the room, remotely controlling when tracks are played ful
 Local Machine Setup
 -------------------
 
+Configure site settings (eg which folders contain your media):
+```
+$ make .env
+```
+Then edit settings in .env
+
+Pre-built software, if you just want to run the site:
 ```console
+$ docker-compose pull
 $ docker-compose up
 ```
 
+Compile your own software, if you want to make customisations or build new features:
+```console
+$ docker-compose build
+$ docker-compose up
+```
 
 Core components
 ---------------
