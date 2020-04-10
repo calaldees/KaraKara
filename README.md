@@ -8,8 +8,14 @@ Karaoke Event System - hosted at [karakara.org.uk](http://karakara.org.uk/)
 * A Projector/TV shows a HTML5 player
 * Internet connection is required
 
-[![Build Status](https://travis-ci.org/calaldees/KaraKara.svg?branch=master)](https://travis-ci.org/calaldees/KaraKara)
-
+![Postgres](https://github.com/calaldees/KaraKara/workflows/Postgres/badge.svg)
+![Websocket](https://github.com/calaldees/KaraKara/workflows/Websocket/badge.svg)
+![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
+![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
+![Nginx](https://github.com/calaldees/KaraKara/workflows/Nginx/badge.svg)
+![Dashboard](https://github.com/calaldees/KaraKara/workflows/Dashboard/badge.svg)
+![Website](https://github.com/calaldees/KaraKara/workflows/Website/badge.svg)
+![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
 
 Overview of a karaoke event
 ---------------------------
