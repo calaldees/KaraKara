@@ -16,9 +16,17 @@ import {
     KeyboardListener,
 } from "./subs";
 
+// If we're running stand-alone, then use the main karakara.org.uk
+// server; else we're probably running as part of the full-stack,
+// in which case we should use server we were loaded from.
+const auto_root =
+    window.location.pathname == "/"
+        ? "https://karakara.org.uk"
+        : window.location.protocol + "//" + window.location.host;
+
 const state: State = {
     // global persistent
-    root: "https://karakara.org.uk",
+    root: auto_root,
     queue_id: "booth",
     is_podium: false,
 

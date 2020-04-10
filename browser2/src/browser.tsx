@@ -7,13 +7,21 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
 import { http2ws } from "./utils";
 
+// If we're running stand-alone, then use the main karakara.org.uk
+// server; else we're probably running as part of the full-stack,
+// in which case we should use server we were loaded from.
+const auto_root =
+    window.location.pathname == "/"
+        ? "https://karakara.org.uk"
+        : window.location.protocol + "//" + window.location.host;
+
 const state: State = {
     // bump this each time the schema changes to
     // invalidate anybody's saved state
     version: 1,
 
     // global
-    root: "https://karakara.org.uk",
+    root: auto_root,
     screen: "explore",
     notification: null,
     ws_errors: 0,
