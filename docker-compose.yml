@@ -115,16 +115,6 @@ services:
             KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
             KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
             KARAKARA_CONTAINER_NAME_website: 'website'
-        # command: [
-        #   'pytest',
-        #   'processmedia_libs',
-        #   'tests',
-        #   '--doctest-modules',
-        #   '--pdb',
-        #   '-x',
-        #   #'-k', 'test_get_image_from_video'
-        # ]
-        #command: ['make', 'test']
 
         # Force import
         #docker-compose exec processmedia2 /bin/bash
