@@ -26,7 +26,7 @@ const state: State = {
     ws_errors: 0,
 
     // login
-    tmp_queue_id: "test",
+    tmp_queue_id: "demo",
     queue_id: null,
     loading: false,
 

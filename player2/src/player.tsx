@@ -27,7 +27,7 @@ const auto_root =
 const state: State = {
     // global persistent
     root: auto_root,
-    queue_id: "booth",
+    queue_id: "demo",
     is_podium: false,
 
     // global temporary
