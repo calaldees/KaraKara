@@ -1,4 +1,4 @@
-name: Push Browser2
+name: Browser2
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - 'browser2/**'
 
 jobs:
-  build:
+  publish:
     name: Docker Push
     runs-on: ubuntu-latest
     steps:

@@ -1,4 +1,4 @@
-name: Push Dashboard
+name: Dashboard
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - 'dashboard/**'
 
 jobs:
-  build:
+  publish:
     name: Docker Push
     runs-on: ubuntu-latest
     steps:

@@ -1,4 +1,4 @@
-name: Push Postgres
+name: Postgres
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - 'postgres/**'
 
 jobs:
-  build:
+  publish:
     name: Docker Push
     runs-on: ubuntu-latest
     steps:

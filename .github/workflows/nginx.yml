@@ -1,4 +1,4 @@
-name: Push Nginx
+name: Nginx
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - 'nginx/**'
 
 jobs:
-  build:
+  publish:
     name: Docker Push
     runs-on: ubuntu-latest
     steps:

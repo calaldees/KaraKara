@@ -1,4 +1,4 @@
-name: Push Websocket
+name: Websocket
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     - 'websocket/**'
 
 jobs:
-  build:
+  publish:
     name: Docker Push
     runs-on: ubuntu-latest
     steps:
