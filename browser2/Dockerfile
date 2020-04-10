@@ -1,4 +1,4 @@
-FROM node:11
+FROM node:13
 EXPOSE 80
 VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/ || exit 1
