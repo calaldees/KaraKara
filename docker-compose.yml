@@ -4,6 +4,7 @@ volumes:
     website_db:
     processmedia2_data:
     logs:
+    influxdb_data:
 
 services:
     website:
@@ -119,6 +120,9 @@ services:
             context: ./dashboard
         volumes:
             - logs:/logs
+            - influxdb_data:/root/.influxdbv2
+        ports:
+            - "127.0.0.1:${PORT_DASHBOARD}:9999"
 
 # docker-compose run --rm processmedia2 bash
 # docker run -it --rm --entrypoint bash -v //C//Users/calal/code/personal/KaraKara/processmedia2/tests/source:/tmp/workdir jrottenberg/ffmpeg
