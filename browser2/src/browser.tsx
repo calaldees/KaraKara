@@ -2,7 +2,6 @@
 import { app, h } from "hyperapp";
 import { WebSocketListen } from "hyperapp-fx";
 import { AutoHistory } from "hyperapp-auto-history";
-import ReconnectingWebSocket from "reconnecting-websocket";
 
 import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
 import { http2ws } from "./utils";
