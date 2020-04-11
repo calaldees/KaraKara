@@ -46,12 +46,12 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Podium</td>
                     <td>
                         <input
-                            checked={state.is_podium}
+                            checked={state.podium}
                             type={"checkbox"}
                             onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    is_podium: !state.is_podium,
+                                    podium: !state.podium,
                                 } as State)
                             }
                         />

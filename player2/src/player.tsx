@@ -28,7 +28,7 @@ const state: State = {
     // global persistent
     root: auto_root,
     queue_id: "demo",
-    is_podium: false,
+    podium: false,
 
     // global temporary
     show_settings: false,
@@ -65,7 +65,7 @@ const state: State = {
 function view(state: State) {
     let screen = <section>Unknown state :(</section>;
 
-    if (!state.audio_allowed && !state.is_podium)
+    if (!state.audio_allowed && !state.podium)
         // podium doesn't play sound
         screen = (
             <section key="title" className={"screen_title"}>
@@ -73,7 +73,7 @@ function view(state: State) {
             </section>
         );
     else if (state.queue.length === 0) screen = <TitleScreen state={state} />;
-    else if (state.is_podium) screen = <PodiumScreen state={state} />;
+    else if (state.podium) screen = <PodiumScreen state={state} />;
     else if (state.queue.length > 0 && !state.playing)
         screen = <PreviewScreen state={state} />;
     else if (state.queue.length > 0 && state.playing)
@@ -100,7 +100,7 @@ function view(state: State) {
 const HistoryManager = AutoHistory({
     init: state,
     push: ["root", "queue_id"],
-    replace: ["is_podium"],
+    replace: ["podium"],
 });
 
 function subscriptions(state: State) {

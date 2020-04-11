@@ -57,7 +57,7 @@ export function getOpenWebSocketListener(state: State): WebSocketListen {
                     // Only one instance should mark the current track as skipped, to avoid
                     // skipping two tracks
                     case "skip":
-                        return state.is_podium
+                        return state.podium
                             ? Dequeue(state)
                             : MarkTrackSkipped(state);
                     default:
