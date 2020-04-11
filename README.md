@@ -68,7 +68,7 @@ Local Machine Setup
 
 Configure site settings (eg which folders contain your media):
 ```
-$ make .env
+$ cp .env.example .env
 ```
 Then edit settings in .env
 

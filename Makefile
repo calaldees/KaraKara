@@ -1,5 +1,4 @@
-include .env._base
-include .env._rsync
+-include .env
 
 SHELL := $(SHELL) -e
 ENV:=_env
@@ -14,8 +13,7 @@ help:
 
 
 .env:
-	cp $@._base $@
-	cat $@._local >> $@
+	cp .env.example .env
 
 
 # Docker ----------------------------------------------------------------------
