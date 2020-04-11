@@ -8,15 +8,6 @@ Karaoke Event System - hosted at [karakara.org.uk](http://karakara.org.uk/)
 * A Projector/TV shows a HTML5 player
 * Internet connection is required
 
-![Postgres](https://github.com/calaldees/KaraKara/workflows/Postgres/badge.svg)
-![Websocket](https://github.com/calaldees/KaraKara/workflows/Websocket/badge.svg)
-![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
-![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
-![Nginx](https://github.com/calaldees/KaraKara/workflows/Nginx/badge.svg)
-![Dashboard](https://github.com/calaldees/KaraKara/workflows/Dashboard/badge.svg)
-![Website](https://github.com/calaldees/KaraKara/workflows/Website/badge.svg)
-![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
-
 Overview of a karaoke event
 ---------------------------
 
@@ -98,44 +89,47 @@ Core components
 
 ![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/docs/architecture.png)
 
-* processmedia2
+* processmedia2 ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
   * Takes folders of source data (video, image+mp3, subtitles)
   * Hard subbed final video
-      * this high bitrate mp4 is presented via the player interface.
+    * this high bitrate mp4 is presented via the player interface.
   * Low bitrate previews for mobile devices
-      * Currently just mp4 but could support other formats in future.
+    * Currently just mp4 but could support other formats in future.
   * Thumbnail images
-      * Each video has 4 images taken at even intervals
+    * Each video has 4 images taken at even intervals
   * SRT subtitles
-      * regardless of input format, a normalised srt will be created for each video
+    * regardless of input format, a normalised srt will be created for each video
   * JSON metadata
-      * Once scanned, each item will have JSON data containing the hashes of
-        source data
+    * Once scanned, each item will have JSON data containing the hashes of
+      source data
   * Pushes / Imports track data by calling `website` api.
-* website
-  * `jquerymobile` web interface to search / preview / queue tracks
-    * Produces printable hard copy track lists for use without mobile interface
-    * Populates elasticsearch events to be visualized with `admindashboard`
-    * api
-      * `track`, `search`, `queue`, `settings`
-      * `track_import` endpoint (for imports from processmedia2)
+* website ![Website](https://github.com/calaldees/KaraKara/workflows/Website/badge.svg)
+  * API server
+    * `track`, `search`, `queue`, `settings`
+    * `track_import` endpoint (for imports from processmedia2)
+  * Produces printable hard copy track lists for use without mobile interface
   * Community interface
     * A dynamic web app to facilitate the duration of track content
       * preview high and low res encoded videos
       * tag videos
       * edit subtitles
-* player2 - html5 event display player
-  * Looks at website / queue api
+* websocket ![Websocket](https://github.com/calaldees/KaraKara/workflows/Websocket/badge.svg)
+  * An echo server which accepts messages from the admin panel and
+    forwards the messages to all clients
+* browser2 ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
+  * Mobile webapp interface to search / preview / queue tracks
+  * Gets data from website / `track_list` api
+* player2 ![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
+  * Displays the current queue for use on a projector
+  * Gets data from website / `queue` api
   * Streams final video from `nginx` in fullscreen mode.
   * Can be controlled via hotkeys or remotely with websockets
-    * `s` skip
-    * `enter` play
-    * `escape` stop
-    * `left` seek backwards
-    * `right` seek forwards
-    * `space` pause
   * Automatically updates track list when the queue is changed.
   * Queue order is obscured past a configurable time
-* admindashboard
-  * Logstash data importer for event logs from the other containers
-  * HTML5/js app to visualise event data from elasticsearch
+* dashboard ![Dashboard](https://github.com/calaldees/KaraKara/workflows/Dashboard/badge.svg)
+  * Imports the logs from all the different apps
+  * Displays graphical dashboards
+* nginx ![Nginx](https://github.com/calaldees/KaraKara/workflows/Nginx/badge.svg)
+  * Accepts HTTP requests and forwards them to the API / various GUIs as appropriate
+* postgres ![Postgres](https://github.com/calaldees/KaraKara/workflows/Postgres/badge.svg)
+  * Main database / long-term data storage for the track database and queues
