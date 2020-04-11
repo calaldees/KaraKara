@@ -69,7 +69,7 @@
 					##<li><a href="${request.route_path('community_upload', spacer='', format='')}">upload</a></li>
 					##<li><a href="/search_tags/">MobileBrowse</a></li>
 					##<li><a href="/track_list">PrintableList</a></li>
-					<li><a href="/community/queues">${_('Queues').title()}}</a></li>
+					<li><a href="/community/queues">${_('Queues').title()}</a></li>
 					##<li><a href="/community/settings">Settings</a></li>
 					<li><a href="/community/processmedia_log?levels=WARNING,ERROR">EncodeLog</a></li>
 					<li><a href="/community/users">Users</a></li>
