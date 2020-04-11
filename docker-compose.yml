@@ -40,8 +40,6 @@ services:
             context: ./websocket
         volumes:
             - logs:/logs
-        expose:
-            - 9800
 
     player2:
         image: karakara/player2
@@ -69,8 +67,6 @@ services:
 
     redis:
         image: redis
-        expose:
-            - 6379
 
     nginx:
         image: karakara/nginx
