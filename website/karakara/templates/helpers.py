@@ -53,9 +53,9 @@ def paths_for_queue(queue_id):
     queue_context = TraversalGlobalRootFactory(None)['queue'][queue_id]
     return {
         **{
-            'queue': pyramid.traversal.resource_path(queue_context),
-            'player': f'/player2/index.html#queue_id={queue_context.id}',
-            'podium': f'/player2/index.html#podium=true&queue_id={queue_context.id}',
+            'queue': f'/browser2/#queue_id={queue_context.id}',
+            'player': f'/player2/#queue_id={queue_context.id}',
+            'podium': f'/player2/#podium=true&queue_id={queue_context.id}',
         },
         **{
             route_name: pyramid.traversal.resource_path(queue_context[route_name])
