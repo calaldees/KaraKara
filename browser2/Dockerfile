@@ -1,19 +1,20 @@
-FROM node:13
-EXPOSE 80
-VOLUME /logs
-HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/ || exit 1
+FROM node:13 AS build
+RUN apt-get update && apt-get install -y util-linux git && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y util-linux curl git && rm -rf /var/lib/apt/lists/*
-
-# this takes ages, so do it in advance
+# Install dependencies
 COPY package.json package-lock.json /app/
 WORKDIR /app
 RUN npm install
 
+# Build app
 COPY . /app
 RUN npm run build
 
-# https://github.com/parcel-bundler/parcel/issues/857
-#CMD npm run serve
-RUN npm install -g http-server
-CMD http-server -p 80 dist >>/logs/browser2-access.log 2>>/logs/browser2-error.log
+# Copy built app to minimal-httpd container
+FROM alpine:3.7
+EXPOSE 80
+VOLUME /logs
+HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1/ || exit 1
+RUN apk add --no-cache curl thttpd
+COPY --from=build /app/dist /www
+CMD thttpd -D -l /logs/browser2.log -d /www
