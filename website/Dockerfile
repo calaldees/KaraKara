@@ -1,4 +1,5 @@
-FROM python:3-alpine as base
+ARG ARCHITECTURE=amd64
+FROM ${ARCHITECTURE}/python:3-alpine as base
 
 RUN apk --no-cache add \
     nano \

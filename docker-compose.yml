@@ -8,9 +8,11 @@ volumes:
 
 services:
     website:
-        image: karakara/website
+        image: ${ARCHITECTURE}/karakara/website
         build:
             context: ./website
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
         env_file:
             - .env
         environment:
@@ -35,30 +37,38 @@ services:
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     websocket:
-        image: karakara/websocket
+        image: ${ARCHITECTURE}/karakara/websocket
         build:
             context: ./websocket
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
         volumes:
             - logs:/logs
 
     player2:
-        image: karakara/player2
+        image: ${ARCHITECTURE}/karakara/player2
         build:
             context: ./player2
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
         volumes:
             - logs:/logs
 
     browser2:
-        image: karakara/browser2
+        image: ${ARCHITECTURE}/karakara/browser2
         build:
             context: ./browser2
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
         volumes:
             - logs:/logs
 
     postgres:
-        image: karakara/postgres
+        image: ${ARCHITECTURE}/karakara/postgres
         build:
             context: ./postgres
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
         environment:
             POSTGRES_PASSWORD: password
         volumes:
@@ -69,8 +79,10 @@ services:
         image: redis
 
     nginx:
-        image: karakara/nginx
+        image: ${ARCHITECTURE}/karakara/nginx
         build:
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
             context: ./nginx
         env_file:
             - .env
@@ -86,8 +98,10 @@ services:
             - browser2
 
     processmedia2:
-        image: karakara/processmedia2
+        image: ${ARCHITECTURE}/karakara/processmedia2
         build:
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
             context: ./processmedia2
         links:
             - website
@@ -111,8 +125,10 @@ services:
         #root@245ee075bf91:/processmedia2# python3 import_media.py  --config config.docker.json --force
 
     dashboard:
-        image: karakara/dashboard
+        image: ${ARCHITECTURE}/karakara/dashboard
         build:
+            args:
+                - ARCHITECTURE=${ARCHITECTURE}
             context: ./dashboard
         volumes:
             - logs:/logs
