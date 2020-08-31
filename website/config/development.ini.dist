@@ -10,7 +10,6 @@ pyramid.debug_routematch    = false
 pyramid.debug_templates     = true
 pyramid.includes =
     pyramid_tm
-    #pyramid_debugtoolbar
 
 
 # i18n -------------------------------------------------------------------------

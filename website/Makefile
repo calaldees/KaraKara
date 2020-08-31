@@ -8,10 +8,8 @@ CONFIG_SOURCE_PATH=config
 WRITE_PATH=data
 CONFIG_PATH=$(WRITE_PATH)/config
 LOG_PATH=$(WRITE_PATH)/logs
-EXTERNAL_PATH=$(WRITE_PATH)/externals
 UPLOAD_PATH=$(WRITE_PATH)/upload
 LOCALE_PATH=$(WRITE_PATH)/locale
-#DEPENDENCY_FETCHER=$(EXTERNAL_PATH)/dependency_fetcher.py
 ENV=$(WRITE_PATH)/_env
 PYTHONPATH_ENV=PYTHONPATH="./:$(WRITE_PATH)" $(ENV)
 PYTHON=$(PYTHONPATH_ENV)/bin/python$(PYTHON_VERSION)
@@ -52,25 +50,11 @@ help:
 
 # Installation -----------------------------------------------------------------
 
-#python3-dev curl
 
-#.PRECIOUS: $(ENV)
-$(ENV):
-	#python$(PYTHON_VERSION) -m virtualenv $(ENV)
-	virtualenv -p python$(PYTHON_VERSION) $(ENV)
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
 dev_libs:
 	# Link local calaldees library for debugging
 	$(PIP) install --editable ../../libs/
 
-
-# Experiments
-#env/bin/node: env
-#	env/bin/pip install nodeenv
-#	source env/bin/activate && nodeenv --python-virtualenv --prebuilt
-#env/lib/node_modules/bower: env/bin/node
-#	source env/bin/activate && npm install -g bower
 
 KaraKara.egg-info:
 	# in docker this is `ro` mount. Attempted to surpress a conflict when starting container
@@ -79,20 +63,9 @@ KaraKara.egg-info:
 KaraKara.egg-info/PKG-INFO: KaraKara.egg-info $(ENV)
 	$(PYTHON) setup.py develop
 
-# Force reexecution of setup.py dependenys (this must be done from the Makefile or make gets confused and repetedy runs the task)
-#setup: KaraKara.egg-info
-#	$(PYTHON) setup.py develop
-
-$(EXTERNAL_PATH):
-	mkdir -p $(EXTERNAL_PATH) && touch $(EXTERNAL_PATH)/__init__.py
-
-.PHONY: dependency_download
-dependency_download: $(ENV)
-	# Trigger dependency check on every startup
-	$(PYTHON) -m calaldees.apps.dependency_fetcher dependency_fetcher.json --tracker $(EXTERNAL_PATH)/tracker.json --destination_path $(EXTERNAL_PATH)
 
 .PHONY: install
-install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO dependency_download $(LOCALE_PATH)/karakara.pot upload_paths
+install: $(INI_DEV) $(LOG_PATH) $(CONFIG_PATH)/search_config.json $(CONFIG_PATH)/production.inidiff KaraKara.egg-info/PKG-INFO $(LOCALE_PATH)/karakara.pot upload_paths
 
 
 # Ini files --------------------------------------------------------------------
