@@ -35,11 +35,9 @@ services:
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     websocket:
-        image: karakara/websocket
-        build:
-            context: ./websocket
+        image: eclipse-mosquitto:1.6
         volumes:
-            - logs:/logs
+          - ./websocket/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
     player2:
         image: karakara/player2

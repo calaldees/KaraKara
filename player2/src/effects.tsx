@@ -3,20 +3,17 @@
  * http request, etc) and we'll update the app state some time
  * later, after we get a response.
  */
-import { Http, WebSocketSend } from "hyperapp-fx";
+import { Http } from "hyperapp-fx";
+import { MQTTPublish } from "hyperapp-mqtt";
 import { get_lyrics, http2ws } from "./utils";
 import { SetQueue } from "./actions";
 
 export function SendCommand(state: State, command: string) {
     console.log("websocket_send(" + command + ")");
-    return WebSocketSend({
-        url:
-            http2ws(state.root) +
-            "/" +
-            state.queue_id +
-            ".ws?ws_error_count=" +
-            state.ws_error_count,
-        data: command,
+    return MQTTPublish({
+        url: http2ws(state.root) + "/mqtt",
+        topic: "karakara/queue/" + state.queue_id,
+        payload: command,
     });
 }
 

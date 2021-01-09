@@ -6,16 +6,8 @@
     var socket = null;
     $(document).ready(function() {
         try {
-            socket = new WebSocket(${self.js_websocket_url()});
-            socket.addEventListener('open', function (event) {
-                console.log('open');
-            });
-            socket.addEventListener('close', function (event) {
-                console.log('close');
-            });
-            socket.addEventListener('message', function (event) {
-                console.log('message', event.data);
-            });
+            socket = new Paho.MQTT.Client(${self.js_websocket_url()});
+            socket.connect({reconnect: true})
         }
         catch(err) {
             console.error("Websockets not supported. Using request method", err);
@@ -25,7 +17,7 @@
     function send(message) {
         if (socket != null) {
             console.log('send', message);
-            socket.send(message);
+            socket.send("karakara/queue/${request.queue.id}", message);
             return false;
         }
         return true;

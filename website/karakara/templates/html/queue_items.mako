@@ -114,9 +114,10 @@ import datetime
             ## You get some funky behaviour where the websocket refreshes before the first format=redirect happens, so the success message appears on the queue screen.
             try {
                 var currently_dragging = false;
-                socket = new WebSocket(${self.js_websocket_url()});
-                socket.onmessage = function(msg) {
-                    var cmd = $.trim(msg.data);
+                socket = new Paho.MQTT.Client(${self.js_websocket_url()});
+
+                socket.onMessageArrived = function(msg) {
+                    var cmd = $.trim(msg.payload);
                     if (currently_dragging==false && cmd=='queue_updated') {
                         console.log('queue_updated: reloading page');
                         location.reload();

@@ -11,7 +11,7 @@ import {
     VideoScreen,
 } from "./screens";
 import {
-    getOpenWebSocketListener,
+    getOpenMQTTListener,
     IntervalListener,
     KeyboardListener,
 } from "./subs";
@@ -33,7 +33,6 @@ const state: State = {
     // global temporary
     show_settings: false,
     connected: false,
-    ws_errors: 0,
     fullscreen: false,
     audio_allowed:
         window.AudioContext == undefined ||
@@ -108,7 +107,7 @@ function subscriptions(state: State) {
     return [
         HistoryManager,
         KeyboardListener,
-        getOpenWebSocketListener(state),
+        getOpenMQTTListener(state),
         state.audio_allowed &&
             !state.paused &&
             !state.playing &&

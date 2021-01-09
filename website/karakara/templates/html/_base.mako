@@ -14,6 +14,7 @@
         
         <!-- Scripts -->
         ## TODO: Consider moving js to bottom of page - this may require some refactoring of inline js
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
         <script src="${ h.path.static   }js/modernizer.custom.js"></script>
         <script src="${ h.path.external }jquery.min.js"></script>
         <script src="${ h.path.static   }js/jquery.mobile-extras.js"></script>
@@ -65,9 +66,4 @@
     </body>
 </html>
 
-<%def name="js_websocket_url()"><%
-    websocket_path = ''
-    if not request.registry.settings['karakara.websocket.host']:
-        websocket_path += f""":{request.registry.settings['karakara.websocket.port']}"""
-    websocket_path += f'/{request.queue.id}.ws'
-%>('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname + '${websocket_path}'</%def>
+<%def name="js_websocket_url()">('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname + '/mqtt'</%def>

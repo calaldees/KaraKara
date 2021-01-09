@@ -1,6 +1,6 @@
 /// <reference path='./browser.d.ts'/>
 import { app, h } from "hyperapp";
-import { WebSocketListen } from "hyperapp-fx";
+import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
 
 import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
@@ -23,7 +23,6 @@ const state: State = {
     root: auto_root,
     screen: "explore",
     notification: null,
-    ws_errors: 0,
 
     // login
     tmp_queue_id: "demo",
@@ -80,28 +79,21 @@ const HistoryManager = AutoHistory({
 
 let mySubs = {};
 
-function getOpenWebSocketListener(state: State): WebSocketListen {
-    let url =
-        http2ws(state.root) + "/" + state.queue_id + ".ws?_=" + state.ws_errors;
+function getOpenMQTTListener(state: State): MQTTSubscribe {
+    let url = http2ws(state.root) + "/mqtt";
     if (!mySubs[url]) {
-        mySubs[url] = WebSocketListen({
+        mySubs[url] = MQTTSubscribe({
             url: url,
-            open(state: State) {
+            topic: "karakara/queue/" + state.queue_id,
+            connect(state: State) {
                 return refresh(state);
             },
             close(state: State) {
-                delete mySubs[url];
-                return {
-                    ...state,
-                    ws_error_count: state.ws_errors + 1,
-                };
+                // delete mySubs[url];
+                return {...state};
             },
-            action(state: State, msg: MessageEvent) {
+            message(state: State, msg) {
                 return refresh(state);
-            },
-            error(state: State, response) {
-                console.log("Error listening to websocket:", response);
-                return { ...state, ws_error_count: state.ws_errors + 1 };
             },
         });
     }
@@ -110,7 +102,7 @@ function getOpenWebSocketListener(state: State): WebSocketListen {
 
 function subscriptions(state: State) {
     HistoryManager.push_state_if_changed(state);
-    return [HistoryManager, state.queue_id && getOpenWebSocketListener(state)];
+    return [HistoryManager, state.queue_id && getOpenMQTTListener(state)];
 }
 
 app({
