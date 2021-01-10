@@ -1,6 +1,7 @@
 import { h } from "hyperapp";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
+import { DisplayErrorResponse } from "../effects";
 import { Http } from "hyperapp-fx";
 import parseSRT from "parse-srt";
 
@@ -80,10 +81,10 @@ function enqueue(state: State) {
                     ") to queue",
                 action: null,
             }),
-            error: (state, response) => ({
-                ...state,
-                notification: "Error adding track to queue", // response.messages[0],
-            }),
+            error: (state, response) => ([
+                {...state,},
+                DisplayErrorResponse({response})
+            ]),
         }),
     ];
 }
