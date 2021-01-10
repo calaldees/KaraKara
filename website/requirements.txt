@@ -22,5 +22,6 @@ pytest-mock
 webtest
 #pycrypto  # Considering this inclusion for encrypted cookies
 decorator
+paho-mqtt
 
 git+https://github.com/calaldees/libs.git@master#egg=calaldees

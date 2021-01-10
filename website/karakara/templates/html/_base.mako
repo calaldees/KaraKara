@@ -14,7 +14,6 @@
         
         <!-- Scripts -->
         ## TODO: Consider moving js to bottom of page - this may require some refactoring of inline js
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
         <script src="${ h.path.static   }js/modernizer.custom.js"></script>
         <script src="${ h.path.external }jquery.min.js"></script>
         <script src="${ h.path.static   }js/jquery.mobile-extras.js"></script>
@@ -23,6 +22,7 @@
         <script src="${ h.path.external }jquery.sortable.js"></script>
         <script src="${ h.path.static   }js/lib.js"></script>
         <script src="${ h.path.static   }js/karakara.js"></script>
+        <script src="${ h.path.external }mqttws31.min.js"></script>
         
         <!-- Other -->
         <link   href="${ h.path.static   }favicon.ico" rel="shortcut icon" />
