@@ -3,7 +3,7 @@
     "dependencies": {
         "hyperapp": "^2.0.4",
         "hyperapp-auto-history": "^1.0.14",
-        "hyperapp-fx": "github:shish/hyperapp-fx#eabef1da8f83ba85af7fda4112be7a11b44e1213",
+        "hyperapp-fx": "^2.0.0-beta.1",
         "hyperapp-mqtt": "^0.0.4",
         "parse-srt": "^1.0.0-alpha"
     },
