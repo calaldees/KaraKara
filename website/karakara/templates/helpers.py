@@ -124,7 +124,7 @@ def video_mime_type(attachment):
 _test_tags = {'title':['dynamite explosion','キ'], 'from':['macross'], 'macross':['dynamite'], 'category':['anime','jpop'], 'use':['opening','op1'], 'artist':['firebomber']}
 
 
-def tag_hireachy(tags, tag):
+def tag_hireachy(tags, tag, n=0):
     """
     >>> tag_hireachy(_test_tags, 'from')
     'macross: dynamite'
@@ -133,8 +133,10 @@ def tag_hireachy(tags, tag):
     """
     if tag not in tags:
         return ''
+    if n > 10:
+        raise Exception("Infinite(?) tag loop: %s // %s" % (tags, tag))
     tag_value = ', '.join(tags[tag])
-    subtag_value = tag_hireachy(tags, tag_value)
+    subtag_value = tag_hireachy(tags, tag_value, n+1)
     if tag_value and subtag_value:
         return '{0}: {1}'.format(tag_value, subtag_value)
     return tag_value
