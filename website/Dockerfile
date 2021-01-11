@@ -1,4 +1,4 @@
-FROM python:3-alpine as base
+FROM python:3.8-alpine as base
 
 RUN apk --no-cache add \
     nano \
