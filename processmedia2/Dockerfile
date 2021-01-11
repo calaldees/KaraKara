@@ -9,6 +9,8 @@ HEALTHCHECK --interval=1m --timeout=3s CMD touch -d"-30min" /tmp/marker && [ /pr
 
 COPY --from=jrottenberg/ffmpeg /usr/local /usr/local
 
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
 RUN apt-get update && apt-get install -y \
     git \
     python3-pip \
