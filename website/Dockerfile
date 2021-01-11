@@ -2,7 +2,6 @@ FROM python:3-alpine as base
 
 RUN apk --no-cache add \
     nano \
-    curl \
     less \
     make \
     git \
@@ -12,7 +11,7 @@ RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
 EXPOSE 6543
 EXPOSE 9873
 VOLUME /logs
-HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ || exit 1
+HEALTHCHECK --interval=1m --timeout=3s CMD wget -q http://127.0.0.1:6543/ -O /dev/null
 
 # Upgrade python tools
 #
