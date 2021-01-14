@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
 import { Http } from "hyperapp-fx";

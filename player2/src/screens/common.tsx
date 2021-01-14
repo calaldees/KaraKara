@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 
 function _lineStyle(item, state: State) {
     // show subs a little faster, to counteract podium lag

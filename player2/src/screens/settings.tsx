@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 
 export const SettingsMenu = ({ state }: { state: State }) => (
     <div className={"settings"}>

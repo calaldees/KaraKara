@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 
 export const TitleScreen = ({ state }: { state: State }) => (
     <section key="title" className={"screen_title"}>

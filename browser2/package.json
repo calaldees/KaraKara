@@ -1,9 +1,10 @@
 {
     "name": "browser2",
     "dependencies": {
-        "hyperapp": "^2.0.4",
+        "hyperapp": "^2.0.8",
         "hyperapp-auto-history": "^1.0.14",
         "hyperapp-fx": "^2.0.0-beta.1",
+        "hyperapp-jsx-pragma": "^1.0.0",
         "hyperapp-mqtt": "^0.0.4",
         "parse-srt": "^1.0.0-alpha"
     },

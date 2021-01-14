@@ -1,6 +1,7 @@
 /// <reference path='./player.d.ts'/>
-import { app, h } from "hyperapp";
+import { app } from "hyperapp";
 import { AutoHistory } from "hyperapp-auto-history";
+import h from "hyperapp-jsx-pragma";
 
 import { FetchRandomImages } from "./effects";
 import {

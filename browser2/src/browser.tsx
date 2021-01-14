@@ -1,5 +1,6 @@
 /// <reference path='./browser.d.ts'/>
-import { app, h } from "hyperapp";
+import { app } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
 

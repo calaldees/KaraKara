@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { Http } from "hyperapp-fx";
 import { DisplayErrorResponse } from "../effects";

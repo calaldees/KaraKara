@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { get_attachment, get_tag, timedelta_str, title_case } from "../utils";
 import { AutoplayCountdown } from "./common";
 import { SetPreviewVolume } from "../actions";

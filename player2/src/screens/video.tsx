@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Lyrics } from "./common";
 import { get_attachment, get_tag, title_case } from "../utils";
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
