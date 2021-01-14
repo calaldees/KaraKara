@@ -8,7 +8,7 @@
         "parse-srt": "^1.0.0-alpha"
     },
     "scripts": {
-        "build": "parcel build --public-url . src/index.html --experimental-scope-hoisting",
+        "build": "parcel build --public-url . src/index.html",
         "watch": "parcel watch --public-url . src/index.html",
         "serve": "parcel serve --port 1235 src/index.html",
         "format": "prettier --write 'src/**/*.tsx' --tab-width 4 --trailing-comma all"
