@@ -19,8 +19,8 @@
         "babel-core": "^6.26.3",
         "node-sass": "^5.0.0",
         "parcel-bundler": "^1.12.4",
-        "parcel-plugin-imagemin": "^4.0.1",
-        "parcel-plugin-pwa-manifest": "^2.9.2",
+        "parcel-plugin-imagemin": "^4.0.2",
+        "parcel-plugin-pwa-manifest": "^3.0.10",
         "prettier": "^2.2.1",
         "typescript": "^4.1.3"
     },
