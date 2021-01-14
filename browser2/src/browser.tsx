@@ -90,7 +90,7 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
             },
             close(state: State) {
                 // delete mySubs[url];
-                return {...state};
+                return { ...state };
             },
             message(state: State, msg) {
                 return refresh(state);

@@ -81,10 +81,10 @@ function enqueue(state: State) {
                     ") to queue",
                 action: null,
             }),
-            error: (state, response) => ([
-                {...state,},
-                DisplayErrorResponse({response})
-            ]),
+            error: (state, response) => [
+                { ...state },
+                DisplayErrorResponse({ response }),
+            ],
         }),
     ];
 }

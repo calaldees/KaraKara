@@ -34,7 +34,8 @@ export function getOpenMQTTListener(state: State): MQTTSubscribe {
                     connected: false,
                 };
             },
-            message(state: State, msg) { // msg = mqtt-packet
+            message(state: State, msg) {
+                // msg = mqtt-packet
                 const cmd = msg.payload.toString().trim();
                 console.log("websocket_onmessage(" + cmd + ")");
                 switch (cmd) {
