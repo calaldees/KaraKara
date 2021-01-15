@@ -23,7 +23,7 @@ export const Screen = (
     },
     children,
 ) => (
-    <main className={className}>
+    <main class={className}>
         <header>
             {navLeft}
             <h1 onclick={log_state}>{title}</h1>

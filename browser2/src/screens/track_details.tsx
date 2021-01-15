@@ -115,7 +115,7 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             >
                 Cancel
             </button>
-            <button onClick={enqueue}>Confirm</button>
+            <button onclick={enqueue}>Confirm</button>
         </div>
     </footer>
 );
@@ -154,7 +154,7 @@ export const TrackDetails = ({
     >
         {/* Preview */}
         <video
-            className={"video_placeholder"}
+            class={"video_placeholder"}
             preload={"none"}
             poster={get_attachment(track, "image")}
             durationHint={track.duration}
@@ -165,7 +165,7 @@ export const TrackDetails = ({
 
         {/* Lyrics */}
         {track.srt && (
-            <div className={"lyrics"}>
+            <div class={"lyrics"}>
                 <h2>Lyrics</h2>
                 {parseSRT(track.srt).map(item => (
                     <div>{item.text}</div>
@@ -175,13 +175,13 @@ export const TrackDetails = ({
 
         {/* Tags */}
         <h2>Tags</h2>
-        <div className={"tags"}>
+        <div class={"tags"}>
             {Object.keys(track.tags)
                 .filter(key => BLOCKED_KEYS.indexOf(key) == -1)
                 .map(key => (
-                    <div className={"tag"}>
-                        <div className={"tag_key"}>{title_case(key)}</div>
-                        <div className={"tag_value"}>
+                    <div class={"tag"}>
+                        <div class={"tag_key"}>{title_case(key)}</div>
+                        <div class={"tag_value"}>
                             {title_case(track.tags[key].join(", "))}
                         </div>
                     </div>

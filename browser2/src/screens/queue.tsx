@@ -85,7 +85,7 @@ const QueueItemRender = ({
         {state.performer_name == item.performer_name && (
             <span
                 class={"go_arrow"}
-                onClick={state => [
+                onclick={state => [
                     { ...state, notification: "Removing track" },
                     Http({
                         url:
