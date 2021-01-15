@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 
 export const SettingsMenu = ({ state }: { state: State }) => (
-    <div className={"settings"}>
+    <div class={"settings"}>
         <div>
             <h2
                 onclick={function(state) {

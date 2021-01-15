@@ -68,7 +68,7 @@ function view(state: State) {
     if (!state.audio_allowed && !state.podium)
         // podium doesn't play sound
         screen = (
-            <section key="title" className={"screen_title"}>
+            <section key="title" class={"screen_title"}>
                 <h1>Click to Activate</h1>
             </section>
         );
@@ -85,7 +85,7 @@ function view(state: State) {
             ondblclick={state => ({ ...state, show_settings: true })}
         >
             <main
-                className={"theme-" + state.settings["karakara.player.theme"]}
+                class={"theme-" + state.settings["karakara.player.theme"]}
             >
                 {state.connected || (
                     <h1 id={"error"}>Not Connected To Server</h1>

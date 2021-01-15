@@ -6,8 +6,8 @@ import { SetPreviewVolume } from "../actions";
 const show_tracks = 5;
 
 export const PreviewScreen = ({ state }: { state: State }) => (
-    <section key="preview" className={"screen_preview"}>
-        <div className="preview_holder">
+    <section key="preview" class={"screen_preview"}>
+        <div class="preview_holder">
             <video
                 src={get_attachment(state, state.queue[0].track, "video")}
                 preload={"auto"}
@@ -32,14 +32,14 @@ export const PreviewScreen = ({ state }: { state: State }) => (
                 {state.queue.slice(0, show_tracks).map(item => (
                     <li key={item.id}>
                         <img src={get_attachment(state, item.track, "image")} />
-                        <p className="title">
+                        <p class="title">
                             {title_case(get_tag(item.track.tags.title))}
                         </p>
-                        <p className="from">
+                        <p class="from">
                             {title_case(get_tag(item.track.tags.from))}
                         </p>
-                        <p className="performer">{item.performer_name}</p>
-                        <p className="time">
+                        <p class="performer">{item.performer_name}</p>
+                        <p class="time">
                             <span>
                                 {timedelta_str(item.total_duration * 1000)}
                             </span>
