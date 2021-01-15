@@ -6,7 +6,10 @@
     var socket = null;
     $(document).ready(function() {
         try {
-            socket = new Paho.MQTT.Client(${self.js_websocket_url()});
+            var clientId = "kk-ctrl-";
+            var chars = "0123456789ABCDEF";
+            for(var i=0; i<8; i++) {clientId += chars.charAt(Math.floor(Math.random()*chars.length));}
+            socket = new Paho.MQTT.Client(${self.js_websocket_url()}, clientId);
             socket.connect({reconnect: true})
         }
         catch(err) {
