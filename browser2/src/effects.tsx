@@ -1,7 +1,11 @@
 import { MQTTPublish } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
 
-function errorParser(dispatch, response) {
+export function DisplayResponseMessage(dispatch, response) {
+    if(response.status >= 200 && response.status < 400) {
+        dispatch(state => ({ ...state, notification: "" }));
+    }
+
     response
         .json()
         .then(json => {
@@ -11,9 +15,6 @@ function errorParser(dispatch, response) {
             console.log(err);
             dispatch(state => ({ ...state, notification: "Internal Error" }));
         });
-}
-export function DisplayErrorResponse({ response }) {
-    return [errorParser, response];
 }
 
 export function SendCommand(state: State, command: string) {

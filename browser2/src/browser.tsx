@@ -43,6 +43,8 @@ const state: State = {
 
     // queue
     queue: [],
+    drop_source: null,
+    drop_target: null,
 
     // bookmarks
     bookmarks: [],

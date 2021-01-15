@@ -3,12 +3,60 @@ import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
 import { Http } from "hyperapp-fx";
 import { refresh } from "./queue";
-import { SendCommand } from "../effects";
+import { SendCommand, DisplayResponseMessage } from "../effects";
 
-/*
- * Coming Soon
- */
-const ComingSoon = ({
+function createDragStart(src_id) {
+    return function(state, event) {
+        event.dataTransfer.dropEffect = "move";
+        return {...state, drop_source: src_id};
+    }
+}
+
+function createDragOver(dst_id) {
+    return function(state, event) {
+        event.preventDefault();
+        return {...state, drop_target: dst_id};
+    }
+}
+
+function createDrop(dst_id) {
+    return function(state, event) {
+        event.preventDefault();
+        let src_id = state.drop_source;
+        // find the dragged item by ID number, remove it from the list
+        let src_ob = state.queue.find(x => x.id == src_id);
+        let new_queue = state.queue.filter(x => x.id != src_id);
+        // insert the dragged item above the drop target
+        let dst_pos = new_queue.findIndex(x => x.id == dst_id);
+        new_queue.splice(dst_pos, 0, src_ob);
+        return [
+            {...state, queue: new_queue, drop_source: null, drop_target: null},
+            Http({
+                url: state.root+'/queue/'+state.queue_id+'/queue_items.json',
+                options: {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({
+                        'queue_item.id': src_id,
+                        'queue_item.move.target_id': dst_id,
+                    }),
+                },
+                action: (state, response) => [
+                    {...state},
+                    [DisplayResponseMessage, response],
+                ],
+                error: (state, response) => [
+                    {...state},
+                    [DisplayResponseMessage, response]
+                ],
+        })
+        ];
+    }
+}
+
+const Playlist = ({
     state,
     items,
 }: {
@@ -20,6 +68,11 @@ const ComingSoon = ({
             {items.map(item => (
                 <QueueItemRender state={state} item={item} />
             ))}
+            {state.drop_source && <li
+                class={{"queue_item": true, "drop_target": state.drop_target == -1}}
+                ondragover={createDragOver(-1)}
+                ondrop={createDrop(-1)}
+            >(Move to end)</li>}
         </ul>
     </section>
 );
@@ -31,7 +84,13 @@ const QueueItemRender = ({
     state: State;
     item: QueueItem;
 }) => (
-    <li class={"queue_item"}>
+    <li
+        class={{"queue_item": true, "drop_target": state.drop_target == item.id}}
+        draggable={true}
+        ondragstart={createDragStart(item.id)}
+        ondragover={createDragOver(item.id)}
+        ondrop={createDrop(item.id)}
+    >
         <span
             class={"thumb"}
             style={{
@@ -53,43 +112,39 @@ const QueueItemRender = ({
             </span>
         )}
 
-        {state.performer_name == item.performer_name && (
-            <span
-                class={"go_arrow"}
-                onclick={state => [
-                    { ...state, notification: "Removing track" },
-                    Http({
-                        url:
-                            state.root +
-                            "/queue/" +
-                            state.queue_id +
-                            "/queue_items.json",
-                        options: {
-                            method: "DELETE",
-                            headers: {
-                                "Content-Type":
-                                    "application/x-www-form-urlencoded",
-                            },
-                            body: new URLSearchParams({
-                                // method: "delete",
-                                // format: "redirect",
-                                "queue_item.id": item.id.toString(),
-                            }),
+        <span
+            class={"go_arrow"}
+            onclick={state => [
+                { ...state, notification: "Removing track" },
+                Http({
+                    url:
+                        state.root +
+                        "/queue/" +
+                        state.queue_id +
+                        "/queue_items.json",
+                    options: {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded",
                         },
-                        action: (state, response) => ({
-                            ...state,
-                            notification: "Removed from queue",
+                        body: new URLSearchParams({
+                            "queue_item.id": item.id.toString(),
                         }),
-                        error: (state, response) => ({
-                            ...state,
-                            notification: "Error removing track from queue",
-                        }),
-                    }),
-                ]}
-            >
-                <i class={"fas fa-times-circle"} />
-            </span>
-        )}
+                    },
+                    action: (state, response) => [
+                        {...state},
+                        [DisplayResponseMessage, response],
+                    ],
+                    error: (state, response) => [
+                        {...state},
+                        [DisplayResponseMessage, response],
+                    ],
+                }),
+            ]}
+        >
+            <i class={"fas fa-times-circle"} />
+        </span>
     </li>
 );
 
@@ -143,7 +198,7 @@ export const Control = ({ state }: { state: State }) => (
     >
         {state.queue.length == 0 && <h2>Queue Empty</h2>}
         {state.queue.length > 1 && (
-            <ComingSoon state={state} items={state.queue} />
+            <Playlist state={state} items={state.queue} />
         )}
     </Screen>
 );

@@ -67,17 +67,24 @@ MAIN {
     }
   }
   .notification {
-    flex: 0 0 auto;
+    position: absolute;
+    left: 8em;
+    right: 8em;
+    top: 0;
     display: flex;
     align-items: center;
     background-color: $NOTIFICATION;
+    border-left: 1px solid $BORDER;
+    border-right: 1px solid $BORDER;
     border-bottom: 1px solid $BORDER;
-    padding: 0.5em 5%;
+    border-radius: 0 0 1em 1em;
+    padding: 0.5em 0.5em;
     SPAN {
       flex: 1 1 auto;
     }
     I {
       flex: 0 0 auto;
+      padding: 0em .5em;
     }
   }
   ARTICLE {
@@ -301,6 +308,9 @@ MAIN.queue ARTICLE {
     background: $NOTIFICATION;
   }
   UL LI {
+    &.drop_target {
+      border-top: 1px solid red;
+    }
     SPAN.lyrics {
       font-weight: normal;
     }

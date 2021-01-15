@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { DisplayErrorResponse } from "../effects";
+import { DisplayResponseMessage } from "../effects";
 import { Http } from "hyperapp-fx";
 import parseSRT from "parse-srt";
 
@@ -53,10 +53,6 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
 
 // TODO: remove self from queue?
 function enqueue(state: State) {
-    let adding_title = title_case(
-        state.track_list[state.track_id].tags["title"][0],
-    );
-    let adding_performer = state.performer_name;
     return [
         { ...state, notification: "Adding to queue..." },
         Http({
@@ -71,19 +67,13 @@ function enqueue(state: State) {
                     performer_name: state.performer_name,
                 }),
             },
-            action: (state, response) => ({
-                ...state,
-                notification:
-                    "Added " +
-                    adding_title +
-                    " (" +
-                    adding_performer +
-                    ") to queue",
-                action: null,
-            }),
+            action: (state, response) => [
+                {...state, action: null},
+                [DisplayResponseMessage, response],
+            ],
             error: (state, response) => [
                 { ...state },
-                DisplayErrorResponse({ response }),
+                [DisplayResponseMessage, response],
             ],
         }),
     ];

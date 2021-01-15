@@ -82,6 +82,8 @@ type State = {
 
     // queue
     queue: Array<QueueItem>,
+    drop_source: number,
+    drop_target: number,
 
     // bookmarks
     bookmarks: Array<string>,

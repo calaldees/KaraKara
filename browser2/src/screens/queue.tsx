@@ -1,6 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
+import { DisplayResponseMessage } from "../effects";
 import { Http } from "hyperapp-fx";
 import parseSRT from "parse-srt";
 
@@ -99,19 +100,17 @@ const QueueItemRender = ({
                                     "application/x-www-form-urlencoded",
                             },
                             body: new URLSearchParams({
-                                // method: "delete",
-                                // format: "redirect",
                                 "queue_item.id": item.id.toString(),
                             }),
                         },
-                        action: (state, response) => ({
-                            ...state,
-                            notification: "Removed from queue",
-                        }),
-                        error: (state, response) => ({
-                            ...state,
-                            notification: "Error removing track from queue",
-                        }),
+                        action: (state, response) => [
+                            {...state},
+                            [DisplayResponseMessage, response],
+                        ],
+                        error: (state, response) => [
+                            {...state},
+                            [DisplayResponseMessage, response],
+                        ],
                     }),
                 ]}
             >
@@ -154,11 +153,10 @@ export function refresh(state: State) {
                 loading: false,
                 queue: response.data.queue,
             }),
-            error: (state, response) => ({
-                ...state,
-                loading: false,
-                notification: "" + response,
-            }),
+            error: (state, response) => [
+                {...state, loading: false},
+                [DisplayResponseMessage, response],
+            ],
         }),
     ];
 }
