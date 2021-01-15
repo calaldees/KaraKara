@@ -4,7 +4,7 @@
         "hyperapp": "^2.0.8",
         "hyperapp-auto-history": "^1.0.14",
         "hyperapp-fx": "^2.0.0-beta.1",
-        "hyperapp-jsx-pragma": "^1.0.0",
+        "hyperapp-jsx-pragma": "github:shish/hyperapp-jsx-pragma#2581e90f97d9ea059cf15340f7af63de1af60a58",
         "hyperapp-mqtt": "^0.0.4",
         "parse-srt": "^1.0.0-alpha"
     },
