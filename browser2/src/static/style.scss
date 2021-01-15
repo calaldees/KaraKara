@@ -100,7 +100,15 @@ MAIN {
       flex-flow: row;
       justify-content: space-between;
       BUTTON {
-        flex: 0 0 48%;
+        flex: 1 0;
+        margin-left: .3em;
+        margin-right: .3em;
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
   }

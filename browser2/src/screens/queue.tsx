@@ -9,7 +9,6 @@ import parseSRT from "parse-srt";
  */
 const NowPlaying = ({ state, item }: { state: State; item: QueueItem }) => (
     <div>
-        <h2>Now Playing</h2>
         <ul>
             <QueueItemRender state={state} item={item} />
             {state.track_list[item.track.id].srt && (
