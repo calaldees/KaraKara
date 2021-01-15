@@ -1,3 +1,6 @@
+import { MQTTPublish } from "hyperapp-mqtt";
+import { http2ws } from "./utils";
+
 function errorParser(dispatch, response) {
     response
         .json()
@@ -9,4 +12,15 @@ function errorParser(dispatch, response) {
             dispatch(state => ({ ...state, notification: "Internal Error" }));
         });
 }
-export const DisplayErrorResponse = ({ response }) => [errorParser, response];
+export function DisplayErrorResponse({ response }) {
+    return [errorParser, response];
+}
+
+export function SendCommand(state: State, command: string) {
+    console.log("websocket_send(" + command + ")");
+    return MQTTPublish({
+        url: http2ws(state.root) + "/mqtt",
+        topic: "karakara/queue/" + state.queue_id,
+        payload: command,
+    });
+}

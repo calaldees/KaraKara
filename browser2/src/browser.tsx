@@ -4,7 +4,7 @@ import h from "hyperapp-jsx-pragma";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
 
-import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
+import { Login, TrackExplorer, TrackDetails, Queue, Control, refresh } from "./screens";
 import { http2ws } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.org.uk
@@ -66,6 +66,8 @@ function view(state: State) {
         } else {
             body = <TrackExplorer state={state} />;
         }
+    } else if (state.screen == "control") {
+        body = <Control state={state} />;
     } else if (state.screen == "queue") {
         body = <Queue state={state} />;
     }

@@ -341,7 +341,7 @@ export const TrackExplorer = ({ state }: { state: State }) => (
         }
         title={"Explore Tracks"}
         navRight={
-            <a onclick={state => ({ ...state, screen: "queue" })}>
+            <a onclick={state => ({ ...state, screen: state.performer_name == "Shish" ? "control" : "queue" })}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
