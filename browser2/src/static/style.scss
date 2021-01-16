@@ -68,17 +68,15 @@ MAIN {
   }
   .notification {
     position: absolute;
-    left: 8em;
-    right: 8em;
-    top: 0;
+    left: 2em;
+    right: 2em;
+    top: 4em;
     display: flex;
     align-items: center;
     background-color: $NOTIFICATION;
-    border-left: 1px solid $BORDER;
-    border-right: 1px solid $BORDER;
-    border-bottom: 1px solid $BORDER;
-    border-radius: 0 0 1em 1em;
-    padding: 0.5em 0.5em;
+    border: 1px solid $BORDER;
+    border-radius: 1em;
+    padding: 1em;
     SPAN {
       flex: 1 1 auto;
     }
