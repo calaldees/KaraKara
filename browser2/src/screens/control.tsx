@@ -196,9 +196,9 @@ export const Control = ({ state }: { state: State }) => (
         }
         footer={<ControlButtons state={state} />}
     >
-        {state.queue.length == 0 && <h2>Queue Empty</h2>}
-        {state.queue.length > 1 && (
+        {state.queue.length == 0 ?
+            <h2>Queue Empty</h2> :
             <Playlist state={state} items={state.queue} />
-        )}
+        }
     </Screen>
 );
