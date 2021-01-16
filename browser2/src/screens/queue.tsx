@@ -86,7 +86,7 @@ const QueueItemRender = ({
             <span
                 class={"go_arrow"}
                 onclick={state => [
-                    { ...state, notification: "Removing track" },
+                    { ...state, notification: {text: "Removing track...", style: "warning"} },
                     Http({
                         url:
                             state.root +

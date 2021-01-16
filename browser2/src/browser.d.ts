@@ -62,7 +62,10 @@ type State = {
     // global
     root: string,
     screen: string,
-    notification: string,
+    notification: {
+        text: string,
+        style: string,
+    },
 
     // login
     tmp_queue_id: string,

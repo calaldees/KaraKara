@@ -19,6 +19,13 @@ function createDragOver(dst_id) {
     }
 }
 
+function createDragLeave() {
+    return function(state, event) {
+        event.preventDefault();
+        return {...state, drop_target: null};
+    }
+}
+
 function createDrop(dst_id) {
     return function(state, event) {
         event.preventDefault();
@@ -64,7 +71,7 @@ const Playlist = ({
     items: Array<QueueItem>;
 }) => (
     <section>
-        <ul>
+        <ul ondragleave={createDragLeave()}>
             {items.map(item => (
                 <QueueItemRender state={state} item={item} />
             ))}
@@ -115,7 +122,7 @@ const QueueItemRender = ({
         <span
             class={"go_arrow"}
             onclick={state => [
-                { ...state, notification: "Removing track" },
+                { ...state, notification: {text: "Removing track...", style: "warning"} },
                 Http({
                     url:
                         state.root +

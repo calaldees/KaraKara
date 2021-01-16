@@ -7,8 +7,8 @@ import parseSRT from "parse-srt";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
-        {track.id in state.queue.map(i => i.track.id) && (
-            <div class={"notification"}>Track is already queued</div>
+        {state.queue.find(i => i.track.id == track.id) && (
+            <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
@@ -18,7 +18,7 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
                         action: "enqueue",
                     } as State)
                 }
-                disabled={track.id in state.queue.map(i => i.track.id)}
+                disabled={state.queue.find(i => i.track.id == track.id)}
             >
                 Enqueue
             </button>
@@ -54,7 +54,7 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
 // TODO: remove self from queue?
 function enqueue(state: State) {
     return [
-        { ...state, notification: "Adding to queue..." },
+        { ...state, notification: {text: "Adding to queue...", style: "warning"} },
         Http({
             url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
             options: {

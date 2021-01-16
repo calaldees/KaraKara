@@ -31,10 +31,10 @@ export const Screen = (
         </header>
         {state.notification && (
             <div
-                class={"notification"}
+                class={"notification "+state.notification.style}
                 onclick={state => ({ ...state, notification: null })}
             >
-                <span>{state.notification}</span>
+                <span>{state.notification.text}</span>
                 <i class={"fas fa-times-circle"} />
             </div>
         )}

@@ -6,9 +6,13 @@ $BORDER: #DDD;
 $BG_DARK: #E9E9E9;
 $BG_LIGHT: #F9F9F9;
 $SHADOW: #AAA;
-$NOTIFICATION: #FFA;
 $INPUT_FG: #000;
 $INPUT_BG: #FFF;
+$NOTIFICATION_OK: #AFA;
+$NOTIFICATION_WARNING: #FFA;
+$NOTIFICATION_ERROR: #FAA;
+$DISABLED: grey;
+$DROP_TARGET: red;
 
 /*
 // @media (prefers-color-scheme: dark) {}
@@ -73,16 +77,30 @@ MAIN {
     top: 4em;
     display: flex;
     align-items: center;
-    background-color: $NOTIFICATION;
-    border: 1px solid $BORDER;
     border-radius: 1em;
     padding: 1em;
+    // For some reason even though the notification appears over
+    // the top of the video, clicks act as if the video is on top?
+    // z-index appears to fix it...
+    z-index: 2;
     SPAN {
       flex: 1 1 auto;
     }
     I {
       flex: 0 0 auto;
       padding: 0em .5em;
+    }
+    &.ok {
+      background-color: $NOTIFICATION_OK;
+      border: 1px solid darken($NOTIFICATION_OK, 50);
+    }
+    &.warning {
+      background-color: $NOTIFICATION_WARNING;
+      border: 1px solid darken($NOTIFICATION_WARNING, 50);
+    }
+    &.error {
+      background-color: $NOTIFICATION_ERROR;
+      border: 1px solid darken($NOTIFICATION_ERROR, 50);
     }
   }
   ARTICLE {
@@ -100,6 +118,10 @@ MAIN {
     background-color: $BG_DARK;
     padding: 0.3em 5%;
 
+    .already_queued {
+      text-align: center;
+    }
+
     .buttons {
       display: flex;
       flex-flow: row;
@@ -113,6 +135,9 @@ MAIN {
         }
         &:last-child {
           margin-right: 0;
+        }
+        &:disabled {
+          color: $DISABLED;
         }
       }
     }
@@ -303,11 +328,11 @@ MAIN.track_details ARTICLE {
 /* Queue */
 MAIN.queue ARTICLE {
   .me {
-    background: $NOTIFICATION;
+    background: $NOTIFICATION_WARNING;
   }
   UL LI {
     &.drop_target {
-      border-top: 1px solid red;
+      border-top: 1px solid $DROP_TARGET;
     }
     SPAN.lyrics {
       font-weight: normal;
