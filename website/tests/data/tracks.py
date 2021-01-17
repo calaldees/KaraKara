@@ -204,7 +204,7 @@ def create_test_track(id=None, duration=None, tags=(), attachments=(), srt=None,
 
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def track_unicode_special(DBSession, commit):
     tags_data = (
         'title:UnicodeAssention',

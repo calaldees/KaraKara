@@ -1,10 +1,10 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Lyrics } from "./common";
 import { get_attachment, get_tag, title_case } from "../utils";
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
 export const VideoScreen = ({ state }: { state: State }) => (
-    <section key="video" className={"screen_video"}>
+    <section key="video" class={"screen_video"}>
         <video
             src={get_attachment(state, state.queue[0].track, "video")}
             autoPlay={true}
@@ -20,16 +20,16 @@ export const VideoScreen = ({ state }: { state: State }) => (
                     "%",
             }}
         />
-        <div id="pimpkk" className="pimp">
+        <div id="pimpkk" class="pimp">
             KaraKara
         </div>
-        <div id="pimpsong" className="pimp">
+        <div id="pimpsong" class="pimp">
             {title_case(get_tag(state.queue[0].track.tags.title))}
             <br />
             Performed by {state.queue[0].performer_name}
         </div>
         {/* too much on screen at once?
-        <div id="pimpcontributor" className="pimp">
+        <div id="pimpcontributor" class="pimp">
             Contributed by {get_tag(state.queue[0].track.tags.contributor)}
         </div>
         */}

@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
 
@@ -7,7 +7,7 @@ import { get_attachment, title_case } from "../utils";
  */
 const TrackItem = ({ track }: { track: Track }) => (
     <li
-        className={"track_item"}
+        class={"track_item"}
         onclick={state => ({ ...state, track_id: track.id })}
     >
         <div
@@ -42,8 +42,8 @@ const FilterListGroupHeader = (
     children,
 ) => (
     <li
-        className={"filter_list_group_header"}
-        onClick={state => ({ ...state, expanded: expanded ? null : filter })}
+        class={"filter_list_group_header"}
+        onclick={state => ({ ...state, expanded: expanded ? null : filter })}
     >
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
@@ -95,8 +95,8 @@ const AddFilter = (
     children,
 ) => (
     <li
-        className={"add_filter"}
-        onClick={state => ({
+        class={"add_filter"}
+        onclick={state => ({
             ...state,
             expanded: null,
             filters: state.filters.concat([filter]),
@@ -341,14 +341,14 @@ export const TrackExplorer = ({ state }: { state: State }) => (
         }
         title={"Explore Tracks"}
         navRight={
-            <a onclick={state => ({ ...state, screen: "queue" })}>
+            <a onclick={state => ({ ...state, screen: state.password ? "control" : "queue" })}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
     >
         {/* Full-text search */}
         <input
-            className={"search"}
+            class={"search"}
             type={"text"}
             placeholder={"Add search keywords"}
             value={state.search}
@@ -361,10 +361,10 @@ export const TrackExplorer = ({ state }: { state: State }) => (
         />
 
         {/* List active filters */}
-        <div className={"active_filter_list"}>
+        <div class={"active_filter_list"}>
             {state.filters.map(filter => (
                 <a
-                    className={"active_filter"}
+                    class={"active_filter"}
                     onclick={state => ({
                         ...state,
                         expanded: null,

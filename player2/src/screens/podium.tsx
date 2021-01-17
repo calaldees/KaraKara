@@ -1,4 +1,4 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { get_attachment, get_tag, s_to_mns, title_case } from "../utils";
 import { Lyrics, AutoplayCountdown } from "./common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
@@ -7,7 +7,7 @@ import { SendCommand } from "../effects";
 export const PodiumScreen = ({ state }: { state: State }) => (
     <section
         key="podium"
-        className={
+        class={
             "screen_podium" +
             (state.queue[0].track.srt_lyrics ? "" : " no_lyrics")
         }
@@ -22,7 +22,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
         Give the video key=playing so that it creates a new
         object when switching from preview to play
          */}
-        <div className="preview_holder">
+        <div class="preview_holder">
             <video
                 src={get_attachment(state, state.queue[0].track, "preview")}
                 ontimeupdate={UpdatePodiumProgress}
@@ -36,7 +36,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
 
         {state.playing ? (
             <div
-                className={"progressBar"}
+                class={"progressBar"}
                 style={{
                     "background-position":
                         100 -
@@ -52,7 +52,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
             </div>
         ) : (
             <div
-                className={"startButton"}
+                class={"startButton"}
                 onclick={state => [state, SendCommand(state, "play")]}
                 style={{
                     "background-position":

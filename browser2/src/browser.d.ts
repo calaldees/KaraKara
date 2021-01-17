@@ -62,13 +62,17 @@ type State = {
     // global
     root: string,
     screen: string,
-    notification: string,
-    ws_errors: number,
+    notification: {
+        text: string,
+        style: string,
+    },
+    show_settings: boolean,
 
     // login
     tmp_queue_id: string,
     queue_id: string,
     loading: boolean,
+    password: string,
 
     // track list
     track_list: Dictionary<Track>,
@@ -83,6 +87,8 @@ type State = {
 
     // queue
     queue: Array<QueueItem>,
+    drop_source: number,
+    drop_target: number,
 
     // bookmarks
     bookmarks: Array<string>,

@@ -1,9 +1,18 @@
 /// <reference path='./browser.d.ts'/>
-import { app, h } from "hyperapp";
-import { WebSocketListen } from "hyperapp-fx";
+import { app } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
+import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
 
-import { Login, TrackExplorer, TrackDetails, Queue, refresh } from "./screens";
+import {
+    Login,
+    TrackExplorer,
+    TrackDetails,
+    Queue,
+    Control,
+    SettingsMenu,
+    refresh
+} from "./screens";
 import { http2ws } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.org.uk
@@ -23,12 +32,13 @@ const state: State = {
     root: auto_root,
     screen: "explore",
     notification: null,
-    ws_errors: 0,
+    show_settings: false,
 
     // login
     tmp_queue_id: "demo",
     queue_id: null,
     loading: false,
+    password: "",
 
     // track list
     track_list: {},
@@ -43,6 +53,8 @@ const state: State = {
 
     // queue
     queue: [],
+    drop_source: null,
+    drop_target: null,
 
     // bookmarks
     bookmarks: [],
@@ -66,10 +78,15 @@ function view(state: State) {
         } else {
             body = <TrackExplorer state={state} />;
         }
+    } else if (state.screen == "control") {
+        body = <Control state={state} />;
     } else if (state.screen == "queue") {
         body = <Queue state={state} />;
     }
-    return <body>{body}</body>;
+    return <body>
+        {body}
+        {state.show_settings && <SettingsMenu state={state} />}
+    </body>;
 }
 
 const HistoryManager = AutoHistory({
@@ -80,28 +97,21 @@ const HistoryManager = AutoHistory({
 
 let mySubs = {};
 
-function getOpenWebSocketListener(state: State): WebSocketListen {
-    let url =
-        http2ws(state.root) + "/" + state.queue_id + ".ws?_=" + state.ws_errors;
+function getOpenMQTTListener(state: State): MQTTSubscribe {
+    let url = http2ws(state.root) + "/mqtt";
     if (!mySubs[url]) {
-        mySubs[url] = WebSocketListen({
+        mySubs[url] = MQTTSubscribe({
             url: url,
-            open(state: State) {
+            topic: "karakara/queue/" + state.queue_id,
+            connect(state: State) {
                 return refresh(state);
             },
             close(state: State) {
-                delete mySubs[url];
-                return {
-                    ...state,
-                    ws_error_count: state.ws_errors + 1,
-                };
+                // delete mySubs[url];
+                return { ...state };
             },
-            action(state: State, msg: MessageEvent) {
+            message(state: State, msg) {
                 return refresh(state);
-            },
-            error(state: State, response) {
-                console.log("Error listening to websocket:", response);
-                return { ...state, ws_error_count: state.ws_errors + 1 };
             },
         });
     }
@@ -110,7 +120,7 @@ function getOpenWebSocketListener(state: State): WebSocketListen {
 
 function subscriptions(state: State) {
     HistoryManager.push_state_if_changed(state);
-    return [HistoryManager, state.queue_id && getOpenWebSocketListener(state)];
+    return [HistoryManager, state.queue_id && getOpenMQTTListener(state)];
 }
 
 app({

@@ -43,45 +43,20 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     </td>
                 </tr>
                 <tr>
-                    <td>Podium</td>
+                    <td>Password</td>
                     <td>
                         <input
-                            checked={state.podium}
-                            type={"checkbox"}
+                            value={state.password}
+                            type={"password"}
                             onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    podium: !state.podium,
+                                    password: event.target.value,
                                 } as State)
                             }
                         />
                     </td>
                 </tr>
-                {document.body.requestFullscreen && (
-                    <tr>
-                        <td>Fullscreen</td>
-                        <td>
-                            <input
-                                checked={state.fullscreen}
-                                type={"checkbox"}
-                                onchange={function(
-                                    state: State,
-                                    event: FormInputEvent,
-                                ) {
-                                    if (state.fullscreen) {
-                                        document.exitFullscreen();
-                                    } else {
-                                        document.body.requestFullscreen();
-                                    }
-                                    return {
-                                        ...state,
-                                        fullscreen: !state.fullscreen,
-                                    };
-                                }}
-                            />
-                        </td>
-                    </tr>
-                )}
                 <tr>
                     <td colspan={2}>
                         <button

@@ -108,7 +108,12 @@ class QueueLogic():
 
         estimated_next_add_time = datetime.timedelta(0)
         if time_limit and latest_queue_item:
-            estimated_next_add_time = time_limit - (now() - latest_queue_item.time_touched)  # time_touched is NOT an acceptable way of measuring this. We need to calculate the estimated track time, but that is really expensive
+            # time_touched is NOT an acceptable way of measuring this. We need to
+            # calculate the estimated track time, but that is really expensive
+            t = time_limit - (now() - latest_queue_item.time_touched)
+            # Forget about the microseconds, so that we can tell the user
+            # "try again in 00:12:43" instead of "try again in 00:12:43.2134321"
+            estimated_next_add_time = datetime.timedelta(t.days, t.seconds)
 
         return {
             'queue_items': queue_items,

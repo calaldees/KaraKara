@@ -88,7 +88,7 @@ class QueueManager():
         assert queue_length - 1 == len(self.items)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def queue_manager(app, queue, DBSession, commit):
     queue_manager = QueueManager(app, queue)
     assert len(queue_manager.items) == 0

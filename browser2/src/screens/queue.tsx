@@ -1,6 +1,7 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
+import { DisplayResponseMessage } from "../effects";
 import { Http } from "hyperapp-fx";
 import parseSRT from "parse-srt";
 
@@ -9,7 +10,6 @@ import parseSRT from "parse-srt";
  */
 const NowPlaying = ({ state, item }: { state: State; item: QueueItem }) => (
     <div>
-        <h2>Now Playing</h2>
         <ul>
             <QueueItemRender state={state} item={item} />
             {state.track_list[item.track.id].srt && (
@@ -85,8 +85,8 @@ const QueueItemRender = ({
         {state.performer_name == item.performer_name && (
             <span
                 class={"go_arrow"}
-                onClick={state => [
-                    { ...state, notification: "Removing track" },
+                onclick={state => [
+                    { ...state, notification: {text: "Removing track...", style: "warning"} },
                     Http({
                         url:
                             state.root +
@@ -100,19 +100,17 @@ const QueueItemRender = ({
                                     "application/x-www-form-urlencoded",
                             },
                             body: new URLSearchParams({
-                                // method: "delete",
-                                // format: "redirect",
                                 "queue_item.id": item.id.toString(),
                             }),
                         },
-                        action: (state, response) => ({
-                            ...state,
-                            notification: "Removed from queue",
-                        }),
-                        error: (state, response) => ({
-                            ...state,
-                            notification: "Error removing track from queue",
-                        }),
+                        action: (state, response) => [
+                            {...state},
+                            [DisplayResponseMessage, response],
+                        ],
+                        error: (state, response) => [
+                            {...state},
+                            [DisplayResponseMessage, response],
+                        ],
                     }),
                 ]}
             >
@@ -155,11 +153,10 @@ export function refresh(state: State) {
                 loading: false,
                 queue: response.data.queue,
             }),
-            error: (state, response) => ({
-                ...state,
-                loading: false,
-                notification: "" + response,
-            }),
+            error: (state, response) => [
+                {...state, loading: false},
+                [DisplayResponseMessage, response],
+            ],
         }),
     ];
 }

@@ -22,6 +22,7 @@
         <script src="${ h.path.external }jquery.sortable.js"></script>
         <script src="${ h.path.static   }js/lib.js"></script>
         <script src="${ h.path.static   }js/karakara.js"></script>
+        <script src="${ h.path.external }mqttws31.min.js"></script>
         
         <!-- Other -->
         <link   href="${ h.path.static   }favicon.ico" rel="shortcut icon" />
@@ -65,9 +66,4 @@
     </body>
 </html>
 
-<%def name="js_websocket_url()"><%
-    websocket_path = ''
-    if not request.registry.settings['karakara.websocket.host']:
-        websocket_path += f""":{request.registry.settings['karakara.websocket.port']}"""
-    websocket_path += f'/{request.queue.id}.ws'
-%>('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname + '${websocket_path}'</%def>
+<%def name="js_websocket_url()">('https:' == document.location.protocol ? 'wss://' : 'ws://') + location.hostname + '/mqtt'</%def>

@@ -1,6 +1,7 @@
 /// <reference path='./player.d.ts'/>
-import { app, h } from "hyperapp";
+import { app } from "hyperapp";
 import { AutoHistory } from "hyperapp-auto-history";
+import h from "hyperapp-jsx-pragma";
 
 import { FetchRandomImages } from "./effects";
 import {
@@ -11,7 +12,7 @@ import {
     VideoScreen,
 } from "./screens";
 import {
-    getOpenWebSocketListener,
+    getOpenMQTTListener,
     IntervalListener,
     KeyboardListener,
 } from "./subs";
@@ -33,7 +34,6 @@ const state: State = {
     // global temporary
     show_settings: false,
     connected: false,
-    ws_errors: 0,
     fullscreen: false,
     audio_allowed:
         window.AudioContext == undefined ||
@@ -68,7 +68,7 @@ function view(state: State) {
     if (!state.audio_allowed && !state.podium)
         // podium doesn't play sound
         screen = (
-            <section key="title" className={"screen_title"}>
+            <section key="title" class={"screen_title"}>
                 <h1>Click to Activate</h1>
             </section>
         );
@@ -85,7 +85,7 @@ function view(state: State) {
             ondblclick={state => ({ ...state, show_settings: true })}
         >
             <main
-                className={"theme-" + state.settings["karakara.player.theme"]}
+                class={"theme-" + state.settings["karakara.player.theme"]}
             >
                 {state.connected || (
                     <h1 id={"error"}>Not Connected To Server</h1>
@@ -108,7 +108,7 @@ function subscriptions(state: State) {
     return [
         HistoryManager,
         KeyboardListener,
-        getOpenWebSocketListener(state),
+        getOpenMQTTListener(state),
         state.audio_allowed &&
             !state.paused &&
             !state.playing &&

@@ -6,7 +6,7 @@ from karakara.model import DBSession, commit
 from karakara.model.model_queue import Queue, QueueSetting
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def queue(request, DBSession, commit, cache_store):
     QUEUE_ID = 'qtest'
 

@@ -1,13 +1,14 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
+import { DisplayResponseMessage } from "../effects";
 import { Http } from "hyperapp-fx";
 import parseSRT from "parse-srt";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
-        {track.id in state.queue.map(i => i.track.id) && (
-            <div class={"notification"}>Track is already queued</div>
+        {state.queue.find(i => i.track.id == track.id) && (
+            <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
@@ -17,7 +18,7 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
                         action: "enqueue",
                     } as State)
                 }
-                disabled={track.id in state.queue.map(i => i.track.id)}
+                disabled={state.queue.find(i => i.track.id == track.id)}
             >
                 Enqueue
             </button>
@@ -52,12 +53,8 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
 
 // TODO: remove self from queue?
 function enqueue(state: State) {
-    let adding_title = title_case(
-        state.track_list[state.track_id].tags["title"][0],
-    );
-    let adding_performer = state.performer_name;
     return [
-        { ...state, notification: "Adding to queue..." },
+        { ...state, notification: {text: "Adding to queue...", style: "warning"} },
         Http({
             url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
             options: {
@@ -70,20 +67,14 @@ function enqueue(state: State) {
                     performer_name: state.performer_name,
                 }),
             },
-            action: (state, response) => ({
-                ...state,
-                notification:
-                    "Added " +
-                    adding_title +
-                    " (" +
-                    adding_performer +
-                    ") to queue",
-                action: null,
-            }),
-            error: (state, response) => ({
-                ...state,
-                notification: "Error adding track to queue", // response.messages[0],
-            }),
+            action: (state, response) => [
+                {...state, action: null},
+                [DisplayResponseMessage, response],
+            ],
+            error: (state, response) => [
+                { ...state },
+                [DisplayResponseMessage, response],
+            ],
         }),
     ];
 }
@@ -114,7 +105,7 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             >
                 Cancel
             </button>
-            <button onClick={enqueue}>Confirm</button>
+            <button onclick={enqueue}>Confirm</button>
         </div>
     </footer>
 );
@@ -145,7 +136,7 @@ export const TrackDetails = ({
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a onclick={state => ({ ...state, screen: "queue" })}>
+            <a onclick={state => ({ ...state, screen: state.password ? "control" : "queue" })}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
@@ -153,7 +144,7 @@ export const TrackDetails = ({
     >
         {/* Preview */}
         <video
-            className={"video_placeholder"}
+            class={"video_placeholder"}
             preload={"none"}
             poster={get_attachment(track, "image")}
             durationHint={track.duration}
@@ -164,7 +155,7 @@ export const TrackDetails = ({
 
         {/* Lyrics */}
         {track.srt && (
-            <div className={"lyrics"}>
+            <div class={"lyrics"}>
                 <h2>Lyrics</h2>
                 {parseSRT(track.srt).map(item => (
                     <div>{item.text}</div>
@@ -174,13 +165,13 @@ export const TrackDetails = ({
 
         {/* Tags */}
         <h2>Tags</h2>
-        <div className={"tags"}>
+        <div class={"tags"}>
             {Object.keys(track.tags)
                 .filter(key => BLOCKED_KEYS.indexOf(key) == -1)
                 .map(key => (
-                    <div className={"tag"}>
-                        <div className={"tag_key"}>{title_case(key)}</div>
-                        <div className={"tag_value"}>
+                    <div class={"tag"}>
+                        <div class={"tag_key"}>{title_case(key)}</div>
+                        <div class={"tag_value"}>
                             {title_case(track.tags[key].join(", "))}
                         </div>
                     </div>

@@ -1,13 +1,15 @@
 {
     "name": "browser2",
     "dependencies": {
-        "hyperapp": "^2.0.4",
+        "hyperapp": "^2.0.8",
         "hyperapp-auto-history": "^1.0.14",
-        "hyperapp-fx": "github:shish/hyperapp-fx#eabef1da8f83ba85af7fda4112be7a11b44e1213",
+        "hyperapp-fx": "^2.0.0-beta.1",
+        "hyperapp-jsx-pragma": "^1.1.0",
+        "hyperapp-mqtt": "^0.0.4",
         "parse-srt": "^1.0.0-alpha"
     },
     "scripts": {
-        "build": "parcel build --public-url . src/index.html --experimental-scope-hoisting",
+        "build": "parcel build --public-url . src/index.html",
         "watch": "parcel watch --public-url . src/index.html",
         "serve": "parcel serve --port 1234 src/index.html",
         "format": "prettier --write 'src/**/*.tsx' --tab-width 4 --trailing-comma all"
@@ -16,12 +18,12 @@
     "license": "GPL-3.0-only",
     "devDependencies": {
         "babel-core": "^6.26.3",
-        "node-sass": "^4.13.1",
+        "node-sass": "^5.0.0",
         "parcel-bundler": "^1.12.4",
-        "parcel-plugin-imagemin": "^4.0.1",
-        "parcel-plugin-pwa-manifest": "^2.9.2",
-        "prettier": "^1.19.1",
-        "typescript": "^3.8.3"
+        "parcel-plugin-imagemin": "^4.0.2",
+        "parcel-plugin-pwa-manifest": "^3.0.10",
+        "prettier": "^2.2.1",
+        "typescript": "^4.1.3"
     },
     "pwaManifest": {
         "name": "KaraKara Browser",

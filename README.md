@@ -113,9 +113,6 @@ Core components
       * preview high and low res encoded videos
       * tag videos
       * edit subtitles
-* websocket ![Websocket](https://github.com/calaldees/KaraKara/workflows/Websocket/badge.svg)
-  * An echo server which accepts messages from the admin panel and
-    forwards the messages to all clients
 * browser2 ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
   * Mobile webapp interface to search / preview / queue tracks
   * Gets data from website / `track_list` api

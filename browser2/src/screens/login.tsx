@@ -1,6 +1,7 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { Http } from "hyperapp-fx";
+import { DisplayResponseMessage } from "../effects";
 
 function track_list_to_map(raw_list: Array<Track>) {
     let map = {};
@@ -40,12 +41,14 @@ export const Login = ({ state }: { state: State }) => (
                             loading: false,
                             track_list: track_list_to_map(response.data.list),
                         }),
-                        error: (state, response) => ({
-                            ...state,
-                            queue_id: null,
-                            loading: false,
-                            notification: "" + response,
-                        }),
+                        error: (state, response) => [
+                            {
+                                ...state,
+                                queue_id: null,
+                                loading: false,
+                            },
+                            [DisplayResponseMessage, response],
+                        ],
                     }),
                     Http({
                         url:
@@ -57,11 +60,10 @@ export const Login = ({ state }: { state: State }) => (
                             ...state,
                             queue: response.data.queue,
                         }),
-                        error: (state, response) => ({
-                            ...state,
-                            notification: "" + response,
-                            queue_id: null,
-                        }),
+                        error: (state, response) => [
+                            {...state, queue_id: null},
+                            [DisplayResponseMessage, response],
+                        ],
                     }),
                 ]}
                 disabled={state.loading}

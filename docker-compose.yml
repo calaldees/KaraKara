@@ -38,8 +38,6 @@ services:
         image: karakara/websocket
         build:
             context: ./websocket
-        volumes:
-            - logs:/logs
 
     player2:
         image: karakara/player2

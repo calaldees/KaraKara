@@ -1,7 +1,7 @@
-import { h } from "hyperapp";
+import h from "hyperapp-jsx-pragma";
 
 export const TitleScreen = ({ state }: { state: State }) => (
-    <section key="title" className={"screen_title"}>
+    <section key="title" class={"screen_title"}>
         <div id={"splash"}>
             {state.images.map(item => (
                 <img
