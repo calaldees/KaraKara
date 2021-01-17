@@ -3,14 +3,14 @@ import os
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.md')).read()
+#README = open(os.path.join(here, 'README.md')).read()
 
 
 setup(
     name='KaraKara',
     version='0.1',
     description='KaraKara: Karaoke Event System - Attendees can view and queue tracks from their mobile phones',
-    long_description=README,
+    #long_description=README,
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
@@ -21,7 +21,7 @@ setup(
     author='',
     author_email='calaldees@gmail.com',
     url='http://github.com/calaldees/KaraKara',
-    keywords='web wsgi bfg pylons pyramid jquery jquerymobile karaoke nginx html5 video',
+    keywords='web wsgi pyramid karaoke video',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,

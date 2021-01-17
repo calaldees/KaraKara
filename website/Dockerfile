@@ -1,4 +1,4 @@
-FROM python:3-slim as dependencies
+FROM python:3-slim as base
 
     # System dependencies
     RUN apt-get update && apt-get install -y \
@@ -15,14 +15,24 @@ FROM python:3-slim as dependencies
     ENV WORKDIR=/app
     WORKDIR ${WORKDIR}
 
-    # Python dependencies
+    ENV PATH_WRITE=/appdata
+    RUN mkdir -p ${PATH_WRITE}
+
+FROM base as python_dependencies
+# -- Python dependencies
     COPY requirements.txt ./
     RUN pip3 install --no-cache-dir -r requirements.txt
 
-    # Static web dependencies
-    ENV PATH_WRITE==${WORKDIR}/data
+# -- Static web dependencies
+
+FROM base as static
+
     ENV PATH_EXTERNAL=${PATH_WRITE}/externals/static
-    RUN mkdir -p ${PATH_EXTERNAL}/images ${PATH_EXTERNAL}/js ${PATH_EXTERNAL}/css ${PATH_EXTERNAL}/fonts
+    RUN mkdir -p \
+      ${PATH_EXTERNAL}/images \
+      ${PATH_EXTERNAL}/js \
+      ${PATH_EXTERNAL}/css \
+      ${PATH_EXTERNAL}/fonts
 
     ENV VERSION_JQUERY=2.1.4
         RUN \
@@ -64,28 +74,49 @@ FROM python:3-slim as dependencies
               -o "${PATH_EXTERNAL}/fonts/glyphicons-halflings-regular.svg" &&\
             true
 
+# --- config
+#FROM base as config
+FROM python_dependencies as xxx
+    ENV PATH_CONFIG=${PATH_WRITE}/config
+    ENV INI_DEV=${PATH_CONFIG}/development.ini
+    COPY ./config/development.ini.dist ${INI_DEV}
+    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
 
+# --- test
+#FROM python_dependencies as test
+    COPY ./requirements.test.txt ./
+    RUN pip install --no-cache-dir -r requirements.test.txt
+    COPY ./config/test.inidiff.dist ${PATH_CONFIG}/test.inidiff
+    RUN python -m calaldees.apps.make_ini \
+        ${INI_DEV} \
+        ${PATH_CONFIG}/test.inidiff \
+        ${PATH_CONFIG}/test.ini
+    RUN pytest --ini_file=${PATH_CONFIG}/test.ini karakara
 
+# --- it8n
+FROM python_dependencies as it8n
+    ENV PATH_LOCALE=${PATH_WRITE}/locale
+    COPY ./locale ${PATH_LOCALE}
+    #RUN python setup.py extract_messages
+    #RUN python setup.py update_catalog
+    #RUN python setup.py compile_catalog
 
-FROM dependencies as production
-    COPY . /app
+FROM python_dependencies as production
+    #COPY . /app
+    COPY ./config/production.inidiff ${PATH_CONFIG}/
+    RUN python -m calaldees.apps.make_ini \
+        ${INI_DEV} \
+        ${PATH_CONFIG)/production.inidiff \
+        ${PATH_CONFIG}/production.ini
     EXPOSE 6543
     VOLUME /logs
     HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ || exit 1
-    CMD pserve ?/production.ini
-
-
-
-
-
-
+    CMD pserve ${PATH_CONFIG}/production.ini
 
 #RUN make install
 #CMD make run_production
 
 
-FROM base as test
-RUN make test
 
 
 
