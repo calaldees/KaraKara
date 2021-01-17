@@ -38,7 +38,7 @@ const state: State = {
     tmp_queue_id: "demo",
     queue_id: null,
     loading: false,
-    password: "",
+    password: "asdf",
 
     // track list
     track_list: {},

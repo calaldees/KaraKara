@@ -30,12 +30,19 @@ function createDrop(dst_id) {
     return function(state, event) {
         event.preventDefault();
         let src_id = state.drop_source;
+        if (src_id === dst_id) {
+            return {...state, drop_source: null, drop_target: null};
+        }
         // find the dragged item by ID number, remove it from the list
         let src_ob = state.queue.find(x => x.id == src_id);
         let new_queue = state.queue.filter(x => x.id != src_id);
         // insert the dragged item above the drop target
-        let dst_pos = new_queue.findIndex(x => x.id == dst_id);
-        new_queue.splice(dst_pos, 0, src_ob);
+        if(dst_id === -1) {
+            new_queue.push(src_ob);
+        } else {
+            let dst_pos = new_queue.findIndex(x => x.id == dst_id);
+            new_queue.splice(dst_pos, 0, src_ob);
+        }
         return [
             {...state, queue: new_queue, drop_source: null, drop_target: null},
             Http({
@@ -58,7 +65,7 @@ function createDrop(dst_id) {
                     {...state},
                     [DisplayResponseMessage, response]
                 ],
-        })
+            })
         ];
     }
 }
@@ -76,10 +83,10 @@ const Playlist = ({
                 <QueueItemRender state={state} item={item} />
             ))}
             {state.drop_source && <li
-                class={{"queue_item": true, "drop_target": state.drop_target == -1}}
+                class={{"queue_item": true, "drop_target": state.drop_target == -1, "drop_last": true}}
                 ondragover={createDragOver(-1)}
                 ondrop={createDrop(-1)}
-            >(Move to end)</li>}
+            ><span class={"text"}>(Move to end)</span></li>}
         </ul>
     </section>
 );
@@ -92,7 +99,11 @@ const QueueItemRender = ({
     item: QueueItem;
 }) => (
     <li
-        class={{"queue_item": true, "drop_target": state.drop_target == item.id}}
+        class={{
+            "queue_item": true,
+            "drop_source": state.drop_source == item.id,
+            "drop_target": state.drop_target == item.id,
+        }}
         draggable={true}
         ondragstart={createDragStart(item.id)}
         ondragover={createDragOver(item.id)}

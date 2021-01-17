@@ -358,8 +358,15 @@ MAIN.queue ARTICLE {
     background: $NOTIFICATION_WARNING;
   }
   UL LI {
+    &.drop_source {
+      display: none;
+    }
     &.drop_target {
-      border-top: 1px solid $DROP_TARGET;
+      border-top: 5px solid $DROP_TARGET;
+    }
+    &.drop_last {
+      text-align: center;
+      padding: 1em;
     }
     SPAN.lyrics {
       font-weight: normal;
