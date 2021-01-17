@@ -1,10 +1,5 @@
 import h from "hyperapp-jsx-pragma";
 
-function log_state(state: State): State {
-    console.log(state);
-    return state;
-}
-
 export const Screen = (
     {
         state,
@@ -26,7 +21,7 @@ export const Screen = (
     <main class={className}>
         <header>
             {navLeft}
-            <h1 onclick={log_state}>{title}</h1>
+            <h1 ondblclick={(state) => ({...state, show_settings: true})}>{title}</h1>
             {navRight}
         </header>
         {state.notification && (

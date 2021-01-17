@@ -4,7 +4,15 @@ import h from "hyperapp-jsx-pragma";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
 
-import { Login, TrackExplorer, TrackDetails, Queue, Control, refresh } from "./screens";
+import {
+    Login,
+    TrackExplorer,
+    TrackDetails,
+    Queue,
+    Control,
+    SettingsMenu,
+    refresh
+} from "./screens";
 import { http2ws } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.org.uk
@@ -24,11 +32,13 @@ const state: State = {
     root: auto_root,
     screen: "explore",
     notification: null,
+    show_settings: false,
 
     // login
     tmp_queue_id: "demo",
     queue_id: null,
     loading: false,
+    password: "",
 
     // track list
     track_list: {},
@@ -73,7 +83,10 @@ function view(state: State) {
     } else if (state.screen == "queue") {
         body = <Queue state={state} />;
     }
-    return <body>{body}</body>;
+    return <body>
+        {body}
+        {state.show_settings && <SettingsMenu state={state} />}
+    </body>;
 }
 
 const HistoryManager = AutoHistory({

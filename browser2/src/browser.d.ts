@@ -66,11 +66,13 @@ type State = {
         text: string,
         style: string,
     },
+    show_settings: boolean,
 
     // login
     tmp_queue_id: string,
     queue_id: string,
     loading: boolean,
+    password: string,
 
     // track list
     track_list: Dictionary<Track>,
