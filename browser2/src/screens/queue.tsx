@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { Screen, Refresh, BackToExplore } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
 import { DisplayResponseMessage } from "../effects";
 import { Http } from "hyperapp-fx";
@@ -143,45 +143,13 @@ const ComingLater = ({
 /*
  * Page Layout
  */
-export function refresh(state: State) {
-    return [
-        { ...state, loading: true },
-        Http({
-            url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
-            action: (state, response) => ({
-                ...state,
-                loading: false,
-                queue: response.data.queue,
-            }),
-            error: (state, response) => [
-                {...state, loading: false},
-                [DisplayResponseMessage, response],
-            ],
-        }),
-    ];
-}
-
 export const Queue = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"queue"}
-        navLeft={
-            <a onclick={state => ({ ...state, screen: "explore" })}>
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
-            </a>
-        }
+        navLeft={<BackToExplore />}
         title={"Now Playing"}
-        navRight={
-            <a onclick={refresh}>
-                <i
-                    class={
-                        state.loading
-                            ? "fas fa-2x fa-sync loading"
-                            : "fas fa-2x fa-sync"
-                    }
-                />
-            </a>
-        }
+        navRight={<Refresh state={state} />}
     >
         {state.queue.length == 0 && <h2>Queue Empty</h2>}
         {state.queue.length > 0 && (

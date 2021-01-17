@@ -23,7 +23,7 @@ const auto_root =
         ? "https://karakara.org.uk"
         : window.location.protocol + "//" + window.location.host;
 
-const state: State = {
+let state: State = {
     // bump this each time the schema changes to
     // invalidate anybody's saved state
     version: 1,
@@ -37,8 +37,8 @@ const state: State = {
     // login
     tmp_queue_id: "demo",
     queue_id: null,
+    queue_password: "",
     loading: false,
-    password: "asdf",
 
     // track list
     track_list: {},
@@ -58,6 +58,10 @@ const state: State = {
 
     // bookmarks
     bookmarks: [],
+};
+state = {
+    ...state,
+    ...JSON.parse(window.localStorage.getItem("saved_state") || "{}")
 };
 
 function view(state: State) {

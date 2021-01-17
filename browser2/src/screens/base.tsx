@@ -1,4 +1,6 @@
 import h from "hyperapp-jsx-pragma";
+import { DisplayResponseMessage } from "../effects";
+import { Http } from "hyperapp-fx";
 
 export const Screen = (
     {
@@ -37,3 +39,39 @@ export const Screen = (
         {footer}
     </main>
 );
+
+export function refresh(state: State) {
+    return [
+        { ...state, loading: true },
+        Http({
+            url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
+            action: (state, response) => ({
+                ...state,
+                loading: false,
+                queue: response.data.queue,
+            }),
+            error: (state, response) => [
+                {...state, loading: false},
+                [DisplayResponseMessage, response],
+            ],
+        }),
+    ];
+}
+
+export const Refresh = ({ state }: { state: State }) => (
+    <a onclick={refresh}>
+        <i
+            class={
+                state.loading
+                    ? "fas fa-2x fa-sync loading"
+                    : "fas fa-2x fa-sync"
+            }
+        />
+    </a>
+)
+
+export const BackToExplore = () => (
+    <a onclick={state => ({ ...state, screen: "explore" })}>
+        <i class={"fas fa-2x fa-chevron-circle-left"} />
+    </a>
+)

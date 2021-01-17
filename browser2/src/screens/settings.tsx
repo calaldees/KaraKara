@@ -46,12 +46,12 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Password</td>
                     <td>
                         <input
-                            value={state.password}
+                            value={state.queue_password}
                             type={"password"}
                             onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    password: event.target.value,
+                                    queue_password: event.target.value,
                                 } as State)
                             }
                         />

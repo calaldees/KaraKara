@@ -1,8 +1,7 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { Screen, Refresh, BackToExplore } from "./base";
 import { get_attachment, title_case } from "../utils";
 import { Http } from "hyperapp-fx";
-import { refresh } from "./queue";
 import { SendCommand, DisplayResponseMessage } from "../effects";
 
 function createDragStart(src_id) {
@@ -195,23 +194,9 @@ export const Control = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"queue"}
-        navLeft={
-            <a onclick={state => ({ ...state, screen: "explore" })}>
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
-            </a>
-        }
+        navLeft={<BackToExplore />}
         title={"Remote Control"}
-        navRight={
-            <a onclick={refresh}>
-                <i
-                    class={
-                        state.loading
-                            ? "fas fa-2x fa-sync loading"
-                            : "fas fa-2x fa-sync"
-                    }
-                />
-            </a>
-        }
+        navRight={<Refresh state={state} />}
         footer={<ControlButtons state={state} />}
     >
         {state.queue.length == 0 ?
