@@ -34,12 +34,4 @@ setup(
     [console_scripts]
     populate_KaraKara = karakara.model.setup:main
     """,
-    message_extractors={
-        'karakara': [
-            ('**.py'            , 'python', None),  # could replace None with {'input_encoding': 'utf-8'}
-            ('templates/**.html', 'mako'  , None),
-            ('templates/**.mako', 'mako'  , None),
-            ('static/**'        , 'ignore', None),
-        ]
-    },
 )

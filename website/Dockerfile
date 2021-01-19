@@ -91,15 +91,39 @@ FROM python_dependencies as xxx
         ${INI_DEV} \
         ${PATH_CONFIG}/test.inidiff \
         ${PATH_CONFIG}/test.ini
-    RUN pytest --ini_file=${PATH_CONFIG}/test.ini karakara
+    #RUN pytest --ini_file=${PATH_CONFIG}/test.ini karakara
 
 # --- it8n
 FROM python_dependencies as it8n
     ENV PATH_LOCALE=${PATH_WRITE}/locale
-    COPY ./locale ${PATH_LOCALE}
-    #RUN python setup.py extract_messages
-    #RUN python setup.py update_catalog
-    #RUN python setup.py compile_catalog
+    RUN mkdir -p ${PATH_LOCALE}
+
+    # extract messages from source files and generate a POT file
+    COPY ./karakara ./karakara
+    COPY ./locale/babel_message_extractors.ini ${PATH_LOCALE}/
+    RUN pybabel extract \
+        --mapping=${PATH_LOCALE}/babel_message_extractors.ini \
+        --output=${PATH_LOCALE}/karakara.pot \
+        karakara
+
+    # update existing message catalogs (po files) from a POT file
+    COPY \
+        ./locale/en/LC_MESSAGES/karakara.po \
+        ${PATH_LOCALE}/en/LC_MESSAGES/karakara.po
+    RUN pybabel update \
+        --domain=karakara \
+        --output-dir=${PATH_LOCALE} \
+        --input-file=${PATH_LOCALE}/karakara.pot \
+        --locale=en \
+        --previous true
+    # TODO: expose this to host? `docker cp`?
+
+    # compile message catalogs (po files) to MO files (binary for gettext)
+    RUN pybabel compile \
+        --domain=karakara \
+        --directory=${PATH_LOCALE} \
+        --statistics true
+
 
 FROM python_dependencies as production
     #COPY . /app
