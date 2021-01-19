@@ -14,7 +14,8 @@ pyramid.includes =
 
 # i18n -------------------------------------------------------------------------
 pyramid.default_locale_name = en
-i18n.translation_dirs = ../data/locale
+# TODO: Remove `/appdata/` hard-code
+i18n.translation_dirs = /appdata/locale
 i18n.available_languages = [en]
 
 # Karaoke settings -------------------------------------------------------------
@@ -28,7 +29,8 @@ karakara.faves.enabled                         = False -> bool
 karakara.websocket.host =
 karakara.websocket.port = 9001 -> int
 
-karakara.search.view.config = data/config/search_config.json
+# TODO: Remove `/appdata/` hard-code
+karakara.search.view.config = /appdata/config/search_config.json
 
 
 # Community ---------------------------------------------------------------------

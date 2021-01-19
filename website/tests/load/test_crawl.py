@@ -6,7 +6,7 @@ def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
 
-from karakara.tests.conftest import slow
+from ..conftest import slow
 
 
 def get_ram():

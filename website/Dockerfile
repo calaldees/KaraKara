@@ -18,10 +18,14 @@ FROM python:3-slim as base
     ENV PATH_WRITE=/appdata
     RUN mkdir -p ${PATH_WRITE}
 
+    ENV PATH_LOCALE=${PATH_WRITE}/locale
+
 FROM base as python_dependencies
-# -- Python dependencies
     COPY requirements.txt ./
     RUN pip3 install --no-cache-dir -r requirements.txt
+FROM python_dependencies as python_dependencies_test
+    COPY ./requirements.test.txt ./
+    RUN pip install --no-cache-dir -r requirements.test.txt
 
 # -- Static web dependencies
 
@@ -74,28 +78,8 @@ FROM base as static
               -o "${PATH_EXTERNAL}/fonts/glyphicons-halflings-regular.svg" &&\
             true
 
-# --- config
-#FROM base as config
-FROM python_dependencies as xxx
-    ENV PATH_CONFIG=${PATH_WRITE}/config
-    ENV INI_DEV=${PATH_CONFIG}/development.ini
-    COPY ./config/development.ini.dist ${INI_DEV}
-    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
-
-# --- test
-#FROM python_dependencies as test
-    COPY ./requirements.test.txt ./
-    RUN pip install --no-cache-dir -r requirements.test.txt
-    COPY ./config/test.inidiff.dist ${PATH_CONFIG}/test.inidiff
-    RUN python -m calaldees.apps.make_ini \
-        ${INI_DEV} \
-        ${PATH_CONFIG}/test.inidiff \
-        ${PATH_CONFIG}/test.ini
-    #RUN pytest --ini_file=${PATH_CONFIG}/test.ini karakara
-
-# --- it8n
-FROM python_dependencies as it8n
-    ENV PATH_LOCALE=${PATH_WRITE}/locale
+# --- locale
+FROM python_dependencies as locale
     RUN mkdir -p ${PATH_LOCALE}
 
     # extract messages from source files and generate a POT file
@@ -123,6 +107,30 @@ FROM python_dependencies as it8n
         --domain=karakara \
         --directory=${PATH_LOCALE} \
         --statistics true
+
+
+# --- config
+#FROM base as config
+FROM python_dependencies_test as xxx
+    ENV PATH_CONFIG=${PATH_WRITE}/config
+    ENV INI_DEV=${PATH_CONFIG}/development.ini
+    COPY ./config/development.ini.dist ${INI_DEV}
+    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
+
+# --- test
+#FROM python_dependencies_test as test
+    COPY ./config/test.inidiff.dist ${PATH_CONFIG}/test.inidiff
+    RUN python -m calaldees.apps.make_ini \
+        ${INI_DEV} \
+        ${PATH_CONFIG}/test.inidiff \
+        ${PATH_CONFIG}/test.ini
+    COPY ./karakara ./karakara
+    COPY ./tests ./tests
+    COPY ./setup.py ./
+    COPY --from=locale ${PATH_LOCALE} ${PATH_LOCALE}
+    RUN pip install -e .
+    RUN pytest --ini_file=${PATH_CONFIG}/test.ini -x
+
 
 
 FROM python_dependencies as production
