@@ -54,7 +54,7 @@ export const Login = ({ state }: { state: State }) => (
                         url:
                             state.root +
                             "/queue/" +
-                            state.tmp_queue_id +
+                            state.queue_id +
                             "/queue_items.json",
                         action: (state, response) => ({
                             ...state,
