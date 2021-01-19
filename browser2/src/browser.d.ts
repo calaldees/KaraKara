@@ -69,7 +69,6 @@ type State = {
     show_settings: boolean,
 
     // login
-    tmp_queue_id: string,
     queue_id: string,
     queue_password: string,
     loading: boolean,

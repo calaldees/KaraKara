@@ -3,6 +3,7 @@ import { app } from "hyperapp";
 import h from "hyperapp-jsx-pragma";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
+import { SaveStateManager } from "./save_state";
 
 import {
     Login,
@@ -35,7 +36,6 @@ let state: State = {
     show_settings: false,
 
     // login
-    tmp_queue_id: "demo",
     queue_id: null,
     queue_password: "",
     loading: false,
@@ -48,7 +48,7 @@ let state: State = {
 
     // track
     track_id: null,
-    performer_name: "Shish",
+    performer_name: "",
     action: null,
 
     // queue
@@ -59,10 +59,12 @@ let state: State = {
     // bookmarks
     bookmarks: [],
 };
-state = {
-    ...state,
-    ...JSON.parse(window.localStorage.getItem("saved_state") || "{}")
-};
+const ssm = new SaveStateManager(state, [
+    "performer_name",
+    "queue_id",
+    "queue_password",
+    "bookmarks",
+]);
 
 function view(state: State) {
     let body = null;
@@ -123,6 +125,7 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
 }
 
 function subscriptions(state: State) {
+    ssm.save_state_if_changed(state);
     HistoryManager.push_state_if_changed(state);
     return [HistoryManager, state.queue_id && getOpenMQTTListener(state)];
 }

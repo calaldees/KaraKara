@@ -1,4 +1,3 @@
-One user add two tracks to queue back to back, "error adding to queue" - what error??
 
 identify own tracks properly (by session instead of by name?)
 
@@ -10,10 +9,6 @@ prompt to install PWA
 
 search by track id
 
-save some state
-- `performer_name` (localStorage)
-- `version` / `track_list` (localStorage?)
-- `bookmarks` (localStorage)
 
 ```
 karakara.system.user.readonly
