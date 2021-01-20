@@ -36,16 +36,18 @@ FROM base as static
       ${PATH_EXTERNAL}/css \
       ${PATH_EXTERNAL}/fonts
 
+    ENV URL_GITHUB_RAW="https://raw.githubusercontent.com"
+
     ENV VERSION_JQUERY=2.1.4
         RUN \
             curl "http://code.jquery.com/jquery-${VERSION_JQUERY}.min.js" -o "${PATH_EXTERNAL}/jquery.min.js" &&\
             curl "http://code.jquery.com/jquery-${VERSION_JQUERY}.min.map" -o "${PATH_EXTERNAL}/jquery-${VERSION_JQUERY}.min.map"
     ENV VERSION_JQUERY_COOKIE=1.4.0
         RUN \
-            curl "http://raw.github.com/carhartl/jquery-cookie/v${VERSION_JQUERY_COOKIE}/jquery.cookie.js" -o "${PATH_EXTERNAL}/jquery.cookie.js"
+            curl "${URL_GITHUB_RAW}/carhartl/jquery-cookie/v${VERSION_JQUERY_COOKIE}/jquery.cookie.js" -o "${PATH_EXTERNAL}/jquery.cookie.js"
     ENV VERSION_JQUERY_SORTABLE=master
         RUN \
-            curl "https://raw.github.com/farhadi/html5sortable/${VERSION_JQUERY_SORTABLE}/jquery.sortable.js" -o "${PATH_EXTERNAL}/jquery.sortable.js"
+            curl "${URL_GITHUB_RAW}/farhadi/html5sortable/${VERSION_JQUERY_SORTABLE}/jquery.sortable.js" -o "${PATH_EXTERNAL}/jquery.sortable.js"
     ENV VERSION_JQUERY_MOBILE=1.4.5
         RUN \
             curl "http://code.jquery.com/mobile/${VERSION_JQUERY_MOBILE}/jquery.mobile-${VERSION_JQUERY_MOBILE}.min.js" -o "${PATH_EXTERNAL}/jquery.mobile.min.js" &&\
@@ -57,7 +59,7 @@ FROM base as static
             curl "http://yui.yahooapis.com/${VERSION_YUI_RESET}/build/cssreset/cssreset-min.css" -o "${PATH_EXTERNAL}/cssreset-min.css"
     ENV VERSION_BOOTSTRAP=3.3.7
         RUN \
-            BOOTSTRAP_URL="http://raw.github.com/twbs/bootstrap/v${VERSION_BOOTSTRAP}/dist/" &&\
+            BOOTSTRAP_URL="${URL_GITHUB_RAW}/twbs/bootstrap/v${VERSION_BOOTSTRAP}/dist" &&\
             curl "${BOOTSTRAP_URL}/js/bootstrap.min.js" \
               -o "${PATH_EXTERNAL}/js/bootstrap.min.js" &&\
             curl "${BOOTSTRAP_URL}/css/bootstrap-theme.min.css" \
@@ -78,6 +80,7 @@ FROM base as static
     ENV VERSION_MQTT=1.0.1
         RUN \
             curl "https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/${VERSION_MQTT}/mqttws31.min.js" -o "${PATH_EXTERNAL}/mqttws31.min.js"
+    RUN [ `find ${PATH_EXTERNAL} -empty` == ""]
 
 
 
