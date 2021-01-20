@@ -1,6 +1,7 @@
 # Application ------------------------------------------------------------------
 [app:main]
-use = egg:KaraKara
+#use = egg:KaraKara  # with this removed `entry_points` in `setup.py` is not needed and therefor no `pip install -e .` is required
+use = call:karakara:main
 
 # Pyramid ----------------------------------------------------------------------
 pyramid.reload_templates    = true
@@ -48,7 +49,8 @@ api.search.max_age = 0 -> int
 
 # Static Assets ----------------------------------------------------------------
 static.assets = karakara/static
-static.externals = data/externals/static
+# TODO: Remove `/appdata/` hard-code
+static.externals = /appdata/externals/static
 static.player = ../player
 static.player2 = ../player2/dist
 

@@ -50,9 +50,9 @@ def main(global_config, **settings):
 
     # Db
     init_DBSession(settings)
-    from .model.init_data import init_initial_tags
+    from .model.init_data import init_initial_tags  # TODO: this janky import before init is also present in test/conftest.py - can we remove the duplication?
     init_DBSession_tables()
-    #import pdb ; pdb.set_trace()
+
 
     # Pyramid Global Settings
     config = pyramid.config.Configurator(settings=settings, root_factory=TraversalGlobalRootFactory)  # , autocommit=True

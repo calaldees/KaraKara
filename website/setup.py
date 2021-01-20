@@ -28,10 +28,10 @@ setup(
     test_suite='py.test',
     #tests_require=test_requires,
     #install_requires=install_requires + test_requires,
-    entry_points="""\
-    [paste.app_factory]
-    main = karakara:main
-    [console_scripts]
-    populate_KaraKara = karakara.model.setup:main
-    """,
+    #entry_points="""\
+    #[paste.app_factory]
+    #main = karakara:main
+    #[console_scripts]
+    #populate_KaraKara = karakara.model.setup:main
+    #""",
 )

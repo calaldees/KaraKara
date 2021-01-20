@@ -28,60 +28,6 @@ FROM python_dependencies as python_dependencies_test
     RUN pip install --no-cache-dir -r requirements.test.txt
 
 
-FROM python_dependencies as locale
-    RUN mkdir -p ${PATH_LOCALE}
-
-    # extract messages from source files and generate a POT file
-    COPY ./karakara ./karakara
-    COPY ./locale/babel_message_extractors.ini ${PATH_LOCALE}/
-    RUN pybabel extract \
-        --mapping=${PATH_LOCALE}/babel_message_extractors.ini \
-        --output=${PATH_LOCALE}/karakara.pot \
-        karakara
-
-    # update existing message catalogs (po files) from a POT file
-    COPY \
-        ./locale/en/LC_MESSAGES/karakara.po \
-        ${PATH_LOCALE}/en/LC_MESSAGES/karakara.po
-    RUN pybabel update \
-        --domain=karakara \
-        --output-dir=${PATH_LOCALE} \
-        --input-file=${PATH_LOCALE}/karakara.pot \
-        --locale=en \
-        --previous true
-    # TODO: expose this to host? `docker cp`?
-
-    # compile message catalogs (po files) to MO files (binary for gettext)
-    RUN pybabel compile \
-        --domain=karakara \
-        --directory=${PATH_LOCALE} \
-        --statistics true
-
-
-# --- config
-#FROM base as config
-FROM python_dependencies_test as xxx
-    ENV PATH_CONFIG=${PATH_WRITE}/config
-    ENV INI_DEV=${PATH_CONFIG}/development.ini
-    COPY ./config/development.ini.dist ${INI_DEV}
-    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
-
-# --- test
-#FROM python_dependencies_test as test
-
-    COPY ./karakara ./karakara
-    COPY --from=locale ${PATH_LOCALE} ${PATH_LOCALE}
-    COPY ./setup.py ./
-    RUN pip install -e .
-    COPY ./tests ./tests
-    COPY ./config/test.inidiff.dist ${PATH_CONFIG}/test.inidiff
-    RUN python -m calaldees.apps.make_ini \
-        ${INI_DEV} \
-        ${PATH_CONFIG}/test.inidiff \
-        ${PATH_CONFIG}/test.ini
-    RUN pytest --ini_file=${PATH_CONFIG}/test.ini -x
-
-
 FROM base as static
     RUN mkdir -p \
       ${PATH_EXTERNAL}/images \
@@ -128,6 +74,67 @@ FROM base as static
             curl "${BOOTSTRAP_URL}/fonts/glyphicons-halflings-regular.svg" \
               -o "${PATH_EXTERNAL}/fonts/glyphicons-halflings-regular.svg" &&\
             true
+    ENV VERSION_MQTT=1.0.1
+        RUN \
+            curl "https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/${VERSION_MQTT}/mqttws31.min.js" -o "${PATH_EXTERNAL}/mqttws31.min.js"
+
+
+
+FROM python_dependencies as locale
+    RUN mkdir -p ${PATH_LOCALE}
+
+    # extract messages from source files and generate a POT file
+    COPY ./karakara ./karakara
+    COPY ./locale/babel_message_extractors.ini ${PATH_LOCALE}/
+    RUN pybabel extract \
+        --mapping=${PATH_LOCALE}/babel_message_extractors.ini \
+        --output=${PATH_LOCALE}/karakara.pot \
+        karakara
+
+    # update existing message catalogs (po files) from a POT file
+    COPY \
+        ./locale/en/LC_MESSAGES/karakara.po \
+        ${PATH_LOCALE}/en/LC_MESSAGES/karakara.po
+    RUN pybabel update \
+        --domain=karakara \
+        --output-dir=${PATH_LOCALE} \
+        --input-file=${PATH_LOCALE}/karakara.pot \
+        --locale=en \
+        --previous true
+    # TODO: expose this to host? `docker cp`?
+
+    # compile message catalogs (po files) to MO files (binary for gettext)
+    RUN pybabel compile \
+        --domain=karakara \
+        --directory=${PATH_LOCALE} \
+        --statistics true
+
+
+# --- config
+#FROM base as config
+FROM python_dependencies_test as xxx
+    ENV PATH_CONFIG=${PATH_WRITE}/config
+    ENV INI_DEV=${PATH_CONFIG}/development.ini
+    COPY ./config/development.ini.dist ${INI_DEV}
+    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
+
+# --- test
+#FROM python_dependencies_test as test
+
+    COPY ./karakara ./karakara
+    COPY --from=locale ${PATH_LOCALE} ${PATH_LOCALE}
+    COPY --from=static ${PATH_EXTERNAL} ${PATH_EXTERNAL}
+    #COPY ./setup.py ./
+    #RUN pip install -e .
+    COPY ./tests ./tests
+    COPY ./config/test.inidiff.dist ${PATH_CONFIG}/test.inidiff
+    RUN python -m calaldees.apps.make_ini \
+        ${INI_DEV} \
+        ${PATH_CONFIG}/test.inidiff \
+        ${PATH_CONFIG}/test.ini
+    RUN pytest --ini_file=${PATH_CONFIG}/test.ini -x
+
+
 
 FROM python_dependencies as production
     COPY --from=locale ${PATH_LOCALE} ${PATH_LOCALE}

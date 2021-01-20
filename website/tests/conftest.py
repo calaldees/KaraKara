@@ -74,6 +74,7 @@ def DBSession(request, app_ini):
     from karakara.model import DBSession, init_DBSession, init_DBSession_tables, clear_DBSession_tables
     init_DBSession(app_ini)
     clear_DBSession_tables()
+    from karakara.model.init_data import init_initial_tags  # TODO: this janky import before init is also present in __init__:main - can we remove the duplication?
     init_DBSession_tables()
 
     return DBSession
