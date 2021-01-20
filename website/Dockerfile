@@ -1,4 +1,5 @@
 FROM python:3-slim as base
+    ENV PATH_SITE_PACKAGES=/usr/local/lib/python3.9/site-packages/
 
     # System dependencies
     RUN apt-get update && apt-get install -y \
@@ -6,7 +7,6 @@ FROM python:3-slim as base
         curl \
         nano \
         less \
-        make \
     && pip install --no-cache-dir --upgrade \
         pip \
         setuptools \
@@ -15,6 +15,7 @@ FROM python:3-slim as base
 # Maybe move these ENV's to after dependencies? - that would mean copying the dependecies folder? humm ...
     ENV WORKDIR=/app
     WORKDIR ${WORKDIR}
+    ENV PYTHONPATH=${WORKDIR}
     ENV PATH_WRITE=/appdata
     RUN mkdir -p ${PATH_WRITE}
     ENV PATH_LOCALE=${PATH_WRITE}/locale
@@ -110,50 +111,38 @@ FROM python_dependencies as locale
         --statistics true
 
 
-# --- config
-#FROM base as config
-FROM python_dependencies_test as xxx
-    ENV PATH_CONFIG=${PATH_WRITE}/config
-    ENV INI_DEV=${PATH_CONFIG}/development.ini
-    COPY ./config/development.ini.dist ${INI_DEV}
-    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
-
-# --- test
-#FROM python_dependencies_test as test
-
+FROM python_dependencies as code
     COPY ./karakara ./karakara
     COPY --from=locale ${PATH_LOCALE} ${PATH_LOCALE}
     COPY --from=static ${PATH_EXTERNAL} ${PATH_EXTERNAL}
-    #COPY ./setup.py ./
-    #RUN pip install -e .
+
+    ENV PATH_CONFIG=${PATH_WRITE}/config
+    COPY ./config/development.ini.dist ${PATH_CONFIG}/development.ini
+    COPY ./config/search_config.json.dist ${PATH_CONFIG}/search_config.json
+
+    EXPOSE 6543
+    VOLUME /logs
+
+FROM code as development
+    CMD pserve ${PATH_CONFIG}/development.ini
+
+FROM code as test
+    COPY --from=python_dependencies_test ${PATH_SITE_PACKAGES} ${PATH_SITE_PACKAGES}
+    COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
+    COPY ./pytest.ini ./
     COPY ./config/test.inidiff.dist ${PATH_CONFIG}/test.inidiff
     RUN python -m calaldees.apps.make_ini \
-        ${INI_DEV} \
+        ${PATH_CONFIG}/development.ini \
         ${PATH_CONFIG}/test.inidiff \
         ${PATH_CONFIG}/test.ini
     RUN pytest --ini_file=${PATH_CONFIG}/test.ini -x
 
-
-
-FROM python_dependencies as production
-    COPY --from=locale ${PATH_LOCALE} ${PATH_LOCALE}
-    COPY --from=static ${PATH_EXTERNAL} ${PATH_EXTERNAL}
-    #COPY . /app
-    COPY ./config/production.inidiff ${PATH_CONFIG}/
+FROM code as production
+    COPY ./config/production.inidiff.dist ${PATH_CONFIG}/production.inidiff
     RUN python -m calaldees.apps.make_ini \
-        ${INI_DEV} \
-        ${PATH_CONFIG)/production.inidiff \
+        ${PATH_CONFIG}/development.ini \
+        ${PATH_CONFIG}/production.inidiff \
         ${PATH_CONFIG}/production.ini
-    EXPOSE 6543
-    VOLUME /logs
-    HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ || exit 1
     CMD pserve ${PATH_CONFIG}/production.ini
-
-#RUN make install
-#CMD make run_production
-
-
-
-
-
+    HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:6543/ || exit 1
