@@ -7,19 +7,19 @@ help:
 
 build:
 	docker build \
-		--tag karakara:local \
+		--tag karakara/website:local \
 		--target test \
 		.
 
 build_prod:
 	docker build \
-		--tag karakara:prod \
+		--tag karakara/website \
 		.
 
 DOCKER_RUN_LOCAL:=docker run -it --rm \
 	--publish 6543:6543 \
 	--volume=${PWD}:/app/:ro \
-	karakara:local
+	karakara/website:local
 run:
 	${DOCKER_RUN_LOCAL} pserve /appdata/config/development.ini
 test:

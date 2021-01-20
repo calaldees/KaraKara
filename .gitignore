@@ -1,15 +1,20 @@
 /.env
 
 **/.DS_Store
+
+**/*.py[oc]
+**/__pycache__
 **/.pytest_cache
+**/*.egg-info
+**/_env
+
 *.log
 *.pid
-**/*.py[oc]
+
 **/*.cache
 **/~
 hash_cache.pickle
-**/*.egg-info
-**/_env
+
 **/.swp
 
 **/.idea

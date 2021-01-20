@@ -1,5 +1,7 @@
-FROM python:3-slim as base
-    ENV PATH_SITE_PACKAGES=/usr/local/lib/python3.9/site-packages/
+ARG PYTHON_IMAGE_VERSION=3.9
+FROM python:${PYTHON_IMAGE_VERSION}-slim as base
+    ARG PYTHON_IMAGE_VERSION
+    ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
 
     # System dependencies
     RUN apt-get update && apt-get install -y \
@@ -16,8 +18,8 @@ FROM python:3-slim as base
     ENV WORKDIR=/app
     WORKDIR ${WORKDIR}
     ENV PYTHONPATH=${WORKDIR}
+
     ENV PATH_WRITE=/appdata
-    RUN mkdir -p ${PATH_WRITE}
     ENV PATH_LOCALE=${PATH_WRITE}/locale
     ENV PATH_EXTERNAL=${PATH_WRITE}/externals/static
 
