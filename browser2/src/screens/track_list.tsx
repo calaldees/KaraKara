@@ -141,6 +141,7 @@ function find_tracks(
         if (search != "") {
             search = search.toLowerCase();
             let any_match = false;
+            if (track_id.startsWith(search)) any_match = true;
             fts_match: for (let tag in track.tags) {
                 if (!track.tags.hasOwnProperty(tag)) continue;
                 for (let i = 0; i < track.tags[tag].length; i++) {
