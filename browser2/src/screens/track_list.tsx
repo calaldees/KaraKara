@@ -352,7 +352,7 @@ export const TrackExplorer = ({ state }: { state: State }) => (
             type={"text"}
             placeholder={"Add search keywords"}
             value={state.search}
-            onInput={(state: State, event: FormInputEvent) =>
+            oninput={(state: State, event: FormInputEvent) =>
                 ({
                     ...state,
                     search: event.target.value,
