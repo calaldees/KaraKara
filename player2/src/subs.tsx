@@ -74,6 +74,11 @@ export function getOpenMQTTListener(state: State): MQTTSubscribe {
 export const KeyboardListener = Keyboard({
     downs: true,
     action(state: State, event): State {
+        // Disable keyboard shortcuts when the settings
+        // screen is active
+        if (state.show_settings) {
+            return state;
+        }
         let action = null;
         switch (event.key) {
             case "s":

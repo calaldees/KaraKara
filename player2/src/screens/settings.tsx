@@ -43,6 +43,21 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     </td>
                 </tr>
                 <tr>
+                    <td>Password</td>
+                    <td>
+                        <input
+                            value={state.queue_password}
+                            type={"password"}
+                            onchange={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    queue_password: event.target.value,
+                                } as State)
+                            }
+                        />
+                    </td>
+                </tr>
+                <tr>
                     <td>Podium</td>
                     <td>
                         <input

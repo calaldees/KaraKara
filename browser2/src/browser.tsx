@@ -1,20 +1,12 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
-import h from "hyperapp-jsx-pragma";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { AutoHistory } from "hyperapp-auto-history";
 import { SaveStateManager } from "./save_state";
 
-import {
-    Login,
-    TrackExplorer,
-    TrackDetails,
-    Queue,
-    Control,
-    SettingsMenu,
-    refresh
-} from "./screens";
 import { http2ws } from "./utils";
+import { refresh } from "./screens/base";
+import { Root } from "./screens/root";
 
 // If we're running stand-alone, then use the main karakara.org.uk
 // server; else we're probably running as part of the full-stack,
@@ -58,6 +50,12 @@ let state: State = {
 
     // bookmarks
     bookmarks: [],
+
+    // settings
+    settings: {},
+
+    // priority_tokens
+    priority_tokens: [],
 };
 const ssm = new SaveStateManager(state, [
     "performer_name",
@@ -65,35 +63,6 @@ const ssm = new SaveStateManager(state, [
     "queue_password",
     "bookmarks",
 ]);
-
-function view(state: State) {
-    let body = null;
-    // queue_id can be set from saved state, but then track_list will be empty,
-    // so push the user back to login screen if that happens (can we load the
-    // track list on-demand somehow?)
-    if (state.queue_id === null || Object.keys(state.track_list).length === 0) {
-        body = <Login state={state} />;
-    } else if (state.screen == "explore") {
-        if (state.track_id) {
-            body = (
-                <TrackDetails
-                    state={state}
-                    track={state.track_list[state.track_id]}
-                />
-            );
-        } else {
-            body = <TrackExplorer state={state} />;
-        }
-    } else if (state.screen == "control") {
-        body = <Control state={state} />;
-    } else if (state.screen == "queue") {
-        body = <Queue state={state} />;
-    }
-    return <body>
-        {body}
-        {state.show_settings && <SettingsMenu state={state} />}
-    </body>;
-}
 
 const HistoryManager = AutoHistory({
     init: state,
@@ -132,7 +101,7 @@ function subscriptions(state: State) {
 
 app({
     init: state,
-    view: view,
+    view: Root,
     subscriptions: subscriptions,
     node: document.body,
 });

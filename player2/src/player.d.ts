@@ -54,6 +54,7 @@ type State = {
     // global persistent
     root: string,
     queue_id: string,
+    queue_password: string,
     podium: boolean,
 
     // global temporary

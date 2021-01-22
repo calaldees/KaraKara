@@ -66,7 +66,7 @@ export const Login = ({ state }: { state: State }) => (
                         ],
                     }),
                 ]}
-                disabled={state.loading}
+                disabled={(!state.queue_id) || state.loading}
             >
                 {state.loading ? (
                     <span>

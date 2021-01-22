@@ -1,6 +1,8 @@
 import h from "hyperapp-jsx-pragma";
+import { Http } from "hyperapp-fx";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
+import { DisplayResponseMessage } from "../effects";
 
 /*
  * List individual tracks
@@ -331,7 +333,67 @@ function back(state: State): State {
     return { ...state };
 }
 
-export const TrackExplorer = ({ state }: { state: State }) => (
+const AdminButtons = () => (
+    <footer>
+        <div class={"buttons"}>
+            <button onclick={(state) => [
+                {...state, screen: "priority_tokens"},
+                Http({
+                    url:
+                        state.root +
+                        "/queue/" +
+                        state.queue_id +
+                        "/priority_tokens.json",
+                    action: (state, response) => ({
+                        ...state,
+                        loading: false,
+                        priority_tokens: response.data.priority_tokens,
+                    }),
+                    error: (state, response) => [
+                        {
+                            ...state,
+                            loading: false,
+                            priority_tokens: [],
+                        },
+                        [DisplayResponseMessage, response],
+                    ],
+                }),
+            ]}>
+                Priority Tokens
+            </button>
+            <button onclick={(state) => [
+                {...state, screen: "room_settings"},
+                Http({
+                    url:
+                        state.root +
+                        "/queue/" +
+                        state.queue_id +
+                        "/settings.json",
+                    action: (state, response) => ({
+                        ...state,
+                        loading: false,
+                        settings: response.data.settings,
+                    }),
+                    error: (state, response) => [
+                        {
+                            ...state,
+                            loading: false,
+                            settings: {},
+                        },
+                        [DisplayResponseMessage, response],
+                    ],
+                }),
+            ]}>
+                Room Settings
+            </button>
+            <button onclick={(state) => [{...state, screen: "printable_list"}]}>
+                Printable Tracklist
+            </button>
+        </div>
+    </footer>
+);
+
+export const TrackList = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"track_list"}
@@ -346,6 +408,7 @@ export const TrackExplorer = ({ state }: { state: State }) => (
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
+        footer={state.queue_password && <AdminButtons />}
     >
         {/* Full-text search */}
         <input

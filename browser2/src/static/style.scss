@@ -381,3 +381,23 @@ MAIN.queue ARTICLE {
     SPAN:last-child::after {content: "";}
   }
 }
+
+@page {
+  size: landscape;
+}
+@media print {
+  MAIN {
+    position: relative;
+    HEADER {
+      display: none !important;
+    }
+    ARTICLE {
+      overflow: visible !important;
+      column-count: 4;
+      font-size: 0.75em;
+    }
+    FOOTER {
+      display: none !important;
+    }
+  }
+}

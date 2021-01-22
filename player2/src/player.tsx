@@ -1,16 +1,9 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
 import { AutoHistory } from "hyperapp-auto-history";
-import h from "hyperapp-jsx-pragma";
 
+import { Root } from "./screens/root";
 import { FetchRandomImages } from "./effects";
-import {
-    PodiumScreen,
-    PreviewScreen,
-    SettingsMenu,
-    TitleScreen,
-    VideoScreen,
-} from "./screens";
 import {
     getOpenMQTTListener,
     IntervalListener,
@@ -29,6 +22,7 @@ const state: State = {
     // global persistent
     root: auto_root,
     queue_id: "demo",
+    queue_password: "",
     podium: false,
 
     // global temporary
@@ -62,41 +56,6 @@ const state: State = {
     progress: 0,
 };
 
-function view(state: State) {
-    let screen = <section>Unknown state :(</section>;
-
-    if (!state.audio_allowed && !state.podium)
-        // podium doesn't play sound
-        screen = (
-            <section key="title" class={"screen_title"}>
-                <h1>Click to Activate</h1>
-            </section>
-        );
-    else if (state.queue.length === 0) screen = <TitleScreen state={state} />;
-    else if (state.podium) screen = <PodiumScreen state={state} />;
-    else if (state.queue.length > 0 && !state.playing)
-        screen = <PreviewScreen state={state} />;
-    else if (state.queue.length > 0 && state.playing)
-        screen = <VideoScreen state={state} />;
-
-    return (
-        <body
-            onclick={state => ({ ...state, audio_allowed: true })}
-            ondblclick={state => ({ ...state, show_settings: true })}
-        >
-            <main
-                class={"theme-" + state.settings["karakara.player.theme"]}
-            >
-                {state.connected || (
-                    <h1 id={"error"}>Not Connected To Server</h1>
-                )}
-                {screen}
-            </main>
-            {state.show_settings && <SettingsMenu state={state} />}
-        </body>
-    );
-}
-
 const HistoryManager = AutoHistory({
     init: state,
     push: ["root", "queue_id"],
@@ -119,7 +78,7 @@ function subscriptions(state: State) {
 
 app({
     init: [state, FetchRandomImages(state)],
-    view: view,
+    view: Root,
     subscriptions: subscriptions,
     node: document.body,
 });

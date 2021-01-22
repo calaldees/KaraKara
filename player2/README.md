@@ -4,7 +4,12 @@ A self-contained KaraKara frontend for big screens (showing the
 playlist and preview of next track) + singer podiums (showing
 lyrics and a "start" button)
 
-## TL;DR
+## Admin Tips
+
+Double-click the player to show the options window, where you can
+set a custom server / change queue ID / enter Podium mode / etc.
+
+## Dev Setup
 
 Depending on whether you prefer Docker or Node:
 ```
@@ -17,26 +22,14 @@ npm install
 npm run serve
 ```
 
-And then visit the player at
-`http://localhost:1235/#queue_id=my_queue`
+And then visit the player at `http://localhost:1235/`
 
-## Configuration
+With `npm run serve`, files will automatically get rebuilt and
+hot-reloaded, no need to even hit refresh in the browser :)
 
-Double-click the player to show the options window, where you can set a
-custom server / change queue ID / enter Podium mode / etc.
-
-## Dev Setup
-
-If you want to develop new features, by far the easiest way is to run node
-on your dev box:
-
-```
-npm install
-npm run serve
-```
-
-Files will automatically get rebuilt and hot-reloaded, no need to even hit
-refresh in the browser :)
+If you want to see the whole state for the app, you can double-click
+anywhere on the screen to open the settings menu, and then click the
+"Settings" heading to write the state to the debug console.
 
 ## Developer Notes
 

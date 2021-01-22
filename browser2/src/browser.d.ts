@@ -34,6 +34,7 @@ type Attachment = {
 
 type Track = {
     id: string,
+    id_short: string,
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,
@@ -54,6 +55,15 @@ type QueueItem = {
     track: Track,
     performer_name: string,
     total_duration: number,
+}
+
+type PriorityToken = {
+    id: string,
+    issued: Date,
+    used: boolean,
+    session_owner: string,
+    valid_start: Date,
+    valid_end: Date,
 }
 
 type State = {
@@ -91,4 +101,10 @@ type State = {
 
     // bookmarks
     bookmarks: Array<string>,
+
+    // settings
+    settings: Dictionary<any>,
+
+    // priority_tokens
+    priority_tokens: Array<PriorityToken>,
 }
