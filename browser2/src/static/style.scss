@@ -382,10 +382,10 @@ MAIN.queue ARTICLE {
   }
 }
 
-@page {
-  size: landscape;
-}
 @media print {
+  @page {
+    size: landscape;
+  }
   MAIN {
     position: relative;
     HEADER {
@@ -399,5 +399,27 @@ MAIN.queue ARTICLE {
     FOOTER {
       display: none !important;
     }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Don't put stuff in iPhone's weird rounded corners
+
+MAIN {
+  HEADER {
+    padding-top: env(safe-area-inset-top);
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+  }
+  ARTICLE {
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  FOOTER {
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+    padding-bottom: Max(0.3em, env(safe-area-inset-bottom));
   }
 }

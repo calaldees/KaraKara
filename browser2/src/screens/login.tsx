@@ -21,7 +21,7 @@ export const Login = ({ state }: { state: State }) => (
                 oninput={(state: State, event: FormInputEvent) =>
                     ({
                         ...state,
-                        queue_id: event.target.value,
+                        queue_id: event.target.value.toLowerCase(),
                     } as State)
                 }
                 disabled={state.loading}
