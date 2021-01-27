@@ -1,0 +1,15 @@
+topic readwrite test/#
+
+# Everybody can subscribe to room state broadcasts
+topic read karakara/room/+/queue
+topic read karakara/room/+/settings
+topic read karakara/room/+/commands
+
+# People who have the room password can write to the room's
+# command channel
+pattern write karakara/room/%u/commands
+
+# Server can write to everything
+user karakara
+topic readwrite karakara/#
+

@@ -119,7 +119,11 @@ import datetime
                 var chars = "0123456789ABCDEF";
                 for(var i=0; i<8; i++) {clientId += chars.charAt(Math.floor(Math.random()*chars.length));}
                 socket = new Paho.MQTT.Client(${self.js_websocket_url()}, clientId);
-                socket.connect({reconnect: true})
+                socket.connect({
+                    reconnect: true,
+                    userName: 'karakara',
+                    password: 'aeyGGrYJ',
+                })
 
                 socket.onMessageArrived = function(msg) {
                     var cmd = $.trim(msg.payload);

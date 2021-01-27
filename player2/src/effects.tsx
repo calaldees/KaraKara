@@ -12,7 +12,7 @@ export function SendCommand(state: State, command: string) {
     console.log("websocket_send(" + command + ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        topic: "karakara/queue/" + state.queue_id,
+        topic: "karakara/room/" + state.queue_id + "/commands",
         payload: command,
     });
 }
