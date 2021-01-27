@@ -26,8 +26,8 @@
         "typescript": "^4.1.3"
     },
     "pwaManifest": {
-        "name": "KaraKara Browser",
-        "shortName": "KaraKara Browser",
+        "name": "KaraKara",
+        "shortName": "KaraKara",
         "startURL": ".",
         "theme": "#e9e9e9",
         "display": "standalone",
