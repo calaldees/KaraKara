@@ -17,11 +17,11 @@ export const Login = ({ state }: { state: State }) => (
             <input
                 type={"text"}
                 placeholder={"Room Name"}
-                value={state.queue_id}
-                onchange={(state: State, event: FormInputEvent) =>
+                value={state.tmp_queue_id}
+                oninput={(state: State, event: FormInputEvent) =>
                     ({
                         ...state,
-                        queue_id: event.target.value.toLowerCase(),
+                        tmp_queue_id: event.target.value.toLowerCase(),
                     } as State)
                 }
                 disabled={state.loading}
@@ -33,40 +33,25 @@ export const Login = ({ state }: { state: State }) => (
                         url:
                             state.root +
                             "/queue/" +
-                            state.queue_id +
+                            state.tmp_queue_id +
                             "/track_list.json",
                         action: (state, response) => ({
                             ...state,
-                            queue_id: state.queue_id,
+                            queue_id: state.tmp_queue_id,
                             loading: false,
                             track_list: track_list_to_map(response.data.list),
                         }),
                         error: (state, response) => [
                             {
                                 ...state,
-                                queue_id: "",
+                                tmp_queue_id: "",
                                 loading: false,
                             },
                             [DisplayResponseMessage, response],
                         ],
                     }),
-                    Http({
-                        url:
-                            state.root +
-                            "/queue/" +
-                            state.queue_id +
-                            "/queue_items.json",
-                        action: (state, response) => ({
-                            ...state,
-                            queue: response.data.queue,
-                        }),
-                        error: (state, response) => [
-                            {...state, queue_id: ""},
-                            [DisplayResponseMessage, response],
-                        ],
-                    }),
                 ]}
-                disabled={(!state.queue_id) || state.loading}
+                disabled={(!state.tmp_queue_id) || state.loading}
             >
                 {state.loading ? (
                     <span>

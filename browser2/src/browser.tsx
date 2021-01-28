@@ -28,6 +28,7 @@ let state: State = {
     show_settings: false,
 
     // login
+    tmp_queue_id: "",
     queue_id: "",
     queue_password: "",
     loading: false,
@@ -59,15 +60,14 @@ let state: State = {
 };
 const ssm = new SaveStateManager(state, [
     "performer_name",
-    "queue_id",
     "queue_password",
     "bookmarks",
 ]);
 
 const HistoryManager = AutoHistory({
     init: state,
-    push: ["root", "queue_id", "filters", "track_id"],
-    replace: ["search"],
+    push: ["root", "filters", "track_id"],
+    replace: ["tmp_queue_id", "search"],
 });
 
 let mySubs = {};
@@ -97,7 +97,7 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
 function subscriptions(state: State) {
     ssm.save_state_if_changed(state);
     HistoryManager.push_state_if_changed(state);
-    return [HistoryManager, state.queue_id && getOpenMQTTListener(state)];
+    return [HistoryManager, state.queue_id && state.track_list && getOpenMQTTListener(state)];
 }
 
 app({
