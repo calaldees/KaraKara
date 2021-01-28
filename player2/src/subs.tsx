@@ -19,6 +19,7 @@ export function getOpenMQTTListener(state: State): MQTTSubscribe {
     if (!mySubs[url]) {
         mySubs[url] = MQTTSubscribe({
             url: url,
+            options: state.queue_password ? {username: state.queue_id, password: state.queue_password} : {},
             topic: "karakara/room/" + state.queue_id + "/commands",
             connect(state: State) {
                 return [
