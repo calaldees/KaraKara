@@ -1,4 +1,4 @@
-topic readwrite test/#
+topic readwrite test/public/#
 
 # Everybody can subscribe to room state broadcasts
 topic read karakara/room/+/queue
@@ -13,3 +13,6 @@ pattern write karakara/room/%u/commands
 user karakara
 topic readwrite karakara/#
 
+# For testing
+user test
+topic readwrite test/private/#
