@@ -136,9 +136,6 @@ MAIN {
         &:last-child {
           margin-right: 0;
         }
-        &:disabled {
-          color: $DISABLED;
-        }
       }
     }
   }
@@ -266,6 +263,9 @@ BUTTON {
 }
 BUTTON:active {
   background: darken($BG_DARK, 10);
+}
+BUTTON:disabled {
+  color: $DISABLED;
 }
 .loading {
   animation: spin 1s linear infinite;
