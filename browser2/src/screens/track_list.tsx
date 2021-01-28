@@ -327,7 +327,7 @@ function back(state: State): State {
     } else {
         // if we're at the start of the exploring process and
         // go back, go to the login screen
-        state.queue_id = null;
+        state.queue_id = "";
         state.track_list = {};
     }
     return { ...state };

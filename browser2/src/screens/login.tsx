@@ -18,7 +18,7 @@ export const Login = ({ state }: { state: State }) => (
                 type={"text"}
                 placeholder={"Room Name"}
                 value={state.queue_id}
-                oninput={(state: State, event: FormInputEvent) =>
+                onchange={(state: State, event: FormInputEvent) =>
                     ({
                         ...state,
                         queue_id: event.target.value.toLowerCase(),
@@ -44,7 +44,7 @@ export const Login = ({ state }: { state: State }) => (
                         error: (state, response) => [
                             {
                                 ...state,
-                                queue_id: null,
+                                queue_id: "",
                                 loading: false,
                             },
                             [DisplayResponseMessage, response],
@@ -61,7 +61,7 @@ export const Login = ({ state }: { state: State }) => (
                             queue: response.data.queue,
                         }),
                         error: (state, response) => [
-                            {...state, queue_id: null},
+                            {...state, queue_id: ""},
                             [DisplayResponseMessage, response],
                         ],
                     }),

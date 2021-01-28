@@ -15,7 +15,7 @@ export function Root(state: State) {
     // queue_id can be set from saved state, but then track_list will be empty,
     // so push the user back to login screen if that happens (can we load the
     // track list on-demand somehow?)
-    if (state.queue_id === null || Object.keys(state.track_list).length === 0) {
+    if (state.queue_id === "" || Object.keys(state.track_list).length === 0) {
         body = <Login state={state} />;
     } else if (state.screen == "explore") {
         if (state.track_id) {

@@ -87,7 +87,7 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             value={state.performer_name}
             placeholder={"Performer Name"}
             required={true}
-            oninput={(state: State, event: FormInputEvent) =>
+            onchange={(state: State, event: FormInputEvent) =>
                 ({
                     ...state,
                     performer_name: event.target.value,

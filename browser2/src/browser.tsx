@@ -28,7 +28,7 @@ let state: State = {
     show_settings: false,
 
     // login
-    queue_id: null,
+    queue_id: "",
     queue_password: "",
     loading: false,
 
