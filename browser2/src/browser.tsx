@@ -70,28 +70,42 @@ const HistoryManager = AutoHistory({
     replace: ["tmp_queue_id", "search"],
 });
 
-let mySubs = {};
-
 function getOpenMQTTListener(state: State): MQTTSubscribe {
-    let url = http2ws(state.root) + "/mqtt";
-    if (!mySubs[url]) {
-        mySubs[url] = MQTTSubscribe({
-            url: url,
-            options: state.queue_password ? {username: state.queue_id, password: state.queue_password} : {},
-            topic: "karakara/room/" + state.queue_id + "/commands",
-            connect(state: State) {
-                return refresh(state);
-            },
-            close(state: State) {
-                // delete mySubs[url];
-                return { ...state };
-            },
-            message(state: State, msg) {
-                return refresh(state);
-            },
-        });
-    }
-    return mySubs[url];
+    return MQTTSubscribe({
+        url: http2ws(state.root) + "/mqtt",
+        // don't specify un/pw at all, unless pw is non-empty
+        ...(state.queue_password ? {
+            username: state.queue_id,
+            password: state.queue_password,
+        } : {}),
+        topic: "karakara/room/" + state.queue_id + "/commands",
+        connect(state: State) {
+            // TODO: no need to refresh on connect if we
+            // have retained messages
+            console.log("Connected, refreshing");
+            return refresh(state);
+        },
+        close(state: State) {
+            console.log("MQTT socket closed, assuming it'll reopen");
+            return { ...state };
+        },
+        error(state: State, err) {
+            console.log(
+                "Got an unrecoverable MQTT error, "+
+                "returning to login screen", err
+            )
+            return {
+                ...state,
+                queue_id: "",
+                notification: {text: err.message, style: "error"}
+            };
+        },
+        message(state: State, msg) {
+            // TODO: state.queue = JSON.parse(msg.payload.toString());
+            console.log("Got command, refreshing:", msg.payload.toString());
+            return refresh(state);
+        },
+    });
 }
 
 function subscriptions(state: State) {
