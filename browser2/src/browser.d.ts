@@ -71,6 +71,7 @@ type State = {
 
     // global
     root: string,
+    root_edit: string,
     screen: string,
     notification: {
         text: string,
@@ -79,9 +80,10 @@ type State = {
     show_settings: boolean,
 
     // login
-    tmp_queue_id: string,
     queue_id: string,
+    queue_id_edit: string,
     queue_password: string,
+    queue_password_edit: string,
     loading: boolean,
 
     // track list

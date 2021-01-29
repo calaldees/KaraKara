@@ -17,11 +17,11 @@ export const Login = ({ state }: { state: State }) => (
             <input
                 type={"text"}
                 placeholder={"Room Name"}
-                value={state.tmp_queue_id}
+                value={state.queue_id_edit}
                 oninput={(state: State, event: FormInputEvent) =>
                     ({
                         ...state,
-                        tmp_queue_id: event.target.value.toLowerCase(),
+                        queue_id_edit: event.target.value.toLowerCase(),
                     } as State)
                 }
                 disabled={state.loading}
@@ -33,25 +33,25 @@ export const Login = ({ state }: { state: State }) => (
                         url:
                             state.root +
                             "/queue/" +
-                            state.tmp_queue_id +
+                            state.queue_id_edit +
                             "/track_list.json",
                         action: (state, response) => ({
                             ...state,
-                            queue_id: state.tmp_queue_id,
+                            queue_id: state.queue_id_edit,
                             loading: false,
                             track_list: track_list_to_map(response.data.list),
                         }),
                         error: (state, response) => [
                             {
                                 ...state,
-                                tmp_queue_id: "",
+                                queue_id_edit: "",
                                 loading: false,
                             },
                             [DisplayResponseMessage, response],
                         ],
                     }),
                 ]}
-                disabled={(!state.tmp_queue_id) || state.loading}
+                disabled={(!state.queue_id_edit) || state.loading}
             >
                 {state.loading ? (
                     <span>

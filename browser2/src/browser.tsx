@@ -23,14 +23,16 @@ let state: State = {
 
     // global
     root: auto_root,
+    root_edit: auto_root,
     screen: "explore",
     notification: null,
     show_settings: false,
 
     // login
-    tmp_queue_id: "",
     queue_id: "",
+    queue_id_edit: "",
     queue_password: "",
+    queue_password_edit: "",
     loading: false,
 
     // track list
@@ -67,7 +69,7 @@ const ssm = new SaveStateManager(state, [
 const HistoryManager = AutoHistory({
     init: state,
     push: ["root", "filters", "track_id"],
-    replace: ["tmp_queue_id", "search"],
+    replace: ["queue_id_edit", "search"],
 });
 
 function getOpenMQTTListener(state: State): MQTTSubscribe {

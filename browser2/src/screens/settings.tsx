@@ -19,11 +19,11 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                         <input
                             value={state.root}
                             type={"text"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({...state, root_edit: event.target.value} as State)
+                            }
                             onchange={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    root: event.target.value,
-                                } as State)
+                                ({...state, root: state.root_edit} as State)
                             }
                         />
                     </td>
@@ -34,11 +34,11 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                         <input
                             value={state.queue_id}
                             type={"text"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({...state, queue_id_edit: event.target.value} as State)
+                            }
                             onchange={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    queue_id: event.target.value,
-                                } as State)
+                                ({...state, queue_id: state.queue_id_edit} as State)
                             }
                         />
                     </td>
@@ -49,11 +49,11 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                         <input
                             value={state.queue_password}
                             type={"password"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({...state, queue_password_edit: event.target.value} as State)
+                            }
                             onchange={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    queue_password: event.target.value,
-                                } as State)
+                                ({...state, queue_password: state.queue_password_edit} as State)
                             }
                         />
                     </td>
