@@ -1,7 +1,7 @@
 
 - test priority token view screen with real tokens
 - identify own tracks properly (by session instead of by name?)
-- MQTT authentication
+  - Associate device UUID with queue item?
 
 ```
 karakara.system.user.readonly

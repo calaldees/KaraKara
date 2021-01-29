@@ -53,8 +53,11 @@ type WaterfallImage = {
 type State = {
     // global persistent
     root: string,
+    root_edit: string,
     queue_id: string,
+    queue_id_edit: string,
     queue_password: string,
+    queue_password_edit: string,
     podium: boolean,
 
     // global temporary
