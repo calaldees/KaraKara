@@ -31,6 +31,11 @@ export const Login = ({ state }: { state: State }) => (
                     ApiRequest({
                         function: "track_list",
                         state: state,
+                        progress: (state, done, size) => [{
+                            ...state,
+                            download_done: done,
+                            download_size: size,
+                        }],
                         action: (state, response) =>
                             response.status == "ok"
                                 ? {
@@ -51,7 +56,10 @@ export const Login = ({ state }: { state: State }) => (
             >
                 {state.loading ? (
                     <span>
-                        Loading Tracks <i class={"loading fas fa-sync-alt"} />
+                        Loading Tracks{" "}
+                        {state.download_size ?
+                            ((state.download_done/state.download_size)*100 + "%") :
+                            <i class={"loading fas fa-sync-alt"} />}
                     </span>
                 ) : (
                     <span>

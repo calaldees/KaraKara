@@ -79,6 +79,8 @@ type State = {
         style: string,
     },
     show_settings: boolean,
+    download_size: number,
+    download_done: number,
 
     // login
     session_id: string,

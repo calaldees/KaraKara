@@ -27,6 +27,8 @@ let state: State = {
     screen: "explore",
     notification: null,
     show_settings: false,
+    download_size: null,
+    download_done: 0,
 
     // login
     session_id: null,
