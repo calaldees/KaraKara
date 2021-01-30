@@ -13,7 +13,7 @@ function _lineStyle(item, state: State) {
 export const Lyrics = ({ state }: { state: State }) => (
     <div class={"lyrics"}>
         <ol>
-            {state.queue[0].track.srt_lyrics.map(item => (
+            {state.queue[0].track.srt_lyrics && state.queue[0].track.srt_lyrics.map(item => (
                 <li key={item.id} class={_lineStyle(item, state)}>
                     <span>{item.text}</span>
                 </li>
