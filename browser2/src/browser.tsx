@@ -29,6 +29,7 @@ let state: State = {
     show_settings: false,
 
     // login
+    session_id: null,
     room_name: "",
     room_name_edit: "",
     room_password: "",

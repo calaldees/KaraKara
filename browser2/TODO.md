@@ -1,7 +1,5 @@
 
 - test priority token view screen with real tokens
-- identify own tracks properly (by session instead of by name?)
-  - Associate device UUID with queue item?
 - Progress bar for loading tracks
 
 ```

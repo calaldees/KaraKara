@@ -56,7 +56,7 @@ const QueueItemRender = ({
 }) => (
     <li
         class={
-            state.performer_name == item.performer_name
+            state.session_id == item.session_owner
                 ? "queue_item me"
                 : "queue_item"
         }
@@ -82,7 +82,7 @@ const QueueItemRender = ({
             </span>
         )}
 
-        {state.performer_name == item.performer_name && (
+        {state.session_id == item.session_owner && (
             <span
                 class={"go_arrow"}
                 onclick={state => [

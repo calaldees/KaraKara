@@ -39,6 +39,7 @@ export const Login = ({ state }: { state: State }) => (
                             ...state,
                             room_name: state.room_name_edit,
                             loading: false,
+                            session_id: response.identity.id,
                             track_list: track_list_to_map(response.data.list),
                         }),
                         error: (state, response) => [

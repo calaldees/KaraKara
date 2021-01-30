@@ -55,6 +55,7 @@ type QueueItem = {
     track: Track,
     performer_name: string,
     total_duration: number,
+    session_owner: string,
 }
 
 type PriorityToken = {
@@ -80,6 +81,7 @@ type State = {
     show_settings: boolean,
 
     // login
+    session_id: string,
     room_name: string,
     room_name_edit: string,
     room_password: string,
