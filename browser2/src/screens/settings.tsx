@@ -32,13 +32,13 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Room</td>
                     <td>
                         <input
-                            value={state.queue_id_edit}
+                            value={state.room_name_edit}
                             type={"text"}
                             oninput={(state: State, event: FormInputEvent) =>
-                                ({...state, queue_id_edit: event.target.value} as State)
+                                ({...state, room_name_edit: event.target.value} as State)
                             }
                             onchange={(state: State, event: FormInputEvent) =>
-                                ({...state, queue_id: state.queue_id_edit} as State)
+                                ({...state, room_name: state.room_name_edit} as State)
                             }
                         />
                     </td>
@@ -47,13 +47,13 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Password</td>
                     <td>
                         <input
-                            value={state.queue_password_edit}
+                            value={state.room_password_edit}
                             type={"password"}
                             oninput={(state: State, event: FormInputEvent) =>
-                                ({...state, queue_password_edit: event.target.value} as State)
+                                ({...state, room_password_edit: event.target.value} as State)
                             }
                             onchange={(state: State, event: FormInputEvent) =>
-                                ({...state, queue_password: state.queue_password_edit} as State)
+                                ({...state, room_password: state.room_password_edit} as State)
                             }
                         />
                     </td>

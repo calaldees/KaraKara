@@ -327,7 +327,7 @@ function back(state: State): State {
     } else {
         // if we're at the start of the exploring process and
         // go back, go to the login screen
-        state.queue_id = "";
+        state.room_name = "";
         state.track_list = {};
     }
     return { ...state };
@@ -342,7 +342,7 @@ const AdminButtons = () => (
                     url:
                         state.root +
                         "/queue/" +
-                        state.queue_id +
+                        state.room_name +
                         "/priority_tokens.json",
                     action: (state, response) => ({
                         ...state,
@@ -367,7 +367,7 @@ const AdminButtons = () => (
                     url:
                         state.root +
                         "/queue/" +
-                        state.queue_id +
+                        state.room_name +
                         "/settings.json",
                     action: (state, response) => ({
                         ...state,
@@ -404,11 +404,11 @@ export const TrackList = ({ state }: { state: State }) => (
         }
         title={"Explore Tracks"}
         navRight={
-            <a onclick={state => ({ ...state, screen: state.queue_password ? "control" : "queue" })}>
+            <a onclick={state => ({ ...state, screen: state.room_password ? "control" : "queue" })}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
-        footer={state.queue_password && <AdminButtons />}
+        footer={state.room_password && <AdminButtons />}
     >
         {/* Full-text search */}
         <input

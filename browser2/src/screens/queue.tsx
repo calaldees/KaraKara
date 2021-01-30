@@ -91,7 +91,7 @@ const QueueItemRender = ({
                         url:
                             state.root +
                             "/queue/" +
-                            state.queue_id +
+                            state.room_name +
                             "/queue_items.json",
                         options: {
                             method: "DELETE",

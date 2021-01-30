@@ -61,7 +61,7 @@ export const PreviewScreen = ({ state }: { state: State }) => (
         {/* key= to make sure this element stays put while the above may disappear */}
         <div id="join_info" key={"join_info"}>
             Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.queue_id}</strong>
+            Name is <strong>{state.room_name}</strong>
             {state.settings["karakara.event.end"] && (
                 <span>
                     <br />

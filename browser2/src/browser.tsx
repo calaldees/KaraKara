@@ -29,10 +29,10 @@ let state: State = {
     show_settings: false,
 
     // login
-    queue_id: "",
-    queue_id_edit: "",
-    queue_password: "",
-    queue_password_edit: "",
+    room_name: "",
+    room_name_edit: "",
+    room_password: "",
+    room_password_edit: "",
     loading: false,
 
     // track list
@@ -62,7 +62,7 @@ let state: State = {
 };
 const ssm = new SaveStateManager(state, [
     "performer_name",
-    "queue_password",
+    "room_password",
     "bookmarks",
 ]);
 
@@ -70,11 +70,11 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         // don't specify un/pw at all, unless pw is non-empty
-        ...(state.queue_password ? {
-            username: state.queue_id,
-            password: state.queue_password,
+        ...(state.room_password ? {
+            username: state.room_name,
+            password: state.room_password,
         } : {}),
-        topic: "karakara/room/" + state.queue_id + "/commands",
+        topic: "karakara/room/" + state.room_name + "/commands",
         connect(state: State) {
             // TODO: no need to refresh on connect if we
             // have retained messages
@@ -92,7 +92,7 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
             )
             return {
                 ...state,
-                queue_id: "",
+                room_name: "",
                 notification: {text: err.message, style: "error"}
             };
         },
@@ -109,10 +109,10 @@ function subscriptions(state: State) {
     return [
         AutoHistory({
             push: ["root", "filters", "track_id"],
-            replace: ["queue_id_edit", "search"],
+            replace: ["room_name_edit", "search"],
             encoder: "json",
         }, state),
-        state.queue_id && state.track_list && getOpenMQTTListener(state),
+        state.room_name && state.track_list && getOpenMQTTListener(state),
     ];
 }
 

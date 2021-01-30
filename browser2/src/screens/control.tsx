@@ -45,7 +45,7 @@ function createDrop(dst_id) {
         return [
             {...state, queue: new_queue, drop_source: null, drop_target: null},
             Http({
-                url: state.root+'/queue/'+state.queue_id+'/queue_items.json',
+                url: state.root+'/queue/'+state.room_name+'/queue_items.json',
                 options: {
                     method: "PUT",
                     headers: {
@@ -137,7 +137,7 @@ const QueueItemRender = ({
                     url:
                         state.root +
                         "/queue/" +
-                        state.queue_id +
+                        state.room_name +
                         "/queue_items.json",
                     options: {
                         method: "DELETE",

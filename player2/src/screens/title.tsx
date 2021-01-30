@@ -16,7 +16,7 @@ export const TitleScreen = ({ state }: { state: State }) => (
         <h1>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
             Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.queue_id}</strong>
+            Name is <strong>{state.room_name}</strong>
         </div>
     </section>
 );

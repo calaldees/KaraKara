@@ -22,10 +22,10 @@ const state: State = {
     // global persistent
     root: auto_root,
     root_edit: auto_root,
-    queue_id: "demo",
-    queue_id_edit: "demo",
-    queue_password: "",
-    queue_password_edit: "",
+    room_name: "demo",
+    room_name_edit: "demo",
+    room_password: "",
+    room_password_edit: "",
     podium: false,
 
     // global temporary
@@ -62,7 +62,7 @@ const state: State = {
 function subscriptions(state: State) {
     return [
         AutoHistory({
-            push: ["root", "queue_id"],
+            push: ["root", "room_name"],
             replace: ["podium"],
             encoder: "json",
         }, state),

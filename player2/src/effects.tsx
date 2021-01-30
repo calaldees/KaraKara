@@ -12,11 +12,11 @@ export function SendCommand(state: State, command: string) {
     console.log("websocket_send(" + command + ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        ...(state.queue_password ? {
-            username: state.queue_id,
-            password: state.queue_password,
+        ...(state.room_password ? {
+            username: state.room_name,
+            password: state.room_password,
         } : {}),
-        topic: "karakara/room/" + state.queue_id + "/commands",
+        topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });
 }
@@ -26,7 +26,7 @@ export function FetchRandomImages(state: State) {
         url:
             state.root +
             "/queue/" +
-            state.queue_id +
+            state.room_name +
             "/random_images.json?count=25",
         action(state: State, response): State {
             return {
@@ -47,7 +47,7 @@ export function FetchRandomImages(state: State) {
 
 export function CheckSettings(state: State) {
     return Http({
-        url: state.root + "/queue/" + state.queue_id + "/settings.json",
+        url: state.root + "/queue/" + state.room_name + "/settings.json",
         action(state: State, response) {
             return {
                 ...state,
@@ -63,7 +63,7 @@ export function CheckSettings(state: State) {
 
 export function CheckQueue(state: State) {
     return Http({
-        url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
+        url: state.root + "/queue/" + state.room_name + "/queue_items.json",
         action(state: State, response) {
             function merge_lyrics(item) {
                 item.track.srt_lyrics = get_lyrics(state, item.track);
@@ -83,7 +83,7 @@ export function CheckQueue(state: State) {
 
 export function SetTrackState(state: State, value: string) {
     return Http({
-        url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
+        url: state.root + "/queue/" + state.room_name + "/queue_items.json",
         options: {
             method: "PUT",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },

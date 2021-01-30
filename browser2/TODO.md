@@ -16,5 +16,5 @@ karakara.search.list.alphabetical.threshold
 Potential new features:
 - broadcast message
 - notify user via app when their song is up now / next
-- if API says "this event is over", notify "this event has finished" + set `queue_id` to null
+- if API says "this event is over", notify "this event has finished" + set `room_name` to null
 - prompt to install PWA

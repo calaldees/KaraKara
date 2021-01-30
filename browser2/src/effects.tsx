@@ -42,11 +42,11 @@ export function SendCommand(state: State, command: string) {
     console.log("websocket_send(" + command + ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        ...(state.queue_password ? {
-            username: state.queue_id,
-            password: state.queue_password,
+        ...(state.room_password ? {
+            username: state.room_name,
+            password: state.room_password,
         } : {}),
-        topic: "karakara/room/" + state.queue_id + "/commands",
+        topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });
 }

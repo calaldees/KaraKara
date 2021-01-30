@@ -12,10 +12,10 @@ import { PriorityTokens } from "./priority_tokens";
 
 export function Root(state: State) {
     let body = null;
-    // queue_id can be set from saved state, but then track_list will be empty,
+    // room_name can be set from saved state, but then track_list will be empty,
     // so push the user back to login screen if that happens (can we load the
     // track list on-demand somehow?)
-    if (state.queue_id === "" || Object.keys(state.track_list).length === 0) {
+    if (state.room_name === "" || Object.keys(state.track_list).length === 0) {
         body = <Login state={state} />;
     } else if (state.screen == "explore") {
         if (state.track_id) {

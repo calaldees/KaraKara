@@ -44,7 +44,7 @@ export function refresh(state: State) {
     return [
         { ...state, loading: true },
         Http({
-            url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
+            url: state.root + "/queue/" + state.room_name + "/queue_items.json",
             action: (state, response) => ({
                 ...state,
                 loading: false,

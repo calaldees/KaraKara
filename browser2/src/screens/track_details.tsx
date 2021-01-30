@@ -56,7 +56,7 @@ function enqueue(state: State) {
     return [
         { ...state, notification: {text: "Adding to queue...", style: "warning"} },
         Http({
-            url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
+            url: state.root + "/queue/" + state.room_name + "/queue_items.json",
             options: {
                 method: "POST",
                 headers: {
@@ -136,7 +136,7 @@ export const TrackDetails = ({
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a onclick={state => ({ ...state, screen: state.queue_password ? "control" : "queue" })}>
+            <a onclick={state => ({ ...state, screen: state.room_password ? "control" : "queue" })}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
