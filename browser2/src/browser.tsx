@@ -66,12 +66,6 @@ const ssm = new SaveStateManager(state, [
     "bookmarks",
 ]);
 
-const HistoryManager = AutoHistory({
-    init: state,
-    push: ["root", "filters", "track_id"],
-    replace: ["queue_id_edit", "search"],
-});
-
 function getOpenMQTTListener(state: State): MQTTSubscribe {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
@@ -112,8 +106,14 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
 
 function subscriptions(state: State) {
     ssm.save_state_if_changed(state);
-    HistoryManager.push_state_if_changed(state);
-    return [HistoryManager, state.queue_id && state.track_list && getOpenMQTTListener(state)];
+    return [
+        AutoHistory({
+            push: ["root", "filters", "track_id"],
+            replace: ["queue_id_edit", "search"],
+            encoder: "json",
+        }, state),
+        state.queue_id && state.track_list && getOpenMQTTListener(state),
+    ];
 }
 
 app({

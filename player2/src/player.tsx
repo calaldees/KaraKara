@@ -59,16 +59,13 @@ const state: State = {
     progress: 0,
 };
 
-const HistoryManager = AutoHistory({
-    init: state,
-    push: ["root", "queue_id"],
-    replace: ["podium"],
-});
-
 function subscriptions(state: State) {
-    HistoryManager.push_state_if_changed(state);
     return [
-        HistoryManager,
+        AutoHistory({
+            push: ["root", "queue_id"],
+            replace: ["podium"],
+            encoder: "json",
+        }, state),
         KeyboardListener,
         getOpenMQTTListener(state),
         state.audio_allowed &&
