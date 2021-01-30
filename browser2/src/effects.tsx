@@ -2,50 +2,111 @@ import { MQTTPublish } from "hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
 import { http2ws } from "./utils";
 
-export function DisplayResponseMessage(dispatch, response) {
-    function parseResponse(data) {
-        if(data.code >= 200 && data.code < 400) {
-            dispatch(state => [
-                { ...state, notification: {text: data.messages[0], style: "ok"} },
-                Delay({
-                    wait: 2000,
-                    action: (state) => ({...state, notification: null})
-                })
-            ]);
-        }
-        else {
-            dispatch(state => ({ ...state, notification: {text: data.messages[0], style: "error"} }));
-        }
-    }
+function apiRequestEffect(dispatch, props) {
+    dispatch((state) => ({
+        ...state,
+        loading: true,
+        notification: props.title
+            ? { text: props.title, style: "warning" }
+            : null,
+    }));
 
-    // When Http() is successful, response = the json from the server
-    if(response.code) {
-        parseResponse(response);
-    }
-
-    // When Http() fails, response = the raw blob, which we need
-    // to decode for ourselves. First attempt to decode JSON, like
-    // if karakara sent us a 403; fall back to "internal error" if
-    // we can't decode it, like if the server crashed)
-    else {
-        response
-        .json()
-        .then(parseResponse)
-        .catch(err => {
-            console.log(err);
-            dispatch(state => ({ ...state, notification: {text: "Internal Error", style: "error"} }));
+    fetch(props.url, props.options)
+        .then(function (response) {
+            return response;
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (result) {
+            dispatch(
+                (state, result) => [
+                    {
+                        ...state,
+                        loading: false,
+                    },
+                ],
+                result,
+            );
+            if (result.status == "ok") {
+                if (result.messages.length > 0) {
+                    dispatch((state) => [
+                        {
+                            ...state,
+                            notification: {
+                                text: result.messages[0],
+                                style: "ok",
+                            },
+                        },
+                        Delay({
+                            wait: 2000,
+                            action: (state) => ({
+                                ...state,
+                                notification: null,
+                            }),
+                        }),
+                    ]);
+                }
+            } else {
+                dispatch((state) => [
+                    {
+                        ...state,
+                        notification: {
+                            text: result.messages[0],
+                            style: "error",
+                        },
+                    },
+                ]);
+            }
+            if (props.action) {
+                dispatch(props.action, result);
+            }
+        })
+        .catch(function (error) {
+            dispatch(
+                (state, error) => [
+                    {
+                        ...state,
+                        loading: false,
+                        notification: {
+                            text: "Internal Error: " + error,
+                            style: "error",
+                        },
+                    },
+                ],
+                error,
+            );
         });
-    }
+}
+
+export function ApiRequest(props) {
+    return [
+        apiRequestEffect,
+        {
+            options: {},
+            response: "json",
+            url:
+                props.state.root +
+                "/queue/" +
+                (props.state.room_name || props.state.room_name_edit) +
+                "/" +
+                props.function +
+                ".json",
+            ...props,
+        },
+    ];
 }
 
 export function SendCommand(state: State, command: string) {
     console.log("websocket_send(" + command + ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        ...(state.room_password ? {
-            username: state.room_name,
-            password: state.room_password,
-        } : {}),
+        ...(state.room_password
+            ? {
+                  username: state.room_name,
+                  password: state.room_password,
+              }
+            : {}),
         topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });

@@ -6,7 +6,7 @@ export const PriorityTokens = ({ state }: { state: State }) => (
         state={state}
         className={"priority_tokens"}
         navLeft={
-            <a onclick={(state) => [{...state, screen: "explore"}]}>
+            <a onclick={(state) => [{ ...state, screen: "explore" }]}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
@@ -24,14 +24,16 @@ export const PriorityTokens = ({ state }: { state: State }) => (
                 <th>End</th>
             </thead>
             <tbody>
-                {state.priority_tokens.map((t: PriorityToken) => <tr>
-                    <td>{t.id}</td>
-                    <td>{t.issued}</td>
-                    <td>{t.used}</td>
-                    <td>{t.session_owner}</td>
-                    <td>{t.valid_start}</td>
-                    <td>{t.valid_end}</td>
-                </tr>)}
+                {state.priority_tokens.map((t: PriorityToken) => (
+                    <tr>
+                        <td>{t.id}</td>
+                        <td>{t.issued}</td>
+                        <td>{t.used}</td>
+                        <td>{t.session_owner}</td>
+                        <td>{t.valid_start}</td>
+                        <td>{t.valid_end}</td>
+                    </tr>
+                ))}
             </tbody>
         </table>
     </Screen>

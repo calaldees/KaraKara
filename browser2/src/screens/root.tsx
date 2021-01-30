@@ -39,8 +39,10 @@ export function Root(state: State) {
     } else if (state.screen == "priority_tokens") {
         body = <PriorityTokens state={state} />;
     }
-    return <body>
-        {body}
-        {state.show_settings && <SettingsMenu state={state} />}
-    </body>;
+    return (
+        <body>
+            {body}
+            {state.show_settings && <SettingsMenu state={state} />}
+        </body>
+    );
 }

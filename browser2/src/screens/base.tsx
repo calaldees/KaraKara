@@ -1,6 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { DisplayResponseMessage } from "../effects";
-import { Http } from "hyperapp-fx";
+import { ApiRequest } from "../effects";
 
 export const Screen = (
     {
@@ -23,13 +22,15 @@ export const Screen = (
     <main class={className}>
         <header>
             {navLeft}
-            <h1 ondblclick={(state) => ({...state, show_settings: true})}>{title}</h1>
+            <h1 ondblclick={(state) => ({ ...state, show_settings: true })}>
+                {title}
+            </h1>
             {navRight}
         </header>
         {state.notification && (
             <div
-                class={"notification "+state.notification.style}
-                onclick={state => ({ ...state, notification: null })}
+                class={"notification " + state.notification.style}
+                onclick={(state) => ({ ...state, notification: null })}
             >
                 <span>{state.notification.text}</span>
                 <i class={"fas fa-times-circle"} />
@@ -42,18 +43,14 @@ export const Screen = (
 
 export function refresh(state: State) {
     return [
-        { ...state, loading: true },
-        Http({
-            url: state.root + "/queue/" + state.room_name + "/queue_items.json",
+        state,
+        ApiRequest({
+            function: "queue_items",
+            state: state,
             action: (state, response) => ({
                 ...state,
-                loading: false,
                 queue: response.data.queue,
             }),
-            error: (state, response) => [
-                {...state, loading: false},
-                [DisplayResponseMessage, response],
-            ],
         }),
     ];
 }
@@ -68,10 +65,10 @@ export const Refresh = ({ state }: { state: State }) => (
             }
         />
     </a>
-)
+);
 
 export const BackToExplore = () => (
-    <a onclick={state => ({ ...state, screen: "explore" })}>
+    <a onclick={(state) => ({ ...state, screen: "explore" })}>
         <i class={"fas fa-2x fa-chevron-circle-left"} />
     </a>
-)
+);

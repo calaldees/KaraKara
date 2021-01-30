@@ -6,7 +6,7 @@ export const RoomSettings = ({ state }: { state: State }) => (
         state={state}
         className={"room_settings"}
         navLeft={
-            <a onclick={(state) => [{...state, screen: "explore"}]}>
+            <a onclick={(state) => [{ ...state, screen: "explore" }]}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
@@ -14,9 +14,12 @@ export const RoomSettings = ({ state }: { state: State }) => (
         //navRight={}
         //footer={}
     >
-        {Object.entries(state.settings).map(([key, value]) =>
-            <p>{key}:
-            <br/><input value={value} /></p>
-        )}
+        {Object.entries(state.settings).map(([key, value]) => (
+            <p>
+                {key}:
+                <br />
+                <input value={value} />
+            </p>
+        ))}
     </Screen>
 );

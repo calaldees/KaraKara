@@ -71,10 +71,12 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         // don't specify un/pw at all, unless pw is non-empty
-        ...(state.room_password ? {
-            username: state.room_name,
-            password: state.room_password,
-        } : {}),
+        ...(state.room_password
+            ? {
+                  username: state.room_name,
+                  password: state.room_password,
+              }
+            : {}),
         topic: "karakara/room/" + state.room_name + "/commands",
         connect(state: State) {
             // TODO: no need to refresh on connect if we
@@ -88,13 +90,14 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
         },
         error(state: State, err) {
             console.log(
-                "Got an unrecoverable MQTT error, "+
-                "returning to login screen", err
-            )
+                "Got an unrecoverable MQTT error, " +
+                    "returning to login screen",
+                err,
+            );
             return {
                 ...state,
                 room_name: "",
-                notification: {text: err.message, style: "error"}
+                notification: { text: err.message, style: "error" },
             };
         },
         message(state: State, msg) {
@@ -108,11 +111,14 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
 function subscriptions(state: State) {
     ssm.save_state_if_changed(state);
     return [
-        AutoHistory({
-            push: ["root", "filters", "track_id"],
-            replace: ["room_name_edit", "search"],
-            encoder: "json",
-        }, state),
+        AutoHistory(
+            {
+                push: ["root", "filters", "track_id"],
+                replace: ["room_name_edit", "search"],
+                encoder: "json",
+            },
+            state,
+        ),
         state.room_name && state.track_list && getOpenMQTTListener(state),
     ];
 }

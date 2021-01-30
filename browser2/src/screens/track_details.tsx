@@ -1,13 +1,12 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { DisplayResponseMessage } from "../effects";
-import { Http } from "hyperapp-fx";
+import { ApiRequest } from "../effects";
 import parseSRT from "parse-srt";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
-        {state.queue.find(i => i.track.id == track.id) && (
+        {state.queue.find((i) => i.track.id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
@@ -18,11 +17,11 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
                         action: "enqueue",
                     } as State)
                 }
-                disabled={state.queue.find(i => i.track.id == track.id)}
+                disabled={state.queue.find((i) => i.track.id == track.id)}
             >
                 Enqueue
             </button>
-            {state.bookmarks.filter(x => x == track.id).length == 0 ? (
+            {state.bookmarks.filter((x) => x == track.id).length == 0 ? (
                 <button
                     onclick={(state: State, event: FormInputEvent) =>
                         ({
@@ -39,7 +38,7 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
                         ({
                             ...state,
                             bookmarks: state.bookmarks.filter(
-                                x => x != track.id,
+                                (x) => x != track.id,
                             ),
                         } as State)
                     }
@@ -54,9 +53,11 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
 // TODO: remove self from queue?
 function enqueue(state: State) {
     return [
-        { ...state, notification: {text: "Adding to queue...", style: "warning"} },
-        Http({
-            url: state.root + "/queue/" + state.room_name + "/queue_items.json",
+        state,
+        ApiRequest({
+            title: "Adding to queue...",
+            function: "queue_items",
+            state: state,
             options: {
                 method: "POST",
                 headers: {
@@ -67,14 +68,7 @@ function enqueue(state: State) {
                     performer_name: state.performer_name,
                 }),
             },
-            action: (state, response) => [
-                {...state, action: null},
-                [DisplayResponseMessage, response],
-            ],
-            error: (state, response) => [
-                { ...state },
-                [DisplayResponseMessage, response],
-            ],
+            action: (state, response) => [{ ...state, action: null }],
         }),
     ];
 }
@@ -87,7 +81,7 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             value={state.performer_name}
             placeholder={"Performer Name"}
             required={true}
-            onchange={(state: State, event: FormInputEvent) =>
+            oninput={(state: State, event: FormInputEvent) =>
                 ({
                     ...state,
                     performer_name: event.target.value,
@@ -130,13 +124,18 @@ export const TrackDetails = ({
         state={state}
         className={"track_details"}
         navLeft={
-            <a onclick={state => ({ ...state, track_id: null })}>
+            <a onclick={(state) => ({ ...state, track_id: null })}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a onclick={state => ({ ...state, screen: state.room_password ? "control" : "queue" })}>
+            <a
+                onclick={(state) => ({
+                    ...state,
+                    screen: state.room_password ? "control" : "queue",
+                })}
+            >
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
@@ -157,7 +156,7 @@ export const TrackDetails = ({
         {track.srt && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {parseSRT(track.srt).map(item => (
+                {parseSRT(track.srt).map((item) => (
                     <div>{item.text}</div>
                 ))}
             </div>
@@ -167,8 +166,8 @@ export const TrackDetails = ({
         <h2>Tags</h2>
         <div class={"tags"}>
             {Object.keys(track.tags)
-                .filter(key => BLOCKED_KEYS.indexOf(key) == -1)
-                .map(key => (
+                .filter((key) => BLOCKED_KEYS.indexOf(key) == -1)
+                .map((key) => (
                     <div class={"tag"}>
                         <div class={"tag_key"}>{title_case(key)}</div>
                         <div class={"tag_value"}>

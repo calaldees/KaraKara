@@ -1,72 +1,69 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, Refresh, BackToExplore } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { Http } from "hyperapp-fx";
-import { SendCommand, DisplayResponseMessage } from "../effects";
+import { SendCommand, ApiRequest } from "../effects";
 
 function createDragStart(src_id) {
-    return function(state, event) {
+    return function (state, event) {
         event.dataTransfer.dropEffect = "move";
-        return {...state, drop_source: src_id};
-    }
+        return { ...state, drop_source: src_id };
+    };
 }
 
 function createDragOver(dst_id) {
-    return function(state, event) {
+    return function (state, event) {
         event.preventDefault();
-        return {...state, drop_target: dst_id};
-    }
+        return { ...state, drop_target: dst_id };
+    };
 }
 
 function createDragLeave() {
-    return function(state, event) {
+    return function (state, event) {
         event.preventDefault();
-        return {...state, drop_target: null};
-    }
+        return { ...state, drop_target: null };
+    };
 }
 
 function createDrop(dst_id) {
-    return function(state, event) {
+    return function (state, event) {
         event.preventDefault();
         let src_id = state.drop_source;
         if (src_id === dst_id) {
-            return {...state, drop_source: null, drop_target: null};
+            return { ...state, drop_source: null, drop_target: null };
         }
         // find the dragged item by ID number, remove it from the list
-        let src_ob = state.queue.find(x => x.id == src_id);
-        let new_queue = state.queue.filter(x => x.id != src_id);
+        let src_ob = state.queue.find((x) => x.id == src_id);
+        let new_queue = state.queue.filter((x) => x.id != src_id);
         // insert the dragged item above the drop target
-        if(dst_id === -1) {
+        if (dst_id === -1) {
             new_queue.push(src_ob);
         } else {
-            let dst_pos = new_queue.findIndex(x => x.id == dst_id);
+            let dst_pos = new_queue.findIndex((x) => x.id == dst_id);
             new_queue.splice(dst_pos, 0, src_ob);
         }
         return [
-            {...state, queue: new_queue, drop_source: null, drop_target: null},
-            Http({
-                url: state.root+'/queue/'+state.room_name+'/queue_items.json',
+            {
+                ...state,
+                queue: new_queue,
+                drop_source: null,
+                drop_target: null,
+            },
+            ApiRequest({
+                function: "queue_items",
+                state: state,
                 options: {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
                     body: new URLSearchParams({
-                        'queue_item.id': src_id,
-                        'queue_item.move.target_id': dst_id,
+                        "queue_item.id": src_id,
+                        "queue_item.move.target_id": dst_id,
                     }),
                 },
-                action: (state, response) => [
-                    {...state},
-                    [DisplayResponseMessage, response],
-                ],
-                error: (state, response) => [
-                    {...state},
-                    [DisplayResponseMessage, response]
-                ],
-            })
+            }),
         ];
-    }
+    };
 }
 
 const Playlist = ({
@@ -78,14 +75,22 @@ const Playlist = ({
 }) => (
     <section>
         <ul ondragleave={createDragLeave()}>
-            {items.map(item => (
+            {items.map((item) => (
                 <QueueItemRender state={state} item={item} />
             ))}
-            {state.drop_source && <li
-                class={{"queue_item": true, "drop_target": state.drop_target == -1, "drop_last": true}}
-                ondragover={createDragOver(-1)}
-                ondrop={createDrop(-1)}
-            ><span class={"text"}>(Move to end)</span></li>}
+            {state.drop_source && (
+                <li
+                    class={{
+                        queue_item: true,
+                        drop_target: state.drop_target == -1,
+                        drop_last: true,
+                    }}
+                    ondragover={createDragOver(-1)}
+                    ondrop={createDrop(-1)}
+                >
+                    <span class={"text"}>(Move to end)</span>
+                </li>
+            )}
         </ul>
     </section>
 );
@@ -99,9 +104,9 @@ const QueueItemRender = ({
 }) => (
     <li
         class={{
-            "queue_item": true,
-            "drop_source": state.drop_source == item.id,
-            "drop_target": state.drop_target == item.id,
+            queue_item: true,
+            drop_source: state.drop_source == item.id,
+            drop_target: state.drop_target == item.id,
         }}
         draggable={true}
         ondragstart={createDragStart(item.id)}
@@ -131,32 +136,21 @@ const QueueItemRender = ({
 
         <span
             class={"go_arrow"}
-            onclick={state => [
-                { ...state, notification: {text: "Removing track...", style: "warning"} },
-                Http({
-                    url:
-                        state.root +
-                        "/queue/" +
-                        state.room_name +
-                        "/queue_items.json",
+            onclick={(state) => [
+                state,
+                ApiRequest({
+                    title: "Removing track...",
+                    function: "queue_items",
+                    state: state,
                     options: {
                         method: "DELETE",
                         headers: {
-                            "Content-Type":
-                                "application/x-www-form-urlencoded",
+                            "Content-Type": "application/x-www-form-urlencoded",
                         },
                         body: new URLSearchParams({
                             "queue_item.id": item.id.toString(),
                         }),
                     },
-                    action: (state, response) => [
-                        {...state},
-                        [DisplayResponseMessage, response],
-                    ],
-                    error: (state, response) => [
-                        {...state},
-                        [DisplayResponseMessage, response],
-                    ],
                 }),
             ]}
         >
@@ -168,22 +162,32 @@ const QueueItemRender = ({
 const ControlButtons = ({ state }: { state: State }) => (
     <footer>
         <div class={"buttons"}>
-            <button onclick={state => [state, SendCommand(state, "seek_backwards")]}>
+            <button
+                onclick={(state) => [
+                    state,
+                    SendCommand(state, "seek_backwards"),
+                ]}
+            >
                 <i class={"fas fa-backward"} />
             </button>
-            <button onclick={state => [state, SendCommand(state, "seek_forwards")]}>
+            <button
+                onclick={(state) => [
+                    state,
+                    SendCommand(state, "seek_forwards"),
+                ]}
+            >
                 <i class={"fas fa-forward"} />
             </button>
-            <button onclick={state => [state, SendCommand(state, "play")]}>
+            <button onclick={(state) => [state, SendCommand(state, "play")]}>
                 <i class={"fas fa-play"} />
             </button>
-            <button onclick={state => [state, SendCommand(state, "pause")]}>
+            <button onclick={(state) => [state, SendCommand(state, "pause")]}>
                 <i class={"fas fa-pause"} />
             </button>
-            <button onclick={state => [state, SendCommand(state, "stop")]}>
+            <button onclick={(state) => [state, SendCommand(state, "stop")]}>
                 <i class={"fas fa-stop"} />
             </button>
-            <button onclick={state => [state, SendCommand(state, "skip")]}>
+            <button onclick={(state) => [state, SendCommand(state, "skip")]}>
                 <i class={"fas fa-step-forward"} />
             </button>
         </div>
@@ -199,9 +203,10 @@ export const Control = ({ state }: { state: State }) => (
         navRight={<Refresh state={state} />}
         footer={<ControlButtons state={state} />}
     >
-        {state.queue.length == 0 ?
-            <h2>Queue Empty</h2> :
+        {state.queue.length == 0 ? (
+            <h2>Queue Empty</h2>
+        ) : (
             <Playlist state={state} items={state.queue} />
-        }
+        )}
     </Screen>
 );

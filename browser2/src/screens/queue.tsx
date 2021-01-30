@@ -1,8 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, Refresh, BackToExplore } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
-import { DisplayResponseMessage } from "../effects";
-import { Http } from "hyperapp-fx";
+import { ApiRequest } from "../effects";
 import parseSRT from "parse-srt";
 
 /*
@@ -16,7 +15,7 @@ const NowPlaying = ({ state, item }: { state: State; item: QueueItem }) => (
                 <li>
                     <span class={"lyrics"}>
                         {parseSRT(state.track_list[item.track.id].srt).map(
-                            item => (
+                            (item) => (
                                 <div>{item.text}</div>
                             ),
                         )}
@@ -40,7 +39,7 @@ const ComingSoon = ({
     <section>
         <h2>Coming Soon</h2>
         <ul>
-            {items.map(item => (
+            {items.map((item) => (
                 <QueueItemRender state={state} item={item} />
             ))}
         </ul>
@@ -85,14 +84,12 @@ const QueueItemRender = ({
         {state.session_id == item.session_owner && (
             <span
                 class={"go_arrow"}
-                onclick={state => [
-                    { ...state, notification: {text: "Removing track...", style: "warning"} },
-                    Http({
-                        url:
-                            state.root +
-                            "/queue/" +
-                            state.room_name +
-                            "/queue_items.json",
+                onclick={(state) => [
+                    state,
+                    ApiRequest({
+                        title: "Removing track...",
+                        function: "queue_items",
+                        state: state,
                         options: {
                             method: "DELETE",
                             headers: {
@@ -103,14 +100,6 @@ const QueueItemRender = ({
                                 "queue_item.id": item.id.toString(),
                             }),
                         },
-                        action: (state, response) => [
-                            {...state},
-                            [DisplayResponseMessage, response],
-                        ],
-                        error: (state, response) => [
-                            {...state},
-                            [DisplayResponseMessage, response],
-                        ],
                     }),
                 ]}
             >
@@ -133,7 +122,7 @@ const ComingLater = ({
     <section>
         <h2>Coming Later</h2>
         <div class={"coming_later"}>
-            {items.map(item => (
+            {items.map((item) => (
                 <span>{item.performer_name}</span>
             ))}
         </div>

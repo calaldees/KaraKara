@@ -1,7 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { Http } from "hyperapp-fx";
-import { DisplayResponseMessage } from "../effects";
+import { ApiRequest } from "../effects";
 
 function track_list_to_map(raw_list: Array<Track>) {
     let map = {};
@@ -28,31 +27,27 @@ export const Login = ({ state }: { state: State }) => (
             />
             <button
                 onclick={(state: State) => [
-                    { ...state, loading: true } as State,
-                    Http({
-                        url:
-                            state.root +
-                            "/queue/" +
-                            state.room_name_edit +
-                            "/track_list.json",
-                        action: (state, response) => ({
-                            ...state,
-                            room_name: state.room_name_edit,
-                            loading: false,
-                            session_id: response.identity.id,
-                            track_list: track_list_to_map(response.data.list),
-                        }),
-                        error: (state, response) => [
-                            {
-                                ...state,
-                                room_name_edit: "",
-                                loading: false,
-                            },
-                            [DisplayResponseMessage, response],
-                        ],
+                    state,
+                    ApiRequest({
+                        function: "track_list",
+                        state: state,
+                        action: (state, response) =>
+                            response.status == "ok"
+                                ? {
+                                      ...state,
+                                      room_name: state.room_name_edit,
+                                      session_id: response.identity.id,
+                                      track_list: track_list_to_map(
+                                          response.data.list,
+                                      ),
+                                  }
+                                : {
+                                      ...state,
+                                      room_name_edit: "",
+                                  },
                     }),
                 ]}
-                disabled={(!state.room_name_edit) || state.loading}
+                disabled={!state.room_name_edit || state.loading}
             >
                 {state.loading ? (
                     <span>

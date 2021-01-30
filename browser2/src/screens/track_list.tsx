@@ -1,8 +1,7 @@
 import h from "hyperapp-jsx-pragma";
-import { Http } from "hyperapp-fx";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { DisplayResponseMessage } from "../effects";
+import { ApiRequest } from "../effects";
 
 /*
  * List individual tracks
@@ -10,7 +9,7 @@ import { DisplayResponseMessage } from "../effects";
 const TrackItem = ({ track }: { track: Track }) => (
     <li
         class={"track_item"}
-        onclick={state => ({ ...state, track_id: track.id })}
+        onclick={(state) => ({ ...state, track_id: track.id })}
     >
         <div
             class={"thumb"}
@@ -45,7 +44,7 @@ const FilterListGroupHeader = (
 ) => (
     <li
         class={"filter_list_group_header"}
-        onclick={state => ({ ...state, expanded: expanded ? null : filter })}
+        onclick={(state) => ({ ...state, expanded: expanded ? null : filter })}
     >
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
@@ -60,7 +59,7 @@ const FilterListGroupHeader = (
 const GroupedFilterList = ({ heading, filters, expanded }) =>
     Object.keys(filters)
         .sort()
-        .map(group =>
+        .map((group) =>
             group == expanded ? (
                 <div class={"filter_list_group"}>
                     <FilterListGroupHeader
@@ -86,7 +85,7 @@ const GroupedFilterList = ({ heading, filters, expanded }) =>
 const FilterList = ({ heading, filters }) =>
     Object.keys(filters)
         .sort()
-        .map(child => (
+        .map((child) => (
             <AddFilter filter={heading + ":" + child} count={filters[child]}>
                 {title_case(child)}
             </AddFilter>
@@ -98,7 +97,7 @@ const AddFilter = (
 ) => (
     <li
         class={"add_filter"}
-        onclick={state => ({
+        onclick={(state) => ({
             ...state,
             expanded: null,
             filters: state.filters.concat([filter]),
@@ -133,7 +132,7 @@ function find_tracks(
                     continue tracks;
                 }
                 if (
-                    track.tags[filter_key].filter(x => x == filter_value)
+                    track.tags[filter_key].filter((x) => x == filter_value)
                         .length == 0
                 ) {
                     continue tracks;
@@ -264,7 +263,7 @@ function show_list(state: State) {
     if (tracks.length < 20) {
         return (
             <ul>
-                {tracks.map(track => (
+                {tracks.map((track) => (
                     <TrackItem track={track} />
                 ))}
             </ul>
@@ -295,7 +294,7 @@ function show_list(state: State) {
         let filter_list = null;
         if (Object.keys(tag_values).length > 50) {
             let grouped_groups = {};
-            Object.keys(tag_values).forEach(function(x) {
+            Object.keys(tag_values).forEach(function (x) {
                 if (grouped_groups[x[0]] == undefined)
                     grouped_groups[x[0]] = {};
                 grouped_groups[x[0]][x] = tag_values[x];
@@ -336,57 +335,48 @@ function back(state: State): State {
 const AdminButtons = () => (
     <footer>
         <div class={"buttons"}>
-            <button onclick={(state) => [
-                {...state, screen: "priority_tokens"},
-                Http({
-                    url:
-                        state.root +
-                        "/queue/" +
-                        state.room_name +
-                        "/priority_tokens.json",
-                    action: (state, response) => ({
-                        ...state,
-                        loading: false,
-                        priority_tokens: response.data.priority_tokens,
+            <button
+                onclick={(state) => [
+                    state,
+                    ApiRequest({
+                        function: "priority_tokens",
+                        state: state,
+                        action: (state, response) =>
+                            response.status == "ok"
+                                ? {
+                                      ...state,
+                                      screen: "priority_tokens",
+                                      priority_tokens:
+                                          response.data.priority_tokens,
+                                  }
+                                : {
+                                      ...state,
+                                      priority_tokens: [],
+                                  },
                     }),
-                    error: (state, response) => [
-                        {
-                            ...state,
-                            loading: false,
-                            priority_tokens: [],
-                        },
-                        [DisplayResponseMessage, response],
-                    ],
-                }),
-            ]}>
+                ]}
+            >
                 Priority Tokens
             </button>
-            <button onclick={(state) => [
-                {...state, screen: "room_settings"},
-                Http({
-                    url:
-                        state.root +
-                        "/queue/" +
-                        state.room_name +
-                        "/settings.json",
-                    action: (state, response) => ({
-                        ...state,
-                        loading: false,
-                        settings: response.data.settings,
-                    }),
-                    error: (state, response) => [
-                        {
+            <button
+                onclick={(state) => [
+                    state,
+                    ApiRequest({
+                        function: "settings",
+                        state: state,
+                        action: (state, response) => ({
                             ...state,
-                            loading: false,
-                            settings: {},
-                        },
-                        [DisplayResponseMessage, response],
-                    ],
-                }),
-            ]}>
+                            screen: "room_settings",
+                            settings: response.data.settings,
+                        }),
+                    }),
+                ]}
+            >
                 Room Settings
             </button>
-            <button onclick={(state) => [{...state, screen: "printable_list"}]}>
+            <button
+                onclick={(state) => [{ ...state, screen: "printable_list" }]}
+            >
                 Printable Tracklist
             </button>
         </div>
@@ -404,7 +394,12 @@ export const TrackList = ({ state }: { state: State }) => (
         }
         title={"Explore Tracks"}
         navRight={
-            <a onclick={state => ({ ...state, screen: state.room_password ? "control" : "queue" })}>
+            <a
+                onclick={(state) => ({
+                    ...state,
+                    screen: state.room_password ? "control" : "queue",
+                })}
+            >
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
@@ -426,13 +421,13 @@ export const TrackList = ({ state }: { state: State }) => (
 
         {/* List active filters */}
         <div class={"active_filter_list"}>
-            {state.filters.map(filter => (
+            {state.filters.map((filter) => (
                 <a
                     class={"active_filter"}
-                    onclick={state => ({
+                    onclick={(state) => ({
                         ...state,
                         expanded: null,
-                        filters: state.filters.filter(v => v !== filter),
+                        filters: state.filters.filter((v) => v !== filter),
                     })}
                 >
                     <span class={"remove"}>

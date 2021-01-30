@@ -2,7 +2,7 @@ export function title_case(str) {
     return str
         .toLowerCase()
         .split(" ")
-        .map(function(word) {
+        .map(function (word) {
             return word.charAt(0).toUpperCase() + word.slice(1);
         })
         .join(" ");
