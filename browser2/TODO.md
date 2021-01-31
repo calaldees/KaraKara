@@ -1,6 +1,6 @@
 
 - test priority token view screen with real tokens
-- Progress bar for loading tracks
+- Progress bar for loading tracks (depends on Content-Length from the server)
 
 ```
 karakara.system.user.readonly

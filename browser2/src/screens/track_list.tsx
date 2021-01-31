@@ -319,6 +319,19 @@ function show_list(state: State) {
     return sections;
 }
 
+function show_bookmarks(state: State) {
+    return (state.bookmarks.length > 0 && state.filters.length == 0 && state.search == "") && (
+        <div>
+            <h2>Bookmarks</h2>
+            <ul>
+                {state.bookmarks.map((bm) => (
+                    <TrackItem track={state.track_list[bm]} />
+                ))}
+            </ul>
+        </div>
+    );
+}
+
 function back(state: State): State {
     if (state.filters.length > 0) {
         // if we're searching the list, take a step back in the search
@@ -332,7 +345,7 @@ function back(state: State): State {
     return { ...state };
 }
 
-const AdminButtons = () => (
+const AdminButtons = (state) => (
     <footer>
         <div class={"buttons"}>
             <button
@@ -355,6 +368,7 @@ const AdminButtons = () => (
                                   },
                     }),
                 ]}
+                disabled={state.loading}
             >
                 Priority Tokens
             </button>
@@ -371,6 +385,7 @@ const AdminButtons = () => (
                         }),
                     }),
                 ]}
+                disabled={state.loading}
             >
                 Room Settings
             </button>
@@ -403,7 +418,7 @@ export const TrackList = ({ state }: { state: State }) => (
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
-        footer={state.room_password && <AdminButtons />}
+        footer={state.room_password && <AdminButtons state={state} />}
     >
         {/* Full-text search */}
         <input
@@ -442,5 +457,8 @@ export const TrackList = ({ state }: { state: State }) => (
 
         {/* Show list of tags, or tracks */}
         {show_list(state)}
+
+        {/* If no filters, show bookmarks */}
+        {show_bookmarks(state)}
     </Screen>
 );
