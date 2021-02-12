@@ -10,6 +10,52 @@ function track_list_to_map(raw_list: Array<Track>) {
     return map;
 }
 
+const FetchTrackList = (state) =>
+    ApiRequest({
+        function: "track_list",
+        state: state,
+        progress: (state, done, size) => [
+            {
+                ...state,
+                download_done: done,
+                download_size: size,
+            },
+        ],
+        action: (state, response) =>
+            response.status == "ok"
+                ? {
+                      ...state,
+                      room_name: state.room_name_edit,
+                      session_id: response.identity.id,
+                      track_list: track_list_to_map(response.data.list),
+                  }
+                : {
+                      ...state,
+                      room_name_edit: "",
+                  },
+    });
+
+const LoginThenFetchTrackList = (state) =>
+    ApiRequest({
+        function: "admin",
+        state: state,
+        options: {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                password: state.room_password,
+            }),
+        },
+        action: (state, response) =>
+            response.status == "ok" ? [state, FetchTrackList(state)] : state,
+    });
+
+function percent(a, b) {
+    return (a / b) * 100 + "%";
+}
+
 export const Login = ({ state }: { state: State }) => (
     <Screen state={state} className={"login"} title={"Welcome to KaraKara"}>
         <div class={"flex-center"}>
@@ -28,38 +74,20 @@ export const Login = ({ state }: { state: State }) => (
             <button
                 onclick={(state: State) => [
                     state,
-                    ApiRequest({
-                        function: "track_list",
-                        state: state,
-                        progress: (state, done, size) => [{
-                            ...state,
-                            download_done: done,
-                            download_size: size,
-                        }],
-                        action: (state, response) =>
-                            response.status == "ok"
-                                ? {
-                                      ...state,
-                                      room_name: state.room_name_edit,
-                                      session_id: response.identity.id,
-                                      track_list: track_list_to_map(
-                                          response.data.list,
-                                      ),
-                                  }
-                                : {
-                                      ...state,
-                                      room_name_edit: "",
-                                  },
-                    }),
+                    state.room_password
+                        ? LoginThenFetchTrackList(state)
+                        : FetchTrackList(state),
                 ]}
                 disabled={!state.room_name_edit || state.loading}
             >
                 {state.loading ? (
                     <span>
                         Loading Tracks{" "}
-                        {state.download_size ?
-                            ((state.download_done/state.download_size)*100 + "%") :
-                            <i class={"loading fas fa-sync-alt"} />}
+                        {state.download_size ? (
+                            percent(state.download_done, state.download_size)
+                        ) : (
+                            <i class={"loading fas fa-sync-alt"} />
+                        )}
                     </span>
                 ) : (
                     <span>

@@ -320,15 +320,19 @@ function show_list(state: State) {
 }
 
 function show_bookmarks(state: State) {
-    return (state.bookmarks.length > 0 && state.filters.length == 0 && state.search == "") && (
-        <div>
-            <h2>Bookmarks</h2>
-            <ul>
-                {state.bookmarks.map((bm) => (
-                    <TrackItem track={state.track_list[bm]} />
-                ))}
-            </ul>
-        </div>
+    return (
+        state.bookmarks.length > 0 &&
+        state.filters.length == 0 &&
+        state.search == "" && (
+            <div>
+                <h2>Bookmarks</h2>
+                <ul>
+                    {state.bookmarks.map((bm) => (
+                        <TrackItem track={state.track_list[bm]} />
+                    ))}
+                </ul>
+            </div>
+        )
     );
 }
 
