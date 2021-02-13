@@ -120,7 +120,7 @@ function find_tracks(
     filters: Array<string>,
     search: string,
 ): Array<Track> {
-    let tracks = [];
+    let tracks: any[] = [];
     tracks: for (let track_id in track_list) {
         let track = track_list[track_id];
         if (filters.length > 0) {
@@ -287,7 +287,7 @@ function show_list(state: State) {
      *     ...
      * }} />
      */
-    let sections = [];
+    let sections: any[] = [];
     for (let i = 0; i < section_names.length; i++) {
         let tag_key = section_names[i]; // eg "vocaltrack"
         let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}

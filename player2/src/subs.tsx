@@ -76,7 +76,7 @@ export const KeyboardListener = Keyboard({
         if (state.show_settings) {
             return state;
         }
-        let action = null;
+        let action: CallableFunction | null = null;
         switch (event.key) {
             case "s":
                 action = Dequeue;

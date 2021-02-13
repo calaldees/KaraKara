@@ -38,10 +38,10 @@ export function get_attachment(
 // get_attachment(srt) + parse SRT file
 export function get_lyrics(state: State, track: Track): Array<SrtLine> {
     let xhr = new XMLHttpRequest();
-    let data = null;
+    let data: string | null = null;
     xhr.open("GET", get_attachment(state, track, "srt"), false);
     xhr.onload = function(e: ProgressEvent<XMLHttpRequest>) {
-        data = e.target.responseText;
+        data = e.target ? e.target.responseText : null;
     };
     xhr.send();
     return data ? parseSRT(data) : null;

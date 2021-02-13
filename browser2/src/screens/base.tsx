@@ -12,7 +12,7 @@ export const Screen = (
     }: {
         state: State;
         title: string;
-        className?: string;
+        className?: string | null;
         footer?: any;
         navLeft?: any;
         navRight?: any;

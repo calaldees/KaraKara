@@ -6,7 +6,7 @@ export const SettingsMenu = ({ state }: { state: State }) => (
             <h2
                 onclick={function (state) {
                     console.log(state);
-                    window.state = state;
+                    (window as any).state = state;
                     return state;
                 }}
             >

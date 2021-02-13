@@ -64,7 +64,7 @@ function enqueue(state: State) {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams({
-                    track_id: state.track_id,
+                    track_id: state.track_id || "error",
                     performer_name: state.performer_name,
                 }),
             },

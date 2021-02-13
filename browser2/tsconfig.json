@@ -9,7 +9,8 @@
     "target": "es6",
     "jsx": "react",
     "jsxFactory": "h",
-    "noEmit": true
+    "noEmit": true,
+    "strictNullChecks": true,
   },
   "include": ["./src/**/*"]
 }

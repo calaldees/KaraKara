@@ -74,16 +74,16 @@ type State = {
     root: string,
     root_edit: string,
     screen: string,
-    notification: {
+    notification: null | {
         text: string,
         style: string,
     },
     show_settings: boolean,
-    download_size: number,
+    download_size: number | null,
     download_done: number,
 
     // login
-    session_id: string,
+    session_id: string | null,
     room_name: string,
     room_name_edit: string,
     room_password: string,
@@ -94,17 +94,17 @@ type State = {
     track_list: Dictionary<Track>,
     search: string,
     filters: Array<string>,
-    expanded: string,
+    expanded: string | null,
 
     // track
-    track_id: string,
+    track_id: string | null,
     performer_name: string,
-    action: string,
+    action: string | null,
 
     // queue
     queue: Array<QueueItem>,
-    drop_source: number,
-    drop_target: number,
+    drop_source: number | null,
+    drop_target: number | null,
 
     // bookmarks
     bookmarks: Array<string>,
