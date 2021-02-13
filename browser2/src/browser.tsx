@@ -69,7 +69,7 @@ const ssm = new SaveStateManager(state, [
     "bookmarks",
 ]);
 
-function getOpenMQTTListener(state: State): MQTTSubscribe {
+function getCommandListener(state: State): MQTTSubscribe {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         // don't specify un/pw at all, unless pw is non-empty
@@ -109,6 +109,23 @@ function getOpenMQTTListener(state: State): MQTTSubscribe {
         },
     });
 }
+function getNotificationListener(state: State): MQTTSubscribe {
+    return MQTTSubscribe({
+        url: http2ws(state.root) + "/mqtt",
+        // don't specify un/pw at all, unless pw is non-empty
+        ...(state.room_password
+            ? {
+                  username: state.room_name,
+                  password: state.room_password,
+              }
+            : {}),
+        topic: "karakara/room/" + state.room_name + "/notifications",
+        message: (state: State, msg) => ({
+            ...state,
+            notification: { text: msg.payload.toString(), style: "warning" },
+        }),
+    });
+}
 
 function subscriptions(state: State) {
     ssm.save_state_if_changed(state);
@@ -121,7 +138,8 @@ function subscriptions(state: State) {
             },
             state,
         ),
-        state.room_name && state.track_list && getOpenMQTTListener(state),
+        state.room_name && state.track_list && getCommandListener(state),
+        state.room_name && getNotificationListener(state),
     ];
 }
 

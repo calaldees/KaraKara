@@ -4,10 +4,12 @@ topic readwrite test/public/#
 topic read karakara/room/+/queue
 topic read karakara/room/+/settings
 topic read karakara/room/+/commands
+topic read karakara/room/+/notifications
 
 # People who have the room password can write to the room's
 # command channel
 pattern write karakara/room/%u/commands
+pattern write karakara/room/%u/notifications
 
 # Server can write to everything
 user karakara
