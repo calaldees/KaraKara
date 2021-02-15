@@ -8,6 +8,7 @@ from pyramid.view import view_config
 
 from calaldees.date_tools import now
 from calaldees.data import subdict
+from calaldees.json import json_string
 
 from . import web, action_ok, action_error, etag_decorator, is_admin, modification_action, admin_only
 
@@ -40,8 +41,12 @@ def acquire_cache_bucket_func(request):
 def invalidate_cache(request, track_id):
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
     request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
-    # TODO: This needs to incorporate the alert for the specific queue_id
     request.send_websocket_message('commands', 'queue_updated')
+    request.send_websocket_message(
+        'queue',
+        json_string(_get_queue_dict_from_request(request)),
+        retain=True
+    )
 
 def _queue_query(queue_id):
     return DBSession.query(QueueItem).filter(QueueItem.queue_id==queue_id).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)

@@ -3,6 +3,7 @@ from collections import ChainMap
 from pyramid.view import view_config
 
 from calaldees.string_convert import convert_str, _string_list_format_hack
+from calaldees.json import json_string
 
 from . import action_ok, action_error, is_admin
 
@@ -204,5 +205,10 @@ def queue_settings_view_put(request):
     request.cache_bucket.invalidate()
     request.log_event(method='update', admin=is_admin(request))
     request.send_websocket_message('commands', 'settings')  # Ensure that the player interface is notified of an update
+    request.send_websocket_message(
+        'settings',
+        json_string(_get_queue_settings_dict_from_request(request)),
+        retain=True
+    )
 
     return action_ok(message='queue_settings updated')

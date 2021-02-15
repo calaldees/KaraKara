@@ -120,7 +120,10 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
 
     # Queue 'Track 1'
     queue_manager.add_queue_item(track_id='t1', performer_name='testperformer1')
-    mock_send_websocket_message.assert_called_once_with(mock.ANY, 'commands', 'queue_updated', False)
+    mock_send_websocket_message.assert_has_calls((
+        mock.call(mock.ANY, 'commands', 'queue_updated', False),
+        mock.call(mock.ANY, 'queue', mock.ANY, True),
+    ))
     mock_send_websocket_message.reset_mock()
 
     # Check track is in queue list
@@ -133,7 +136,10 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
 
     # Queue 'Track 2'
     queue_manager.add_queue_item(track_id='t2', performer_name='testperformer2')
-    mock_send_websocket_message.assert_called_once_with(mock.ANY, 'commands', 'queue_updated', False)
+    mock_send_websocket_message.assert_has_calls((
+        mock.call(mock.ANY, 'commands', 'queue_updated', False),
+        mock.call(mock.ANY, 'queue', mock.ANY, True),
+    ))
     mock_send_websocket_message.reset_mock()
 
     QueueItemTuple = namedtuple('QueueItemTuple', ('id', 'track_id'))
@@ -142,13 +148,17 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
 
     # Removing a queue_item fires a websocket updated event
     queue_manager.del_queue_item(queue_item_id=queue_item_tuples[1].id)
-    mock_send_websocket_message.assert_called_once_with(mock.ANY, 'commands', 'queue_updated', False)
+    mock_send_websocket_message.assert_has_calls((
+        mock.call(mock.ANY, 'commands', 'queue_updated', False),
+        mock.call(mock.ANY, 'queue', mock.ANY, True),
+    ))
     mock_send_websocket_message.reset_mock()
     # Removing the first queue_item fires an additional `stop` event
     queue_manager.del_queue_item(queue_item_id=queue_item_tuples[0].id)
     mock_send_websocket_message.assert_has_calls((
         mock.call(mock.ANY, 'commands', 'stop', False),
         mock.call(mock.ANY, 'commands', 'queue_updated', False),
+        mock.call(mock.ANY, 'queue', mock.ANY, True),
     ))
 
 
