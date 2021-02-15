@@ -53,7 +53,7 @@ export function get_tag(tag: Array<string>): string {
     else return "";
 }
 
-export function title_case(str) {
+export function title_case(str: string) {
     return str
         .toLowerCase()
         .split(" ")

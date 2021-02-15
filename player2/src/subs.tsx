@@ -12,7 +12,7 @@ import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
 
-export function getOpenMQTTListener(state: State): MQTTSubscribe {
+export function getOpenMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         ...(state.room_password ? {
@@ -70,7 +70,7 @@ export function getOpenMQTTListener(state: State): MQTTSubscribe {
 
 export const KeyboardListener = Keyboard({
     downs: true,
-    action(state: State, event): State {
+    action(state: State, event: KeyboardEvent): State {
         // Disable keyboard shortcuts when the settings
         // screen is active
         if (state.show_settings) {

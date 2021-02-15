@@ -9,6 +9,26 @@ lyrics and a "start" button)
 Double-click the player to show the options window, where you can
 set a custom server / change queue ID / enter Podium mode / etc.
 
+## Architecture
+
+Source code in `src/`, compiled results in `dist/`
+
+All of the app state is specified in `src/player.d.ts` (initialised in
+`src/player.tsx`)
+
+State is turned into HTML via the templates in `src/screens/`
+
+State is mostly updated by `src/subs.tsx` - In this case we mostly listen
+on the MQTT channel `/karakara/rooms/<roomname>/commands` - commands are
+things like "play", "pause", "skip", etc which directly update the state;
+but also "update_queue" which will trigger an HTTP fetch for
+`queue_items.json` (placing the response into `state.queue_items`) and
+"settings" which will trigger an HTTP fetch for `settings.json` (placing
+the response into `state.settings`).
+
+In the future we could replace "broadcast a command, which triggers JSON
+fetch over HTTP" with "broadcast JSON"
+
 ## Dev Setup
 
 Depending on whether you prefer Docker or Node:
