@@ -14,5 +14,5 @@ def remote(request):
     cmd = request.params.get('cmd')
     if cmd:
         request.log_event(command=cmd)
-        request.send_websocket_message(cmd)
+        request.send_websocket_message('commands', cmd)
     return action_ok()

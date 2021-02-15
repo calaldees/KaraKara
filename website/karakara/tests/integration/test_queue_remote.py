@@ -28,7 +28,7 @@ def test_remote_control(app, queue, mock_send_websocket_message):
             response = app.get(f'{remote_control_url}/{url}')
             assert response.status_code==200
             assert 'remote' in response.text.lower()
-            assert button_text in mock_send_websocket_message.call_args.args[1]
+            assert button_text in mock_send_websocket_message.call_args.args[2]
             mock_send_websocket_message.reset_mock()
 
         soup = BeautifulSoup(app.get(remote_control_url).text)
