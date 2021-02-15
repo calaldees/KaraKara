@@ -207,7 +207,7 @@ def queue_settings_view_put(request):
     request.send_websocket_message('commands', 'settings')  # Ensure that the player interface is notified of an update
     request.send_websocket_message(
         'settings',
-        json_string(_get_queue_settings_dict_from_request(request)),
+        json_string(_get_queue_settings_dict_from_request(request)['settings']),
         retain=True
     )
 

@@ -44,7 +44,7 @@ def invalidate_cache(request, track_id):
     request.send_websocket_message('commands', 'queue_updated')
     request.send_websocket_message(
         'queue',
-        json_string(_get_queue_dict_from_request(request)),
+        json_string(_get_queue_dict_from_request(request)['queue']),
         retain=True
     )
 
