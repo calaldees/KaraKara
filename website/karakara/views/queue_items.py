@@ -29,19 +29,12 @@ import logging
 log = logging.getLogger(__name__)
 
 
-
-#def socket_update_queue_items_event(request):
-#    # TODO: This needs to incorporate the alert for the specific queue_id
-#    request.socket_manager.recv('queue_updated'.encode('utf-8'))
-#cache_manager.get('queue_items').register_invalidate_callback(socket_update_queue_items_event, ('request', ))
-
 def acquire_cache_bucket_func(request):
     return request.cache_manager.get(f'queue-{request.context.queue_id}')
 
 def invalidate_cache(request, track_id):
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
     request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
-    request.send_websocket_message('commands', 'queue_updated')
     request.send_websocket_message(
         'queue',
         json_string(_get_queue_dict_from_request(request)['queue']),
@@ -319,7 +312,7 @@ def queue_item_del(request):
         # BUG: Currently player.js surpress's queue_update events while it is playing a video.
         #      Broken Flow: queue 3 tracks - play - delete queue_item (thats not playing) - stop - player queue is out of date
         request.send_websocket_message('commands', 'stop')
-        # The impending invalidate_cache() will queue_updated the client queue
+        # The impending invalidate_cache() will update the client queue
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status', 'removed')
