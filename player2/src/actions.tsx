@@ -3,6 +3,7 @@
  * in response to eg a button press
  */
 import { SetTrackState } from "./effects";
+import { get_lyrics } from "./utils";
 
 // App controls
 export function SetPreviewVolume(state: State, event): State {
@@ -68,22 +69,28 @@ export function SeekBackwards(state: State, value): State {
 }
 
 // Playlist controls
-export function SetQueue(state: State, value: Array<QueueItem>): State {
+export function AddLyricsToNewQueue(state: State, value: Array<QueueItem>): State {
+    function merge_lyrics(item) {
+        item.track.srt_lyrics = get_lyrics(state, item.track);
+        return item;
+    }
+    let new_queue = value.map((item) => merge_lyrics(item));
+
     // if the first song in the queue has changed, stop playing
     if (
         state.queue.length === 0 ||
-        value.length === 0 ||
-        state.queue[0].id !== value[0].id
+        new_queue.length === 0 ||
+        state.queue[0].id !== new_queue[0].id
     ) {
         return {
             ...state,
-            queue: value,
+            queue: new_queue,
             playing: false,
             paused: false,
             progress: 0,
         };
     } else {
-        return { ...state, queue: value };
+        return { ...state, queue: new_queue };
     }
 }
 
@@ -101,10 +108,10 @@ export function Dequeue(state: State): State {
     };
 }
 
-export function MarkTrackPlayed(state: State) {
+export function MarkTrackPlayed(state: State): [State, any] {
     return [Dequeue(state), SetTrackState(state, "played")];
 }
 
-export function MarkTrackSkipped(state: State) {
+export function MarkTrackSkipped(state: State): [State, any] {
     return [Dequeue(state), SetTrackState(state, "skipped")];
 }

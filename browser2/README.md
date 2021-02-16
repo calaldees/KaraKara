@@ -20,19 +20,15 @@ State is turned into HTML via the templates in `src/screens/`
 State is updated in two ways:
 
 - Actions - functions which take a `State` as input and return a
-  modified `State` as output.
+  modified `State` as output, normally linked to an onclick handler.
   - Eg `<li onclick={(state) => ({...state, track_id: 'abcd'})}>MyTrack</li>` -
     "When I click this track name, update state so that it's the same
-    as it was except for track_id"
-- Subscriptions - functions which listen for external things (eg
-  websocket activity) and update the state.
-  - In this case we mostly listen on the MQTT channel
-    `/karakara/rooms/<roomname>/commands` - each time the room
-    gets a command, we fetch the current queue state from
-    `/queue/<roomname>/queue_items.json`
-
-In the future we could replace "broadcast a command, which triggers JSON
-fetch over HTTP" with "broadcast JSON"
+    as it was except for state.track_id being abcd"
+- An MQTT subscription (in `src/subs.tsx`) to topics under
+  `/karakara/room/<roomname>/...`:
+  - `queue` - JSON, each update goes to `state.queue`
+  - `settings` - JSON, each update goes to `state.settings`
+  - `notifications` - Text, each message is turned into a notification
 
 ## Dev Setup
 

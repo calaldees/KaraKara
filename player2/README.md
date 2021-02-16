@@ -16,18 +16,19 @@ Source code in `src/`, compiled results in `dist/`
 All of the app state is specified in `src/player.d.ts` (initialised in
 `src/player.tsx`)
 
-State is turned into HTML via the templates in `src/screens/`
+State is turned into HTML via the templates in `src/screens/`. `root.tsx`
+contains the logic which decides which screen we're on (title, preview,
+video, etc)
 
-State is mostly updated by `src/subs.tsx` - In this case we mostly listen
-on the MQTT channel `/karakara/rooms/<roomname>/commands` - commands are
-things like "play", "pause", "skip", etc which directly update the state;
-but also "update_queue" which will trigger an HTTP fetch for
-`queue_items.json` (placing the response into `state.queue_items`) and
-"settings" which will trigger an HTTP fetch for `settings.json` (placing
-the response into `state.settings`).
+State is mostly updated by `src/subs.tsx` - we have an MQTT subscription
+which listens to topics under `/karakara/room/<roomname>/...`:
 
-In the future we could replace "broadcast a command, which triggers JSON
-fetch over HTTP" with "broadcast JSON"
+- `commands` - Text, commands like "play", "pause", "skip", etc
+- `queue` - JSON, each update goes to `state.queue`
+- `settings` - JSON, each update goes to `state.settings`
+
+(There are also some keyboard shortcuts to trigger play / pause / etc
+locally, for easier development)
 
 ## Dev Setup
 

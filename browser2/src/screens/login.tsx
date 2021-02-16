@@ -46,6 +46,7 @@ const LoginThenFetchTrackList = (state) =>
             },
             body: new URLSearchParams({
                 password: state.room_password,
+                fixme: "true",
             }),
         },
         action: (state, response) =>

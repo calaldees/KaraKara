@@ -6,6 +6,7 @@ import {
     SeekBackwards,
     SeekForwards,
     Stop,
+    AddLyricsToNewQueue,
 } from "./actions";
 import { CheckQueue, CheckSettings, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
@@ -15,12 +16,12 @@ import { http2ws } from "./utils";
 export function getOpenMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
-        ...(state.room_password ? {
-            username: state.room_name,
-            password: state.room_password,
-        } : {}),
-        topic: "karakara/room/" + state.room_name + "/commands",
+        username: state.room_name,
+        password: state.room_password,
+        topic: "karakara/room/" + state.room_name + "/#",
         connect(state: State) {
+            // TODO: no need to refresh on connect if we
+            // have retained messages
             return [
                 { ...state, connected: true },
                 CheckSettings(state),
@@ -33,35 +34,52 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
                 connected: false,
             };
         },
-        message(state: State, msg) {
+        message(state: State, msg): State | [State, any] {
             // msg = mqtt-packet
-            const cmd = msg.payload.toString().trim();
-            console.log("websocket_onmessage(" + cmd + ")");
-            switch (cmd) {
-                case "play":
-                    return Play(state);
-                case "stop":
-                    return Stop(state);
-                case "pause":
-                    return Pause(state);
-                case "seek_forwards":
-                    return SeekForwards(state, null);
-                case "seek_backwards":
-                    return SeekBackwards(state, null);
-                case "played":
-                    return Dequeue(state);
-                case "queue_updated":
-                    return [state, CheckQueue(state)];
+            const topic = msg.topic.split("/").pop();
+            const data = msg.payload.toString();
+
+            console.groupCollapsed("mqtt_onmessage(", topic, ")");
+            try {
+                console.log(JSON.parse(data));
+            } catch (error) {
+                console.log(data);
+            }
+            console.groupEnd();
+
+            switch(topic) {
+                case "commands":
+                    const cmd = data.trim();
+                    switch (cmd) {
+                        case "play":
+                            return Play(state);
+                        case "stop":
+                            return Stop(state);
+                        case "pause":
+                            return Pause(state);
+                        case "seek_forwards":
+                            return SeekForwards(state, null);
+                        case "seek_backwards":
+                            return SeekBackwards(state, null);
+                        case "played":
+                            return Dequeue(state);
+                        // Only one instance should mark the current track as skipped, to avoid
+                        // skipping two tracks
+                        case "skip":
+                            return state.podium
+                                ? Dequeue(state)
+                                : MarkTrackSkipped(state);
+                        default:
+                            return state;
+                    }
                 case "settings":
-                    return [state, CheckSettings(state)];
-                // Only one instance should mark the current track as skipped, to avoid
-                // skipping two tracks
-                case "skip":
-                    return state.podium
-                        ? Dequeue(state)
-                        : MarkTrackSkipped(state);
+                    return {
+                        ...state,
+                        settings: JSON.parse(data),
+                    };
+                case "queue":
+                    return AddLyricsToNewQueue(state, JSON.parse(data));
                 default:
-                    console.log("unknown command: " + cmd);
                     return state;
             }
         },

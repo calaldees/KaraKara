@@ -4,7 +4,7 @@ import { AutoHistory } from "hyperapp-auto-history";
 import { SaveStateManager } from "./save_state";
 
 import { Root } from "./screens/root";
-import { getCommandListener, getNotificationListener } from "./subs";
+import { getMQTTListener } from "./subs";
 
 // If we're running stand-alone, then use the main karakara.org.uk
 // server; else we're probably running as part of the full-stack,
@@ -78,8 +78,7 @@ function subscriptions(state: State) {
             },
             state,
         ),
-        state.room_name && state.track_list && getCommandListener(state),
-        state.room_name && getNotificationListener(state),
+        state.room_name && state.track_list && getMQTTListener(state),
     ];
 }
 

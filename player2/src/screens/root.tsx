@@ -5,7 +5,6 @@ import { PodiumScreen } from "./podium";
 import { SettingsMenu } from "./settings";
 import { PreviewScreen } from "./preview";
 
-
 export function Root(state: State) {
     let screen = <section>Unknown state :(</section>;
 
@@ -25,12 +24,10 @@ export function Root(state: State) {
 
     return (
         <body
-            onclick={state => ({ ...state, audio_allowed: true })}
-            ondblclick={state => ({ ...state, show_settings: true })}
+            onclick={(state) => ({ ...state, audio_allowed: true })}
+            ondblclick={(state) => ({ ...state, show_settings: true })}
         >
-            <main
-                class={"theme-" + state.settings["karakara.player.theme"]}
-            >
+            <main class={"theme-" + state.settings["karakara.player.theme"]}>
                 {state.connected || (
                     <h1 id={"error"}>Not Connected To Server</h1>
                 )}

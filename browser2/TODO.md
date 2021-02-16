@@ -16,3 +16,8 @@ Potential new features:
 - notify user via app when their song is up now / next
 - if API says "this event is over", notify "this event has finished" + set `room_name` to null
 - prompt to install PWA
+
+
+- make sure mqtt retained messages can survive a system restart
+- push initial state to /queue and /settings on startup
+- drop "fetch initial state over HTTP" from clients

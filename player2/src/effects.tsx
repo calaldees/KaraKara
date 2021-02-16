@@ -5,17 +5,15 @@
  */
 import { Http } from "hyperapp-fx";
 import { MQTTPublish } from "hyperapp-mqtt";
-import { get_lyrics, http2ws } from "./utils";
-import { SetQueue } from "./actions";
+import { http2ws } from "./utils";
+import { AddLyricsToNewQueue } from "./actions";
 
 export function SendCommand(state: State, command: string) {
-    console.log("websocket_send(" + command + ")");
+    console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        ...(state.room_password ? {
-            username: state.room_name,
-            password: state.room_password,
-        } : {}),
+        username: state.room_name,
+        password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });
@@ -65,14 +63,7 @@ export function CheckQueue(state: State) {
     return Http({
         url: state.root + "/queue/" + state.room_name + "/queue_items.json",
         action(state: State, response) {
-            function merge_lyrics(item) {
-                item.track.srt_lyrics = get_lyrics(state, item.track);
-                return item;
-            }
-            let queue_with_lyrics = response.data.queue.map(item =>
-                merge_lyrics(item),
-            );
-            return SetQueue(state, queue_with_lyrics);
+            return AddLyricsToNewQueue(state, response.data.queue);
         },
         error(state: State, response) {
             console.log("Error checking queue:", response);

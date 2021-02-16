@@ -53,7 +53,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
         ) : (
             <div
                 class={"startButton"}
-                onclick={state => [state, SendCommand(state, "play")]}
+                onclick={(state) => [state, SendCommand(state, "play")]}
                 style={{
                     "background-position":
                         100 -

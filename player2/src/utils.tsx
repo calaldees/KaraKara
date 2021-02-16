@@ -40,7 +40,7 @@ export function get_lyrics(state: State, track: Track): Array<SrtLine> {
     let xhr = new XMLHttpRequest();
     let data: string | null = null;
     xhr.open("GET", get_attachment(state, track, "srt"), false);
-    xhr.onload = function(e: ProgressEvent<XMLHttpRequest>) {
+    xhr.onload = function (e: ProgressEvent<XMLHttpRequest>) {
         data = e.target ? e.target.responseText : null;
     };
     xhr.send();
@@ -57,7 +57,7 @@ export function title_case(str: string) {
     return str
         .toLowerCase()
         .split(" ")
-        .map(function(word) {
+        .map(function (word) {
             return word.charAt(0).toUpperCase() + word.slice(1);
         })
         .join(" ");

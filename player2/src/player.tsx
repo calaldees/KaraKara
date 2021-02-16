@@ -61,11 +61,14 @@ const state: State = {
 
 function subscriptions(state: State) {
     return [
-        AutoHistory({
-            push: ["root", "room_name"],
-            replace: ["podium"],
-            encoder: "json",
-        }, state),
+        AutoHistory(
+            {
+                push: ["root", "room_name"],
+                replace: ["podium"],
+                encoder: "json",
+            },
+            state,
+        ),
         KeyboardListener,
         getOpenMQTTListener(state),
         state.audio_allowed &&

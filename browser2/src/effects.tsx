@@ -19,6 +19,10 @@ function apiRequestEffect(dispatch, props) {
             return response.json();
         })
         .then(function (result) {
+            console.groupCollapsed("api_request(", props.url, ")");
+            console.log(result);
+            console.groupEnd();
+
             dispatch(
                 (state, result) => [
                     {
@@ -28,6 +32,7 @@ function apiRequestEffect(dispatch, props) {
                 ],
                 result,
             );
+
             if (result.status == "ok") {
                 if (result.messages.length > 0) {
                     dispatch((state) => [
@@ -98,15 +103,11 @@ export function ApiRequest(props) {
 }
 
 export function SendCommand(state: State, command: string) {
-    console.log("websocket_send(" + command + ")");
+    console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        ...(state.room_password
-            ? {
-                  username: state.room_name,
-                  password: state.room_password,
-              }
-            : {}),
+        username: state.room_name,
+        password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });

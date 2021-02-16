@@ -29,7 +29,7 @@ export const PreviewScreen = ({ state }: { state: State }) => (
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>
-                {state.queue.slice(0, show_tracks).map(item => (
+                {state.queue.slice(0, show_tracks).map((item) => (
                     <li key={item.id}>
                         <img src={get_attachment(state, item.track, "image")} />
                         <p class="title">
@@ -51,7 +51,7 @@ export const PreviewScreen = ({ state }: { state: State }) => (
         {state.queue.length > show_tracks && (
             <div id="playlist_obscured" key={"playlist_obscured"}>
                 <ul>
-                    {state.queue.slice(show_tracks).map(item => (
+                    {state.queue.slice(show_tracks).map((item) => (
                         <li key={item.id}>{item.performer_name}</li>
                     ))}
                 </ul>

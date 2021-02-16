@@ -2,17 +2,12 @@ import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
 import { refresh } from "./screens/base";
 
-export function getCommandListener(state: State): [CallableFunction, any] {
+export function getMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
-        // don't specify un/pw at all, unless pw is non-empty
-        ...(state.room_password
-            ? {
-                  username: state.room_name,
-                  password: state.room_password,
-              }
-            : {}),
-        topic: "karakara/room/" + state.room_name + "/commands",
+        username: state.room_name,
+        password: state.room_password,
+        topic: "karakara/room/" + state.room_name + "/#",
         connect(state: State) {
             // TODO: no need to refresh on connect if we
             // have retained messages
@@ -35,28 +30,37 @@ export function getCommandListener(state: State): [CallableFunction, any] {
                 notification: { text: err.message, style: "error" },
             };
         },
-        message(state: State, msg) {
-            // TODO: state.queue = JSON.parse(msg.payload.toString());
-            console.log("Got command, refreshing:", msg.payload.toString());
-            return refresh(state);
-        },
-    });
-}
+        message(state: State, msg): State {
+            const topic = msg.topic.split("/").pop();
+            const data = msg.payload.toString();
 
-export function getNotificationListener(state: State): [CallableFunction, any] {
-    return MQTTSubscribe({
-        url: http2ws(state.root) + "/mqtt",
-        // don't specify un/pw at all, unless pw is non-empty
-        ...(state.room_password
-            ? {
-                  username: state.room_name,
-                  password: state.room_password,
-              }
-            : {}),
-        topic: "karakara/room/" + state.room_name + "/notifications",
-        message: (state: State, msg) => ({
-            ...state,
-            notification: { text: msg.payload.toString(), style: "warning" },
-        }),
+            console.groupCollapsed("mqtt_onmessage(", topic, ")");
+            try {
+                console.log(JSON.parse(data));
+            } catch (error) {
+                console.log(data);
+            }
+            console.groupEnd();
+
+            switch(topic) {
+                case "notifications":
+                    return {
+                        ...state,
+                        notification: { text: data, style: "warning" },
+                    };
+                case "settings":
+                    return {
+                        ...state,
+                        settings: JSON.parse(data),
+                    };
+                case "queue":
+                    return {
+                        ...state,
+                        queue: JSON.parse(data),
+                    };
+                default:
+                    return state;
+            }
+        },
     });
 }
