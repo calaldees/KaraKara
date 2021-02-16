@@ -68,6 +68,10 @@ function apiRequestEffect(dispatch, props) {
             }
         })
         .catch(function (error) {
+            console.groupCollapsed("api_request(", props.url, ")");
+            console.log(error);
+            console.groupEnd();
+
             dispatch(
                 (state, error) => [
                     {
