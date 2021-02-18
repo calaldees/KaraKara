@@ -1,7 +1,7 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
 import { AutoHistory } from "hyperapp-auto-history";
-import { SaveStateManager } from "./save_state";
+import { LocalStorageLoader, LocalStorageSaver } from "./save_state";
 
 import { Root } from "./screens/root";
 import { getMQTTListener } from "./subs";
@@ -61,30 +61,27 @@ let state: State = {
     // priority_tokens
     priority_tokens: [],
 };
-const ssm = new SaveStateManager(state, [
-    "performer_name",
-    "room_password",
-    "bookmarks",
-]);
 
-function subscriptions(state: State) {
-    ssm.save_state_if_changed(state);
-    return [
+app({
+    init: [
+        state,
+        LocalStorageLoader("performer_name", (state, x) => ({...state, performer_name: x})),
+        LocalStorageLoader("room_password", (state, x) => ({...state, room_password: x})),
+        LocalStorageLoader("bookmarks", (state, x) => ({...state, bookmarks: x})),
+    ],
+    view: Root,
+    subscriptions: (state) => [
         AutoHistory(
             {
                 push: ["root", "filters", "track_id"],
                 replace: ["room_name_edit", "search"],
-                encoder: "json",
             },
             state,
         ),
         state.room_name && state.track_list && getMQTTListener(state),
-    ];
-}
-
-app({
-    init: state,
-    view: Root,
-    subscriptions: subscriptions,
+        LocalStorageSaver("performer_name", state.performer_name),
+        LocalStorageSaver("room_password", state.room_password),
+        LocalStorageSaver("bookmarks", state.bookmarks),
+    ],
     node: document.body,
 });
