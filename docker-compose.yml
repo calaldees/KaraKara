@@ -4,7 +4,7 @@ volumes:
     website_db:
     processmedia2_data:
     logs:
-    influxdb_data:
+    mosquitto_data:
 
 services:
     website:
@@ -38,6 +38,8 @@ services:
         image: karakara/websocket
         build:
             context: ./websocket
+        volumes:
+            - mosquitto_data:/mosquitto/data
 
     player2:
         image: karakara/player2
