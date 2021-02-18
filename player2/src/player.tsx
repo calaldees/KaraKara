@@ -65,7 +65,6 @@ function subscriptions(state: State) {
             {
                 push: ["root", "room_name"],
                 replace: ["podium"],
-                encoder: "json",
             },
             state,
         ),
