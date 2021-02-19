@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen, Refresh, BackToExplore } from "./base";
+import { Screen, BackToExplore } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
 import { ApiRequest } from "../effects";
 import parseSRT from "parse-srt";
@@ -138,7 +138,7 @@ export const Queue = ({ state }: { state: State }) => (
         className={"queue"}
         navLeft={<BackToExplore />}
         title={"Now Playing"}
-        navRight={<Refresh state={state} />}
+        // navRight={}
     >
         {state.queue.length == 0 && <h2>Queue Empty</h2>}
         {state.queue.length > 0 && (

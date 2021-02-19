@@ -1,6 +1,5 @@
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
-import { refresh } from "./screens/base";
 
 export function getMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
@@ -8,16 +7,6 @@ export function getMQTTListener(state: State): [CallableFunction, any] {
         username: state.room_name,
         password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/#",
-        connect(state: State) {
-            // TODO: no need to refresh on connect if we
-            // have retained messages
-            console.log("Connected, refreshing");
-            return refresh(state);
-        },
-        close(state: State) {
-            console.log("MQTT socket closed, assuming it'll reopen");
-            return { ...state };
-        },
         error(state: State, err) {
             console.log(
                 "Got an unrecoverable MQTT error, " +
@@ -42,7 +31,7 @@ export function getMQTTListener(state: State): [CallableFunction, any] {
             }
             console.groupEnd();
 
-            switch(topic) {
+            switch (topic) {
                 case "notifications":
                     return {
                         ...state,

@@ -377,19 +377,7 @@ const AdminButtons = (state) => (
                 Priority Tokens
             </button>
             <button
-                onclick={(state) => [
-                    state,
-                    ApiRequest({
-                        function: "settings",
-                        state: state,
-                        action: (state, response) => ({
-                            ...state,
-                            screen: "room_settings",
-                            settings: response.data.settings,
-                        }),
-                    }),
-                ]}
-                disabled={state.loading}
+                onclick={(state) => ({ ...state, screen: "room_settings" })}
             >
                 Room Settings
             </button>

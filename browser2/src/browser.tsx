@@ -65,9 +65,18 @@ let state: State = {
 app({
     init: [
         state,
-        LocalStorageLoader("performer_name", (state, x) => ({...state, performer_name: x})),
-        LocalStorageLoader("room_password", (state, x) => ({...state, room_password: x})),
-        LocalStorageLoader("bookmarks", (state, x) => ({...state, bookmarks: x})),
+        LocalStorageLoader("performer_name", (state, x) => ({
+            ...state,
+            performer_name: x,
+        })),
+        LocalStorageLoader("room_password", (state, x) => ({
+            ...state,
+            room_password: x,
+        })),
+        LocalStorageLoader("bookmarks", (state, x) => ({
+            ...state,
+            bookmarks: x,
+        })),
     ],
     view: Root,
     subscriptions: (state) => [

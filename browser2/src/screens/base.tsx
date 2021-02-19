@@ -41,32 +41,6 @@ export const Screen = (
     </main>
 );
 
-export function refresh(state: State) {
-    return [
-        state,
-        ApiRequest({
-            function: "queue_items",
-            state: state,
-            action: (state, response) => ({
-                ...state,
-                queue: response.data.queue,
-            }),
-        }),
-    ];
-}
-
-export const Refresh = ({ state }: { state: State }) => (
-    <a onclick={refresh}>
-        <i
-            class={
-                state.loading
-                    ? "fas fa-2x fa-sync loading"
-                    : "fas fa-2x fa-sync"
-            }
-        />
-    </a>
-);
-
 export const BackToExplore = () => (
     <a onclick={(state) => ({ ...state, screen: "explore" })}>
         <i class={"fas fa-2x fa-chevron-circle-left"} />

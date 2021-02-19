@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen, Refresh, BackToExplore } from "./base";
+import { Screen, BackToExplore } from "./base";
 import { get_attachment, title_case } from "../utils";
 import { SendCommand, ApiRequest } from "../effects";
 
@@ -200,7 +200,7 @@ export const Control = ({ state }: { state: State }) => (
         className={"queue"}
         navLeft={<BackToExplore />}
         title={"Remote Control"}
-        navRight={<Refresh state={state} />}
+        // navRight={}
         footer={<ControlButtons state={state} />}
     >
         {state.queue.length == 0 ? (

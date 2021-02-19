@@ -3,16 +3,24 @@
 
 function _stateLoader(dispatch, props) {
     let data = localStorage.getItem(props.key);
-    if(!data) return;
+    if (!data) return;
     data = JSON.parse(data);
     dispatch(props.action, data);
 }
 
-export const LocalStorageLoader = (key, action) => [_stateLoader, {key, action}];
+export const LocalStorageLoader = (key, action) => [
+    _stateLoader,
+    { key, action },
+];
 
 function _stateWatcher(dispatch, props) {
-    requestAnimationFrame((_) => localStorage.setItem(props.key, JSON.stringify(props.value)));
+    requestAnimationFrame((_) =>
+        localStorage.setItem(props.key, JSON.stringify(props.value)),
+    );
     return () => {};
 }
 
-export const LocalStorageSaver = (key, value) => [_stateWatcher, {key, value}];
+export const LocalStorageSaver = (key, value) => [
+    _stateWatcher,
+    { key, value },
+];
