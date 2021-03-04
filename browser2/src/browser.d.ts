@@ -34,7 +34,6 @@ type Attachment = {
 
 type Track = {
     id: string,
-    id_short: string,
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,

@@ -74,7 +74,9 @@ def track_list_all(request):
     # We derive a truncated id specially for this printed list
     short_id_length = request.queue.settings.get('karakara.print_tracks.short_id_length', 6)
 
-    # Hack/Patch for title of tracks (could be transferred to browser2? speak to Shish)
+    # Hack/Patch for title of tracks
+    # Browser2 does this on the client-side - can be removed if we remove
+    # server-side track browsing
     for track in track_list:
         track['id_short'] = track['id'][:short_id_length]
         if track['tags'].get('vocaltrack') == ["off"]:

@@ -41,9 +41,10 @@ export const PrintableList = ({ state }: { state: State }) => (
         {/* fields = ['id_short'] + settings['karakara.print_tracks.fields'] */}
         {Object.values(state.track_list).map((track: Track) => (
             <p>
-                <code>{track.id_short}</code>: {t(track.tags["from"])} (
+                <code>{track.id.substring(0, state.settings['karakara.print_tracks.short_id_length'] || 6)}</code>{": "}
+                {t(track.tags["from"])} (
                 {t(track.tags["use"])}){": "}
-                {track.title}
+                {t(track.tags["title"])}
                 {" - "}
                 {track.tags["artist"] || "No Artist"} (
                 {Math.floor(track.duration / 60)}m
