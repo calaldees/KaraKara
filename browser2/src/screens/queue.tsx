@@ -11,12 +11,12 @@ const NowPlaying = ({ state, item }: { state: State; item: QueueItem }) => (
     <div>
         <ul>
             <QueueItemRender state={state} item={item} />
-            {state.track_list[item.track.id].srt && (
+            {item.track.srt && (
                 <li>
                     <span class={"lyrics"}>
-                        {parseSRT(state.track_list[item.track.id].srt).map(
-                            (item) => (
-                                <div>{item.text}</div>
+                        {parseSRT(item.track.srt).map(
+                            (line) => (
+                                <div>{line.text}</div>
                             ),
                         )}
                     </span>

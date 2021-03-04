@@ -1,5 +1,3 @@
-import parseSRT from "parse-srt";
-
 // turn milliseconds into {X}min / {X}sec
 export function timedelta_str(timedelta: number): String {
     const seconds_total = Math.floor(timedelta / 1000);
@@ -33,18 +31,6 @@ export function get_attachment(
         }
     }
     return "";
-}
-
-// get_attachment(srt) + parse SRT file
-export function get_lyrics(state: State, track: Track): Array<SrtLine> {
-    let xhr = new XMLHttpRequest();
-    let data: string | null = null;
-    xhr.open("GET", get_attachment(state, track, "srt"), false);
-    xhr.onload = function (e: ProgressEvent<XMLHttpRequest>) {
-        data = e.target ? e.target.responseText : null;
-    };
-    xhr.send();
-    return data ? parseSRT(data) : null;
 }
 
 // get a tag if it is defined, else blank

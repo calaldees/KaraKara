@@ -34,6 +34,6 @@ export const VideoScreen = ({ state }: { state: State }) => (
         </div>
         */}
         {state.settings["karakara.player.subs_on_screen"] &&
-            state.queue[0].track.lyrics && <Lyrics state={state} />}
+            state.queue[0].track.srt_lyrics && <Lyrics state={state} />}
     </section>
 );
