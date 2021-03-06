@@ -9,7 +9,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
         key="podium"
         class={
             "screen_podium" +
-            (state.queue[0].track.srt_lyrics ? "" : " no_lyrics")
+            (state.queue[0].track.lyrics ? "" : " no_lyrics")
         }
     >
         <h1>

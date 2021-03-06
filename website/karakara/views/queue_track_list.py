@@ -1,4 +1,5 @@
 from pyramid.view import view_config
+import srt
 
 from sqlalchemy.orm import joinedload, undefer
 
@@ -81,6 +82,22 @@ def track_list_all(request):
         track['id_short'] = track['id'][:short_id_length]
         if track['tags'].get('vocaltrack') == ["off"]:
             track['title'] += " (Karaoke Ver)"
+
+        # Convert SRT format lyrics in 'srt' property
+        # into JSON format lyrics in 'lyrics' property
+        try:
+            if track['srt']:
+                track['lyrics'] = [{
+                    'id': line.index,
+                    'text': line.content,
+                    'start': line.start.total_seconds(),
+                    'end': line.start.total_seconds(),
+                } for line in srt.parse(track['srt'])]
+        except Exception as e:
+            log.exception(f"Error parsing subtitles for track {track['id']}")
+        if 'lyrics' not in track:
+            track['lyrics'] = []
+        del track['srt']
 
     # Sort track list
     #  this needs to be handled at the python layer because the tag logic is fairly compicated

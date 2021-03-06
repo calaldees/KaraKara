@@ -2,7 +2,6 @@ import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
 import { ApiRequest } from "../effects";
-import parseSRT from "parse-srt";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
@@ -153,10 +152,10 @@ export const TrackDetails = ({
         </video>
 
         {/* Lyrics */}
-        {track.srt && (
+        {track.lyrics && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {parseSRT(track.srt).map((item) => (
+                {track.lyrics.map((item) => (
                     <div>{item.text}</div>
                 ))}
             </div>

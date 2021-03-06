@@ -6,7 +6,7 @@ import {
     SeekBackwards,
     SeekForwards,
     Stop,
-    AddLyricsToNewQueue,
+    UpdateQueue,
 } from "./actions";
 import { CheckQueue, CheckSettings, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
@@ -78,7 +78,7 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
                         settings: JSON.parse(data),
                     };
                 case "queue":
-                    return AddLyricsToNewQueue(state, JSON.parse(data));
+                    return UpdateQueue(state, JSON.parse(data));
                 default:
                     return state;
             }

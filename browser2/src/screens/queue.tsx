@@ -2,7 +2,6 @@ import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
 import { ApiRequest } from "../effects";
-import parseSRT from "parse-srt";
 
 /*
  * Now Playing
@@ -11,10 +10,10 @@ const NowPlaying = ({ state, item }: { state: State; item: QueueItem }) => (
     <div>
         <ul>
             <QueueItemRender state={state} item={item} />
-            {item.track.srt && (
+            {item.track.lyrics && (
                 <li>
                     <span class={"lyrics"}>
-                        {parseSRT(item.track.srt).map(
+                        {item.track.lyrics.map(
                             (line) => (
                                 <div>{line.text}</div>
                             ),

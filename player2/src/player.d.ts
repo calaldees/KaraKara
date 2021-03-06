@@ -27,11 +27,7 @@ type Track = {
     tags: Dictionary<Array<string>>,
     description: string,
     attachments: Array<Attachment>,
-    // .srt_lyrics is the only field which doesn't come directly
-    // as-is from the server. The server broadcasts .srt as a text
-    // field, and on each update, we re-parse that into .srt_lyrics
-    srt_lyrics: Array<SrtLine>,
-    srt: string,
+    lyrics: Array<SrtLine>,
     image: string,
     source_filename: string,
     queue: {

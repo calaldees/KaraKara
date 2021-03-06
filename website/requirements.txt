@@ -23,5 +23,6 @@ webtest
 #pycrypto  # Considering this inclusion for encrypted cookies
 decorator
 paho-mqtt
+srt
 
 git+https://github.com/calaldees/libs.git@master#egg=calaldees

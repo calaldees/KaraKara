@@ -3,7 +3,6 @@
  * in response to eg a button press
  */
 import { SetTrackState } from "./effects";
-import parseSRT from "parse-srt";
 
 // App controls
 export function SetPreviewVolume(state: State, event): State {
@@ -69,13 +68,7 @@ export function SeekBackwards(state: State, value): State {
 }
 
 // Playlist controls
-export function AddLyricsToNewQueue(state: State, value: Array<QueueItem>): State {
-    function merge_lyrics(item) {
-        item.track.srt_lyrics = item.track.srt ? parseSRT(item.track.srt) : null;
-        return item;
-    }
-    let new_queue = value.map((item) => merge_lyrics(item));
-
+export function UpdateQueue(state: State, new_queue: Array<QueueItem>): State {
     // if the first song in the queue has changed, stop playing
     if (
         state.queue.length === 0 ||

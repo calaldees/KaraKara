@@ -1,5 +1,6 @@
 import datetime
 from functools import partial
+import srt
 
 from sqlalchemy.orm import joinedload, undefer  # , joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
@@ -72,6 +73,22 @@ def _queue_items_dict_with_track_dict(queue_query):
     #           This is to be removed ...
     for track in tracks.values():
         track['title'] = track_title(track['tags'])
+
+        # Convert SRT format lyrics in 'srt' property
+        # into JSON format lyrics in 'lyrics' property
+        try:
+            if track['srt']:
+                track['lyrics'] = [{
+                    'id': line.index,
+                    'text': line.content,
+                    'start': line.start.total_seconds(),
+                    'end': line.start.total_seconds(),
+                } for line in srt.parse(track['srt'])]
+        except Exception as e:
+            log.exception(f"Error parsing subtitles for track {track['id']}")
+        if 'lyrics' not in track:
+            track['lyrics'] = []
+        del track['srt']
 
     # Attach track to queue_item
     for queue_item in queue_dicts:

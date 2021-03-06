@@ -5,7 +5,7 @@
  */
 import { MQTTPublish } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
-import { AddLyricsToNewQueue } from "./actions";
+import { UpdateQueue } from "./actions";
 
 
 function apiRequestEffect(dispatch, props) {
@@ -140,7 +140,7 @@ export function CheckQueue(state: State) {
         function: "queue_items",
         state: state,
         action(state: State, response) {
-            return AddLyricsToNewQueue(state, response.data.queue);
+            return UpdateQueue(state, response.data.queue);
         },
     });
 }
