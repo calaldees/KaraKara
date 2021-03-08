@@ -6,10 +6,8 @@ topic read karakara/room/+/settings
 topic read karakara/room/+/commands
 topic read karakara/room/+/notifications
 
-# People who have the room password can write to the room's
-# command channel
-pattern write karakara/room/%u/commands
-pattern write karakara/room/%u/notifications
+# People who have the room password can write to that room
+pattern readwrite karakara/room/%u/#
 
 # Server can write to everything
 user karakara
