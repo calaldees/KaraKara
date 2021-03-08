@@ -1,15 +1,11 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { BackToExplore, Screen } from "./base";
 
 export const PriorityTokens = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"priority_tokens"}
-        navLeft={
-            <a onclick={(state) => [{ ...state, screen: "explore" }]}>
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
-            </a>
-        }
+        navLeft={<BackToExplore />}
         title={"Priority Tokens"}
         //navRight={}
         //footer={}

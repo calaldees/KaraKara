@@ -1,7 +1,8 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { SendCommand, ApiRequest } from "../effects";
+import { ApiRequest } from "../effects";
+import { RemoveTrack, Command } from "../actions";
 
 function createDragStart(src_id) {
     return function (state, event) {
@@ -134,26 +135,7 @@ const QueueItemRender = ({
             </span>
         )}
 
-        <span
-            class={"go_arrow"}
-            onclick={(state) => [
-                state,
-                ApiRequest({
-                    title: "Removing track...",
-                    function: "queue_items",
-                    state: state,
-                    options: {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: new URLSearchParams({
-                            "queue_item.id": item.id.toString(),
-                        }),
-                    },
-                }),
-            ]}
-        >
+        <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
             <i class={"fas fa-times-circle"} />
         </span>
     </li>
@@ -162,32 +144,22 @@ const QueueItemRender = ({
 const ControlButtons = ({ state }: { state: State }) => (
     <footer>
         <div class={"buttons"}>
-            <button
-                onclick={(state) => [
-                    state,
-                    SendCommand(state, "seek_backwards"),
-                ]}
-            >
+            <button onclick={Command("seek_backwards")}>
                 <i class={"fas fa-backward"} />
             </button>
-            <button
-                onclick={(state) => [
-                    state,
-                    SendCommand(state, "seek_forwards"),
-                ]}
-            >
+            <button onclick={Command("seek_forwards")}>
                 <i class={"fas fa-forward"} />
             </button>
-            <button onclick={(state) => [state, SendCommand(state, "play")]}>
+            <button onclick={Command("play")}>
                 <i class={"fas fa-play"} />
             </button>
-            <button onclick={(state) => [state, SendCommand(state, "pause")]}>
+            <button onclick={Command("pause")}>
                 <i class={"fas fa-pause"} />
             </button>
-            <button onclick={(state) => [state, SendCommand(state, "stop")]}>
+            <button onclick={Command("stop")}>
                 <i class={"fas fa-stop"} />
             </button>
-            <button onclick={(state) => [state, SendCommand(state, "skip")]}>
+            <button onclick={Command("skip")}>
                 <i class={"fas fa-step-forward"} />
             </button>
         </div>

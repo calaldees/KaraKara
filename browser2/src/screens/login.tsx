@@ -1,79 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { ApiRequest } from "../effects";
-
-function track_list_to_map(raw_list: Array<Track>) {
-    let map = {};
-    for (let i = 0; i < raw_list.length; i++) {
-        map[raw_list[i].id] = raw_list[i];
-    }
-    return map;
-}
-
-const FetchTrackList = (state) =>
-    ApiRequest({
-        function: "track_list",
-        state: state,
-        progress: (state, done, size) => [
-            {
-                ...state,
-                download_done: done,
-                download_size: size,
-            },
-        ],
-        action: (state, response) =>
-            response.status == "ok"
-                ? [
-                      {
-                          ...state,
-                          room_name: state.room_name_edit,
-                          session_id: response.identity.id,
-                          track_list: track_list_to_map(response.data.list),
-                      },
-                      // queue & settings should come from mqtt, but if there
-                      // was no cache for some reason, fetch from HTTP
-                      !state.queue &&
-                          ApiRequest({
-                              function: "queue_items",
-                              state: state,
-                              action: (state, response) => ({
-                                  ...state,
-                                  queue: response.data.queue,
-                              }),
-                          }),
-                      !state.settings &&
-                          ApiRequest({
-                              function: "settings",
-                              state: state,
-                              action: (state, response) => ({
-                                  ...state,
-                                  settings: response.data.settings,
-                              }),
-                          }),
-                  ]
-                : {
-                      ...state,
-                      room_name_edit: "",
-                  },
-    });
-
-const LoginThenFetchTrackList = (state) =>
-    ApiRequest({
-        function: "admin",
-        state: state,
-        options: {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                password: state.room_password,
-                fixme: "true",
-            }),
-        },
-        action: (state, response) =>
-            response.status == "ok" ? [state, FetchTrackList(state)] : state,
-    });
+import { TryLogin, UpdateRoomName } from "../actions";
 
 function percent(a, b) {
     return (a / b) * 100 + "%";
@@ -86,21 +13,11 @@ export const Login = ({ state }: { state: State }) => (
                 type={"text"}
                 placeholder={"Room Name"}
                 value={state.room_name_edit}
-                oninput={(state: State, event: FormInputEvent) =>
-                    ({
-                        ...state,
-                        room_name_edit: event.target.value.toLowerCase(),
-                    } as State)
-                }
+                oninput={UpdateRoomName()}
                 disabled={state.loading}
             />
             <button
-                onclick={(state: State) => [
-                    state,
-                    state.room_password
-                        ? LoginThenFetchTrackList(state)
-                        : FetchTrackList(state),
-                ]}
+                onclick={TryLogin()}
                 disabled={!state.room_name_edit || state.loading}
             >
                 {state.loading ? (

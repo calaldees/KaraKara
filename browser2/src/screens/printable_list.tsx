@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { BackToExplore, Screen } from "./base";
 
 const PrintButtons = () => (
     <footer>
@@ -29,11 +29,7 @@ export const PrintableList = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"track_list"}
-        navLeft={
-            <a onclick={(state) => [{ ...state, screen: "explore" }]}>
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
-            </a>
-        }
+        navLeft={<BackToExplore />}
         title={"Track List"}
         //navRight={}
         footer={<PrintButtons />}
@@ -41,9 +37,16 @@ export const PrintableList = ({ state }: { state: State }) => (
         {/* fields = ['id_short'] + settings['karakara.print_tracks.fields'] */}
         {Object.values(state.track_list).map((track: Track) => (
             <p>
-                <code>{track.id.substring(0, state.settings['karakara.print_tracks.short_id_length'] || 6)}</code>{": "}
-                {t(track.tags["from"])} (
-                {t(track.tags["use"])}){": "}
+                <code>
+                    {track.id.substring(
+                        0,
+                        state.settings[
+                            "karakara.print_tracks.short_id_length"
+                        ] || 6,
+                    )}
+                </code>
+                {": "}
+                {t(track.tags["from"])} ({t(track.tags["use"])}){": "}
                 {t(track.tags["title"])}
                 {" - "}
                 {track.tags["artist"] || "No Artist"} (

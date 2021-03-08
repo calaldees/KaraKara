@@ -1,3 +1,6 @@
+/*
+ * Effects: functions which send data to the outside world
+ */
 import { MQTTPublish } from "hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
 import { http2ws } from "./utils";
@@ -116,3 +119,76 @@ export function SendCommand(state: State, command: string) {
         payload: command,
     });
 }
+
+function track_list_to_map(raw_list: Array<Track>) {
+    let map = {};
+    for (let i = 0; i < raw_list.length; i++) {
+        map[raw_list[i].id] = raw_list[i];
+    }
+    return map;
+}
+
+export const FetchTrackList = (state) =>
+    ApiRequest({
+        function: "track_list",
+        state: state,
+        progress: (state, done, size) => [
+            {
+                ...state,
+                download_done: done,
+                download_size: size,
+            },
+        ],
+        action: (state, response) =>
+            response.status == "ok"
+                ? [
+                      {
+                          ...state,
+                          room_name: state.room_name_edit,
+                          session_id: response.identity.id,
+                          track_list: track_list_to_map(response.data.list),
+                      },
+                      // queue & settings should come from mqtt, but if there
+                      // was no cache for some reason, fetch from HTTP
+                      !state.queue &&
+                          ApiRequest({
+                              function: "queue_items",
+                              state: state,
+                              action: (state, response) => ({
+                                  ...state,
+                                  queue: response.data.queue,
+                              }),
+                          }),
+                      !state.settings &&
+                          ApiRequest({
+                              function: "settings",
+                              state: state,
+                              action: (state, response) => ({
+                                  ...state,
+                                  settings: response.data.settings,
+                              }),
+                          }),
+                  ]
+                : {
+                      ...state,
+                      room_name_edit: "",
+                  },
+    });
+
+export const LoginThenFetchTrackList = (state) =>
+    ApiRequest({
+        function: "admin",
+        state: state,
+        options: {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                password: state.room_password,
+                fixme: "true",
+            }),
+        },
+        action: (state, response) =>
+            response.status == "ok" ? [state, FetchTrackList(state)] : state,
+    });

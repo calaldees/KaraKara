@@ -1,15 +1,11 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { BackToExplore, Screen } from "./base";
 
 export const RoomSettings = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"room_settings"}
-        navLeft={
-            <a onclick={(state) => [{ ...state, screen: "explore" }]}>
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
-            </a>
-        }
+        navLeft={<BackToExplore />}
         title={"Room Settings"}
         //navRight={}
         //footer={}

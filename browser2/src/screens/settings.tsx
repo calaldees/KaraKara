@@ -1,4 +1,5 @@
 import h from "hyperapp-jsx-pragma";
+import { HideSettings } from "../actions";
 
 export const SettingsMenu = ({ state }: { state: State }) => (
     <div class={"settings"}>
@@ -75,14 +76,7 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                 </tr>
                 <tr>
                     <td colspan={2}>
-                        <button
-                            onclick={(state) => ({
-                                ...state,
-                                show_settings: false,
-                            })}
-                        >
-                            Close
-                        </button>
+                        <button onclick={HideSettings()}>Close</button>
                     </td>
                 </tr>
             </table>

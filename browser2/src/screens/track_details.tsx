@@ -1,7 +1,16 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { ApiRequest } from "../effects";
+import {
+    GoToScreen,
+    ActivateEnqueue,
+    CancelEnqueue,
+    EnqueueCurrentTrack,
+    SelectTrack,
+    AddBookmark,
+    RemoveBookmark,
+    SetPerformerName,
+} from "../actions";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
@@ -10,67 +19,19 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
         )}
         <div class={"buttons"}>
             <button
-                onclick={(state: State, event: FormInputEvent) =>
-                    ({
-                        ...state,
-                        action: "enqueue",
-                    } as State)
-                }
+                onclick={ActivateEnqueue()}
                 disabled={state.queue.find((i) => i.track.id == track.id)}
             >
                 Enqueue
             </button>
             {state.bookmarks.includes(track.id) ? (
-                <button
-                onclick={(state: State, event: FormInputEvent) =>
-                    ({
-                        ...state,
-                        bookmarks: state.bookmarks.filter(
-                            (x) => x != track.id,
-                        ),
-                    } as State)
-                }
-            >
-                Un-Bookmark
-            </button>
-        ) : (
-                <button
-                    onclick={(state: State, event: FormInputEvent) =>
-                        ({
-                            ...state,
-                            bookmarks: state.bookmarks.concat([track.id]),
-                        } as State)
-                    }
-                >
-                    Bookmark
-                </button>
+                <button onclick={RemoveBookmark(track.id)}>Un-Bookmark</button>
+            ) : (
+                <button onclick={AddBookmark(track.id)}>Bookmark</button>
             )}
         </div>
     </footer>
 );
-
-// TODO: remove self from queue?
-function enqueue(state: State) {
-    return [
-        state,
-        ApiRequest({
-            title: "Adding to queue...",
-            function: "queue_items",
-            state: state,
-            options: {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    track_id: state.track_id || "error",
-                    performer_name: state.performer_name,
-                }),
-            },
-            action: (state, response) => [{ ...state, action: null }],
-        }),
-    ];
-}
 
 const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
@@ -80,25 +41,11 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             value={state.performer_name}
             placeholder={"Performer Name"}
             required={true}
-            oninput={(state: State, event: FormInputEvent) =>
-                ({
-                    ...state,
-                    performer_name: event.target.value,
-                } as State)
-            }
+            oninput={SetPerformerName()}
         />
         <div class={"buttons"}>
-            <button
-                onclick={(state: State, event: FormInputEvent) =>
-                    ({
-                        ...state,
-                        action: null,
-                    } as State)
-                }
-            >
-                Cancel
-            </button>
-            <button onclick={enqueue}>Confirm</button>
+            <button onclick={CancelEnqueue()}>Cancel</button>
+            <button onclick={EnqueueCurrentTrack()}>Confirm</button>
         </div>
     </footer>
 );
@@ -123,18 +70,13 @@ export const TrackDetails = ({
         state={state}
         className={"track_details"}
         navLeft={
-            <a onclick={(state) => ({ ...state, track_id: null })}>
+            <a onclick={SelectTrack(null)}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a
-                onclick={(state) => ({
-                    ...state,
-                    screen: state.room_password ? "control" : "queue",
-                })}
-            >
+            <a onclick={GoToScreen(state.room_password ? "control" : "queue")}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }

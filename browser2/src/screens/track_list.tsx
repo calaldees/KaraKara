@@ -2,15 +2,13 @@ import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
 import { ApiRequest } from "../effects";
+import { SelectTrack } from "../actions";
 
 /*
  * List individual tracks
  */
 const TrackItem = ({ track }: { track: Track }) => (
-    <li
-        class={"track_item"}
-        onclick={(state) => ({ ...state, track_id: track.id })}
-    >
+    <li class={"track_item"} onclick={SelectTrack(track.id)}>
         <div
             class={"thumb"}
             style={{
