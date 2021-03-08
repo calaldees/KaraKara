@@ -71,6 +71,7 @@ app({
         })),
         LocalStorageLoader("room_password", (state, x) => ({
             ...state,
+            room_password_edit: x,
             room_password: x,
         })),
         LocalStorageLoader("bookmarks", (state, x) => ({
