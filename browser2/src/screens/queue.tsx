@@ -3,46 +3,6 @@ import { Screen, BackToExplore } from "./base";
 import { get_attachment, title_case, shuffle } from "../utils";
 import { RemoveTrack } from "../actions";
 
-/*
- * Now Playing
- */
-const NowPlaying = ({ state, item }: { state: State; item: QueueItem }) => (
-    <div>
-        <ul>
-            <QueueItemRender state={state} item={item} />
-            {item.track.lyrics && (
-                <li>
-                    <span class={"lyrics"}>
-                        {item.track.lyrics.map((line) => (
-                            <div>{line.text}</div>
-                        ))}
-                    </span>
-                </li>
-            )}
-        </ul>
-    </div>
-);
-
-/*
- * Coming Soon
- */
-const ComingSoon = ({
-    state,
-    items,
-}: {
-    state: State;
-    items: Array<QueueItem>;
-}) => (
-    <section>
-        <h2>Coming Soon</h2>
-        <ul>
-            {items.map((item) => (
-                <QueueItemRender state={state} item={item} />
-            ))}
-        </ul>
-    </section>
-);
-
 const QueueItemRender = ({
     state,
     item,
@@ -87,26 +47,6 @@ const QueueItemRender = ({
 );
 
 /*
- * Coming Later
- */
-const ComingLater = ({
-    state,
-    items,
-}: {
-    state: State;
-    items: Array<QueueItem>;
-}) => (
-    <section>
-        <h2>Coming Later</h2>
-        <div class={"coming_later"}>
-            {items.map((item) => (
-                <span>{item.performer_name}</span>
-            ))}
-        </div>
-    </section>
-);
-
-/*
  * Page Layout
  */
 export const Queue = ({ state }: { state: State }) => (
@@ -117,15 +57,49 @@ export const Queue = ({ state }: { state: State }) => (
         title={"Now Playing"}
         // navRight={}
     >
+        {/* No items */}
         {state.queue.length == 0 && <h2>Queue Empty</h2>}
+
+        {/* At least one item */}
         {state.queue.length > 0 && (
-            <NowPlaying state={state} item={state.queue[0]} />
+            <div>
+                <ul>
+                    <QueueItemRender state={state} item={state.queue[0]} />
+                    {state.queue[0].track.lyrics && (
+                        <li>
+                            <span class={"lyrics"}>
+                                {state.queue[0].track.lyrics.map((line) => (
+                                    <div>{line.text}</div>
+                                ))}
+                            </span>
+                        </li>
+                    )}
+                </ul>
+            </div>
         )}
+
+        {/* Some items */}
         {state.queue.length > 1 && (
-            <ComingSoon state={state} items={state.queue.slice(1, 6)} />
+            <section>
+                <h2>Coming Soon</h2>
+                <ul>
+                    {state.queue.slice(1, 6).map((item) => (
+                        <QueueItemRender state={state} item={item} />
+                    ))}
+                </ul>
+            </section>
         )}
+
+        {/* Many items */}
         {state.queue.length > 6 && (
-            <ComingLater state={state} items={shuffle(state.queue.slice(6))} />
+            <section>
+                <h2>Coming Later</h2>
+                <div class={"coming_later"}>
+                    {shuffle(state.queue.slice(6)).map((item) => (
+                        <span>{item.performer_name}</span>
+                    ))}
+                </div>
+            </section>
         )}
     </Screen>
 );
