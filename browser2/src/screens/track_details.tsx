@@ -20,7 +20,20 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
             >
                 Enqueue
             </button>
-            {state.bookmarks.filter((x) => x == track.id).length == 0 ? (
+            {state.bookmarks.includes(track.id) ? (
+                <button
+                onclick={(state: State, event: FormInputEvent) =>
+                    ({
+                        ...state,
+                        bookmarks: state.bookmarks.filter(
+                            (x) => x != track.id,
+                        ),
+                    } as State)
+                }
+            >
+                Un-Bookmark
+            </button>
+        ) : (
                 <button
                     onclick={(state: State, event: FormInputEvent) =>
                         ({
@@ -30,19 +43,6 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
                     }
                 >
                     Bookmark
-                </button>
-            ) : (
-                <button
-                    onclick={(state: State, event: FormInputEvent) =>
-                        ({
-                            ...state,
-                            bookmarks: state.bookmarks.filter(
-                                (x) => x != track.id,
-                            ),
-                        } as State)
-                    }
-                >
-                    Un-Bookmark
                 </button>
             )}
         </div>
