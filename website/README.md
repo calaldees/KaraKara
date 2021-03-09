@@ -1,19 +1,15 @@
 KaraKara README
 ===============
 
-Installation
-------------
-
-* git clone git://github.com/calaldees/KaraKara.git
-* cd KaraKara/website
-
-
 Getting Started
 ---------------
 
-* docker run --rm -p 0.0.0.0:6543:6543 -p 0.0.0.0:9873:9873 -t $(docker build -q .)
-* open http://localhost:6543/
-
+```bash
+    # local standalone dev version
+    make build
+    make run
+    # http://localhost:6543/
+```
 
 Features
 --------
@@ -55,8 +51,6 @@ Todo
   * per phone limit?
   * request limit of assets?
   * session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
-  * disbale device on mac address
-    * lock mac address to ip address
   * queue
     * validate + limit to badge name (!)
   * year tag and year range
@@ -70,15 +64,13 @@ Todo
     * api to return string datatype for simpler user operation
   * message system to class messages (both community and mobile)
 * community (!)
-  * social login + user activation
   * tag editor (per track importing)
     * tag warning if missing list
     * video qa checked
     * known isues list, unchecked list
   * encode queue + progress feedback
   * delete/rename track
-  * played tracks list (partof admin? or community?)
-    * score = (times actually played * 10) + (times requested * 5) + (page views * 1)
+  * score = (times actually played * 10) + (times requested * 5) + (page views * 1)
 * admin pannel
   * log statistics to es (2)
   * provides
@@ -90,10 +82,6 @@ Todo
     * device disabling
     * name devices
     * event summary (scoring system) (partof admin? or community?)
-* network
-  * dchp assign lese to mac address (for reliable ip to ban)
-  * dns to only return ip for server (nginx then redirect non int.karakara to int.karakara)
-
 
 
 flash message:
@@ -104,13 +92,10 @@ flash message:
 Bugs
 ----
 
-* player
-  * Chrome - if you have the mouse over the video - the help text will trigger when the playstate changes. park the mouse over the body content and  it will disapear when in presentation mode. (shift+cmf+f)
 
 status_error message style dose not propergate to flash message with format='redirect'
  - flash message from queue.py error (e.g. duplicate performer) is not styled as error but looks like success. feedback error is displayed appropriately. so what gives?!
 
-Starting the player interface directly on the 'player.html' before visiting the normal mobile view fails. This is because the access to .html does not generate a session id and admin mode cannot be aquired
 
 
 Karakara Community
