@@ -39,6 +39,13 @@ const SettingsButtons = (state) => (
     </footer>
 );
 
+function val2str(val: any): string {
+    if(Array.isArray(val)) {
+        return "[" + val.join(",") + "]";
+    }
+    return val;
+}
+
 export const RoomSettings = ({ state }: { state: State }) => (
     <Screen
         state={state}
@@ -52,7 +59,7 @@ export const RoomSettings = ({ state }: { state: State }) => (
             <p>
                 {key}:
                 <br />
-                <input name={key} value={value} onchange={UpdateSettings} />
+                <input name={key} value={val2str(value)} onchange={UpdateSettings} />
             </p>
         ))}
     </Screen>
