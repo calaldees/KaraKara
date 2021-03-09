@@ -75,7 +75,10 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
                 case "settings":
                     return {
                         ...state,
-                        settings: JSON.parse(data),
+                        settings: {
+                            ...state.settings,
+                            ...JSON.parse(data)
+                        },
                     };
                 case "queue":
                     return UpdateQueue(state, JSON.parse(data));
