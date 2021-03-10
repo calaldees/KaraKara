@@ -40,7 +40,7 @@ const state: State = {
         "karakara.player.theme": "metalghosts",
         "karakara.player.video.preview_volume": 0.2,
         "karakara.player.video.skip.seconds": 20,
-        "karakara.player.autoplay": 0, // Autoplay after X seconds
+        "karakara.player.autoplay.seconds": 0, // Autoplay after X seconds
         "karakara.player.subs_on_screen": true, // Set false if using podium
         "karakara.event.end": null,
         "karakara.podium.video_lag": 0.5, // adjust to get podium and projector in sync
@@ -73,7 +73,7 @@ function subscriptions(state: State) {
         state.audio_allowed &&
             !state.paused &&
             !state.playing &&
-            state.settings["karakara.player.autoplay"] !== 0 &&
+            state.settings["karakara.player.autoplay.seconds"] !== 0 &&
             IntervalListener,
     ];
 }

@@ -129,7 +129,7 @@ export const KeyboardListener = Keyboard({
 export const IntervalListener = Interval({
     every: 200,
     action(state: State, timestamp) {
-        if (state.progress >= state.settings["karakara.player.autoplay"]) {
+        if (state.progress >= state.settings["karakara.player.autoplay.seconds"]) {
             return [state, SendCommand(state, "play")];
         } else {
             return { ...state, progress: state.progress + 1 / 5 };

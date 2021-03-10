@@ -32,8 +32,7 @@ SETTINGS_TYPE_MAPPING = {
     'karakara.player.title': None,
     'karakara.player.video.preview_volume': 'float',
     'karakara.player.video.skip.seconds': 'int',
-    'karakara.player.queue.update_time': 'timedelta',  # TODO: Depricated - remove when player1 is removed
-    "karakara.player.autoplay": 'int',  # in seconds. TODO: Rename to '...autoplay.seconds'
+    "karakara.player.autoplay.seconds": 'int',
     "karakara.player.subs_on_screen": 'bool',
 
     'karakara.queue.group.split_markers': 'timedelta',
@@ -69,8 +68,7 @@ DEFAULT_SETTINGS = {
     'karakara.player.title': 'KaraKara (dev player)',
     'karakara.player.video.preview_volume': 0.10,
     'karakara.player.video.skip.seconds': 20,
-    'karakara.player.queue.update_time': '0:00:03',  # TODO: Depricated - remove when player1 is removed
-    "karakara.player.autoplay": 0,
+    "karakara.player.autoplay.seconds": 0,
     "karakara.player.subs_on_screen": False,
 
     'karakara.queue.group.split_markers': '[0:15:00, 0:30:00]',

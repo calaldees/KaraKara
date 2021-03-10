@@ -30,13 +30,13 @@ export const AutoplayCountdown = ({
     state: State;
     show_if_disabled: boolean;
 }) =>
-    state.settings["karakara.player.autoplay"] === 0 ? (
+    state.settings["karakara.player.autoplay.seconds"] === 0 ? (
         show_if_disabled && <small>(autoplay disabled)</small>
     ) : (
         <small>
             (autoplay in{" "}
             {Math.ceil(
-                state.settings["karakara.player.autoplay"] - state.progress,
+                state.settings["karakara.player.autoplay.seconds"] - state.progress,
             )}{" "}
             seconds)
         </small>

@@ -58,7 +58,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
                     "background-position":
                         100 -
                         (state.progress /
-                            state.settings["karakara.player.autoplay"]) *
+                            state.settings["karakara.player.autoplay.seconds"]) *
                             100 +
                         "%",
                 }}

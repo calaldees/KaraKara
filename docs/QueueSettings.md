@@ -23,9 +23,6 @@ Queue Settings
   * The volume the projector previews track when displaying the queue screen.
 * `karakara.player.video.skip.seconds` (int)
   * When using the skip buttons on the remote control or keyboard will jump this many seconds.
-* `karakara.player.queue.update_time` (timedelta)
-  * The time between poll refreshes.
-  * Not used in normal operation as the projector will have a websocket connection.
 * `karakara.websocket.disconnected_retry_interval` (int)
   * Number of seconds to attempt a websocket reconnect if the connection fails
 
