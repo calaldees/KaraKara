@@ -109,26 +109,23 @@ def acquire_cache_bucket_func(request):
     return request.cache_manager.get(f'queue-settings-{request.context.queue_id}')
 
 
-def _get_queue_settings_dict_from_request(request):
-    log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
-
+def _get_queue_settings(registry, queue_id):
     queue_settings = {
         **DEFAULT_SETTINGS,
         **{
-            k: request.registry.settings[k]
+            k: registry.settings[k]
             for k in REGISTRY_SETTINGS_PASSTHROUGH
         },
         **{
             queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
-            for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
+            for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == queue_id)
         },
     }
-    queue_settings = {
+    return {
         k: v
         for k, v in queue_settings.items()
         if not k.startswith(SETTING_IDENTIFIER_PRIVATE)
     }
-    return {'settings': queue_settings}
 
 
 @view_config(
@@ -139,7 +136,8 @@ def _get_queue_settings_dict_from_request(request):
 def queue_settings_view(request):
 
     def get_queue_settings_dict():
-        return _get_queue_settings_dict_from_request(request)
+        log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
+        return {'settings': _get_queue_settings(request.registry, request.context.queue_id)}
 
     return action_ok(data=request.cache_bucket.get_or_create(get_queue_settings_dict))
 
@@ -206,7 +204,7 @@ def queue_settings_view_put(request):
     request.log_event(method='update', admin=is_admin(request))
     request.send_websocket_message(
         'settings',
-        json_string(_get_queue_settings_dict_from_request(request)['settings']),
+        json_string(_get_queue_settings(request.registry, request.context.queue_id)),
         retain=True
     )
 

@@ -4,6 +4,7 @@ import operator
 import random
 from functools import partial
 from datetime import timedelta
+from website.karakara.model.model_queue import Queue
 
 # Pyramid imports
 import pyramid.events
@@ -284,6 +285,31 @@ def main(global_config, **settings):
     if config.registry.settings.get('karakara.server.mode') == 'development' and config.registry.settings.get('karakara.server.postmortem'):
         config.add_tween('karakara.postmortem_tween_factory')
 
+    # Sync to MQTT -------------------------------------------------------------
+    if config.registry.settings.get('karakara.server.mode') != 'test':
+        import paho.mqtt.client as mqtt
+        from .views.queue_items import _queue_items_dict_with_track_dict, _queue_query
+        from .views.queue_settings import _get_queue_settings
+        from .model import DBSession
+        from .model.model_queue import Queue
+
+        c = mqtt.Client()
+        c.username_pw_set(
+            config.registry.settings['karakara.websocket.username'],
+            config.registry.settings['karakara.websocket.password'],
+        )
+        c.connect(config.registry.settings['karakara.websocket.host'])
+        c.loop_start()
+
+        for queue_obj in DBSession.query(Queue):
+            log.info(f"Syncing state for {queue_obj.id}")
+            queue = json_string(_queue_items_dict_with_track_dict(_queue_query(queue_obj.id)))
+            msg = c.publish(f"karakara/room/{queue_obj.id}/queue", queue, retain=True)
+            msg.wait_for_publish()
+
+            settings = json_string(_get_queue_settings(config.registry, queue_obj.id))
+            msg = c.publish(f"karakara/room/{queue_obj.id}/settings", settings, retain=True)
+            msg.wait_for_publish()
 
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')
