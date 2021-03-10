@@ -38,7 +38,7 @@ def invalidate_cache(request, track_id):
     request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
     request.send_websocket_message(
         'queue',
-        json_string(_get_queue_dict_from_request(request)['queue']),
+        json_string(_queue_items_dict_with_track_dict(_queue_query(request.context.queue_id))),
         retain=True
     )
 
@@ -101,38 +101,6 @@ def _queue_items_dict_with_track_dict(queue_query):
 # Queue
 #-------------------------------------------------------------------------------
 
-
-def _get_queue_dict_from_request(request):
-    log.debug('cache gen - queue {0}'.format(request.cache_bucket.version))
-
-    # Get queue order
-    queue_dicts = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id))
-
-    # Calculate estimated track time
-    # Overlay 'total_duration' on all tracks
-    # It takes time for performers to change, so each track add a padding time
-    #  +
-    # Calculate the index to split the queue list
-    #  - non admin users do not see the whole queue in order.
-    #  - after a specifyed time threshold, the quque order is obscured
-    #  - it is expected that consumers of this api return will obscure the
-    #    order passed the specifyed 'split_index'
-    split_markers = list(request.queue.settings.get('karakara.queue.group.split_markers'))
-    time_padding = request.queue.settings.get('karakara.queue.track.padding')
-    split_indexs = []
-    total_duration = datetime.timedelta(seconds=0)
-    for index, queue_item in enumerate(queue_dicts):
-        if not queue_item['track']:
-            continue
-        queue_item['total_duration'] = total_duration
-        total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
-        if split_markers and total_duration > split_markers[0]:
-            split_indexs.append(index + 1)
-            del split_markers[0]
-
-    return {'queue': queue_dicts, 'queue_split_indexs': split_indexs}
-
-
 #@view_config(route_name='queue', request_method='GET')
 @view_config(
     context='karakara.traversal.QueueItemsContext',
@@ -144,7 +112,34 @@ def queue_items_view(request):
     view current queue
     """
     def get_queue_dict():
-        return _get_queue_dict_from_request(request)
+        log.debug('cache gen - queue {0}'.format(request.cache_bucket.version))
+
+        # Get queue order
+        queue_dicts = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id))
+
+        # Calculate estimated track time
+        # Overlay 'total_duration' on all tracks
+        # It takes time for performers to change, so each track add a padding time
+        #  +
+        # Calculate the index to split the queue list
+        #  - non admin users do not see the whole queue in order.
+        #  - after a specifyed time threshold, the quque order is obscured
+        #  - it is expected that consumers of this api return will obscure the
+        #    order passed the specifyed 'split_index'
+        split_markers = list(request.queue.settings.get('karakara.queue.group.split_markers'))
+        time_padding = request.queue.settings.get('karakara.queue.track.padding')
+        split_indexs = []
+        total_duration = datetime.timedelta(seconds=0)
+        for index, queue_item in enumerate(queue_dicts):
+            if not queue_item['track']:
+                continue
+            queue_item['total_duration'] = total_duration
+            total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
+            if split_markers and total_duration > split_markers[0]:
+                split_indexs.append(index + 1)
+                del split_markers[0]
+
+        return {'queue': queue_dicts, 'queue_split_indexs': split_indexs}
 
     return action_ok(
         data=request.cache_bucket.get_or_create(get_queue_dict)
