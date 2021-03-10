@@ -55,7 +55,7 @@ export function getMQTTListener(state: State): [CallableFunction, any] {
                         ...state,
                         settings: {
                             ...state.settings,
-                            ...JSON.parse(data)
+                            ...JSON.parse(data),
                         },
                     };
                 case "queue":

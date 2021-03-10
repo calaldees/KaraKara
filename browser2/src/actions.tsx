@@ -50,6 +50,11 @@ export const UpdateRoomName = () => (state: State, event: FormInputEvent) =>
         room_name_edit: event.target.value.toLowerCase(),
     } as State);
 
+export function UpdateSettings(state: State, event) {
+    state.settings[event.target.name] = event.target.value;
+    return state;
+}
+
 /*
  * Player controls
  */

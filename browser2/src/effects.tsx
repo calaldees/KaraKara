@@ -193,6 +193,25 @@ export const LoginThenFetchTrackList = (state) =>
             response.status == "ok" ? [state, FetchTrackList(state)] : state,
     });
 
+export function SaveSettings(state: State) {
+    return [
+        { ...state },
+        ApiRequest({
+            title: "Saving setting...",
+            function: "settings",
+            state: state,
+            options: {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(state.settings),
+            },
+            // action: (state, response) => [{ ...state }],
+        }),
+    ];
+}
+
 export function CheckSettings(state: State) {
     return ApiRequest({
         function: "settings",
