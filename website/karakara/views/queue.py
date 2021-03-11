@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 
-from . import web, action_ok, action_error, etag_decorator, generate_cache_key
+from . import action_ok, action_error, generate_cache_key
 
 import logging
 log = logging.getLogger(__name__)

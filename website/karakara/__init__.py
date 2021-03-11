@@ -1,6 +1,4 @@
 import os
-import re
-import operator
 import random
 from functools import partial
 from datetime import timedelta

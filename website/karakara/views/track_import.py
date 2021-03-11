@@ -2,9 +2,9 @@ import json
 
 from pyramid.view import view_config
 
-from . import web, action_ok, action_error, admin_only, etag_decorator, generate_cache_key
+from . import action_ok, action_error
 
-from karakara.model.model_tracks import Track, Tag, Attachment, _attachment_types
+from karakara.model.model_tracks import Track, Attachment, _attachment_types
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag, delete_track
 ATTACHMENT_TYPES = set(_attachment_types.enums)

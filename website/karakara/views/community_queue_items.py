@@ -1,10 +1,9 @@
 from pyramid.view import view_config
 
-from . import action_ok, action_error, community_only
+from . import action_ok, community_only
 
-from ..model import DBSession, commit
+from ..model import DBSession
 from ..model.model_queue import QueueItem
-from ..model.model_tracks import Track
 
 from .queue_items import _queue_items_dict_with_track_dict
 

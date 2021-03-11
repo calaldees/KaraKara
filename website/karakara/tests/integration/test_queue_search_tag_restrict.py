@@ -9,10 +9,8 @@ e.g
 We can restrict tracks returned to a subset of tracks by enforcing
 the 'karakara.search.tag.restrict' setting.
 """
-from unittest.mock import patch
 
-
-from . import admin_rights, temporary_settings, with_settings
+from . import temporary_settings, with_settings
 
 
 @with_settings(settings={

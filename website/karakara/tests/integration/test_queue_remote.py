@@ -1,4 +1,3 @@
-from unittest import mock
 import re
 
 import bs4

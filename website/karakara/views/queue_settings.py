@@ -7,7 +7,7 @@ from calaldees.json import json_string
 
 from . import action_ok, action_error, is_admin
 
-from ..model import DBSession, commit
+from ..model import DBSession
 from ..model.model_queue import QueueSetting
 
 import logging

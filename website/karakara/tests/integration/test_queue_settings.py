@@ -1,5 +1,4 @@
 import pytest
-import tempfile
 
 
 def test_queue_settings(app, queue):

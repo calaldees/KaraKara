@@ -1,6 +1,6 @@
 from . import Base, JSONEncodedDict
 
-from sqlalchemy import Column, Enum
+from sqlalchemy import Column
 from sqlalchemy import Unicode, UnicodeText, Integer, DateTime
 
 import copy

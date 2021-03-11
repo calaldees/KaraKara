@@ -1,13 +1,10 @@
 ## -*- coding: utf-8 -*-
 
-import pytest
-import re
-
 import bs4
 def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
-from . import admin_rights, temporary_settings
+from . import temporary_settings
 
 
 def test_queue_track_list_print_all(app, queue, tracks):

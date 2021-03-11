@@ -1,5 +1,3 @@
-import pytest
-
 from .test_community import login, logout
 
 from karakara.model.model_queue import QueueItem

@@ -1,12 +1,11 @@
 
-from datetime import timedelta
 from decorator import decorator
 
 from dogpile.cache.api import NO_VALUE as cache_none  # bit of contamination here - cache is backed by dogpile
 
 from calaldees.decorator import decorator_combine
 
-from calaldees.pyramid_helpers import request_from_args, mark_external_request, gzip
+from calaldees.pyramid_helpers import request_from_args, mark_external_request
 from calaldees.pyramid_helpers.etag import etag, etag_decorator, _generate_cache_key_default
 from calaldees.pyramid_helpers.auto_format2 import action_ok, action_error
 

@@ -2,7 +2,6 @@
 
 import pytest
 
-from karakara.model import DBSession, commit
 from karakara.model.model_queue import Queue, QueueSetting
 
 

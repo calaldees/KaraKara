@@ -1,5 +1,4 @@
 import os
-import random
 import re
 import json
 import shutil
@@ -19,9 +18,6 @@ from ..model import DBSession
 from ..model.model_tracks import Track
 
 from . import action_ok, action_error, community_only, is_community
-
-#from ..views.track import invalidate_track
-from ..templates import helpers as h
 
 import logging
 log = logging.getLogger(__name__)

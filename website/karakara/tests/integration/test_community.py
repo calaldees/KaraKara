@@ -3,7 +3,6 @@ import json
 import contextlib
 from unittest.mock import patch
 
-from calaldees.data import first
 from calaldees.string_tools import random_string
 from calaldees.social._login import ILoginProvider, ProviderToken
 from calaldees.test import MultiMockOpen

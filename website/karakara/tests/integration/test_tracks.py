@@ -2,8 +2,6 @@
 
 import pytest
 
-from . import admin_rights
-
 
 @pytest.mark.parametrize(('track_id', 'expected_response', 'text_list',), [
     ('t1', 200, ['Test Track 1'   , 'series X', 'anime', 'ここ', 'test/image1.jpg'  ]),

@@ -1,12 +1,10 @@
-import random
-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.traversal import resource_path
 
 from calaldees.data import first, subdict
 
-from . import web, action_ok, action_error, etag_decorator, generate_cache_key, admin_only, cache_none
+from . import action_ok, action_error, cache_none
 
 from ..model import DBSession
 from ..model.actions import get_track_dict_full

@@ -11,9 +11,9 @@ from calaldees.date_tools import now
 from calaldees.data import subdict
 from calaldees.json import json_string
 
-from . import web, action_ok, action_error, etag_decorator, is_admin, modification_action, admin_only
+from . import action_ok, action_error, is_admin, modification_action, admin_only
 
-from ..model import DBSession, commit
+from ..model import DBSession
 from ..model.model_queue import QueueItem, _queueitem_statuss
 from ..model.model_tracks import Track
 from ..model.model_priority_token import PriorityToken

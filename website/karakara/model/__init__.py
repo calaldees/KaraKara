@@ -111,7 +111,6 @@ class JSONEncodedDict(TypeDecorator):
 #-------------------------------------------------------------------------------
 
 import copy
-import datetime
 
 def obj_to_dict(obj, field_processors):
     """

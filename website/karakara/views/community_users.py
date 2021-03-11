@@ -1,7 +1,7 @@
 from pyramid.view import view_config
 
 from calaldees.string_convert import convert_str
-from . import action_ok, action_error, community_only
+from . import action_ok, community_only
 
 from ..model import DBSession
 from ..model.model_community import CommunityUser

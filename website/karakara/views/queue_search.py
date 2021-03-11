@@ -1,13 +1,12 @@
 import re
 import copy
-import random
 import collections
 import urllib.parse
 from itertools import groupby
 from operator import attrgetter
 
 from sqlalchemy import func, and_, text
-from sqlalchemy.orm import joinedload, aliased, defer
+from sqlalchemy.orm import joinedload, aliased
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -16,7 +15,7 @@ from pyramid.traversal import resource_path
 from calaldees.data import update_dict
 #from calaldees.pyramid_helpers.auto_format import registered_formats
 
-from . import web, etag, action_ok  # generate_cache_key,
+from . import action_ok  # generate_cache_key,
 
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping

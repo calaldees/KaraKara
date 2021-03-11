@@ -1,7 +1,7 @@
 from . import Base
 
 from sqlalchemy import event, Column, Enum, ForeignKey, String, Unicode, Integer, DateTime, Float
-from sqlalchemy.orm import relationship, backref, Session
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 import copy
