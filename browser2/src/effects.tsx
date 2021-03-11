@@ -3,7 +3,7 @@
  */
 import { MQTTPublish } from "hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { http2ws } from "./utils";
+import { http2ws, flatten_settings } from "./utils";
 
 function apiRequestEffect(dispatch, props) {
     dispatch((state) => ({
@@ -205,7 +205,7 @@ export function SaveSettings(state: State) {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-                body: new URLSearchParams(state.settings),
+                body: new URLSearchParams(flatten_settings(state.settings)),
             },
             // action: (state, response) => [{ ...state }],
         }),

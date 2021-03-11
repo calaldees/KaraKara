@@ -170,18 +170,12 @@ def queue_settings_view_put(request):
             return queue_setting_obj
 
     def is_valid(key, value):
-        t = SETTINGS_TYPE_MAPPING.get(key)
+        type_ = SETTINGS_TYPE_MAPPING.get(key)
         try:
-            # Hack because karakara.queue.group.split_markers
-            # is a "list[timedelta]", but we only actually support
-            # "timedelta" and "list[str]"
-            if t == "timedelta" and value.startswith("["):
-                [convert_str(part, t) for part in value[1:-1].split(",")]
-            else:
-                convert_str(value, t)
+            convert_str(value, type_)
             return True
         except ValueError:
-            log.exception(f"Error parsing {key} ({value}) as a {t}")
+            log.exception(f"Error parsing {key} ({value}) as a {type_}")
             return False
         except AssertionError:
             return False

@@ -51,7 +51,12 @@ export const UpdateRoomName = () => (state: State, event: FormInputEvent) =>
     } as State);
 
 export function UpdateSettings(state: State, event) {
-    state.settings[event.target.name] = event.target.value;
+    if(Array.isArray(state.settings[event.target.name])) {
+        state.settings[event.target.name] = event.target.value.split(",");
+    }
+    else {
+        state.settings[event.target.name] = event.target.value;
+    }
     return state;
 }
 

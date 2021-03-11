@@ -44,3 +44,14 @@ export function shuffle(array) {
 export function http2ws(str: string) {
     return str.replace("https://", "wss://").replace("http://", "ws://");
 }
+
+export function flatten_setting(val: any): string {
+    if (Array.isArray(val)) {
+        return "[" + val.join(",") + "]";
+    }
+    return val;
+}
+
+export function flatten_settings(settings: Dictionary<any>): string[][] {
+    return Object.entries(settings).map(([key, value]) => [key, flatten_setting(value)]);
+}
