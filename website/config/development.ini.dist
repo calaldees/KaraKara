@@ -24,10 +24,10 @@ karakara.server.postmortem = False -> bool
 
 karakara.template.title = KaraKara (Dev)
 
-karakara.websocket.disconnected_retry_interval =  5      -> int
 karakara.faves.enabled                         = False -> bool
-karakara.websocket.host =
-karakara.websocket.port = 9001 -> int
+karakara.websocket.username = karakara
+karakara.websocket.password = aeyGGrYJ
+karakara.websocket.host = websocket
 
 karakara.search.view.config = data/config/search_config.json
 
