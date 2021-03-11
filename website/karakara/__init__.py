@@ -284,7 +284,7 @@ def main(global_config, **settings):
 
     # Sync to MQTT -------------------------------------------------------------
     if config.registry.settings.get('karakara.server.mode') != 'test':
-        from website.karakara.model.actions import sync_all_queues_to_mqtt
+        from karakara.model.actions import sync_all_queues_to_mqtt
         sync_all_queues_to_mqtt(config.registry)
 
     # Return -------------------------------------------------------------------
