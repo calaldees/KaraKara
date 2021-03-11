@@ -356,7 +356,7 @@ const AdminButtons = (state) => (
                     ApiRequest({
                         function: "priority_tokens",
                         state: state,
-                        action: (state, response) =>
+                        action: (state, response): Action =>
                             response.status == "ok"
                                 ? {
                                       ...state,

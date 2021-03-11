@@ -1,5 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./base";
+import { short_date } from "../utils";
 
 export const PriorityTokens = ({ state }: { state: State }) => (
     <Screen
@@ -23,11 +24,11 @@ export const PriorityTokens = ({ state }: { state: State }) => (
                 {state.priority_tokens.map((t: PriorityToken) => (
                     <tr>
                         <td>{t.id}</td>
-                        <td>{t.issued}</td>
+                        <td>{short_date(t.issued)}</td>
                         <td>{t.used}</td>
                         <td>{t.session_owner}</td>
-                        <td>{t.valid_start}</td>
-                        <td>{t.valid_end}</td>
+                        <td>{short_date(t.valid_start)}</td>
+                        <td>{short_date(t.valid_end)}</td>
                     </tr>
                 ))}
             </tbody>

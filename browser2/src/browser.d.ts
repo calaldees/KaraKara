@@ -65,11 +65,11 @@ type QueueItem = {
 
 type PriorityToken = {
     id: string,
-    issued: Date,
+    issued: string,  // ISO8601 Date,
     used: boolean,
     session_owner: string,
-    valid_start: Date,
-    valid_end: Date,
+    valid_start: string,  // ISO8601 Date,
+    valid_end: string,  // ISO8601 Date,
 }
 
 type State = {

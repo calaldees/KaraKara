@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { get_attachment, get_tag, timedelta_str, title_case } from "../utils";
+import { get_attachment, get_tag, timedelta_str, title_case, short_date } from "../utils";
 import { AutoplayCountdown } from "./common";
 import { SetPreviewVolume } from "../actions";
 
@@ -66,7 +66,7 @@ export const PreviewScreen = ({ state }: { state: State }) => (
                 <span>
                     <br />
                     Event ends at{" "}
-                    <strong>{state.settings["karakara.event.end"]}</strong>
+                    <strong>{short_date(state.settings["karakara.event.end"])}</strong>
                 </span>
             )}
         </div>

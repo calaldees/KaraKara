@@ -66,3 +66,12 @@ export function title_case(str: string) {
 export function http2ws(str: string) {
     return str.replace("https://", "wss://").replace("http://", "ws://");
 }
+
+/**
+ * Turn an ISO8601 date into a nicer time
+ *
+ * eg "2021-01-03T14:00:00" -> "14:00"
+ */
+export function short_date(long_date: string): string {
+    return long_date.split("T")[1].substring(0, 5);
+}
