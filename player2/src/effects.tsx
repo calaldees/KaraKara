@@ -122,29 +122,6 @@ export function FetchRandomImages(state: State) {
     });
 }
 
-export function CheckSettings(state: State) {
-    return ApiRequest({
-        function: "settings",
-        state: state,
-        action(state: State, response) {
-            return {
-                ...state,
-                settings: { ...state.settings, ...response.data.settings },
-            };
-        },
-    });
-}
-
-export function CheckQueue(state: State) {
-    return ApiRequest({
-        function: "queue_items",
-        state: state,
-        action(state: State, response) {
-            return UpdateQueue(state, response.data.queue);
-        },
-    });
-}
-
 export function SetTrackState(state: State, value: string) {
     return ApiRequest({
         function: "queue_items",

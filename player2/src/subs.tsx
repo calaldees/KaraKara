@@ -8,7 +8,7 @@ import {
     Stop,
     UpdateQueue,
 } from "./actions";
-import { CheckQueue, CheckSettings, SendCommand } from "./effects";
+import { SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
@@ -19,20 +19,11 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
         username: state.room_name,
         password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/#",
-        connect(state: State) {
-            // TODO: no need to refresh on connect if we
-            // have retained messages
-            return [
-                { ...state, connected: true },
-                CheckSettings(state),
-                CheckQueue(state),
-            ];
+        connect(state: State): State {
+            return { ...state, connected: true };
         },
-        close(state: State) {
-            return {
-                ...state,
-                connected: false,
-            };
+        close(state: State): State {
+            return {...state, connected: false};
         },
         message(state: State, msg): State | [State, any] {
             // msg = mqtt-packet

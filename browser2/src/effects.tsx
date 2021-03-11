@@ -211,26 +211,3 @@ export function SaveSettings(state: State) {
         }),
     ];
 }
-
-export function CheckSettings(state: State) {
-    return ApiRequest({
-        function: "settings",
-        state: state,
-        action(state: State, response) {
-            return {
-                ...state,
-                settings: { ...state.settings, ...response.data.settings },
-            };
-        },
-    });
-}
-
-export function CheckQueue(state: State) {
-    return ApiRequest({
-        function: "queue_items",
-        state: state,
-        action(state: State, response) {
-            return { ...state, queue: response.data.queue };
-        },
-    });
-}

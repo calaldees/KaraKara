@@ -3,7 +3,6 @@
  */
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
-import { CheckSettings, CheckQueue } from "./effects";
 
 export function getMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
@@ -11,16 +10,7 @@ export function getMQTTListener(state: State): [CallableFunction, any] {
         username: state.room_name,
         password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/#",
-        connect(state: State) {
-            // TODO: no need to refresh on connect if we
-            // have retained messages
-            return [
-                { ...state, connected: true },
-                CheckSettings(state),
-                CheckQueue(state),
-            ];
-        },
-        error(state: State, err) {
+        error(state: State, err): State {
             console.log(
                 "Got an unrecoverable MQTT error, " +
                     "returning to login screen",
