@@ -82,7 +82,7 @@ def _queue_items_dict_with_track_dict(queue_query):
                     'id': line.index,
                     'text': line.content,
                     'start': line.start.total_seconds(),
-                    'end': line.start.total_seconds(),
+                    'end': line.end.total_seconds(),
                 } for line in srt.parse(track['srt'])]
         except Exception as e:
             log.exception(f"Error parsing subtitles for track {track['id']}")
