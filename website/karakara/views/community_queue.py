@@ -5,7 +5,7 @@ from . import action_ok, action_error, community_only
 
 from ..model import DBSession, commit
 from ..model.model_queue import Queue, QueueSetting
-from ..model.actions import delete_queue
+from ..model.actions import delete_queue, sync_queue_to_mqtt
 
 
 @view_config(
@@ -41,6 +41,8 @@ def community_queue_add(request):
     queue_setting.key = 'karakara.private.password'
     queue_setting.value = request.params.get('queue_password')
     DBSession.add(queue_setting)
+
+    sync_queue_to_mqtt(request.registry, queue.id)
 
     return action_ok(code=201)
 

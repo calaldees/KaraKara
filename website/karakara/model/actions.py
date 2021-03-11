@@ -1,6 +1,8 @@
 import datetime
 import operator
 
+from calaldees.json import json_string
+
 from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -107,3 +109,35 @@ def delete_track(track_id):
 
 def delete_queue(queue_id):
     return _delete_cascade(queue_id, Queue, (QueueItem, QueueSetting), 'queue_id')
+
+
+def sync_all_queues_to_mqtt(registry):
+    from . import DBSession
+    from .model_queue import Queue
+
+    for queue_obj in DBSession.query(Queue):
+        sync_queue_to_mqtt(registry, queue_obj.id)
+
+
+def sync_queue_to_mqtt(registry, queue_id):
+    import paho.mqtt.client as mqtt
+    from ..views.queue_items import _queue_items_dict_with_track_dict, _queue_query
+    from ..views.queue_settings import _get_queue_settings
+
+    log.info(f"Syncing state for {queue_id}")
+
+    c = mqtt.Client()
+    c.username_pw_set(
+        registry.settings['karakara.websocket.username'],
+        registry.settings['karakara.websocket.password'],
+    )
+    c.connect(registry.settings['karakara.websocket.host'])
+    c.loop_start()
+
+    queue = json_string(_queue_items_dict_with_track_dict(_queue_query(queue_id)))
+    msg = c.publish(f"karakara/room/{queue_id}/queue", queue, retain=True)
+    msg.wait_for_publish()
+
+    settings = json_string(_get_queue_settings(registry, queue_id))
+    msg = c.publish(f"karakara/room/{queue_id}/settings", settings, retain=True)
+    msg.wait_for_publish()
