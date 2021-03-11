@@ -181,7 +181,7 @@ def queue_settings_view_put(request):
                 convert_str(value, t)
             return True
         except ValueError:
-            log.exception("Error parsing {key} ({value}) as a {t}")
+            log.exception(f"Error parsing {key} ({value}) as a {t}")
             return False
         except AssertionError:
             return False
