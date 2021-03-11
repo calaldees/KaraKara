@@ -39,7 +39,7 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             type="text"
             name="performer_name"
             value={state.performer_name}
-            placeholder={"Performer Name"}
+            placeholder={state.settings["karakara.template.input.performer_name"]}
             required={true}
             oninput={SetPerformerName()}
         />
