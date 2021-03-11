@@ -141,34 +141,12 @@ export const FetchTrackList = (state) =>
         ],
         action: (state, response) =>
             response.status == "ok"
-                ? [
-                      {
-                          ...state,
-                          room_name: state.room_name_edit,
-                          session_id: response.identity.id,
-                          track_list: track_list_to_map(response.data.list),
-                      },
-                      // queue & settings should come from mqtt, but if there
-                      // was no cache for some reason, fetch from HTTP
-                      !state.queue &&
-                          ApiRequest({
-                              function: "queue_items",
-                              state: state,
-                              action: (state, response) => ({
-                                  ...state,
-                                  queue: response.data.queue,
-                              }),
-                          }),
-                      !state.settings &&
-                          ApiRequest({
-                              function: "settings",
-                              state: state,
-                              action: (state, response) => ({
-                                  ...state,
-                                  settings: response.data.settings,
-                              }),
-                          }),
-                  ]
+                ? {
+                      ...state,
+                      room_name: state.room_name_edit,
+                      session_id: response.identity.id,
+                      track_list: track_list_to_map(response.data.list),
+                  }
                 : {
                       ...state,
                       room_name_edit: "",
