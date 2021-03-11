@@ -4,7 +4,6 @@ import operator
 import random
 from functools import partial
 from datetime import timedelta
-from website.karakara.model.model_queue import Queue
 
 # Pyramid imports
 import pyramid.events
