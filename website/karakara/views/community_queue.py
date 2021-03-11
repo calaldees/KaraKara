@@ -42,7 +42,8 @@ def community_queue_add(request):
     queue_setting.value = request.params.get('queue_password')
     DBSession.add(queue_setting)
 
-    sync_queue_to_mqtt(request.registry, queue.id)
+    if request.registry.settings.get('karakara.server.mode') != 'test':
+        sync_queue_to_mqtt(request.registry, queue.id)
 
     return action_ok(code=201)
 
