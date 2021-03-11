@@ -13,22 +13,26 @@ import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
 
+/**
+ * Connect to the MQTT server, listen for queue / settings state updates,
+ * and react to commands on the command channel
+ */
 export function getOpenMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         username: state.room_name,
         password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/#",
-        connect(state: State): State {
+        connect(state: State): Action {
             return { ...state, connected: true };
         },
-        close(state: State): State {
+        close(state: State): Action {
             return {...state, connected: false};
         },
-        message(state: State, msg): State | [State, any] {
+        message(state: State, msg): Action {
             // msg = mqtt-packet
-            const topic = msg.topic.split("/").pop();
-            const data = msg.payload.toString();
+            const topic: string = msg.topic.split("/").pop();
+            const data: string = msg.payload.toString();
 
             console.groupCollapsed("mqtt_onmessage(", topic, ")");
             try {
@@ -82,7 +86,7 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
 
 export const KeyboardListener = Keyboard({
     downs: true,
-    action(state: State, event: KeyboardEvent): State {
+    action(state: State, event: KeyboardEvent): Action {
         // Disable keyboard shortcuts when the settings
         // screen is active
         if (state.show_settings) {
@@ -119,7 +123,7 @@ export const KeyboardListener = Keyboard({
 
 export const IntervalListener = Interval({
     every: 200,
-    action(state: State, timestamp) {
+    action(state: State, timestamp): Action {
         if (state.progress >= state.settings["karakara.player.autoplay.seconds"]) {
             return [state, SendCommand(state, "play")];
         } else {

@@ -120,3 +120,7 @@ type State = {
     // priority_tokens
     priority_tokens: Array<PriorityToken>,
 }
+
+type Effect = [CallableFunction, object];
+
+type Action = State | [State, Effect];

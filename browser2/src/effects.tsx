@@ -91,7 +91,7 @@ function apiRequestEffect(dispatch, props) {
         });
 }
 
-export function ApiRequest(props) {
+export function ApiRequest(props): Effect {
     return [
         apiRequestEffect,
         {
@@ -109,7 +109,7 @@ export function ApiRequest(props) {
     ];
 }
 
-export function SendCommand(state: State, command: string) {
+export function SendCommand(state: State, command: string): Effect {
     console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
@@ -120,7 +120,7 @@ export function SendCommand(state: State, command: string) {
     });
 }
 
-function track_list_to_map(raw_list: Array<Track>) {
+function track_list_to_map(raw_list: Array<Track>): Dictionary<Track> {
     let map = {};
     for (let i = 0; i < raw_list.length; i++) {
         map[raw_list[i].id] = raw_list[i];
@@ -128,7 +128,7 @@ function track_list_to_map(raw_list: Array<Track>) {
     return map;
 }
 
-export const FetchTrackList = (state) =>
+export const FetchTrackList = (state: State): Effect =>
     ApiRequest({
         function: "track_list",
         state: state,
@@ -153,7 +153,7 @@ export const FetchTrackList = (state) =>
                   },
     });
 
-export const LoginThenFetchTrackList = (state) =>
+export const LoginThenFetchTrackList = (state: State): Effect =>
     ApiRequest({
         function: "admin",
         state: state,
@@ -171,21 +171,19 @@ export const LoginThenFetchTrackList = (state) =>
             response.status == "ok" ? [state, FetchTrackList(state)] : state,
     });
 
-export function SaveSettings(state: State) {
-    return [
-        { ...state },
-        ApiRequest({
-            title: "Saving setting...",
-            function: "settings",
-            state: state,
-            options: {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(flatten_settings(state.settings)),
+export const SaveSettings = (state: State): Action => [
+    { ...state },
+    ApiRequest({
+        title: "Saving setting...",
+        function: "settings",
+        state: state,
+        options: {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
             },
-            // action: (state, response) => [{ ...state }],
-        }),
-    ];
-}
+            body: new URLSearchParams(flatten_settings(state.settings)),
+        },
+        // action: (state, response) => [{ ...state }],
+    }),
+];

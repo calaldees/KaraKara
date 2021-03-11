@@ -1,4 +1,6 @@
-// turn milliseconds into {X}min / {X}sec
+/**
+ * turn milliseconds into {X}min / {X}sec
+ */
 export function timedelta_str(timedelta: number): String {
     const seconds_total = Math.floor(timedelta / 1000);
     const seconds = seconds_total % 60;
@@ -12,14 +14,18 @@ export function timedelta_str(timedelta: number): String {
     return seconds + "sec";
 }
 
-// turn seconds into {MM}:{SS}
+/**
+ * turn seconds into {MM}:{SS}
+ */
 export function s_to_mns(t: number): string {
     return (
         Math.floor(t / 60) + ":" + (Math.floor(t % 60) + "").padStart(2, "0")
     );
 }
 
-// find the path from the player to the media file
+/**
+ * find the path from the player to the media file
+ */
 export function get_attachment(
     state: State,
     track: Track,
@@ -33,12 +39,17 @@ export function get_attachment(
     return "";
 }
 
-// get a tag if it is defined, else blank
+/**
+ * get a tag if it is defined, else blank
+ */
 export function get_tag(tag: Array<string>): string {
     if (tag) return tag[0];
     else return "";
 }
 
+/**
+ * Make track titles look nicer, as the database has them all lowercase
+ */
 export function title_case(str: string) {
     return str
         .toLowerCase()
@@ -49,6 +60,9 @@ export function title_case(str: string) {
         .join(" ");
 }
 
+/**
+ * Looking at the data URL, figure out the websocket URL
+ */
 export function http2ws(str: string) {
     return str.replace("https://", "wss://").replace("http://", "ws://");
 }

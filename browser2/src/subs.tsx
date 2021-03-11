@@ -4,13 +4,16 @@
 import { MQTTSubscribe } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
 
+/**
+ * Connect to the MQTT server, listen for updates to queue / settings
+ */
 export function getMQTTListener(state: State): [CallableFunction, any] {
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         username: state.room_name,
         password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/#",
-        error(state: State, err): State {
+        error(state: State, err): Action {
             console.log(
                 "Got an unrecoverable MQTT error, " +
                     "returning to login screen",
@@ -22,9 +25,9 @@ export function getMQTTListener(state: State): [CallableFunction, any] {
                 notification: { text: err.message, style: "error" },
             };
         },
-        message(state: State, msg): State {
-            const topic = msg.topic.split("/").pop();
-            const data = msg.payload.toString();
+        message(state: State, msg): Action {
+            const topic: string = msg.topic.split("/").pop();
+            const data: string = msg.payload.toString();
 
             console.groupCollapsed("mqtt_onmessage(", topic, ")");
             try {

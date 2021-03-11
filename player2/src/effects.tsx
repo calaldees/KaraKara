@@ -5,7 +5,6 @@
  */
 import { MQTTPublish } from "hyperapp-mqtt";
 import { http2ws } from "./utils";
-import { UpdateQueue } from "./actions";
 
 
 function apiRequestEffect(dispatch, props) {
@@ -75,7 +74,7 @@ function apiRequestEffect(dispatch, props) {
         });
 }
 
-export function ApiRequest(props) {
+export function ApiRequest(props): Effect {
     return [
         apiRequestEffect,
         {
@@ -93,7 +92,7 @@ export function ApiRequest(props) {
     ];
 }
 
-export function SendCommand(state: State, command: string) {
+export function SendCommand(state: State, command: string): Effect {
     console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
@@ -104,7 +103,7 @@ export function SendCommand(state: State, command: string) {
     });
 }
 
-export function FetchRandomImages(state: State) {
+export function FetchRandomImages(state: State): Effect {
     return ApiRequest({
         function: "random_images",
         state: state,
@@ -122,7 +121,7 @@ export function FetchRandomImages(state: State) {
     });
 }
 
-export function SetTrackState(state: State, value: string) {
+export function SetTrackState(state: State, value: string): Effect {
     return ApiRequest({
         function: "queue_items",
         state: state,

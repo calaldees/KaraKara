@@ -77,3 +77,7 @@ type State = {
     paused: boolean,
     progress: number,
 }
+
+type Effect = [CallableFunction, object];
+
+type Action = State | [State, Effect];

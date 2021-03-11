@@ -26,11 +26,7 @@ export const RoomSettings = ({ state }: { state: State }) => (
             <p>
                 {key}:
                 <br />
-                <input
-                    name={key}
-                    value={value}
-                    onchange={UpdateSettings}
-                />
+                <input name={key} value={value} onchange={UpdateSettings} />
             </p>
         ))}
     </Screen>
