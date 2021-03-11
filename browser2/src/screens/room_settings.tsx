@@ -24,7 +24,7 @@ export const RoomSettings = ({ state }: { state: State }) => (
     >
         {Object.entries(state.settings).map(([key, value]) => (
             <p>
-                {key}:
+                {key.replace("karakara.", "")}:
                 <br />
                 <input name={key} value={value} onchange={UpdateSettings} />
             </p>
