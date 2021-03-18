@@ -5,6 +5,7 @@ RUN apk --no-cache add \
     less \
     make \
     git \
+    python3-dev libffi-dev gcc g++ musl-dev \
 && true
 RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
 
@@ -13,11 +14,7 @@ EXPOSE 9873
 VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD wget -q http://127.0.0.1:6543/ -O /dev/null
 
-# Upgrade python tools
-#
-
-
-# copy just this file by itself, so that we only re-run this
+# copy just requirements.txt by itself, so that we only re-run this
 # step when this file changes, not when *anything* changes
 WORKDIR /app
 RUN virtualenv data/_env
