@@ -5,7 +5,6 @@ RUN apk --no-cache add \
     less \
     make \
     git \
-    python3-dev libffi-dev gcc g++ musl-dev \
 && true
 RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
 
