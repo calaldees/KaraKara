@@ -147,42 +147,42 @@ int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *clie
 	if (address == NULL) {
 		// Internal connection
 		// this happens so often, don't even log it
-		// mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Internal connction OK", address, username, topic, access_s);
+		// mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Internal connction OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
 	else if (protocol == mp_mqtt) {
 		// Direct connections over MQTT are always allowed,
 		// and are used to bootstrap the webserver. Only
 		// mp_websockets connections need authorisation.
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Raw TCP OK", address, username, topic, access_s);
+		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Raw TCP OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
 	else if (access == MOSQ_ACL_SUBSCRIBE) {
 		// Subscribing to everything is fine, doesn't mean
 		// the user can _read_ everything
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Subscribe OK", address, username, topic, access_s);
+		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Subscribe OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
 
     // Special cases for unit tests
     else if(starts_with(topic, "test/public/")) {
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Public test OK", address, username, topic, access_s);
+		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Public test OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
     else if(strncmp(username, "test", 5) == 0 && starts_with(topic, "test/private/")) {
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Private test OK", address, username, topic, access_s);
+		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Private test OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
 
     // Each room can write to its own topics
     else if(starts_with(topic, my_room)) {
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Write own room OK", address, username, topic, access_s);
+		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Write own room OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
 
     // Everybody can read room state broadcasts
     else if(starts_with(topic, "karakara/room/") && access == MOSQ_ACL_READ) {
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Read any room OK", address, username, topic, access_s);
+		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Read any room OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
 
