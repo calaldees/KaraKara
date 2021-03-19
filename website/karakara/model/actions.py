@@ -127,10 +127,6 @@ def sync_queue_to_mqtt(registry, queue_id):
     log.info(f"Syncing state for {queue_id}")
 
     c = mqtt.Client()
-    c.username_pw_set(
-        registry.settings['karakara.websocket.username'],
-        registry.settings['karakara.websocket.password'],
-    )
     c.connect(registry.settings['karakara.websocket.host'])
     c.loop_start()
 

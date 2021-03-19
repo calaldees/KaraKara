@@ -1,4 +1,4 @@
-FROM ubuntu:latest AS auth-http
+FROM ubuntu:latest AS auth-karakara
 
 ENV MOSQUITTO_VERSION=1.6.14
 # ENV MOSQUITTO_VERSION=2.0.4
@@ -14,13 +14,13 @@ RUN cd /tmp \
     && make WITH_SRV=yes WITH_MEMORY_TRACKING=no WITH_WEBSOCKETS=yes \
     && make install && ldconfig
 
-COPY auth-http.c /tmp
+COPY auth-karakara.c /tmp
 # gcc -I<path to mosquitto_plugin.h> -fPIC -shared plugin.c -o plugin.so
-RUN gcc -fPIC -shared /tmp/auth-http.c -lcurl -o /usr/local/lib/auth-http.so
+RUN gcc -fPIC -shared /tmp/auth-karakara.c -lcurl -o /usr/local/lib/auth-karakara.so
 
 FROM eclipse-mosquitto:1.6
 EXPOSE 1883
 EXPOSE 9001
 RUN apk add --no-cache libcurl
-COPY --from=auth-http /usr/local/lib/auth-http.so /usr/local/lib/auth-http.so
+COPY --from=auth-karakara /usr/local/lib/auth-karakara.so /usr/local/lib/auth-karakara.so
 COPY mosquitto.conf /mosquitto/config/

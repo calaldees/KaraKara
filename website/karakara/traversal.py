@@ -325,9 +325,3 @@ class MQTTUserContext():
 
     def __init__(self, parent=None):
         self.__parent__ = parent
-
-class MQTTAclContext():
-    __name__ = 'acl'
-
-    def __init__(self, parent=None):
-        self.__parent__ = parent

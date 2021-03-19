@@ -1,3 +1,11 @@
+//
+// Based a lot on:
+// https://github.com/hadleyrich/mosquitto-auth-plugin-http
+// Copyright 2014 Hadley Rich, nice technology Ltd.
+// Website: http://nice.net.nz
+// MIT license
+//
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,10 +17,8 @@
 #include <mosquitto_broker.h>
 
 #define DEFAULT_USER_URI "http://localhost:5000/mqtt-user"
-#define DEFAULT_ACL_URI "http://localhost:5000/mqtt-acl"
 
 static char *http_user_uri = NULL;
-static char *http_acl_uri = NULL;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -25,29 +31,37 @@ int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_opt *auth_opts
 		if (strncmp(auth_opts[i].key, "http_user_uri", 13) == 0) {
 			http_user_uri = auth_opts[i].value;
 		}
-		if (strncmp(auth_opts[i].key, "http_acl_uri", 12) == 0) {
-			http_acl_uri = auth_opts[i].value;
-		}
 	}
 	if (http_user_uri == NULL) {
 		http_user_uri = DEFAULT_USER_URI;
 	}
-	if (http_acl_uri == NULL) {
-		http_acl_uri = DEFAULT_ACL_URI;
-	}
-	mosquitto_log_printf(MOSQ_LOG_INFO, "http_user_uri = %s, http_acl_uri = %s", http_user_uri, http_acl_uri);
+	mosquitto_log_printf(MOSQ_LOG_INFO, "http_user_uri = %s", http_user_uri);
 	return MOSQ_ERR_SUCCESS;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
-// ACL check
+// Authentication
 //
 
 int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const char *username, const char *password) {
+	const char* address = mosquitto_client_address(client);
+	const int protocol = mosquitto_client_protocol(client);
+
+	if (address == NULL) {
+		// Internal connection
+		return MOSQ_ERR_SUCCESS;
+	}
+	if (protocol == mp_mqtt) {
+		// Direct connections over MQTT are always allowed,
+		// and are used to bootstrap the webserver. Only
+		// mp_websockets connections need authentication.
+		return MOSQ_ERR_SUCCESS;
+	}
+
 	if (username == NULL || password == NULL) {
 		return MOSQ_ERR_AUTH;
 	}
-	mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_unpwd_check: username=%s, password=%s", username, password);
 
 	int rc;
 	int rv;
@@ -92,89 +106,91 @@ int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const 
 	if (rv == -1) {
 		return MOSQ_ERR_AUTH;
 	}
-	mosquitto_log_printf(MOSQ_LOG_INFO, "HTTP response code = %d", rc);
+	mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_unpwm_check(%s, XXX) => %d", username, rc);
 
 	return (rc == 200 ? MOSQ_ERR_SUCCESS : MOSQ_ERR_AUTH);
 }
 
 
 ///////////////////////////////////////////////////////////////////////
-// ACL check
+// Authorisation
 //
 
+bool starts_with(const char *str, const char *pre)
+{
+    size_t lenpre = strlen(pre),
+           lenstr = strlen(str);
+    return lenstr < lenpre ? false : memcmp(pre, str, lenpre) == 0;
+}
+
 int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg) {
-	//  return MOSQ_ERR_SUCCESS;
-	const char* clientid = "FAKE_ID"; // mosquitto_client_id(client);
+	const char* address = mosquitto_client_address(client);
 	const char* username = mosquitto_client_username(client);
+	int protocol = mosquitto_client_protocol(client);
+	const char* topic = msg->topic;
+	char* access_s = "unknown";
+
+	if (access == MOSQ_ACL_SUBSCRIBE) {
+		access_s = "subscribe";
+	} else if (access == MOSQ_ACL_READ) {
+		access_s = "read";
+	} else if (access == MOSQ_ACL_WRITE) {
+		access_s = "write";
+	}
 
 	if (username == NULL) {
-		// If the username is NULL then it's an anonymous user
-		username = "FAKE_USER";
-		//  return MOSQ_ERR_SUCCESS;
+		username = "[null]";
+	}
+	char my_room[64];
+	snprintf(my_room, 64, "karakara/room/%s/", username);
+
+	if (address == NULL) {
+		// Internal connection
+		// this happens so often, don't even log it
+		// mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Internal connction OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
+	}
+	else if (protocol == mp_mqtt) {
+		// Direct connections over MQTT are always allowed,
+		// and are used to bootstrap the webserver. Only
+		// mp_websockets connections need authorisation.
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Raw TCP OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
+	}
+	else if (access == MOSQ_ACL_SUBSCRIBE) {
+		// Subscribing to everything is fine, doesn't mean
+		// the user can _read_ everything
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Subscribe OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
 	}
 
-	char access_name[6];
-	if (access == MOSQ_ACL_READ) {
-		sprintf(access_name, "read");
-	} else if (access == MOSQ_ACL_WRITE) {
-		sprintf(access_name, "write");
-	} else {
-		sprintf(access_name, "none");
+    // Special cases for unit tests
+    else if(starts_with(topic, "test/public/")) {
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Public test OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
+	}
+    else if(strncmp(username, "test", 5) == 0 && starts_with(topic, "test/private/")) {
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Private test OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
 	}
 
-	mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check: clientid=%s, username=%s, topic=%s, access=%s", 
-			clientid, username, msg->topic, access_name);
-	return MOSQ_ERR_SUCCESS;
+    // Each room can write to its own topics
+    else if(starts_with(topic, my_room)) {
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Write own room OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
+	}
 
-	int rc;
-	int rv;
-	CURL *ch;
+    // Everybody can read room state broadcasts
+    else if(starts_with(topic, "karakara/room/") && access == MOSQ_ACL_READ) {
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Read any room OK", address, username, topic, access_s);
+		return MOSQ_ERR_SUCCESS;
+	}
 
-	if ((ch = curl_easy_init()) == NULL) {
-		mosquitto_log_printf(MOSQ_LOG_WARNING, "failed to initialize curl (curl_easy_init ACL): %s", strerror(errno));
+	// Default
+	else {
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Default ERR", address, username, topic, access_s);
 		return MOSQ_ERR_ACL_DENIED;
 	}
-
-	char *escaped_clientid;
-	char *escaped_username;
-	char *escaped_topic;
-	escaped_clientid = curl_easy_escape(ch, clientid, 0);
-	escaped_username = curl_easy_escape(ch, username, 0);
-	escaped_topic = curl_easy_escape(ch, msg->topic, 0);
-	size_t data_len = strlen("clientid=&username=&topic=&access=") + strlen(escaped_clientid) + strlen(escaped_username) + strlen(escaped_topic) + strlen(access_name) + 1;
-	char* data = NULL;
-	if ((data = malloc(data_len)) == NULL) { 
-		mosquitto_log_printf(MOSQ_LOG_WARNING, "failed allocate data memory (%u): %s", data_len, strerror(errno));
-		rv = -1;
-	} else {
-		memset(data, 0, data_len);
-		snprintf(data, data_len, "clientid=%s&username=%s&topic=%s&access=%s",
-				escaped_clientid, escaped_username, escaped_topic, access_name);
-		curl_easy_setopt(ch, CURLOPT_POST, 1L);
-		curl_easy_setopt(ch, CURLOPT_URL, http_acl_uri);
-		curl_easy_setopt(ch, CURLOPT_POSTFIELDS, data);
-		curl_easy_setopt(ch, CURLOPT_POSTFIELDSIZE, strlen(data));
-
-		if ((rv = curl_easy_perform(ch)) == CURLE_OK) {
-			curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &rc);
-			rv = rc;
-		} else {
-			mosquitto_log_printf(MOSQ_LOG_WARNING, "Curl didn't return OK: %s", curl_easy_strerror(rv));
-			rv = -1;
-		}
-	}
-	curl_free(escaped_clientid);
-	curl_free(escaped_username);
-	curl_free(escaped_topic);
-	curl_easy_cleanup(ch);
-	free(data);
-	data = NULL;
-	if (rv == -1) {
-		return MOSQ_ERR_ACL_DENIED;
-	}
-	mosquitto_log_printf(MOSQ_LOG_INFO, "HTTP response code = %d", rc);
-
-	return (rc == 200 ? MOSQ_ERR_SUCCESS : MOSQ_ERR_ACL_DENIED);
 }
 
 

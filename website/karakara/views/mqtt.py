@@ -27,10 +27,6 @@ def user(request):
     if username == "test" and password == "test":
         return action_ok(message="test ok")
 
-    # Admin user not associated with any particular queue
-    if username == "karakara" and password == "aeyGGrYJ":
-        return action_ok(message="admin ok")
-
     if not password:
         raise action_error(message="no password specified", code=403)
 
@@ -39,38 +35,5 @@ def user(request):
 
     if password == queue_setting_password.value:
         return action_ok(message="queue owner ok")
-
-    raise action_error(message="login failed", code=403)
-
-
-@view_config(
-    context='karakara.traversal.MQTTAclContext',
-)
-def acl(request):
-    _ = request.translate
-    clientid: str = request.params.get("clientid")
-    username: str = request.params.get("username")
-    topic: str = request.params.get("topic")
-    access: str = request.params.get("access")
-
-    log.info(f'checking acls for {clientid} / {username} / {topic} / {access}')
-
-    # KaraKara is the admin user who can read/write everything
-    if username == "karakara":
-        return action_ok(message="admin ok")
-
-    # Special cases for unit tests
-    if topic.startswith("test/public/"):
-        return action_ok(message="public test ok")
-    if username == "test" and topic.startswith("test/private/"):
-        return action_ok(message="private test ok")
-
-    # Each room can write to its own topics
-    if topic.startswith("karakara/room/{username}/"):
-        return action_ok(message="queue owner ok")
-
-    # Everybody can subscribe to room state broadcasts
-    if topic.startswith("karakara/room/") and access == "read":
-        return action_ok(message="anon read ok")
 
     raise action_error(message="login failed", code=403)
