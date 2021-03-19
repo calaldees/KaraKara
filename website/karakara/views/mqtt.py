@@ -15,8 +15,14 @@ def user(request):
         QueueSetting.queue_id == username, QueueSetting.key == 'karakara.private.password'
     ).one()
 
+    log.info(f'trying to mqtt-auth as user {username}')
+
     # Not a real user, used for unit tests
     if username == "test" and password == "test":
+        return action_ok()
+
+    # Admin user not associated with any particular queue
+    if username == "karakara" and password == "aeyGGrYJ":
         return action_ok()
 
     if password == queue_setting_password.value:
@@ -32,10 +38,12 @@ def acl(request):
     topic: str = request.params.get("topic")
     access: str = request.params.get("access")
 
+    log.info(f'checking acls for {clientid} / {username} / {topic} / {access}')
+
     # KaraKara is the admin user who can read/write everything
     if username == "karakara":
         return action_ok()
-    
+
     # Special cases for unit tests
     if topic.startswith("test/public/"):
         return action_ok()
@@ -45,7 +53,7 @@ def acl(request):
     # Each room can write to its own topics
     if topic.startswith("karakara/room/{username}/"):
         return action_ok()
-    
+
     # Everybody can subscribe to room state broadcasts
     if topic.startswith("karakara/room/") and access == "read":
         return action_ok()
