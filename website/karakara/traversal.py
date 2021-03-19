@@ -28,6 +28,7 @@ class TraversalGlobalRootFactory(NextContextMixin):
                 #TrackListContext,  # Admin only for all tracks
                 CommunityContext,
                 TrackImportContext,  # Needs secure permissions
+                MQTTContext,
             )
         )
 
@@ -299,6 +300,34 @@ class CommunityUsersContext():
 
 class TrackImportContext():
     __name__ = 'track_import'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+
+class MQTTContext(NextContextMixin):
+    __name__ = '_mqtt'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+    def __getitem__(self, key):
+        return self.next_context(
+            key,
+            (
+                MQTTUserContext,
+                MQTTAclContext,
+            )
+        )
+
+class MQTTUserContext():
+    __name__ = 'user'
+
+    def __init__(self, parent=None):
+        self.__parent__ = parent
+
+class MQTTAclContext():
+    __name__ = 'acl'
 
     def __init__(self, parent=None):
         self.__parent__ = parent
