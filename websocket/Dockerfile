@@ -1,11 +1,9 @@
 FROM ubuntu:latest AS auth-karakara
 
 ENV MOSQUITTO_VERSION=1.6.14
-# ENV MOSQUITTO_VERSION=2.0.4
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libc-ares-dev git libmysqlclient-dev libssl-dev uuid-dev build-essential wget ca-certificates \
-    curl libcurl4-openssl-dev libc-ares2 libcurl4 libwebsockets-dev
+    build-essential wget libwebsockets-dev libc-ares-dev libcurl4-openssl-dev
 
 RUN cd /tmp \
     && wget http://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VERSION.tar.gz -O mosquitto.tar.gz \
