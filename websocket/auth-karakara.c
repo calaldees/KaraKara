@@ -16,29 +16,6 @@
 #include <mosquitto_plugin.h>
 #include <mosquitto_broker.h>
 
-#define DEFAULT_USER_URI "http://localhost:5000/mqtt-user"
-
-static char *http_user_uri = NULL;
-
-
-///////////////////////////////////////////////////////////////////////
-// Load settings
-//
-
-int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_opt *auth_opts, int auth_opt_count) {
-	int i = 0;
-	for (i = 0; i < auth_opt_count; i++) {
-		if (strncmp(auth_opts[i].key, "http_user_uri", 13) == 0) {
-			http_user_uri = auth_opts[i].value;
-		}
-	}
-	if (http_user_uri == NULL) {
-		http_user_uri = DEFAULT_USER_URI;
-	}
-	mosquitto_log_printf(MOSQ_LOG_INFO, "http_user_uri = %s", http_user_uri);
-	return MOSQ_ERR_SUCCESS;
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 // Authentication
@@ -48,19 +25,27 @@ int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const 
 	const char* address = mosquitto_client_address(client);
 	const int protocol = mosquitto_client_protocol(client);
 
+	// Internal connection
 	if (address == NULL) {
-		// Internal connection
-		return MOSQ_ERR_SUCCESS;
-	}
-	if (protocol == mp_mqtt) {
-		// Direct connections over MQTT are always allowed,
-		// and are used to bootstrap the webserver. Only
-		// mp_websockets connections need authentication.
 		return MOSQ_ERR_SUCCESS;
 	}
 
+	// Direct connections over MQTT are always allowed,
+	// and are used to bootstrap the webserver. Only
+	// mp_websockets connections need authentication.
+	if (protocol == mp_mqtt) {
+		return MOSQ_ERR_SUCCESS;
+	}
+
+	// unpwd_check shouldn't even be called if there's no un/pwd?
 	if (username == NULL || password == NULL) {
 		return MOSQ_ERR_AUTH;
+	}
+
+	// special case for unit tests
+	if (strcmp(username, "test") == 0 || strcmp(password, "test") == 0) {
+		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_unpwm_check(%s, XXX) => test", username);
+		return MOSQ_ERR_SUCCESS;
 	}
 
 	int rc;
@@ -74,35 +59,24 @@ int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const 
 
 	char *escaped_username;
 	char *escaped_password;
+	char url[256];
+
 	escaped_username = curl_easy_escape(ch, username, 0);
 	escaped_password = curl_easy_escape(ch, password, 0);
-	size_t data_len = strlen("username=&password=") + strlen(escaped_username) + strlen(escaped_password) + 1;
-	char* data = NULL;
-	if ((data = malloc(data_len)) == NULL) { 
-		mosquitto_log_printf(MOSQ_LOG_WARNING, "failed allocate data memory (%u): %s", data_len, strerror(errno));
-		rv = -1;
+	snprintf(url, 256, "http://website:6543/queue/%s/admin.json?password=%s", escaped_username, escaped_password);
+
+	curl_easy_setopt(ch, CURLOPT_URL, url);
+	if ((rv = curl_easy_perform(ch)) == CURLE_OK) {
+		curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &rc);
+		rv = rc;
 	} else {
-		memset(data, 0, data_len);
-		snprintf(data, data_len, "username=%s&password=%s", escaped_username, escaped_password);
-
-		curl_easy_setopt(ch, CURLOPT_POST, 1L);
-		curl_easy_setopt(ch, CURLOPT_URL, http_user_uri);
-		curl_easy_setopt(ch, CURLOPT_POSTFIELDS, data);
-		curl_easy_setopt(ch, CURLOPT_POSTFIELDSIZE, strlen(data));
-
-		if ((rv = curl_easy_perform(ch)) == CURLE_OK) {
-			curl_easy_getinfo(ch, CURLINFO_RESPONSE_CODE, &rc);
-			rv = rc;
-		} else {
-			mosquitto_log_printf(MOSQ_LOG_WARNING, "Curl didn't return OK: %s", curl_easy_strerror(rv));
-			rv = -1;
-		}
+		mosquitto_log_printf(MOSQ_LOG_WARNING, "Curl didn't return OK: %s", curl_easy_strerror(rv));
+		rv = -1;
 	}
+
 	curl_free(escaped_username);
 	curl_free(escaped_password);
 	curl_easy_cleanup(ch);
-	free(data);
-	data = NULL;
 	if (rv == -1) {
 		return MOSQ_ERR_AUTH;
 	}
@@ -144,22 +118,24 @@ int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *clie
 	char my_room[64];
 	snprintf(my_room, 64, "karakara/room/%s/", username);
 
+	// Internal connection
 	if (address == NULL) {
-		// Internal connection
 		// this happens so often, don't even log it
 		// mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Internal connction OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
+
+	// Direct connections over MQTT are always allowed,
+	// and are used to bootstrap the webserver. Only
+	// mp_websockets connections need authorisation.
 	else if (protocol == mp_mqtt) {
-		// Direct connections over MQTT are always allowed,
-		// and are used to bootstrap the webserver. Only
-		// mp_websockets connections need authorisation.
 		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Raw TCP OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
+
+	// Subscribing to everything is fine, doesn't mean
+	// the user can _read_ everything
 	else if (access == MOSQ_ACL_SUBSCRIBE) {
-		// Subscribing to everything is fine, doesn't mean
-		// the user can _read_ everything
 		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Subscribe OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
@@ -169,7 +145,7 @@ int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *clie
 		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Public test OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
-    else if(strncmp(username, "test", 5) == 0 && starts_with(topic, "test/private/")) {
+    else if(strcmp(username, "test") == 0 && starts_with(topic, "test/private/")) {
 		mosquitto_log_printf(MOSQ_LOG_DEBUG, "mosquitto_auth_acl_check(%s, %s, %s, %s) => Private test OK", address, username, topic, access_s);
 		return MOSQ_ERR_SUCCESS;
 	}
@@ -197,6 +173,10 @@ int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *clie
 ///////////////////////////////////////////////////////////////////////
 // Things which aren't relevant to this use-case
 //
+
+int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_opt *auth_opts, int auth_opt_count) {
+	return MOSQ_ERR_SUCCESS;
+}
 
 int mosquitto_auth_plugin_version(void) {
 	return MOSQ_AUTH_PLUGIN_VERSION;
