@@ -11,7 +11,7 @@ Installation
 Getting Started
 ---------------
 
-* docker run --rm -p 0.0.0.0:6543:6543 -p 0.0.0.0:9873:9873 -t $(docker build -q .)
+* docker run --rm -p 0.0.0.0:6543:6543 -t $(docker build -q .)
 * open http://localhost:6543/
 
 

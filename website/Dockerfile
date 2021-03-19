@@ -6,17 +6,16 @@ RUN apk --no-cache add \
     make \
     git \
 && true
-RUN pip3 install --no-cache-dir --upgrade pip setuptools virtualenv
+RUN pip3 install --no-cache-dir --upgrade pip setuptools
 
 EXPOSE 6543
-EXPOSE 9873
 VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD wget -q http://127.0.0.1:6543/ -O /dev/null
 
 # copy just requirements.txt by itself, so that we only re-run this
 # step when this file changes, not when *anything* changes
 WORKDIR /app
-RUN virtualenv data/_env
+RUN python3 -m venv data/_env
 COPY requirements.txt /tmp/requirements.txt
 RUN data/_env/bin/pip3 install --no-cache-dir -r /tmp/requirements.txt
 
