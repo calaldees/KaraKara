@@ -1,7 +1,7 @@
 OS = $(shell uname -s)
 
 PROJECT=karakara
-PYTHON_VERSION:=3.8
+PYTHON_VERSION:=3
 
 CONFIG_SOURCE_PATH=config
 

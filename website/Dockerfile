@@ -5,6 +5,7 @@ RUN apk --no-cache add \
     less \
     make \
     git \
+    gcc musl-dev g++ \
 && true
 RUN pip3 install --no-cache-dir --upgrade pip setuptools
 
