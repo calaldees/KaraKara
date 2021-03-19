@@ -13,7 +13,6 @@ RUN npm run build
 # Copy built app to minimal-httpd container
 FROM alpine:3.7
 EXPOSE 80
-VOLUME /logs
 HEALTHCHECK --interval=1m --timeout=3s CMD wget -q http://127.0.0.1/ -O /dev/null
 RUN apk add --no-cache thttpd
 COPY --from=build /app/dist /www

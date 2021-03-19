@@ -24,7 +24,7 @@
             "level": "INFO",
             "formatter": "simple",
             "filename": "/logs/processmedia2-app.log",
-            "maxBytes": 102400,
+            "maxBytes": 1024000,
             "backupCount": 3,
             "encoding": "utf8"
         }
