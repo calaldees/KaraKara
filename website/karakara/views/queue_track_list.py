@@ -67,7 +67,6 @@ def track_list_all(request):
         joinedload(Track.attachments),
         joinedload(Track.tags),
         joinedload('tags.parent'),
-        undefer(Track.srt),
     )
     track_list = [track.to_dict(include_fields=('tags', 'attachments', 'srt')) for track in tracks]
 

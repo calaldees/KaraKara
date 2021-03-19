@@ -58,7 +58,6 @@ def _queue_items_dict_with_track_dict(queue_query):
                                 joinedload(Track.tags),\
                                 joinedload(Track.attachments),\
                                 joinedload('tags.parent'),\
-                                undefer(Track.srt)
                             )
         tracks = {track['id']:track for track in [track.to_dict('full') for track in tracks]}
 

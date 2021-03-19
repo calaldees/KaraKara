@@ -41,7 +41,7 @@ class Track(Base):
     attachments = relationship("Attachment", secondary=TrackAttachmentMapping.__table__)
     #lyrics = relationship("Lyrics", cascade="all, delete-orphan")
     #lyrics = deferred(Column(UnicodeText(), nullable=True))
-    srt = deferred(Column(UnicodeText(), nullable=True))
+    srt = Column(UnicodeText(), nullable=True)
 
     time_updated = Column(DateTime(), nullable=False, default=now)
 
