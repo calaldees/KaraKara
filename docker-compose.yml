@@ -45,15 +45,11 @@ services:
         image: karakara/player2
         build:
             context: ./player2
-        volumes:
-            - logs:/logs
 
     browser2:
         image: karakara/browser2
         build:
             context: ./browser2
-        volumes:
-            - logs:/logs
 
     postgres:
         image: karakara/postgres
