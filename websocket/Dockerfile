@@ -16,10 +16,11 @@ RUN cd /tmp \
 
 COPY auth-http.c /tmp
 # gcc -I<path to mosquitto_plugin.h> -fPIC -shared plugin.c -o plugin.so
-RUN gcc -fPIC -shared /tmp/auth-http.c -o /usr/local/lib/auth-http.so
+RUN gcc -fPIC -shared /tmp/auth-http.c -lcurl -o /usr/local/lib/auth-http.so
 
 FROM eclipse-mosquitto:1.6
 EXPOSE 1883
 EXPOSE 9001
+RUN apk add --no-cache libcurl
 COPY --from=auth-http /usr/local/lib/auth-http.so /usr/local/lib/auth-http.so
 COPY mosquitto.conf /mosquitto/config/
