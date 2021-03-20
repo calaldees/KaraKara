@@ -30,6 +30,17 @@ int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const 
 		return MOSQ_ERR_SUCCESS;
 	}
 
+	// special case for unit tests
+	if (strcmp(username, "test") == 0) {
+		if(strcmp(password, "test") == 0) {
+			mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_unpwm_check(%s, XXX) => test_ok", username);
+			return MOSQ_ERR_SUCCESS;
+		} else {
+			mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_unpwm_check(%s, XXX) => test_err", username);
+			return MOSQ_ERR_AUTH;
+		}
+	}
+
 	// Direct connections over MQTT are always allowed,
 	// and are used to bootstrap the webserver. Only
 	// mp_websockets connections need authentication.
@@ -40,12 +51,6 @@ int mosquitto_auth_unpwd_check(void *user_data, struct mosquitto *client, const 
 	// unpwd_check shouldn't even be called if there's no un/pwd?
 	if (username == NULL || password == NULL) {
 		return MOSQ_ERR_AUTH;
-	}
-
-	// special case for unit tests
-	if (strcmp(username, "test") == 0 || strcmp(password, "test") == 0) {
-		mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_unpwm_check(%s, XXX) => test", username);
-		return MOSQ_ERR_SUCCESS;
 	}
 
 	int rc;
