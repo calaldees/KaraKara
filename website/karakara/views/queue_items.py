@@ -36,16 +36,15 @@ def acquire_cache_bucket_func(request):
 def invalidate_cache(request, track_id):
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
     request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
-    request.send_websocket_message(
-        'queue',
-        json_string(_queue_items_dict_with_track_dict(_queue_query(request.context.queue_id))),
-        retain=True
-    )
+
+    time_padding = request.queue.settings.get('karakara.queue.track.padding')
+    queue_items = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id), time_padding)
+    request.send_websocket_message('queue', json_string(queue_items), retain=True)
 
 def _queue_query(queue_id):
     return DBSession.query(QueueItem).filter(QueueItem.queue_id==queue_id).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
 
-def _queue_items_dict_with_track_dict(queue_query):
+def _queue_items_dict_with_track_dict(queue_query, time_padding):
     queue_dicts = [queue_item.to_dict('full') for queue_item in queue_query]
 
     # Fetch all tracks with id's in the queue
@@ -89,9 +88,16 @@ def _queue_items_dict_with_track_dict(queue_query):
             track['lyrics'] = []
         del track['srt']
 
-    # Attach track to queue_item
+    total_duration = datetime.timedelta(seconds=0)
     for queue_item in queue_dicts:
+        # Attach track to queue_item
         queue_item['track'] = tracks.get(queue_item['track_id'], {})
+
+        # Attach total_duration to queue_item
+        if not queue_item['track']:
+            continue
+        queue_item['total_duration'] = total_duration
+        total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
 
     return queue_dicts
 
@@ -112,27 +118,22 @@ def queue_items_view(request):
     """
     def get_queue_dict():
         log.debug('cache gen - queue {0}'.format(request.cache_bucket.version))
+        time_padding = request.queue.settings.get('karakara.queue.track.padding')
 
         # Get queue order
-        queue_dicts = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id))
+        queue_dicts = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id), time_padding)
 
-        # Calculate estimated track time
-        # Overlay 'total_duration' on all tracks
-        # It takes time for performers to change, so each track add a padding time
-        #  +
         # Calculate the index to split the queue list
         #  - non admin users do not see the whole queue in order.
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
         split_markers = list(request.queue.settings.get('karakara.queue.group.split_markers'))
-        time_padding = request.queue.settings.get('karakara.queue.track.padding')
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
             if not queue_item['track']:
                 continue
-            queue_item['total_duration'] = total_duration
             total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
             if split_markers and total_duration > split_markers[0]:
                 split_indexs.append(index + 1)
