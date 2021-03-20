@@ -58,7 +58,6 @@ services:
         environment:
             POSTGRES_PASSWORD: password
         volumes:
-            - logs:/logs
             - website_db:/var/lib/postgresql
 
     redis:
