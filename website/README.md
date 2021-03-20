@@ -42,32 +42,16 @@ Todo
     * way of recovering tracks that have been played/skipped (just in case of crash or problem)
     * rejected messages (duplicate performer limit, etc) (log 2)
     * priority token assignment (log 2)
-  * search
-    * search id first then tags? (if starts with any non word/diget/space character) (!)
-  * settings
-    * layout enhancements
 * server
   * multiple queues
-    * mode (single/multi)
-    * landing page selection (+new if superuser)
     * create (if superuser)(private/public queue)
     * destroy (if owning superuser)
   * per phone limit?
   * request limit of assets?
   * session_owner bound to ip address, reject if they don't match - production only setting (better than obscurning in API for cache reasons+simplicity)
-  * disbale device on mac address
-    * lock mac address to ip address
-  * queue
-    * validate + limit to badge name (!)
   * year tag and year range
   * items other than videos in queue (text annoncements, images)
   * archive songs played for reference later (log 2)
-  * import
-    * import new tracks without destroying whole dataset (utilise video hashs to detect renames?) (! done?)
-    * pass down parent folder name to prevent need to sync folder name and json (! done?)
-  * settings
-    * some settings need to be renamed/grouped
-    * api to return string datatype for simpler user operation
   * message system to class messages (both community and mobile)
 * community (!)
   * social login + user activation
@@ -79,7 +63,7 @@ Todo
   * delete/rename track
   * played tracks list (partof admin? or community?)
     * score = (times actually played * 10) + (times requested * 5) + (page views * 1)
-* admin pannel
+* admin panel
   * log statistics to es (2)
   * provides
     * page views ranked
@@ -90,9 +74,6 @@ Todo
     * device disabling
     * name devices
     * event summary (scoring system) (partof admin? or community?)
-* network
-  * dchp assign lese to mac address (for reliable ip to ban)
-  * dns to only return ip for server (nginx then redirect non int.karakara to int.karakara)
 
 
 
