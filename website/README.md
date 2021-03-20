@@ -37,7 +37,6 @@ Todo
     * messaging - save to cookie, notifications in top tray (2)
     * disabling/rickrolling
   * admin:
-    * alerts for feedback messages
     * when remove track - prompt for optional message to user (2)
     * way of recovering tracks that have been played/skipped (just in case of crash or problem)
     * rejected messages (duplicate performer limit, etc) (log 2)
@@ -80,18 +79,6 @@ Todo
 flash message:
   query session+queid 'refresh required'
   you're up in 'xx' min (client cookie)
-
-
-Bugs
-----
-
-* player
-  * Chrome - if you have the mouse over the video - the help text will trigger when the playstate changes. park the mouse over the body content and  it will disapear when in presentation mode. (shift+cmf+f)
-
-status_error message style dose not propergate to flash message with format='redirect'
- - flash message from queue.py error (e.g. duplicate performer) is not styled as error but looks like success. feedback error is displayed appropriately. so what gives?!
-
-Starting the player interface directly on the 'player.html' before visiting the normal mobile view fails. This is because the access to .html does not generate a session id and admin mode cannot be aquired
 
 
 Karakara Community

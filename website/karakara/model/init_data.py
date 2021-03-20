@@ -20,7 +20,6 @@ log = logging.getLogger(__name__)
 # Note: you may see pyflakes 'not used' errors here. This is necessary! the import registers them with the model
 from .model_tracks import Track, Tag
 from .model_queue import QueueItem
-#from .model_feedback import Feedback  # Depricated until we can replace it with 'messaging'
 from .model_priority_token import PriorityToken
 from .model_message import Message
 from .model_community import CommunityUser

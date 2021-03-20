@@ -11,7 +11,7 @@ __all__ = [
     "Message",
 ]
 
-#_message_types = Enum('user', 'feedback', 'boardcast', name="message_types")
+#_message_types = Enum('user', 'feedback', 'broadcast', name="message_types")
 
 
 class Message(Base):
