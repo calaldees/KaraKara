@@ -46,8 +46,6 @@ api.search.max_age = 0 -> int
 # Static Assets ----------------------------------------------------------------
 static.assets = karakara/static
 static.externals = data/externals/static
-static.player = ../player
-static.player2 = ../player2/dist
 
 static.path.source = 
 static.path.meta = 
