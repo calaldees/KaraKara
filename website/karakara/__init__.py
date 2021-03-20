@@ -83,7 +83,7 @@ def main(global_config, **settings):
     config.add_view_predicate('requires_param', RequiresParamPredicate)
 
     # Session identity
-    config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'faves', 'user'}), 'session_identity', reify=True)
+    config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'user'}), 'session_identity', reify=True)
 
     # Setup Cache Manager config in view
     setup_pyramid_cache_manager(config)
