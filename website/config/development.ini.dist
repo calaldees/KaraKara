@@ -25,7 +25,7 @@ karakara.server.postmortem = False -> bool
 karakara.template.title = KaraKara (Dev)
 
 karakara.faves.enabled                         = False -> bool
-karakara.websocket.host = websocket
+karakara.websocket.host = mosquitto
 
 karakara.search.view.config = data/config/search_config.json
 
