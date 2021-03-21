@@ -1,4 +1,5 @@
 from collections import ChainMap
+from typing import Set, Optional, Any, Dict
 
 from pyramid.view import view_config
 
@@ -15,14 +16,13 @@ log = logging.getLogger(__name__)
 
 # TODO: Translation strings for this file
 
-REGISTRY_SETTINGS_PASSTHROUGH = {
-}
+REGISTRY_SETTINGS_PASSTHROUGH: Set[str] = set()
 
-SETTINGS_ADMIN_EXTRA_EXPOSE = {
+SETTINGS_ADMIN_EXTRA_EXPOSE: Set[str] = {
     'karakara.private.password',
 }
 
-SETTINGS_TYPE_MAPPING = {
+SETTINGS_TYPE_MAPPING: Dict[str, Optional[str]] = {
     'karakara.system.user.readonly': 'bool',
     'karakara.event.end': 'datetime',
     'karakara.event.start': 'datetime',
@@ -60,7 +60,7 @@ SETTINGS_TYPE_MAPPING = {
 }
 
 
-DEFAULT_SETTINGS = {
+UNTYPED_DEFAULT_SETTINGS: Dict[str, Any] = {
     'karakara.system.user.readonly': False,
 
     'karakara.player.title': 'KaraKara (dev player)',
@@ -97,9 +97,9 @@ DEFAULT_SETTINGS = {
     'karakara.event.end': '',
     'karakara.event.start': '',
 }
-DEFAULT_SETTINGS = {
+DEFAULT_SETTINGS: Dict[str, Any] = {
     k: convert_str(v, SETTINGS_TYPE_MAPPING.get(k))
-    for k, v in DEFAULT_SETTINGS.items()
+    for k, v in UNTYPED_DEFAULT_SETTINGS.items()
 }
 SETTING_IDENTIFIER = 'karakara'
 SETTING_IDENTIFIER_PRIVATE = f'{SETTING_IDENTIFIER}.private'  # Possibly replace this with a list of allowed private keys

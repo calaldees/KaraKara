@@ -4,10 +4,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
-from karakara.tests.data.queue import *
-from karakara.tests.data.tracks import *
-from karakara.tests.data.tracks_random import *
-from karakara.tests.data.auth import *
+from karakara.tests.data.queue import queue
+from karakara.tests.data.tracks import tags, attachments, tracks, tracks_volume, track_unicode_special
+from karakara.tests.data.tracks_random import random_tracks
+from karakara.tests.data.auth import users
 
 # Markers ----------------------------------------------------------------------
 
