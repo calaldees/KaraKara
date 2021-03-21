@@ -395,7 +395,7 @@ def community_track_update(request):
                 'Source subtitle file is not in utf-8. '
                 'Saving subtitles would loose information. '
                 'Recommend that file is converted to utf-8 to enable web saving. '
-                ' - {0} - {1}'.format(ctrack._get_source_filename('subtitles'), unicode_decode_error)
+                f" - {ctrack._get_source_filename('subtitles')} - {unicode_decode_error}"
             )
         ctrack.subtitles = request.params['subtitles']
 
@@ -423,7 +423,7 @@ def community_processmedia_log(request):
                 if item.get('loglevel') in LEVELS
             ]
     except IOError:
-        raise action_error(message='unable to open {}'.format(LOGFILE))
+        raise action_error(message=f'unable to open {LOGFILE}')
     return action_ok(data={
         'processmedia_log': processmedia_log,
     })

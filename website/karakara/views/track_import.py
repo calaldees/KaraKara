@@ -43,10 +43,10 @@ def track_import_post(request):
 
     for track_dict in _get_json_request(request):
         if track_dict['id'] in existing_track_ids:
-            log.warning('Exists: {source_filename} - {id}'.format(**track_dict))
+            log.warning(f"Exists: {track_dict['source_filename']} - {track_dict['id']}")
             continue
 
-        log.info('Import: {source_filename} - {id}'.format(**track_dict))
+        log.info(f"Import: {track_dict['source_filename']} - {track_dict['id']}")
         track = Track()
         track.id = track_dict['id']
         track.source_filename = track_dict['source_filename']
