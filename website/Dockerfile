@@ -28,5 +28,7 @@ CMD make run_production
 FROM base as test
 RUN make test
 
+RUN data/_env/bin/pip3 install mypy sqlalchemy-stubs
+RUN data/_env/bin/mypy .
 
 FROM base
