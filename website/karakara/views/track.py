@@ -77,7 +77,7 @@ def track_view(request):
     # Search, find and redirect for shortened track id's
     # This is kind of a hack to allow id's shorter than 64 characters in tests
     if len(id) != 64:
-        full_id = first(DBSession.query(Track.id).filter(Track.id.like('{0}%'.format(id))).first())
+        full_id = first(DBSession.query(Track.id).filter(Track.id.like(f'{id}%')).first())
         if full_id and len(id) != len(full_id):
             raise HTTPFound(location=resource_path(request.context.queue_context['track'][full_id]))
 
@@ -111,7 +111,7 @@ def track_view(request):
     #       every attack vector.
     track = request.cache_bucket.get_or_create(lambda: get_track_and_queued_dict(id))
     if not track:
-        raise action_error(message='track {0} not found'.format(id), code=404)
+        raise action_error(message=f'track {id} not found', code=404)
 
     request.log_event(track_id=id, title=track['title'])
 

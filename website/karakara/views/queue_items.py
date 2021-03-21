@@ -117,7 +117,7 @@ def queue_items_view(request):
     view current queue
     """
     def get_queue_dict():
-        log.debug('cache gen - queue {0}'.format(request.cache_bucket.version))
+        log.debug(f'cache gen - queue {request.cache_bucket.version}')
         time_padding = request.queue.settings.get('karakara.queue.track.padding')
 
         # Get queue order
@@ -163,7 +163,7 @@ def queue_item_add(request):
     # Validation
     for field in ['track_id', 'performer_name']:
         if not request.params.get(field):
-            raise action_error(message='no {0}'.format(field), code=400)
+            raise action_error(message=f'no {field}', code=400)
     track_id = request.params.get('track_id')
     try:
         track = DBSession.query(Track).get(track_id)
@@ -364,7 +364,7 @@ def queue_item_update(request):
         try:
             params[field] = int(params[field])
         except ValueError:
-            raise action_error(message='invalid {0}'.format(field), code=404)
+            raise action_error(message=f'invalid {field}', code=404)
     status = params.get('status')
     if status and status not in _queueitem_statuss.enums:
         raise action_error(message=f'invalid queue_item.status {status} - valid values are {_queueitem_statuss.enums}', code=400)

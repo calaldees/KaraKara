@@ -161,12 +161,12 @@ class CommunityTrack():
 
     @property
     def _meta(self):
-        meta_filename = os.path.join(self.path_meta, '{}.json'.format(self.track['source_filename']))
+        meta_filename = os.path.join(self.path_meta, f"{self.track['source_filename']}.json")
         try:
             with self._open(meta_filename, 'r') as meta_filehandle:
                 return json.load(meta_filehandle)
         except FileNotFoundError:
-            log.warn('Unable to locate metadata for {id} - {meta_filename}'.format(id=self.track['id'], path_meta=self.path_meta, meta_filename=meta_filename))
+            log.warning(f"Unable to locate metadata for {self.track['id']} - {meta_filename}")
             return {}
 
     def _get_source_filename(self, source_type):
@@ -188,7 +188,7 @@ class CommunityTrack():
             first(
                 filedata.get('relative')
                 for filename, filedata in self._meta.get('scan', {}).items()
-                if any(filename.endswith('.{}'.format(extension)) for extension in SOURCE_TYPE_EXTENSION_LOOKUP[source_type])
+                if any(filename.endswith(f'.{extension}') for extension in SOURCE_TYPE_EXTENSION_LOOKUP[source_type])
             ) or ''
         )
 
@@ -203,7 +203,7 @@ class CommunityTrack():
             with self._open(source_filename, 'tr', encoding='utf-8', errors=errors) as filehandle:
                 return filehandle.read()
         except IOError as ex:
-            log.error('Unable to load {} - {}'.format(source_filename, ex))
+            log.error(f'Unable to load {source_filename} - {ex}')
             return ''
 
     def _set_source_file(self, source_type, data):
@@ -314,7 +314,7 @@ def community_list(request):
             track_dict['status'] = CommunityTrack.factory(track_dict, request).status
             # Flatten tags into a single list
             track_dict['tags_flattened'] = [
-                '{}:{}'.format(parent, tag)
+                f'{parent}:{tag}'
                 for parent, tags in track_dict['tags'].items()
                 for tag in tags
             ]
@@ -365,7 +365,7 @@ def community_list(request):
 )
 @community_only
 def community_track(request):
-    log.debug('community_track {}'.format(request.context.id))
+    log.debug(f'community_track {request.context.id}')
     ctrack = CommunityTrack.factory(request.context.id, request)
     return action_ok(data={
         'track': ctrack.track,
@@ -382,7 +382,7 @@ def community_track(request):
 )
 @community_only
 def community_track_update(request):
-    log.debug('community_track_update {}'.format(request.context.id))
+    log.debug(f'community_track_update {request.context.id}')
     ctrack = CommunityTrack.factory(request.context.id, request)
 
     if 'tag_data' in request.params:

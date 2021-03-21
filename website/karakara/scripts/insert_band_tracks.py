@@ -84,7 +84,7 @@ def band_tracks(DBSession, commit):
     ]
 
     for d in data:
-        _id = "band_{0}".format(d['id'])
+        _id = f"band_{d['id']}"
 
         track = get_track(_id)
         if not track:

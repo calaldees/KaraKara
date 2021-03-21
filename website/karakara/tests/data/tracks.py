@@ -186,7 +186,7 @@ def create_test_track(id=None, duration=None, tags=(), attachments=(), srt=None,
         if hasattr(attachment, 'location') and hasattr(attachment, 'type'):
             return create_attachment(attachment)
         else:
-            return DBSession.query(Attachment).filter(Attachment.location.like('%%{0}%%'.format(attachment))).one()
+            return DBSession.query(Attachment).filter(Attachment.location.like(f'%%{attachment}%%')).one()
 
     track = Track()
     track.id = id if id else random_string(10)

@@ -120,7 +120,7 @@ def main(global_config, **settings):
     # Cachebust etags ----------------------------------------------------------
     #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate
     if not config.registry.settings['server.etag.cache_buster']:
-        config.registry.settings['server.etag.cache_buster'] = 'last_update:{0}'.format(str(last_track_db_update()))
+        config.registry.settings['server.etag.cache_buster'] = f'last_update:{last_track_db_update()}'
         # TODO: Where is this used? How is this related to karakara.tracks.version?
 
     # Global State -------------------------------------------------------------
@@ -255,7 +255,7 @@ def main(global_config, **settings):
     def settings_path(key):
         path = os.path.join(os.getcwd(), config.registry.settings[key])
         if not os.path.isdir(path):
-            log.error('Unable to add_static_view {key}:{path}'.format(key=key, path=path))  #TODO: reaplce with formatstring
+            log.error(f'Unable to add_static_view {key}:{path}')
         return path
 
     # Static Routes

@@ -136,7 +136,7 @@ class Tag(Base):
 
     @property
     def full(self):
-        return '{0}:{1}'.format(self.parent.name, self.name) if self.parent else self.name
+        return f'{self.parent.name}:{self.name}' if self.parent else self.name
 
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({

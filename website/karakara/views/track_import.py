@@ -89,7 +89,7 @@ def track_delete(request):
         if track_id in existing_track_ids:
             delete_track(track_id)
             request.registry.settings['karakara.tracks.version'] += 1
-            log.info('Delete: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
+            log.info(f'Delete: {track_id}')
         else:
-            log.warning('NotExists: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
+            log.warning(f'NotExists: {track_id}')
     return action_ok()

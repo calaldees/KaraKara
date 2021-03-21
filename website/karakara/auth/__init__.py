@@ -59,6 +59,6 @@ class NullCommunityUserStore(IUserStore):
         return {
             'username': 'developer',
             'approved': True,
-            'avatar': '{0}{1}'.format(h.path.static, 'dev_avatar.png'),
+            'avatar': f'{h.path.static}dev_avatar.png',
         }
 
