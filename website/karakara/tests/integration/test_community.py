@@ -166,7 +166,7 @@ def test_community_track_render(app, users, tracks):
             '/community/track/t1.html_template',
     ):
         # Make web request
-        with patch.object(CommunityTrack, '_open', multi_mock_open.open):
+        with patch('karakara.views.community._open', multi_mock_open.open):
             response = app.get(track_url)
 
         # Assert output
@@ -238,8 +238,7 @@ def test_community_processmedia_logs(app, registry_settings):
 """
     )
     with patch.dict(registry_settings, {'static.processmedia2.log': 'processmedia.log'}):
-        # rrrrrrr - kind of a hack using CommunityTrack._open .. but it works ..
-        with patch.object(CommunityTrack, '_open', multi_mock_open.open):
+        with patch('karakara.views.community._open', multi_mock_open.open):
             response = app.get('/community/processmedia_log?levels=WARNING,ERROR', expect_errors=True)
 
     assert 'Info test' not in response.text

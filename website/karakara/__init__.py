@@ -1,7 +1,8 @@
 import os
 import random
+from typing import List
 from functools import partial
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Pyramid imports
 import pyramid.events
@@ -55,8 +56,8 @@ def main(global_config, **settings):
     # Pyramid Global Settings
     config = pyramid.config.Configurator(settings=settings, root_factory=TraversalGlobalRootFactory)  # , autocommit=True
 
-    def assert_settings_keys(keys):
-        for settings_key in key:
+    def assert_settings_keys(keys: List[str]):
+        for settings_key in keys:
             assert config.registry.settings.get(settings_key)
 
     # Register Additional Includes ---------------------------------------------
@@ -112,7 +113,7 @@ def main(global_config, **settings):
     config.set_session_factory(session_factory)
 
     from .model.actions import last_track_db_update
-    def _last_track_db_update(request):
+    def _last_track_db_update(request) -> datetime:
         return last_track_db_update()
     # Track DB Version ---------------------------------------------------------
     config.add_request_method(_last_track_db_update, 'last_track_db_update', property=True, reify=True)
@@ -222,11 +223,11 @@ def main(global_config, **settings):
 
     # Request addition - Cache -------------------------------------------------
 
-    def _cache_key_etag_expire(request):
+    def _cache_key_etag_expire(request) -> str:
         cache_bust = request.registry.settings.get('server.etag.cache_buster', '')
         etag_expire = normalize_datetime(accuracy=request.registry.settings.get('server.etag.expire')).ctime()
         return f'{cache_bust}-{etag_expire}'
-    def _cache_key_identity_admin(request):
+    def _cache_key_identity_admin(request) -> bool:
         if request.session.peek_flash():
             raise LookupError  # Response is not cacheable/indexable if there is a custom flash message
         #return is_admin(request)
@@ -252,7 +253,7 @@ def main(global_config, **settings):
 
     # Routes -------------------------------------------------------------------
 
-    def settings_path(key):
+    def settings_path(key: str) -> str:
         path = os.path.join(os.getcwd(), config.registry.settings[key])
         if not os.path.isdir(path):
             log.error(f'Unable to add_static_view {key}:{path}')

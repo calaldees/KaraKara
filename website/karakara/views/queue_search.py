@@ -62,7 +62,7 @@ SearchParams = collections.namedtuple('SearchParams', ('tags', 'keywords', 'trac
 REGEX_SPLIT_QUERY_STRING = re.compile(r'[^ ,]+')
 
 def _get_search_params_from_request(request):
-    def parse_query_string_key(key):
+    def parse_query_string_key(key: str) -> List[str]:
         return REGEX_SPLIT_QUERY_STRING.findall(request.params.get(key, ''))
     return SearchParams(
         tags=tuple(request.context.tags),

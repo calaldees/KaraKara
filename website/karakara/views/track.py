@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.traversal import resource_path
@@ -81,7 +83,7 @@ def track_view(request):
         if full_id and len(id) != len(full_id):
             raise HTTPFound(location=resource_path(request.context.queue_context['track'][full_id]))
 
-    def get_track_dict(id):
+    def get_track_dict(id: str) -> Dict[str, Any]:
         try:
             log.debug(f'cache gen - track_dict for {id}')
             track_dict = get_track_dict_full(id)
@@ -90,7 +92,7 @@ def track_view(request):
         except (KeyError, TypeError):
             return cache_none
 
-    def get_track_and_queued_dict(id):
+    def get_track_and_queued_dict(id: str) -> Dict[str, Any]:
         track = request.cache_manager.get(f'''track_dict-{id}-{request.registry.settings['karakara.tracks.version']}''').get_or_create(lambda: get_track_dict(id))
         if not track:
             return cache_none

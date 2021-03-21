@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 # TODO: REIMPLEMENT This shite
-def generate_cache_key_homepage(request):
+def generate_cache_key_homepage(request) -> str:
     """
     Custom etag for homepage
     The homepage template has a few if statements to display various buttons
