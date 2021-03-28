@@ -11,8 +11,7 @@ from karakara.model.model_queue import QueueItem
 def test_community_queue_items(app, queue, queue_manager, users, tracks, DBSession, commit):
     url = f'/community/queue_items/{queue}'
 
-    response = app.get(url, expect_errors=True)
-    assert response.status_code == 403
+    response = app.get(url, status=403)
 
     #create_test_track(id='del_test')
     #commit()

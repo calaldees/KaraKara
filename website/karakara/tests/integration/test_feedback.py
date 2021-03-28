@@ -11,8 +11,7 @@ def test_feedback(app):
     assert 'readonly' not in response.text
 
     # Post empty details
-    response = app.post('/feedback', {}, expect_errors=True)
-    assert response.status_code == 400
+    response = app.post('/feedback', {}, status=400)
     assert 'provide' in response.text
 
     # Post feedback

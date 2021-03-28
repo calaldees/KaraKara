@@ -4,8 +4,7 @@ from karakara.model.model_queue import QueueItem
 
 
 def test_community_queue(app, queue, users, tracks, DBSession):
-    response = app.get('/community/queues', expect_errors=True)
-    assert response.status_code == 403
+    response = app.get('/community/queues', status=403)
 
     login(app)
 
@@ -17,14 +16,11 @@ def test_community_queue(app, queue, users, tracks, DBSession):
         assert queue in response.text
     assert QUEUE_NEW not in response.text
 
-    response = app.post('/community/queues', {'queue_id': QUEUE_NEW.title(), 'queue_password': 'bad'}, expect_errors=True)
-    assert response.status_code == 400
+    response = app.post('/community/queues', {'queue_id': QUEUE_NEW.title(), 'queue_password': 'bad'}, status=400)
     assert 'uppercase' in response.text.lower()
 
-    response = app.post('/community/queues', {'queue_id': QUEUE_NEW, 'format': 'redirect'}, expect_errors=True)
-    assert response.status_code == 302
-    response = response.follow()
-    #assert response.status_code == 400  # This is a normal page load with a flash message
+    response = app.post('/community/queues', {'queue_id': QUEUE_NEW, 'format': 'redirect'}, status=302)
+    response = response.follow()  # status=400  # This is a normal page load with a flash message
     assert 'api.error.param_required' in response.text
 
     response = app.post('/community/queues', {'queue_id': QUEUE_NEW, 'queue_password': 'password', 'format': 'redirect'})

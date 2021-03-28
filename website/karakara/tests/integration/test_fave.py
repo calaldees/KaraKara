@@ -15,8 +15,7 @@ def test_fave_cycle(app, settings, tracks):
         response = app.post('/fave', {'id': 't1', 'method': 'delete'})
         response = app.post('/fave', {'id': 't2'})
         # Check the correct tracks are in the fave view
-        response = app.get('/fave')
-        assert response.status_code == 302
+        response = app.get('/fave', status=302)
         response = response.follow()
         assert 'track 2' in response.text.lower()
         assert 'track 1' not in response.text.lower()
@@ -33,9 +32,7 @@ def test_fave_cycle(app, settings, tracks):
 def test_fave_disbaled(app, settings, tracks):
     # Faves disabled
     with patch.dict(settings, {'karakara.faves.enabled': False}):
-        response = app.get('/fave', expect_errors=True)
-        assert response.status_code == 400
-        response = app.post('/fave?format=json', {'id': 't1'}, expect_errors=True)
-        assert response.status_code == 400, 'faves should be disabled'
+        response = app.get('/fave', status=400)
+        response = app.post('/fave?format=json', {'id': 't1'}, status=400)
         response = app.get('/track/t1')
         assert 'faves' not in response.text.lower()
