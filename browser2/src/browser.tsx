@@ -1,7 +1,7 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
-import { LocalStorageLoader, LocalStorageSaver } from "./save_state";
+import { LocalStorageLoader, LocalStorageSaver } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
 import { getMQTTListener } from "./subs";
