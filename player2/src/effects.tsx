@@ -3,7 +3,7 @@
  * http request, etc) and we'll update the app state some time
  * later, after we get a response.
  */
-import { MQTTPublish } from "hyperapp-mqtt";
+import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
 
 
