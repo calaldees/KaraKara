@@ -32,6 +32,13 @@ type Attachment = {
     extra_fields: Dictionary<any>,
 }
 
+type SrtLine = {
+    id: string,
+    text: string,
+    start: number,
+    end: number,
+}
+
 type Track = {
     id: string,
     title: string,
@@ -39,8 +46,7 @@ type Track = {
     tags: Dictionary<Array<string>>,
     description: string,
     attachments: Array<Attachment>,
-    lyrics: string,
-    srt: string,
+    lyrics: Array<SrtLine>,
     image: string,
     source_filename: string,
     queue: {
@@ -54,6 +60,16 @@ type QueueItem = {
     track: Track,
     performer_name: string,
     total_duration: number,
+    session_owner: string,
+}
+
+type PriorityToken = {
+    id: string,
+    issued: string,  // ISO8601 Date,
+    used: boolean,
+    session_owner: string,
+    valid_start: string,  // ISO8601 Date,
+    valid_end: string,  // ISO8601 Date,
 }
 
 type State = {
@@ -61,35 +77,50 @@ type State = {
 
     // global
     root: string,
+    root_edit: string,
     screen: string,
-    notification: {
+    notification: null | {
         text: string,
         style: string,
     },
     show_settings: boolean,
+    download_size: number | null,
+    download_done: number,
 
     // login
-    tmp_queue_id: string,
-    queue_id: string,
+    session_id: string | null,
+    room_name: string,
+    room_name_edit: string,
+    room_password: string,
+    room_password_edit: string,
     loading: boolean,
-    password: string,
 
     // track list
     track_list: Dictionary<Track>,
     search: string,
     filters: Array<string>,
-    expanded: string,
+    expanded: string | null,
 
     // track
-    track_id: string,
+    track_id: string | null,
     performer_name: string,
-    action: string,
+    action: string | null,
 
     // queue
     queue: Array<QueueItem>,
-    drop_source: number,
-    drop_target: number,
+    drop_source: number | null,
+    drop_target: number | null,
 
     // bookmarks
     bookmarks: Array<string>,
+
+    // settings
+    settings: Dictionary<any>,
+
+    // priority_tokens
+    priority_tokens: Array<PriorityToken>,
 }
+
+type Effect = [CallableFunction, object];
+
+type Action = State | [State, Effect];

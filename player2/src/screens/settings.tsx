@@ -4,7 +4,7 @@ export const SettingsMenu = ({ state }: { state: State }) => (
     <div class={"settings"}>
         <div>
             <h2
-                onclick={function(state) {
+                onclick={function (state) {
                     console.log(state);
                     return state;
                 }}
@@ -16,13 +16,16 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Server</td>
                     <td>
                         <input
-                            value={state.root}
+                            value={state.root_edit}
                             type={"text"}
-                            onchange={(state: State, event: FormInputEvent) =>
+                            oninput={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    root: event.target.value,
+                                    root_edit: event.target.value,
                                 } as State)
+                            }
+                            onchange={(state: State, event: FormInputEvent) =>
+                                ({ ...state, root: state.root_edit } as State)
                             }
                         />
                     </td>
@@ -31,12 +34,39 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Room</td>
                     <td>
                         <input
-                            value={state.queue_id}
+                            value={state.room_name_edit}
                             type={"text"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    room_name_edit: event.target.value,
+                                } as State)
+                            }
                             onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    queue_id: event.target.value,
+                                    room_name: state.room_name_edit,
+                                } as State)
+                            }
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td>
+                        <input
+                            value={state.room_password_edit}
+                            type={"password"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    room_password_edit: event.target.value,
+                                } as State)
+                            }
+                            onchange={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    room_password: state.room_password_edit,
                                 } as State)
                             }
                         />
@@ -64,7 +94,7 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                             <input
                                 checked={state.fullscreen}
                                 type={"checkbox"}
-                                onchange={function(
+                                onchange={function (
                                     state: State,
                                     event: FormInputEvent,
                                 ) {
@@ -85,7 +115,7 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                 <tr>
                     <td colspan={2}>
                         <button
-                            onclick={state => ({
+                            onclick={(state) => ({
                                 ...state,
                                 show_settings: false,
                             })}

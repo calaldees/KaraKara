@@ -10,7 +10,8 @@
     "jsx": "react",
     "jsxFactory": "h",
     "noEmit": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true
   },
   "include": ["./src/**/*"]
 }

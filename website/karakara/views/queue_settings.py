@@ -3,10 +3,11 @@ from collections import ChainMap
 from pyramid.view import view_config
 
 from calaldees.string_convert import convert_str, _string_list_format_hack
+from calaldees.json import json_string
 
 from . import action_ok, action_error, is_admin
 
-from ..model import DBSession, commit
+from ..model import DBSession
 from ..model.model_queue import QueueSetting
 
 import logging
@@ -15,8 +16,6 @@ log = logging.getLogger(__name__)
 # TODO: Translation strings for this file
 
 REGISTRY_SETTINGS_PASSTHROUGH = {
-    'karakara.websocket.host',
-    'karakara.websocket.port',
 }
 
 SETTINGS_ADMIN_EXTRA_EXPOSE = {
@@ -31,8 +30,7 @@ SETTINGS_TYPE_MAPPING = {
     'karakara.player.title': None,
     'karakara.player.video.preview_volume': 'float',
     'karakara.player.video.skip.seconds': 'int',
-    'karakara.player.queue.update_time': 'timedelta',  # TODO: Depricated - remove when player1 is removed
-    "karakara.player.autoplay": 'int',  # in seconds. TODO: Rename to '...autoplay.seconds'
+    "karakara.player.autoplay.seconds": 'int',
     "karakara.player.subs_on_screen": 'bool',
 
     'karakara.queue.group.split_markers': 'timedelta',
@@ -68,8 +66,7 @@ DEFAULT_SETTINGS = {
     'karakara.player.title': 'KaraKara (dev player)',
     'karakara.player.video.preview_volume': 0.10,
     'karakara.player.video.skip.seconds': 20,
-    'karakara.player.queue.update_time': '0:00:03',  # TODO: Depricated - remove when player1 is removed
-    "karakara.player.autoplay": 0,
+    "karakara.player.autoplay.seconds": 0,
     "karakara.player.subs_on_screen": False,
 
     'karakara.queue.group.split_markers': '[0:15:00, 0:30:00]',
@@ -112,6 +109,25 @@ def acquire_cache_bucket_func(request):
     return request.cache_manager.get(f'queue-settings-{request.context.queue_id}')
 
 
+def _get_queue_settings(registry, queue_id):
+    queue_settings = {
+        **DEFAULT_SETTINGS,
+        **{
+            k: registry.settings[k]
+            for k in REGISTRY_SETTINGS_PASSTHROUGH
+        },
+        **{
+            queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
+            for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == queue_id)
+        },
+    }
+    return {
+        k: v
+        for k, v in queue_settings.items()
+        if not k.startswith(SETTING_IDENTIFIER_PRIVATE)
+    }
+
+
 @view_config(
     context='karakara.traversal.QueueSettingsContext',
     request_method='GET',
@@ -121,24 +137,7 @@ def queue_settings_view(request):
 
     def get_queue_settings_dict():
         log.debug(f'cache gen - queue settings {request.cache_bucket.version}')
-
-        queue_settings = {
-            **DEFAULT_SETTINGS,
-            **{
-                k: request.registry.settings[k]
-                for k in REGISTRY_SETTINGS_PASSTHROUGH
-            },
-            **{
-                queue_setting.key: convert_str(queue_setting.value, SETTINGS_TYPE_MAPPING.get(queue_setting.key))
-                for queue_setting in DBSession.query(QueueSetting).filter(QueueSetting.queue_id == request.context.queue_id)
-            },
-        }
-        queue_settings = {
-            k: v
-            for k, v in queue_settings.items()
-            if not k.startswith(SETTING_IDENTIFIER_PRIVATE)
-        }
-        return {'settings': queue_settings}
+        return {'settings': _get_queue_settings(request.registry, request.context.queue_id)}
 
     return action_ok(data=request.cache_bucket.get_or_create(get_queue_settings_dict))
 
@@ -169,9 +168,13 @@ def queue_settings_view_put(request):
             return queue_setting_obj
 
     def is_valid(key, value):
+        type_ = SETTINGS_TYPE_MAPPING.get(key)
         try:
-            convert_str(value, SETTINGS_TYPE_MAPPING.get(key))
+            convert_str(value, type_)
             return True
+        except ValueError:
+            log.exception(f"Error parsing {key} ({value}) as a {type_}")
+            return False
         except AssertionError:
             return False
 
@@ -199,6 +202,10 @@ def queue_settings_view_put(request):
 
     request.cache_bucket.invalidate()
     request.log_event(method='update', admin=is_admin(request))
-    request.send_websocket_message('settings')  # Ensure that the player interface is notified of an update
+    request.send_websocket_message(
+        'settings',
+        json_string(_get_queue_settings(request.registry, request.context.queue_id)),
+        retain=True
+    )
 
     return action_ok(message='queue_settings updated')

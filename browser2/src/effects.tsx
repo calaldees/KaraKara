@@ -1,48 +1,189 @@
-import { MQTTPublish } from "hyperapp-mqtt";
+/*
+ * Effects: functions which send data to the outside world
+ */
+import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { http2ws } from "./utils";
+import { http2ws, flatten_settings } from "./utils";
 
-export function DisplayResponseMessage(dispatch, response) {
-    function parseResponse(data) {
-        if(data.code >= 200 && data.code < 400) {
-            dispatch(state => [
-                { ...state, notification: {text: data.messages[0], style: "ok"} },
-                Delay({
-                    wait: 2000,
-                    action: (state) => ({...state, notification: null})
-                })
-            ]);
-        }
-        else {
-            dispatch(state => ({ ...state, notification: {text: data.messages[0], style: "error"} }));
-        }
-    }
+function apiRequestEffect(dispatch, props) {
+    dispatch((state) => ({
+        ...state,
+        loading: true,
+        notification: props.title
+            ? { text: props.title, style: "warning" }
+            : null,
+    }));
 
-    // When Http() is successful, response = the json from the server
-    if(response.code) {
-        parseResponse(response);
-    }
+    fetch(props.url, props.options)
+        .then(function (response) {
+            return response;
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (result) {
+            console.groupCollapsed("api_request(", props.url, ")");
+            console.log(result);
+            console.groupEnd();
 
-    // When Http() fails, response = the raw blob, which we need
-    // to decode for ourselves. First attempt to decode JSON, like
-    // if karakara sent us a 403; fall back to "internal error" if
-    // we can't decode it, like if the server crashed)
-    else {
-        response
-        .json()
-        .then(parseResponse)
-        .catch(err => {
-            console.log(err);
-            dispatch(state => ({ ...state, notification: {text: "Internal Error", style: "error"} }));
+            dispatch(
+                (state, result) => [
+                    {
+                        ...state,
+                        loading: false,
+                    },
+                ],
+                result,
+            );
+
+            if (result.status == "ok") {
+                if (result.messages.length > 0) {
+                    dispatch((state) => [
+                        {
+                            ...state,
+                            notification: {
+                                text: result.messages[0],
+                                style: "ok",
+                            },
+                        },
+                        Delay({
+                            wait: 2000,
+                            action: (state) => ({
+                                ...state,
+                                notification: null,
+                            }),
+                        }),
+                    ]);
+                }
+            } else {
+                dispatch((state) => [
+                    {
+                        ...state,
+                        notification: {
+                            text: result.messages[0],
+                            style: "error",
+                        },
+                    },
+                ]);
+            }
+            if (props.action) {
+                dispatch(props.action, result);
+            }
+        })
+        .catch(function (error) {
+            console.groupCollapsed("api_request(", props.url, ")");
+            console.log(error);
+            console.groupEnd();
+
+            dispatch(
+                (state, error) => [
+                    {
+                        ...state,
+                        loading: false,
+                        notification: {
+                            text: "Internal Error: " + error,
+                            style: "error",
+                        },
+                    },
+                ],
+                error,
+            );
         });
-    }
 }
 
-export function SendCommand(state: State, command: string) {
-    console.log("websocket_send(" + command + ")");
+export function ApiRequest(props): Effect {
+    return [
+        apiRequestEffect,
+        {
+            options: {},
+            response: "json",
+            url:
+                props.state.root +
+                "/queue/" +
+                (props.state.room_name || props.state.room_name_edit) +
+                "/" +
+                props.function +
+                ".json",
+            ...props,
+        },
+    ];
+}
+
+export function SendCommand(state: State, command: string): Effect {
+    console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
         url: http2ws(state.root) + "/mqtt",
-        topic: "karakara/queue/" + state.queue_id,
+        username: state.room_name,
+        password: state.room_password,
+        topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });
 }
+
+function track_list_to_map(raw_list: Array<Track>): Dictionary<Track> {
+    let map = {};
+    for (let i = 0; i < raw_list.length; i++) {
+        map[raw_list[i].id] = raw_list[i];
+    }
+    return map;
+}
+
+export const FetchTrackList = (state: State): Effect =>
+    ApiRequest({
+        function: "track_list",
+        state: state,
+        progress: (state, done, size) => [
+            {
+                ...state,
+                download_done: done,
+                download_size: size,
+            },
+        ],
+        action: (state, response) =>
+            response.status == "ok"
+                ? {
+                      ...state,
+                      room_name: state.room_name_edit,
+                      session_id: response.identity.id,
+                      track_list: track_list_to_map(response.data.list),
+                  }
+                : {
+                      ...state,
+                      room_name_edit: "",
+                  },
+    });
+
+export const LoginThenFetchTrackList = (state: State): Effect =>
+    ApiRequest({
+        function: "admin",
+        state: state,
+        options: {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                password: state.room_password,
+                fixme: "true",
+            }),
+        },
+        action: (state, response) =>
+            response.status == "ok" ? [state, FetchTrackList(state)] : state,
+    });
+
+export const SaveSettings = (state: State): Action => [
+    { ...state },
+    ApiRequest({
+        title: "Saving setting...",
+        function: "settings",
+        state: state,
+        options: {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(flatten_settings(state.settings)),
+        },
+        // action: (state, response) => [{ ...state }],
+    }),
+];

@@ -18,7 +18,7 @@ def random_tracks(request, DBSession, commit, num_tracks=800):
     """
     Generate 100's of random tracks
     """
-    log.info('Generating {0} random tracks'.format(num_tracks))
+    log.info(f'Generating {num_tracks} random tracks')
 
     # Attachment generation ----------------------------------------------------
     attachments_meta = [
@@ -42,7 +42,7 @@ def random_tracks(request, DBSession, commit, num_tracks=800):
     # Random Tag generation ----------------------------------------------------
     parent_tag = get_tag('from')
     for series_num in range(10):
-        DBSession.add(Tag('Series %s'%random_string(1), parent_tag))
+        DBSession.add(Tag(f'Series {random_string(1)}', parent_tag))
     commit()
     
     
@@ -84,7 +84,7 @@ def random_tracks(request, DBSession, commit, num_tracks=800):
         return " ".join([random_string(word_size) for word in range(words)])
         
     # Track generation ---------------------------------------------------------
-    tag_titles = [get_tag('Test Track {0}'.format(i), 'title', create_if_missing=True) for i in range(num_tracks)]
+    tag_titles = [get_tag(f'Test Track {i}', 'title', create_if_missing=True) for i in range(num_tracks)]
     #commit()
 
     for track_number in range(num_tracks):

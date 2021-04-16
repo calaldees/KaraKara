@@ -55,5 +55,5 @@ def test_crawl(app, tracks, random_tracks):
 
     from pprint import pprint
     pprint(crawled)
-    print('Crawled: {0} in {1} ({2:.2f} page/sec)'.format(pages, time_taken, pages/time_taken.total_seconds()))
-    print('RAM Start: {0:.1f}, End: {1:.1f}, Change: {2:.1f} Megabytes'.format(ram_start, ram_end, ram_end-ram_start))
+    print(f'Crawled: {pages} in {time_taken} ({pages/time_taken.total_seconds():.2f} page/sec)')
+    print(f'RAM Start: {ram_start:.1f}, End: {ram_end:.1f}, Change: {ram_end-ram_start:.1f} Megabytes')

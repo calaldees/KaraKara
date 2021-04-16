@@ -1,13 +1,12 @@
 import re
 import copy
-import random
 import collections
 import urllib.parse
 from itertools import groupby
 from operator import attrgetter
 
 from sqlalchemy import func, and_, text
-from sqlalchemy.orm import joinedload, aliased, defer
+from sqlalchemy.orm import joinedload, aliased
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
@@ -16,7 +15,7 @@ from pyramid.traversal import resource_path
 from calaldees.data import update_dict
 #from calaldees.pyramid_helpers.auto_format import registered_formats
 
-from . import web, etag, action_ok  # generate_cache_key,
+from . import action_ok  # generate_cache_key,
 
 from ..model import DBSession
 from ..model.model_tracks import Track, Tag, TrackTagMapping
@@ -238,10 +237,9 @@ def tags(request):
         # If there is only a small list, we might as well just show them all
         if len(trackids) < request.queue.settings['karakara.search.list.threshold']:
             # TODO: Lame - This url is created with string concatination. Use a proper builder.
-            raise HTTPFound(location='{path}?keywords={keywords}'.format(
-                path=resource_path(request.context.queue_context['search_list'], *tags),
-                keywords=urllib.parse.quote(','.join(keywords)),
-            ))
+            path = resource_path(request.context.queue_context['search_list'], *tags)
+            keywords = urllib.parse.quote(','.join(keywords))
+            raise HTTPFound(location=f'{path}?keywords={keywords}')
 
     def get_action_return_with_sub_tags():
         log.debug('cache gen - subtags')

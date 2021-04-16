@@ -1,5 +1,4 @@
 import pytest
-import tempfile
 
 
 def test_queue_settings(app, queue):
@@ -14,12 +13,12 @@ def test_queue_settings(app, queue):
     settings = _get_settings()
     assert settings
     assert key not in settings
-    assert 'karakara.websocket.host' in settings, 'Some registry.settings should always propergate through to this output'
+    # There are no passthrough settings any more
+    # assert 'karakara.websocket.host' in settings, 'Some registry.settings should always propergate through to this output'
 
     # Settings permissions
     # This is difficult to test as settings endpoint in test mode does not throw a 403
-    #response = app.put('/settings.json', {key: 'bob'}, expect_errors=True)
-    #assert response.status_code == 403
+    #response = app.put('/settings.json', {key: 'bob'}, status=403)
     #with admin_rights(app):
     _put_settings({key: 'bob'})
     assert _get_settings()[key] == 'bob'

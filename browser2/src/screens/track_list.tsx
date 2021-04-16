@@ -1,15 +1,14 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
+import { ApiRequest } from "../effects";
+import { SelectTrack } from "../actions";
 
 /*
  * List individual tracks
  */
 const TrackItem = ({ track }: { track: Track }) => (
-    <li
-        class={"track_item"}
-        onclick={state => ({ ...state, track_id: track.id })}
-    >
+    <li class={"track_item"} onclick={SelectTrack(track.id)}>
         <div
             class={"thumb"}
             style={{
@@ -43,7 +42,7 @@ const FilterListGroupHeader = (
 ) => (
     <li
         class={"filter_list_group_header"}
-        onclick={state => ({ ...state, expanded: expanded ? null : filter })}
+        onclick={(state) => ({ ...state, expanded: expanded ? null : filter })}
     >
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
@@ -58,7 +57,7 @@ const FilterListGroupHeader = (
 const GroupedFilterList = ({ heading, filters, expanded }) =>
     Object.keys(filters)
         .sort()
-        .map(group =>
+        .map((group) =>
             group == expanded ? (
                 <div class={"filter_list_group"}>
                     <FilterListGroupHeader
@@ -84,7 +83,7 @@ const GroupedFilterList = ({ heading, filters, expanded }) =>
 const FilterList = ({ heading, filters }) =>
     Object.keys(filters)
         .sort()
-        .map(child => (
+        .map((child) => (
             <AddFilter filter={heading + ":" + child} count={filters[child]}>
                 {title_case(child)}
             </AddFilter>
@@ -96,7 +95,7 @@ const AddFilter = (
 ) => (
     <li
         class={"add_filter"}
-        onclick={state => ({
+        onclick={(state) => ({
             ...state,
             expanded: null,
             filters: state.filters.concat([filter]),
@@ -119,7 +118,7 @@ function find_tracks(
     filters: Array<string>,
     search: string,
 ): Array<Track> {
-    let tracks = [];
+    let tracks: any[] = [];
     tracks: for (let track_id in track_list) {
         let track = track_list[track_id];
         if (filters.length > 0) {
@@ -131,7 +130,7 @@ function find_tracks(
                     continue tracks;
                 }
                 if (
-                    track.tags[filter_key].filter(x => x == filter_value)
+                    track.tags[filter_key].filter((x) => x == filter_value)
                         .length == 0
                 ) {
                     continue tracks;
@@ -141,6 +140,7 @@ function find_tracks(
         if (search != "") {
             search = search.toLowerCase();
             let any_match = false;
+            if (track_id.startsWith(search)) any_match = true;
             fts_match: for (let tag in track.tags) {
                 if (!track.tags.hasOwnProperty(tag)) continue;
                 for (let i = 0; i < track.tags[tag].length; i++) {
@@ -261,7 +261,7 @@ function show_list(state: State) {
     if (tracks.length < 20) {
         return (
             <ul>
-                {tracks.map(track => (
+                {tracks.map((track) => (
                     <TrackItem track={track} />
                 ))}
             </ul>
@@ -285,14 +285,14 @@ function show_list(state: State) {
      *     ...
      * }} />
      */
-    let sections = [];
+    let sections: any[] = [];
     for (let i = 0; i < section_names.length; i++) {
         let tag_key = section_names[i]; // eg "vocaltrack"
         let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
         let filter_list = null;
         if (Object.keys(tag_values).length > 50) {
             let grouped_groups = {};
-            Object.keys(tag_values).forEach(function(x) {
+            Object.keys(tag_values).forEach(function (x) {
                 if (grouped_groups[x[0]] == undefined)
                     grouped_groups[x[0]] = {};
                 grouped_groups[x[0]][x] = tag_values[x];
@@ -317,6 +317,23 @@ function show_list(state: State) {
     return sections;
 }
 
+function show_bookmarks(state: State) {
+    return (
+        state.bookmarks.length > 0 &&
+        state.filters.length == 0 &&
+        state.search == "" && (
+            <div>
+                <h2>Bookmarks</h2>
+                <ul>
+                    {state.bookmarks.map((bm) => (
+                        <TrackItem track={state.track_list[bm]} />
+                    ))}
+                </ul>
+            </div>
+        )
+    );
+}
+
 function back(state: State): State {
     if (state.filters.length > 0) {
         // if we're searching the list, take a step back in the search
@@ -324,13 +341,54 @@ function back(state: State): State {
     } else {
         // if we're at the start of the exploring process and
         // go back, go to the login screen
-        state.queue_id = null;
+        state.room_name = "";
         state.track_list = {};
     }
     return { ...state };
 }
 
-export const TrackExplorer = ({ state }: { state: State }) => (
+const AdminButtons = (state) => (
+    <footer>
+        <div class={"buttons"}>
+            <button
+                onclick={(state) => [
+                    state,
+                    ApiRequest({
+                        function: "priority_tokens",
+                        state: state,
+                        action: (state, response): Action =>
+                            response.status == "ok"
+                                ? {
+                                      ...state,
+                                      screen: "priority_tokens",
+                                      priority_tokens:
+                                          response.data.priority_tokens,
+                                  }
+                                : {
+                                      ...state,
+                                      priority_tokens: [],
+                                  },
+                    }),
+                ]}
+                disabled={state.loading}
+            >
+                Priority Tokens
+            </button>
+            <button
+                onclick={(state) => ({ ...state, screen: "room_settings" })}
+            >
+                Room Settings
+            </button>
+            <button
+                onclick={(state) => [{ ...state, screen: "printable_list" }]}
+            >
+                Printable Tracklist
+            </button>
+        </div>
+    </footer>
+);
+
+export const TrackList = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"track_list"}
@@ -341,10 +399,16 @@ export const TrackExplorer = ({ state }: { state: State }) => (
         }
         title={"Explore Tracks"}
         navRight={
-            <a onclick={state => ({ ...state, screen: state.password ? "control" : "queue" })}>
+            <a
+                onclick={(state) => ({
+                    ...state,
+                    screen: state.room_password ? "control" : "queue",
+                })}
+            >
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
+        footer={state.room_password && <AdminButtons state={state} />}
     >
         {/* Full-text search */}
         <input
@@ -352,7 +416,7 @@ export const TrackExplorer = ({ state }: { state: State }) => (
             type={"text"}
             placeholder={"Add search keywords"}
             value={state.search}
-            onInput={(state: State, event: FormInputEvent) =>
+            oninput={(state: State, event: FormInputEvent) =>
                 ({
                     ...state,
                     search: event.target.value,
@@ -362,13 +426,13 @@ export const TrackExplorer = ({ state }: { state: State }) => (
 
         {/* List active filters */}
         <div class={"active_filter_list"}>
-            {state.filters.map(filter => (
+            {state.filters.map((filter) => (
                 <a
                     class={"active_filter"}
-                    onclick={state => ({
+                    onclick={(state) => ({
                         ...state,
                         expanded: null,
-                        filters: state.filters.filter(v => v !== filter),
+                        filters: state.filters.filter((v) => v !== filter),
                     })}
                 >
                     <span class={"remove"}>
@@ -383,5 +447,8 @@ export const TrackExplorer = ({ state }: { state: State }) => (
 
         {/* Show list of tags, or tracks */}
         {show_list(state)}
+
+        {/* If no filters, show bookmarks */}
+        {show_bookmarks(state)}
     </Screen>
 );

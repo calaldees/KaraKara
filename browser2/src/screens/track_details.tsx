@@ -1,83 +1,37 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { DisplayResponseMessage } from "../effects";
-import { Http } from "hyperapp-fx";
-import parseSRT from "parse-srt";
+import {
+    GoToScreen,
+    ActivateEnqueue,
+    CancelEnqueue,
+    EnqueueCurrentTrack,
+    SelectTrack,
+    AddBookmark,
+    RemoveBookmark,
+    SetPerformerName,
+} from "../actions";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
-        {state.queue.find(i => i.track.id == track.id) && (
+        {state.queue.find((i) => i.track.id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
-                onclick={(state: State, event: FormInputEvent) =>
-                    ({
-                        ...state,
-                        action: "enqueue",
-                    } as State)
-                }
-                disabled={state.queue.find(i => i.track.id == track.id)}
+                onclick={ActivateEnqueue()}
+                disabled={state.queue.find((i) => i.track.id == track.id)}
             >
                 Enqueue
             </button>
-            {state.bookmarks.filter(x => x == track.id).length == 0 ? (
-                <button
-                    onclick={(state: State, event: FormInputEvent) =>
-                        ({
-                            ...state,
-                            bookmarks: state.bookmarks.concat([track.id]),
-                        } as State)
-                    }
-                >
-                    Bookmark
-                </button>
+            {state.bookmarks.includes(track.id) ? (
+                <button onclick={RemoveBookmark(track.id)}>Un-Bookmark</button>
             ) : (
-                <button
-                    onclick={(state: State, event: FormInputEvent) =>
-                        ({
-                            ...state,
-                            bookmarks: state.bookmarks.filter(
-                                x => x != track.id,
-                            ),
-                        } as State)
-                    }
-                >
-                    Un-Bookmark
-                </button>
+                <button onclick={AddBookmark(track.id)}>Bookmark</button>
             )}
         </div>
     </footer>
 );
-
-// TODO: remove self from queue?
-function enqueue(state: State) {
-    return [
-        { ...state, notification: {text: "Adding to queue...", style: "warning"} },
-        Http({
-            url: state.root + "/queue/" + state.queue_id + "/queue_items.json",
-            options: {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    track_id: state.track_id,
-                    performer_name: state.performer_name,
-                }),
-            },
-            action: (state, response) => [
-                {...state, action: null},
-                [DisplayResponseMessage, response],
-            ],
-            error: (state, response) => [
-                { ...state },
-                [DisplayResponseMessage, response],
-            ],
-        }),
-    ];
-}
 
 const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
@@ -85,27 +39,15 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
             type="text"
             name="performer_name"
             value={state.performer_name}
-            placeholder={"Performer Name"}
-            required={true}
-            oninput={(state: State, event: FormInputEvent) =>
-                ({
-                    ...state,
-                    performer_name: event.target.value,
-                } as State)
+            placeholder={
+                state.settings["karakara.template.input.performer_name"]
             }
+            required={true}
+            oninput={SetPerformerName()}
         />
         <div class={"buttons"}>
-            <button
-                onclick={(state: State, event: FormInputEvent) =>
-                    ({
-                        ...state,
-                        action: null,
-                    } as State)
-                }
-            >
-                Cancel
-            </button>
-            <button onclick={enqueue}>Confirm</button>
+            <button onclick={CancelEnqueue()}>Cancel</button>
+            <button onclick={EnqueueCurrentTrack()}>Confirm</button>
         </div>
     </footer>
 );
@@ -130,13 +72,13 @@ export const TrackDetails = ({
         state={state}
         className={"track_details"}
         navLeft={
-            <a onclick={state => ({ ...state, track_id: null })}>
+            <a onclick={SelectTrack(null)}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a onclick={state => ({ ...state, screen: state.password ? "control" : "queue" })}>
+            <a onclick={GoToScreen(state.room_password ? "control" : "queue")}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
@@ -154,10 +96,10 @@ export const TrackDetails = ({
         </video>
 
         {/* Lyrics */}
-        {track.srt && (
+        {track.lyrics && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {parseSRT(track.srt).map(item => (
+                {track.lyrics.map((item) => (
                     <div>{item.text}</div>
                 ))}
             </div>
@@ -167,8 +109,8 @@ export const TrackDetails = ({
         <h2>Tags</h2>
         <div class={"tags"}>
             {Object.keys(track.tags)
-                .filter(key => BLOCKED_KEYS.indexOf(key) == -1)
-                .map(key => (
+                .filter((key) => BLOCKED_KEYS.indexOf(key) == -1)
+                .map((key) => (
                     <div class={"tag"}>
                         <div class={"tag_key"}>{title_case(key)}</div>
                         <div class={"tag_value"}>

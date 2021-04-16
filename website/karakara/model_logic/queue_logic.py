@@ -2,11 +2,10 @@ import datetime
 
 from pyramid.decorator import reify
 from sqlalchemy import or_, and_
-from sqlalchemy.orm.exc import NoResultFound
 
 from calaldees.date_tools import now
 
-from . import QUEUE_DUPLICATE, TOKEN_ISSUE_ERROR
+from . import QUEUE_DUPLICATE
 
 from ..model import DBSession
 from ..model.model_queue import Queue, QueueItem

@@ -123,9 +123,6 @@ Core components
   * Can be controlled via hotkeys or remotely with websockets
   * Automatically updates track list when the queue is changed.
   * Queue order is obscured past a configurable time
-* dashboard ![Dashboard](https://github.com/calaldees/KaraKara/workflows/Dashboard/badge.svg)
-  * Imports the logs from all the different apps
-  * Displays graphical dashboards
 * nginx ![Nginx](https://github.com/calaldees/KaraKara/workflows/Nginx/badge.svg)
   * Accepts HTTP requests and forwards them to the API / various GUIs as appropriate
 * postgres ![Postgres](https://github.com/calaldees/KaraKara/workflows/Postgres/badge.svg)

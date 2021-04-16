@@ -9,7 +9,7 @@ export const PodiumScreen = ({ state }: { state: State }) => (
         key="podium"
         class={
             "screen_podium" +
-            (state.queue[0].track.srt_lyrics ? "" : " no_lyrics")
+            (state.queue[0].track.lyrics ? "" : " no_lyrics")
         }
     >
         <h1>
@@ -53,12 +53,12 @@ export const PodiumScreen = ({ state }: { state: State }) => (
         ) : (
             <div
                 class={"startButton"}
-                onclick={state => [state, SendCommand(state, "play")]}
+                onclick={(state) => [state, SendCommand(state, "play")]}
                 style={{
                     "background-position":
                         100 -
                         (state.progress /
-                            state.settings["karakara.player.autoplay"]) *
+                            state.settings["karakara.player.autoplay.seconds"]) *
                             100 +
                         "%",
                 }}

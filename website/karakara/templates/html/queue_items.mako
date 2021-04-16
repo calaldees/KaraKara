@@ -108,7 +108,7 @@ import datetime
                 });
             });
 
-            // Connect to websocket to subscribe to queue_updated events to reload page
+            // Connect to websocket to subscribe to queue events to reload page
             ## No need to authenticate websocket because we are just reading the stream
             ## It may be possible to have this funcationality for all users - just being cautions for now, don't want to overload the websocket server
             ## You get some funky behaviour where the websocket refreshes before the first format=redirect happens, so the success message appears on the queue screen.
@@ -119,12 +119,15 @@ import datetime
                 var chars = "0123456789ABCDEF";
                 for(var i=0; i<8; i++) {clientId += chars.charAt(Math.floor(Math.random()*chars.length));}
                 socket = new Paho.MQTT.Client(${self.js_websocket_url()}, clientId);
-                socket.connect({reconnect: true})
+                socket.connect({
+                    reconnect: true,
+                    userName: 'karakara',
+                    password: 'aeyGGrYJ',
+                })
 
                 socket.onMessageArrived = function(msg) {
-                    var cmd = $.trim(msg.payload);
-                    if (currently_dragging==false && cmd=='queue_updated') {
-                        console.log('queue_updated: reloading page');
+                    if (currently_dragging==false && msg.topic=='queue') {
+                        console.log('queue updated: reloading page');
                         location.reload();
                     }
                 };
@@ -132,10 +135,10 @@ import datetime
                 $('html'       ).bind('mousedown', function() {currently_dragging=true; });
                 $('html'       ).bind('mouseup'  , function() {currently_dragging=false;});
                 $('.queue-list').bind('drop'     , function() {currently_dragging=false;});
-                console.info("websocket queue_updated listener setup");
+                console.info("websocket queue update listener setup");
             }
             catch(e) {
-                console.warn('unable to setup websocket queue_updated listener');
+                console.warn('unable to setup websocket queue update listener');
                 socket = null;
             }
         });

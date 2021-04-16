@@ -1,8 +1,9 @@
 from pyramid.view import view_config
+import srt
 
 from sqlalchemy.orm import joinedload, undefer
 
-from . import web, action_ok, action_error, etag_decorator, generate_cache_key, admin_only
+from . import action_ok
 from .queue_search import _restrict_search
 
 from ..model import DBSession
@@ -26,13 +27,6 @@ log = logging.getLogger(__name__)
 #    #    track_list.append(track.id)
 #    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
 
-
-#def track_list_cache_key(request):
-#    '{0}-{1}-{2}'.format(
-#        generate_cache_key(request),
-#        request.registry.settings.get('karakara.search.tag.silent_forced', []),
-#        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
-#    )
 
 def acquire_cache_bucket_func(request):
     request.log_event()
@@ -66,7 +60,6 @@ def track_list_all(request):
         joinedload(Track.attachments),
         joinedload(Track.tags),
         joinedload('tags.parent'),
-        undefer(Track.srt),
     )
     track_list = [track.to_dict(include_fields=('tags', 'attachments', 'srt')) for track in tracks]
 
@@ -74,11 +67,29 @@ def track_list_all(request):
     # We derive a truncated id specially for this printed list
     short_id_length = request.queue.settings.get('karakara.print_tracks.short_id_length', 6)
 
-    # Hack/Patch for title of tracks (could be transferred to browser2? speak to Shish)
+    # Hack/Patch for title of tracks
+    # Browser2 does this on the client-side - can be removed if we remove
+    # server-side track browsing
     for track in track_list:
         track['id_short'] = track['id'][:short_id_length]
         if track['tags'].get('vocaltrack') == ["off"]:
             track['title'] += " (Karaoke Ver)"
+
+        # Convert SRT format lyrics in 'srt' property
+        # into JSON format lyrics in 'lyrics' property
+        try:
+            if track['srt']:
+                track['lyrics'] = [{
+                    'id': line.index,
+                    'text': line.content,
+                    'start': line.start.total_seconds(),
+                    'end': line.end.total_seconds(),
+                } for line in srt.parse(track['srt'])]
+        except Exception as e:
+            log.exception(f"Error parsing subtitles for track {track['id']}")
+        if 'lyrics' not in track:
+            track['lyrics'] = []
+        del track['srt']
 
     # Sort track list
     #  this needs to be handled at the python layer because the tag logic is fairly compicated

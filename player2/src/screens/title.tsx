@@ -3,7 +3,7 @@ import h from "hyperapp-jsx-pragma";
 export const TitleScreen = ({ state }: { state: State }) => (
     <section key="title" class={"screen_title"}>
         <div id={"splash"}>
-            {state.images.map(item => (
+            {state.images.map((item) => (
                 <img
                     src={state.root + "/files/" + item.filename}
                     style={{
@@ -16,7 +16,7 @@ export const TitleScreen = ({ state }: { state: State }) => (
         <h1>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
             Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.queue_id}</strong>
+            Name is <strong>{state.room_name}</strong>
         </div>
     </section>
 );

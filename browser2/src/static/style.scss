@@ -136,9 +136,6 @@ MAIN {
         &:last-child {
           margin-right: 0;
         }
-        &:disabled {
-          color: $DISABLED;
-        }
       }
     }
   }
@@ -267,6 +264,9 @@ BUTTON {
 BUTTON:active {
   background: darken($BG_DARK, 10);
 }
+BUTTON:disabled {
+  color: $DISABLED;
+}
 .loading {
   animation: spin 1s linear infinite;
   @keyframes spin {
@@ -276,8 +276,7 @@ BUTTON:active {
 }
 
 /* Login */
-MAIN.login ARTICLE {
-}
+// MAIN.login ARTICLE {}
 
 /* Track List */
 MAIN.track_list ARTICLE {
@@ -297,9 +296,7 @@ MAIN.track_list ARTICLE {
       SPAN.remove {
         margin-right: 0.3em;
       }
-      SPAN.name {
-
-      }
+      // SPAN.name {}
     }
   }
   UL {
@@ -358,8 +355,15 @@ MAIN.queue ARTICLE {
     background: $NOTIFICATION_WARNING;
   }
   UL LI {
+    &.drop_source {
+      display: none;
+    }
     &.drop_target {
-      border-top: 1px solid $DROP_TARGET;
+      border-top: 5px solid $DROP_TARGET;
+    }
+    &.drop_last {
+      text-align: center;
+      padding: 1em;
     }
     SPAN.lyrics {
       font-weight: normal;
@@ -375,5 +379,47 @@ MAIN.queue ARTICLE {
     text-align: center;
     SPAN::after {content: ", ";}
     SPAN:last-child::after {content: "";}
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+  }
+  MAIN {
+    position: relative;
+    HEADER {
+      display: none !important;
+    }
+    ARTICLE {
+      overflow: visible !important;
+      column-count: 4;
+      font-size: 0.75em;
+    }
+    FOOTER {
+      display: none !important;
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Don't put stuff in iPhone's weird rounded corners
+
+MAIN {
+  HEADER {
+    padding-top: env(safe-area-inset-top);
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+  }
+  ARTICLE {
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  FOOTER {
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+    padding-bottom: Max(0.3em, env(safe-area-inset-bottom));
   }
 }

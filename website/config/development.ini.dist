@@ -25,10 +25,8 @@ karakara.server.postmortem = False -> bool
 
 karakara.template.title = KaraKara (Dev)
 
-karakara.websocket.disconnected_retry_interval =  5      -> int
 karakara.faves.enabled                         = False -> bool
-karakara.websocket.host =
-karakara.websocket.port = 9001 -> int
+karakara.websocket.host = mosquitto
 
 # TODO: Remove `/appdata/` hard-code
 karakara.search.view.config = /appdata/config/search_config.json
@@ -51,8 +49,6 @@ api.search.max_age = 0 -> int
 static.assets = karakara/static
 # TODO: Remove `/appdata/` hard-code
 static.externals = /appdata/externals/static
-static.player = ../player
-static.player2 = ../player2/dist
 
 static.path.source = 
 static.path.meta = 

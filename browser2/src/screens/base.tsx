@@ -1,4 +1,5 @@
 import h from "hyperapp-jsx-pragma";
+import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
 
 export const Screen = (
     {
@@ -11,7 +12,7 @@ export const Screen = (
     }: {
         state: State;
         title: string;
-        className?: string;
+        className?: string | null;
         footer?: any;
         navLeft?: any;
         navRight?: any;
@@ -21,13 +22,13 @@ export const Screen = (
     <main class={className}>
         <header>
             {navLeft}
-            <h1 ondblclick={(state) => ({...state, show_settings: true})}>{title}</h1>
+            <h1 ondblclick={ShowSettings()}>{title}</h1>
             {navRight}
         </header>
         {state.notification && (
             <div
-                class={"notification "+state.notification.style}
-                onclick={state => ({ ...state, notification: null })}
+                class={"notification " + state.notification.style}
+                onclick={ClearNotification()}
             >
                 <span>{state.notification.text}</span>
                 <i class={"fas fa-times-circle"} />
@@ -36,4 +37,10 @@ export const Screen = (
         <article>{children}</article>
         {footer}
     </main>
+);
+
+export const BackToExplore = () => (
+    <a onclick={GoToScreen("explore")}>
+        <i class={"fas fa-2x fa-chevron-circle-left"} />
+    </a>
 );

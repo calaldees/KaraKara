@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { get_attachment, get_tag, timedelta_str, title_case } from "../utils";
+import { get_attachment, get_tag, timedelta_str, title_case, short_date } from "../utils";
 import { AutoplayCountdown } from "./common";
 import { SetPreviewVolume } from "../actions";
 
@@ -29,7 +29,7 @@ export const PreviewScreen = ({ state }: { state: State }) => (
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>
-                {state.queue.slice(0, show_tracks).map(item => (
+                {state.queue.slice(0, show_tracks).map((item) => (
                     <li key={item.id}>
                         <img src={get_attachment(state, item.track, "image")} />
                         <p class="title">
@@ -51,7 +51,7 @@ export const PreviewScreen = ({ state }: { state: State }) => (
         {state.queue.length > show_tracks && (
             <div id="playlist_obscured" key={"playlist_obscured"}>
                 <ul>
-                    {state.queue.slice(show_tracks).map(item => (
+                    {state.queue.slice(show_tracks).map((item) => (
                         <li key={item.id}>{item.performer_name}</li>
                     ))}
                 </ul>
@@ -61,12 +61,12 @@ export const PreviewScreen = ({ state }: { state: State }) => (
         {/* key= to make sure this element stays put while the above may disappear */}
         <div id="join_info" key={"join_info"}>
             Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.queue_id}</strong>
+            Name is <strong>{state.room_name}</strong>
             {state.settings["karakara.event.end"] && (
                 <span>
                     <br />
                     Event ends at{" "}
-                    <strong>{state.settings["karakara.event.end"]}</strong>
+                    <strong>{short_date(state.settings["karakara.event.end"])}</strong>
                 </span>
             )}
         </div>

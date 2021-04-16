@@ -1,6 +1,4 @@
 import os
-import re
-import operator
 import random
 from functools import partial
 from datetime import timedelta
@@ -122,7 +120,7 @@ def main(global_config, **settings):
     # Cachebust etags ----------------------------------------------------------
     #  crude implementation; count the number of tags in db, if thats changed, the etags will invalidate
     if not config.registry.settings['server.etag.cache_buster']:
-        config.registry.settings['server.etag.cache_buster'] = 'last_update:{0}'.format(str(last_track_db_update()))
+        config.registry.settings['server.etag.cache_buster'] = f'last_update:{last_track_db_update()}'
         # TODO: Where is this used? How is this related to karakara.tracks.version?
 
     # Global State -------------------------------------------------------------
@@ -257,14 +255,12 @@ def main(global_config, **settings):
     def settings_path(key):
         path = os.path.join(os.getcwd(), config.registry.settings[key])
         if not os.path.isdir(path):
-            log.error('Unable to add_static_view {key}:{path}'.format(key=key, path=path))  #TODO: reaplce with formatstring
+            log.error(f'Unable to add_static_view {key}:{path}')
         return path
 
     # Static Routes
     config.add_static_view(name='ext', path=settings_path('static.externals'))  # cache_max_age=3600
     config.add_static_view(name='static', path=settings_path('static.assets'))  # cache_max_age=3600
-    config.add_static_view(name='player', path=settings_path('static.player'))
-    config.add_static_view(name='player2', path=settings_path('static.player2'))
 
     # If in local dev mode - pyramid webserver should host static files - this path is overridden by nginx in production
     if config.registry.settings.get('static.path.processed'):
@@ -284,6 +280,10 @@ def main(global_config, **settings):
     if config.registry.settings.get('karakara.server.mode') == 'development' and config.registry.settings.get('karakara.server.postmortem'):
         config.add_tween('karakara.postmortem_tween_factory')
 
+    # Sync to MQTT -------------------------------------------------------------
+    if config.registry.settings.get('karakara.server.mode') != 'test':
+        from karakara.model.actions import sync_all_queues_to_mqtt
+        sync_all_queues_to_mqtt(config.registry)
 
     # Return -------------------------------------------------------------------
     config.scan(ignore='.tests')

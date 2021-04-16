@@ -1,9 +1,6 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPFound
 
-
-from . import web, action_ok, action_error, admin_only
-
+from . import action_ok
 
 import logging
 log = logging.getLogger(__name__)

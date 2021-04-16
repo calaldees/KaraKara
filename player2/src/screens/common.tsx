@@ -13,11 +13,12 @@ function _lineStyle(item, state: State) {
 export const Lyrics = ({ state }: { state: State }) => (
     <div class={"lyrics"}>
         <ol>
-            {state.queue[0].track.srt_lyrics.map(item => (
-                <li key={item.id} class={_lineStyle(item, state)}>
-                    <span>{item.text}</span>
-                </li>
-            ))}
+            {state.queue[0].track.lyrics &&
+                state.queue[0].track.lyrics.map((item) => (
+                    <li key={item.id} class={_lineStyle(item, state)}>
+                        <span>{item.text}</span>
+                    </li>
+                ))}
         </ol>
     </div>
 );
@@ -29,13 +30,13 @@ export const AutoplayCountdown = ({
     state: State;
     show_if_disabled: boolean;
 }) =>
-    state.settings["karakara.player.autoplay"] === 0 ? (
+    state.settings["karakara.player.autoplay.seconds"] === 0 ? (
         show_if_disabled && <small>(autoplay disabled)</small>
     ) : (
         <small>
             (autoplay in{" "}
             {Math.ceil(
-                state.settings["karakara.player.autoplay"] - state.progress,
+                state.settings["karakara.player.autoplay.seconds"] - state.progress,
             )}{" "}
             seconds)
         </small>

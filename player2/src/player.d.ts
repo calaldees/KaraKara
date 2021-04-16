@@ -27,8 +27,7 @@ type Track = {
     tags: Dictionary<Array<string>>,
     description: string,
     attachments: Array<Attachment>,
-    lyrics: string,
-    srt_lyrics: Array<SrtLine>,
+    lyrics: Array<SrtLine>,
     image: string,
     source_filename: string,
     queue: {
@@ -53,7 +52,11 @@ type WaterfallImage = {
 type State = {
     // global persistent
     root: string,
-    queue_id: string,
+    root_edit: string,
+    room_name: string,
+    room_name_edit: string,
+    room_password: string,
+    room_password_edit: string,
     podium: boolean,
 
     // global temporary
@@ -74,3 +77,7 @@ type State = {
     paused: boolean,
     progress: number,
 }
+
+type Effect = [CallableFunction, object];
+
+type Action = State | [State, Effect];

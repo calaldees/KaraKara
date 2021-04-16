@@ -1,13 +1,10 @@
 ## -*- coding: utf-8 -*-
 
-import pytest
-import re
-
 import bs4
 def BeautifulSoup(markup):
     return bs4.BeautifulSoup(markup, "html.parser")
 
-from . import admin_rights, temporary_settings
+from . import temporary_settings
 
 
 def test_queue_track_list_print_all(app, queue, tracks):
@@ -15,8 +12,7 @@ def test_queue_track_list_print_all(app, queue, tracks):
     Track list displays all tracks in one giant document
     Used for printing
     """
-    #response = app.get(f'/queue/{queue}/track_list', expect_errors=True)
-    #assert response.status_code == 403
+    #response = app.get(f'/queue/{queue}/track_list', status=403)
 
     #with admin_rights(app, queue):
     response = app.get(f'/queue/{queue}/track_list')
@@ -57,15 +53,6 @@ def test_queue_track_list_print_all_api(app, queue, tracks):
     )
     assert len(attachments) > 0
     assert {'image', 'preview', 'video'} == {a['type'] for a in attachments}
-
-    # Subtitles
-    srts = tuple(
-        track['srt']
-        for track in data['list']
-        if track['srt']
-    )
-    for srt in srts:
-        assert re.search(r'^\d{2}:\d{2}:\d{2},\d+ -->', srt, re.MULTILINE)
 
 
 def test_queue_track_list_all_tag_restrict(app, queue, tracks):

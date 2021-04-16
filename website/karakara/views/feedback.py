@@ -1,7 +1,7 @@
 #from pyramid.view import view_config
 
 from calaldees.data import strip_non_base_types
-from . import web, action_ok, action_error
+from . import action_ok, action_error
 
 from ..model import DBSession
 #from ..model.model_feedback import Feedback
@@ -33,6 +33,6 @@ def feedback_view(request):
     feedback.environ = strip_non_base_types(request.environ)
     DBSession.add(feedback)
 
-    log.info('feedback - {0}'.format(request.params.get('details')))
+    log.info(f"feedback - {request.params.get('details')}")
     request.log_event(**request.params)
     return action_ok(message='Feedback received, thank you!')

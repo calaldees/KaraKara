@@ -7,8 +7,6 @@ import logging
 log = logging.getLogger(__name__)
 
 from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
-
 from sqlalchemy.orm             import scoped_session, sessionmaker
 DBSession = scoped_session(sessionmaker(autoflush=False))
 
@@ -111,7 +109,6 @@ class JSONEncodedDict(TypeDecorator):
 #-------------------------------------------------------------------------------
 
 import copy
-import datetime
 
 def obj_to_dict(obj, field_processors):
     """
@@ -142,59 +139,43 @@ def obj_to_dict(obj, field_processors):
     return d
 
 
-def to_dict(self, list_type='default', include_fields=None, exclude_fields=None, master_list_name='full', **kwargs):
-    """
-    Because API returns typically are dict objects, we need a convenient way to convert all DB objects to dicts
+class CustomBase:
+    __to_dict__ = {}
 
-    list_type = empty | default | full
+    def to_dict(self, list_type='default', include_fields=None, exclude_fields=None, master_list_name='full', **kwargs):
+        """
+        Because API returns typically are dict objects, we need a convenient way to convert all DB objects to dicts
 
-    TODO: Doctest ...
-    """
-    # Setup/Copy field list from exisintg list of fields -----------------------
-    if list_type == 'empty':
-        fields = {}
-    else:
-        if list_type not in self.__to_dict__:
-            raise Exception("unsupported list type")
-        fields = copy.copy(self.__to_dict__[list_type])
+        list_type = empty | default | full
 
-    # Import fields from include fields - if present ---------------------------
-    if isinstance(include_fields, str):
-        include_fields = (f.strip() for f in include_fields.split(','))
-    include_fields = tuple(include_fields) if include_fields else ()
-    for field in [field for field in include_fields if field in self.__to_dict__[master_list_name]]:
-        fields[field] = self.__to_dict__[master_list_name][field]
+        TODO: Doctest ...
+        """
+        # Setup/Copy field list from exisintg list of fields -----------------------
+        if list_type == 'empty':
+            fields = {}
+        else:
+            if list_type not in self.__to_dict__:
+                raise Exception("unsupported list type")
+            fields = copy.copy(self.__to_dict__[list_type])
 
-    # Delete excluded fields from return ---------------------------------------
-    if isinstance(exclude_fields, str):
-        exclude_fields = (f.strip() for f in exclude_fields.split(','))
-    exclude_fields = tuple(exclude_fields) if exclude_fields else ()
-    if exclude_fields:
-        for field in [field for field in exclude_fields if field in fields]:
-            del fields[field]
+        # Import fields from include fields - if present ---------------------------
+        if isinstance(include_fields, str):
+            include_fields = (f.strip() for f in include_fields.split(','))
+        include_fields = tuple(include_fields) if include_fields else ()
+        for field in [field for field in include_fields if field in self.__to_dict__[master_list_name]]:
+            fields[field] = self.__to_dict__[master_list_name][field]
 
-    return obj_to_dict(self, fields)
+        # Delete excluded fields from return ---------------------------------------
+        if isinstance(exclude_fields, str):
+            exclude_fields = (f.strip() for f in exclude_fields.split(','))
+        exclude_fields = tuple(exclude_fields) if exclude_fields else ()
+        if exclude_fields:
+            for field in [field for field in exclude_fields if field in fields]:
+                del fields[field]
 
+        return obj_to_dict(self, fields)
 
-def to_dict_setup(self, list_type='default', clone_list='super', field_processors={}):
-    """
-    A failed experiment
-    """
-    if clone_list == 'super':
-        self.__to_dict__ = copy.deepcopy(self.__class__.__bases__[0].__to_dict__)
-    elif clone_list:
-        self.__to_dict__.update({list_type: copy.deepcopy(__to_dict__[clone_list])})
-    else:
-        pass
-    self.__to_dict__[list_type].update(field_processors)
-
-
-def augment_declarative_base(base_class):
-    base_class.__to_dict__    =  {}
-    base_class.to_dict        = to_dict
-    base_class.to_dict_setup  = to_dict_setup
-
-augment_declarative_base(Base)
+Base = declarative_base(cls=CustomBase)
 
 
 #-------------------------------------------------------------------------------

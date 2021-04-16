@@ -4,7 +4,7 @@ volumes:
     website_db:
     processmedia2_data:
     logs:
-    influxdb_data:
+    mosquitto_data:
 
 services:
     website:
@@ -23,35 +23,33 @@ services:
             #STATIC_PATH_PROCESSED: /media/processed
             #SESSION_SECRET: change_me
             KARAKARA_CONTAINER_NAME_postgres: 'postgres'
-            KARAKARA_WEBSOCKET_HOST: 'websocket'
+            KARAKARA_WEBSOCKET_HOST: 'mosquitto'
         links:
             - postgres
             - redis
-            - websocket
+            - mosquitto
         volumes:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:/media/meta:ro
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
-    websocket:
-        image: karakara/websocket
+    mosquitto:
+        image: karakara/mosquitto
         build:
-            context: ./websocket
+            context: ./mosquitto
+        volumes:
+            - mosquitto_data:/mosquitto/data
 
     player2:
         image: karakara/player2
         build:
             context: ./player2
-        volumes:
-            - logs:/logs
 
     browser2:
         image: karakara/browser2
         build:
             context: ./browser2
-        volumes:
-            - logs:/logs
 
     postgres:
         image: karakara/postgres
@@ -60,8 +58,7 @@ services:
         environment:
             POSTGRES_PASSWORD: password
         volumes:
-            - logs:/logs
-            - website_db:/var/lib/postgresql
+            - website_db:/var/lib/postgresql/data
 
     redis:
         image: redis
@@ -79,7 +76,7 @@ services:
             - ${PATH_HOST_processed}:/media/processed:ro
         links:
             - website
-            - websocket
+            - mosquitto
             - player2
             - browser2
 
@@ -107,16 +104,6 @@ services:
         # Force import
         #docker-compose exec processmedia2 /bin/bash
         #root@245ee075bf91:/processmedia2# python3 import_media.py  --config config.docker.json --force
-
-    dashboard:
-        image: karakara/dashboard
-        build:
-            context: ./dashboard
-        volumes:
-            - logs:/logs
-            - influxdb_data:/root/.influxdbv2
-        ports:
-            - "127.0.0.1:${PORT_DASHBOARD}:9999"
 
 # docker-compose run --rm processmedia2 bash
 # docker run -it --rm --entrypoint bash -v //C//Users/calal/code/personal/KaraKara/processmedia2/tests/source:/tmp/workdir jrottenberg/ffmpeg

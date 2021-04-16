@@ -1,17 +1,19 @@
 import datetime
 from functools import partial
+import srt
 
-from sqlalchemy.orm import joinedload, defer  # , joinedload_all
+from sqlalchemy.orm import joinedload, undefer  # , joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.view import view_config
 
 from calaldees.date_tools import now
 from calaldees.data import subdict
+from calaldees.json import json_string
 
-from . import web, action_ok, action_error, etag_decorator, is_admin, modification_action, admin_only
+from . import action_ok, action_error, is_admin, modification_action, admin_only
 
-from ..model import DBSession, commit
+from ..model import DBSession
 from ..model.model_queue import QueueItem, _queueitem_statuss
 from ..model.model_tracks import Track
 from ..model.model_priority_token import PriorityToken
@@ -28,25 +30,21 @@ import logging
 log = logging.getLogger(__name__)
 
 
-
-#def socket_update_queue_items_event(request):
-#    # TODO: This needs to incorporate the alert for the specific queue_id
-#    request.socket_manager.recv('queue_updated'.encode('utf-8'))
-#cache_manager.get('queue_items').register_invalidate_callback(socket_update_queue_items_event, ('request', ))
-
 def acquire_cache_bucket_func(request):
     return request.cache_manager.get(f'queue-{request.context.queue_id}')
 
 def invalidate_cache(request, track_id):
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
     request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
-    # TODO: This needs to incorporate the alert for the specific queue_id
-    request.send_websocket_message('queue_updated')
+
+    time_padding = request.queue.settings.get('karakara.queue.track.padding')
+    queue_items = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id), time_padding)
+    request.send_websocket_message('queue', json_string(queue_items), retain=True)
 
 def _queue_query(queue_id):
     return DBSession.query(QueueItem).filter(QueueItem.queue_id==queue_id).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
 
-def _queue_items_dict_with_track_dict(queue_query):
+def _queue_items_dict_with_track_dict(queue_query, time_padding):
     queue_dicts = [queue_item.to_dict('full') for queue_item in queue_query]
 
     # Fetch all tracks with id's in the queue
@@ -59,9 +57,8 @@ def _queue_items_dict_with_track_dict(queue_query):
                                 joinedload(Track.tags),\
                                 joinedload(Track.attachments),\
                                 joinedload('tags.parent'),\
-                                #defer(Track.srt),\  # Already defered by default in model
                             )
-        tracks = {track['id']:track for track in [track.to_dict('full', exclude_fields='srt') for track in tracks]}
+        tracks = {track['id']:track for track in [track.to_dict('full') for track in tracks]}
 
     # HACK
     # AllanC - Hack to overlay title on API return.
@@ -75,9 +72,32 @@ def _queue_items_dict_with_track_dict(queue_query):
     for track in tracks.values():
         track['title'] = track_title(track['tags'])
 
-    # Attach track to queue_item
+        # Convert SRT format lyrics in 'srt' property
+        # into JSON format lyrics in 'lyrics' property
+        try:
+            if track['srt']:
+                track['lyrics'] = [{
+                    'id': line.index,
+                    'text': line.content,
+                    'start': line.start.total_seconds(),
+                    'end': line.end.total_seconds(),
+                } for line in srt.parse(track['srt'])]
+        except Exception as e:
+            log.exception(f"Error parsing subtitles for track {track['id']}")
+        if 'lyrics' not in track:
+            track['lyrics'] = []
+        del track['srt']
+
+    total_duration = datetime.timedelta(seconds=0)
     for queue_item in queue_dicts:
+        # Attach track to queue_item
         queue_item['track'] = tracks.get(queue_item['track_id'], {})
+
+        # Attach total_duration to queue_item
+        if not queue_item['track']:
+            continue
+        queue_item['total_duration'] = total_duration
+        total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
 
     return queue_dicts
 
@@ -97,28 +117,23 @@ def queue_items_view(request):
     view current queue
     """
     def get_queue_dict():
-        log.debug('cache gen - queue {0}'.format(request.cache_bucket.version))
+        log.debug(f'cache gen - queue {request.cache_bucket.version}')
+        time_padding = request.queue.settings.get('karakara.queue.track.padding')
 
         # Get queue order
-        queue_dicts = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id))
+        queue_dicts = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id), time_padding)
 
-        # Calculate estimated track time
-        # Overlay 'total_duration' on all tracks
-        # It takes time for performers to change, so each track add a padding time
-        #  +
         # Calculate the index to split the queue list
         #  - non admin users do not see the whole queue in order.
         #  - after a specifyed time threshold, the quque order is obscured
         #  - it is expected that consumers of this api return will obscure the
         #    order passed the specifyed 'split_index'
         split_markers = list(request.queue.settings.get('karakara.queue.group.split_markers'))
-        time_padding = request.queue.settings.get('karakara.queue.track.padding')
         split_indexs = []
         total_duration = datetime.timedelta(seconds=0)
         for index, queue_item in enumerate(queue_dicts):
             if not queue_item['track']:
                 continue
-            queue_item['total_duration'] = total_duration
             total_duration += datetime.timedelta(seconds=queue_item['track']['duration']) + time_padding
             if split_markers and total_duration > split_markers[0]:
                 split_indexs.append(index + 1)
@@ -148,7 +163,7 @@ def queue_item_add(request):
     # Validation
     for field in ['track_id', 'performer_name']:
         if not request.params.get(field):
-            raise action_error(message='no {0}'.format(field), code=400)
+            raise action_error(message=f'no {field}', code=400)
     track_id = request.params.get('track_id')
     try:
         track = DBSession.query(Track).get(track_id)
@@ -308,8 +323,8 @@ def queue_item_del(request):
         # TODO: Consider if this is client side logic or server side logic.
         # BUG: Currently player.js surpress's queue_update events while it is playing a video.
         #      Broken Flow: queue 3 tracks - play - delete queue_item (thats not playing) - stop - player queue is out of date
-        request.send_websocket_message('stop')
-        # The impending invalidate_cache() will queue_updated the client queue
+        request.send_websocket_message('commands', 'stop')
+        # The impending invalidate_cache() will update the client queue
 
     #DBSession.delete(queue_item)
     queue_item.status = request.params.get('status', 'removed')
@@ -349,7 +364,7 @@ def queue_item_update(request):
         try:
             params[field] = int(params[field])
         except ValueError:
-            raise action_error(message='invalid {0}'.format(field), code=404)
+            raise action_error(message=f'invalid {field}', code=404)
     status = params.get('status')
     if status and status not in _queueitem_statuss.enums:
         raise action_error(message=f'invalid queue_item.status {status} - valid values are {_queueitem_statuss.enums}', code=400)

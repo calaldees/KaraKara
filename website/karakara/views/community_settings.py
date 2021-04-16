@@ -1,6 +1,6 @@
 from pyramid.view import view_config
 
-from . import action_ok, action_error, community_only, is_community
+from . import action_ok, action_error, community_only
 
 from .queue_settings import queue_settings_view_put, acquire_cache_bucket_func, REGISTRY_SETTINGS_PASSTHROUGH, SETTINGS_ADMIN_EXTRA_EXPOSE
 

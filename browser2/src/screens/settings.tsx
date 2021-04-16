@@ -1,11 +1,13 @@
 import h from "hyperapp-jsx-pragma";
+import { HideSettings } from "../actions";
 
 export const SettingsMenu = ({ state }: { state: State }) => (
     <div class={"settings"}>
         <div>
             <h2
-                onclick={function(state) {
+                onclick={function (state) {
                     console.log(state);
+                    (window as any).state = state;
                     return state;
                 }}
             >
@@ -16,13 +18,16 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Server</td>
                     <td>
                         <input
-                            value={state.root}
+                            value={state.root_edit}
                             type={"text"}
-                            onchange={(state: State, event: FormInputEvent) =>
+                            oninput={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    root: event.target.value,
+                                    root_edit: event.target.value,
                                 } as State)
+                            }
+                            onchange={(state: State, event: FormInputEvent) =>
+                                ({ ...state, root: state.root_edit } as State)
                             }
                         />
                     </td>
@@ -31,12 +36,18 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Room</td>
                     <td>
                         <input
-                            value={state.queue_id}
+                            value={state.room_name_edit}
                             type={"text"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    room_name_edit: event.target.value,
+                                } as State)
+                            }
                             onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    queue_id: event.target.value,
+                                    room_name: state.room_name_edit,
                                 } as State)
                             }
                         />
@@ -46,12 +57,18 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     <td>Password</td>
                     <td>
                         <input
-                            value={state.password}
+                            value={state.room_password_edit}
                             type={"password"}
+                            oninput={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    room_password_edit: event.target.value,
+                                } as State)
+                            }
                             onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
-                                    password: event.target.value,
+                                    room_password: state.room_password_edit,
                                 } as State)
                             }
                         />
@@ -59,14 +76,7 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                 </tr>
                 <tr>
                     <td colspan={2}>
-                        <button
-                            onclick={state => ({
-                                ...state,
-                                show_settings: false,
-                            })}
-                        >
-                            Close
-                        </button>
+                        <button onclick={HideSettings()}>Close</button>
                     </td>
                 </tr>
             </table>

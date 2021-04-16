@@ -1,12 +1,10 @@
-import random
-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.traversal import resource_path
 
 from calaldees.data import first, subdict
 
-from . import web, action_ok, action_error, etag_decorator, generate_cache_key, admin_only, cache_none
+from . import action_ok, action_error, cache_none
 
 from ..model import DBSession
 from ..model.actions import get_track_dict_full
@@ -25,7 +23,7 @@ log = logging.getLogger(__name__)
 
 #track_version = {}
 #def track_key(id):
-#    return "{0}:{1}".format(TRACK_CACHE_KEY, id)
+#    return f"{TRACK_CACHE_KEY}:{id}"
 #def invalidate_track(id):
 #    cache.delete(track_key(id))
 #    global track_version
@@ -79,7 +77,7 @@ def track_view(request):
     # Search, find and redirect for shortened track id's
     # This is kind of a hack to allow id's shorter than 64 characters in tests
     if len(id) != 64:
-        full_id = first(DBSession.query(Track.id).filter(Track.id.like('{0}%'.format(id))).first())
+        full_id = first(DBSession.query(Track.id).filter(Track.id.like(f'{id}%')).first())
         if full_id and len(id) != len(full_id):
             raise HTTPFound(location=resource_path(request.context.queue_context['track'][full_id]))
 
@@ -113,7 +111,7 @@ def track_view(request):
     #       every attack vector.
     track = request.cache_bucket.get_or_create(lambda: get_track_and_queued_dict(id))
     if not track:
-        raise action_error(message='track {0} not found'.format(id), code=404)
+        raise action_error(message=f'track {id} not found', code=404)
 
     request.log_event(track_id=id, title=track['title'])
 
