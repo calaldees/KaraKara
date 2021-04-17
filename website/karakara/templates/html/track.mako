@@ -69,20 +69,6 @@ ${video(track)}
 </div>
 
 
-<!-- Fave -->
-<%doc>
-% if request.registry.settings.get('karakara.faves.enabled'):
-    <% fave = track['id'] in (identity.get('faves',[]) or []) %>
-    <form action="/fave.redirect" method="${'DELETE' if fave else 'POST'}">
-        % if fave:
-        <input type='hidden' name='method' value='delete' />
-        % endif
-        <input type="hidden" name="id" value="${track['id']}" />
-        <input type="submit" value="${'Remove from faves' if fave else 'Add to faves'}" />
-    </form>
-% endif
-</%doc>
-
 ##------------------------------------------------------------------------------
 
 % if track.get('queue',{}).get('played'):

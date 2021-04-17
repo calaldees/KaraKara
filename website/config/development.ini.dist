@@ -25,7 +25,6 @@ karakara.server.postmortem = False -> bool
 
 karakara.template.title = KaraKara (Dev)
 
-karakara.faves.enabled                         = False -> bool
 karakara.websocket.host = mosquitto
 
 # TODO: Remove `/appdata/` hard-code
