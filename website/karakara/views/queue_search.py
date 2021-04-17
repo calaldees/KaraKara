@@ -4,6 +4,7 @@ import collections
 import urllib.parse
 from itertools import groupby
 from operator import attrgetter
+from typing import Dict, List
 
 from sqlalchemy import func, and_, text
 from sqlalchemy.orm import joinedload, aliased
@@ -29,7 +30,7 @@ log = logging.getLogger(__name__)
 
 # A list of the sub tags allowed when browsing by specific tags
 # rather than overwelming the user with all possible tags, limit the browsing to a subset under known circumstances.
-search_config = {}
+search_config: Dict[str, List[str]] = {}
 
 # Utils ------------------------------------------------------------------------
 
@@ -61,7 +62,7 @@ SearchParams = collections.namedtuple('SearchParams', ('tags', 'keywords', 'trac
 REGEX_SPLIT_QUERY_STRING = re.compile(r'[^ ,]+')
 
 def _get_search_params_from_request(request):
-    def parse_query_string_key(key):
+    def parse_query_string_key(key: str) -> List[str]:
         return REGEX_SPLIT_QUERY_STRING.findall(request.params.get(key, ''))
     return SearchParams(
         tags=tuple(request.context.tags),

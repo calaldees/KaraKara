@@ -2,6 +2,7 @@ __all__ = [
     "DBSession", "Base", "init_DBSession", "init_DBSession_tables", "clear_DBSession_tables", "commit"
     "JSONEncodedDict",
 ]
+from typing import Dict, Any
 
 import logging
 log = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ register(DBSession)
 
 
 engine = None
+
 
 #-------------------------------------------------------------------------------
 # DB Setup
@@ -140,7 +142,7 @@ def obj_to_dict(obj, field_processors):
 
 
 class CustomBase:
-    __to_dict__ = {}
+    __to_dict__: Dict[str, Dict[str, Any]] = {}
 
     def to_dict(self, list_type='default', include_fields=None, exclude_fields=None, master_list_name='full', **kwargs):
         """

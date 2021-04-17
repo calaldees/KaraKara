@@ -1,4 +1,5 @@
 import json
+from typing import Dict, Any
 
 from pyramid.view import view_config
 
@@ -13,14 +14,14 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _get_json_request(request):
+def _get_json_request(request) -> Any:
     try:
         return request.json
     except json.JSONDecodeError:
         raise action_error('required json track data to import', code=400)
 
 
-def _existing_tracks_dict():
+def _existing_tracks_dict() -> Dict[str, str]:
     return {t.id: t.source_filename for t in DBSession.query(Track.id, Track.source_filename)}
 
 

@@ -38,10 +38,10 @@ web = decorator_combine(
 #-------------------------------------------------------------------------------
 
 # AllanC - need to look into Pyramids security model
-def is_admin(request):
+def is_admin(request) -> bool:
     return request.session_identity['admin']
 
-def is_community(request):
+def is_community(request) -> bool:
     return request.session.get('user',{}).get('approved', False)
 
 # Work to depricate @decorator - heavy dependency not needed
@@ -86,7 +86,7 @@ def modification_action(target, *args, **kwargs):
 #-------------------------------------------------------------------------------
 # eTag
 #-------------------------------------------------------------------------------
-def generate_cache_key(request):
+def generate_cache_key(request) -> str:
     if request.session.peek_flash():
         raise LookupError  # Response is not cacheable/indexable if there is a custom flash message
     return '-'.join([_generate_cache_key_default(request), str(is_admin(request))])

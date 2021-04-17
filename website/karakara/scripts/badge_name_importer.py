@@ -13,21 +13,17 @@ DEFAULT_BADGENAME_REGEX = re.compile(r'(?P<name>.*)\((?P<badge_name>.+)\)')
 
 # Processors -------------------------------------------------------------------
 
-def minami_processor(soup):
-    """
-    """
+def _minami_processor(soup):
     regex = DEFAULT_BADGENAME_REGEX
     return [regex.match(name_string).groupdict()['badge_name'] for name_string in (cell.string for cell in soup.find_all('td')) if regex.match(name_string)]
-minami_processor.url = "http://minamicon.org.uk/members.php"
+minami_processor = (_minami_processor, "http://minamicon.org.uk/members.php")
 
 
-def ame_processor(soup):
-    """
-    """
+def _ame_processor(soup):
     regex = DEFAULT_BADGENAME_REGEX
     names = (cell.string for cell in soup.find(id='registration-section').find_all('td'))
     return [regex.match(name_string).groupdict()['badge_name'] for name_string in names if regex.match(name_string)]
-ame_processor.url = "http://www.amecon.org.uk/registration/members"
+ame_processor = (_ame_processor, "http://www.amecon.org.uk/registration/members")
 
 processors = {
     'ame': ame_processor,
@@ -63,14 +59,14 @@ def main():
     logging.basicConfig(level=logging.DEBUG if args['verbose'] else logging.INFO)
 
     cache_filename = args['cache_filename']
-    processor = processors[args['source']]
+    processor, url = processors[args['source']]
 
     response_text = ''
     if os.path.exists(cache_filename):
         with open(cache_filename, 'r') as f:
             response_text = f.read()
     else:
-        response_text = requests.get(processor.url).text
+        response_text = requests.get(url).text
         if not os.path.exists(cache_filename):
             with open(cache_filename, 'w') as f:
                 f.write(response_text)

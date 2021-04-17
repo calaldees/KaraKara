@@ -4,10 +4,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
-from .data.queue import *
-from .data.tracks import *
-from .data.tracks_random import *
-from .data.auth import *
+from .data.queue import queue
+from .data.tracks import tags, attachments, tracks, tracks_volume, track_unicode_special
+from .data.tracks_random import random_tracks
+from .data.auth import users
 
 # Markers ----------------------------------------------------------------------
 

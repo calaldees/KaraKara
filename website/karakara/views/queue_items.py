@@ -1,8 +1,9 @@
 import datetime
 from functools import partial
 import srt
+from typing import List, Dict, Any
 
-from sqlalchemy.orm import joinedload, undefer  # , joinedload_all
+from sqlalchemy.orm import joinedload, undefer, Query  # , joinedload_all
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.view import view_config
@@ -33,7 +34,7 @@ log = logging.getLogger(__name__)
 def acquire_cache_bucket_func(request):
     return request.cache_manager.get(f'queue-{request.context.queue_id}')
 
-def invalidate_cache(request, track_id):
+def invalidate_cache(request, track_id: str) -> None:
     request.cache_bucket.invalidate(request=request)  # same as acquire_cache_bucket_func(request)
     request.cache_manager.get(f'queue-{request.context.queue_id}-track-{track_id}').invalidate(request=request)
 
@@ -41,10 +42,10 @@ def invalidate_cache(request, track_id):
     queue_items = _queue_items_dict_with_track_dict(_queue_query(request.context.queue_id), time_padding)
     request.send_websocket_message('queue', json_string(queue_items), retain=True)
 
-def _queue_query(queue_id):
+def _queue_query(queue_id: str) -> Query:
     return DBSession.query(QueueItem).filter(QueueItem.queue_id==queue_id).filter(QueueItem.status=='pending').order_by(QueueItem.queue_weight)
 
-def _queue_items_dict_with_track_dict(queue_query, time_padding):
+def _queue_items_dict_with_track_dict(queue_query: Query, time_padding: datetime.timedelta) -> List[Dict[str, Any]]:
     queue_dicts = [queue_item.to_dict('full') for queue_item in queue_query]
 
     # Fetch all tracks with id's in the queue
@@ -116,7 +117,7 @@ def queue_items_view(request):
     """
     view current queue
     """
-    def get_queue_dict():
+    def get_queue_dict() -> Dict[str, Any]:
         log.debug(f'cache gen - queue {request.cache_bucket.version}')
         time_padding = request.queue.settings.get('karakara.queue.track.padding')
 

@@ -19,3 +19,4 @@ hash_cache.pickle
 
 **/.idea
 **/.vscode
+**/.mypy_cache

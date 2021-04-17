@@ -2,6 +2,7 @@ import os
 import re
 import json
 import shutil
+from typing import Optional, Set, Tuple
 from collections import defaultdict
 
 from pyramid.view import view_config
@@ -42,10 +43,11 @@ STATUS_TAGS = {
 STATUS_LIGHT_ORDER = ('black', 'green', 'red', 'yellow')
 
 
-def get_overall_status(status_keys, status_light_order=STATUS_LIGHT_ORDER):
-    for light in status_light_order:
+def get_overall_status(status_keys) -> Optional[str]:
+    for light in STATUS_LIGHT_ORDER:
         if light in status_keys:
             return light
+    return None
 
 
 #-------------------------------------------------------------------------------
@@ -102,6 +104,9 @@ def file_uploaded(event):
 # Community Utils
 #-------------------------------------------------------------------------------
 
+_open = open
+
+
 class CommunityTrack():
     """
     Tracks are more than just a db entry. They have static data files accociated
@@ -113,7 +118,6 @@ class CommunityTrack():
     CommunityTrack is an object that wraps a Track with additional methods to
     manipulate these files.
     """
-    _open = open
 
     @classmethod
     def factory(cls, track, request):
@@ -122,7 +126,6 @@ class CommunityTrack():
             path_source=request.registry.settings['static.path.source'],
             path_meta=request.registry.settings['static.path.meta'],
             path_backup=request.registry.settings[PATH_BACKUP_KEY],
-            open=cls._open
         )
 
     def __init__(self, track, path_source, path_meta, path_backup, open=open):
@@ -147,8 +150,6 @@ class CommunityTrack():
             self.track_id = track['id']
             self._track_dict = track
 
-        self._open = open  # Allow mockable open() for testing
-
     @property
     def track(self):
         if not self._track_dict:
@@ -163,13 +164,13 @@ class CommunityTrack():
     def _meta(self):
         meta_filename = os.path.join(self.path_meta, f"{self.track['source_filename']}.json")
         try:
-            with self._open(meta_filename, 'r') as meta_filehandle:
+            with _open(meta_filename, 'r') as meta_filehandle:
                 return json.load(meta_filehandle)
         except FileNotFoundError:
             log.warning(f"Unable to locate metadata for {self.track['id']} - {meta_filename}")
             return {}
 
-    def _get_source_filename(self, source_type):
+    def _get_source_filename(self, source_type: str) -> str:
         """
         Lookup metadata from source_filename
         From metadata lookup tags file (identifyable with .txt extension)
@@ -192,7 +193,7 @@ class CommunityTrack():
             ) or ''
         )
 
-    def _get_source_file(self, source_type, errors='replace'):
+    def _get_source_file(self, source_type: str, errors: str='replace') -> str:
         try:
             source_filename = self._get_source_filename(source_type)
             # If the charset is not utf8 (like some kind of latin variant) then
@@ -200,34 +201,34 @@ class CommunityTrack():
             # We cant use 'surrogateescape' we cant output this in pure utf-8 to the web interface
             # The web interface will only save the subtiles IF they have been editied on the web.
             # It may be worth erroring on web save if we detect the existing subtitles are not in utf-8
-            with self._open(source_filename, 'tr', encoding='utf-8', errors=errors) as filehandle:
+            with _open(source_filename, 'tr', encoding='utf-8', errors=errors) as filehandle:
                 return filehandle.read()
         except IOError as ex:
             log.error(f'Unable to load {source_filename} - {ex}')
             return ''
 
-    def _set_source_file(self, source_type, data):
+    def _set_source_file(self, source_type: str, data: str) -> None:
         source_filename = self._get_source_filename(source_type)
         backup(source_filename, self.path_backup)
-        with self._open(source_filename, 'w') as filehandle:
+        with _open(source_filename, 'w') as filehandle:
             filehandle.write(data)
 
     @property
-    def tag_data_raw(self):
+    def tag_data_raw(self) -> str:
         return self._get_source_file('tag')
     @tag_data_raw.setter
-    def tag_data_raw(self, tag_data):
+    def tag_data_raw(self, tag_data: str) -> None:
         self._set_source_file('tag', tag_data)
 
     @property
-    def tag_data(self):
+    def tag_data(self) -> Set[Tuple[str, ...]]:
         return {tuple(line.split(':')) for line in self.tag_data_raw.split('\n')}
 
     @property
-    def subtitles(self):
+    def subtitles(self) -> str:
         return self._get_source_file('subtitles')
     @subtitles.setter
-    def subtitles(self, subtitles):
+    def subtitles(self, subtitles: str):
         self._set_source_file('subtitles', subtitles)
 
     @staticmethod
@@ -411,8 +412,8 @@ def community_processmedia_log(request):
     REGEX_LOG_ITEM = re.compile(r'(?P<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<source>.+?) - (?P<loglevel>.+?) - (?P<message>.+?)(\n\d{2}-|$)', flags=re.DOTALL + re.IGNORECASE + re.MULTILINE)
     LEVELS = request.params.get('levels', 'WARNING,ERROR').split(',')
     try:
-        # rrrrrrr - kind of a hack using CommunityTrack._open .. but it works ..
-        with CommunityTrack._open(LOGFILE, 'rt') as filehandle:
+        # rrrrrrr - kind of a hack using _open .. but it works ..
+        with _open(LOGFILE, 'rt') as filehandle:
             processmedia_log = [
                 item
                 for item in

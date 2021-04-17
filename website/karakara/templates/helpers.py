@@ -4,6 +4,7 @@ These will be accessible as 'h.' in all mako templates
 """
 import random
 import logging
+from typing import Dict, Any
 
 import pyramid.traversal
 
@@ -30,7 +31,7 @@ video_fileext_to_mime_types = {
 
 
 # A container to hold buckets of inline js to be injected into page
-javascript_inline = {}
+javascript_inline: Dict[str, Any] = {}
 
 
 # TODO: replace url methods with constant PATH

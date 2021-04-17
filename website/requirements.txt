@@ -19,5 +19,7 @@ oauth2client
 decorator
 paho-mqtt
 srt
+mypy
+sqlalchemy-stubs
 
 git+https://github.com/calaldees/libs.git@master#egg=calaldees

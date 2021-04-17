@@ -31,7 +31,7 @@ from .actions import get_tag
 # Init Base Data
 #-------------------------------------------------------------------------------
 
-@event.listens_for(Tag.__table__, 'after_create')
+@event.listens_for(Tag.__table__, 'after_create')  # type: ignore
 def init_initial_tags(*args, **kwargs):
     #init_db()  # Clear current DB and Create Blank Tables
 
