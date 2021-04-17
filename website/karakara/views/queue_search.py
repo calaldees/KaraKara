@@ -237,10 +237,9 @@ def tags(request):
         # If there is only a small list, we might as well just show them all
         if len(trackids) < request.queue.settings['karakara.search.list.threshold']:
             # TODO: Lame - This url is created with string concatination. Use a proper builder.
-            raise HTTPFound(location='{path}?keywords={keywords}'.format(
-                path=resource_path(request.context.queue_context['search_list'], *tags),
-                keywords=urllib.parse.quote(','.join(keywords)),
-            ))
+            path = resource_path(request.context.queue_context['search_list'], *tags)
+            keywords = urllib.parse.quote(','.join(keywords))
+            raise HTTPFound(location=f'{path}?keywords={keywords}')
 
     def get_action_return_with_sub_tags():
         log.debug('cache gen - subtags')

@@ -139,5 +139,4 @@ def test_search_etag(app, queue, tracks, url_part):
     response = app.get(url)
     etag = response.etag
     assert etag
-    response = app.get(url, headers={'If-None-Match':etag})
-    assert response.status_code == 304
+    response = app.get(url, headers={'If-None-Match':etag}, status=304)

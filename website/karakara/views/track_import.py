@@ -43,10 +43,10 @@ def track_import_post(request):
 
     for track_dict in _get_json_request(request):
         if track_dict['id'] in existing_track_ids:
-            log.warning('Exists: {source_filename} - {id}'.format(**track_dict))
+            log.warning(f"Exists: {track_dict['source_filename']} - {track_dict['id']}")
             continue
 
-        log.info('Import: {source_filename} - {id}'.format(**track_dict))
+        log.info(f"Import: {track_dict['source_filename']} - {track_dict['id']}")
         track = Track()
         track.id = track_dict['id']
         track.source_filename = track_dict['source_filename']
@@ -89,7 +89,7 @@ def track_delete(request):
         if track_id in existing_track_ids:
             delete_track(track_id)
             request.registry.settings['karakara.tracks.version'] += 1
-            log.info('Delete: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
+            log.info(f'Delete: {track_id}')
         else:
-            log.warning('NotExists: {track_id}'.format(track_id=track_id))  # TODO: replace with formatstring
+            log.warning(f'NotExists: {track_id}')
     return action_ok()

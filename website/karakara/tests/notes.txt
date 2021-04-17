@@ -16,7 +16,7 @@ def _pytest_sessionstart():
         settings = appconfig('config:' + os.path.join(ROOT_PATH, INI))
         engine = engine_from_config(settings, prefix='sqlalchemy.')
 
-        print('Creating the tables on the test database {0}'.format(engine))
+        print(f'Creating the tables on the test database {engine}')
 
         config = Configurator(settings=settings)
         initialize_sql(settings, config)
@@ -172,7 +172,7 @@ class TestKaraKara():
         log.info("teardown")
     
     #def test_example(self, example):
-    #    print('example {0}'.format(example))
+    #    print(f'example {example}')
     #    assert False
 
     def test_db(self, tracks):

@@ -129,10 +129,10 @@ def sync_queue_to_mqtt(registry, queue_id):
     c.connect(registry.settings['karakara.websocket.host'])
     c.loop_start()
 
-    queue = json_string(_queue_items_dict_with_track_dict(_queue_query(queue_id)))
-    msg = c.publish(f"karakara/room/{queue_id}/queue", queue, retain=True)
+    settings = _get_queue_settings(registry, queue_id)
+    msg = c.publish(f"karakara/room/{queue_id}/settings", json_string(settings), retain=True)
     msg.wait_for_publish()
 
-    settings = json_string(_get_queue_settings(registry, queue_id))
-    msg = c.publish(f"karakara/room/{queue_id}/settings", settings, retain=True)
+    queue = _queue_items_dict_with_track_dict(_queue_query(queue_id), settings.get('karakara.queue.track.padding'))
+    msg = c.publish(f"karakara/room/{queue_id}/queue", json_string(queue), retain=True)
     msg.wait_for_publish()

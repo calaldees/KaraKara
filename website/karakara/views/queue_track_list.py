@@ -28,13 +28,6 @@ log = logging.getLogger(__name__)
 #    return action_ok(data={'list':[track.to_dict() for track in DBSession.query(Track).all()]})
 
 
-#def track_list_cache_key(request):
-#    '{0}-{1}-{2}'.format(
-#        generate_cache_key(request),
-#        request.registry.settings.get('karakara.search.tag.silent_forced', []),
-#        request.registry.settings.get('karakara.search.tag.silent_hidden', []),
-#    )
-
 def acquire_cache_bucket_func(request):
     request.log_event()
     return request.cache_manager.get(

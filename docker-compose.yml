@@ -23,21 +23,21 @@ services:
             #STATIC_PATH_PROCESSED: /media/processed
             #SESSION_SECRET: change_me
             KARAKARA_CONTAINER_NAME_postgres: 'postgres'
-            KARAKARA_WEBSOCKET_HOST: 'websocket'
+            KARAKARA_WEBSOCKET_HOST: 'mosquitto'
         links:
             - postgres
             - redis
-            - websocket
+            - mosquitto
         volumes:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:/media/meta:ro
             - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
-    websocket:
-        image: karakara/websocket
+    mosquitto:
+        image: karakara/mosquitto
         build:
-            context: ./websocket
+            context: ./mosquitto
         volumes:
             - mosquitto_data:/mosquitto/data
 
@@ -58,8 +58,7 @@ services:
         environment:
             POSTGRES_PASSWORD: password
         volumes:
-            - logs:/logs
-            - website_db:/var/lib/postgresql
+            - website_db:/var/lib/postgresql/data
 
     redis:
         image: redis
@@ -77,7 +76,7 @@ services:
             - ${PATH_HOST_processed}:/media/processed:ro
         links:
             - website
-            - websocket
+            - mosquitto
             - player2
             - browser2
 

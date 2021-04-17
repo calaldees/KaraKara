@@ -1,16 +1,16 @@
 KaraKara README
 ===============
 
-Installation
-------------
-
-* git clone git://github.com/calaldees/KaraKara.git
-* cd KaraKara/website
-
-
 Getting Started
 ---------------
 
+```bash
+    # local standalone dev version
+    make build
+    make run
+    # http://localhost:6543/
+```
+(TODO: resolve this)
 * docker run --rm -p 0.0.0.0:6543:6543 -t $(docker build -q .)
 * open http://localhost:6543/
 
@@ -53,7 +53,6 @@ Todo
   * archive songs played for reference later (log 2)
   * message system to class messages (both community and mobile)
 * community (!)
-  * social login + user activation
   * tag editor (per track importing)
     * tag warning if missing list
     * video qa checked
@@ -75,10 +74,18 @@ Todo
     * event summary (scoring system) (partof admin? or community?)
 
 
-
 flash message:
   query session+queid 'refresh required'
   you're up in 'xx' min (client cookie)
+
+
+Bugs
+----
+
+
+status_error message style dose not propergate to flash message with format='redirect'
+ - flash message from queue.py error (e.g. duplicate performer) is not styled as error but looks like success. feedback error is displayed appropriately. so what gives?!
+
 
 
 Karakara Community
