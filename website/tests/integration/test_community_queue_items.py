@@ -1,8 +1,8 @@
 
 from .test_community import community_login
 
-from karakara.tests.data.tracks import create_test_track
-from karakara.tests.integration.test_queue_items import QueueManager, queue_manager
+from ..data.tracks import create_test_track
+from .test_queue_items import QueueManager, queue_manager
 
 from karakara.model.actions import delete_track
 from karakara.model.model_queue import QueueItem
