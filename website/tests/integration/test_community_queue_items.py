@@ -1,8 +1,8 @@
 
 from .test_community import community_login
 
-from karakara.tests.data.tracks import create_test_track
-from karakara.tests.integration.test_queue_items import QueueManager, queue_manager
+from ..data.tracks import create_test_track
+from .test_queue_items import QueueManager, queue_manager
 
 from karakara.model.actions import delete_track
 from karakara.model.model_queue import QueueItem
@@ -11,8 +11,7 @@ from karakara.model.model_queue import QueueItem
 def test_community_queue_items(app, queue, queue_manager, users, tracks, DBSession, commit):
     url = f'/community/queue_items/{queue}'
 
-    response = app.get(url, expect_errors=True)
-    assert response.status_code == 403
+    response = app.get(url, status=403)
 
     #create_test_track(id='del_test')
     #commit()

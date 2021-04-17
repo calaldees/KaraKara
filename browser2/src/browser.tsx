@@ -1,7 +1,7 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
-import { AutoHistory } from "hyperapp-auto-history";
-import { LocalStorageLoader, LocalStorageSaver } from "./save_state";
+import { HashStateManager } from "@shish2k/hyperapp-hash-state";
+import { LocalStorageLoader, LocalStorageSaver } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
 import { getMQTTListener } from "./subs";
@@ -81,7 +81,7 @@ app({
     ],
     view: Root,
     subscriptions: (state) => [
-        AutoHistory(
+        HashStateManager(
             {
                 push: ["root", "filters", "track_id"],
                 replace: ["room_name_edit", "search"],

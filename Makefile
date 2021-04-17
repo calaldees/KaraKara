@@ -36,28 +36,8 @@ docker_stop:
 pull:
 	git pull && docker-compose stop && docker-compose up --build -d
 
-# Test ------------------------------------------------------------------------
-
-.PHONY: test
-test: .env
-	docker-compose --file docker-compose.yml --file docker-compose.test.yml run --no-deps --rm website
-	docker-compose --file docker-compose.yml --file docker-compose.test.yml run --no-deps --rm processmedia2
-
 # Cloc ------------------------------------------------------------------------
 
 .PHONY: cloc
 cloc:
 	cloc --vcs=git
-
-# Clean ------------------------------------------------------------------------
-
-.PHONY: clean_osx_cancer
-clean_osx_cancer:
-	find ./ -iname \.DS_Store -delete
-
-.PHONY: clean
-clean: clean_osx_cancer docker_clean
-	rm -rf .cache .vagrant .env
-	for project in $(PROJECTS); do \
-		$(MAKE) clean --directory $$project ; \
-	done

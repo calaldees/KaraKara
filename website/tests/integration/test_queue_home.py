@@ -34,8 +34,7 @@ def test_queue_home(app, queue):
 
 
 def test_queue_home_not_exist(app, queue):
-    response = app.get(f'/queue/not_a_queue')
-    assert response.status_code == 302
+    response = app.get(f'/queue/not_a_queue', status=302)
     response = response.follow()
     assert response.request.path == '/'
     assert 'view.queue.not_exist' in response.text

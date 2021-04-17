@@ -34,13 +34,6 @@
 % else:
     <a href="${paths['search_tags']}" data-role="button">${_('mobile.home.search_tags')}</a>
     <a href="${paths['queue_items']}" data-role="button">${_('mobile.home.queue')}</a>
-
-    ##% if identity.get('faves',[]):
-    ##<a href="${path_queue}/fave"           data-role="button">${_('mobile.home.fave')}</a>
-    ##% endif
-
-    ## Disbaled until we can reimplement it as 'messaging'
-    ##<a href="${path_queue}/feedback"       data-role="button">${_('mobile.home.feedback')}</a>
 % endif
 
 % if identity.get('admin', False):

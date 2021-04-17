@@ -49,9 +49,9 @@ def main(global_config, **settings):
 
     # Db
     init_DBSession(settings)
-    from .model.init_data import init_initial_tags
+    from .model.init_data import init_initial_tags  # TODO: this janky import before init is also present in test/conftest.py - can we remove the duplication?
     init_DBSession_tables()
-    #import pdb ; pdb.set_trace()
+
 
     # Pyramid Global Settings
     config = pyramid.config.Configurator(settings=settings, root_factory=TraversalGlobalRootFactory)  # , autocommit=True
@@ -84,7 +84,7 @@ def main(global_config, **settings):
     config.add_view_predicate('requires_param', RequiresParamPredicate)
 
     # Session identity
-    config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'faves', 'user'}), 'session_identity', reify=True)
+    config.add_request_method(partial(session_identity, session_keys={'id', 'admin', 'user'}), 'session_identity', reify=True)
 
     # Setup Cache Manager config in view
     setup_pyramid_cache_manager(config)

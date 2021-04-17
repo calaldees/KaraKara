@@ -1,7 +1,7 @@
 /*
  * Effects: functions which send data to the outside world
  */
-import { MQTTPublish } from "hyperapp-mqtt";
+import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
 import { http2ws, flatten_settings } from "./utils";
 

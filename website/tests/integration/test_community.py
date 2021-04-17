@@ -84,8 +84,7 @@ def test_login_new_user(app, users):
 
 
 def test_reject_unapproved(app):
-    response = app.get('/community/list', expect_errors=True)
-    assert response.status_code == 403
+    response = app.get('/community/list', status=403)
     assert 'Approved community users only' in response.text
 
 
@@ -186,8 +185,7 @@ def test_community_settings(app, tracks, users, settings):
     """
     This is also testing tracks_all heavily in this flow
     """
-    response = app.get('/community/settings', expect_errors=True)
-    assert response.status_code == 403
+    response = app.get('/community/settings', status=403)
     login(app)
 
     # Starting assertions
@@ -223,8 +221,7 @@ def test_community_settings(app, tracks, users, settings):
 
 
 def test_community_processmedia_logs(app, registry_settings):
-    response = app.get('/community/processmedia_log', expect_errors=True)
-    assert response.status_code == 403
+    response = app.get('/community/processmedia_log', status=403)
 
     login(app)
 

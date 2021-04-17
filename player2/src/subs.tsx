@@ -10,7 +10,7 @@ import {
 } from "./actions";
 import { SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
-import { MQTTSubscribe } from "hyperapp-mqtt";
+import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
 
 /**

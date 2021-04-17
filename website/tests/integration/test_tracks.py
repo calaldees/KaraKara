@@ -15,8 +15,7 @@ def test_track_view(app, queue, tracks, track_id, expected_response, text_list):
     Assert the track data is rendered by the template
     """
     url = f'/queue/{queue}/track/{track_id}'
-    response = app.get(url)
-    assert response.status_code == expected_response
+    response = app.get(url, status=expected_response)
     for text in text_list:
         assert text.lower() in response.text.lower()
     assert 'poster="/files/test/image' in response.text, 'html5 video poster with an image should be present'
@@ -36,18 +35,15 @@ def test_track_unknown(app, queue):
     """
     Uknown track
     """
-    response = app.get(f'/queue/{queue}/track/unknown_track_id', expect_errors=True)
-    assert response.status_code == 404
+    response = app.get(f'/queue/{queue}/track/unknown_track_id', status=404)
 
 
 def test_track_redirect_query_string(app, queue):
     """
     Track redirect id
     """
-    response = app.get(f'/queue/{queue}/track?track_id=t1')
-    assert response.status_code == 302
-    response = response.follow()
-    assert response.status_code == 200
+    response = app.get(f'/queue/{queue}/track?track_id=t1', status=302)
+    response = response.follow(status=200)
     assert 'Test Track 1' in response.text
 
 
@@ -55,10 +51,8 @@ def test_track_redirect_partial(app, queue):
     """
     Track redirect partial id
     """
-    response = app.get(f'/queue/{queue}/track/x')
-    assert response.status_code == 302
-    response = response.follow()
-    assert response.status_code == 200
+    response = app.get(f'/queue/{queue}/track/x', status=302)
+    response = response.follow(status=200)
     assert 'Wildcard' in response.text
 
 

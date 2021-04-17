@@ -1,6 +1,7 @@
 # Application ------------------------------------------------------------------
 [app:main]
-use = egg:KaraKara
+#use = egg:KaraKara  # with this removed `entry_points` in `setup.py` is not needed and therefor no `pip install -e .` is required
+use = call:karakara:main
 
 # Pyramid ----------------------------------------------------------------------
 pyramid.reload_templates    = true
@@ -10,12 +11,12 @@ pyramid.debug_routematch    = false
 pyramid.debug_templates     = true
 pyramid.includes =
     pyramid_tm
-    #pyramid_debugtoolbar
 
 
 # i18n -------------------------------------------------------------------------
 pyramid.default_locale_name = en
-i18n.translation_dirs = ../data/locale
+# TODO: Remove `/appdata/` hard-code
+i18n.translation_dirs = /appdata/locale
 i18n.available_languages = [en]
 
 # Karaoke settings -------------------------------------------------------------
@@ -24,10 +25,10 @@ karakara.server.postmortem = False -> bool
 
 karakara.template.title = KaraKara (Dev)
 
-karakara.faves.enabled                         = False -> bool
 karakara.websocket.host = mosquitto
 
-karakara.search.view.config = data/config/search_config.json
+# TODO: Remove `/appdata/` hard-code
+karakara.search.view.config = /appdata/config/search_config.json
 
 
 # Community ---------------------------------------------------------------------
@@ -45,7 +46,8 @@ api.search.max_age = 0 -> int
 
 # Static Assets ----------------------------------------------------------------
 static.assets = karakara/static
-static.externals = data/externals/static
+# TODO: Remove `/appdata/` hard-code
+static.externals = /appdata/externals/static
 
 static.path.source = 
 static.path.meta = 
@@ -57,7 +59,7 @@ static.backup = data/backup
 
 
 # Database ---------------------------------------------------------------------
-sqlalchemy.url = sqlite:///data/database/test.db
+sqlalchemy.url = sqlite:////appdata/database/test.db
 
 # Sessions ---------------------------------------------------------------------
 session.cookie_name          = karakara_session
@@ -148,7 +150,7 @@ formatter = generic
 
 [handler_logfile]
 class = FileHandler
-args = ('data/logs/development.log',)
+args = ('/logs/development.log',)
 level = NOTSET
 formatter = generic
 
@@ -167,6 +169,6 @@ qualname = json_log_event
 
 [handler_admindashboard]
 class = FileHandler
-args = ('data/logs/admindashboard_events.log',)
+args = ('/logs/admindashboard_events.log',)
 level = NOTSET
 formatter = message_only

@@ -1,6 +1,6 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
-import { AutoHistory } from "hyperapp-auto-history";
+import { HashStateManager } from "@shish2k/hyperapp-hash-state";
 
 import { Root } from "./screens/root";
 import { FetchRandomImages } from "./effects";
@@ -61,7 +61,7 @@ const state: State = {
 
 function subscriptions(state: State) {
     return [
-        AutoHistory(
+        HashStateManager(
             {
                 push: ["root", "room_name"],
                 replace: ["podium"],
