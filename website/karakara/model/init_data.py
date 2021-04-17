@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 from .model_tracks import Track, Tag
 from .model_queue import QueueItem
 from .model_priority_token import PriorityToken
-from .model_message import Message
 from .model_community import CommunityUser
 
 # db action import
