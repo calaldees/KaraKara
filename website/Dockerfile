@@ -9,7 +9,6 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim as base
         curl \
         nano \
         less \
-        gcc musl-dev g++ \
     && pip install --no-cache-dir --upgrade \
         pip \
         setuptools \
