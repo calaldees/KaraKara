@@ -37,7 +37,6 @@ Todo
     * messaging - save to cookie, notifications in top tray (2)
     * disabling/rickrolling
   * admin:
-    * alerts for feedback messages
     * when remove track - prompt for optional message to user (2)
     * way of recovering tracks that have been played/skipped (just in case of crash or problem)
     * rejected messages (duplicate performer limit, etc) (log 2)
