@@ -12,8 +12,7 @@ def test_queue_track_list_print_all(app, queue, tracks):
     Track list displays all tracks in one giant document
     Used for printing
     """
-    #response = app.get(f'/queue/{queue}/track_list', expect_errors=True)
-    #assert response.status_code == 403
+    #response = app.get(f'/queue/{queue}/track_list', status=403)
 
     #with admin_rights(app, queue):
     response = app.get(f'/queue/{queue}/track_list')

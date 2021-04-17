@@ -18,8 +18,7 @@ def test_queue_settings(app, queue):
 
     # Settings permissions
     # This is difficult to test as settings endpoint in test mode does not throw a 403
-    #response = app.put('/settings.json', {key: 'bob'}, expect_errors=True)
-    #assert response.status_code == 403
+    #response = app.put('/settings.json', {key: 'bob'}, status=403)
     #with admin_rights(app):
     _put_settings({key: 'bob'})
     assert _get_settings()[key] == 'bob'

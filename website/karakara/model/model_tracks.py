@@ -92,7 +92,6 @@ class Track(Base):
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
-    #Base.to_dict_setup(self, list_type='default', field_processors={
             'id'           : None,
             'title'        : None,
             'duration'     : None,
@@ -101,7 +100,6 @@ class Track(Base):
 
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-    #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
             'description' : None,
             'attachments' : lambda track: [attachment.to_dict() for attachment in track.attachments] ,
             'tags'        : lambda track: track.tags_with_parents_dict(),
@@ -138,12 +136,11 @@ class Tag(Base):
 
     @property
     def full(self):
-        return '{0}:{1}'.format(self.parent.name, self.name) if self.parent else self.name
+        return f'{self.parent.name}:{self.name}' if self.parent else self.name
 
     __to_dict__ = copy.deepcopy(Base.__to_dict__)
     __to_dict__.update({
         'default': {
-    #Base.to_dict_setup(self, list_type='default', field_processors={
             'id'           : None ,
             'name'         : None , #lambda tag: str(tag)
         },
@@ -151,7 +148,6 @@ class Tag(Base):
 
     __to_dict__.update({'full': copy.deepcopy(__to_dict__['default'])})
     __to_dict__['full'].update({
-    #Base.to_dict_setup(self, list_type='full', clone_list='default', filed_processors={
             'parent' : lambda track: track.parent.name ,
             'full'   : None,
     })

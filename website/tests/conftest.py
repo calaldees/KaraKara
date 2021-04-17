@@ -4,10 +4,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
-from karakara.tests.data.queue import *
-from karakara.tests.data.tracks import *
-from karakara.tests.data.tracks_random import *
-from karakara.tests.data.auth import *
+from .data.queue import *
+from .data.tracks import *
+from .data.tracks_random import *
+from .data.auth import *
 
 # Markers ----------------------------------------------------------------------
 
@@ -74,6 +74,7 @@ def DBSession(request, app_ini):
     from karakara.model import DBSession, init_DBSession, init_DBSession_tables, clear_DBSession_tables
     init_DBSession(app_ini)
     clear_DBSession_tables()
+    from karakara.model.init_data import init_initial_tags  # TODO: this janky import before init is also present in __init__:main - can we remove the duplication?
     init_DBSession_tables()
 
     return DBSession

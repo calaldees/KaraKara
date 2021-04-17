@@ -1,8 +1,6 @@
 pyramid
 pyramid_tm
 pyramid_mako
-# todo - remove pyramid_debugtoolbar
-pyramid_debugtoolbar
 SQLAlchemy
 zope.sqlalchemy
 transaction
@@ -17,9 +15,6 @@ httpagentparser
 humanize
 google-api-python-client
 oauth2client
-pytest
-pytest-mock
-webtest
 #pycrypto  # Considering this inclusion for encrypted cookies
 decorator
 paho-mqtt

@@ -46,21 +46,26 @@ class QueueManager():
     def items(self):
         return self.data['queue']
 
-    def add_queue_item(self, track_id, performer_name, expect_errors=False):
-        response = self.app.post(self.queue_items_url, dict(track_id=track_id, performer_name=performer_name), expect_errors=expect_errors)
-        if not expect_errors:
-            assert response.status_code == 201
-        return response
+    def add_queue_item(self, track_id, performer_name, status=201):
+        return self.app.post(
+            self.queue_items_url,
+            dict(track_id=track_id, performer_name=performer_name),
+            status=status
+        )
 
-    def del_queue_item(self, queue_item_id, expect_errors=False):
+    def del_queue_item(self, queue_item_id, status=200):
         """
         humm .. the current setup is not conforming to the REST standard,
         may need a refactor this
         response = app.delete('/queue', {'queue_item.id':queue_item_id})
         """
-        return self.app.post(self.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id}, expect_errors=expect_errors)
+        return self.app.post(
+            self.queue_items_url,
+            {'method': 'delete', 'queue_item.id': queue_item_id},
+            status=status
+        )
 
-    def move_queue_item(self, queue_index, queue_index_target, expect_errors=False):
+    def move_queue_item(self, queue_index, queue_index_target, status=200):
         queue_ids = [q['id'] for q in self.items]
         return self.app.put(
             self.queue_items_url,
@@ -68,7 +73,7 @@ class QueueManager():
                 'queue_item.id': queue_ids[queue_index],
                 'queue_item.move.target_id': queue_ids[queue_index_target],
             },
-            expect_errors=expect_errors,
+            status=status,
         )
 
     def clear(self):
@@ -161,16 +166,13 @@ def test_queue_view_add_delete_cycle_with_socket_messages(app, queue, queue_mana
 def test_queue_errors(app, queue, queue_manager, tracks):
     queue_items_url = queue_manager.queue_items_url
 
-    response = app.post(queue_items_url, dict(track_id='t1000'), expect_errors=True)
-    assert response.status_code == 400
+    response = app.post(queue_items_url, dict(track_id='t1000'), status=400)
     assert 'performer' in response.text  # test should grumble about needing a 'performer' name
 
-    response = app.post(queue_items_url, dict(track_id='t1000', performer_name='test_user'), expect_errors=True)
-    assert response.status_code == 400
+    response = app.post(queue_items_url, dict(track_id='t1000', performer_name='test_user'), status=400)
     assert 'view.queue_item.add.error.track_id' in response.text
 
-    response = app.put(queue_items_url, {'queue_item.id': 'not_real_id'}, expect_errors=True)
-    assert response.status_code == 404
+    response = app.put(queue_items_url, {'queue_item.id': 'not_real_id'}, status=404)
     assert 'invalid queue_item.id' in response.text
 
 
@@ -201,10 +203,8 @@ def test_queue_etag(app, queue, queue_manager, tracks):
     assert etag_track != response.etag
     etag_track = response.etag
 
-    response = app.get(queue_items_url, headers={'If-None-Match': etag_queue})
-    assert response.status_code == 304
-    response = app.get(track_url, headers={'If-None-Match': etag_track})
-    assert response.status_code == 304
+    response = app.get(queue_items_url, headers={'If-None-Match': etag_queue}, status=304)
+    response = app.get(track_url, headers={'If-None-Match': etag_track}, status=304)
 
 
 def test_queue_form_action_format_redirect(app, queue, queue_manager, tracks):
@@ -212,15 +212,13 @@ def test_queue_form_action_format_redirect(app, queue, queue_manager, tracks):
     The web forms use the format 'redirect'.
     This enables flash messages to be set and move back to the originating page.
     """
-    response = app.post(queue_manager.queue_items_url, {'track_id': 't1', 'performer_name': 'redirect_man', 'format': 'redirect'})
-    assert response.status_code == 302
+    response = app.post(queue_manager.queue_items_url, {'track_id': 't1', 'performer_name': 'redirect_man', 'format': 'redirect'}, status=302)
     response = response.follow()
     assert 'add.ok' in response.text
 
     queue_item_id = queue_manager.items[0]['id']
 
-    response = app.post(queue_manager.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id, 'format': 'redirect'})
-    assert response.status_code == 302
+    response = app.post(queue_manager.queue_items_url, {'method': 'delete', 'queue_item.id': queue_item_id, 'format': 'redirect'}, status=302)
     response = response.follow()
     assert 'delete.ok' in response.text
 
@@ -235,13 +233,11 @@ def test_queue_permissions(app, queue, queue_manager, tracks):
     #response = app.post('/queue', dict(track_id='t1', performer_name='testperformer'))
     queue_item_id = queue_manager.items[0]['id']
     # Try to move the track (only admins can move things)
-    response = app.put(queue_manager.queue_items_url, {'queue_item.id': queue_item_id, 'queue_item.move.target_id': 9999}, expect_errors=True)
-    assert response.status_code == 403
+    response = app.put(queue_manager.queue_items_url, {'queue_item.id': queue_item_id, 'queue_item.move.target_id': 9999}, status=403)
     # Clear the cookies (ensure we are a new user)
     app.cookiejar.clear()
     # Attempt to delete the queued track (should fail)
-    response = queue_manager.del_queue_item(queue_item_id, expect_errors=True)
-    assert response.status_code == 403
+    response = queue_manager.del_queue_item(queue_item_id, status=403)
     assert len(queue_manager.items) == 1, 'the previous user should not of had permissions to remove the item from the queue'
     # Become an admin, del track, remove admin status
     with admin_rights(app, queue):
@@ -261,8 +257,7 @@ def test_queue_played(app, queue, queue_manager, tracks):
     # Try to set as 'played' as normal user - and get rejected
     app.cookiejar.clear()  # Loose the cookie so we are not identifyed as the creator of this queue item.
     queue_item_id = queue_manager.items[0]['id']
-    response = app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, expect_errors=True)
-    assert response.status_code == 403
+    response = app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "played", 'format': 'json'}, status=403)
     assert len(queue_manager.items) == 1
 
     # As admin player mark track as played
@@ -279,8 +274,7 @@ def test_queue_update_with_invalid_status(app, queue, queue_manager, tracks, DBS
 
     queue_item_id = queue_manager.items[0]['id']
 
-    response = app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "unknown_test_value", 'format': 'json'}, expect_errors=True)
-    assert response.status_code == 400
+    response = app.put(queue_manager.queue_items_url, {"queue_item.id": queue_item_id, "status": "unknown_test_value", 'format': 'json'}, status=400)
     assert len(queue_manager.items) == 1
 
 
@@ -336,8 +330,7 @@ def test_queue_reorder(app, queue, queue_manager, tracks):
         assert ['xxx', 't1', 't3', 't2'] == get_track_ids()
 
     # Check normal users cannot change order
-    response = queue_manager.move_queue_item(1, 3, expect_errors=True)
-    assert response.status_code == 403
+    response = queue_manager.move_queue_item(1, 3, status=403)
     assert 'view.admin_required' in response.text
 
     assert ['xxx', 't1', 't3', 't2'] == get_track_ids()
@@ -398,8 +391,7 @@ def test_queue_track_duplicate(app, queue, tracks, queue_manager, DBSession, com
     commit()
 
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1')
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob2', expect_errors=True)
-    assert response.status_code == 400
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob2', status=400)
 
 
 @with_settings(settings={
@@ -418,10 +410,9 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
 
     with temporary_settings(app, queue, {'karakara.queue.add.duplicate.performer_limit': 1}):
         response = queue_manager.add_queue_item(track_id='t1', performer_name='bob')
-        response = queue_manager.add_queue_item(track_id='t1', performer_name='bob', expect_errors=True)
-        assert response.status_code == 400
+        response = queue_manager.add_queue_item(track_id='t1', performer_name='bob', status=400)
         assert 'bob' in BeautifulSoup(response.text).find(**{'class': 'flash_message'}).text.lower()
-        response = queue_manager.add_queue_item(track_id='t1', performer_name='BoB', expect_errors=True)  # Case should not affect the duplicate
+        response = queue_manager.add_queue_item(track_id='t1', performer_name='BoB', status=400)  # Case should not affect the duplicate
 
     #response = app.put('/settings', {'karakara.queue.add.duplicate.performer_limit': '0 -> int',})
     clear_played()
@@ -442,8 +433,7 @@ def test_queue_performer_duplicate(app, queue, queue_manager, tracks, DBSession,
 def test_queue_performer_restrict(app, queue, queue_manager, tracks, DBSession, commit):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob')
     response = queue_manager.add_queue_item(track_id='t1', performer_name='Bob')  # Valid performer names should be case insensetive
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='jane', expect_errors=True)
-    assert response.status_code == 400
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='jane', status=400)
     assert 'jane' in BeautifulSoup(response.text).find(**{'class': 'flash_message'}).text.lower()
 
 
@@ -470,14 +460,13 @@ def test_queue_limit(app, queue, queue_manager, tracks):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob3')  # 180sec (1min track + 30sec padding) - by adding this track we will be at 180sec, that is now OVER 150sec, the next addition will error
 
     # Fail quque add, get priority token
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob4', expect_errors=True)
-    assert response.status_code == 400
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob4', status=400)
     cookie_priority_token = get_cookie(app, 'priority_token')
     assert cookie_priority_token.get('valid_start')
     assert cookie_priority_token.get('server_datetime')
 
     # Try queue add again and not get priority token give as we already have one
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob4', expect_errors=True)
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob4', status=400)
     #assert 'already have' in response.json['messages'][0]
     assert 'view.queue_item.add.priority_token_already_issued' in response.text
 
@@ -498,8 +487,7 @@ def test_queue_limit(app, queue, queue_manager, tracks):
 })
 def test_event_end(app, queue, queue_manager, tracks):
     response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1')
-    response = queue_manager.add_queue_item(track_id='t2', performer_name='bob2', expect_errors=True)
-    assert response.status_code == 400
+    response = queue_manager.add_queue_item(track_id='t2', performer_name='bob2', status=400)
     assert 'view.queue_item.add.event_end' in response.text
 
 
@@ -507,16 +495,13 @@ def test_event_end(app, queue, queue_manager, tracks):
     'karakara.event.start': str(now() + datetime.timedelta(minutes=0, seconds=30)),
 })
 def test_event_start(app, queue, queue_manager, tracks):
-    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1', expect_errors=True)
-    assert response.status_code == 400
+    response = queue_manager.add_queue_item(track_id='t1', performer_name='bob1', status=400)
     assert 'view.queue_item.add.event_start' in response.text
 
 
 def test_priority_tokens(app, queue):
     priority_token_url = f'/queue/{queue}/priority_tokens'
-    response = app.get(priority_token_url, expect_errors=True)
-    assert response.status_code == 403
+    response = app.get(priority_token_url, status=403)
     with admin_rights(app, queue):
         # TODO: assert priority token in list?
-        response = app.get(priority_token_url)
-        assert response.status_code == 200
+        response = app.get(priority_token_url, status=200)

@@ -1,7 +1,7 @@
 /*
  * Subscriptions: functions which take data from the outside world
  */
-import { MQTTSubscribe } from "hyperapp-mqtt";
+import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
 
 /**

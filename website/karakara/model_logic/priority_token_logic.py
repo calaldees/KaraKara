@@ -84,7 +84,7 @@ class PriorityTokenManager():
             'server_datetime': now(),  # The client datetime and server datetime may be out. we need to return the server time so the client can calculate the difference
         })
         json_cookie = json_string(priority_token_dict)
-        self.request.response.headerlist.append(('Set-Cookie', 'priority_token={0}; Path=/'.format(json_cookie)))
+        self.request.response.headerlist.append(('Set-Cookie', f'priority_token={json_cookie}; Path=/'))
         #self.request.response.set_cookie(name='priority_token', value=json_cookie, path='/', overwrite=True)  # This method butchers the json and cannot be used
 
         log.debug('priority_token issued')

@@ -35,7 +35,7 @@ class CommunityUserStore(IUserStore):
             provider=provider_token.provider,
             data=user_data,
         ))
-        #user.name = '{first_name} {last_name}'.format(**user_data)
+        #user.name = f"{user_data['first_name']} {user_data['last_name']}'
         log.debug(' - '.join(('create_user', str(provider_token), str(user_data))))
 
         DBSession.add(user)
@@ -59,6 +59,6 @@ class NullCommunityUserStore(IUserStore):
         return {
             'username': 'developer',
             'approved': True,
-            'avatar': '{0}{1}'.format(h.path.static, 'dev_avatar.png'),
+            'avatar': f'{h.path.static}dev_avatar.png',
         }
 
