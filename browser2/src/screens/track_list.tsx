@@ -7,13 +7,13 @@ import { SelectTrack } from "../actions";
 /*
  * List individual tracks
  */
-const TrackItem = ({ track }: { track: Track }) => (
+const TrackItem = ({ state, track }: { state: State, track: Track }) => (
     <li class={"track_item"} onclick={SelectTrack(track.id)}>
         <div
             class={"thumb"}
             style={{
                 "background-image":
-                    "url(" + get_attachment(track, "image") + ")",
+                    "url(" + get_attachment(state.root, track, "image") + ")",
             }}
         />
         <span class={"text track_info"}>
@@ -262,7 +262,7 @@ function show_list(state: State) {
         return (
             <ul>
                 {tracks.map((track) => (
-                    <TrackItem track={track} />
+                    <TrackItem state={state} track={track} />
                 ))}
             </ul>
         );

@@ -12,23 +12,15 @@ export function title_case(str: string): string {
 }
 
 /**
- * Find the absolute URL for an attachment when the API gives us a
- * relative URL
- */
-export function attachment_url(path: string): string {
-    return "https://karakara.org.uk/files/" + path;
-}
-
-/**
  * Looking at a Track, find the first matching attachment, or null
  * 
  * eg get_attachment(track, "preview") -> https://karakara.org.uk/files/asdfasdfa.mp4
  */
-export function get_attachment(track: Track, type: string): string | null {
+export function get_attachment(root: string, track: Track, type: string): string | null {
     for (let i = 0; i < track.attachments.length; i++) {
         let a = track.attachments[i];
         if (a.type == type) {
-            return attachment_url(a.location);
+            return root + "/files/" + a.location;
         }
     }
     return null;

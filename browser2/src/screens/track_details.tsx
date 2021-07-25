@@ -88,11 +88,11 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={get_attachment(track, "image")}
+            poster={get_attachment(state.root, track, "image")}
             durationHint={track.duration}
             controls={true}
         >
-            <source src={get_attachment(track, "preview")} type={"video/mp4"} />
+            <source src={get_attachment(state.root, track, "preview")} type={"video/mp4"} />
         </video>
 
         {/* Lyrics */}
