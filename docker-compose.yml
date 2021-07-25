@@ -79,6 +79,11 @@ services:
             - mosquitto
             - player2
             - browser2
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=karakara_default"
+            - "traefik.http.routers.karakara.rule=Host(`kk.shish.io`)"
+            - "traefik.http.routers.karakara.tls.certResolver=le"
 
     processmedia2:
         image: karakara/processmedia2
