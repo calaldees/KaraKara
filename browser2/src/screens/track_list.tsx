@@ -7,7 +7,7 @@ import { SelectTrack } from "../actions";
 /*
  * List individual tracks
  */
-const TrackItem = ({ state, track }: { state: State, track: Track }) => (
+const TrackItem = ({ state, track }: { state: State; track: Track }) => (
     <li class={"track_item"} onclick={SelectTrack(track.id)}>
         <div
             class={"thumb"}

@@ -92,7 +92,10 @@ export const TrackDetails = ({
             durationHint={track.duration}
             controls={true}
         >
-            <source src={get_attachment(state.root, track, "preview")} type={"video/mp4"} />
+            <source
+                src={get_attachment(state.root, track, "preview")}
+                type={"video/mp4"}
+            />
         </video>
 
         {/* Lyrics */}

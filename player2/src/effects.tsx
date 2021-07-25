@@ -6,7 +6,6 @@
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
 
-
 function apiRequestEffect(dispatch, props) {
     dispatch((state) => ({
         ...state,

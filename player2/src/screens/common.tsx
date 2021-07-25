@@ -36,7 +36,8 @@ export const AutoplayCountdown = ({
         <small>
             (autoplay in{" "}
             {Math.ceil(
-                state.settings["karakara.player.autoplay.seconds"] - state.progress,
+                state.settings["karakara.player.autoplay.seconds"] -
+                    state.progress,
             )}{" "}
             seconds)
         </small>

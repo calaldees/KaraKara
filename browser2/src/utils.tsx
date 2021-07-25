@@ -13,10 +13,14 @@ export function title_case(str: string): string {
 
 /**
  * Looking at a Track, find the first matching attachment, or null
- * 
+ *
  * eg get_attachment(track, "preview") -> https://karakara.org.uk/files/asdfasdfa.mp4
  */
-export function get_attachment(root: string, track: Track, type: string): string | null {
+export function get_attachment(
+    root: string,
+    track: Track,
+    type: string,
+): string | null {
     for (let i = 0; i < track.attachments.length; i++) {
         let a = track.attachments[i];
         if (a.type == type) {

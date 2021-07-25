@@ -27,7 +27,7 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
             return { ...state, connected: true };
         },
         close(state: State): Action {
-            return {...state, connected: false};
+            return { ...state, connected: false };
         },
         message(state: State, msg): Action {
             // msg = mqtt-packet
@@ -42,7 +42,7 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
             }
             console.groupEnd();
 
-            switch(topic) {
+            switch (topic) {
                 case "commands":
                     const cmd = data.trim();
                     switch (cmd) {
@@ -72,7 +72,7 @@ export function getOpenMQTTListener(state: State): [CallableFunction, any] {
                         ...state,
                         settings: {
                             ...state.settings,
-                            ...JSON.parse(data)
+                            ...JSON.parse(data),
                         },
                     };
                 case "queue":
@@ -124,7 +124,9 @@ export const KeyboardListener = Keyboard({
 export const IntervalListener = Interval({
     every: 200,
     action(state: State, timestamp): Action {
-        if (state.progress >= state.settings["karakara.player.autoplay.seconds"]) {
+        if (
+            state.progress >= state.settings["karakara.player.autoplay.seconds"]
+        ) {
             return [state, SendCommand(state, "play")];
         } else {
             return { ...state, progress: state.progress + 1 / 5 };

@@ -118,7 +118,9 @@ const QueueItemRender = ({
             class={"thumb"}
             style={{
                 "background-image":
-                    "url(" + get_attachment(state.root, item.track, "image") + ")",
+                    "url(" +
+                    get_attachment(state.root, item.track, "image") +
+                    ")",
             }}
         />
         <span class={"text queue_info"}>
