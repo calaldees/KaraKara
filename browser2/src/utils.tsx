@@ -14,7 +14,7 @@ export function title_case(str: string): string {
 /**
  * Looking at a Track, find the first matching attachment, or null
  *
- * eg get_attachment(track, "preview") -> https://karakara.org.uk/files/asdfasdfa.mp4
+ * eg get_attachment(track, "preview") -> https://karakara.uk/files/asdfasdfa.mp4
  */
 export function get_attachment(
     root: string,

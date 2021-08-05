@@ -25,7 +25,6 @@ api.search.max_age = 3600 -> int
 
 server.gzip         = False -> bool
 server.etag.enabled = True -> bool
-server.url          = http://www.karakara.org.uk/
 
 sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@postgres/karakara
 

@@ -190,7 +190,7 @@ def main(global_config, **settings):
     # Firefox Persona (Deprecated technology but a useful reference)
     #if 'persona' in login_providers:
     #    social_login.add_login_provider(PersonaLogin(
-    #        site_url=config.registry.settings.get('server.url')
+    #        site_url=$HOSTNAME
     #    ))
     # No login provider
     if not login_providers and config.registry.settings.get('karakara.server.mode') != 'test':

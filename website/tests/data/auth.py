@@ -13,7 +13,7 @@ def users(request):
 
     user = CommunityUser()
     user.name = 'TestUser'
-    user.email = 'tester@karakara.org.uk'
+    user.email = 'tester@karakara.uk'
     user.approved = True
     token = SocialToken()
     token.token = 'abcdefg'
@@ -25,7 +25,7 @@ def users(request):
 
     user = CommunityUser()
     user.name = 'UnknownUser'
-    user.email = 'unknown@karakara.org.uk'
+    user.email = 'unknown@karakara.uk'
     user.approved = False
     token = SocialToken()
     token.token = '1234567'

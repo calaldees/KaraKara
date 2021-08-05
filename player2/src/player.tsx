@@ -10,12 +10,12 @@ import {
     KeyboardListener,
 } from "./subs";
 
-// If we're running stand-alone, then use the main karakara.org.uk
+// If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
 // in which case we should use server we were loaded from.
 const auto_root =
     window.location.pathname == "/"
-        ? "https://karakara.org.uk"
+        ? "https://karakara.uk"
         : window.location.protocol + "//" + window.location.host;
 
 const state: State = {

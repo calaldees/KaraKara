@@ -1,7 +1,7 @@
 KaraKara
 ========
 
-Karaoke Event System - hosted at [karakara.org.uk](http://karakara.org.uk/)
+Karaoke Event System - hosted at [karakara.uk](http://karakara.uk/)
 
 * Run small events in your livingroom or big events with multiple karaoke rooms
 * Attendees view and queue tracks from their mobile phones
@@ -13,7 +13,7 @@ Overview of a karaoke event
 
 A projector is fired up in a dimly lit room and a microphone stands ready on the mic stand. The PA is buzzing lightly. The attendees slowly enter the room. But this time is different. They look at the familiar paper printed list of tracks on the tables but also notice signs on the walls and a title-sheet that says *use your mobile*. Some continue to peruse the paper printouts while others are greeted with a mobile / tablet / laptop web interface to browse, search, see preview videos of tracks, lists of lyrics, see the current queued tracks with estimated times. Queue a track themselves. Pass the device to a friend to browse and queue a track under a different name.
 
-A laptop at the front is connected to the projector. It is running a karakara.org.uk with a pre-processed tagged dataset of tracks in various formats.
+A laptop at the front is connected to the projector. It is running a karakara.uk with a pre-processed tagged dataset of tracks in various formats.
 
 Admins can walk around the room, remotely controlling when tracks are played fullscreen, re-ordering tracks, viewing feedback from attendees. Yet a desk at the front is still taking face to face song requests.
 

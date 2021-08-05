@@ -1,6 +1,6 @@
 Booth-in-a-Box Setup
 ====================
-Using as a thin-client for karakara.org.uk
+Using as a thin-client for karakara.uk
 
 Parts:
 
@@ -23,5 +23,7 @@ One-time steps:
 Each-time steps:
 
 * Open one chrome window, get admin cookie by logging in to [admin console]()
-* Open up [player2](https://karakara.org.uk/player2/#queue_id=MY_QUEUE), fullscreen it on the projector
-* Open up [browser2](https://karakara.org.uk/), fullscreen it on the touchscreen
+* Open up [player2](https://karakara.uk/player2/) on the projector,
+  double-click title to set room / password / fulscreen
+* Open up [browser2](https://karakara.uk/browser2/) touchscreen,
+  double-click title to set room / password / fulscreen

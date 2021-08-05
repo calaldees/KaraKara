@@ -5,10 +5,10 @@ backend of many, you can use a config like this:
 ```
 server {
 	listen 0.0.0.0:80;
-	server_name  karakara.org.uk www.karakara.org.uk;
-	access_log  /data/sites/karakara.org.uk/logs/access.log;
-	error_log   /data/sites/karakara.org.uk/logs/error.log;
-	root /data/sites/karakara.org.uk/htdocs/;
+	server_name  karakara.uk www.karakara.uk;
+	access_log  /data/sites/karakara.uk/logs/access.log;
+	error_log   /data/sites/karakara.uk/logs/error.log;
+	root /data/sites/karakara.uk/htdocs/;
 
 	location / {
 		include proxy_params;
