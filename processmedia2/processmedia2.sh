@@ -16,7 +16,7 @@ function run() {
     fi
 }
 
-while [ "${KARAKARA_PROCESSMEDIA2_ENABLED:-true}" == "true" ]; do
+while true ; do
     touch data/.heartbeat || true
     run || true
     touch data/.heartbeat || true

@@ -84,6 +84,8 @@ services:
 
     processmedia2:
         image: karakara/processmedia2
+        profiles:
+            - processmedia
         build:
             context: ./processmedia2
         links:
@@ -97,7 +99,6 @@ services:
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw
         environment:
-            KARAKARA_PROCESSMEDIA2_ENABLED: ${KARAKARA_PROCESSMEDIA2_ENABLED:-true}
             KARAKARA_RESCAN_INTERVAL_SECONDS: 600
             KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
             KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
