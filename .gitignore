@@ -12,6 +12,7 @@
 *.pid
 
 **/*.cache
+**/.parcel-cache
 **/~
 hash_cache.pickle
 
