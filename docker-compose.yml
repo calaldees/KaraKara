@@ -67,8 +67,6 @@ services:
         image: karakara/nginx
         build:
             context: ./nginx
-        env_file:
-            - .env
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
