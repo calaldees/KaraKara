@@ -79,7 +79,6 @@ services:
             - browser2
         labels:
             - "traefik.enable=true"
-            - "traefik.docker.network=karakara_default"
             - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
 
     processmedia2:
