@@ -1,5 +1,5 @@
 data/
-**.egg-info/
+**/*.egg-info/
 **/*.py[co]
 **/__pycache__
 .cache
