@@ -7,6 +7,24 @@ volumes:
     mosquitto_data:
 
 services:
+    nginx:
+        image: karakara/nginx
+        build:
+            context: ./nginx
+        ports:
+            - "127.0.0.1:${PORT_NGINX}:80"
+        volumes:
+            - logs:/logs
+            - ${PATH_HOST_processed}:/media/processed:ro
+        links:
+            - website
+            - mosquitto
+            - player2
+            - browser2
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
+
     website:
         image: karakara/website
         build:
@@ -62,24 +80,6 @@ services:
 
     redis:
         image: redis
-
-    nginx:
-        image: karakara/nginx
-        build:
-            context: ./nginx
-        ports:
-            - "127.0.0.1:${PORT_NGINX}:80"
-        volumes:
-            - logs:/logs
-            - ${PATH_HOST_processed}:/media/processed:ro
-        links:
-            - website
-            - mosquitto
-            - player2
-            - browser2
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
 
     processmedia2:
         image: karakara/processmedia2
