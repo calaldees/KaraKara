@@ -1,8 +1,9 @@
 import h from "hyperapp-jsx-pragma";
 
-function _lineStyle(item, state: State) {
+function _lineStyle(item: SrtLine, state: State) {
     // show subs a little faster, to counteract podium lag
     const ts = state.progress + state.settings["karakara.podium.soft_sub_lag"];
+
     if (!state.playing) return "future";
     if (item.text === "-") return "past";
     if (item.start < ts && item.end > ts) return "present";
@@ -10,13 +11,21 @@ function _lineStyle(item, state: State) {
     if (item.start > ts) return "future";
 }
 
+function _lyricStyle(lyrics: Array<SrtLine>) {
+    // TODO: check current lyric alignment instead of first lyric?
+    if(lyrics && lyrics.length && lyrics[0].text.startsWith("{\\a6}")) {
+        return "top lyrics";
+    }
+    return "bottom lyrics";
+}
+
 export const Lyrics = ({ state }: { state: State }) => (
-    <div class={"lyrics"}>
+    <div class={_lyricStyle(state.queue[0].track.lyrics)}>
         <ol>
             {state.queue[0].track.lyrics &&
                 state.queue[0].track.lyrics.map((item) => (
                     <li key={item.id} class={_lineStyle(item, state)}>
-                        <span>{item.text}</span>
+                        <span>{item.text.replace("{\\a6}", "")}</span>
                     </li>
                 ))}
         </ol>

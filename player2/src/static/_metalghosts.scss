@@ -401,9 +401,14 @@ $LIGHT: #29EDF2;
 			100% {left: 5vw;}
 		}
 
+		.lyrics.top OL {
+			top: 7vh;
+		}
+		.lyrics.bottom OL {
+			bottom: 7vh;
+		}
 		.lyrics OL {
 			position: absolute;
-			bottom: 7vh;
 			font-size: 7vh;
 			width: 100%;
 			LI {text-align: center; display: none;}
