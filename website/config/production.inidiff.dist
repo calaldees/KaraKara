@@ -6,17 +6,6 @@ karakara.server.mode = production
 
 karakara.player.title = KaraKara (Beta)
 
-#karakara.queue.group.split_markers = [0:15:00, 0:30:00] -> timedelta
-#karakara.queue.track.padding       = 0:00:60 -> timedelta
-#karakara.queue.add.limit                     = 0:25:00 -> timedelta
-#karakara.queue.add.limit.priority_token      = 0:45:00 -> timedelta
-#karakara.queue.add.limit.priority_window     = 0:03:00 -> timedelta
-#karakara.queue.add.duplicate.track_limit     = 1       -> int
-#karakara.queue.add.duplicate.performer_limit = 1       -> int
-#karakara.queue.add.duplicate.time_limit      = 1:00:00 -> timedelta
-#
-#karakara.template.input.performer_name = Enter your badge name
-
 karakara.template.title = KaraKara (Beta)
 
 static.processmedia2.log = /logs/processmedia2-app.log
@@ -28,13 +17,10 @@ server.etag.enabled = True -> bool
 
 sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@postgres/karakara
 
-session.secret   = change_me
-
+session.secret = change_me
 
 cache.backend = dogpile.cache.redis
-cache.backend.arguments = {}
-
-
+cache.backend.arguments = {"host": "redis", "port": 6379} -> json
 
 [logger_root]
 level = INFO

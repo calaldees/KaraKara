@@ -31,17 +31,6 @@ services:
             context: ./website
         env_file:
             - .env
-        environment:
-            STATIC_PROCESSMEDIA2_LOG: /logs/processmedia2-app.log
-            SQLALCHEMY_URL: postgresql+pypostgresql://karakara:karakara@postgres/karakara
-            CACHE_BACKEND: dogpile.cache.redis
-            CACHE_BACKEND_ARGUMENTS: '{"host": "redis", "port": 6379} -> json'
-            STATIC_PATH_SOURCE: /media/source
-            STATIC_PATH_META: /media/meta
-            #STATIC_PATH_PROCESSED: /media/processed
-            #SESSION_SECRET: change_me
-            KARAKARA_CONTAINER_NAME_postgres: 'postgres'
-            KARAKARA_WEBSOCKET_HOST: 'mosquitto'
         links:
             - postgres
             - redis
@@ -50,7 +39,6 @@ services:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:/media/meta:ro
-            - ${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:${LOGIN_GOOGLE_CLIENT_SECRET_FILE}:ro
 
     mosquitto:
         image: karakara/mosquitto
@@ -73,8 +61,6 @@ services:
         image: karakara/postgres
         build:
             context: ./postgres
-        environment:
-            POSTGRES_PASSWORD: password
         volumes:
             - website_db:/var/lib/postgresql/data
 
@@ -97,11 +83,6 @@ services:
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw
-        environment:
-            KARAKARA_RESCAN_INTERVAL_SECONDS: 600
-            KARAKARA_PROCESSMEDIA2_CONFIG: config.docker.json
-            KARAKARA_PROCESSMEDIA2_CLEANUP: 'false'
-            KARAKARA_CONTAINER_NAME_website: 'website'
 
         # Force import
         #docker-compose exec processmedia2 /bin/bash

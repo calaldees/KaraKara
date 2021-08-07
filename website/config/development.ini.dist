@@ -33,7 +33,7 @@ karakara.search.view.config = /appdata/config/search_config.json
 
 # Community ---------------------------------------------------------------------
 
-community.title = KaraKara.org.uk
+community.title = KaraKara.uk
 
 upload.route.uploaded = /uploaded/
 upload.path = data/upload/
@@ -49,9 +49,9 @@ static.assets = karakara/static
 # TODO: Remove `/appdata/` hard-code
 static.externals = /appdata/externals/static
 
-static.path.source = 
-static.path.meta = 
-static.path.processed = 
+static.path.source = /media/source
+static.path.meta = /media/meta
+static.path.processed = /media/processed
 static.processmedia2.log = ../processmedia2/logs/processmedia.log
 static.backup = data/backup
 
@@ -81,7 +81,7 @@ login.facebook.secret =
 login.facebook.permissions = public_profile
 
 login.google.clientid =
-login.google.client_secret_file =
+login.google.client_secret =
 
 login.provider.enabled = []
 

@@ -8,7 +8,7 @@
     "path_meta": "/media/meta",
     "path_processed": "/media/processed",
 
-    "api_host": "{KARAKARA_CONTAINER_NAME_website}:6543",
+    "api_host": "website:6543",
 
     "process_order_function": "random",
     "disable_meta_write_safety": true
