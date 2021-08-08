@@ -13,7 +13,7 @@ function _lineStyle(item: SrtLine, state: State) {
 
 function _lyricStyle(lyrics: Array<SrtLine>) {
     // TODO: check current lyric alignment instead of first lyric?
-    if(lyrics && lyrics.length && lyrics[0].text.startsWith("{\\a6}")) {
+    if (lyrics && lyrics.length && lyrics[0].text.startsWith("{\\a6}")) {
         return "top lyrics";
     }
     return "bottom lyrics";
