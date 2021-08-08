@@ -105,7 +105,7 @@ export const TrackDetails = ({
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
                 {track.lyrics.map((item) => (
-                    <div>{item.text.replace("{\\a6}", "")}</div>
+                    <div>{item.text.replace(/^\{.*?\}/, "")}</div>
                 ))}
             </div>
         )}

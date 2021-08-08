@@ -25,7 +25,7 @@ export const Lyrics = ({ state }: { state: State }) => (
             {state.queue[0].track.lyrics &&
                 state.queue[0].track.lyrics.map((item) => (
                     <li key={item.id} class={_lineStyle(item, state)}>
-                        <span>{item.text.replace("{\\a6}", "")}</span>
+                        <span>{item.text.replace(/^\{.*?\}/, "")}</span>
                     </li>
                 ))}
         </ol>

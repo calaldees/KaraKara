@@ -71,7 +71,7 @@ export const Queue = ({ state }: { state: State }) => (
                         <li>
                             <span class={"lyrics"}>
                                 {state.queue[0].track.lyrics.map((line) => (
-                                    <div>{line.text}</div>
+                                    <div>{line.text.replace(/^\{.*?\}/, "")}</div>
                                 ))}
                             </span>
                         </li>
