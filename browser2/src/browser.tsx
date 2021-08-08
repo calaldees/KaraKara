@@ -31,7 +31,7 @@ let state: State = {
     download_size: null,
     download_done: 0,
     booth: false,
-    widescreen: true,
+    widescreen: false,
 
     // login
     session_id: null,
