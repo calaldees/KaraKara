@@ -35,6 +35,28 @@ BODY {
   font-family: arial, sans-serif;
   user-select: none;
 }
+.widescreen {
+  background: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  MAIN:nth-child(1) {
+    position: relative;
+    flex: 0 0 50%;
+    border-right: 2px solid black;
+    .notification {
+      display: none;
+    }
+  }
+  MAIN:nth-child(2) {
+    position: relative;
+    flex: 0 0 50%;
+    border-left: 2px solid black;
+  }  
+}
 MAIN {
   position: fixed;
   top: 0;

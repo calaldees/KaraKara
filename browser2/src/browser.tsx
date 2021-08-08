@@ -31,6 +31,7 @@ let state: State = {
     download_size: null,
     download_done: 0,
     booth: false,
+    widescreen: true,
 
     // login
     session_id: null,
@@ -88,7 +89,7 @@ app({
         HashStateManager(
             {
                 push: ["root", "filters", "track_id"],
-                replace: ["room_name_edit", "search", "booth"],
+                replace: ["room_name_edit", "search", "booth", "widescreen"],
             },
             state,
         ),

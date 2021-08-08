@@ -86,6 +86,7 @@ type State = {
     download_size: number | null,
     download_done: number,
     booth: boolean,
+    widescreen: boolean,
 
     // login
     session_id: string | null,

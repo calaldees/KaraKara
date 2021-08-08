@@ -172,7 +172,7 @@ export const Control = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"queue"}
-        navLeft={<BackToExplore />}
+        navLeft={!state.widescreen && <BackToExplore />}
         title={"Remote Control"}
         // navRight={}
         footer={<ControlButtons state={state} />}

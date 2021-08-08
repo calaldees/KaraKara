@@ -55,7 +55,7 @@ export const Queue = ({ state }: { state: State }) => (
     <Screen
         state={state}
         className={"queue"}
-        navLeft={<BackToExplore />}
+        navLeft={!state.widescreen && <BackToExplore />}
         title={"Now Playing"}
         // navRight={}
     >

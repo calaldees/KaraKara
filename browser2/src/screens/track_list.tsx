@@ -393,17 +393,24 @@ export const TrackList = ({ state }: { state: State }) => (
         state={state}
         className={"track_list"}
         navLeft={
-            <a onclick={back}>
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
-            </a>
+            !state.widescreen && (
+                <a onclick={back}>
+                    <i class={"fas fa-2x fa-chevron-circle-left"} />
+                </a>
+            )
         }
         title={"Explore Tracks"}
         navRight={
-            <a onclick={GoToScreen("queue")}>
-                <i class={"fas fa-2x fa-list-ol"} />
-            </a>
+            !state.widescreen && (
+                <a onclick={GoToScreen("queue")}>
+                    <i class={"fas fa-2x fa-list-ol"} />
+                </a>
+            )
         }
-        footer={state.room_password && !state.booth && <AdminButtons state={state} />}
+        footer={
+            state.room_password &&
+            !state.booth && <AdminButtons state={state} />
+        }
     >
         {/* Full-text search */}
         <input

@@ -10,6 +10,16 @@ import { PrintableList } from "./printable_list";
 import { RoomSettings } from "./room_settings";
 import { PriorityTokens } from "./priority_tokens";
 
+export const QueueOrControl = ({ state }: { state: State }) =>
+    state.room_password ? <Control state={state} /> : <Queue state={state} />;
+
+export const Explore = ({ state }: { state: State }) =>
+    state.track_id ? (
+        <TrackDetails state={state} track={state.track_list[state.track_id]} />
+    ) : (
+        <TrackList state={state} />
+    );
+
 export function Root(state: State) {
     let body = null;
     // room_name can be set from saved state, but then track_list will be empty,
@@ -17,30 +27,30 @@ export function Root(state: State) {
     // track list on-demand somehow?)
     if (state.room_name === "" || Object.keys(state.track_list).length === 0) {
         body = <Login state={state} />;
-    } else if (state.screen == "explore") {
-        if (state.track_id) {
-            body = (
-                <TrackDetails
-                    state={state}
-                    track={state.track_list[state.track_id]}
-                />
-            );
-        } else {
-            body = <TrackList state={state} />;
-        }
-    } else if (state.screen == "queue") {
-        if (state.room_password) {
-            body = <Control state={state} />;
-        }
-        else {
-            body = <Queue state={state} />;
-        }
     } else if (state.screen == "printable_list") {
         body = <PrintableList state={state} />;
-    } else if (state.screen == "room_settings") {
-        body = <RoomSettings state={state} />;
-    } else if (state.screen == "priority_tokens") {
-        body = <PriorityTokens state={state} />;
+    } else {
+        let active_screen = null;
+        if (state.screen == "explore") {
+            active_screen = <Explore state={state} />;
+        } else if (state.screen == "queue") {
+            active_screen = <QueueOrControl state={state} />;
+        } else if (state.screen == "room_settings") {
+            active_screen = <RoomSettings state={state} />;
+        } else if (state.screen == "priority_tokens") {
+            active_screen = <PriorityTokens state={state} />;
+        }
+
+        if (state.widescreen) {
+            body = (
+                <div class={"widescreen"}>
+                    <QueueOrControl state={state} />
+                    {active_screen}
+                </div>
+            );
+        } else {
+            body = active_screen;
+        }
     }
     return (
         <body>

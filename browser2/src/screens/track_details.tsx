@@ -78,9 +78,11 @@ export const TrackDetails = ({
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a onclick={GoToScreen("queue")}>
-                <i class={"fas fa-2x fa-list-ol"} />
-            </a>
+            !state.widescreen && (
+                <a onclick={GoToScreen("queue")}>
+                    <i class={"fas fa-2x fa-list-ol"} />
+                </a>
+            )
         }
         footer={get_buttons(state, track)}
     >
