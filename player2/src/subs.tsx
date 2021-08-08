@@ -17,7 +17,11 @@ import { http2ws } from "./utils";
  * Connect to the MQTT server, listen for queue / settings state updates,
  * and react to commands on the command channel
  */
-export function getOpenMQTTListener(state: State): [CallableFunction, any] {
+export function getOpenMQTTListener(state: State): [CallableFunction, any] | null {
+    if (!state.room_name) {
+        return null;
+    }
+
     return MQTTSubscribe({
         url: http2ws(state.root) + "/mqtt",
         username: state.room_name,

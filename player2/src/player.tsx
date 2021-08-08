@@ -22,8 +22,8 @@ const state: State = {
     // global persistent
     root: auto_root,
     root_edit: auto_root,
-    room_name: "demo",
-    room_name_edit: "demo",
+    room_name: "",
+    room_name_edit: "",
     room_password: "",
     room_password_edit: "",
     podium: false,
@@ -79,7 +79,7 @@ function subscriptions(state: State) {
 }
 
 app({
-    init: [state, FetchRandomImages(state)],
+    init: [state, state.room_name && FetchRandomImages(state)],
     view: Root,
     subscriptions: subscriptions,
     node: document.body,

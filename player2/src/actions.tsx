@@ -6,6 +6,10 @@
 import { SetTrackState } from "./effects";
 
 // App controls
+export function SetRoom(state: State, room: string): Action {
+    return { ...state, room_name: room };
+}
+
 export function SetPreviewVolume(state: State, event): Action {
     event.target.volume =
         state.settings["karakara.player.video.preview_volume"];
