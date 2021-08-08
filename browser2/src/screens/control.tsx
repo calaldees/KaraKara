@@ -242,7 +242,11 @@ export const Control = ({ state }: { state: State }): VNode => (
         className={"queue"}
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Remote Control"}
-        // navRight={}
+        navRight={
+            <div class={"cast-button"}>
+                <google-cast-launcher></google-cast-launcher>
+            </div>
+        }
         footer={<ControlButtons state={state} />}
     >
         {state.queue.length == 0 ? (

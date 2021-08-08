@@ -3,6 +3,7 @@
  */
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
+import { ChromecastSender, LoadMedia } from "./cc_sender";
 
 /**
  * Connect to the MQTT server, listen for updates to queue / settings
@@ -76,3 +77,37 @@ function _resizeSubscriber(dispatch, props) {
 export function ResizeListener(callback: Dispatchable): Subscription {
     return [_resizeSubscriber, { onresize: callback }];
 }
+
+export const ChromecastListener = ChromecastSender({
+    receiverApplicationId: "05C10F57",
+    onCastStateChanged(state: State, event) {
+        console.log("Cast state changed:", event);
+        return state;
+    },
+    onSessionStateChanged(state: State, event) {
+        console.log("Session state changed:", event);
+        switch (event.sessionState) {
+            case cast.framework.SessionState.SESSION_STARTED:
+                if (state.room_name) {
+                    return [
+                        { ...state, casting: true },
+                        LoadMedia({
+                            contentId: state.room_name,
+                            contentType: "karakara/room",
+                            credentials: state.room_password,
+                        }),
+                    ];
+                }
+                return { ...state, casting: true };
+            case cast.framework.SessionState.SESSION_RESUMED:
+                // TODO: if we log into a room while state.casting=true,
+                // then send a LoadMedia
+                return { ...state, casting: true };
+            case cast.framework.SessionState.SESSION_ENDED:
+                return { ...state, casting: false };
+                break;
+            default:
+                return state;
+        }
+    },
+});

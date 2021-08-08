@@ -394,6 +394,7 @@ const GoToPriorityTokens = (state: State): Dispatchable => [
                       },
                       PushScrollPos(),
                   ]
+
                 : {
                       ...state,
                       priority_tokens: [],

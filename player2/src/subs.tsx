@@ -12,6 +12,7 @@ import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
+import { ChromecastReceiver } from "./cc_receiver";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -174,3 +175,17 @@ function _friSubscriber(dispatch, props) {
 export function FetchRandomImages(room_name: string): Subscription {
     return [_friSubscriber, { room: room_name }];
 }
+
+export const ChromecastListener = ChromecastReceiver({
+        onMessageLoad: function (state, data): State {
+            if (data.media.contentType == "karakara/room") {
+                const context = cast.framework.CastReceiverContext.getInstance();
+                let parts = data.media.contentId.split(":");
+                context.setApplicationState("Playing room: " + parts[0]);
+                return {...state, room_name: parts[0], room_password: parts[1] };    
+            }
+            console.log("Chromecast sender gave an unknown media type: " + data.media.contentType);
+            return state;
+        },
+
+});

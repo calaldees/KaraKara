@@ -77,12 +77,16 @@ MAIN {
     background-color: $BG_DARK;
     border-bottom: 1px solid $BORDER;
     padding: 0 5%;
-    A {
+    A, .cast-button {
       display: block;
       flex: 0 0 auto;
       width: 2em;
       height: 2em;
     }
+    google-cast-launcher {
+      --disconnected-color: black;
+      --connected-color: blue;
+    }        
     H1 {
       width: 100%;
       font-size: 1.5em;

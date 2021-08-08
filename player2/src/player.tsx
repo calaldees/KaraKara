@@ -9,7 +9,9 @@ import {
     IntervalListener,
     KeyboardListener,
     FetchRandomImages,
+    ChromecastListener,
 } from "./subs";
+import { ChromecastReceiver } from "./cc_receiver";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -76,6 +78,7 @@ const subscriptions = (state: State) => [
         state.settings["karakara.player.autoplay.seconds"] !== 0 &&
         IntervalListener,
     FetchRandomImages(state.room_name),
+	window.location.search.includes("chromecast=true") && ChromecastListener,
 ];
 
 let dispatch = app({

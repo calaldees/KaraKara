@@ -88,6 +88,7 @@ type State = {
     booth: boolean,
     widescreen: boolean,
     scroll_stack: Array<number>,
+    casting: boolean,
 
     // login
     session_id: string | null,

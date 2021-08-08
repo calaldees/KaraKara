@@ -8,7 +8,8 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { getMQTTListener, ResizeListener } from "./subs";
+import { getMQTTListener, ResizeListener, ChromecastListener } from "./subs";
+import { isCastAvailable } from "./cc_sender";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -38,6 +39,7 @@ let state: State = {
     booth: false,
     widescreen: isWidescreen(),
     scroll_stack: [],
+    casting: false,
 
     // login
     session_id: null,
@@ -89,6 +91,7 @@ const subscriptions = (state: State): Array<Subscription> => [
         ...state,
         widescreen: isWidescreen(),
     })),
+    isCastAvailable() && ChromecastListener,
 ];
 
 let dispatch = app({
