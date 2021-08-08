@@ -2,7 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
 import { ApiRequest } from "../effects";
-import { SelectTrack } from "../actions";
+import { GoToScreen, SelectTrack } from "../actions";
 
 /*
  * List individual tracks
@@ -399,12 +399,7 @@ export const TrackList = ({ state }: { state: State }) => (
         }
         title={"Explore Tracks"}
         navRight={
-            <a
-                onclick={(state) => ({
-                    ...state,
-                    screen: state.room_password ? "control" : "queue",
-                })}
-            >
+            <a onclick={GoToScreen("queue")}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }

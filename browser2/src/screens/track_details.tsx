@@ -78,7 +78,7 @@ export const TrackDetails = ({
         }
         title={title_case(track.tags["title"][0])}
         navRight={
-            <a onclick={GoToScreen(state.room_password ? "control" : "queue")}>
+            <a onclick={GoToScreen("queue")}>
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }

@@ -28,10 +28,13 @@ export function Root(state: State) {
         } else {
             body = <TrackList state={state} />;
         }
-    } else if (state.screen == "control") {
-        body = <Control state={state} />;
     } else if (state.screen == "queue") {
-        body = <Queue state={state} />;
+        if (state.room_password) {
+            body = <Control state={state} />;
+        }
+        else {
+            body = <Queue state={state} />;
+        }
     } else if (state.screen == "printable_list") {
         body = <PrintableList state={state} />;
     } else if (state.screen == "room_settings") {
