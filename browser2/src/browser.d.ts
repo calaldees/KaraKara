@@ -1,5 +1,4 @@
 declare module '*.jpg';
-declare module 'hyperapp';
 
 declare module "*.json" {
     const value: any;
