@@ -7,7 +7,7 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { getMQTTListener } from "./subs";
+import { getMQTTListener, ResizeListener } from "./subs";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -31,7 +31,7 @@ let state: State = {
     download_size: null,
     download_done: 0,
     booth: false,
-    widescreen: false,
+    widescreen: window.innerWidth > window.innerHeight,
 
     // login
     session_id: null,
@@ -97,6 +97,7 @@ app({
         LocalStorageSaver("performer_name", state.performer_name),
         LocalStorageSaver("room_password", state.room_password),
         LocalStorageSaver("bookmarks", state.bookmarks),
+        ResizeListener((state, event) => ({...state, widescreen: window.innerWidth > window.innerHeight})),
     ],
     node: document.body,
 });

@@ -90,21 +90,6 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     </td>
                 </tr>
                 <tr>
-                    <td>Widescreen</td>
-                    <td>
-                        <input
-                            checked={state.widescreen}
-                            type={"checkbox"}
-                            onchange={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    widescreen: !state.widescreen,
-                                } as State)
-                            }
-                        />
-                    </td>
-                </tr>
-                <tr>
                     <td colspan={2}>
                         <button onclick={HideSettings()}>Close</button>
                     </td>
