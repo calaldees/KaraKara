@@ -326,7 +326,7 @@ function show_bookmarks(state: State) {
                 <h2>Bookmarks</h2>
                 <ul>
                     {state.bookmarks.map((bm) => (
-                        <TrackItem track={state.track_list[bm]} />
+                        <TrackItem state={state} track={state.track_list[bm]} />
                     ))}
                 </ul>
             </div>
