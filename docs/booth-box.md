@@ -22,8 +22,7 @@ One-time steps:
 
 Each-time steps:
 
-* Open one chrome window, get admin cookie by logging in to [admin console]()
 * Open up [player2](https://karakara.uk/player2/) on the projector,
-  double-click title to set room / password / fulscreen
+  double-click title to set room / password / fullscreen
 * Open up [browser2](https://karakara.uk/browser2/) touchscreen,
-  double-click title to set room / password / fulscreen
+  double-click title to set room / password / fullscreen
