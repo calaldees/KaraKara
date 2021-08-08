@@ -75,6 +75,21 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     </td>
                 </tr>
                 <tr>
+                    <td>Booth Mode</td>
+                    <td>
+                        <input
+                            checked={state.booth}
+                            type={"checkbox"}
+                            onchange={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    booth: !state.booth,
+                                } as State)
+                            }
+                        />
+                    </td>
+                </tr>
+                <tr>
                     <td colspan={2}>
                         <button onclick={HideSettings()}>Close</button>
                     </td>

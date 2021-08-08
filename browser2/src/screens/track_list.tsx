@@ -408,7 +408,7 @@ export const TrackList = ({ state }: { state: State }) => (
                 <i class={"fas fa-2x fa-list-ol"} />
             </a>
         }
-        footer={state.room_password && <AdminButtons state={state} />}
+        footer={state.room_password && !state.booth && <AdminButtons state={state} />}
     >
         {/* Full-text search */}
         <input
