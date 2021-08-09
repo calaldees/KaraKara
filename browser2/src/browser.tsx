@@ -101,7 +101,10 @@ app({
         LocalStorageSaver("performer_name", state.performer_name),
         LocalStorageSaver("room_password", state.room_password),
         LocalStorageSaver("bookmarks", state.bookmarks),
-        ResizeListener((state, event) => ({...state, widescreen: isWidescreen()})),
+        ResizeListener((state, event) => ({
+            ...state,
+            widescreen: isWidescreen(),
+        })),
     ],
     node: document.body,
 });

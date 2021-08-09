@@ -9,13 +9,16 @@ import { GoToScreen, SelectTrack } from "../actions";
  */
 const TrackItem = ({ state, track }: { state: State; track: Track }) => (
     <li class={"track_item"} onclick={SelectTrack(track.id)}>
-        <div
-            class={"thumb"}
-            style={{
-                "background-image":
-                    "url(" + get_attachment(state.root, track, "image") + ")",
-            }}
-        />
+        <div class={"thumb"}>
+            <div
+                style={{
+                    "background-image":
+                        "url(" +
+                        get_attachment(state.root, track, "image") +
+                        ")",
+                }}
+            />
+        </div>
         <span class={"text track_info"}>
             <span class={"from"}>
                 {title_case((track.tags["from"] || track.tags["artist"])[0])}

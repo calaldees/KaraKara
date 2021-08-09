@@ -114,15 +114,16 @@ const QueueItemRender = ({
         ondragover={createDragOver(item.id)}
         ondrop={createDrop(item.id)}
     >
-        <span
-            class={"thumb"}
-            style={{
-                "background-image":
-                    "url(" +
-                    get_attachment(state.root, item.track, "image") +
-                    ")",
-            }}
-        />
+        <span class={"thumb"}>
+            <div
+                style={{
+                    "background-image":
+                        "url(" +
+                        get_attachment(state.root, item.track, "image") +
+                        ")",
+                }}
+            />
+        </span>
         <span class={"text queue_info"}>
             <span class={"title"}>
                 {title_case(item.track.tags["title"][0])}

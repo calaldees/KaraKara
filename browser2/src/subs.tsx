@@ -64,13 +64,16 @@ export function getMQTTListener(state: State): [CallableFunction, any] {
 }
 
 export function ResizeListener(callback) {
-    return [function(dispatch, props) {
-        function handler(event) {
-            dispatch(callback, event);
-        }
-        window.addEventListener("resize", handler);
-        return function() {
-            window.removeEventListener("resize", handler);
-        }
-    }, {onresize: callback}];
+    return [
+        function (dispatch, props) {
+            function handler(event) {
+                dispatch(callback, event);
+            }
+            window.addEventListener("resize", handler);
+            return function () {
+                window.removeEventListener("resize", handler);
+            };
+        },
+        { onresize: callback },
+    ];
 }

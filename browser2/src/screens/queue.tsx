@@ -17,15 +17,16 @@ const QueueItemRender = ({
                 : "queue_item"
         }
     >
-        <span
-            class={"thumb"}
-            style={{
-                "background-image":
-                    "url(" +
-                    get_attachment(state.root, item.track, "image") +
-                    ")",
-            }}
-        />
+        <span class={"thumb"}>
+            <div
+                style={{
+                    "background-image":
+                        "url(" +
+                        get_attachment(state.root, item.track, "image") +
+                        ")",
+                }}
+            />
+        </span>
         <span class={"text queue_info"}>
             <span class={"title"}>
                 {title_case(item.track.tags["title"][0])}
@@ -71,7 +72,9 @@ export const Queue = ({ state }: { state: State }) => (
                         <li>
                             <span class={"lyrics"}>
                                 {state.queue[0].track.lyrics.map((line) => (
-                                    <div>{line.text.replace(/^\{.*?\}/, "")}</div>
+                                    <div>
+                                        {line.text.replace(/^\{.*?\}/, "")}
+                                    </div>
                                 ))}
                             </span>
                         </li>
