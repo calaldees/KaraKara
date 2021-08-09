@@ -17,6 +17,10 @@ const auto_root =
         ? "https://karakara.uk"
         : window.location.protocol + "//" + window.location.host;
 
+function isWidescreen() {
+    return window.innerWidth > 780 && window.innerWidth > window.innerHeight;
+}
+
 let state: State = {
     // bump this each time the schema changes to
     // invalidate anybody's saved state
@@ -31,7 +35,7 @@ let state: State = {
     download_size: null,
     download_done: 0,
     booth: false,
-    widescreen: window.innerWidth > window.innerHeight,
+    widescreen: isWidescreen(),
 
     // login
     session_id: null,
@@ -97,7 +101,7 @@ app({
         LocalStorageSaver("performer_name", state.performer_name),
         LocalStorageSaver("room_password", state.room_password),
         LocalStorageSaver("bookmarks", state.bookmarks),
-        ResizeListener((state, event) => ({...state, widescreen: window.innerWidth > window.innerHeight})),
+        ResizeListener((state, event) => ({...state, widescreen: isWidescreen()})),
     ],
     node: document.body,
 });
