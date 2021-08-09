@@ -12,6 +12,26 @@ export const Notification = ({ state }: { state: State }) =>
         </div>
     );
 
+function isMySong(state: State, n: number) {
+    return (
+        state.queue.length > n &&
+        (state.queue[n].session_owner == state.session_id ||
+            state.queue[n].performer_name == state.performer_name)
+    );
+}
+
+export const YoureNext = ({ state }: { state: State }) =>
+    (isMySong(state, 0) && (
+        <h2 class="main-only upnext">
+            Your song "{state.queue[0].track.title}" is up now!
+        </h2>
+    )) ||
+    (isMySong(state, 1) && (
+        <h2 class="main-only upnext">
+            Your song "{state.queue[1].track.title}" is up next!
+        </h2>
+    ));
+
 export const Screen = (
     {
         state,
@@ -37,6 +57,7 @@ export const Screen = (
             {navRight}
         </header>
         <Notification state={state} />
+        <YoureNext state={state} />
         <article>{children}</article>
         {footer}
     </main>

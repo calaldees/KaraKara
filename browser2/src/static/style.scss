@@ -92,6 +92,12 @@ MAIN {
       overflow: hidden;
     }
   }
+  .upnext {
+    background: $NOTIFICATION_WARNING;
+    padding: 1em;
+    margin-top: 0;
+    border-bottom: 1px solid $BORDER;
+  }
   .notification {
     position: absolute;
     left: 2em;
