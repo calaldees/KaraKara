@@ -4,7 +4,7 @@ import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
 export const Notification = ({ state }: { state: State }) =>
     state.notification && (
         <div
-            class={"notification " + state.notification.style}
+            class={"main-only notification " + state.notification.style}
             onclick={ClearNotification()}
         >
             <span>{state.notification.text}</span>
