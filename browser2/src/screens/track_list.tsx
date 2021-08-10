@@ -172,7 +172,7 @@ function find_tracks(
  *   category:jpop  -> artist (akb48, mell, x japan)
  *   from:gundam    -> gundam (wing, waltz, unicorn)
  */
-function choose_section_names(state: State, groups: {}) {
+function choose_section_names(state: State, groups: {}): Array<string> {
     let last_filter = state.filters[state.filters.length - 1];
 
     // if no search, show a sensible selection
@@ -288,11 +288,14 @@ function show_list(state: State) {
      *     ...
      * }} />
      */
+    let leftover_tracks: Track[] = tracks;
     let sections: any[] = [];
     for (let i = 0; i < section_names.length; i++) {
         let tag_key = section_names[i]; // eg "vocaltrack"
         let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
         let filter_list = null;
+        // remove all tracks which would be discovered by this sub-query
+        leftover_tracks = leftover_tracks.filter((t) => !(tag_key in t.tags));
         if (Object.keys(tag_values).length > 50) {
             let grouped_groups = {};
             Object.keys(tag_values).forEach(function (x) {
@@ -314,6 +317,21 @@ function show_list(state: State) {
             <div>
                 <h2>{title_case(tag_key)}</h2>
                 <ul>{filter_list}</ul>
+            </div>,
+        );
+    }
+
+    // if there are tracks which wouldn't be found if we used any
+    // of the above filters, show them now
+    if (leftover_tracks.length > 0) {
+        sections.push(
+            <div>
+                <h2>Other</h2>
+                <ul>
+                    {leftover_tracks.map((track) => (
+                        <TrackItem state={state} track={track} />
+                    ))}
+                </ul>
             </div>,
         );
     }
