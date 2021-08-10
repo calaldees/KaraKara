@@ -326,7 +326,7 @@ function show_list(state: State) {
     if (leftover_tracks.length > 0) {
         sections.push(
             <div>
-                <h2>Other</h2>
+                <h2>Tracks</h2>
                 <ul>
                     {leftover_tracks.map((track) => (
                         <TrackItem state={state} track={track} />
