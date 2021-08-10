@@ -33,27 +33,6 @@ export const SettingsMenu = ({ state }: { state: State }) => (
                     </td>
                 </tr>
                 <tr>
-                    <td>Room</td>
-                    <td>
-                        <input
-                            value={state.room_name_edit}
-                            type={"text"}
-                            oninput={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    room_name_edit: event.target.value,
-                                } as State)
-                            }
-                            onchange={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    room_name: state.room_name_edit,
-                                } as State)
-                            }
-                        />
-                    </td>
-                </tr>
-                <tr>
                     <td>Password</td>
                     <td>
                         <input
