@@ -7,7 +7,7 @@ import { RemoveTrack, Command } from "../actions";
 function createDragStart(src_id) {
     return function (state, event) {
         event.dataTransfer.dropEffect = "move";
-        return { ...state, drop_source: src_id };
+        return { ...state, drop_source: src_id, drop_target: src_id };
     };
 }
 function createDragOver(dst_id) {
@@ -25,8 +25,47 @@ function createDragLeave() {
 function createDrop(dst_id) {
     return function (state, event) {
         event.preventDefault();
-        let src_id = state.drop_source;
-        return moveTrack(state, src_id, dst_id);
+        return moveTrack(state, state.drop_source, dst_id);
+    };
+}
+
+function createTouchStart(src_id) {
+    return function (state, event) {
+        event.preventDefault();
+        return { ...state, drop_source: src_id, drop_target: src_id };
+    };
+}
+function createTouchMove() {
+    return function (state, event) {
+        // target = the innermost element of the heirachy that was touched
+        // but we want to find the root UL
+        let ul: HTMLElement | null = event.target as HTMLElement;
+        while (ul && ul.tagName != "UL") ul = ul.parentElement;
+        if (!ul) return { state };
+
+        let x = event.touches[0].clientX,
+            y = event.touches[0].clientY;
+        let tgt_id = null;
+        ul.querySelectorAll("LI").forEach(function (el, key) {
+            let r = el.getBoundingClientRect();
+            if (x > r.left && x < r.right && y > r.top && y < r.bottom) {
+                tgt_id = state.queue[key].id;
+            }
+        });
+
+        return { ...state, drop_target: tgt_id };
+    };
+}
+function createTouchEnd() {
+    return function (state, event) {
+        event.preventDefault();
+        return moveTrack(state, state.drop_source, state.drop_target);
+    };
+}
+function createTouchCancel() {
+    return function (state, event) {
+        event.preventDefault();
+        return { ...state, drop_source: null, drop_target: null };
     };
 }
 
@@ -124,7 +163,13 @@ const QueueItemRender = ({
         ondragover={createDragOver(item.id)}
         ondrop={createDrop(item.id)}
     >
-        <span class={"thumb"}>
+        <span
+            class={"thumb"}
+            ontouchstart={createTouchStart(item.id)}
+            ontouchmove={createTouchMove()}
+            ontouchend={createTouchEnd()}
+            ontouchcancel={createTouchCancel()}
+        >
             <div
                 style={{
                     "background-image":

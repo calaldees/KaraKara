@@ -220,6 +220,10 @@ UL {
     padding: 0.75em;
     font-weight: bold;
     align-items: center;
+    .drag-handle {
+      width: 2em;
+      flex: 0 0 auto;
+    }
     .thumb {
       // placeholder.svg + https://yoksel.github.io/url-encoder/
       // inline instead of url("placeholder.svg"); because we want
@@ -277,14 +281,14 @@ UL {
     }
   }
   LI:first-child {
-    .thumb {
+    .thumb:first-child {
       border-top-left-radius: 0.5em;
       overflow: hidden;
     }
   }
   LI:last-child {
     border-bottom: 0;
-    .thumb {
+    .thumb:first-child {
       border-bottom-left-radius: 0.5em;
       overflow: hidden;
     }
