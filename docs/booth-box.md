@@ -18,6 +18,14 @@ One-time steps:
 * Assemble pi / screen / case
 * Boot, do basic setup (eg wifi, software updates)
 * Edit `/boot/config.txt` - set `lcd_rotate=2`, reboot
+* Edit `~/.config/lxsession/LXDE-pi/autostart`, add:
+```
+@lxpanel --profile LXDE-pi
+@xset s off
+@xset -dpms
+@xset s noblank
+@chromium-browser https://karakara.uk/browser2/
+```
 * MAYBE: chrome on-screen keyboard?
 
 Each-time steps:
