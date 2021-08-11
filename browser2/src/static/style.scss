@@ -292,14 +292,20 @@ UL {
 }
 
 
-INPUT, BUTTON {
+INPUT[type="text"],
+INPUT[type="password"],
+BUTTON {
   font-size: 1em;
   width: 100%;
   margin: 0.25em 0;
   border-radius: 5px;
   padding: 0.5em;
 }
-INPUT {
+INPUT[type="checkbox"] {
+  margin: 0.5em;
+}
+INPUT[type="text"],
+INPUT[type="password"] {
   color: $INPUT_FG;
   font-weight: bold;
   background: $INPUT_BG;
