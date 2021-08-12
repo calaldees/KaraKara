@@ -16,9 +16,6 @@ function apiRequestEffect(dispatch, props) {
 
     fetch(props.url, props.options)
         .then(function (response) {
-            return response;
-        })
-        .then(function (response) {
             return response.json();
         })
         .then(function (result) {
