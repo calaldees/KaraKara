@@ -113,13 +113,13 @@ function moveTrack(
                 }),
             },
             // on server-side error, revert to original queue
-            action: function(state, response) {
-                if(response.status == "ok") return state;
-                return {...state, queue: original_queue };
+            action: function (state, response) {
+                if (response.status == "ok") return state;
+                return { ...state, queue: original_queue };
             },
             // on network error, revert to original queue
-            exception: function(state) {
-                return {...state, queue: original_queue };
+            exception: function (state) {
+                return { ...state, queue: original_queue };
             },
         }),
     ];
@@ -187,6 +187,9 @@ const QueueItemRender = ({
                         ")",
                 }}
             />
+            <span class={"drag-handle"}>
+                <i class="fas fa-grip-vertical" />
+            </span>
         </span>
         <span class={"text queue_info"}>
             <span class={"title"}>

@@ -220,10 +220,6 @@ UL {
     padding: 0.75em;
     font-weight: bold;
     align-items: center;
-    .drag-handle {
-      width: 2em;
-      flex: 0 0 auto;
-    }
     .thumb {
       // placeholder.svg + https://yoksel.github.io/url-encoder/
       // inline instead of url("placeholder.svg"); because we want
@@ -258,6 +254,16 @@ UL {
         bottom: 0;
         background-size: cover;
         background-position: center;
+      }
+      .drag-handle {
+        position: absolute;
+        top: 1em;
+        left: 0;
+        bottom: 1em;
+        background: rgba($BG_LIGHT, .8);
+        border: 1px solid $BORDER;
+        border-radius: 0 .5em .5em 0;
+        padding: .4em .4em .5em .2em;
       }
     }
     SPAN.text {
