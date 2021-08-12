@@ -88,6 +88,9 @@ function apiRequestEffect(dispatch, props) {
                 ],
                 error,
             );
+            if (props.exception) {
+                dispatch(props.exception);
+            }
         });
 }
 

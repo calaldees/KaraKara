@@ -90,8 +90,8 @@ function moveTrack(
         new_queue.splice(dst_pos, 0, src_ob);
     }
 
-    // update our local queue, tell the server to update server queue
-    // TODO: on error, revert to original queue?
+    // update our local queue, tell the server to update server queue,
+    let original_queue = state.queue;
     return [
         {
             ...state,
@@ -111,6 +111,15 @@ function moveTrack(
                     "queue_item.id": "" + src_id,
                     "queue_item.move.target_id": "" + dst_id,
                 }),
+            },
+            // on server-side error, revert to original queue
+            action: function(state, response) {
+                if(response.status == "ok") return state;
+                return {...state, queue: original_queue };
+            },
+            // on network error, revert to original queue
+            exception: function(state) {
+                return {...state, queue: original_queue };
             },
         }),
     ];
