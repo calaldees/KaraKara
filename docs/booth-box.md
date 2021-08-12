@@ -18,13 +18,14 @@ One-time steps:
 * Assemble pi / screen / case
 * Boot, do basic setup (eg wifi, software updates)
 * Edit `/boot/config.txt` - set `lcd_rotate=2`, reboot
-* Edit `~/.config/lxsession/LXDE-pi/autostart`, add:
+* run `raspi-config`, Performance, GPU Memory, set to 512MB
+  (Is this actually needed? How much exactly is needed? Note that it seems
+  external displays are only detected at boot, no hot-plugging...)
+* Copy [booth.sh](./scripts/booth.sh) to the pi's home directory
+* To launch karakara on boot, create `~/.config/lxsession/LXDE-pi/autostart`, add:
 ```
 @lxpanel --profile LXDE-pi
-@xset s off
-@xset -dpms
-@xset s noblank
-@chromium-browser https://karakara.uk/browser2/
+@bash /home/pi/booth.sh
 ```
 * MAYBE: chrome on-screen keyboard?
 
