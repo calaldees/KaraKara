@@ -15,8 +15,45 @@ function apiRequestEffect(dispatch, props) {
     }));
 
     fetch(props.url, props.options)
+        .then((response) => response.body)
+        .then((rb) => {
+            if (!rb) return;
+            const reader = rb.getReader();
+            let download_done = 0;
+            let download_size = 7500000; // TODO: add content-length to track_list.json
+
+            return new ReadableStream({
+                start(controller) {
+                    function push() {
+                        reader.read().then(({ done, value }) => {
+                            if (done) {
+                                controller.close();
+                                return;
+                            }
+                            if (value) {
+                                download_done += value.byteLength;
+                                if (props.progress) {
+                                    dispatch(props.progress, {
+                                        done: download_done,
+                                        size: download_size,
+                                    });
+                                }
+                            }
+                            controller.enqueue(value);
+                            push();
+                        });
+                    }
+                    push();
+                },
+            });
+        })
+        .then((stream) => {
+            return new Response(stream, {
+                headers: { "Content-Type": "text/json" },
+            }).text();
+        })
         .then(function (response) {
-            return response.json();
+            return JSON.parse(response);
         })
         .then(function (result) {
             console.groupCollapsed("api_request(", props.url, ")");
@@ -68,7 +105,7 @@ function apiRequestEffect(dispatch, props) {
             }
         })
         .catch(function (error) {
-            console.groupCollapsed("api_request(", props.url, ")");
+            console.groupCollapsed("api_request(", props.url, ") [error]");
             console.log(error);
             console.groupEnd();
 
@@ -132,7 +169,7 @@ export const FetchTrackList = (state: State): Effect =>
     ApiRequest({
         function: "track_list",
         state: state,
-        progress: (state, done, size) => [
+        progress: (state, { done, size }) => [
             {
                 ...state,
                 download_done: done,
@@ -146,10 +183,14 @@ export const FetchTrackList = (state: State): Effect =>
                       room_name: state.room_name_edit,
                       session_id: response.identity.id,
                       track_list: track_list_to_map(response.data.list),
+                      download_done: 0,
+                      download_size: null,
                   }
                 : {
                       ...state,
                       room_name_edit: "",
+                      download_done: 0,
+                      download_size: null,
                   },
     });
 

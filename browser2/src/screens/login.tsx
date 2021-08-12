@@ -3,7 +3,7 @@ import { Screen } from "./base";
 import { TryLogin, UpdateRoomName } from "../actions";
 
 function percent(a, b) {
-    return (a / b) * 100 + "%";
+    return Math.round((a / b) * 100) + "%";
 }
 
 export const Login = ({ state }: { state: State }) => (
