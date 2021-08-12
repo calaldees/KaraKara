@@ -10,61 +10,71 @@ function createDragStart(src_id) {
         return { ...state, drop_source: src_id };
     };
 }
-
 function createDragOver(dst_id) {
     return function (state, event) {
         event.preventDefault();
         return { ...state, drop_target: dst_id };
     };
 }
-
 function createDragLeave() {
     return function (state, event) {
         event.preventDefault();
         return { ...state, drop_target: null };
     };
 }
-
 function createDrop(dst_id) {
     return function (state, event) {
         event.preventDefault();
         let src_id = state.drop_source;
-        if (src_id === dst_id) {
-            return { ...state, drop_source: null, drop_target: null };
-        }
-        // find the dragged item by ID number, remove it from the list
-        let src_ob = state.queue.find((x) => x.id == src_id);
-        let new_queue = state.queue.filter((x) => x.id != src_id);
-        // insert the dragged item above the drop target
-        if (dst_id === -1) {
-            new_queue.push(src_ob);
-        } else {
-            let dst_pos = new_queue.findIndex((x) => x.id == dst_id);
-            new_queue.splice(dst_pos, 0, src_ob);
-        }
-        return [
-            {
-                ...state,
-                queue: new_queue,
-                drop_source: null,
-                drop_target: null,
-            },
-            ApiRequest({
-                function: "queue_items",
-                state: state,
-                options: {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({
-                        "queue_item.id": src_id,
-                        "queue_item.move.target_id": dst_id,
-                    }),
-                },
-            }),
-        ];
+        return moveTrack(state, src_id, dst_id);
     };
+}
+
+function moveTrack(
+    state: State,
+    src_id: number | null,
+    dst_id: number | null,
+): Action {
+    let cancel = { ...state, drop_source: null, drop_target: null };
+    if (src_id === dst_id) return cancel;
+
+    // find the dragged item by ID number, remove it from the list
+    let src_ob = state.queue.find((x) => x.id == src_id);
+    if (!src_ob) return cancel;
+    let new_queue = state.queue.filter((x) => x.id != src_id);
+
+    // insert the dragged item above the drop target
+    if (dst_id === -1) {
+        new_queue.push(src_ob);
+    } else {
+        let dst_pos = new_queue.findIndex((x) => x.id == dst_id);
+        new_queue.splice(dst_pos, 0, src_ob);
+    }
+
+    // update our local queue, tell the server to update server queue
+    // TODO: on error, revert to original queue?
+    return [
+        {
+            ...state,
+            queue: new_queue,
+            drop_source: null,
+            drop_target: null,
+        },
+        ApiRequest({
+            function: "queue_items",
+            state: state,
+            options: {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    "queue_item.id": "" + src_id,
+                    "queue_item.move.target_id": "" + dst_id,
+                }),
+            },
+        }),
+    ];
 }
 
 const Playlist = ({
