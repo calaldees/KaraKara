@@ -26,7 +26,7 @@ export const RoomSettings = ({ state }: { state: State }) => (
             <p>
                 {key.replace("karakara.", "")}:
                 <br />
-                <input name={key} value={value} onchange={UpdateSettings} />
+                <input type={"text"} name={key} value={value} onchange={UpdateSettings} />
             </p>
         ))}
     </Screen>
