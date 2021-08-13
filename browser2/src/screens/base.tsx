@@ -32,7 +32,7 @@ export const YoureNext = ({ state }: { state: State }) =>
         </h2>
     ));
 
-export const EmptyHeaderLink = () => (<a />);
+export const EmptyHeaderLink = () => <a />;
 
 export const Screen = (
     {
