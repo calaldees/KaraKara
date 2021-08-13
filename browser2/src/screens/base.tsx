@@ -32,14 +32,16 @@ export const YoureNext = ({ state }: { state: State }) =>
         </h2>
     ));
 
+export const EmptyHeaderLink = () => (<a />);
+
 export const Screen = (
     {
         state,
         title,
         className = null,
         footer = <div />,
-        navLeft = null,
-        navRight = null,
+        navLeft = <EmptyHeaderLink />,
+        navRight = <EmptyHeaderLink />,
     }: {
         state: State;
         title: string;
