@@ -363,6 +363,7 @@ function back(state: State): State {
         // if we're at the start of the exploring process and
         // go back, go to the login screen
         state.room_name = "";
+        state.queue = [];
         state.track_list = {};
     }
     return { ...state };
