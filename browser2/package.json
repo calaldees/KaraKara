@@ -22,6 +22,9 @@
         "prettier": "^2.3.2"
     },
     "pwaManifest": {
+        "development":{
+            "disabled": true
+        },
         "name": "KaraKara",
         "shortName": "KaraKara",
         "startURL": ".",
@@ -30,11 +33,7 @@
         "orientation": "portrait",
         "generateIconOptions": {
             "baseIcon": "./src/static/favicon.svg",
-            "sizes": [
-                192,
-                384,
-                512
-            ],
+            "sizes": [192, 384, 512],
             "genFavicons": true
         }
     }
