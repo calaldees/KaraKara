@@ -17,12 +17,13 @@
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",
     "devDependencies": {
-        "@parcel/transformer-sass": "^2.0.0-beta.2",
-        "parcel": "^2.0.0-beta.2",
+        "@parcel/transformer-sass": "^2.0.0-rc.0",
+        "parcel": "^2.0.0-rc.0",
+        "parcel-config-pwa-manifest": "0.0.9",
         "prettier": "^2.3.2"
     },
     "pwaManifest": {
-        "development":{
+        "development": {
             "disabled": true
         },
         "name": "KaraKara",
@@ -33,7 +34,11 @@
         "orientation": "portrait",
         "generateIconOptions": {
             "baseIcon": "./src/static/favicon.svg",
-            "sizes": [192, 384, 512],
+            "sizes": [
+                192,
+                384,
+                512
+            ],
             "genFavicons": true
         }
     }
