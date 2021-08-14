@@ -369,41 +369,39 @@ function back(state: State): State {
     return { ...state };
 }
 
-const AdminButtons = (state) => (
+const GoToPriorityTokens = (state) => [
+    state,
+    ApiRequest({
+        function: "priority_tokens",
+        state: state,
+        action: (state, response): Action => 
+            response.status == "ok"
+                ? {
+                      ...state,
+                      screen: "priority_tokens",
+                      priority_tokens:
+                          response.data.priority_tokens,
+                  }
+                : {
+                      ...state,
+                      priority_tokens: [],
+                  },
+    }),
+];
+
+const AdminButtons = (state: State) => (
     <footer>
         <div class={"buttons"}>
             <button
-                onclick={(state) => [
-                    state,
-                    ApiRequest({
-                        function: "priority_tokens",
-                        state: state,
-                        action: (state, response): Action =>
-                            response.status == "ok"
-                                ? {
-                                      ...state,
-                                      screen: "priority_tokens",
-                                      priority_tokens:
-                                          response.data.priority_tokens,
-                                  }
-                                : {
-                                      ...state,
-                                      priority_tokens: [],
-                                  },
-                    }),
-                ]}
+                onclick={GoToPriorityTokens}
                 disabled={state.loading}
             >
                 Priority Tokens
             </button>
-            <button
-                onclick={(state) => ({ ...state, screen: "room_settings" })}
-            >
+            <button onclick={GoToScreen("room_settings")}>
                 Room Settings
             </button>
-            <button
-                onclick={(state) => [{ ...state, screen: "printable_list" }]}
-            >
+            <button onclick={GoToScreen("printable_list")}>
                 Printable Tracklist
             </button>
         </div>

@@ -16,25 +16,9 @@
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",
     "devDependencies": {
-        "@parcel/transformer-sass": "^2.0.0-beta.2",
-        "parcel": "^2.0.0-beta.2",
+        "@parcel/transformer-image": "^2.0.0-rc.0",
+        "@parcel/transformer-sass": "^2.0.0-rc.0",
+        "parcel": "^2.0.0-rc.0",
         "prettier": "^2.3.2"
-    },
-    "pwaManifest": {
-        "name": "KaraKara Player",
-        "shortName": "KaraKara Player",
-        "startURL": ".",
-        "theme": "#68c4d6",
-        "display": "standalone",
-        "orientation": "landscape",
-        "generateIconOptions": {
-            "baseIcon": "./src/static/favicon.svg",
-            "sizes": [
-                192,
-                384,
-                512
-            ],
-            "genFavicons": true
-        }
     }
 }
