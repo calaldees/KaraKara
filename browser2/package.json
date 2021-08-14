@@ -17,6 +17,8 @@
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",
     "devDependencies": {
+        "@parcel/optimizer-data-url": "^2.0.0-rc.0",
+        "@parcel/transformer-inline-string": "^2.0.0-rc.0",
         "@parcel/transformer-sass": "^2.0.0-rc.0",
         "parcel": "^2.0.0-rc.0",
         "parcel-config-pwa-manifest": "0.0.9",

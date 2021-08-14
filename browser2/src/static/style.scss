@@ -223,22 +223,7 @@ UL {
     font-weight: bold;
     align-items: center;
     .thumb {
-      // placeholder.svg + https://yoksel.github.io/url-encoder/
-      // inline instead of url("placeholder.svg"); because we want
-      // it to be loaded on startup rather than when used.
-      background-image: url(
-        "data:image/svg+xml,%3Csvg width='96' height='64' xmlns='http://www."+
-        "w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' x2='4'"+
-        " y1='0' y2='4' gradientUnits='userSpaceOnUse' spreadMethod='repeat'"+
-        "%3E%3Cstop stop-color='%23ddd' offset='0'/%3E%3Cstop stop-color='%2"+
-        "3ddd' offset='.5'/%3E%3Cstop stop-color='%23fff' stop-opacity='0' o"+
-        "ffset='.5'/%3E%3Cstop stop-color='%23fff' stop-opacity='0' offset='"+
-        "1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23a)' d='M"+
-        "0 0h96v64H0z'/%3E%3Cpath fill='%23fff' stroke='%234d4d4d' d='M32 16"+
-        "h32v32H32z'/%3E%3Ccircle cx='56' cy='24' fill='%23666' r='4'/%3E%3C"+
-        "path d='m32 28 4-4 8 12 4-4 4 4 8-4 4 4v12H32z' fill='%23666'/%3E%3"+
-        "C/svg%3E"
-      );
+      background-image: url("data-url:placeholder.svg");
       height: 4em;
       width: 6em;
       margin: -0.75em;
