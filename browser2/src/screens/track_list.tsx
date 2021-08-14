@@ -389,7 +389,7 @@ const GoToPriorityTokens = (state) => [
     }),
 ];
 
-const AdminButtons = (state: State) => (
+const AdminButtons = ({state}: {state: State}) => (
     <footer>
         <div class={"buttons"}>
             <button
