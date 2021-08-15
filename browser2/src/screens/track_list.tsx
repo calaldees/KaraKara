@@ -374,13 +374,12 @@ const GoToPriorityTokens = (state) => [
     ApiRequest({
         function: "priority_tokens",
         state: state,
-        action: (state, response): Action => 
+        action: (state, response): Action =>
             response.status == "ok"
                 ? {
                       ...state,
                       screen: "priority_tokens",
-                      priority_tokens:
-                          response.data.priority_tokens,
+                      priority_tokens: response.data.priority_tokens,
                   }
                 : {
                       ...state,
@@ -389,18 +388,13 @@ const GoToPriorityTokens = (state) => [
     }),
 ];
 
-const AdminButtons = ({state}: {state: State}) => (
+const AdminButtons = ({ state }: { state: State }) => (
     <footer>
         <div class={"buttons"}>
-            <button
-                onclick={GoToPriorityTokens}
-                disabled={state.loading}
-            >
+            <button onclick={GoToPriorityTokens} disabled={state.loading}>
                 Priority Tokens
             </button>
-            <button onclick={GoToScreen("room_settings")}>
-                Room Settings
-            </button>
+            <button onclick={GoToScreen("room_settings")}>Room Settings</button>
             <button onclick={GoToScreen("printable_list")}>
                 Printable Tracklist
             </button>
