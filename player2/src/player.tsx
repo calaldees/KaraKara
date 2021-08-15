@@ -63,7 +63,7 @@ const subscriptions = (state: State) => [
     HashStateManager(
         {
             push: ["root", "room_name"],
-            replace: ["podium"],
+            replace: ["podium", "room_name_edit"],
         },
         state,
     ),
