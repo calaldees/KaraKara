@@ -1,6 +1,7 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
+import { survive_hmr } from "@shish2k/hyperapp-survive-hmr";
 import {
     LocalStorageLoader,
     LocalStorageSaver,
@@ -111,16 +112,4 @@ let dispatch = app({
     node: document.body,
 });
 
-if (module && module.hot) {
-    module.hot.dispose(function (data) {
-        dispatch(function (state) {
-            data.saved_state = state;
-            return state;
-        });
-    });
-    module.hot.accept(function (getParents) {
-        dispatch(function (state) {
-            return module.hot.data.saved_state;
-        });
-    });
-}
+survive_hmr(dispatch, module);
