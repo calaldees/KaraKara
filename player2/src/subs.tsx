@@ -181,28 +181,31 @@ import silence from 'url:./static/silence.mp3';
 export const ChromecastListener = ChromecastReceiver({
     onMessageLoad: function (state: State, data): State {
         if (data.media.contentType == "karakara/room") {
+            let room_name = data.media.contentId;
+            let room_password = data.credentials;
             const context = cast.framework.CastReceiverContext.getInstance();
             const playerManager = context.getPlayerManager();
             playerManager.setMediaElement(
                 document.getElementById("chromecast-keepalive")
             );
             if(data.media.contentId) {
-                let req = cast.framework.messages.LoadRequestData();
-                req.media = cast.framework.messages.MediaInformation()
-                req.media.contentId = silence;
-                req.media.contentType = "audio/mp3";
-                playerManager.load(req);
+                data.media.contentId = silence;
+                data.media.contentType = "audio/mp3";
+                playerManager.load(data);
                 context.setApplicationState(
-                    "Playing room: " + data.media.contentId,
-                );    
+                    "Playing room: " + room_name
+                );
             }
             else {
+                context.setApplicationState(
+                    "Not playing"
+                );
                 playerManager.stop();
             }
             return {
                 ...state,
-                room_name: data.media.contentId,
-                room_password: data.credentials,
+                room_name: room_name,
+                room_password: room_password,
             };
         }
 
