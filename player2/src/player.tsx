@@ -3,11 +3,11 @@ import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
 
 import { Root } from "./screens/root";
-import { FetchRandomImages } from "./effects";
 import {
     getOpenMQTTListener,
     IntervalListener,
     KeyboardListener,
+    FetchRandomImages,
 } from "./subs";
 
 // If we're running stand-alone, then use the main karakara.uk
@@ -59,26 +59,26 @@ const state: State = {
     progress: 0,
 };
 
-const subscriptions = (state: State) =>
-    [
-        HashStateManager(
-            {
-                push: ["root", "room_name"],
-                replace: ["podium"],
-            },
-            state,
-        ),
-        KeyboardListener,
-        getOpenMQTTListener(state),
-        state.audio_allowed &&
-            !state.paused &&
-            !state.playing &&
-            state.settings["karakara.player.autoplay.seconds"] !== 0 &&
-            IntervalListener,
-    ];
+const subscriptions = (state: State) => [
+    HashStateManager(
+        {
+            push: ["root", "room_name"],
+            replace: ["podium"],
+        },
+        state,
+    ),
+    KeyboardListener,
+    getOpenMQTTListener(state),
+    state.audio_allowed &&
+        !state.paused &&
+        !state.playing &&
+        state.settings["karakara.player.autoplay.seconds"] !== 0 &&
+        IntervalListener,
+    FetchRandomImages(state.room_name),
+];
 
 let dispatch = app({
-    init: [state, state.room_name && FetchRandomImages(state)],
+    init: state,
     view: Root,
     subscriptions: subscriptions,
     node: document.body,

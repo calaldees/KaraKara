@@ -102,24 +102,6 @@ export function SendCommand(state: State, command: string): Effect {
     });
 }
 
-export function FetchRandomImages(state: State): Effect {
-    return ApiRequest({
-        function: "random_images",
-        state: state,
-        action(state: State, response): State {
-            let images = response.data.images.slice(0, 25);
-            return {
-                ...state,
-                images: images.map((fn, n) => ({
-                    filename: fn,
-                    x: n / images.length,
-                    delay: Math.random() * 10,
-                })),
-            };
-        },
-    });
-}
-
 export function SetTrackState(state: State, value: string): Effect {
     return ApiRequest({
         function: "queue_items",

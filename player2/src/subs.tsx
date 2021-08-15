@@ -8,7 +8,7 @@ import {
     Stop,
     UpdateQueue,
 } from "./actions";
-import { SendCommand } from "./effects";
+import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { http2ws } from "./utils";
@@ -139,3 +139,38 @@ export const IntervalListener = Interval({
         }
     },
 });
+
+function _friSubscriber(dispatch, props) {
+    // subscription is restarted whenever props changes,
+    // and props is just {room: state.room_name}
+    if (props.room) {
+        setTimeout(function () {
+            dispatch((state) => [
+                state,
+                ApiRequest({
+                    function: "random_images",
+                    state: state,
+                    action(state: State, response): State {
+                        let images = response.data.images.slice(0, 25);
+                        return {
+                            ...state,
+                            images: images.map((fn, n) => ({
+                                filename: fn,
+                                x: n / images.length,
+                                delay: Math.random() * 10,
+                            })),
+                        };
+                    },
+                }),
+            ]);
+        }, 0);
+    }
+
+    return function () {
+        // no unsubscribe
+    };
+}
+
+export function FetchRandomImages(room_name) {
+    return [_friSubscriber, { room: room_name }];
+}
