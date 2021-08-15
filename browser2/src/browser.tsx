@@ -71,7 +71,25 @@ let state: State = {
     priority_tokens: [],
 };
 
-app({
+const subscriptions = (state) => [
+    HashStateManager(
+        {
+            push: ["root", "filters", "track_id"],
+            replace: ["room_name_edit", "search", "booth", "widescreen"],
+        },
+        state,
+    ),
+    state.room_name && state.track_list && getMQTTListener(state),
+    LocalStorageSaver("performer_name", state.performer_name),
+    LocalStorageSaver("room_password", state.room_password),
+    LocalStorageSaver("bookmarks", state.bookmarks),
+    ResizeListener((state, event) => ({
+        ...state,
+        widescreen: isWidescreen(),
+    })),
+];
+
+let dispatch = app({
     init: [
         state,
         LocalStorageLoader("performer_name", (state, x) => ({
@@ -89,22 +107,20 @@ app({
         })),
     ],
     view: Root,
-    subscriptions: (state) => [
-        HashStateManager(
-            {
-                push: ["root", "filters", "track_id"],
-                replace: ["room_name_edit", "search", "booth", "widescreen"],
-            },
-            state,
-        ),
-        state.room_name && state.track_list && getMQTTListener(state),
-        LocalStorageSaver("performer_name", state.performer_name),
-        LocalStorageSaver("room_password", state.room_password),
-        LocalStorageSaver("bookmarks", state.bookmarks),
-        ResizeListener((state, event) => ({
-            ...state,
-            widescreen: isWidescreen(),
-        })),
-    ],
+    subscriptions: subscriptions,
     node: document.body,
 });
+
+if (module && module.hot) {
+    module.hot.dispose(function (data) {
+        dispatch(function (state) {
+            data.saved_state = state;
+            return state;
+        });
+    });
+    module.hot.accept(function (getParents) {
+        dispatch(function (state) {
+            return module.hot.data.saved_state;
+        });
+    });
+}

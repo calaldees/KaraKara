@@ -59,8 +59,8 @@ const state: State = {
     progress: 0,
 };
 
-function subscriptions(state: State) {
-    return [
+const subscriptions = (state: State) =>
+    [
         HashStateManager(
             {
                 push: ["root", "room_name"],
@@ -76,11 +76,24 @@ function subscriptions(state: State) {
             state.settings["karakara.player.autoplay.seconds"] !== 0 &&
             IntervalListener,
     ];
-}
 
-app({
+let dispatch = app({
     init: [state, state.room_name && FetchRandomImages(state)],
     view: Root,
     subscriptions: subscriptions,
     node: document.body,
 });
+
+if (module && module.hot) {
+    module.hot.dispose(function (data) {
+        dispatch(function (state) {
+            data.saved_state = state;
+            return state;
+        });
+    });
+    module.hot.accept(function (getParents) {
+        dispatch(function (state) {
+            return module.hot.data.saved_state;
+        });
+    });
+}
