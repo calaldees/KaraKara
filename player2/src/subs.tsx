@@ -176,6 +176,8 @@ export function FetchRandomImages(room_name: string): Subscription {
     return [_friSubscriber, { room: room_name }];
 }
 
+import silence from 'url:./static/silence.mp3';
+
 export const ChromecastListener = ChromecastReceiver({
     onMessageLoad: function (state: State, data): State {
         if (data.media.contentType == "karakara/room") {
@@ -187,7 +189,7 @@ export const ChromecastListener = ChromecastReceiver({
             if(data.media.contentId) {
                 playerManager.load(
                     chrome.cast.media.LoadRequest(
-                        chrome.cast.media.MediaInfo("src/static/silence.mp3", "audio/mp3"),
+                        chrome.cast.media.MediaInfo(silence, "audio/mp3"),
                     ),
                 );
                 context.setApplicationState(
