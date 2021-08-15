@@ -177,15 +177,37 @@ export function FetchRandomImages(room_name: string): Subscription {
 }
 
 export const ChromecastListener = ChromecastReceiver({
-        onMessageLoad: function (state, data): State {
-            if (data.media.contentType == "karakara/room") {
-                const context = cast.framework.CastReceiverContext.getInstance();
-                let parts = data.media.contentId.split(":");
-                context.setApplicationState("Playing room: " + parts[0]);
-                return {...state, room_name: parts[0], room_password: parts[1] };    
+    onMessageLoad: function (state: State, data): State {
+        if (data.media.contentType == "karakara/room") {
+            const context = cast.framework.CastReceiverContext.getInstance();
+            const playerManager = context.getPlayerManager();
+            playerManager.setMediaElement(
+                document.getElementById("chromecast-keepalive")
+            );
+            if(data.media.contentId) {
+                playerManager.load(
+                    chrome.cast.media.LoadRequest(
+                        chrome.cast.media.MediaInfo("src/static/silence.mp3", "audio/mp3"),
+                    ),
+                );
+                context.setApplicationState(
+                    "Playing room: " + data.media.contentId,
+                );    
             }
-            console.log("Chromecast sender gave an unknown media type: " + data.media.contentType);
-            return state;
-        },
+            else {
+                playerManager.stop();
+            }
+            return {
+                ...state,
+                room_name: data.media.contentId,
+                room_password: data.credentials,
+            };
+        }
 
+        console.log(
+            "Chromecast sender gave an unknown media type: " +
+                data.media.contentType,
+        );
+        return state;
+    },
 });

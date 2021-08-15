@@ -18,7 +18,10 @@ function _chromecastReceiverSub(dispatch, props) {
     if (props.onMessageLoad) {
         playerManager.setMessageInterceptor(
             cast.framework.messages.MessageType.LOAD,
-            (data) => dispatch(props.onMessageLoad, data),
+            function (data) {
+                dispatch(props.onMessageLoad, data);
+                return null;
+            },
         );
     }
 
@@ -39,9 +42,6 @@ function _chromecastReceiverSub(dispatch, props) {
         context.stop();
     };
 }
-
-// cast.framework.PlayerManager.setMediaElement(mediaElement)
-
 
 export function ChromecastReceiver(props) {
     return [_chromecastReceiverSub, props];

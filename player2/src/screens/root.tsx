@@ -40,6 +40,7 @@ export function Root(state: State): VNode {
                 {screen}
             </main>
             {state.show_settings && <SettingsMenu state={state} />}
+            <audio id="chromecast-keepalive" />
         </body>
     );
 }
