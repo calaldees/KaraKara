@@ -187,11 +187,11 @@ export const ChromecastListener = ChromecastReceiver({
                 document.getElementById("chromecast-keepalive")
             );
             if(data.media.contentId) {
-                playerManager.load(
-                    chrome.cast.media.LoadRequest(
-                        chrome.cast.media.MediaInfo(silence, "audio/mp3"),
-                    ),
-                );
+                let req = cast.framework.messages.LoadRequestData();
+                req.media = cast.framework.messages.MediaInformation()
+                req.media.contentId = silence;
+                req.media.contentType = "audio/mp3";
+                playerManager.load(req);
                 context.setApplicationState(
                     "Playing room: " + data.media.contentId,
                 );    
