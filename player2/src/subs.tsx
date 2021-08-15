@@ -190,7 +190,7 @@ export const ChromecastListener = ChromecastReceiver({
             );
             if(data.media.contentId) {
                 data.media.contentId = silence;
-                data.media.contentType = "audio/mp3";
+                data.media.contentType = "audio/mpeg";
                 playerManager.load(data);
                 context.setApplicationState(
                     "Playing room: " + room_name
