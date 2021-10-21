@@ -1,7 +1,12 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { get_attachment, title_case } from "../utils";
-import { ApiRequest } from "../effects";
+import {
+    ClearScrollPos,
+    ApiRequest,
+    PushScrollPos,
+    PopScrollPos,
+} from "../effects";
 import { GoToScreen, SelectTrack } from "../actions";
 
 /*
@@ -98,11 +103,14 @@ const AddFilter = (
 ) => (
     <li
         class={"add_filter"}
-        onclick={(state) => ({
-            ...state,
-            expanded: null,
-            filters: state.filters.concat([filter]),
-        })}
+        onclick={(state) => [
+            {
+                ...state,
+                expanded: null,
+                filters: state.filters.concat([filter]),
+            },
+            PushScrollPos(),
+        ]}
     >
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
@@ -355,32 +363,37 @@ function show_bookmarks(state: State) {
     );
 }
 
-function back(state: State): State {
+function back(state: State): Dispatchable {
+    var effect;
     if (state.filters.length > 0) {
-        // if we're searching the list, take a step back in the search
         state.filters.pop();
+        effect = PopScrollPos();
     } else {
         // if we're at the start of the exploring process and
         // go back, go to the login screen
         state.room_name = "";
         state.queue = [];
         state.track_list = {};
+        effect = ClearScrollPos();
     }
-    return { ...state };
+    return [{ ...state }, effect];
 }
 
-const GoToPriorityTokens = (state) => [
+const GoToPriorityTokens = (state: State): Dispatchable => [
     state,
     ApiRequest({
         function: "priority_tokens",
         state: state,
-        action: (state, response): Action =>
+        action: (state, response): Dispatchable =>
             response.status == "ok"
-                ? {
-                      ...state,
-                      screen: "priority_tokens",
-                      priority_tokens: response.data.priority_tokens,
-                  }
+                ? [
+                      {
+                          ...state,
+                          screen: "priority_tokens",
+                          priority_tokens: response.data.priority_tokens,
+                      },
+                      PushScrollPos(),
+                  ]
                 : {
                       ...state,
                       priority_tokens: [],
@@ -394,8 +407,10 @@ const AdminButtons = ({ state }: { state: State }) => (
             <button onclick={GoToPriorityTokens} disabled={state.loading}>
                 Priority Tokens
             </button>
-            <button onclick={GoToScreen("room_settings")}>Room Settings</button>
-            <button onclick={GoToScreen("printable_list")}>
+            <button onclick={GoToScreen("room_settings", [PushScrollPos()])}>
+                Room Settings
+            </button>
+            <button onclick={GoToScreen("printable_list", [PushScrollPos()])}>
                 Printable Tracklist
             </button>
         </div>
@@ -416,7 +431,7 @@ export const TrackList = ({ state }: { state: State }) => (
         title={"Explore Tracks"}
         navRight={
             !state.widescreen && (
-                <a onclick={GoToScreen("queue")}>
+                <a onclick={GoToScreen("queue", [PushScrollPos()])}>
                     <i class={"fas fa-2x fa-list-ol"} />
                 </a>
             )
@@ -445,11 +460,14 @@ export const TrackList = ({ state }: { state: State }) => (
             {state.filters.map((filter) => (
                 <a
                     class={"active_filter"}
-                    onclick={(state) => ({
-                        ...state,
-                        expanded: null,
-                        filters: state.filters.filter((v) => v !== filter),
-                    })}
+                    onclick={(state) => [
+                        {
+                            ...state,
+                            expanded: null,
+                            filters: state.filters.filter((v) => v !== filter),
+                        },
+                        ClearScrollPos(),
+                    ]}
                 >
                     <span class={"remove"}>
                         <i class={"fas fa-times-circle"} />

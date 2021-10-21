@@ -11,6 +11,7 @@ import {
     RemoveBookmark,
     SetPerformerName,
 } from "../actions";
+import { PopScrollPos, PushScrollPos } from "../effects";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     <footer>
@@ -79,7 +80,7 @@ export const TrackDetails = ({
         title={title_case(track.tags["title"][0])}
         navRight={
             !state.widescreen && (
-                <a onclick={GoToScreen("queue")}>
+                <a onclick={GoToScreen("queue", [PushScrollPos()])}>
                     <i class={"fas fa-2x fa-list-ol"} />
                 </a>
             )

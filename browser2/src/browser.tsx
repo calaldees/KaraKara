@@ -37,6 +37,7 @@ let state: State = {
     download_done: 0,
     booth: false,
     widescreen: isWidescreen(),
+    scroll_stack: [],
 
     // login
     session_id: null,

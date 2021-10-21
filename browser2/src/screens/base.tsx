@@ -1,5 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
+import { PopScrollPos } from "../effects";
 
 export const Notification = ({ state }: { state: State }) =>
     state.notification && (
@@ -66,7 +67,7 @@ export const Screen = (
 );
 
 export const BackToExplore = () => (
-    <a onclick={GoToScreen("explore")}>
+    <a onclick={GoToScreen("explore", [PopScrollPos()])}>
         <i class={"fas fa-2x fa-chevron-circle-left"} />
     </a>
 );

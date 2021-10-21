@@ -87,6 +87,7 @@ type State = {
     download_done: number,
     booth: boolean,
     widescreen: boolean,
+    scroll_stack: Array<number>,
 
     // login
     session_id: string | null,

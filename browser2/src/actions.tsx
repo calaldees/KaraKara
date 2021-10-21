@@ -8,17 +8,24 @@ import {
     SendCommand,
     LoginThenFetchTrackList,
     FetchTrackList,
+    PushScrollPos,
+    PopScrollPos,
 } from "./effects";
 
 /*
  * App navigation
  */
+
 export const GoToScreen =
-    (screen: string): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        screen,
-    });
+    (screen: string, effects: Array<Effect> = []): Action =>
+    (state: State): Dispatchable =>
+        [
+            {
+                ...state,
+                screen,
+            },
+            ...effects,
+        ];
 
 export const ClearNotification =
     (): Action =>
@@ -43,7 +50,11 @@ export const HideSettings =
 
 export const SelectTrack =
     (track_id: string | null): Action =>
-    (state: State): Dispatchable => ({ ...state, track_id });
+    (state: State): Dispatchable =>
+        [
+            { ...state, track_id },
+            track_id ? PushScrollPos() : PopScrollPos(),
+        ];
 
 export const TryLogin =
     (): Action =>
@@ -72,7 +83,10 @@ export const UpdateRoomName =
         room_name_edit: event.target.value.toLowerCase(),
     });
 
-export function UpdateSettings(state: State, event: FormInputEvent): Dispatchable {
+export function UpdateSettings(
+    state: State,
+    event: FormInputEvent,
+): Dispatchable {
     if (Array.isArray(state.settings[event.target.name])) {
         state.settings[event.target.name] = event.target.value.split(",");
     } else {

@@ -30,6 +30,27 @@ State is updated in two ways:
   - `settings` - JSON, each update goes to `state.settings`
   - `notifications` - Text, each message is turned into a notification
 
+## Layout
+
+Click things to go towards the leaves, click the "Back" button to go towards
+the root.
+
+If you add new screens to the app, remember to PushScrollPos() when moving
+towards the leaves and PopScrollPos() when moving back.
+```
+Login
+ \- Explore
+     |- Explore (with more filters)
+     |   \- [...]
+     |- Track Details
+     |   \- Queue (if user) / Control (if admin)
+     |- Queue (if user) / Control (if admin)
+     |- Tokens (admin only)
+     |- Settings (admin only)
+     \- Tracklist (admin only)
+
+```
+
 ## Dev Setup
 
 Depending on whether you prefer Docker or Node:

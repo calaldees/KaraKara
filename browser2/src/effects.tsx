@@ -5,6 +5,54 @@ import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
 import { http2ws, flatten_settings } from "./utils";
 
+// get article
+function _get_article() {
+    return document.getElementsByTagName("article")[0];
+}
+export function PushScrollPos(): Effect {
+    function saveScrollPos(dispatch, props) {
+        // note the scroll pos while on the original page
+        var pos = _get_article().scrollTop;
+        // not immediately (give the new page a chance to generate the DOM),
+        // but before the next repaint, scroll the page
+        requestAnimationFrame(() =>
+            dispatch(function (state: State): State {
+                _get_article().scrollTop = 0;
+                return {
+                    ...state,
+                    scroll_stack: state.scroll_stack.concat([pos]),
+                };
+            }),
+        );
+    }
+    return [saveScrollPos, {}];
+}
+export function PopScrollPos(): Effect {
+    function restoreScrollPos(dispatch, props) {
+        // after the new page has loaded, scroll it
+        requestAnimationFrame(() =>
+            dispatch(function (state: State): State {
+                _get_article().scrollTop = state.scroll_stack.pop() || 0;
+                return {
+                    ...state,
+                };
+            }),
+        );
+    }
+    return [restoreScrollPos, {}];
+}
+export function ClearScrollPos(): Effect {
+    function clearScrollPos(dispatch, props) {
+        dispatch(function (state: State): State {
+            return {
+                ...state,
+                scroll_stack: [],
+            };
+        });
+    }
+    return [clearScrollPos, {}];
+}
+
 function apiRequestEffect(dispatch, props) {
     dispatch((state) => ({
         ...state,
