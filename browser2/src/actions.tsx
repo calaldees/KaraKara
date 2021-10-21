@@ -14,40 +14,40 @@ import {
  * App navigation
  */
 export const GoToScreen =
-    (screen: string) =>
-    (state: State): Action => ({
+    (screen: string): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         screen,
     });
 
 export const ClearNotification =
-    () =>
-    (state: State): Action => ({
+    (): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         notification: null,
     });
 
 export const ShowSettings =
-    () =>
-    (state: State): Action => ({
+    (): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         show_settings: true,
     });
 
 export const HideSettings =
-    () =>
-    (state: State): Action => ({
+    (): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         show_settings: false,
     });
 
 export const SelectTrack =
-    (track_id: string | null) =>
-    (state: State): Action => ({ ...state, track_id });
+    (track_id: string | null): Action =>
+    (state: State): Dispatchable => ({ ...state, track_id });
 
 export const TryLogin =
-    () =>
-    (state: State): Action =>
+    (): Action =>
+    (state: State): Dispatchable =>
         [
             state,
             state.room_password
@@ -59,20 +59,20 @@ export const TryLogin =
  * User inputs
  */
 export const SetPerformerName =
-    () =>
-    (state: State, event: FormInputEvent): Action => ({
+    (): Action =>
+    (state: State, event: FormInputEvent): Dispatchable => ({
         ...state,
         performer_name: event.target.value,
     });
 
 export const UpdateRoomName =
-    () =>
-    (state: State, event: FormInputEvent): Action => ({
+    (): Action =>
+    (state: State, event: FormInputEvent): Dispatchable => ({
         ...state,
         room_name_edit: event.target.value.toLowerCase(),
     });
 
-export function UpdateSettings(state: State, event: FormInputEvent): Action {
+export function UpdateSettings(state: State, event: FormInputEvent): Dispatchable {
     if (Array.isArray(state.settings[event.target.name])) {
         state.settings[event.target.name] = event.target.value.split(",");
     } else {
@@ -85,30 +85,30 @@ export function UpdateSettings(state: State, event: FormInputEvent): Action {
  * Player controls
  */
 export const Command =
-    (command: string) =>
-    (state: State): Action =>
+    (command: string): Action =>
+    (state: State): Dispatchable =>
         [state, SendCommand(state, command)];
 
 /*
  * Add / remove tracks
  */
 export const ActivateEnqueue =
-    () =>
-    (state: State): Action => ({
+    (): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         action: "enqueue",
     });
 
 export const CancelEnqueue =
-    () =>
-    (state: State): Action => ({
+    (): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         action: null,
     });
 
 export const EnqueueCurrentTrack =
-    () =>
-    (state: State): Action =>
+    (): Action =>
+    (state: State): Dispatchable =>
         [
             state,
             ApiRequest({
@@ -130,8 +130,8 @@ export const EnqueueCurrentTrack =
         ];
 
 export const RemoveTrack =
-    (queue_item_id: number) =>
-    (state: State): Action =>
+    (queue_item_id: number): Action =>
+    (state: State): Dispatchable =>
         [
             state,
             ApiRequest({
@@ -154,15 +154,15 @@ export const RemoveTrack =
  * Bookmarks
  */
 export const AddBookmark =
-    (track_id: string) =>
-    (state: State): Action => ({
+    (track_id: string): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         bookmarks: state.bookmarks.concat([track_id]),
     });
 
 export const RemoveBookmark =
-    (track_id: string) =>
-    (state: State): Action => ({
+    (track_id: string): Action =>
+    (state: State): Dispatchable => ({
         ...state,
         bookmarks: state.bookmarks.filter((x) => x != track_id),
     });

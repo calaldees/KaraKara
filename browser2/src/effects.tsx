@@ -212,7 +212,7 @@ export const LoginThenFetchTrackList = (state: State): Effect =>
             response.status == "ok" ? [state, FetchTrackList(state)] : state,
     });
 
-export const SaveSettings = (state: State): Action => [
+export const SaveSettings = (state: State): Dispatchable => [
     { ...state },
     ApiRequest({
         title: "Saving setting...",

@@ -19,7 +19,7 @@ import { http2ws } from "./utils";
  */
 export function getOpenMQTTListener(
     state: State,
-): [CallableFunction, any] | null {
+): Subscription | null {
     if (!state.room_name) {
         return null;
     }
@@ -29,13 +29,13 @@ export function getOpenMQTTListener(
         username: state.room_name,
         password: state.room_password,
         topic: "karakara/room/" + state.room_name + "/#",
-        connect(state: State): Action {
+        connect(state: State): Dispatchable {
             return { ...state, connected: true };
         },
-        close(state: State): Action {
+        close(state: State): Dispatchable {
             return { ...state, connected: false };
         },
-        message(state: State, msg): Action {
+        message(state: State, msg): Dispatchable {
             // msg = mqtt-packet
             const topic: string = msg.topic.split("/").pop();
             const data: string = msg.payload.toString();
@@ -92,7 +92,7 @@ export function getOpenMQTTListener(
 
 export const KeyboardListener = Keyboard({
     downs: true,
-    action(state: State, event: KeyboardEvent): Action {
+    action(state: State, event: KeyboardEvent): Dispatchable {
         // Disable keyboard shortcuts when the settings
         // screen is active
         if (state.show_settings) {
@@ -129,7 +129,7 @@ export const KeyboardListener = Keyboard({
 
 export const IntervalListener = Interval({
     every: 200,
-    action(state: State, timestamp): Action {
+    action(state: State, timestamp): Dispatchable {
         if (
             state.progress >= state.settings["karakara.player.autoplay.seconds"]
         ) {
@@ -171,6 +171,6 @@ function _friSubscriber(dispatch, props) {
     };
 }
 
-export function FetchRandomImages(room_name) {
+export function FetchRandomImages(room_name: string): Subscription {
     return [_friSubscriber, { room: room_name }];
 }

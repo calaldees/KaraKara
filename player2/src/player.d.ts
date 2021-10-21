@@ -78,6 +78,7 @@ type State = {
     progress: number,
 }
 
-type Effect = [CallableFunction, object];
-
-type Action = State | [State, Effect];
+declare type Action = import('hyperapp').Action<State>;
+declare type Effect = import('hyperapp').Effect<State>;
+declare type Dispatchable = import('hyperapp').Dispatchable<State>;
+declare type Subscription = import('hyperapp').Subscription<State>;

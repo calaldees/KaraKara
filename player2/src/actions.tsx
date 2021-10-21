@@ -6,27 +6,27 @@
 import { SetTrackState } from "./effects";
 
 // App controls
-export function SetRoom(state: State, room: string): Action {
+export function SetRoom(state: State, room: string): Dispatchable {
     return { ...state, room_name: room };
 }
 
-export function SetPreviewVolume(state: State, event): Action {
+export function SetPreviewVolume(state: State, event): Dispatchable {
     event.target.volume =
         state.settings["karakara.player.video.preview_volume"];
     return state;
 }
 
-export function UpdateProgress(state: State, event): Action {
+export function UpdateProgress(state: State, event): Dispatchable {
     return { ...state, progress: event.target.currentTime };
 }
 
-export function UpdatePodiumProgress(state: State, event): Action {
+export function UpdatePodiumProgress(state: State, event): Dispatchable {
     if (state.playing) return { ...state, progress: event.target.currentTime };
     return state;
 }
 
 // Current track controls
-export function Play(state: State): Action {
+export function Play(state: State): Dispatchable {
     return {
         ...state,
         playing: true,
@@ -37,7 +37,7 @@ export function Play(state: State): Action {
     };
 }
 
-export function Pause(state: State): Action {
+export function Pause(state: State): Dispatchable {
     const video = document.getElementsByTagName("video")[0];
     if (video) {
         if (state.paused) {
@@ -49,7 +49,7 @@ export function Pause(state: State): Action {
     return { ...state, paused: !state.paused };
 }
 
-export function Stop(state: State): Action {
+export function Stop(state: State): Dispatchable {
     return {
         ...state,
         playing: false,
@@ -58,14 +58,14 @@ export function Stop(state: State): Action {
     };
 }
 
-export function SeekForwards(state: State, value: number | null): Action {
+export function SeekForwards(state: State, value: number | null): Dispatchable {
     const skip = value || state.settings["karakara.player.video.skip.seconds"];
     const video = document.getElementsByTagName("video")[0];
     if (video) video.currentTime += skip;
     return { ...state, progress: state.progress + skip };
 }
 
-export function SeekBackwards(state: State, value: number | null): Action {
+export function SeekBackwards(state: State, value: number | null): Dispatchable {
     const skip = value || state.settings["karakara.player.video.skip.seconds"];
     const video = document.getElementsByTagName("video")[0];
     if (video) video.currentTime -= skip;
@@ -73,7 +73,7 @@ export function SeekBackwards(state: State, value: number | null): Action {
 }
 
 // Playlist controls
-export function UpdateQueue(state: State, new_queue: Array<QueueItem>): Action {
+export function UpdateQueue(state: State, new_queue: Array<QueueItem>): Dispatchable {
     // if the first song in the queue has changed, stop playing
     if (
         state.queue.length === 0 ||
@@ -92,7 +92,7 @@ export function UpdateQueue(state: State, new_queue: Array<QueueItem>): Action {
     }
 }
 
-export function Dequeue(state: State): State {
+function _dequeue(state: State): State {
     return {
         ...state,
         // remove the first song
@@ -106,10 +106,14 @@ export function Dequeue(state: State): State {
     };
 }
 
-export function MarkTrackPlayed(state: State): Action {
-    return [Dequeue(state), SetTrackState(state, "played")];
+export function Dequeue(state: State): Dispatchable {
+    return _dequeue(state);
 }
 
-export function MarkTrackSkipped(state: State): Action {
-    return [Dequeue(state), SetTrackState(state, "skipped")];
+export function MarkTrackPlayed(state: State): Dispatchable {
+    return [_dequeue(state), SetTrackState(state, "played")];
+}
+
+export function MarkTrackSkipped(state: State): Dispatchable {
+    return [_dequeue(state), SetTrackState(state, "skipped")];
 }

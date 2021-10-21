@@ -2,7 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
 import { TryLogin, UpdateRoomName } from "../actions";
 
-function percent(a, b) {
+function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
 }
 

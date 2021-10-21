@@ -72,7 +72,7 @@ let state: State = {
     priority_tokens: [],
 };
 
-const subscriptions = (state) => [
+const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
         {
             push: ["root", "filters", "track_id"],

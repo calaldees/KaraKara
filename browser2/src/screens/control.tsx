@@ -73,7 +73,7 @@ function moveTrack(
     state: State,
     src_id: number | null,
     dst_id: number | null,
-): Action {
+): Dispatchable {
     let cancel = { ...state, drop_source: null, drop_target: null };
     if (src_id === dst_id) return cancel;
 

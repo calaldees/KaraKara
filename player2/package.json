@@ -2,7 +2,7 @@
     "name": "karakara-player",
     "dependencies": {
         "@shish2k/hyperapp-hash-state": "^2.0.6",
-        "@shish2k/hyperapp-mqtt": "^1.1.2",
+        "@shish2k/hyperapp-mqtt": "^1.1.6",
         "@shish2k/hyperapp-survive-hmr": "^1.0.1",
         "hyperapp": "^2.0.19",
         "hyperapp-fx": "^2.0.0-beta.2",
