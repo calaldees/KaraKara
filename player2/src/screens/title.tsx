@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 
-export const TitleScreen = ({ state }: { state: State }) => (
+export const TitleScreen = ({ state }: { state: State }): VNode => (
     <section key="title" class={"screen_title"}>
         <div id={"splash"}>
             {state.images.map((item) => (

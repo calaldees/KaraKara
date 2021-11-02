@@ -3,7 +3,7 @@ import { Lyrics } from "./common";
 import { get_attachment, get_tag, title_case } from "../utils";
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
-export const VideoScreen = ({ state }: { state: State }) => (
+export const VideoScreen = ({ state }: { state: State }): VNode => (
     <section key="video" class={"screen_video"}>
         <video
             src={get_attachment(state, state.queue[0].track, "video")}

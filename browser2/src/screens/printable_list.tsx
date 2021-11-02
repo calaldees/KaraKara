@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./base";
 
-const PrintButtons = () => (
+const PrintButtons = (): VNode => (
     <footer>
         <div class={"buttons"}>
             <button
@@ -25,7 +25,7 @@ function t(n) {
     }
     return n.sort((a, b) => a.length > b.length)[0];
 }
-export const PrintableList = ({ state }: { state: State }) => (
+export const PrintableList = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"track_list"}

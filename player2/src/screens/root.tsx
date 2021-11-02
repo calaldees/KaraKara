@@ -5,7 +5,7 @@ import { PodiumScreen } from "./podium";
 import { SettingsMenu } from "./settings";
 import { PreviewScreen } from "./preview";
 
-export function Root(state: State) {
+export function Root(state: State): VNode {
     let screen = <section>Unknown state :(</section>;
 
     if (!state.audio_allowed && !state.podium)

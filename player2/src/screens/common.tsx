@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 
-function _lineStyle(item: SrtLine, state: State) {
+function _lineStyle(item: SrtLine, state: State): string|null {
     // show subs a little faster, to counteract podium lag
     const ts = state.progress + state.settings["karakara.podium.soft_sub_lag"];
 
@@ -9,9 +9,10 @@ function _lineStyle(item: SrtLine, state: State) {
     if (item.start < ts && item.end > ts) return "present";
     if (item.end < ts) return "past";
     if (item.start > ts) return "future";
+    return null;
 }
 
-function _lyricStyle(lyrics: Array<SrtLine>) {
+function _lyricStyle(lyrics: Array<SrtLine>): string {
     // TODO: check current lyric alignment instead of first lyric?
     if (lyrics && lyrics.length && lyrics[0].text.startsWith("{\\a6}")) {
         return "top lyrics";
@@ -19,7 +20,7 @@ function _lyricStyle(lyrics: Array<SrtLine>) {
     return "bottom lyrics";
 }
 
-export const Lyrics = ({ state }: { state: State }) => (
+export const Lyrics = ({ state }: { state: State }): VNode => (
     <div class={_lyricStyle(state.queue[0].track.lyrics)}>
         <ol>
             {state.queue[0].track.lyrics &&
@@ -38,7 +39,7 @@ export const AutoplayCountdown = ({
 }: {
     state: State;
     show_if_disabled: boolean;
-}) =>
+}): VNode =>
     state.settings["karakara.player.autoplay.seconds"] === 0 ? (
         show_if_disabled && <small>(autoplay disabled)</small>
     ) : (

@@ -3,7 +3,7 @@ import { BackToExplore, Screen } from "./base";
 import { SaveSettings } from "../effects";
 import { UpdateSettings } from "../actions";
 
-const SettingsButtons = ({ state }: { state: State }) => (
+const SettingsButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <div class={"buttons"}>
             <button onclick={SaveSettings} disabled={state.loading}>
@@ -13,7 +13,7 @@ const SettingsButtons = ({ state }: { state: State }) => (
     </footer>
 );
 
-export const RoomSettings = ({ state }: { state: State }) => (
+export const RoomSettings = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"room_settings"}

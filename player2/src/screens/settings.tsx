@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 
-export const SettingsMenu = ({ state }: { state: State }) => (
+export const SettingsMenu = ({ state }: { state: State }): VNode => (
     <div class={"settings"}>
         <div>
             <h2

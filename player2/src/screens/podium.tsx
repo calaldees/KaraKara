@@ -4,7 +4,7 @@ import { Lyrics, AutoplayCountdown } from "./common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
 import { SendCommand } from "../effects";
 
-export const PodiumScreen = ({ state }: { state: State }) => (
+export const PodiumScreen = ({ state }: { state: State }): VNode => (
     <section
         key="podium"
         class={

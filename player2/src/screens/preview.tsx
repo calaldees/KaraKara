@@ -11,7 +11,7 @@ import { SetPreviewVolume } from "../actions";
 
 const show_tracks = 5;
 
-export const PreviewScreen = ({ state }: { state: State }) => (
+export const PreviewScreen = ({ state }: { state: State }): VNode => (
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <video

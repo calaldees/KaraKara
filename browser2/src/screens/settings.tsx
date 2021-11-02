@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { HideSettings } from "../actions";
 
-export const SettingsMenu = ({ state }: { state: State }) => (
+export const SettingsMenu = ({ state }: { state: State }): VNode => (
     <div class={"settings"}>
         <div>
             <h2

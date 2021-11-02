@@ -131,7 +131,7 @@ const Playlist = ({
 }: {
     state: State;
     items: Array<QueueItem>;
-}) => (
+}): VNode => (
     <section>
         <ul ondragleave={createDragLeave()}>
             {items.map((item) => (
@@ -160,7 +160,7 @@ const QueueItemRender = ({
 }: {
     state: State;
     item: QueueItem;
-}) => (
+}): VNode => (
     <li
         class={{
             queue_item: true,
@@ -211,7 +211,7 @@ const QueueItemRender = ({
     </li>
 );
 
-const ControlButtons = ({ state }: { state: State }) => (
+const ControlButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <div class={"buttons"}>
             <button onclick={Command("seek_backwards")}>
@@ -236,7 +236,7 @@ const ControlButtons = ({ state }: { state: State }) => (
     </footer>
 );
 
-export const Control = ({ state }: { state: State }) => (
+export const Control = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"queue"}

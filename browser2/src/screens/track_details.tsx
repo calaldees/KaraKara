@@ -13,7 +13,7 @@ import {
 } from "../actions";
 import { PopScrollPos, PushScrollPos } from "../effects";
 
-const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
+const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
         {state.queue.find((i) => i.track.id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
@@ -34,7 +34,7 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }) => (
     </footer>
 );
 
-const EnqueueButtons = ({ state, track }: { state: State; track: Track }) => (
+const EnqueueButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
         <input
             type="text"
@@ -68,7 +68,7 @@ export const TrackDetails = ({
 }: {
     state: State;
     track: Track;
-}) => (
+}): VNode => (
     <Screen
         state={state}
         className={"track_details"}

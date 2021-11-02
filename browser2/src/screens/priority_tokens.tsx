@@ -2,7 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./base";
 import { short_date } from "../utils";
 
-export const PriorityTokens = ({ state }: { state: State }) => (
+export const PriorityTokens = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"priority_tokens"}

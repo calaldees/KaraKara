@@ -9,7 +9,7 @@ const QueueItemRender = ({
 }: {
     state: State;
     item: QueueItem;
-}) => (
+}): VNode => (
     <li
         class={
             state.session_id == item.session_owner
@@ -52,7 +52,7 @@ const QueueItemRender = ({
 /*
  * Page Layout
  */
-export const Queue = ({ state }: { state: State }) => (
+export const Queue = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"queue"}

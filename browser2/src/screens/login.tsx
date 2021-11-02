@@ -6,7 +6,7 @@ function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
 }
 
-export const Login = ({ state }: { state: State }) => (
+export const Login = ({ state }: { state: State }): VNode => (
     <Screen state={state} className={"login"} title={"Welcome to KaraKara"}>
         <div class={"flex-center"}>
             <input

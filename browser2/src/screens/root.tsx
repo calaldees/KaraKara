@@ -10,17 +10,17 @@ import { PrintableList } from "./printable_list";
 import { RoomSettings } from "./room_settings";
 import { PriorityTokens } from "./priority_tokens";
 
-export const QueueOrControl = ({ state }: { state: State }) =>
+export const QueueOrControl = ({ state }: { state: State }): VNode =>
     state.room_password ? <Control state={state} /> : <Queue state={state} />;
 
-export const Explore = ({ state }: { state: State }) =>
+export const Explore = ({ state }: { state: State }): VNode =>
     state.track_id ? (
         <TrackDetails state={state} track={state.track_list[state.track_id]} />
     ) : (
         <TrackList state={state} />
     );
 
-export function Root(state: State) {
+export function Root(state: State): VNode {
     let body = null;
     // room_name can be set from saved state, but then track_list will be empty,
     // so push the user back to login screen if that happens (can we load the

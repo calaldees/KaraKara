@@ -12,7 +12,7 @@ import { GoToScreen, SelectTrack } from "../actions";
 /*
  * List individual tracks
  */
-const TrackItem = ({ state, track }: { state: State; track: Track }) => (
+const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
     <li class={"track_item"} onclick={SelectTrack(track.id)}>
         <div class={"thumb"}>
             <div
@@ -47,7 +47,7 @@ const FilterListGroupHeader = (
         expanded,
     }: { filter: string; count: number; expanded: boolean },
     children,
-) => (
+): VNode => (
     <li
         class={"filter_list_group_header"}
         onclick={(state) => ({ ...state, expanded: expanded ? null : filter })}
@@ -62,7 +62,7 @@ const FilterListGroupHeader = (
     </li>
 );
 
-const GroupedFilterList = ({ heading, filters, expanded }) =>
+const GroupedFilterList = ({ heading, filters, expanded }): Array<VNode> =>
     Object.keys(filters)
         .sort()
         .map((group) =>
@@ -88,7 +88,7 @@ const GroupedFilterList = ({ heading, filters, expanded }) =>
             ),
         );
 
-const FilterList = ({ heading, filters }) =>
+const FilterList = ({ heading, filters }): Array<VNode> =>
     Object.keys(filters)
         .sort()
         .map((child) => (
@@ -100,7 +100,7 @@ const FilterList = ({ heading, filters }) =>
 const AddFilter = (
     { filter, count }: { filter: string; count: number },
     children,
-) => (
+): VNode => (
     <li
         class={"add_filter"}
         onclick={(state) => [
@@ -401,7 +401,7 @@ const GoToPriorityTokens = (state: State): Dispatchable => [
     }),
 ];
 
-const AdminButtons = ({ state }: { state: State }) => (
+const AdminButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <div class={"buttons"}>
             <button onclick={GoToPriorityTokens} disabled={state.loading}>
@@ -417,7 +417,7 @@ const AdminButtons = ({ state }: { state: State }) => (
     </footer>
 );
 
-export const TrackList = ({ state }: { state: State }) => (
+export const TrackList = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"track_list"}
