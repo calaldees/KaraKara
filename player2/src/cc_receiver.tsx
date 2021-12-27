@@ -27,7 +27,7 @@ function _chromecastReceiverSub(dispatch, props) {
 
     // TODO: options from props
     const options = new cast.framework.CastReceiverOptions();
-    options.maxInactivity = 3600; //Development only
+    options.disableIdleTimeout = true;
 
     context.start(options);
 
