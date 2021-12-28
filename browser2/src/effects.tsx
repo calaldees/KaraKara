@@ -260,6 +260,27 @@ export const LoginThenFetchTrackList = (state: State): Effect =>
             response.status == "ok" ? [state, FetchTrackList(state)] : state,
     });
 
+function _autoLoginEffect(dispatch, props) {
+    const params = new URLSearchParams(window.location.search);
+    const room_name = params.get('r');
+    if(!room_name) return;
+
+    dispatch(function(state: State) {
+        if(state.room_name !== "") return state;  // HMR already loaded our data for us
+        console.log("Autologin", room_name);
+        state = {...state, room_name_edit: room_name};
+        return [
+            state,
+            state.room_password
+                ? LoginThenFetchTrackList(state)
+                : FetchTrackList(state),
+        ];
+    });
+}
+export function AutoLogin() {
+    return [_autoLoginEffect, {}]
+}
+
 export const SaveSettings = (state: State): Dispatchable => [
     { ...state },
     ApiRequest({

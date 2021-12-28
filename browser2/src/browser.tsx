@@ -1,7 +1,7 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
-import { survive_hmr } from "@shish2k/hyperapp-survive-hmr";
+import { SurviveHMR } from "@shish2k/hyperapp-survive-hmr";
 import {
     LocalStorageLoader,
     LocalStorageSaver,
@@ -9,6 +9,7 @@ import {
 
 import { Root } from "./screens/root";
 import { getMQTTListener, ResizeListener } from "./subs";
+import { AutoLogin } from "./effects";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -91,26 +92,28 @@ const subscriptions = (state: State): Array<Subscription> => [
     })),
 ];
 
-let dispatch = app({
+
+app({
     init: [
         state,
-        LocalStorageLoader("performer_name", (state, x) => ({
-            ...state,
-            performer_name: x,
-        })),
-        LocalStorageLoader("room_password", (state, x) => ({
-            ...state,
-            room_password_edit: x,
-            room_password: x,
-        })),
-        LocalStorageLoader("bookmarks", (state, x) => ({
-            ...state,
-            bookmarks: x,
-        })),
+        SurviveHMR(module, [
+            LocalStorageLoader("performer_name", (state, x) => ({
+                ...state,
+                performer_name: x,
+            })),
+            LocalStorageLoader("room_password", (state, x) => ({
+                ...state,
+                room_password_edit: x,
+                room_password: x,
+            })),
+            LocalStorageLoader("bookmarks", (state, x) => ({
+                ...state,
+                bookmarks: x,
+            })),
+            AutoLogin(),
+        ]),
     ],
     view: Root,
     subscriptions: subscriptions,
     node: document.body,
 });
-
-survive_hmr(dispatch, module);
