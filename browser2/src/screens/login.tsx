@@ -9,32 +9,32 @@ function percent(a: number, b: number): string {
 export const Login = ({ state }: { state: State }): VNode => (
     <Screen state={state} className={"login"} title={"Welcome to KaraKara"}>
         <div class={"flex-center"}>
-            <input
-                type={"text"}
-                placeholder={"Room Name"}
-                value={state.room_name_edit}
-                oninput={UpdateRoomName()}
-                disabled={state.loading}
-            />
-            <button
-                onclick={TryLogin()}
-                disabled={!state.room_name_edit || state.loading}
-            >
-                {state.loading ? (
-                    <span>
-                        Loading Tracks{" "}
-                        {state.download_size ? (
-                            percent(state.download_done, state.download_size)
-                        ) : (
-                            <i class={"loading fas fa-sync-alt"} />
-                        )}
-                    </span>
-                ) : (
-                    <span>
-                        Enter Room <i class={"fas fa-sign-in-alt"} />
-                    </span>
-                )}
-            </button>
+            <form onsubmit={TryLogin()}>
+                <input
+                    type={"text"}
+                    placeholder={"Room Name"}
+                    value={state.room_name_edit}
+                    oninput={UpdateRoomName()}
+                    disabled={state.loading}
+                    required={true}
+                />
+                <button disabled={!state.room_name_edit || state.loading}>
+                    {state.loading ? (
+                        <span>
+                            Loading Tracks{" "}
+                            {state.download_size ? (
+                                percent(state.download_done, state.download_size)
+                            ) : (
+                                <i class={"loading fas fa-sync-alt"} />
+                            )}
+                        </span>
+                    ) : (
+                        <span>
+                            Enter Room <i class={"fas fa-sign-in-alt"} />
+                        </span>
+                    )}
+                </button>
+            </form>
         </div>
     </Screen>
 );
