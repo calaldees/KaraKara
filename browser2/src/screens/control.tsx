@@ -211,26 +211,33 @@ const QueueItemRender = ({
     </li>
 );
 
+import ico_backward from 'data-url:../static/backward.svg';
+import ico_forward from 'data-url:../static/forward.svg';
+import ico_play from 'data-url:../static/play.svg';
+import ico_pause from 'data-url:../static/pause.svg';
+import ico_stop from 'data-url:../static/stop.svg';
+import ico_step_forward from 'data-url:../static/step-forward.svg';
+
 const ControlButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <div class={"buttons"}>
             <button onclick={Command("seek_backwards")}>
-                <i class={"fas fa-backward"} />
+                <img class={"ico"} src={ico_backward} />
             </button>
             <button onclick={Command("seek_forwards")}>
-                <i class={"fas fa-forward"} />
+                <img class={"ico"} src={ico_forward} />
             </button>
             <button onclick={Command("play")}>
-                <i class={"fas fa-play"} />
+                <img class={"ico"} src={ico_play} />
             </button>
             <button onclick={Command("pause")}>
-                <i class={"fas fa-pause"} />
+                <img class={"ico"} src={ico_pause} />
             </button>
             <button onclick={Command("stop")}>
-                <i class={"fas fa-stop"} />
+                <img class={"ico"} src={ico_stop} />
             </button>
             <button onclick={Command("skip")}>
-                <i class={"fas fa-step-forward"} />
+                <img class={"ico"} src={ico_step_forward} />
             </button>
         </div>
     </footer>

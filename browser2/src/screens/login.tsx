@@ -6,6 +6,9 @@ function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
 }
 
+import ico_sync_alt from 'data-url:../static/sync-alt.svg';
+import ico_sign_in_alt from 'data-url:../static/sign-in-alt.svg';
+
 export const Login = ({ state }: { state: State }): VNode => (
     <Screen state={state} className={"login"} title={"Welcome to KaraKara"}>
         <div class={"flex-center"}>
@@ -26,12 +29,12 @@ export const Login = ({ state }: { state: State }): VNode => (
                         {state.download_size ? (
                             percent(state.download_done, state.download_size)
                         ) : (
-                            <i class={"loading fas fa-sync-alt"} />
+                            <img class={"ico loading"} src={ico_sync_alt} />
                         )}
                     </span>
                 ) : (
                     <span>
-                        Enter Room <i class={"fas fa-sign-in-alt"} />
+                        Enter Room <img class={"ico"} src={ico_sign_in_alt} />
                     </span>
                 )}
             </button>
