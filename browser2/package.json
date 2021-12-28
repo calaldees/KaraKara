@@ -7,7 +7,8 @@
         "@shish2k/hyperapp-survive-hmr": "^2.0.0",
         "hyperapp": "^2.0.19",
         "hyperapp-fx": "^2.0.0-beta.2",
-        "hyperapp-jsx-pragma": "^1.3.0"
+        "hyperapp-jsx-pragma": "^1.3.0",
+        "qrcode-generator": "^1.4.4"
     },
     "scripts": {
         "build": "parcel build --public-url . src/index.html",

@@ -455,6 +455,10 @@ MAIN.queue ARTICLE {
       overflow: visible !important;
       column-count: 4;
       font-size: 0.75em;
+      .qr_code {
+        width: 75%;
+        margin: auto;
+      }
     }
     FOOTER {
       display: none !important;
