@@ -1,7 +1,7 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
-import { survive_hmr } from "@shish2k/hyperapp-survive-hmr";
+import { SurviveHMR } from "@shish2k/hyperapp-survive-hmr";
 
 import { Root } from "./screens/root";
 import {
@@ -78,11 +78,9 @@ const subscriptions = (state: State) => [
     FetchRandomImages(state.room_name),
 ];
 
-let dispatch = app({
-    init: state,
+app({
+    init: [state, SurviveHMR(module, [])],
     view: Root,
     subscriptions: subscriptions,
     node: document.body,
 });
-
-survive_hmr(dispatch, module);
