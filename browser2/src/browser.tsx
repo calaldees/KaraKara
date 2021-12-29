@@ -92,24 +92,23 @@ const subscriptions = (state: State): Array<Subscription> => [
     })),
 ];
 
-
 app({
     init: [
         state,
+        LocalStorageLoader("performer_name", (state, x) => ({
+            ...state,
+            performer_name: x,
+        })),
+        LocalStorageLoader("room_password", (state, x) => ({
+            ...state,
+            room_password_edit: x,
+            room_password: x,
+        })),
+        LocalStorageLoader("bookmarks", (state, x) => ({
+            ...state,
+            bookmarks: x,
+        })),
         SurviveHMR(module, [
-            LocalStorageLoader("performer_name", (state, x) => ({
-                ...state,
-                performer_name: x,
-            })),
-            LocalStorageLoader("room_password", (state, x) => ({
-                ...state,
-                room_password_edit: x,
-                room_password: x,
-            })),
-            LocalStorageLoader("bookmarks", (state, x) => ({
-                ...state,
-                bookmarks: x,
-            })),
             AutoLogin(),
         ]),
     ],
