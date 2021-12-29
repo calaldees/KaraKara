@@ -10,6 +10,7 @@ import {
 import { Root } from "./screens/root";
 import { getMQTTListener, ResizeListener } from "./subs";
 import { AutoLogin } from "./effects";
+import { is_logged_in } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -43,7 +44,6 @@ let state: State = {
     // login
     session_id: null,
     room_name: "",
-    room_name_edit: "",
     room_password: "",
     room_password_edit: "",
     loading: false,
@@ -77,12 +77,12 @@ let state: State = {
 const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
         {
-            push: ["root", "filters", "track_id"],
-            replace: ["room_name_edit", "search", "booth", "widescreen"],
+            push: ["root", "filters", "track_id", "room_name"],
+            replace: ["search", "booth", "widescreen"],
         },
         state,
     ),
-    state.room_name && state.track_list && getMQTTListener(state),
+    is_logged_in(state) && getMQTTListener(state),
     LocalStorageSaver("performer_name", state.performer_name),
     LocalStorageSaver("room_password", state.room_password),
     LocalStorageSaver("bookmarks", state.bookmarks),

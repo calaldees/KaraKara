@@ -92,7 +92,6 @@ type State = {
     // login
     session_id: string | null,
     room_name: string,
-    room_name_edit: string,
     room_password: string,
     room_password_edit: string,
     loading: boolean,

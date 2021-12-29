@@ -76,13 +76,6 @@ export const SetPerformerName =
         performer_name: event.target.value,
     });
 
-export const UpdateRoomName =
-    (): Action =>
-    (state: State, event: FormInputEvent): Dispatchable => ({
-        ...state,
-        room_name_edit: event.target.value.toLowerCase(),
-    });
-
 export function UpdateSettings(
     state: State,
     event: FormInputEvent,

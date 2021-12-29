@@ -90,3 +90,7 @@ export function flatten_settings(settings: Dictionary<any>): string[][] {
 export function short_date(long_date: string): string {
     return long_date.split("T")[1].substring(0, 5);
 }
+
+export function is_logged_in(state: State): boolean {
+    return (state.room_name !== "" && Object.keys(state.track_list).length > 0);
+}

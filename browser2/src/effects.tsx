@@ -3,7 +3,7 @@
  */
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { http2ws, flatten_settings } from "./utils";
+import { http2ws, flatten_settings, is_logged_in } from "./utils";
 
 // get article
 function _get_article() {
@@ -185,7 +185,7 @@ export function ApiRequest(props): Effect {
             url:
                 props.state.root +
                 "/queue/" +
-                (props.state.room_name || props.state.room_name_edit) +
+                props.state.room_name +
                 "/" +
                 props.function +
                 ".json",
@@ -228,7 +228,6 @@ export const FetchTrackList = (state: State): Effect =>
             response.status == "ok"
                 ? {
                       ...state,
-                      room_name: state.room_name_edit,
                       session_id: response.identity.id,
                       track_list: track_list_to_map(response.data.list),
                       download_done: 0,
@@ -236,7 +235,6 @@ export const FetchTrackList = (state: State): Effect =>
                   }
                 : {
                       ...state,
-                      room_name_edit: "",
                       download_done: 0,
                       download_size: null,
                   },
@@ -261,14 +259,12 @@ export const LoginThenFetchTrackList = (state: State): Effect =>
     });
 
 function _autoLoginEffect(dispatch, props) {
-    const params = new URLSearchParams(window.location.search);
-    const room_name = params.get('r');
-    if(!room_name) return;
-
     dispatch(function(state: State) {
-        if(state.room_name !== "") return state;  // HMR already loaded our data for us
-        console.log("Autologin", room_name);
-        state = {...state, room_name_edit: room_name};
+        // HMR already loaded our data for us
+        if(is_logged_in(state)) return state;
+        // No room name was set, so prompt the user
+        if(state.room_name === "") return state;
+        // console.log("Autologin", state.room_name);
         return [
             state,
             state.room_password

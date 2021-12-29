@@ -48,7 +48,7 @@ export const PrintableList = ({ state }: { state: State }): VNode => (
     >
         To get an interactive track list on your phone, scan this QR code or
         visit {state.root} and use room name "{state.room_name}".
-        <br/><QrCode text={state.root + "/browser2/?r=" + state.room_name} />
+        <br/><QrCode text={state.root + "/browser2/#" + JSON.stringify({room_name: state.room_name})} />
         {/* fields = ['id_short'] + settings['karakara.print_tracks.fields'] */}
         {Object.values(state.track_list).map((track: Track) => (
             <p>

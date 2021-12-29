@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { TryLogin, UpdateRoomName } from "../actions";
+import { TryLogin } from "../actions";
 
 function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
@@ -13,12 +13,15 @@ export const Login = ({ state }: { state: State }): VNode => (
                 <input
                     type={"text"}
                     placeholder={"Room Name"}
-                    value={state.room_name_edit}
-                    oninput={UpdateRoomName()}
+                    value={state.room_name}
+                    oninput={(state, event) => ({
+                        ...state,
+                        room_name: event.target.value.toLowerCase(),
+                    })}
                     disabled={state.loading}
                     required={true}
                 />
-                <button disabled={!state.room_name_edit || state.loading}>
+                <button disabled={!state.room_name || state.loading}>
                     {state.loading ? (
                         <span>
                             Loading Tracks{" "}
