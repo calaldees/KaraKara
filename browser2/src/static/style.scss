@@ -334,6 +334,16 @@ BUTTON:disabled {
     100% {transform: rotate(180deg);}
   }
 }
+.qr_container {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.qr_code {
+  width: 75%;
+  image-rendering: pixelated;
+}
+
 
 /* Login */
 // MAIN.login ARTICLE {}
@@ -455,10 +465,6 @@ MAIN.queue ARTICLE {
       overflow: visible !important;
       column-count: 4;
       font-size: 0.75em;
-      .qr_code {
-        width: 75%;
-        margin: auto;
-      }
     }
     FOOTER {
       display: none !important;

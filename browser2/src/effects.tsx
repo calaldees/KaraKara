@@ -4,7 +4,6 @@
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
 import { http2ws, flatten_settings } from "./utils";
-import * as qrcode from "qrcode-generator";
 
 // get article
 function _get_article() {
@@ -214,13 +213,6 @@ function track_list_to_map(raw_list: Array<Track>): Dictionary<Track> {
     return map;
 }
 
-function make_qr(state: State) {
-    let qr = qrcode(8, 'L');
-    qr.addData(state.root + "/browser2/?r=" + state.room_name_edit);
-    qr.make();
-    return qr.createDataURL(4);
-}
-
 export const FetchTrackList = (state: State): Effect =>
     ApiRequest({
         function: "track_list",
@@ -241,7 +233,6 @@ export const FetchTrackList = (state: State): Effect =>
                       track_list: track_list_to_map(response.data.list),
                       download_done: 0,
                       download_size: null,
-                      qr_data: make_qr(state),
                   }
                 : {
                       ...state,
