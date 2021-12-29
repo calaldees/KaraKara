@@ -13,67 +13,69 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
             >
                 Settings
             </h2>
-            <table>
-                <tr>
-                    <td>Server</td>
-                    <td>
-                        <input
-                            value={state.root_edit}
-                            type={"text"}
-                            oninput={(state: State, event: FormInputEvent) =>
+            <form onsubmit={HideSettings()}>
+                <table>
+                    <tr>
+                        <td>Server</td>
+                        <td>
+                            <input
+                                value={state.root_edit}
+                                type={"text"}
+                                oninput={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
                                     root_edit: event.target.value,
                                 } as State)
-                            }
-                            onchange={(state: State, event: FormInputEvent) =>
-                                ({ ...state, root: state.root_edit } as State)
-                            }
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Password</td>
-                    <td>
-                        <input
-                            value={state.room_password_edit}
-                            type={"password"}
-                            oninput={(state: State, event: FormInputEvent) =>
+                                }
+                                onchange={(state: State, event: FormInputEvent) =>
+                                    ({ ...state, root: state.root_edit } as State)
+                                }
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td>
+                            <input
+                                value={state.room_password_edit}
+                                type={"password"}
+                                oninput={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
                                     room_password_edit: event.target.value,
                                 } as State)
-                            }
-                            onchange={(state: State, event: FormInputEvent) =>
+                                }
+                                onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
                                     room_password: state.room_password_edit,
                                 } as State)
-                            }
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Booth Mode</td>
-                    <td>
-                        <input
-                            checked={state.booth}
-                            type={"checkbox"}
-                            onchange={(state: State, event: FormInputEvent) =>
+                                }
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Booth Mode</td>
+                        <td>
+                            <input
+                                checked={state.booth}
+                                type={"checkbox"}
+                                onchange={(state: State, event: FormInputEvent) =>
                                 ({
                                     ...state,
                                     booth: !state.booth,
                                 } as State)
-                            }
-                        />
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan={2}>
-                        <button onclick={HideSettings()}>Close</button>
-                    </td>
-                </tr>
-            </table>
+                                }
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan={2}>
+                            <button>Close</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
         </div>
     </div>
 );
