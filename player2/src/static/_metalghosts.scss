@@ -21,6 +21,12 @@ $LIGHT: #29EDF2;
 	border-radius: 2vh 0 2vh 0;
 }
 
+* {
+	// before animation, be at 0%, after
+	// animation, be at 100%
+	animation-fill-mode: both;
+}
+
 .theme-metalghosts,
 .theme-metalghosts-lite {
 	color: white;
@@ -67,8 +73,8 @@ $LIGHT: #29EDF2;
 
 	// shared between title and playlist screens
 	@keyframes slideup {
-		0% {bottom: -2000px;}
-		100% {bottom: 1vh;}
+		0% {transform: translateY(200vh);}
+		100% {transform: translateY(0vh);}
 	}
 	#join_info {
 		position: absolute;
@@ -78,9 +84,10 @@ $LIGHT: #29EDF2;
 		@include border;
 		color: #BBB;
 		font-size: 4vh;
-		bottom: -2000px;
+		bottom: 1vh;
 		animation-delay: 1s;
-		animation: slideup 2s forwards;
+		animation-name: slideup;
+		animation-duration: 2s;
 	}
 
 	@keyframes glow_y {
@@ -120,13 +127,15 @@ $LIGHT: #29EDF2;
 			text-align: center;
 		}
 
+		// separate animation so that all thumbs flow down, but half
+		// rotate clockwise and half anti
 		@keyframes rain {
-			0% {top: -20vh;}
-			100% {top: 100vh;}
+			0% {transform: translateY(0vh);}
+			100% {transform: translateY(120vh);}
 		}
 		@keyframes rotate1 {
-			0% {transform:rotate(0deg);}
-			100% {transform:rotate(360deg);}
+			0% {transform: rotate(0deg);}
+			100% {transform: rotate(360deg);}
 		}
 		IMG {
 			top: -20vh;
@@ -149,8 +158,8 @@ $LIGHT: #29EDF2;
 
 		/* main blocks */
 		@keyframes slideright {
-			0% {left: -200vw;}
-			100% {left: 0;}
+			0% {transform: translateX(-200vw);}
+			100% {transform: translateX(0vw);}
 		}
 		#playlist {
 			position: absolute;
@@ -166,8 +175,9 @@ $LIGHT: #29EDF2;
 				@include border;
 				height: 12vh;
 				width: 57vw;
-				animation: slideright 1s forwards;
-				left: -2000px;
+				animation-name: slideright;
+				animation-duration: 1s;
+				left: 0vw;
 
 				img {display: none;}
 				p {
@@ -226,7 +236,9 @@ $LIGHT: #29EDF2;
 			li:nth-child(1) .time::before {
 				content: "You're up!";
 				color: #ff0;
-				animation: glow_y 2s infinite;
+				animation-name: glow_y;
+				animation-duration: 2s;
+				animation-iteration-count: infinite;
 			}
 			li:nth-child(2) .time {
 				color: rgba(0,0,0,0);
@@ -239,8 +251,8 @@ $LIGHT: #29EDF2;
 		}
 
 		@keyframes slideleft {
-			0% {right: -200vw;}
-			100% {right: 0;}
+			0% {transform: translateX(200vw);}
+			100% {transform: translateX(0vw);}
 		}
 		#playlist_obscured {
 			position: absolute;
@@ -259,8 +271,9 @@ $LIGHT: #29EDF2;
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
-				right: -2000px;
-				animation: slideleft 1s forwards;
+				right: 0vw;
+				animation-name: slideleft;
+				animation-duration: 1s;
 				animation-delay: 2.0s;
 				position: relative;
 			}
@@ -281,23 +294,21 @@ $LIGHT: #29EDF2;
 		#playlist_obscured::before {
 			content: "Coming Soon: ";
 			right: -2000px;
-			animation: slideleft 1s forwards;
+			animation-name: slideleft;
+			animation-duration: 1s;
 			animation-delay: 0.5s;
 			position: relative;
 		}
 
-		@keyframes slideleftwithpad {
-			0% {right: -200vw;}
-			100% {right: 2vw;}
-		}
 		.preview_holder {
 			@include border;
 			position: absolute;
 			top: 26vh;
 			height: 40vh;
 			width: 38vw;
-			right: -2000px;
-			animation: slideleftwithpad 1s forwards;
+			right: 2vw;
+			animation-name: slideleft;
+			animation-duration: 1s;
 			animation-delay: 0.0s;
 
 			// if <video> is followed by <small>autoplay in x seconds</small>
@@ -369,10 +380,16 @@ $LIGHT: #29EDF2;
 				1px 1px 0 #000,
 				0 0 5vh #000;
 		}
+		@keyframes popright {
+			0% {transform: translate(200vw);}
+			20% {transform: translate(200vw);}
+			40% {transform: translate(0vw);}
+			100% {transform: translate(0vw);}
+		}
 		#pimpkk {
 			font-size: 10vh;
 			top: 5vh;
-			right: -200vw;
+			right: 5vw;
 			animation-name: popright;
 		}
 		#pimpcontributor {
@@ -381,24 +398,18 @@ $LIGHT: #29EDF2;
 			right: -200vw;
 			animation-name: popright;
 		}
-		@keyframes popright {
-			0% {right: -200vw;}
-			20% {right: -200vw;}
-			40% {right: 5vw;}
-			100% {right: 5vw;}
-		}
 
+		@keyframes popleft {
+			0% {transform: translate(-200vw);}
+			20% {transform: translate(-200vw);}
+			40% {transform: translate(0vw);}
+			100% {transform: translate(0vw);}
+		}
 		#pimpsong {
 			font-size: 5vh;
 			bottom: 5vh;
-			left: -200vw;
+			left: 5vw;
 			animation-name: popleft;
-		}
-		@keyframes popleft {
-			0% {left: -200vw;}
-			20% {left: -200vw;}
-			40% {left: 5vw;}
-			100% {left: 5vw;}
 		}
 
 		.lyrics.top OL {
@@ -503,7 +514,11 @@ $LIGHT: #29EDF2;
 			}
 		}
 		DIV.startButton {
-			SPAN {animation: glow_y 2s infinite;}
+			SPAN {
+				animation-name: glow_y;
+				animation-duration: 2s;
+				animation-iteration-count: infinite;
+			}
 		}
 	}
 	.screen_podium.no_lyrics {
