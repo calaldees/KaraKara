@@ -127,15 +127,13 @@ $LIGHT: #29EDF2;
 			text-align: center;
 		}
 
-		// separate animation so that all thumbs flow down, but half
-		// rotate clockwise and half anti
-		@keyframes rain {
-			0% {transform: translateY(0vh);}
-			100% {transform: translateY(120vh);}
+		@keyframes raincw {
+			0% {transform: translateY(0vh) rotate(0deg);}
+			100% {transform: translateY(120vh) rotate(360deg);}
 		}
-		@keyframes rotate1 {
-			0% {transform: rotate(0deg);}
-			100% {transform: rotate(360deg);}
+		@keyframes rainccw {
+			0% {transform: translateY(0vh) rotate(0deg);}
+			100% {transform: translateY(120vh) rotate(-360deg);}
 		}
 		IMG {
 			top: -20vh;
@@ -143,9 +141,9 @@ $LIGHT: #29EDF2;
 			max-height: 20vh;
 			height: auto;
 			width: auto;
-			animation: rain 10s linear infinite, rotate1 10s linear infinite;
+			animation: raincw 10s linear infinite;
 		}
-		IMG:nth-child(odd) {animation-direction: normal, reverse;}
+		IMG:nth-child(odd) {animation: rainccw 10s linear infinite;}
 	}
 
 
