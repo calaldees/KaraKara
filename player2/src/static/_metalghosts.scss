@@ -537,8 +537,10 @@ $LIGHT: #29EDF2;
 }
 
 .theme-metalghosts-lite {
+	// disable background animation
 	animation: none;
 	.screen_title IMG {
+		// disable title screen thumbnail rain
 		animation: none;
 	}
 }
