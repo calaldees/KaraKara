@@ -7,7 +7,10 @@ import { http2ws, flatten_settings, is_logged_in } from "./utils";
 
 // get article
 function _get_article() {
-    return document.getElementsByTagName("article")[0];
+    let articles = document.getElementsByTagName("article");
+    // In portrait mode, only one article; in landscape,
+    // there are two and we want the second.
+    return articles[articles.length - 1];
 }
 export function PushScrollPos(): Effect {
     function saveScrollPos(dispatch, props) {
