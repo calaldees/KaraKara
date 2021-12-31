@@ -91,9 +91,8 @@ $LIGHT: #29EDF2;
 	}
 
 	@keyframes glow_y {
-		0% {color: #ff0;}
-		50% {color: #880;}
-		100% {color: #ff0;}
+		0% {opacity: 0.5;}
+		100% {opacity: 1.0;}
 	}
 
 	#error {
@@ -235,8 +234,9 @@ $LIGHT: #29EDF2;
 				content: "You're up!";
 				color: #ff0;
 				animation-name: glow_y;
-				animation-duration: 2s;
+				animation-duration: 1s;
 				animation-iteration-count: infinite;
+				animation-direction: alternate;
 			}
 			li:nth-child(2) .time {
 				color: rgba(0,0,0,0);
@@ -513,9 +513,12 @@ $LIGHT: #29EDF2;
 		}
 		DIV.startButton {
 			SPAN {
+				color: #ff0;
 				animation-name: glow_y;
-				animation-duration: 2s;
+				animation-duration: 1s;
 				animation-iteration-count: infinite;
+				animation-direction: alternate;
+				animation-timing-function: linear;
 			}
 		}
 	}
