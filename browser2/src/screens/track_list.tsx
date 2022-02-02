@@ -422,7 +422,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         state={state}
         className={"track_list"}
         navLeft={
-            (!state.widescreen || state.filters.length > 0) && (
+            (state.filters.length > 0) && (
                 <a onclick={back}>
                     <i class={"fas fa-2x fa-chevron-circle-left"} />
                 </a>
