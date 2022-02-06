@@ -24,7 +24,7 @@ class CommunityUserStore(IUserStore):
 
     def create_user(self, provider_token, name=None, email=None, **user_data):
         user = CommunityUser()
-        user.name = name
+        user.name = name or user_data.get('username')
         user.email = email
         # The first user created is always automatically an admin
         # TODO: A test for this
