@@ -30,20 +30,22 @@ def community_queue_add(request):
     if request.params.get('queue_id') != request.params.get('queue_id').lower():
         raise action_error(_('api.error.queue_id.uppercase_forbidden'), code=400)
 
+    QUEUE_ID = request.params.get('queue_id').lower()
+
     queue = Queue()
-    queue.id = request.params.get('queue_id').lower()
+    queue.id = QUEUE_ID
     DBSession.add(queue)
 
     commit()  # This is required as in postgres we are not using the orm and the settings insert fails because queue has not been constructed yet. Consider correct use of orm?
 
     queue_setting = QueueSetting()
-    queue_setting.queue_id = request.params.get('queue_id')
+    queue_setting.queue_id = QUEUE_ID
     queue_setting.key = 'karakara.private.password'
     queue_setting.value = request.params.get('queue_password')
     DBSession.add(queue_setting)
 
     if request.registry.settings.get('karakara.server.mode') != 'test':
-        sync_queue_to_mqtt(request.registry, queue.id)
+        sync_queue_to_mqtt(request.registry, QUEUE_ID)
 
     return action_ok(code=201)
 
