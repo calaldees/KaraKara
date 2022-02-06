@@ -3,7 +3,6 @@ import random
 from typing import List
 from functools import partial
 from datetime import timedelta, datetime
-import tempfile
 
 # Pyramid imports
 import pyramid.events
@@ -185,12 +184,8 @@ def main(global_config, **settings):
         ))
     # Google
     if 'google' in login_providers:
-        with tempfile.NamedTemporaryFile(mode="w+") as temp_file:
-            secret = config.registry.settings.get('login.google.client_secret')
-            temp_file.write(secret)
-            temp_file.flush()
             social_login.add_login_provider(GoogleLogin(
-                client_secret_file=temp_file.name,
+                json_string=config.registry.settings.get('login.google.client_secret'),
             ))
     # Firefox Persona (Deprecated technology but a useful reference)
     #if 'persona' in login_providers:

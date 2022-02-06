@@ -119,6 +119,7 @@ def sync_all_queues_to_mqtt(registry):
 
 
 def sync_queue_to_mqtt(registry, queue_id):
+    from socket import gaierror
     import paho.mqtt.client as mqtt
     from ..views.queue_items import _queue_items_dict_with_track_dict, _queue_query
     from ..views.queue_settings import _get_queue_settings
@@ -129,7 +130,7 @@ def sync_queue_to_mqtt(registry, queue_id):
     c = mqtt.Client()
     try:
         c.connect(MQTT_HOST)
-    except socket.gaierror:
+    except gaierror:
         log.error(f'mqtt not running? {MQTT_HOST}:1883')
         return
     c.loop_start()
