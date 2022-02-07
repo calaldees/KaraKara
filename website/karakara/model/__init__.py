@@ -43,12 +43,12 @@ def init_DBSession(settings):
         os.makedirs(folder_database, exist_ok=True)
 
     # Wait (a short period) for postgres port to open if needed
-    postgres_url_match = re.match(r'postgresql://.*?@(?P<host>.*?):(?P<port>\d{2,6})', settings['sqlalchemy.url'])
+    postgres_url_match = re.match(r'postgres.*@(?P<host>.*?)\W', settings['sqlalchemy.url'])  # TODO: this is incomplete and wont identify an alternate port
     if postgres_url_match:
         import socket
         from calaldees.wait_for import wait_for
         TIMEOUT = 10
-        socket_host_port_tuple = (postgres_url_match.group('host'), postgres_url_match.group('port'))
+        socket_host_port_tuple = (postgres_url_match.group('host'), 5432)
         log.info(f'Waiting for postgresql socket to open at {socket_host_port_tuple} for {TIMEOUT} seconds')
         wait_for(
             func_attempt=lambda: socket.create_connection(socket_host_port_tuple, timeout=1),
@@ -76,6 +76,9 @@ def init_DBSession_tables():
     """
     log.info("Create all tables (if needed) that are bound to DeclarativeBase")
     Base.metadata.create_all(bind=DBSession.bind, checkfirst=True)
+    # after_create events are buggered - the tables are not created and stuck in the transaction manager - attempt to do this manually
+    from karakara.model.init_data import init_initial_tags
+    init_initial_tags()
 
 def clear_DBSession_tables():
     log.info("Drop all tables that are bound to DeclarativeBase")

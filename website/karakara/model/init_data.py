@@ -31,7 +31,7 @@ from .actions import get_tag
 # Init Base Data
 #-------------------------------------------------------------------------------
 
-@event.listens_for(Tag.__table__, 'after_create')  # type: ignore
+#@event.listens_for(Tag.__table__, 'after_create')  # disabled - in postgres the tables are not created at `after_create` they are still stuck in the transaction?    # type: ignore
 def init_initial_tags(*args, **kwargs):
     #init_db()  # Clear current DB and Create Blank Tables
 
@@ -95,4 +95,4 @@ def init_initial_tags(*args, **kwargs):
         get_tag(tag, create_if_missing=True)
 
     #DBSession.add_all(tags)
-    commit()  # Can't simply call DBSession.commit() as this is han handled my the Zope transcation manager .. wha?!
+    commit()  # Can't simply call DBSession.commit() as this is handled my the Zope transcation manager .. wha?!

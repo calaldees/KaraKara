@@ -6,7 +6,7 @@ zope.sqlalchemy
 transaction
 waitress
 beautifulsoup4
-py-postgresql
+psycopg2-binary
 python-dateutil
 dogpile.cache
 requests
