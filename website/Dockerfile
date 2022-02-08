@@ -1,14 +1,16 @@
-ARG PYTHON_IMAGE_VERSION=3.9
-FROM python:${PYTHON_IMAGE_VERSION}-slim as base
+ARG PYTHON_IMAGE_VERSION=3.10
+FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
     ARG PYTHON_IMAGE_VERSION
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
 
     # System dependencies
-    RUN apt-get update && apt-get install -y \
-        git \
+    #RUN apt-get update && apt-get install -y \
+    RUN apk add --no-cache \
         curl \
         nano \
         less \
+        bash \
+        git \
     && pip install --no-cache-dir --upgrade \
         pip \
         setuptools \

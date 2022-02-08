@@ -15,7 +15,7 @@ api.search.max_age = 3600 -> int
 server.gzip         = False -> bool
 server.etag.enabled = True -> bool
 
-sqlalchemy.url = postgresql+pypostgresql://karakara:karakara@postgres/karakara
+sqlalchemy.url = postgresql+psycopg2://karakara:karakara@postgres/karakara
 
 session.secret = change_me
 

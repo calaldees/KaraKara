@@ -119,14 +119,20 @@ def sync_all_queues_to_mqtt(registry):
 
 
 def sync_queue_to_mqtt(registry, queue_id):
+    from socket import gaierror
     import paho.mqtt.client as mqtt
     from ..views.queue_items import _queue_items_dict_with_track_dict, _queue_query
     from ..views.queue_settings import _get_queue_settings
 
-    log.info(f"Syncing state for {queue_id}")
+    MQTT_HOST = registry.settings['karakara.websocket.host'] # TODO: rename karakara.websocket.host to 'mqtt'?
+    log.info(f"Syncing state for {queue_id} to {MQTT_HOST}")
 
     c = mqtt.Client()
-    c.connect(registry.settings['karakara.websocket.host'])
+    try:
+        c.connect(MQTT_HOST)
+    except gaierror:
+        log.error(f'mqtt not running? {MQTT_HOST}:1883')
+        return
     c.loop_start()
 
     settings = _get_queue_settings(registry, queue_id)

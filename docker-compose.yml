@@ -39,6 +39,7 @@ services:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:/media/meta:ro
+            #- ${PWD}/website:/app:ro  # for local development
 
     mosquitto:
         image: karakara/mosquitto
