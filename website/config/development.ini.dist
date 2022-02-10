@@ -54,6 +54,7 @@ static.path.meta = /media/meta
 static.path.processed = /media/processed
 static.processmedia2.log = ../processmedia2/logs/processmedia.log
 static.backup = data/backup
+static.path.output = /static
 
 #static.assets = http://staticserver.com/
 

@@ -1,5 +1,12 @@
+import pytest
+
 import re
 import json
+import tempfile
+import pathlib
+
+from unittest.mock import patch
+
 
 
 def _track_import(app, url='/track_import?format=json', json_data={}, method='get'):
@@ -54,3 +61,14 @@ def test_track_import_delete(app, queue, tracks, registry_settings):
     _track_import(app, method='delete', json_data=['import1'])
     _assert_base_tracks(app)
     assert track_version != registry_settings['karakara.tracks.version']
+
+
+@pytest.mark.skip('unimplemented')  # WIP Feature
+def test_track_import_update(app, queue, tracks, registry_settings):
+    with tempfile.TemporaryDirectory() as tempdir:
+        tempdir = pathlib.Path(tempdir)
+        assert tuple(tempdir.iterdir()) == ()
+        with patch.dict(registry_settings, {'static.path.output': tempdir}):  # it is ok to patch the raw setting dict as this is never exposed by the settings api so we don't need temporary_settings
+            _track_import(app, method='patch')  # trigger generation of `track_list.json`
+        # Assert files created a json and in the same format as `/queue/QUEUE/track_list.json`
+        assert json.load(tempdir.joinpath('queue', queue, 'track_list.json').open())['data']['list'], 'static json track list should have tracks in'

@@ -1,5 +1,6 @@
 import json
 from typing import Dict, Any
+import pathlib
 
 from pyramid.view import view_config
 
@@ -93,4 +94,20 @@ def track_delete(request):
             log.info(f'Delete: {track_id}')
         else:
             log.warning(f'NotExists: {track_id}')
+    return action_ok()
+
+
+@view_config(
+    context='karakara.traversal.TrackImportContext',
+    request_method='PATCH',
+)
+def track_patch(request):
+    """
+    Probably not the right use of PATCH,
+    Prompt the static `track_list` for each queue to be regenerated.
+    This is probably a separate job that this not part of the web server.
+    Some kind of queue/message worker would be a better idea
+    """
+    path = pathlib.Path(request.registry.settings['static.path.output'])
+    breakpoint()
     return action_ok()
