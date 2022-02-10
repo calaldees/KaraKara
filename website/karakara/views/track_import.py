@@ -7,6 +7,7 @@ from pyramid.view import view_config
 from . import action_ok, action_error
 
 from karakara.model.model_tracks import Track, Attachment, _attachment_types
+from karakara.model.model_queue import Queue
 from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag, delete_track
 ATTACHMENT_TYPES = set(_attachment_types.enums)
@@ -109,5 +110,8 @@ def track_patch(request):
     Some kind of queue/message worker would be a better idea
     """
     path = pathlib.Path(request.registry.settings['static.path.output'])
-    breakpoint()
+
+    for queue in (q.id for q in DBSession.query(Queue)):
+        path.joinpath('queue', queue).mkdir(parents=True)
+        path.joinpath('queue', queue, 'track_list.json').open('wt').write('{"HELLO": "WORLD"}')
     return action_ok()

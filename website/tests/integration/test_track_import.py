@@ -66,9 +66,9 @@ def test_track_import_delete(app, queue, tracks, registry_settings):
 @pytest.mark.skip('unimplemented')  # WIP Feature
 def test_track_import_update(app, queue, tracks, registry_settings):
     with tempfile.TemporaryDirectory() as tempdir:
-        tempdir = pathlib.Path(tempdir)
-        assert tuple(tempdir.iterdir()) == ()
         with patch.dict(registry_settings, {'static.path.output': tempdir}):  # it is ok to patch the raw setting dict as this is never exposed by the settings api so we don't need temporary_settings
             _track_import(app, method='patch')  # trigger generation of `track_list.json`
         # Assert files created a json and in the same format as `/queue/QUEUE/track_list.json`
-        assert json.load(tempdir.joinpath('queue', queue, 'track_list.json').open())['data']['list'], 'static json track list should have tracks in'
+        assert json.load(
+            pathlib.Path(tempdir).joinpath('queue', queue, 'track_list.json').open()
+        )['data']['list'], 'static json track list should have tracks in'
