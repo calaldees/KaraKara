@@ -121,7 +121,12 @@ def track_patch(request):
         track_list = request.call_sub_view(track_list_all, track_list_acquire_cache_bucket_func)
 
         json.dump(
-            {'data': track_list},  # the static file must match the structure of the normal return - so wrap in 'data'
+            {
+                "status": "ok",
+                'data': track_list,
+                'messages': [],
+                'identity': {'id': 'FAKE_PLACEHOLDER'},
+            },  # the static file must match the structure of the normal api return
             path_tracklist.open('w'),
         )
     return action_ok()

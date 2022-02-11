@@ -72,5 +72,8 @@ def test_track_import_update(app, queue, tracks, registry_settings):
         data = json.load(
             pathlib.Path(tempdir).joinpath('queue', queue, 'track_list.json').open()
         )
+        assert data['status'] == 'ok', 'required for browser2'
+        assert data['messages'] == [], 'required for browser2'
+        assert data['identity']['id'], 'required for browser2'
         assert data['data']['list'], 'static json track list should have tracks in'
         assert 'test track 3 キ' in {track['title'] for track in data['data']['list']}  # double check unicode from static file process
