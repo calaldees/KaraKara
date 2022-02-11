@@ -63,12 +63,13 @@ def test_track_import_delete(app, queue, tracks, registry_settings):
     assert track_version != registry_settings['karakara.tracks.version']
 
 
-@pytest.mark.skip('unimplemented')  # WIP Feature
 def test_track_import_update(app, queue, tracks, registry_settings):
     with tempfile.TemporaryDirectory() as tempdir:
         with patch.dict(registry_settings, {'static.path.output': tempdir}):  # it is ok to patch the raw setting dict as this is never exposed by the settings api so we don't need temporary_settings
             _track_import(app, method='patch')  # trigger generation of `track_list.json`
-        # Assert files created a json and in the same format as `/queue/QUEUE/track_list.json`
-        assert json.load(
+        # Files created a json and in the same format as `/queue/QUEUE/track_list.json`
+        data = json.load(
             pathlib.Path(tempdir).joinpath('queue', queue, 'track_list.json').open()
-        )['data']['list'], 'static json track list should have tracks in'
+        )
+        assert data['data']['list'], 'static json track list should have tracks in'
+        assert 'test track 3 キ' in {track['title'] for track in data['data']['list']}  # double check unicode from static file process

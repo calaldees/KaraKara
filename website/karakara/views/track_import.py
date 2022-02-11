@@ -12,6 +12,8 @@ from karakara.model import DBSession, commit
 from karakara.model.actions import get_tag, delete_track
 ATTACHMENT_TYPES = set(_attachment_types.enums)
 
+from karakara.views.queue_track_list import track_list_all, acquire_cache_bucket_func as track_list_acquire_cache_bucket_func
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -110,8 +112,16 @@ def track_patch(request):
     Some kind of queue/message worker would be a better idea
     """
     path = pathlib.Path(request.registry.settings['static.path.output'])
+    for queue_id in (q.id for q in DBSession.query(Queue)):
+        path_tracklist = path.joinpath('queue', queue_id, 'track_list.json')
+        path_tracklist.parent.mkdir(parents=True)
+        log.info(f'Generating static track file - {path_tracklist}')
 
-    for queue in (q.id for q in DBSession.query(Queue)):
-        path.joinpath('queue', queue).mkdir(parents=True)
-        path.joinpath('queue', queue, 'track_list.json').open('wt').write('{"HELLO": "WORLD"}')
+        request.context.queue_id = queue_id  # Fake the context `queue_id`` for the request
+        track_list = request.call_sub_view(track_list_all, track_list_acquire_cache_bucket_func)
+
+        json.dump(
+            {'data': track_list},  # the static file must match the structure of the normal return - so wrap in 'data'
+            path_tracklist.open('w'),
+        )
     return action_ok()
