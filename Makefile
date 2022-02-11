@@ -28,7 +28,7 @@ docker_shell_website:
 docker_exec_website:
 	docker-compose exec website /bin/bash
 docker_exec_website_generate_static_track_list:  ## Shortcut for manually prompting static regen
-	docker-compose exec website curl -X PATCH http://localhost:6543/track_import
+	docker-compose exec website curl -X PATCH http://localhost:6543/track_import?format=json
 docker_exec_psql:
 	docker-compose exec postgres psql karakara --user karakara
 docker_up:

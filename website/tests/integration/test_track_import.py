@@ -67,6 +67,7 @@ def test_track_import_update(app, queue, tracks, registry_settings):
     with tempfile.TemporaryDirectory() as tempdir:
         with patch.dict(registry_settings, {'static.path.output': tempdir}):  # it is ok to patch the raw setting dict as this is never exposed by the settings api so we don't need temporary_settings
             _track_import(app, method='patch')  # trigger generation of `track_list.json`
+            _track_import(app, method='patch')  # do it twice to assertin if their is a clash
         # Files created a json and in the same format as `/queue/QUEUE/track_list.json`
         data = json.load(
             pathlib.Path(tempdir).joinpath('queue', queue, 'track_list.json').open()

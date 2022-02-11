@@ -114,7 +114,7 @@ def track_patch(request):
     path = pathlib.Path(request.registry.settings['static.path.output'])
     for queue_id in (q.id for q in DBSession.query(Queue)):
         path_tracklist = path.joinpath('queue', queue_id, 'track_list.json')
-        path_tracklist.parent.mkdir(parents=True)
+        path_tracklist.parent.mkdir(parents=True, exist_ok=True)
         log.info(f'Generating static track file - {path_tracklist}')
 
         request.context.queue_id = queue_id  # Fake the context `queue_id`` for the request
