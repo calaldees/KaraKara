@@ -19,7 +19,8 @@ jobs:
 
       - run: make test_cypress_run
 
-      - name: cypress artifacts
+      - name: Artifacts
+        if: always()
         uses: actions/upload-artifact@v2
         with:
             #name: cypress artifacts
