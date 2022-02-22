@@ -1,5 +1,12 @@
+import pytest
+
 import re
 import json
+import tempfile
+import pathlib
+
+from unittest.mock import patch
+
 
 
 def _track_import(app, url='/track_import?format=json', json_data={}, method='get'):
@@ -54,3 +61,19 @@ def test_track_import_delete(app, queue, tracks, registry_settings):
     _track_import(app, method='delete', json_data=['import1'])
     _assert_base_tracks(app)
     assert track_version != registry_settings['karakara.tracks.version']
+
+
+def test_track_import_update(app, queue, tracks, registry_settings):
+    with tempfile.TemporaryDirectory() as tempdir:
+        with patch.dict(registry_settings, {'static.path.output': tempdir}):  # it is ok to patch the raw setting dict as this is never exposed by the settings api so we don't need temporary_settings
+            _track_import(app, method='patch')  # trigger generation of `track_list.json`
+            _track_import(app, method='patch')  # do it twice to assertin if their is a clash
+        # Files created a json and in the same format as `/queue/QUEUE/track_list.json`
+        data = json.load(
+            pathlib.Path(tempdir).joinpath('queue', queue, 'track_list.json').open()
+        )
+        assert data['status'] == 'ok', 'required for browser2'
+        assert data['messages'] == [], 'required for browser2'
+        assert data['identity']['id'], 'required for browser2'
+        assert data['data']['list'], 'static json track list should have tracks in'
+        assert 'test track 3 キ' in {track['title'] for track in data['data']['list']}  # double check unicode from static file process

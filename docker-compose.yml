@@ -1,6 +1,7 @@
 version: '3.5'
 
 volumes:
+    website_static:
     website_db:
     processmedia2_data:
     logs:
@@ -14,8 +15,10 @@ services:
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
+            - website_static:/static:ro
             - logs:/logs
             - ${PATH_HOST_processed}:/media/processed:ro
+            #- ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro  # for local development
         links:
             - website
             - mosquitto
@@ -36,6 +39,7 @@ services:
             - redis
             - mosquitto
         volumes:
+            - website_static:/static:rw  # website writes staic files to overlay
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:/media/meta:ro

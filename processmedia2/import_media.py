@@ -182,6 +182,10 @@ def import_media(**kwargs):
 
     stats['db_end'] = track_api()['data']['tracks'].values()
 
+    log.info("Regenerating of static track files for all queues - this may take some time")
+    log.warn("TODO Refactor this. This should not be a blocking operation!")
+    track_api(method='PATCH')
+
     #assert stats['db_end'] == stats['meta_hash_matched_db_hash'] | stats['meta_imported']  # TODO! Reinstate this
     return stats
 

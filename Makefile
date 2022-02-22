@@ -29,6 +29,8 @@ docker_shell_website:  ## start + shell into website only
 	#  psql -h postgres -U karakara karakara -f /data/karakara_users.sql
 docker_exec_website:  ## website shell (currently running container)
 	docker-compose exec website /bin/bash
+docker_exec_website_generate_static_track_list:  ## Shortcut for manually prompting static regen
+	docker-compose exec website curl -X PATCH http://localhost:6543/track_import?format=json
 docker_exec_psql:  ## psql shell (currently running container)
 	docker-compose exec postgres psql karakara --user karakara
 docker_up:
