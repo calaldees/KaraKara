@@ -10,6 +10,38 @@ import {
 import { GoToScreen, SelectTrack } from "../actions";
 
 /*
+Figure out what extra info is relevant for a given track, given what the
+user is currently searching for
+*/
+let title_tags_for_category: Dictionary<Array<string>> = {
+    'DEFAULT': ['from', 'use', 'length'],
+    'vocaloid': ['artist'],
+    'jpop': ['artist'],
+    'meme': ['from'],
+};
+function track_info(state: State, track: Track): string {
+    let info_tags = title_tags_for_category[track.tags['category'][0]] || title_tags_for_category["DEFAULT"];
+    // look at series that are in the search box
+    let search_from = state.filters.filter(x => x.startsWith("from:")).map(x => x.replace("from:", ""));
+    let info_data = (
+        info_tags
+        // Ignore undefined tags
+        .filter(x => track.tags[x])
+        // We always display track title, so ignore any tags which duplicate that
+        .filter(x => track.tags[x][0] != track.tags["title"][0])
+        // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
+        .filter(x => x != "from" || !search_from.includes(track.tags[x][0]))
+        // Format a list of tags
+        .map(x => title_case(track.tags[x].join(", ")))
+    );
+    let info = info_data.join(" - ");
+    if(track.tags['vocaltrack'][0] == "off") {
+        info += " (No vocal)"
+    }
+    return info;
+}
+
+/*
  * List individual tracks
  */
 const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
@@ -25,11 +57,11 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
             />
         </div>
         <span class={"text track_info"}>
-            <span class={"from"}>
-                {title_case((track.tags["from"] || track.tags["artist"])[0])}
-            </span>
-            <br />
             <span class={"title"}>{title_case(track.tags["title"][0])}</span>
+            <br />
+            <span class={"info"}>
+                {track_info(state, track)}
+            </span>
         </span>
         <span class={"go_arrow"}>
             <i class={"fas fa-chevron-circle-right"} />
