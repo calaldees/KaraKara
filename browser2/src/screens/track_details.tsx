@@ -101,16 +101,6 @@ export const TrackDetails = ({
             />
         </video>
 
-        {/* Lyrics */}
-        {track.lyrics && (
-            <div class={"lyrics"}>
-                <h2>Lyrics</h2>
-                {track.lyrics.map((item) => (
-                    <div>{item.text.replace(/^\{.*?\}/, "")}</div>
-                ))}
-            </div>
-        )}
-
         {/* Tags */}
         <h2>Tags</h2>
         <div class={"tags"}>
@@ -125,5 +115,15 @@ export const TrackDetails = ({
                     </div>
                 ))}
         </div>
+
+        {/* Lyrics */}
+        {track.lyrics && (
+            <div class={"lyrics"}>
+                <h2>Lyrics</h2>
+                {track.lyrics.map((item) => (
+                    <div>{item.text.replace(/^\{.*?\}/, "")}</div>
+                ))}
+            </div>
+        )}
     </Screen>
 );
