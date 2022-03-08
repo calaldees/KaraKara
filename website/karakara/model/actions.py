@@ -56,6 +56,11 @@ def get_tag(tag, parent=None, create_if_missing=False):
 
     if not tag:
         return None
+    if tag == parent:
+        # TODO: Attempt to detect cyclic dependency of tags. If tag and parent are equal then abort.
+        # This is not ideal. Cycles could still exist in bigger chains. It's also not good to do this silently, the user should be told.
+        return None
+
 
     #print("get_tag(%s:%s)" % (parent,tag))
 

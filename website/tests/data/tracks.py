@@ -139,6 +139,7 @@ def tracks(request, DBSession, commit, tags, attachments, cache_store):
             'tags': [
                 'title      :Wildcard',
                 'lang:fr',
+                'from:series x:series x',  # This should never be inserted at this is a cyclic tag and is silently rejectected
             ],
             'attachments': [],
             'source_filename': 'wildcardsource',
@@ -192,7 +193,9 @@ def create_test_track(id=None, duration=None, tags=(), attachments=(), srt=None,
     track.id = id if id else random_string(10)
     track.duration = duration if duration else random.randint(60, 360)
     for tag in tags:
-        track.tags.append(_get_tag(tag))
+        _tag = _get_tag(tag)
+        if _tag:
+            track.tags.append(_tag)
     for attachment in attachments:
         track.attachments.append(_get_attachment(attachment))
     track.srt = srt or ''
