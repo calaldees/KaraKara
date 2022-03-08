@@ -37,7 +37,7 @@ docker_up:
 	docker-compose up
 docker_stop:
 	docker-compose stop
-pull:  # pull + rebuild + run
+pull:  ## pull + rebuild containers + run
 	git pull && docker-compose stop && docker-compose up --build -d
 
 
