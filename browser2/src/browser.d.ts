@@ -82,6 +82,7 @@ type State = {
         text: string,
         style: string,
     },
+    priority_token: PriorityToken | null,
     show_settings: boolean,
     download_size: number | null,
     download_done: number,

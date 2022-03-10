@@ -1,4 +1,5 @@
 /// <reference path='./browser.d.ts'/>
+import Cookies from 'js-cookie'
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
 import { SurviveHMR } from "@shish2k/hyperapp-survive-hmr";
@@ -34,6 +35,7 @@ let state: State = {
     root_edit: auto_root,
     screen: "explore",
     notification: null,
+    priority_token: null,
     show_settings: false,
     download_size: null,
     download_done: 0,
@@ -74,6 +76,24 @@ let state: State = {
     priority_tokens: [],
 };
 
+function _cookieListener(dispatch, props) {
+    let oldCookieVal: string | null = null;
+    let cookieTimer = setInterval(function() {
+        let cookieVal = Cookies.get(props.name);
+        if(cookieVal != oldCookieVal) {
+            oldCookieVal = cookieVal;
+            console.log(props.name + " has new cookie val: " + cookieVal);
+            dispatch(props.callback, cookieVal);
+        }
+    }, 1000);
+    return function() {
+        clearInterval(cookieTimer);
+    };
+}
+function CookieListener(name, callback) {
+    return [_cookieListener, {name: name, callback: callback}];
+}
+
 const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
         {
@@ -89,6 +109,10 @@ const subscriptions = (state: State): Array<Subscription> => [
     ResizeListener((state, event) => ({
         ...state,
         widescreen: isWidescreen(),
+    })),
+    CookieListener("priority_token", (state, cookie) => ({
+        ...state,
+        priority_token: JSON.parse(cookie),
     })),
 ];
 

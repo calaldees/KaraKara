@@ -1,6 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
 import { PopScrollPos } from "../effects";
+import { timedelta_str } from "../utils";
 
 export const Notification = ({ state }: { state: State }): VNode =>
     state.notification && (
@@ -12,6 +13,29 @@ export const Notification = ({ state }: { state: State }): VNode =>
             <i class={"fas fa-times-circle"} />
         </div>
     );
+
+export function PriorityToken({ state }: { state: State }): VNode | null {
+    if(!state.priority_token) return null;
+
+    var now = new Date().getTime(); // TODO: - server_datetime_offset;
+
+    var valid_start = new Date(state.priority_token.valid_start).getTime();
+    var valid_end = new Date(state.priority_token.valid_end).getTime();
+    var delta_start = valid_start - now;
+    var delta_end = valid_end - now;
+
+    if (delta_start > 0) {
+        return <h2 class={"main-only priority_soon"}>
+            Priority mode in {timedelta_str(delta_start)}
+        </h2>;
+    }
+    if (delta_start < 0 && delta_end > 0) {
+        return <h2 class={"main-only priority_now"}>
+            Priority mode for {timedelta_str(delta_end)}
+        </h2>;
+    }
+    return null;
+}
 
 function isMySong(state: State, n: number): boolean {
     return (
@@ -60,6 +84,7 @@ export const Screen = (
             {navRight}
         </header>
         <Notification state={state} />
+        <PriorityToken state={state} />
         <YoureNext state={state} />
         <article>{children}</article>
         {footer}

@@ -1,4 +1,20 @@
 /**
+ * turn milliseconds into {X}min / {X}sec
+ */
+ export function timedelta_str(timedelta: number): String {
+    const seconds_total = Math.floor(timedelta / 1000);
+    const seconds = seconds_total % 60;
+    const minutes = Math.floor(seconds_total / 60);
+    if (minutes >= 1) {
+        return minutes + "min";
+    }
+    if (seconds === 0) {
+        return "Now";
+    }
+    return seconds + "sec";
+}
+
+/**
  * Make track titles look nicer, as the database has them all lowercase
  */
 export function title_case(str: string): string {
