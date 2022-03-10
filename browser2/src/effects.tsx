@@ -208,9 +208,17 @@ export function SendCommand(state: State, command: string): Effect {
     });
 }
 
-function track_list_to_map(raw_list: Array<Track>): Dictionary<Track> {
+function track_list_to_map(room_name: string, raw_list: Array<Track>): Dictionary<Track> {
     let map = {};
     for (let i = 0; i < raw_list.length; i++) {
+        // temporary hack for minami 2022 when server-side track_list.json
+        // wasn't filtering properly, delete this ASAP
+        if(room_name == "minami") {
+            if(raw_list[i].tags['category'].includes("cartoon")) continue;
+        }
+        if(room_name == "retro") {
+            if(!raw_list[i].tags['null'].includes("retro")) continue;
+        }
         map[raw_list[i].id] = raw_list[i];
     }
     return map;
@@ -232,7 +240,7 @@ export const FetchTrackList = (state: State): Effect =>
                 ? {
                       ...state,
                       session_id: response.identity.id,
-                      track_list: track_list_to_map(response.data.list),
+                      track_list: track_list_to_map(state.room_name, response.data.list),
                       download_done: 0,
                       download_size: null,
                   }
