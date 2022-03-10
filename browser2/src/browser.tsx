@@ -112,7 +112,7 @@ const subscriptions = (state: State): Array<Subscription> => [
     })),
     CookieListener("priority_token", (state, cookie) => ({
         ...state,
-        priority_token: JSON.parse(cookie),
+        priority_token: cookie ? JSON.parse(cookie) : null,
     })),
 ];
 
