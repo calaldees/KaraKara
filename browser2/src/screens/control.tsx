@@ -253,6 +253,8 @@ export const Control = ({ state }: { state: State }): VNode => (
                     are going to use this laptop and the microphones :)</li>
                     <li>To avoid feedback loops, don't hold the microphone
                     directly in front of the speaker!</li>
+                    <li>This admin laptop can drag &amp; drop to rearrange
+                    tracks in the queue</li>
                     <li>Either use your phone (open <b>{state.root}</b> and
                     enter room <b>{state.room_name}</b>) or use the menu on the
                     right to queue up tracks.</li>
