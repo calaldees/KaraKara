@@ -246,7 +246,20 @@ export const Control = ({ state }: { state: State }): VNode => (
         footer={<ControlButtons state={state} />}
     >
         {state.queue.length == 0 ? (
-            <h2>Queue Empty</h2>
+            <div class="readme">
+                <h1>READ ME :)</h1>
+                <ol>
+                    <li>Please use hand sanitiser, a lot of different people
+                    are going to use this laptop and the microphones :)</li>
+                    <li>To avoid feedback loops, don't hold the microphone
+                    directly in front of the speaker!</li>
+                    <li>Either use your phone (open <b>{state.root}</b> and
+                    enter room <b>{state.room_name}</b>) or use the menu on the
+                    right to queue up tracks.</li>
+                    <li>Push the play button (<i class={"fas fa-play"} />) down
+                    below when you're ready to start singing.</li>
+                </ol>
+            </div>
         ) : (
             <Playlist state={state} items={state.queue} />
         )}

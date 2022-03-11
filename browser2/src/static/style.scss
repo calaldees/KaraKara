@@ -211,6 +211,12 @@ MAIN {
 }
 
 /* Common elements */
+.readme {
+  H1 {
+    font-size: 4em;
+    margin: 0.1em;
+  }
+}
 .flex-center {
   display: flex;
   flex-flow: column;
