@@ -213,8 +213,13 @@ MAIN {
 /* Common elements */
 .readme {
   H1 {
-    font-size: 4em;
+    text-align: center;
+    font-size: 6em;
     margin: 0.1em;
+  }
+  LI {
+    margin: 1em;
+    font-size: 2em;
   }
 }
 .flex-center {
