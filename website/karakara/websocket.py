@@ -12,6 +12,8 @@ def _send_websocket_message(request: Request, topic: str, message: str, retain: 
     msg = c.publish("karakara/room/"+request.queue.id+"/"+topic, message, retain=retain)
     msg.wait_for_publish()
 
+    c.disconnect()
+
 def send_websocket_message(request: Request, topic: str, message: str, retain: bool=False) -> None:
     """Proxy for unittests mocking"""
     _send_websocket_message(request, topic, message, retain)
