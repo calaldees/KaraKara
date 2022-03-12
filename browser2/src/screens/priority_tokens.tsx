@@ -25,7 +25,7 @@ export const PriorityTokens = ({ state }: { state: State }): VNode => (
                     <tr>
                         <td>{t.id}</td>
                         <td>{short_date(t.issued)}</td>
-                        <td>{t.used}</td>
+                        <td>{t.used ? "yes" : "no"}</td>
                         <td>{t.session_owner}</td>
                         <td>{short_date(t.valid_start)}</td>
                         <td>{short_date(t.valid_end)}</td>
