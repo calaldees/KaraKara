@@ -214,7 +214,7 @@ function track_list_to_map(room_name: string, raw_list: Array<Track>): Dictionar
         // temporary hack for minami 2022 when server-side track_list.json
         // wasn't filtering properly, delete this ASAP
         if(room_name == "minami") {
-            if(raw_list[i].tags['category'].includes("cartoon")) continue;
+            if(raw_list[i].tags['category'].length == 1 && raw_list[i].tags['category'].includes("cartoon")) continue;
         }
         if(room_name == "retro") {
             if(!raw_list[i].tags['null'].includes("retro")) continue;
