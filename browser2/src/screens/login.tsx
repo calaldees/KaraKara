@@ -16,7 +16,7 @@ export const Login = ({ state }: { state: State }): VNode => (
                     value={state.room_name}
                     oninput={(state, event) => ({
                         ...state,
-                        room_name: event.target.value.toLowerCase(),
+                        room_name: event.target.value.toLowerCase().trim(),
                     })}
                     disabled={state.loading}
                     required={true}
