@@ -299,7 +299,7 @@ class Encoder(object):
         return True
 
     def _encode_images_from_meta(self, m, num_images=4):
-        target_files = tuple(
+        target_files = tuple(  ## TODO: replace this with enumeration - we need an arbitrary number of images of different formts (jpg, av1, jp2, etc)
             m.processed_files['image{}'.format(index+1)]
             for index in range(num_images)
         )

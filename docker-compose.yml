@@ -50,7 +50,16 @@ services:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
             - ${PATH_HOST_meta}:/media/meta:ro
-            #- ${PWD}/website:/app:ro  # for local development
+
+        ## for local development
+        ##  docker-compose run --rm --entrypoint /bin/bash --service-ports website
+        #     - ${PWD}/website:/app:ro
+        # ports:
+        #     - 6543:6543
+        # #command: pserve ${PATH_CONFIG}/development.ini
+        # healthcheck: 
+        #     interval: 0m  # TODO: disbale healthcheck
+
 
     mosquitto:
         image: karakara/mosquitto
@@ -95,6 +104,7 @@ services:
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw
+            - website_static:/static:rw
 
         # Force import
         #docker-compose exec processmedia2 /bin/bash

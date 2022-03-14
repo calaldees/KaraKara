@@ -9,7 +9,7 @@ ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_group', 'dict_
 
 class ProcessedFilesManager(object):
     FILE_TYPES = (
-        ProcessedFileType('media', 'image1', 'image', 'jpg', ''),
+        ProcessedFileType('media', 'image1', 'image', 'jpg', ''),  ## TODO: refactor to 'image'+'enumeration_number'. Remote ext and replace with mime_type
         ProcessedFileType('media', 'image2', 'image', 'jpg', ''),
         ProcessedFileType('media', 'image3', 'image', 'jpg', ''),
         ProcessedFileType('media', 'image4', 'image', 'jpg', ''),
@@ -99,3 +99,7 @@ def gen_string_hash(hashs):
         hasher.update(''.join(sorted(hashs)).encode('utf-8'))
         hash_str = hasher.hexdigest()
     return hash_str
+    # TODO: use base62 string rather than hex
+    # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
+    # This is filesystem safe, but not bi-directional as some data is lost
+    # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)

@@ -8,6 +8,8 @@
     "path_meta": "/media/meta",
     "path_processed": "/media/processed",
 
+    "path_static": "/static",
+
     "api_host": "website:6543",
 
     "process_order_function": "random",
