@@ -1,8 +1,0 @@
-python3
-python3-dev
-sox
-jpegoptim
-tesseract-ocr
-tesseract-ocr-eng
-libjpeg-dev
-ffmpeg

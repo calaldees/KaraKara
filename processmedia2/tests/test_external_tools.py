@@ -5,7 +5,7 @@ import os.path
 
 def test_probe_media(path_source_reference, external_tools):
     filename_video = os.path.join(path_source_reference, 'test1.mp4')
-    assert json.dumps(external_tools.probe_media(filename_video), sort_keys=True) == '{"audio": {"bitrate": "2", "format": "aac", "sample_rate": "44100"}, "duration": 30.02, "height": 480, "width": 640}'
+    assert json.dumps(external_tools.probe_media(filename_video), sort_keys=True) == '{"audio": {"bitrate": "2", "format": "aac", "sample_rate": "44100"}, "duration": 30.0, "height": 480, "width": 640}'
 
 
 def test_get_image_from_video(path_source_reference):
