@@ -39,7 +39,7 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
         msttcorefonts-installer \
         fontconfig \
     # build font ms-fonts
-    && update-ms-fonts && fc-cache -f
+    && update-ms-fonts && fc-cache -f \
     && pip3 install --no-cache-dir --upgrade \
         pip \
         setuptools \
