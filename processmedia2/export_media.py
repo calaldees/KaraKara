@@ -37,7 +37,7 @@ def export_media(**kwargs):
                 continue
 
             # Abort if any missing files
-            missing_processed_files = frozenset(m.processed_files.values()) - processed_files_lookup
+            missing_processed_files = frozenset(f.relative for f in m.processed_files.values()) - processed_files_lookup
             if missing_processed_files:
                 log.debug(f'{missing_processed_files=}')
                 # If we are missing any files but we have a source hash,
