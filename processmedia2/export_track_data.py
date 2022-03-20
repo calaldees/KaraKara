@@ -12,7 +12,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export_media(**kwargs):
+def export_track_data(**kwargs):
     """
     """
     stats = {
@@ -94,6 +94,6 @@ def additional_arguments(parser):
 if __name__ == "__main__":
     from _main import main
     main(
-        'export_media', export_media, folder_type_to_derive_mtime='meta',
+        'export_track_data', export_track_data, folder_type_to_derive_mtime='meta',
         additional_arguments_function=additional_arguments,
     )
