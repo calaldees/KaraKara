@@ -39,6 +39,23 @@ docker_stop:
 	docker-compose stop
 pull:  ## pull + rebuild containers + run
 	git pull && docker-compose stop && docker-compose up --build -d
+dbdump_remote:  ## dump remote db to karakara.sql
+	ssh violet "cd /data/sites/karakara.org.uk/src; docker-compose exec -T postgres pg_dump --host=postgres --username=karakara --dbname=karakara" --format=c > karakara.pgdump
+dbdump_local_restore:
+	docker-compose cp karakara.pgdump postgres:/
+# 
+# docker-compose exec postgres /bin/bash
+# cat karakara.sql | psql --host=postgres --username=karakara --dbname=karakara
+
+# docker-compose exec -T postgres pg_restore --host=postgres --username=karakara --dbname=karakara --schema-only --clean --verbose --no-acl --no-owner /karakara.pgdump
+
+
+#  docker-compose run --rm --entrypoint /bin/bash --service-ports website
+
+# 
+# 
+# --column-inserts
+# --data-only
 
 
 test_cypress_run:  ## cypress browser tests
