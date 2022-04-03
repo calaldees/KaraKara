@@ -302,7 +302,7 @@ class Encoder(object):
         target_files = tuple(
             m.processed_files[f'image{index+1}_avif']
             for index in range(num_images)
-        ) + (
+        ) + tuple(
             m.processed_files[f'image{index+1}_webp']
             for index in range(num_images)
         )
@@ -340,7 +340,7 @@ class Encoder(object):
                 extract_success, cmd_result = self.external_tools.extract_image(
                     source=source_file_absolute,
                     destination=uncompressed_image_file,
-                    time=time
+                    time=time,
                 )
                 if not extract_success:
                     if self.pdb:
@@ -350,8 +350,7 @@ class Encoder(object):
 
                 encode_success, cmd_result = self.external_tools.compress_image(
                     source=uncompressed_image_file,
-                    destination=tempdir,
-                    time=time
+                    destination_folder=tempdir,
                 )
                 if not encode_success:
                     if self.pdb:

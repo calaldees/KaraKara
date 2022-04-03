@@ -38,7 +38,7 @@ def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
 def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES, external_tools):
     """
     Test normal video + subtitles encode flow
-    Thubnail images and preview videos should be generated
+    Thumbnail images and preview videos should be generated
     """
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()

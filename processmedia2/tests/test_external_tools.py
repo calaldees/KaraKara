@@ -21,7 +21,8 @@ def test_get_image_from_video(path_source_reference):
 def test_ffmpeg_installed_with_extras():
     cmd = ('ffmpeg', '--help')
     cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=1)
-    assert '--enable-libsvtav1' in cmd_result
+    assert 'Hyper fast Audio and Video encoder' in cmd_result.stdout.decode('utf8')
+    assert '--enable-libsvtav1' in cmd_result.stderr.decode('utf8')
 
 
 def test_sox_installed(path_source_reference):

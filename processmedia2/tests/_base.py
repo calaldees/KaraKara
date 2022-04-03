@@ -180,7 +180,7 @@ class MockEncodeExternalCalls(object):
 
     @staticmethod
     def _mock_command_return_image_success(*args, **kwargs):
-        return True, ('', '')
+        return True, ('test.avif', 'test.webp')
 
     @staticmethod
     def _mock_command_return_fail(*args, **kwargs):
