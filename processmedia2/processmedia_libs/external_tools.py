@@ -53,19 +53,20 @@ class ProcessMediaFilesWithExternalTools:
                 'threads': 2,
                 'process_timeout_seconds': 60 * 30,  # There are some HUGE videos ... this timeout should be dramatically reduced when we've cleared out the crud
                 'log_level': 'warning',
-                'h264_codec': 'libx264',  # 'libx264',  # 'h264',
+                'vcodec_full': 'libsvtav1',  # 'libx264',  # 'h264',
+                'vcodec_preview': 'libx264',
                 'preview_width': 320,
                 'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
                 'crf_factor': DEFAULT_CRF_FACTOR,
                 'cmd_ffmpeg': ('nice', 'ffmpeg'),
                 'cmd_ffprobe': ('ffprobe', ),
-                'cmd_jpegoptim': ('jpegoptim', ),
                 'cmd_sox': ('sox', ),
+                'cmd_imagemagick_convert': ('convert', ),
             },
             **config,
         }
         # parse cmd_xxx into tuples
-        for key in ('cmd_ffmpeg', 'cmd_ffprobe', 'cmd_jpegoptim', 'cmd_sox'):
+        for key in ('cmd_ffmpeg', 'cmd_ffprobe', 'cmd_imagemagick_convert', 'cmd_sox'):
             self.config[key] = tuple(self.config[key].split(' ')) if isinstance(self.config[key], str) else self.config[key]
         self.config.update({
             'vf_for_preview': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(self.config['preview_width'])    # scale=w='min(500, iw*3/2):h=-1'
@@ -77,7 +78,7 @@ class ProcessMediaFilesWithExternalTools:
                 y=None,
             ),
             'encode_image_to_video': cmd_args(
-                vcodec=self.config['h264_codec'],
+                vcodec=self.config['vcodec_full'],
                 r=5,  # 5 fps
                 bf=0,  # wha dis do?
                 qmax=1,  # wha dis do?
@@ -90,19 +91,25 @@ class ProcessMediaFilesWithExternalTools:
                 ar=44100,
             ),
             'encode_video': cmd_args(
-                # preset='slow',
-                vcodec=self.config['h264_codec'],
-                crf=21,
-                maxrate='1500k',
-                bufsize='2500k',
+                #https://trac.ffmpeg.org/wiki/Encode/AV1
+                vcodec=self.config['vcodec_full'],
+                #crf=50,  # 50 is default for av1 - apparently this only functions in ffmpeg5.0+ and at the time we are only using 4.4 so we better be happy with 50
+                #b:v=0  # see below for kwarg hack. Apparently this is mandatory?
+                
+                # old mp4 presets
+                #vcodec='libx264',
+                #crf=21,
+                #maxrate='1500k',
+                #bufsize='2500k',
 
                 acodec='aac',
                 strict='experimental',
                 ab='196k',
                 threads=self.config['threads'],
+                **{'b:v': 0},  # !? should be grouped with vcodec, but cant use key with `:` in as a kwarg
             ),
             'encode_preview': cmd_args(
-                vcodec=self.config['h264_codec'],
+                vcodec=self.config['vcodec_preview'],  # TOOO: preview should encode in multiple formats av1 + mp4
                 crf=34,
                 vf=self.config['vf_for_preview'],
                 acodec='aac',  # libfdk_aac
@@ -262,14 +269,14 @@ class ProcessMediaFilesWithExternalTools:
                 ),
                 destination,
             ),
-            lambda: (os.path.exists(destination), 'expected destination image file was not generated (video source may be damaged) {0}'.format(source)),
-            lambda: self._run_tool(
-                *self.config['cmd_jpegoptim'],
-                #'--size={}'.format(CONFIG['jpegoptim']['target_size_k']),
-                '--strip-all',
-                '--overwrite',
-                destination,
-            ),
+            lambda: (os.path.exists(destination), f'expected destination image file was not generated (video source may be damaged) {source}'),
+            #lambda: self._run_tool(
+            #    *self.config['cmd_jpegoptim'],
+            #    #'--size={}'.format(CONFIG['jpegoptim']['target_size_k']),
+            #    '--strip-all',
+            #    '--overwrite',
+            #    destination,
+            #),
         )
 
         for cmd in cmds:
@@ -277,3 +284,33 @@ class ProcessMediaFilesWithExternalTools:
             if not cmd_success:
                 return False, cmd_result
         return True, None
+
+    def compress_image(self, source, destination_folder):
+        log.debug(f'compress_image to images - {os.path.basename(source)}')
+
+        # https://caniuse.com/?search=image%20format
+
+        destination_avif = os.path.join(destination_folder, 'temp.avif')
+        destination_webp = os.path.join(destination_folder, 'temp.webp')
+
+        cmds = (
+            lambda: self._run_tool(
+                *self.config['cmd_imagemagick_convert'],
+                source,
+                destination_avif,
+            ),
+            lambda: (os.path.exists(destination_avif), f'expected destination image file was not generated (image source may be damaged?) {source}'),
+            lambda: self._run_tool(
+                *self.config['cmd_imagemagick_convert'],
+                source,
+                destination_webp,
+            ),
+            lambda: (os.path.exists(destination_webp), f'expected destination image file was not generated (image source may be damaged?) {source}'),
+        )
+
+        for cmd in cmds:
+            cmd_success, cmd_result = cmd()
+            if not cmd_success:
+                return False, cmd_result
+
+        return True, (destination_avif, destination_webp)

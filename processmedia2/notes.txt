@@ -1,0 +1,53 @@
+# https://dev.to/faraixyz/converting-video-into-animated-images-using-ffmpeg-3cng
+# https://lobste.rs/s/hjz9uo/avif_has_landed
+#   rant about why av1 has not reached penetration yet
+# https://darekkay.com/blog/avif-images/
+# https://evilmartians.com/chronicles/better-web-video-with-av1-codec
+#   video sourceset with codec
+
+
+# https://en.wikipedia.org/wiki/FFmpeg#Image_formats
+
+# https://caniuse.com/?search=image%20format
+
+# avifenc # https://github.com/AOMediaCodec/libavif/blob/master/apps/avifenc.c
+# apk add libavif-apps (or something - search the alpine package repo)
+
+ffmpeg -i Miku.mp4 -ss 15.0 -vframes 1 -an test.webp # 12k
+ffmpeg -i Miku.mp4 -ss 15.0 -vframes 1 -an test.jpg # 22k
+ffmpeg -i Miku.mp4 -ss 15.0 -vframes 1 -an test.png  # 250k
+avifenc test.png test.avif # 13k
+
+
+
+-vf scale=w='320:h=floor((320*(1/a))/2)*2' 
+
+
+
+# https://caniuse.com/?search=video%20format
+
+# https://trac.ffmpeg.org/wiki/Encode/AV1
+# https://trac.ffmpeg.org/wiki/Encode/VP9
+
+#ffmpeg -i Miku.mp4 -c:v libaom-av1 -crf 30 -b:v 0 -strict experimental test.mp4
+# slow as all fuck 0.3 fps
+
+# needs special ffmpeg compile
+#ffmpeg -i Miku.mp4 -c:v libsvtav1 -crf 30 -b:v 0 -strict experimental test.mp4
+#ffmpeg -i Miku.mp4 -c:v librav1e -crf 30 -b:v 0 -strict experimental test.mp4
+
+# Original 180mb
+
+# docker run --rm -it --volume ${PWD}:/Downloads/:rw --entrypoint /bin/sh collelog/ffmpeg:4.4-alpine-amd64
+
+ffmpeg -i Miku.mp4 -c:v libsvtav1 -crf 30 -b:v 0 -strict experimental test2.mp4
+# 9mb
+
+ffmpeg -i Miku.mp4 -c:v libvpx-vp9 -crf 30 -b:v 0 test2.webm
+# 32mb?
+ffmpeg -i Miku.mp4 -c:v libvpx-vp9 -crf 45 -b:v 0 test.webm
+# 8.5mb?
+
+ffmpeg -i Miku.mp4 -c:v libx264 -crf 30 -b:v 0 -strict experimental test.mp4
+# 9mb
+

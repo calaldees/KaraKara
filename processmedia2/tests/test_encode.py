@@ -138,6 +138,7 @@ def test_source_with_nosubs_will_still_create_empty_processed_srt_file(ProcessMe
             assert patches['encode_audio'].call_count == 0
             assert patches['encode_preview_video'].call_count == 0
             assert patches['extract_image'].call_count == 0
+            assert patches['compress_image'].call_count == 0
 
         manager.scan_media()  # this should update the source collection and remove the meta reference to the srt file
         with MockEncodeExternalCalls() as patches:
@@ -146,6 +147,7 @@ def test_source_with_nosubs_will_still_create_empty_processed_srt_file(ProcessMe
             assert patches['encode_audio'].call_count == 1
             assert patches['encode_preview_video'].call_count == 1
             assert patches['extract_image'].call_count == 4
+            assert patches['compress_image'].call_count == 4
 
         # A subtile file should still be derived
         os.path.exists(manager.get('test1').processed_files['srt'].absolute)
@@ -161,6 +163,7 @@ def test_skip_encoding_step_if_processed_file_present(ProcessMediaTestManager, T
             assert patches['encode_audio'].call_count == 1
             assert patches['encode_preview_video'].call_count == 1
             assert patches['extract_image'].call_count == 4
+            assert patches['compress_image'].call_count == 4
 
         manager.scan_media()
         with MockEncodeExternalCalls() as patches:
@@ -169,6 +172,7 @@ def test_skip_encoding_step_if_processed_file_present(ProcessMediaTestManager, T
             assert patches['encode_audio'].call_count == 0
             assert patches['encode_preview_video'].call_count == 0
             assert patches['extract_image'].call_count == 0
+            assert patches['compress_image'].call_count == 0
 
 
 def test_encode_video_not_multiple_of_2():
@@ -223,6 +227,7 @@ def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TES
             assert patches['encode_audio'].call_count == 0
             assert patches['encode_preview_video'].call_count == 0
             assert patches['extract_image'].call_count == 0
+            assert patches['compress_image'].call_count == 0
 
         hash_dict_tag_changed = manager.get('test1').source_hashs
         assert hash_dict_before['media'] == hash_dict_tag_changed['media']
@@ -246,6 +251,7 @@ def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TES
             assert patches['encode_audio'].call_count == 1
             assert patches['encode_preview_video'].call_count == 1
             assert patches['extract_image'].call_count == 4
+            assert patches['compress_image'].call_count == 4
 
         hash_dict_subs_changed = manager.get('test1').source_hashs
         assert hash_dict_tag_changed['media'] != hash_dict_subs_changed['media']

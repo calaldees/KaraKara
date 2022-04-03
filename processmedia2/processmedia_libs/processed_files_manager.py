@@ -1,22 +1,30 @@
 import os
 import shutil
 import hashlib
+import base64
+import re
 from collections import namedtuple, defaultdict
 from calaldees.files.scan import fast_scan
 
-ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_group', 'dict_key', 'attachment_type', 'ext', 'salt'))
+ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_group', 'dict_key', 'attachment_type', 'ext', 'mime','salt'))
 
 
 class ProcessedFilesManager(object):
     FILE_TYPES = (
-        ProcessedFileType('media', 'image1', 'image', 'jpg', ''),  ## TODO: refactor to 'image'+'enumeration_number'. Remote ext and replace with mime_type
-        ProcessedFileType('media', 'image2', 'image', 'jpg', ''),
-        ProcessedFileType('media', 'image3', 'image', 'jpg', ''),
-        ProcessedFileType('media', 'image4', 'image', 'jpg', ''),
-        ProcessedFileType('media', 'video', 'video', 'mp4', ''),
-        ProcessedFileType('media', 'preview', 'preview', 'mp4', ''),
-        ProcessedFileType('data', 'srt', 'srt', 'srt', ''),
-        ProcessedFileType('data', 'tags', 'tags', 'txt', ''),
+        ProcessedFileType('media', 'image1_avif', 'image', 'avif', 'image/avif', ''),
+        ProcessedFileType('media', 'image2_avif', 'image', 'avif', 'image/avif', ''),
+        ProcessedFileType('media', 'image3_avif', 'image', 'avif', 'image/avif', ''),
+        ProcessedFileType('media', 'image4_avif', 'image', 'avif', 'image/avif', ''),
+        ProcessedFileType('media', 'image1_webp', 'image', 'webp', 'image/webp', ''),
+        ProcessedFileType('media', 'image2_webp', 'image', 'webp', 'image/webp', ''),
+        ProcessedFileType('media', 'image3_webp', 'image', 'webp', 'image/webp', ''),
+        ProcessedFileType('media', 'image4_webp', 'image', 'webp', 'image/webp', ''),
+
+        ProcessedFileType('media', 'video', 'video', 'mp4', 'video/mp4; codecs=av01.0.05M.08,opus', ''),
+        ProcessedFileType('media', 'preview', 'preview', 'mp4', 'video/mp4; codecs=avc1.4D401E,mp4a.40.2', ''),
+
+        ProcessedFileType('data', 'srt', 'srt', 'srt', 'text/plain', ''),
+        ProcessedFileType('data', 'tags', 'tags', 'txt', 'text/plain', ''),
     )
     FILE_TYPE_LOOKUP = {
         processed_file_type.attachment_type: processed_file_type
@@ -54,6 +62,10 @@ class ProcessedFile(object):
         return self.processed_file_type.ext
 
     @property
+    def mime(self):
+        return self.processed_file_type.mime
+
+    @property
     def attachment_type(self):
         return self.processed_file_type.attachment_type
 
@@ -63,7 +75,7 @@ class ProcessedFile(object):
 
     @property
     def relative(self):
-        return os.path.join(self.folder, '{}.{}'.format(self.hash, self.ext))
+        return os.path.join(self.folder, f'{self.hash}.{self.ext}')
 
     @property
     def absolute(self):
@@ -97,9 +109,12 @@ def gen_string_hash(hashs):
     else:
         hasher = hashlib.sha256()
         hasher.update(''.join(sorted(hashs)).encode('utf-8'))
-        hash_str = hasher.hexdigest()
+        #hash_str = hasher.hexdigest()
+
+        # Use base62 string rather than hex
+        # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
+        # This is filesystem safe, but not bi-directional as some data is lost
+        # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)
+        # pow(62, 10) ==   839299365868340224
+        hash_str = re.sub('[+/=]','_', base64.b64encode(hasher.digest()).decode('utf8'))[:11]
     return hash_str
-    # TODO: use base62 string rather than hex
-    # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
-    # This is filesystem safe, but not bi-directional as some data is lost
-    # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)

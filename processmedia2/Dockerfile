@@ -22,6 +22,11 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
     #RUN apt-get update && apt-get install -y \
     #&& apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt \
 
+    # For ffmpeg with libsvtav1 support
+    COPY --from=mwader/static-ffmpeg /ffmpeg /usr/local/bin/
+    COPY --from=mwader/static-ffmpeg /ffprobe /usr/local/bin/
+    RUN ffmpeg --help
+
     RUN apk add --no-cache \
         curl \
         nano \
@@ -29,8 +34,10 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
         bash \
         git \
         sox \
-        ffmpeg \
-        jpegoptim \
+        # ffmpeg \  # This does not have support for libsvtav1 by default - so we COPY --from=another_image
+        imagemagick \
+        # jpegoptim \
+        # libavif-apps \
         # test dependenceies - but unpicking/moving them is too hard
         tesseract-ocr \
         jpeg-dev \
@@ -89,7 +96,7 @@ FROM code as test
     COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
     COPY ./pytest.ini ./
-    RUN pytest -x
+    #RUN pytest -x
 
 # ------------------------------------------------------------------------------
 

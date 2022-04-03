@@ -72,7 +72,7 @@ def export_track_data(**kwargs):
                     {
                         'use': processed_file.attachment_type,
                         'url': processed_file.relative,
-                        'mime': 'IMPLEMENT_ME',
+                        'mime': processed_file.mime,
                     }
                     for processed_file in m.processed_files.values()
                 ),

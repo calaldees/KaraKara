@@ -79,7 +79,7 @@ class Encoder(object):
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
         self.pdb = postmortem
         self.external_tools = ProcessMediaFilesWithExternalTools(
-            **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_sox', 'cmd_jpegoptim') and v}
+            **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_imagemagick_convert', 'cmd_sox') and v}
         )
         self._heartbeat_file = Path(heartbeat_file) if heartbeat_file else None
 
@@ -299,8 +299,11 @@ class Encoder(object):
         return True
 
     def _encode_images_from_meta(self, m, num_images=4):
-        target_files = tuple(  ## TODO: replace this with enumeration - we need an arbitrary number of images of different formts (jpg, av1, jp2, etc)
-            m.processed_files['image{}'.format(index+1)]
+        target_files = tuple(
+            m.processed_files[f'image{index+1}_avif']
+            for index in range(num_images)
+        ) + (
+            m.processed_files[f'image{index+1}_webp']
             for index in range(num_images)
         )
         if all(target_file.exists for target_file in target_files):
@@ -313,14 +316,14 @@ class Encoder(object):
         if not source_file_absolute:
             log.warning('No video or image input in meta to extract thumbnail images')
             return False
-        if not os.path.exists(source_file_absolute):
+        if not os.path.isfile(source_file_absolute):
             log.error('The source file to extract images from does not exist {}'.format(source_file_absolute))
             return False
 
         if file_ext(source_file_absolute).ext in EXTS['image']:
-            # If input is a single image, we use it as an imput video and take
+            # If input is a single image, we use it as an input video and take
             # a frame 4 times from frame zero.
-            # This feels inefficent, but we need 4 images for the import check.
+            # This feels inefficient, but we need 4 images for the import check.
             # Variable numbers of images would need more data in the meta
             times = (0, ) * num_images
         else:
@@ -332,14 +335,37 @@ class Encoder(object):
 
         with tempfile.TemporaryDirectory() as tempdir:
             for index, time in enumerate(times):
-                image_file = os.path.join(tempdir, '{}.jpg'.format(index))
-                encode_succes, cmd_result = self.external_tools.extract_image(source=source_file_absolute, destination=image_file, time=time)
-                if not encode_succes:
+                uncompressed_image_file = os.path.join(tempdir, f'{index}.bmp')
+
+                extract_success, cmd_result = self.external_tools.extract_image(
+                    source=source_file_absolute,
+                    destination=uncompressed_image_file,
+                    time=time
+                )
+                if not extract_success:
                     if self.pdb:
                         import pdb ; pdb.set_trace()
                     log.error(cmd_result)
                     return False
-                target_files[index].move(image_file)
+
+                encode_success, cmd_result = self.external_tools.compress_image(
+                    source=uncompressed_image_file,
+                    destination=tempdir,
+                    time=time
+                )
+                if not encode_success:
+                    if self.pdb:
+                        import pdb ; pdb.set_trace()
+                    log.error(cmd_result)
+                    return False
+
+                # I don't like this code smell
+                # cmd_result is a tuple of destination names - hard coded that 0 is avif and 1 is webp
+                # the `index + num_images` is clumsy
+                # ...This is clumsy, the whole image extraction feels clumsy
+                destination_avif, destination_webp = cmd_result
+                target_files[index             ].move(destination_avif)
+                target_files[index + num_images].move(destination_webp)
 
         return True
 

@@ -1,6 +1,7 @@
 import json
+import os
 import os.path
-
+import subprocess
 
 
 def test_probe_media(path_source_reference, external_tools):
@@ -15,3 +16,22 @@ def test_get_image_from_video(path_source_reference):
     assert color_close((255, 0, 0), get_frame_from_video(filename_video, 0).getpixel((0,0)))
     assert color_close((0, 255, 0), get_frame_from_video(filename_video, '10').getpixel((0,0)))
     assert color_close((0, 0, 255), get_frame_from_video(filename_video, '00:00:20').getpixel((0,0)))
+
+
+def test_ffmpeg_installed_with_extras():
+    cmd = ('ffmpeg', '--help')
+    cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=1)
+    assert '--enable-libsvtav1' in cmd_result
+
+
+def test_sox_installed(path_source_reference):
+    pass  # sox must run as part of path_source_reference generation
+
+
+def test_imagemagick(path_source_reference):
+    source = os.path.join(path_source_reference, 'test1_000.png')
+    destination = os.path.join(path_source_reference, 'test1_000.avif')
+    cmd = ('convert', source, destination)
+    cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+    assert os.path.isfile(destination)
+    os.remove(destination)
