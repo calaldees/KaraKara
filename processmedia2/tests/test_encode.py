@@ -112,10 +112,10 @@ def test_encode_audio_simple(ProcessMediaTestManager, TEST2_AUDIO_FILES):
 
         image = get_frame_from_video(video_file, 2)
         assert 'AA' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
-        assert 'BB' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
+        assert 'EE' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
 
         image = get_frame_from_video(video_file, 7)
-        assert 'BB' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
+        assert 'EE' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
         assert '' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
 
         image = get_frame_from_video(video_file, 12)
@@ -265,7 +265,7 @@ def read_subtitle_text(image, color):
     return pytesseract.image_to_string(extract_image_color(image, color)).strip()
 
 
-def extract_image_color(source, color, threshold=70):
+def extract_image_color(source, color, threshold=60):
     target = Image.new('L', source.size)
     for x in range(source.size[0]):
         for y in range(source.size[1]):
