@@ -78,7 +78,7 @@ def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES, externa
         # Assert Thumbnail images
         # We sample at '20% 40% 60% %80' - in out 30 second video that is 'RED, GREEN, GREEN, BLUE'
         for image_num, color in enumerate((COLOR_RED, COLOR_GREEN, COLOR_GREEN, COLOR_BLUE)):
-            assert color_close(color, Image.open(processed_files['image{}'.format(image_num+1)].absolute).getpixel(SAMPLE_COORDINATE))
+            assert color_close(color, Image.open(processed_files[f'image{image_num+1}_webp'].absolute).getpixel(SAMPLE_COORDINATE))
 
         video_details = external_tools.probe_media(video_file)
         preview_details = external_tools.probe_media(preview_file)
@@ -265,7 +265,7 @@ def read_subtitle_text(image, color):
     return pytesseract.image_to_string(extract_image_color(image, color)).strip()
 
 
-def extract_image_color(source, color, threshold=50):
+def extract_image_color(source, color, threshold=70):
     target = Image.new('L', source.size)
     for x in range(source.size[0]):
         for y in range(source.size[1]):
