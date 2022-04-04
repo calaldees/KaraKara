@@ -38,6 +38,7 @@ def test_export_full(ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FIL
             name in EXPECTED_TRACKS
             assert frozenset(track.keys()) == {"source_filename", "duration", "attachments", "srt", "tags"}
             assert frozenset(map(operator.itemgetter('use'), track['attachments'])) == {'image', 'video', 'preview','srt', 'tags'}
+            assert frozenset(map(operator.itemgetter('mime'), track['attachments'])) > {'text/plain', 'image/avif', 'image/webp'}  # TODO: codecs as substring match? 'av01.0.05M.08'
             # Check srt content
             with open(mm.get(name).processed_files['srt'].absolute, 'rt') as filehandle:
                 assert  track['srt'] in filehandle.read()
