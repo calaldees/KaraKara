@@ -3,7 +3,8 @@
 #   rant about why av1 has not reached penetration yet
 # https://darekkay.com/blog/avif-images/
 # https://evilmartians.com/chronicles/better-web-video-with-av1-codec
-#   video sourceset with codec
+#   video sourceset with codec in mime
+# https://www.contentful.com/blog/2021/11/29/load-avif-webp-using-html/
 
 
 # https://en.wikipedia.org/wiki/FFmpeg#Image_formats

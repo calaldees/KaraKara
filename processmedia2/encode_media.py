@@ -347,7 +347,7 @@ class Encoder(object):
                         import pdb ; pdb.set_trace()
                     log.error(cmd_result)
                     return False
-
+                
                 encode_success, cmd_result = self.external_tools.compress_image(
                     source=uncompressed_image_file,
                     destination_folder=tempdir,

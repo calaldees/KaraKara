@@ -288,8 +288,7 @@ class ProcessMediaFilesWithExternalTools:
     def compress_image(self, source, destination_folder):
         log.debug(f'compress_image to images - {os.path.basename(source)}')
 
-        # https://caniuse.com/?search=image%20format
-
+        assert os.path.isdir(destination_folder)
         destination_avif = os.path.join(destination_folder, 'temp.avif')
         destination_webp = os.path.join(destination_folder, 'temp.webp')
 

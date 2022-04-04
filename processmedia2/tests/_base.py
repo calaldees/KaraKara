@@ -180,7 +180,12 @@ class MockEncodeExternalCalls(object):
 
     @staticmethod
     def _mock_command_return_image_success(*args, **kwargs):
-        return True, ('test.avif', 'test.webp')
+        destination_folder = kwargs['destination_folder']
+        destination_avif = os.path.join(destination_folder, 'temp.avif')
+        destination_webp = os.path.join(destination_folder, 'temp.webp')
+        Path(destination_avif).touch()
+        Path(destination_webp).touch()
+        return True, (destination_avif, destination_webp)
 
     @staticmethod
     def _mock_command_return_fail(*args, **kwargs):

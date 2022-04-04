@@ -123,7 +123,7 @@ def test_encode_audio_simple(ProcessMediaTestManager, TEST2_AUDIO_FILES):
         assert '' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
 
         for image_num, color in enumerate((COLOR_MAGENTA,)*4):
-            assert color_close(color, Image.open(processed_files['image{}'.format(image_num+1)].absolute).getpixel(SAMPLE_COORDINATE))
+            assert color_close(color, Image.open(processed_files[f'image{image_num+1}_webp'].absolute).getpixel(SAMPLE_COORDINATE))
 
 
 def test_source_with_nosubs_will_still_create_empty_processed_srt_file(ProcessMediaTestManager, TEST1_VIDEO_FILES):
