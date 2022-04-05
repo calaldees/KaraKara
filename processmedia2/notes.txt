@@ -52,3 +52,30 @@ ffmpeg -i Miku.mp4 -c:v libvpx-vp9 -crf 45 -b:v 0 test.webm
 ffmpeg -i Miku.mp4 -c:v libx264 -crf 30 -b:v 0 -strict experimental test.mp4
 # 9mb
 
+
+
+
+---
+
+
+
+ffmpeg -i /media/source/Anime/Macross\ Dynamite7\ -\ OP\ -\ Dynamite\ Explosion.mkv -c:v libsvtav1 -b:v 0 -strict experimental /media/processed/av1_test.mp4
+
+# https://askubuntu.com/questions/1189174/how-do-i-use-ffmpeg-and-rav1e-to-create-high-quality-av1-files
+ffmpeg -i /media/source/Anime/Macross\ Dynamite7\ -\ OP\ -\ Dynamite\ Explosion.mkv -c:v librav1e -qp 80 -speed 4 -tile-columns 2 -tile-rows 2 -c:a libfdk_aac -b:a 128k -strict experimental /media/processed/av1_test.mp4
+# https://www.mlug-au.org/lib/exe/fetch.php?media=av1_presentation.pdf
+-c:a libopus -ac 2
+
+ffmpeg -i input.mkv -c:v libsvtav1 -preset 4 -qp 30 -sc_detection true -pix_fmt yuv420p10le -g 240 -an -sn svt-av1.mkv
+
+ffmpeg -i /media/source/Anime/Macross\ Dynamite7\ -\ OP\ -\ Dynamite\ Explosion.mkv -c:v libsvtav1 -preset 4 -qp 40 -sc_detection true -pix_fmt yuv420p10le -g 240 -sn -c:a libopus -ac 2 /media/processed/svt-av1.webm
+
+
+---
+
+Original
+
+#vcodec='libx264',
+#crf=21,
+#maxrate='1500k',
+#bufsize='2500k',

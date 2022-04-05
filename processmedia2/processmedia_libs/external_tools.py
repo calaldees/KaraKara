@@ -53,8 +53,6 @@ class ProcessMediaFilesWithExternalTools:
                 'threads': 2,
                 'process_timeout_seconds': 60 * 30,  # There are some HUGE videos ... this timeout should be dramatically reduced when we've cleared out the crud
                 'log_level': 'warning',
-                'vcodec_full': 'libsvtav1',  # 'libx264',  # 'h264',
-                'vcodec_preview': 'libx264',
                 'preview_width': 320,
                 'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
                 'crf_factor': DEFAULT_CRF_FACTOR,
@@ -78,7 +76,7 @@ class ProcessMediaFilesWithExternalTools:
                 y=None,
             ),
             'encode_image_to_video': cmd_args(
-                vcodec=self.config['vcodec_full'],
+                vcodec='libsvtav1',  # TODO: need to add other params for av1 (see full video params - refactor)
                 r=5,  # 5 fps
                 bf=0,  # wha dis do?
                 qmax=1,  # wha dis do?
@@ -91,33 +89,53 @@ class ProcessMediaFilesWithExternalTools:
                 ar=44100,
             ),
             'encode_video': cmd_args(
-                #https://trac.ffmpeg.org/wiki/Encode/AV1
-                vcodec=self.config['vcodec_full'],
-                #crf=50,  # 50 is default for av1 - apparently this only functions in ffmpeg5.0+ and at the time we are only using 4.4 so we better be happy with 50
-                #b:v=0  # see below for kwarg hack. Apparently this is mandatory?
-                
+                # https://trac.ffmpeg.org/wiki/Encode/AV1
+                # https://www.mlug-au.org/lib/exe/fetch.php?media=av1_presentation.pdf
+                #qp=30 # was same size as x264 file (26mb) 1.4fps
+                #qp=40 # was half the size and (slightly) better/comparable to old x264 (14mb) 2.4fps
+                #qp=50 # (8.5mb) and good enough 3fps
+                vcodec='libsvtav1',
+                preset=4,
+                qp=50,
+                sc_detection='true',
+                pix_fmt='yuv420p10le',
+                g=240,
+                sn=None,
+                acodec='libopus',
+                ac=2,
+
                 # old mp4 presets
                 #vcodec='libx264',
                 #crf=21,
                 #maxrate='1500k',
                 #bufsize='2500k',
+                #acodec='aac',
+                #ab='196k',
 
-                acodec='aac',
                 strict='experimental',
-                ab='196k',
                 threads=self.config['threads'],
-                **{'b:v': 0},  # !? should be grouped with vcodec, but cant use key with `:` in as a kwarg
             ),
             'encode_preview': cmd_args(
-                vcodec=self.config['vcodec_preview'],  # TOOO: preview should encode in multiple formats av1 + mp4
-                crf=34,
+                # av1 == 1.2mb (still better than mp4 at 2.4mb)
+                vcodec='libsvtav1',
+                preset=4,
+                qp=60,
+                sc_detection='true',
+                pix_fmt='yuv420p10le',
+                g=240,
+                sn=None,
+                acodec='libopus',
+                ab='24k',
+
+                # original mp4 2.4mb and garbage + underwater
+                #vcodec='libx264',  # TOOO: preview should encode in multiple formats av1 + mp4
+                #crf=34,
+                #acodec='aac',  # libfdk_aac
+                #ab='48k',
+
                 vf=self.config['vf_for_preview'],
-                acodec='aac',  # libfdk_aac
                 strict='experimental',
-                ab='48k',
                 threads=self.config['threads'],
-                #'profile:a': 'aac_he_v1',
-                #ac=1,
             ),
         })
 

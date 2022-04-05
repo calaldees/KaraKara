@@ -213,6 +213,7 @@ class Encoder(object):
                     )
 
             # 3.) Encode
+            destination = os.path.join(tempdir, f'video.{target_file.ext}')
             encode_steps = (
                 # 3.a) Render audio and normalize
                 lambda: self.external_tools.encode_audio(
@@ -225,7 +226,7 @@ class Encoder(object):
                     video_source=absolute_video_to_encode,
                     audio_source=os.path.join(tempdir, 'audio.wav'),
                     subtitle_source=absolute_ssa_to_encode,
-                    destination=os.path.join(tempdir, 'video.mp4'),
+                    destination=destination,
                 ),
             )
             for encode_step in encode_steps:
@@ -237,7 +238,7 @@ class Encoder(object):
                     return False
 
             # 4.) Move the newly encoded file to the target path
-            target_file.move(os.path.join(tempdir, 'video.mp4'))
+            target_file.move(destination)
 
         return True
 
@@ -284,17 +285,17 @@ class Encoder(object):
             return False
 
         with tempfile.TemporaryDirectory() as tempdir:
-            preview_file = os.path.join(tempdir, 'preview.mp4')
+            destination = os.path.join(tempdir, f'preview.{target_file.ext}')
             encode_success, cmd_result = self.external_tools.encode_preview_video(
                 source=source_file.absolute,
-                destination=preview_file,
+                destination=destination,
             )
             if not encode_success:
                 if self.pdb:
                     import pdb ; pdb.set_trace()
                 log.error(cmd_result)
                 return False
-            target_file.move(preview_file)
+            target_file.move(destination)
 
         return True
 

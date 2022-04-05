@@ -111,11 +111,11 @@ def test_encode_audio_simple(ProcessMediaTestManager, TEST2_AUDIO_FILES):
         video_file = processed_files['video'].absolute
 
         image = get_frame_from_video(video_file, 2)
-        assert 'AA' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
-        assert 'EE' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
+        assert 'AA'.lower() == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT).lower()
+        assert 'EE'.lower() == read_subtitle_text(image, COLOR_SUBTITLE_NEXT).lower()
 
         image = get_frame_from_video(video_file, 7)
-        assert 'EE' == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT)
+        assert 'EE'.lower() == read_subtitle_text(image, COLOR_SUBTITLE_CURRENT).lower()
         assert '' == read_subtitle_text(image, COLOR_SUBTITLE_NEXT)
 
         image = get_frame_from_video(video_file, 12)

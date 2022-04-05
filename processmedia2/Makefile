@@ -21,6 +21,8 @@ build_prod:  ##
 DOCKER_RUN_LOCAL:=docker run -it --rm \
 	--volume=${PWD}:/processmedia2/:ro \
 	--volume=/mnt/c/Users/ac954/Downloads:/Downloads/:rw \
+	--volume=/mnt/c/Users/ac954/code/KaraKara/kk-source:/media/source:ro \
+	--volume=/mnt/c/Users/ac954/code/KaraKara/kk-processed:/media/processed:rw \
 	${DOCKER_IMAGE}
 run:  ##
 	${DOCKER_RUN_LOCAL} processmedia2.sh

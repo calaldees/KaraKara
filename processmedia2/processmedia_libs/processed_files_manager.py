@@ -20,8 +20,8 @@ class ProcessedFilesManager(object):
         ProcessedFileType('media', 'image3_webp', 'image', 'webp', 'image/webp', ''),
         ProcessedFileType('media', 'image4_webp', 'image', 'webp', 'image/webp', ''),
 
-        ProcessedFileType('media', 'video', 'video', 'mp4', 'video/mp4; codecs=av01.0.05M.08,opus', ''),
-        ProcessedFileType('media', 'preview', 'preview', 'mp4', 'video/mp4; codecs=avc1.4D401E,mp4a.40.2', ''),
+        ProcessedFileType('media', 'video', 'video', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', ''),
+        ProcessedFileType('media', 'preview', 'preview', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', ''), #'video/mp4; codecs=avc1.4D401E,mp4a.40.2'
 
         ProcessedFileType('data', 'srt', 'srt', 'srt', 'text/plain', ''),
         ProcessedFileType('data', 'tags', 'tags', 'txt', 'text/plain', ''),
