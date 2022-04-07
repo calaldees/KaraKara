@@ -44,22 +44,11 @@ class ProcessMediaFilesWithExternalTools:
         for key in ('cmd_ffmpeg', 'cmd_ffprobe', 'cmd_imagemagick_convert'):
             self.config[key] = tuple(self.config[key].split(' ')) if isinstance(self.config[key], str) else self.config[key]
         self.config.update({
-            'vf_for_preview': "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(self.config['preview_width'])
-        })
-        self.config.update({
             'ffmpeg_base_args': self.config['cmd_ffmpeg'] + cmd_args(
                 loglevel=self.config['log_level'],
                 y=None,
                 strict='experimental',
                 threads=self.config['threads'],
-            ),
-            'audio_normalisisation': cmd_args(
-                ac=2,
-                ar=48000,
-                af='loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1',
-                # GoogleGroups - crazy audio guys conversation
-                # https://groups.google.com/a/opencast.org/g/users/c/R40ZE3l_ay8/m/2IUpQTcQCAAJ
-                # highpass=f=120,acompressor=threshold=0.3:makeup=3:release=50:attack=5:knee=4:ratio=10:detection=peak,alimiter=limit=0.95 
             ),
         })
 
@@ -118,7 +107,7 @@ class ProcessMediaFilesWithExternalTools:
             *cmd_args(
                 t=duration,
 
-                r=5,  # 5 fps
+                r=1,  # 1 fps
                 bf=0,  # wha dis do?
                 qmax=1,  # wha dis do?
                 #vf=self.config['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
@@ -144,18 +133,16 @@ class ProcessMediaFilesWithExternalTools:
         return self._run_tool(
             *self.config['ffmpeg_base_args'],
             '-i', source,
-            *cmd_args(**encode_args),
             *self.config['audio_normalisisation'],
             *cmd_args(
-                #vf=self.config['vf_for_preview'],
-                ac=1, # unsure if this helps
                 sn=None, # don't process subtitles
+                **encode_args,
             ),
             destination,
         )
 
 
-    def extract_image(self, source, destination, timecode=0.2):
+    def extract_image(self, source, destination, encode_args, timecode=0.2):
         log.debug(f'extract_image - {os.path.basename(source)}')
         return self._run_tool(
             *self.config['ffmpeg_base_args'],
@@ -164,7 +151,7 @@ class ProcessMediaFilesWithExternalTools:
                 ss=str(timecode),
                 vframes=1,
                 an=None,
-                vf=self.config['vf_for_preview'],  # TODO: consider higher resolution images now we have moved to av1?
+                **encode_args,
             ),
             destination,
         )

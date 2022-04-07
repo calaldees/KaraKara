@@ -1,12 +1,11 @@
 #!_env/bin/python3
-
-import os
+import datetime
+from operator import attrgetter
 import re
 from collections import defaultdict
-from typing import NamedTuple
-import typing
-from pathlib import Path
 from types import MappingProxyType
+
+import humanize
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
@@ -71,7 +70,13 @@ def print_formated(file_details, **kwargs):
             continue
         print(tcolors.BOLD + title + tcolors.ENDC)
         for f in files:
-            print(f'{terminal.INDENTATION}{f.relative} {terminal.OK if f.file.is_file() else terminal.FAIL}')
+            exists = f.file.is_file()
+            extra = ''
+            if exists and kwargs['extradetails']:
+                stat = f.file.stat()
+                stat = {field: attrgetter(f'st_{field}')(stat) for field in ('size', 'mtime')}
+                extra = f"({humanize.naturalsize(stat.get('size',0))}) {humanize.naturaldelta(datetime.datetime.now()-datetime.datetime.utcfromtimestamp(stat.get('mtime',0)))}"
+            print(f"{terminal.INDENTATION}{f.relative} {terminal.OK if exists else terminal.FAIL} {extra}")
 
 # Main -------------------------------------------------------------------------
 
@@ -81,6 +86,7 @@ def additional_arguments(parser):
     parser.add_argument('--hidesource', action='store_true')
     parser.add_argument('--hideprocessed', action='store_true')
     parser.add_argument('--showmissing', action='store_true')
+    parser.add_argument('--extradetails', action='store_true')
     #parser.add_argument('--raw', action='store_true')
     #parser.add_argument('--pathstyle', choices=('relative', 'absolute'), default='relative')
 
@@ -90,7 +96,7 @@ def _metaviewer(*args, **kwargs):
     file_details = metaviewer.get_meta_details(kwargs['name_regex'])
     if kwargs.get('showmissing'):
         file_details = MappingProxyType({name: filter(lambda f: not f.file.is_file(), files) for name, files in file_details.items()})
-    print_formated(file_details)
+    print_formated(file_details, **kwargs)
 
 
 if __name__ == "__main__":

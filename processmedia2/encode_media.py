@@ -168,6 +168,7 @@ class Encoder(object):
                 self.external_tools.extract_image(
                     source=self._get_absolute_video_to_encode(m),
                     destination=uncompressed_image_file,
+                    encode_args=target_file.type.encode_args,
                     timecode=self._image_index_to_timecode(m, index),
                 )
             self.external_tools.compress_image(

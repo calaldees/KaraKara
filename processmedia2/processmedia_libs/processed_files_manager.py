@@ -10,6 +10,27 @@ from types import MappingProxyType
 from calaldees.files.scan import fast_scan
 
 
+# ffmpeg reuseable args
+VF_SCALE_TEMPLATE = "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'"
+SCALE_IMAGE=dict(
+    vf=VF_SCALE_TEMPLATE.format(412),
+)
+PREVIEW=dict(
+    ab='24k',
+    ac=1,
+    vf=VF_SCALE_TEMPLATE.format(320),
+)
+NORMALIZE_AUDIO=dict(
+    #ar=48000,
+    af='loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1',
+    # GoogleGroups - crazy audio guys conversation
+    # https://groups.google.com/a/opencast.org/g/users/c/R40ZE3l_ay8/m/2IUpQTcQCAAJ
+    # Another idea:
+    # highpass=f=120,acompressor=threshold=0.3:makeup=3:release=50:attack=5:knee=4:ratio=10:detection=peak,alimiter=limit=0.95
+)
+
+
+
 class ProcessedFileType(NamedTuple):
     key: str
     attachment_type: str
@@ -21,7 +42,6 @@ class ProcessedFileType(NamedTuple):
     def salt(self):
         return str(self.encode_args)
 
-BYPASS="scale=w='128:h=floor((128*(1/a))/2)*2'"
 
 class ProcessedFilesManager(object):
     FILE_TYPES = MappingProxyType({processed_file_type.key: processed_file_type for processed_file_type in (
@@ -33,7 +53,8 @@ class ProcessedFilesManager(object):
             pix_fmt='yuv420p10le',
             g=240,
             acodec='libopus',
-            #vf=BYPASS,
+            ac=2,
+            **NORMALIZE_AUDIO,
         )),
         ProcessedFileType('preview_av1', 'preview', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', dict(
             vcodec='libsvtav1',
@@ -43,26 +64,26 @@ class ProcessedFilesManager(object):
             pix_fmt='yuv420p10le',
             g=240,
             acodec='libopus',
-            ab='24k',
-            #vf=BYPASS,
+            **PREVIEW,
+            **NORMALIZE_AUDIO,
         )), 
         ProcessedFileType('preview_h265', 'preview', 'mp4', 'video/mp4; codecs=avc1.4D401E,mp4a.40.2', dict(
             vcodec='libx265',
-            #crf=50,  # SHITE
+            #crf=50,  # Minimum
             crf=39,
             preset='slow',
             acodec='libfdk_aac',  # https://trac.ffmpeg.org/wiki/Encode/AAC#HE-AACversion2
-            ab='24k',
-            #vf=BYPASS,
+            **PREVIEW,
+            **NORMALIZE_AUDIO,
         )),
-        ProcessedFileType('image1_avif', 'image', 'avif', 'image/avif', None),
-        ProcessedFileType('image2_avif', 'image', 'avif', 'image/avif', None),
-        ProcessedFileType('image3_avif', 'image', 'avif', 'image/avif', None),
-        ProcessedFileType('image4_avif', 'image', 'avif', 'image/avif', None),
-        ProcessedFileType('image1_webp', 'image', 'webp', 'image/webp', None),
-        ProcessedFileType('image2_webp', 'image', 'webp', 'image/webp', None),
-        ProcessedFileType('image3_webp', 'image', 'webp', 'image/webp', None),
-        ProcessedFileType('image4_webp', 'image', 'webp', 'image/webp', None),
+        ProcessedFileType('image1_avif', 'image', 'avif', 'image/avif', SCALE_IMAGE),
+        ProcessedFileType('image2_avif', 'image', 'avif', 'image/avif', SCALE_IMAGE),
+        ProcessedFileType('image3_avif', 'image', 'avif', 'image/avif', SCALE_IMAGE),
+        ProcessedFileType('image4_avif', 'image', 'avif', 'image/avif', SCALE_IMAGE),
+        ProcessedFileType('image1_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
+        ProcessedFileType('image2_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
+        ProcessedFileType('image3_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
+        ProcessedFileType('image4_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
     )})
 
     def __init__(self, path):
