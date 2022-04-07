@@ -21,11 +21,11 @@ avifenc test.png test.avif # 13k
 
 
 
--vf scale=w='320:h=floor((320*(1/a))/2)*2' 
+-vf scale=w='320:h=floor((320*(1/a))/2)*2'
 
 
 
-# https://caniuse.com/?search=video%20format
+# https://caniuse.com/?search=video%20gformat
 
 # https://trac.ffmpeg.org/wiki/Encode/AV1
 # https://trac.ffmpeg.org/wiki/Encode/VP9
@@ -68,7 +68,7 @@ ffmpeg -i /media/source/Anime/Macross\ Dynamite7\ -\ OP\ -\ Dynamite\ Explosion.
 
 ffmpeg -i input.mkv -c:v libsvtav1 -preset 4 -qp 30 -sc_detection true -pix_fmt yuv420p10le -g 240 -an -sn svt-av1.mkv
 
-ffmpeg -i /media/source/Anime/Macross\ Dynamite7\ -\ OP\ -\ Dynamite\ Explosion.mkv -c:v libsvtav1 -preset 4 -qp 40 -sc_detection true -pix_fmt yuv420p10le -g 240 -sn -c:a libopus -ac 2 /media/processed/svt-av1.webm
+ffmpeg -i "${ff}" -c:v libsvtav1 -preset 4 -qp 50 -sc_detection true -pix_fmt yuv420p10le -g 240 -sn -c:a libopus -ac 2 svt-av1.webm
 
 
 ---
@@ -79,3 +79,94 @@ Original
 #crf=21,
 #maxrate='1500k',
 #bufsize='2500k',
+
+
+---
+
+VP9
+
+# https://streaminglearningcenter.com/codecs/encoding-vp9-in-ffmpeg-an-update.html
+# ver detailed breakdown of VP9 2 pass settings
+
+export ff="/media/source/Anime/Macross Dynamite7 - OP - Dynamite Explosion.mkv"
+
+ffmpeg -y -i "${ff}" -c:v libvpx-vp9 -pass 1 -b:v 600K -g 48 -keyint_min 48 -sc_threshold 0 -threads 8 -speed 4 -row-mt 1 -tile-columns 4 -an -f webm /dev/null \
+&& \
+ffmpeg -i "${ff}" -c:v libvpx-vp9 -pass 2 -b:v 600K -minrate 400K -maxrate 800K -g 48 -keyint_min 48 -sc_threshold 0 -row-mt 1 -threads 8 -speed 2 -tile-columns 4 output.webm
+
+---
+
+h265
+
+https://trac.ffmpeg.org/wiki/Encode/H.265
+https://codepen.io/cloudunder/post/hevc-html5-video
+
+These are equivalent of the av1 filesizes
+
+ffmpeg -i "${ff}" -c:v libx265 -crf 35 -preset slow -c:a aac -b:a 96k h265-crf35-a96k.mkv
+
+
+ffmpeg -i "${ff}" -c:v libx265 -crf 39 -preset slow -c:a aac -b:a 24k -vf scale=w='320:h=floor((320*(1/a))/2)*2' -ac 1 h265-preview-crf39-a24k.mkv
+
+
+---
+
+
+            'encode_video_av1': cmd_args(
+                # https://trac.ffmpeg.org/wiki/Encode/AV1
+                # https://www.mlug-au.org/lib/exe/fetch.php?media=av1_presentation.pdf
+                #qp=30 # was same size as x264 file (26mb) 1.4fps
+                #qp=40 # was half the size and (slightly) better/comparable to old x264 (14mb) 2.4fps
+                #qp=50 # (8.5mb) and good enough 3fps
+                vcodec='libsvtav1',
+                preset=4,
+                qp=50,
+                sc_detection='true',
+                pix_fmt='yuv420p10le',
+                g=240,
+                sn=None,  # dont copy subtitles?
+                acodec='libopus',
+                ac=2,
+
+                # old mp4 presets
+                #vcodec='libx264',
+                #crf=21,
+                #maxrate='1500k',
+                #bufsize='2500k',
+                #acodec='aac',
+                #ab='196k',
+
+                # h265 equivalent of av1 (8.5mb)
+                #vcodec='libx265',
+                #crf=35,
+                #preset='slow',
+                #acodec='aac',
+                #ab='96k',  # maybe 128k would be better
+            ),
+            'encode_preview_av1': cmd_args(
+                vf=self.config['vf_for_preview'],
+
+                # av1 == 1.2mb (still better than mp4 at 2.4mb)
+                vcodec='libsvtav1',
+                preset=4,
+                qp=60,
+                sc_detection='true',
+                pix_fmt='yuv420p10le',
+                g=240,
+                acodec='libopus',
+                ab='24k',
+
+                # original mp4 2.4mb and garbage + underwater
+                #vcodec='libx264',  # TOOO: preview should encode in multiple formats av1 + mp4
+                #crf=34,
+                #acodec='aac',  # libfdk_aac
+                #ab='48k',
+
+                #h265 equivalent of av1 for filesize (1.2mb)
+                #vcodec='libx265',
+                #crf=39,
+                #preset='slow',
+                #acodec='aac',
+                #ab='24k',
+                #ac=1, # unsure if this helps
+            ),

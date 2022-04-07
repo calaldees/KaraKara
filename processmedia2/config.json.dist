@@ -10,7 +10,6 @@
     "path_processed": "../mediaserver/www/processed/",
 
     "cmd_ffmpeg": "fmpeg",
-    "cmd_sox": "sox",
     "cmd_ffprobe": "ffprobe",
     "cmd_jepgoptim": "jepgoptim"
 }

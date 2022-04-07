@@ -99,8 +99,9 @@ def main(
             sys.exit(0)
 
     # Setup logging.json
-    with open(kwargs['loggingconf'], 'rt') as filehandle:
-        logging.config.dictConfig(json.load(filehandle))
+    #with open(kwargs['loggingconf'], 'rt') as filehandle:
+    #    logging.config.dictConfig(json.load(filehandle))
+    logging.basicConfig(level=logging.DEBUG)
 
     # Heartbeat
     if kwargs['heartbeat_file']:

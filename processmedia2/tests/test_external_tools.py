@@ -25,10 +25,6 @@ def test_ffmpeg_installed_with_extras():
     assert '--enable-libsvtav1' in cmd_result.stderr.decode('utf8')
 
 
-def test_sox_installed(path_source_reference):
-    pass  # sox must run as part of path_source_reference generation
-
-
 def test_imagemagick(path_source_reference):
     source = os.path.join(path_source_reference, 'test1_000.png')
     destination = os.path.join(path_source_reference, 'test1_000.avif')

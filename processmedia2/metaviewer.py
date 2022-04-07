@@ -2,9 +2,11 @@
 
 import os
 import re
-from collections import defaultdict, namedtuple
-
-from calaldees.data import flatten
+from collections import defaultdict
+from typing import NamedTuple
+import typing
+from pathlib import Path
+from types import MappingProxyType
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
@@ -17,9 +19,6 @@ VERSION = '0.0.0'
 
 
 # Meta info gatherer -----------------------------------------------------------
-
-FileItem = namedtuple('FileItem', ('type', 'relative', 'absolute', 'exists'))
-
 
 class MetaViewer(object):
 
@@ -37,17 +36,14 @@ class MetaViewer(object):
                 if re.search(name_regex, f.file_no_ext, flags=re.IGNORECASE)
             )
 
-        def lazy_exists(path):
-            return lambda: os.path.exists(path)
-
         file_details = defaultdict(list)
         for m in meta_items:
             for f in filter(None, m.source_files.values()):
-                file_details[m.name].append(FileItem('source', f['relative'], f['absolute'], lazy_exists(f['absolute'])))
+                file_details[m.name].append(f)
             for f in m.processed_files.values():
-                file_details[m.name].append(FileItem('processed', f.relative, f.absolute, lazy_exists(f.absolute)))
+                file_details[m.name].append(f)
 
-        return file_details
+        return MappingProxyType(file_details)
 
 
 # Printed Output ---------------------------------------------------------------
@@ -69,22 +65,19 @@ class terminal:
 
 
 def print_formated(file_details, **kwargs):
-    def print_file(file_detail):
-        print('{indendation}{filename} {exists}'.format(indendation=terminal.INDENTATION, filename=file_detail.relative, exists=(terminal.OK if file_detail.exists() else terminal.FAIL)))
-
     for title, files in file_details.items():
         files = tuple(files)
         if not files:
             continue
         print(tcolors.BOLD + title + tcolors.ENDC)
         for f in files:
-            print_file(f)
+            print(f'{terminal.INDENTATION}{f.relative} {terminal.OK if f.file.is_file() else terminal.FAIL}')
 
 # Main -------------------------------------------------------------------------
 
 
 def additional_arguments(parser):
-    parser.add_argument('name_regex', default='', help='regex for names')
+    parser.add_argument('name_regex', nargs="?", default='.*', help='regex for names')
     parser.add_argument('--hidesource', action='store_true')
     parser.add_argument('--hideprocessed', action='store_true')
     parser.add_argument('--showmissing', action='store_true')
@@ -96,7 +89,7 @@ def _metaviewer(*args, **kwargs):
     metaviewer = MetaViewer(*args, **kwargs)
     file_details = metaviewer.get_meta_details(kwargs['name_regex'])
     if kwargs.get('showmissing'):
-        file_details = {k: filter(lambda f: not f.exists(), v) for k, v in file_details.items()}
+        file_details = MappingProxyType({name: filter(lambda f: not f.file.is_file(), files) for name, files in file_details.items()})
     print_formated(file_details)
 
 

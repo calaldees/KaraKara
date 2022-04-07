@@ -100,7 +100,7 @@ services:
             - .env
         volumes:
             - logs:/logs
-            - processmedia2_data:/processmedia2/data
+            - processmedia2_data:/data:rw   # does this prevent multiple encoding containers from running because of the `.lock`?
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw

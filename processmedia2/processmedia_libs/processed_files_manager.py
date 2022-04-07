@@ -1,88 +1,120 @@
-import os
 import shutil
 import hashlib
 import base64
 import re
-from collections import namedtuple, defaultdict
+from itertools import chain
+from pathlib import Path
+from typing import NamedTuple
+from types import MappingProxyType
+
 from calaldees.files.scan import fast_scan
 
-ProcessedFileType = namedtuple('ProcessedFileType', ('source_hash_group', 'dict_key', 'attachment_type', 'ext', 'mime','salt'))
 
+class ProcessedFileType(NamedTuple):
+    key: str
+    attachment_type: str
+    ext: str
+    mime:str
+    encode_args: dict
+
+    @property
+    def salt(self):
+        return str(self.encode_args)
+
+BYPASS="scale=w='128:h=floor((128*(1/a))/2)*2'"
 
 class ProcessedFilesManager(object):
-    FILE_TYPES = (
-        ProcessedFileType('media', 'image1_avif', 'image', 'avif', 'image/avif', ''),
-        ProcessedFileType('media', 'image2_avif', 'image', 'avif', 'image/avif', ''),
-        ProcessedFileType('media', 'image3_avif', 'image', 'avif', 'image/avif', ''),
-        ProcessedFileType('media', 'image4_avif', 'image', 'avif', 'image/avif', ''),
-        ProcessedFileType('media', 'image1_webp', 'image', 'webp', 'image/webp', ''),
-        ProcessedFileType('media', 'image2_webp', 'image', 'webp', 'image/webp', ''),
-        ProcessedFileType('media', 'image3_webp', 'image', 'webp', 'image/webp', ''),
-        ProcessedFileType('media', 'image4_webp', 'image', 'webp', 'image/webp', ''),
-
-        ProcessedFileType('media', 'video', 'video', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', ''),
-        ProcessedFileType('media', 'preview', 'preview', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', ''), #'video/mp4; codecs=avc1.4D401E,mp4a.40.2'
-
-        ProcessedFileType('data', 'srt', 'srt', 'srt', 'text/plain', ''),
-        ProcessedFileType('data', 'tags', 'tags', 'txt', 'text/plain', ''),
-    )
-    FILE_TYPE_LOOKUP = {
-        processed_file_type.attachment_type: processed_file_type
-        for processed_file_type in FILE_TYPES
-    }
+    FILE_TYPES = MappingProxyType({processed_file_type.key: processed_file_type for processed_file_type in (
+        ProcessedFileType('video', 'video', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', dict(
+            vcodec='libsvtav1',
+            preset=4,
+            qp=50,
+            sc_detection='true',
+            pix_fmt='yuv420p10le',
+            g=240,
+            acodec='libopus',
+            #vf=BYPASS,
+        )),
+        ProcessedFileType('preview_av1', 'preview', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', dict(
+            vcodec='libsvtav1',
+            preset=4,
+            qp=60,
+            sc_detection='true',
+            pix_fmt='yuv420p10le',
+            g=240,
+            acodec='libopus',
+            ab='24k',
+            #vf=BYPASS,
+        )), 
+        ProcessedFileType('preview_h265', 'preview', 'mp4', 'video/mp4; codecs=avc1.4D401E,mp4a.40.2', dict(
+            vcodec='libx265',
+            #crf=50,  # SHITE
+            crf=39,
+            preset='slow',
+            acodec='libfdk_aac',  # https://trac.ffmpeg.org/wiki/Encode/AAC#HE-AACversion2
+            ab='24k',
+            #vf=BYPASS,
+        )),
+        ProcessedFileType('image1_avif', 'image', 'avif', 'image/avif', None),
+        ProcessedFileType('image2_avif', 'image', 'avif', 'image/avif', None),
+        ProcessedFileType('image3_avif', 'image', 'avif', 'image/avif', None),
+        ProcessedFileType('image4_avif', 'image', 'avif', 'image/avif', None),
+        ProcessedFileType('image1_webp', 'image', 'webp', 'image/webp', None),
+        ProcessedFileType('image2_webp', 'image', 'webp', 'image/webp', None),
+        ProcessedFileType('image3_webp', 'image', 'webp', 'image/webp', None),
+        ProcessedFileType('image4_webp', 'image', 'webp', 'image/webp', None),
+    )})
 
     def __init__(self, path):
-        self.path = path
+        self.path = Path(path)
+        assert self.path.is_dir()
 
-    def get_processed_files(self, hash_dict):
-        if not hash_dict:
-            return {}
-        return {
-            file_type.dict_key: ProcessedFile(
+    def get_processed_files(self, source_media_hashs) -> MappingProxyType:
+        """
+        >>> processed_files_manager = ProcessedFilesManager('/tmp')
+        >>> processed_files = processed_files_manager.get_processed_files(('1', '2', '3'))
+        >>> processed_file = processed_files['image1_avif']
+        >>> processed_file
+        ProcessedFile(root=PosixPath('/tmp'), type=ProcessedFileType(key='image1_avif', attachment_type='image', ext='avif', mime='image/avif', encode_args=None), hash='gUIpHii00zG')
+        >>> processed_file.relative
+        PosixPath('g/gUIpHii00zG.avif')
+
+        >>> processed_files2 = processed_files_manager.get_processed_files(('4', '5', '6'))
+        >>> processed_file2 = processed_files2['image1_avif']
+        >>> processed_file2.hash != processed_file.hash
+        True
+        """
+        source_media_hashs = tuple(source_media_hashs)
+        return MappingProxyType({
+            file_type.key: ProcessedFile.new(
                 self.path,
-                (hash_dict[file_type.source_hash_group], file_type.dict_key, file_type.salt),
-                file_type
+                file_type,
+                chain.from_iterable((source_media_hashs, (file_type.key, file_type.salt))),
             )
-            for file_type in self.FILE_TYPES
-        }
+            for file_type in self.FILE_TYPES.values()
+        })
 
     @property
     def scan(self):
-        return fast_scan(self.path)
+        return fast_scan(str(self.path))
 
 
-class ProcessedFile(object):
-    def __init__(self, path, hashs, processed_file_type):
-        self.hash = gen_string_hash(hashs)
-        self.processed_file_type = processed_file_type
-        self.path = path
+class ProcessedFile(NamedTuple):
+    root: Path
+    type: ProcessedFileType
+    hash: str
 
-    @property
-    def ext(self):
-        return self.processed_file_type.ext
-
-    @property
-    def mime(self):
-        return self.processed_file_type.mime
+    @classmethod
+    def new(cls, root, type, hashs):
+        return cls(root, type, gen_string_hash(hashs))
 
     @property
-    def attachment_type(self):
-        return self.processed_file_type.attachment_type
+    def file(self) -> Path: 
+        return self.root.joinpath(self.hash[0], f'{self.hash}.{self.type.ext}')
 
     @property
-    def folder(self):
-        return self.hash[0]
-
-    @property
-    def relative(self):
-        return os.path.join(self.folder, f'{self.hash}.{self.ext}')
-
-    @property
-    def absolute(self):
-        return os.path.abspath(os.path.join(self.path, self.relative))
-
-    def _create_folders_if_needed(self):
-        os.makedirs(os.path.join(self.path, self.folder), exist_ok=True)
+    def relative(self) -> Path:
+        return self.file.relative_to(self.root)
 
     def move(self, source_file):
         """
@@ -91,30 +123,29 @@ class ProcessedFile(object):
         The remote destination could be 'scp' or another remote service.
         Always using move allows for this abstraction at a later date
         """
-        self._create_folders_if_needed()
-        shutil.move(source_file, self.absolute)
+        self.file.parent.mkdir(exist_ok=True)
+        shutil.move(source_file, self.file.resolve())
 
     def copy(self, source_file):
-        self._create_folders_if_needed()
-        shutil.copy2(source_file, self.absolute)
-
-    @property
-    def exists(self):
-        return os.path.exists(self.absolute)
+        self.file.parent.mkdir(exist_ok=True)
+        shutil.copy2(source_file, self.file.resolve())
 
 
 def gen_string_hash(hashs):
+    """
+    >>> gen_string_hash(('1', '2', '3'))
+    'pmWkWSBCL51'
+    """
     if isinstance(hashs, str):
-        hash_str = hashs
-    else:
-        hasher = hashlib.sha256()
-        hasher.update(''.join(sorted(hashs)).encode('utf-8'))
-        #hash_str = hasher.hexdigest()
+        return hashs
 
-        # Use base62 string rather than hex
-        # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
-        # This is filesystem safe, but not bi-directional as some data is lost
-        # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)
-        # pow(62, 10) ==   839299365868340224
-        hash_str = re.sub('[+/=]','_', base64.b64encode(hasher.digest()).decode('utf8'))[:11]
-    return hash_str
+    hasher = hashlib.sha256()
+    hasher.update(''.join(sorted(hashs)).encode('utf-8'))
+    #hash_str = hasher.hexdigest()
+
+    # Use base62 string rather than hex
+    # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
+    # This is filesystem safe, but not bi-directional as some data is lost
+    # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)
+    # pow(62, 10) ==   839299365868340224
+    return re.sub('[+/=]','_', base64.b64encode(hasher.digest()).decode('utf8'))[:11]

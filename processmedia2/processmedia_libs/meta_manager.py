@@ -52,7 +52,7 @@ class MetaManager(object):
             return
 
         # If meta file modified since scan - abort
-        _check_meta_mtime_safety = False
+        _check_meta_mtime_safety = False  # TODO: this appears to not use `disable_meta_write_safety` in config? Investigate
         if _check_meta_mtime_safety and os.path.exists(filepath):
             mtime_expected = self._meta_timestamps[name]
             mtime_current = os.stat(filepath).st_mtime
