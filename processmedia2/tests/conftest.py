@@ -73,13 +73,13 @@ def path_source_reference(path_source_in_repo, variables):
 
     # Derive other test media
     if 'test1.mp4' not in test_media_filenames:
-        # TODO: use `variables` to aquire `cmd_ffmpeg`
+        # TODO: use `variables` to acquire `cmd_ffmpeg`
         cmd = ('ffmpeg', '-f', 'image2', '-framerate', '0.1', '-i', os.path.join(path_source_in_repo, 'test1_%03d.png'), '-f', 'lavfi', '-i', 'anullsrc', '-shortest', '-c:a', 'aac', '-strict', 'experimental', '-r', '10', '-s', '640x480', os.path.join(tempdir.name, 'test1.mp4'))
         cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
         assert os.path.isfile(os.path.join(tempdir.name, 'test1.mp4'))
 
     if 'test2.ogg' not in test_media_filenames:
-        # TODO: use `variables` to aquire `cmd_sox`
+        # TODO: use `variables` to acquire `cmd_sox`
         cmd = ('sox', '-n', '-r', '44100', '-c', '2', '-L', os.path.join(tempdir.name, 'test2.ogg'), 'trim', '0.0', '15.000')
         cmd_result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
         assert os.path.isfile(os.path.join(tempdir.name, 'test2.ogg'))

@@ -31,9 +31,6 @@ class ProcessMediaFilesWithExternalTools:
                 'threads': 4,
                 'process_timeout_seconds': 60 * 60,  # There are some HUGE videos a timeout of an hour seems pauseable
                 'log_level': 'warning',
-                'preview_width': 320,
-                'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
-
                 'cmd_ffmpeg': ('nice', 'ffmpeg'),
                 'cmd_ffprobe': ('ffprobe', ),
                 'cmd_imagemagick_convert': ('convert', ),
@@ -117,23 +114,10 @@ class ProcessMediaFilesWithExternalTools:
         )
 
     def encode_video(self, source, destination, encode_args):
+        log.debug(f'encode_video - {source=} {destination=}')
         return self._run_tool(
             *self.config['ffmpeg_base_args'],
             '-i', source,
-            *cmd_args(**encode_args),
-            *self.config['audio_normalisisation'],
-            *cmd_args(
-                sn=None, # don't process subtitles
-            ),
-            destination,
-        )
-
-    def encode_preview_video(self, source, destination, encode_args):
-        log.debug('encode_preview_video - %s', os.path.basename(source))
-        return self._run_tool(
-            *self.config['ffmpeg_base_args'],
-            '-i', source,
-            *self.config['audio_normalisisation'],
             *cmd_args(
                 sn=None, # don't process subtitles
                 **encode_args,
@@ -141,9 +125,8 @@ class ProcessMediaFilesWithExternalTools:
             destination,
         )
 
-
     def extract_image(self, source, destination, encode_args, timecode=0.2):
-        log.debug(f'extract_image - {os.path.basename(source)}')
+        log.debug(f'extract_image - {source=} {destination=}')
         return self._run_tool(
             *self.config['ffmpeg_base_args'],
             '-i', source,
@@ -157,7 +140,7 @@ class ProcessMediaFilesWithExternalTools:
         )
 
     def compress_image(self, source, destination):
-        log.debug(f'compress_image - {os.path.basename(source)}')
+        log.debug(f'compress_image - {source=} {destination=}')
         return self._run_tool(
             *self.config['cmd_imagemagick_convert'],
             source,

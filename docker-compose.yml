@@ -96,6 +96,8 @@ services:
             context: ./processmedia2
         links:
             - website
+        environment:
+            - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
         env_file:
             - .env
         volumes:

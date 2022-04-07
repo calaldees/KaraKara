@@ -19,6 +19,7 @@ build_prod:  ##
 	docker build --tag ${DOCKER_IMAGE} .
 
 DOCKER_RUN_LOCAL:=docker run -it --rm \
+	--env KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json \
 	--volume=${PWD}:/processmedia2/:ro \
 	--volume=processmedia2_data:/data/:rw \
 	--volume=/mnt/c/Users/ac954/Downloads:/Downloads/:rw \

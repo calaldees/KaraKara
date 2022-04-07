@@ -11,7 +11,6 @@ from clint.textui.progress import bar as progress_bar
 from processmedia_libs import ALL_EXTS
 from processmedia_libs.scan import locate_primary_files, get_file_collection, PRIMARY_FILE_RANKED_EXTS
 from processmedia_libs.meta_manager import MetaManager
-from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)

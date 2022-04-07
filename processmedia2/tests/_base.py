@@ -62,7 +62,6 @@ class ProcessMediaTestManagerBase(object):
 
     @property
     def commandline_kwargs(self):
-        # TODO: Do we need to set `cmd_ffmpeg`, etc here? or are we happy with the defaults?
         return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed, force=True)  # , postmortem=True
 
     def scan_media(self):

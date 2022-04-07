@@ -8,9 +8,7 @@ from clint.textui.progress import bar as progress_bar
 
 from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
-from processmedia_libs import subtitle_processor_with_codecs as subtitle_processor
 from processmedia_libs.meta_overlay import MetaManagerExtended
-from processmedia_libs.fileset_change_monitor import FilesetChangeMonitor
 
 import logging
 log = logging.getLogger(__name__)
@@ -147,21 +145,14 @@ class Encoder(object):
     def _process_target_file(self, m, target_file):
         destination = Path(self.tempdir, f'{target_file.type.key}.{target_file.type.ext}')
         # Video
-        if target_file.type.attachment_type == 'video':
+        if target_file.type.attachment_type in ('video', 'preview'):
             self.external_tools.encode_video(
                 source=self._get_absolute_video_to_encode(m),
                 destination=destination,
                 encode_args=target_file.type.encode_args,
             ),
-        # Preview
-        elif target_file.type.attachment_type == 'preview':
-            self.external_tools.encode_preview_video(
-                source=self._get_absolute_video_to_encode(m),
-                destination=destination,
-                encode_args=target_file.type.encode_args,
-            ),
         # Image
-        elif target_file.type.attachment_type == 'image':
+        elif target_file.type.attachment_type in ('image',):
             index = re.match('image(\d)_.+', target_file.type.key).group(1)
             uncompressed_image_file = Path(self.tempdir, f'{index}.bmp')
             if not uncompressed_image_file.is_file():

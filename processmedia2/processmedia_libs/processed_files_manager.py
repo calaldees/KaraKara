@@ -28,6 +28,7 @@ NORMALIZE_AUDIO=dict(
     # Another idea:
     # highpass=f=120,acompressor=threshold=0.3:makeup=3:release=50:attack=5:knee=4:ratio=10:detection=peak,alimiter=limit=0.95
 )
+# 'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # h264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
 
 
 
