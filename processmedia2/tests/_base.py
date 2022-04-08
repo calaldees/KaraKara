@@ -2,13 +2,12 @@ import os
 import tempfile
 import json
 from pathlib import Path
-#from shutil import copyfile
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 
 from scan_media import scan_media
-from encode_media import encode_media, Encoder
+from encode_media import encode_media
 from cleanup_media import cleanup_media
 
 

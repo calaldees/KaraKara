@@ -4,7 +4,7 @@ import base64
 import re
 from itertools import chain
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Mapping, Sequence
 from types import MappingProxyType
 
 from calaldees.files.scan import fast_scan
@@ -30,6 +30,24 @@ NORMALIZE_AUDIO=dict(
 )
 # 'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # h264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
 
+def gen_string_hash(hashs: Sequence[str]):
+    """
+    >>> gen_string_hash(('1', '2', '3'))
+    'pmWkWSBCL51'
+    """
+    #if isinstance(hashs, str):
+    #    return hashs
+
+    hasher = hashlib.sha256()
+    hasher.update(''.join(sorted(hashs)).encode('utf-8'))
+    #hash_str = hasher.hexdigest()
+
+    # Use base62 string rather than hex
+    # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
+    # This is filesystem safe, but not bi-directional as some data is lost
+    # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)
+    # pow(62, 10) ==   839299365868340224
+    return re.sub('[+/=]','_', base64.b64encode(hasher.digest()).decode('utf8'))[:11]
 
 
 class ProcessedFileType(NamedTuple):
@@ -42,6 +60,39 @@ class ProcessedFileType(NamedTuple):
     @property
     def salt(self):
         return str(self.encode_args)
+
+
+class ProcessedFile(NamedTuple):
+    root: Path
+    type: ProcessedFileType
+    hash: str
+
+    @classmethod
+    def new(cls, root, type, hashs):
+        return cls(root, type, gen_string_hash(hashs))
+
+    @property
+    def file(self) -> Path: 
+        return self.root.joinpath(self.hash[0], f'{self.hash}.{self.type.ext}')
+
+    @property
+    def relative(self) -> Path:
+        return self.file.relative_to(self.root)
+
+    def move(self, source_file):
+        """
+        It is important that 'move' is used rather than opening a stream to the
+        absolute path directly.
+        The remote destination could be 'scp' or another remote service.
+        Always using move allows for this abstraction at a later date
+        """
+        self.file.parent.mkdir(exist_ok=True)
+        shutil.move(source_file, self.file.resolve())
+
+    def copy(self, source_file):
+        self.file.parent.mkdir(exist_ok=True)
+        shutil.copy2(source_file, self.file.resolve())
+
 
 
 class ProcessedFilesManager(object):
@@ -91,15 +142,13 @@ class ProcessedFilesManager(object):
         self.path = Path(path)
         assert self.path.is_dir()
 
-    def get_processed_files(self, source_media_hashs) -> MappingProxyType:
+    def get_processed_files(self, source_media_hashs: Sequence[str]) -> Mapping[str, ProcessedFile]:
         """
         >>> processed_files_manager = ProcessedFilesManager('/tmp')
         >>> processed_files = processed_files_manager.get_processed_files(('1', '2', '3'))
         >>> processed_file = processed_files['image1_avif']
-        >>> processed_file
-        ProcessedFile(root=PosixPath('/tmp'), type=ProcessedFileType(key='image1_avif', attachment_type='image', ext='avif', mime='image/avif', encode_args=None), hash='gUIpHii00zG')
-        >>> processed_file.relative
-        PosixPath('g/gUIpHii00zG.avif')
+        >>> len(processed_file.hash)
+        11
 
         >>> processed_files2 = processed_files_manager.get_processed_files(('4', '5', '6'))
         >>> processed_file2 = processed_files2['image1_avif']
@@ -119,55 +168,3 @@ class ProcessedFilesManager(object):
     @property
     def scan(self):
         return fast_scan(str(self.path))
-
-
-class ProcessedFile(NamedTuple):
-    root: Path
-    type: ProcessedFileType
-    hash: str
-
-    @classmethod
-    def new(cls, root, type, hashs):
-        return cls(root, type, gen_string_hash(hashs))
-
-    @property
-    def file(self) -> Path: 
-        return self.root.joinpath(self.hash[0], f'{self.hash}.{self.type.ext}')
-
-    @property
-    def relative(self) -> Path:
-        return self.file.relative_to(self.root)
-
-    def move(self, source_file):
-        """
-        It is important that 'move' is used rather than opening a stream to the
-        absolute path directly.
-        The remote destination could be 'scp' or another remote service.
-        Always using move allows for this abstraction at a later date
-        """
-        self.file.parent.mkdir(exist_ok=True)
-        shutil.move(source_file, self.file.resolve())
-
-    def copy(self, source_file):
-        self.file.parent.mkdir(exist_ok=True)
-        shutil.copy2(source_file, self.file.resolve())
-
-
-def gen_string_hash(hashs):
-    """
-    >>> gen_string_hash(('1', '2', '3'))
-    'pmWkWSBCL51'
-    """
-    if isinstance(hashs, str):
-        return hashs
-
-    hasher = hashlib.sha256()
-    hasher.update(''.join(sorted(hashs)).encode('utf-8'))
-    #hash_str = hasher.hexdigest()
-
-    # Use base62 string rather than hex
-    # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
-    # This is filesystem safe, but not bi-directional as some data is lost
-    # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)
-    # pow(62, 10) ==   839299365868340224
-    return re.sub('[+/=]','_', base64.b64encode(hasher.digest()).decode('utf8'))[:11]
