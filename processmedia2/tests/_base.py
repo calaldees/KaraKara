@@ -129,11 +129,10 @@ class MockEncodeExternalCalls(object):
         """
         self.method_returns = dict(
             probe_media=self._mock_command_return_probe,
+            encode_image_to_video=self._mock_command_return_success,
             encode_video=self._mock_command_return_success,
-            encode_audio=self._mock_command_return_success,
-            encode_preview_video=self._mock_command_return_success,
             extract_image=self._mock_command_return_success,
-            compress_image=self._mock_command_return_image_success,
+            compress_image=self._mock_command_return_success,
         )
         self.method_returns.update({
             method_name: self._mock_command_return_success if return_ok_or_fail else self._mock_command_return_fail
@@ -175,15 +174,6 @@ class MockEncodeExternalCalls(object):
         if 'destination' in kwargs:
             Path(kwargs['destination']).touch()
         return True, 'Mock Success'
-
-    @staticmethod
-    def _mock_command_return_image_success(*args, **kwargs):
-        destination_folder = kwargs['destination_folder']
-        destination_avif = os.path.join(destination_folder, 'temp.avif')
-        destination_webp = os.path.join(destination_folder, 'temp.webp')
-        Path(destination_avif).touch()
-        Path(destination_webp).touch()
-        return True, (destination_avif, destination_webp)
 
     @staticmethod
     def _mock_command_return_fail(*args, **kwargs):
