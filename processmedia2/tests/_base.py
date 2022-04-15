@@ -85,9 +85,9 @@ class ProcessMediaTestManagerBase(object):
         else:
             encode_media(**self.commandline_kwargs)
 
-    def cleanup_media(self):
+    def cleanup_media(self, **kwargs):
         self.meta_manager._release_cache()
-        cleanup_media(**self.commandline_kwargs)
+        cleanup_media(**self.commandline_kwargs, **kwargs)
 
     @property
     def meta(self):

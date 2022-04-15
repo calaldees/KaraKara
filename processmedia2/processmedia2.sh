@@ -11,9 +11,7 @@ function run() {
     python3 scan_media.py && \
     python3 encode_media.py && \
     python3 export_track_data.py && \
-    if [ "${KARAKARA_PROCESSMEDIA2_CLEANUP:-false}" == "true" ]; then
-        python3 cleanup_media.py
-    fi
+    python3 cleanup_media.py
 }
 
 while true ; do

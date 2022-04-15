@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
@@ -12,7 +13,8 @@ VERSION = '0.0.0'
 # Main -------------------------------------------------------------------------
 
 
-def cleanup_media(**kwargs):
+def cleanup_media(grace_timedelta=timedelta(), now=datetime.now(), **kwargs):
+    assert grace_timedelta.days <=0, 'only negative timedeltas'
     meta_manager = MetaManagerExtended(**kwargs)
     meta_manager.load_all()
 
@@ -29,10 +31,13 @@ def cleanup_media(**kwargs):
 
     count = 0
     for unlinked_file in unlinked_files:
+        log.debug(unlinked_file.relative)
         if kwargs.get('dryrun'):
-            print(unlinked_file.relative)
+            pass
         else:
-            os.remove(unlinked_file.absolute)
+            mtime = datetime.fromtimestamp(unlinked_file.stats.st_mtime)
+            if (now - mtime) < grace_timedelta:
+                os.remove(unlinked_file.absolute)
         count += 1
     log.info('Cleaned up - {} files'.format(count))
 
@@ -40,6 +45,7 @@ def cleanup_media(**kwargs):
 
 def additional_arguments(parser):
     parser.add_argument('--dryrun', action='store_true', help='', default=False)
+    parser.add_argument('--grace_timedelta', action='store', type=lambda d: timedelta(int(d)), help='Do not delete files newer than -7 days', default=-7)
 
 
 if __name__ == "__main__":
