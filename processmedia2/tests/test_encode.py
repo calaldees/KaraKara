@@ -50,10 +50,12 @@ def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
     return Image.open(BytesIO(subprocess.check_output(cmd, stderr=subprocess.PIPE, shell=True)))
 
 
+# Tests ------------------------------------------------------------------------
+
 def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES, external_tools):
     """
     Test normal video + subtitles encode flow
-    Thumbnail images and preview videos should be generated
+    Thumbnail images and preview videos should be generatedg
     """
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()
@@ -112,7 +114,8 @@ def test_encode_incomplete(ProcessMediaTestManager, TEST2_AUDIO_FILES):
         scan.encode_media()
         processed_files = scan.get('test2').processed_files
 
-        assert not processed_files
+        for f in processed_files.values():
+            assert not f.file.exists()
 
 
 def test_encode_audio_simple(ProcessMediaTestManager, TEST2_AUDIO_FILES):
@@ -142,29 +145,6 @@ def test_encode_audio_simple(ProcessMediaTestManager, TEST2_AUDIO_FILES):
             assert color_close(color, Image.open(processed_files[f'image{image_num+1}_webp'].file).getpixel(SAMPLE_COORDINATE))
 
 
-def test_source_with_nosubs_will_still_create_empty_processed_srt_file(ProcessMediaTestManager, TEST1_VIDEO_FILES):
-    with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
-        manager.scan_media()
-        os.remove(os.path.join(manager.path_source, 'test1.srt'))
-
-        # As the subs source file does not exists -> this should fail to encode
-        with MockEncodeExternalCalls() as patches:
-            manager.encode_media()
-            assert patches['encode_video'].call_count == 0
-            assert patches['extract_image'].call_count == 0
-            assert patches['compress_image'].call_count == 0
-
-        manager.scan_media()  # this should update the source collection and remove the meta reference to the srt file
-        with MockEncodeExternalCalls() as patches:
-            manager.encode_media()
-            assert patches['encode_video'].call_count == 3
-            assert patches['extract_image'].call_count == 4
-            assert patches['compress_image'].call_count == 4
-
-        # A subtile file should still be derived
-        #os.path.exists(manager.get('test1').processed_files['srt'].absolute)
-
-
 def test_skip_encoding_step_if_processed_file_present(ProcessMediaTestManager, TEST1_VIDEO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
 
@@ -173,7 +153,7 @@ def test_skip_encoding_step_if_processed_file_present(ProcessMediaTestManager, T
             manager.encode_media()
             assert patches['encode_video'].call_count == 3
             assert patches['extract_image'].call_count == 4
-            assert patches['compress_image'].call_count == 4
+            assert patches['compress_image'].call_count == 8
 
         manager.scan_media()
         with MockEncodeExternalCalls() as patches:

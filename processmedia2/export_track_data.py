@@ -22,7 +22,7 @@ def export_track_data(**kwargs):
 
     meta_manager = MetaManagerExtended(**kwargs)
     meta_manager.load_all()  # mtime=epoc(last_update())
-    processed_files_lookup = frozenset(f.relative for f in fast_scan(meta_manager.processed_files_manager.path))
+    processed_files_lookup = frozenset(f.relative for f in fast_scan(str(meta_manager.processed_files_manager.path)))
 
     def _tracks():
         for name in progress_bar(meta_manager.meta.keys()):
@@ -30,14 +30,8 @@ def export_track_data(**kwargs):
             meta_manager.load(name)
             m = meta_manager.get(name)
 
-            # Abort id not processed
-            if not m.source_hash:
-                log.debug(f'Unprocessed (no source_hash): {name}')
-                stats['meta_unprocessed'].add(name)
-                continue
-
             # Abort if any missing files
-            missing_processed_files = frozenset(f.relative for f in m.processed_files.values()) - processed_files_lookup
+            missing_processed_files = frozenset(str(f.relative) for f in m.processed_files.values()) - processed_files_lookup
             if missing_processed_files:
                 log.debug(f'{missing_processed_files=}')
                 # If we are missing any files but we have a source hash,
@@ -53,16 +47,16 @@ def export_track_data(**kwargs):
             log.debug(f'Export: {name}')
 
             def _get_srt():
-                processed_file_srt = m.processed_files.get('srt')
-                if not processed_file_srt or not processed_file_srt.exists:
-                    log.debug(f'{processed_file_srt=} missing - unable to import srt')
+                source_file_sub = m.source_files.get('sub')
+                if not source_file_sub or not source_file_sub.file.is_file():
+                    log.debug(f'{source_file_sub=} missing - unable to import srt')
                     return
-                with open(processed_file_srt.absolute, 'rt', encoding='utf-8', errors='ignore') as srt_file:
+                with source_file_sub.file.open('rt', encoding='utf-8', errors='ignore') as srt_file:
                     return srt_file.read()
 
             def _get_tags():
-                processed_file_tags = m.processed_files.get('tags')
-                with open(processed_file_tags.absolute, 'rt', encoding='utf-8', errors='ignore') as tag_file:
+                source_file_tag = m.source_files.get('tag')
+                with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
                     return tag_file.read().strip().strip("\ufeff")
 
             yield m.source_hash, {
@@ -70,9 +64,9 @@ def export_track_data(**kwargs):
                 'duration': m.source_details.get('duration'),
                 'attachments': tuple(
                     {
-                        'use': processed_file.attachment_type,
-                        'url': processed_file.relative,
-                        'mime': processed_file.mime,
+                        'use': processed_file.type.attachment_type,
+                        'mime': processed_file.type.mime,
+                        'url': str(processed_file.relative),
                     }
                     for processed_file in m.processed_files.values()
                 ),

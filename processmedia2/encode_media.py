@@ -153,7 +153,7 @@ class Encoder(object):
             ),
         # Image
         elif target_file.type.attachment_type in ('image',):
-            index = re.match('image(\d)_.+', target_file.type.key).group(1)
+            index = re.match(r'image(\d)_.+', target_file.type.key).group(1)
             uncompressed_image_file = Path(self.tempdir, f'{index}.bmp')
             if not uncompressed_image_file.is_file():
                 self.external_tools.extract_image(
