@@ -56,11 +56,17 @@ def get_frame_from_video(url, time="00:00:10", ffmpeg_cmd='ffmpeg'):
 def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES, external_tools):
     """
     Test normal video + subtitles encode flow
-    Thumbnail images and preview videos should be generatedg
+    Thumbnail images and preview videos should be generated
     """
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as scan:
         scan.scan_media()
+
+        # encode (should trigger heartbeat update)
+        heartbeat_mtime = scan.heartbeat_mtime
+        assert heartbeat_mtime
         scan.encode_media()
+        assert heartbeat_mtime < scan.heartbeat_mtime
+
         processed_files = scan.get('test1').processed_files
 
         # Main Video - use OCR to read subtiles and check them

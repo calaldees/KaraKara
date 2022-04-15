@@ -29,6 +29,7 @@ class ProcessMediaTestManagerBase(object):
             )
 
     def __enter__(self):
+        self._temp_heartbeat = tempfile.NamedTemporaryFile()
         self._temp_scan = tempfile.TemporaryDirectory()
         self._temp_meta = tempfile.TemporaryDirectory()
         self._temp_processed = tempfile.TemporaryDirectory()
@@ -40,12 +41,21 @@ class ProcessMediaTestManagerBase(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self._temp_heartbeat.close()
         self._temp_scan.cleanup()
         self._temp_meta.cleanup()
         self._temp_processed.cleanup()
         self.meta_manager = None
         self.processed_manager = None
         self.source_files_manager = None
+
+    @property
+    def heartbeat_mtime(self):
+        return Path(self.path_heartbeat).stat().st_mtime
+
+    @property
+    def path_heartbeat(self):
+        return self._temp_heartbeat.name
 
     @property
     def path_source(self):
@@ -61,7 +71,7 @@ class ProcessMediaTestManagerBase(object):
 
     @property
     def commandline_kwargs(self):
-        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed, force=True)  # , postmortem=True
+        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed, force=True, heartbeat_file=self.path_heartbeat)  # , postmortem=True
 
     def scan_media(self):
         self.meta_manager._release_cache()
