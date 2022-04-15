@@ -2,6 +2,7 @@ import pytest
 import os
 import subprocess
 from io import BytesIO
+from pathlib import Path
 
 #import pytesseract
 from PIL import Image
@@ -186,7 +187,6 @@ def test_encode_with_already_existing_files_still_extracts_duration(ProcessMedia
         assert manager.meta['test1.json']['processed']['duration'] == 1, 'The relinked meta should have probed a duration'
 
 
-@pytest.mark.skip('depricated')
 def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TEST1_VIDEO_FILES):
     with ProcessMediaTestManager(TEST1_VIDEO_FILES) as manager:
 
@@ -196,9 +196,7 @@ def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TES
         hash_dict_before = manager.get('test1').source_hashs
 
         # Modify the tags file ---------
-        tags_file_absolute = os.path.join(manager.path_source, 'test1.txt')
-        os.remove(tags_file_absolute)
-        with open(tags_file_absolute, 'w') as f:
+        with Path(manager.path_source, 'test1.txt').open('w') as f:
             f.write('the tags file has changed')
 
         manager.scan_media()
@@ -209,29 +207,9 @@ def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TES
             assert patches['compress_image'].call_count == 0
 
         hash_dict_tag_changed = manager.get('test1').source_hashs
-        assert hash_dict_before['media'] == hash_dict_tag_changed['media']
-        assert hash_dict_before['data'] != hash_dict_tag_changed['data']
-        assert hash_dict_before['full'] != hash_dict_tag_changed['full']
+        assert hash_dict_before == hash_dict_tag_changed
+        #assert hash_dict_before['media'] == hash_dict_tag_changed['media']
+        #assert hash_dict_before['data'] != hash_dict_tag_changed['data']
+        #assert hash_dict_before['full'] != hash_dict_tag_changed['full']
 
-        # Modify the subs file ----------
-        subs_file_absolute = os.path.join(manager.path_source, 'test1.srt')
-        os.remove(subs_file_absolute)
-        with open(subs_file_absolute, 'w', encoding='utf-8') as subfile:
-            subfile.write(
-                subtitle_processor.create_srt((
-                    subtitle_processor.Subtitle(subtitle_processor.time(0,0,0,0), subtitle_processor.time(0,1,0,0), 'first'),
-                ))
-            )
-
-        manager.scan_media()
-        with MockEncodeExternalCalls() as patches:
-            manager.encode_media()
-            assert patches['encode_video'].call_count == 3
-            assert patches['extract_image'].call_count == 4
-            assert patches['compress_image'].call_count == 4
-
-        hash_dict_subs_changed = manager.get('test1').source_hashs
-        assert hash_dict_tag_changed['media'] != hash_dict_subs_changed['media']
-        assert hash_dict_tag_changed['data'] != hash_dict_subs_changed['data']
-        assert hash_dict_tag_changed['full'] != hash_dict_subs_changed['full']
-
+        # TODO: modify source file and assert re-encode?
