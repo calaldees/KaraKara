@@ -1,13 +1,10 @@
 import pytest
-import os
 import subprocess
 from io import BytesIO
 from pathlib import Path
 
-#import pytesseract
 from PIL import Image
 
-from calaldees.data import flatten
 from calaldees.color import color_distance, color_close
 
 import processmedia_libs.subtitle_processor as subtitle_processor
@@ -26,6 +23,7 @@ SAMPLE_COORDINATE = (100, 100)
 
 # Utils ------------------------------------------------------------------------
 
+#import pytesseract
 #def read_subtitle_text(image, color):
 #    return pytesseract.image_to_string(extract_image_color(image, color)).strip()
 

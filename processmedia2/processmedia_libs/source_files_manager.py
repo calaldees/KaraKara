@@ -43,7 +43,7 @@ class SourceFilesManager(object):
         self.path = Path(path)
         assert self.path.is_dir()
 
-    def get_source_files(self, metafile):
+    def get_source_files(self, metafile) -> MappingProxyType[str, SourceFile]:
         """
         >>> from unittest.mock import Mock
         >>> metafile = Mock()

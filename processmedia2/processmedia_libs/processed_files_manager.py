@@ -4,7 +4,8 @@ import base64
 import re
 from itertools import chain
 from pathlib import Path
-from typing import NamedTuple, Mapping, Sequence
+from typing import NamedTuple
+from collections.abc import MappingView, Sequence
 from types import MappingProxyType
 
 from calaldees.files.scan import fast_scan
@@ -142,7 +143,7 @@ class ProcessedFilesManager(object):
         self.path = Path(path)
         assert self.path.is_dir()
 
-    def get_processed_files(self, source_media_hashs: Sequence[str]) -> Mapping[str, ProcessedFile]:
+    def get_processed_files(self, source_media_hashs: Sequence[str]) -> MappingProxyType[str, ProcessedFile]:
         """
         >>> processed_files_manager = ProcessedFilesManager('/tmp')
         >>> processed_files = processed_files_manager.get_processed_files(('1', '2', '3'))
