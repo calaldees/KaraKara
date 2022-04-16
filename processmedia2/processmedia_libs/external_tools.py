@@ -29,7 +29,7 @@ class ProcessMediaFilesWithExternalTools:
         self.config = {
             **{
                 'threads': 4,
-                'process_timeout_seconds': 60 * 60,  # There are some HUGE videos a timeout of an hour seems pauseable
+                'process_timeout_seconds': (100 * 60),  # There are some HUGE videos a timeout of 1.5 hour seems pauseable. Sometimes the process can hang. This is a failsafe
                 'log_level': 'warning',
                 'cmd_ffmpeg': ('nice', 'ffmpeg'),
                 'cmd_ffprobe': ('ffprobe', ),
@@ -91,6 +91,10 @@ class ProcessMediaFilesWithExternalTools:
             data['audio'] = raw_audio.groupdict()
         except:
             pass
+        # normalize floats because of flaky tests on different versions/platforms
+        for k, v in data.items():
+            if isinstance(v, float):
+                data[k] = round(v, 1)
         return data
 
 

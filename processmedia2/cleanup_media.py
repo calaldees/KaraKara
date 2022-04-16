@@ -45,7 +45,7 @@ def cleanup_media(grace_timedelta=timedelta(), now=datetime.now(), **kwargs):
 
 def additional_arguments(parser):
     parser.add_argument('--dryrun', action='store_true', help='', default=False)
-    parser.add_argument('--grace_timedelta', action='store', type=lambda d: timedelta(int(d)), help='Do not delete files newer than -7 days', default=-7)
+    parser.add_argument('--grace_timedelta', action='store', type=lambda d: timedelta(days=int(d)), help='Do not delete files newer than -7 days', default=timedelta(days=-7))
 
 
 if __name__ == "__main__":
