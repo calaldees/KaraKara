@@ -44,12 +44,12 @@ FROM python_dependencies as python_dependencies_test
 
     # hack for install pillow
     # https://genji-games.medium.com/dockerizing-an-app-that-uses-pillow-is-not-a-good-intro-to-docker-a026aa67ce1c
-    RUN apk add --no-cache --virtual .build-deps \
-        build-base \
-        linux-headers \
-    && pip install Pillow \
-    && apk del .build-deps \
-    && true
+    #RUN apk add --no-cache --virtual .build-deps \
+    #    build-base \
+    #    linux-headers \
+    #&& pip install Pillow \
+    #&& apk del .build-deps \
+    #&& true
 
     COPY ./requirements.test.txt ./
     RUN pip install --no-cache-dir -r requirements.test.txt

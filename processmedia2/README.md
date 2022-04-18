@@ -60,8 +60,9 @@ References
 ----------
 
 * https://dev.to/faraixyz/converting-video-into-animated-images-using-ffmpeg-3cng
-* https://lobste.rs/s/hjz9uo/avif_has_landed
-    * rant about why av1 has not reached penetration yet
+* https://jakearchibald.com/2020/avif-has-landed/
+    * https://lobste.rs/s/hjz9uo/avif_has_landed
+        * rant about why av1 has not reached penetration yet
 * https://darekkay.com/blog/avif-images/
 * https://evilmartians.com/chronicles/better-web-video-with-av1-codec
     * video sourceset with codec in mime
