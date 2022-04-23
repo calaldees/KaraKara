@@ -1,5 +1,5 @@
 shell:
-	docker-compose run --rm -it api_queue /bin/sh
+	docker-compose run --rm -it --service-ports api_queue /bin/sh
 
 
 # Standalone api_queue container -----------------------------------------------

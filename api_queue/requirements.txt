@@ -1,3 +1,5 @@
-sanic
 redis
+hiredis
+sanic
+sanic-redis
 jwt
