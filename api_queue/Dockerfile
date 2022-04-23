@@ -12,9 +12,8 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
 
 FROM base as python_dependencies
     COPY ./requirements.txt ./
-    RUN apk add --no-cache --virtual .build-deps \
-        build-base \
-    && pip install --no-cache-dir -r requirements.txt \
+    RUN apk add --no-cache --virtual .build-deps build-base \
+        && pip install --no-cache-dir -r requirements.txt \
     && apk --purge del .build-deps
 FROM python_dependencies as python_dependencies_test
     COPY ./requirements.test.txt ./
@@ -29,6 +28,7 @@ FROM code as test
     COPY ./tests ./tests
     COPY ./pytest.ini ./
     RUN pytest -x
+    CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
     CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "1337", "--workers", "4"]

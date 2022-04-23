@@ -1,0 +1,20 @@
+volumes:
+  redis_data:
+
+services:
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data:rw
+
+  api_queue:
+    build:
+      context: ./
+      target: test
+    ports:
+      - 1337:1337
+    links:
+      - redis
+    volumes:
+      - ${PWD}:/app/:ro
