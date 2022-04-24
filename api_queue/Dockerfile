@@ -30,7 +30,7 @@ FROM code as test
     COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
     COPY ./pytest.ini ./
-    #RUN pytest -x
+    RUN pytest -x
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production

@@ -1,8 +1,10 @@
 from sanic import Sanic, response
-from sanic_redis import SanicRedis
+
+import logging
+log = logging.getLogger(__name__)
+
 
 app = Sanic("karakara_queue")
-#app.ctx.db = Database()
 
 
 app.config.update(
@@ -11,32 +13,31 @@ app.config.update(
     }
 )
 
-redis = SanicRedis(config_name="REDIS")
-redis.init_app(app)
 
-# >>> import redis
-# >>> r = redis.Redis(host='localhost', port=6379, db=0)
-# >>> r.set('foo', 'bar')
-# True
-# >>> r.get('foo')
-# b'bar'
+# sanic_redis uses `aioredis` and this has been deprecated`
+#from sanic_redis import SanicRedis
+#redis = SanicRedis(config_name="REDIS")
+#redis.init_app(app)
 
-# from redis import asyncio as aioredis
-# async def main():
-#     redis = aioredis.from_url("redis://localhost")
-#     await redis.set("my-key", "value")
-#     value = await redis.get("my-key")
-#     print(value)
+from redis import asyncio as aioredis
+@app.listener('before_server_start')
+async def aio_redis_configure(_app: Sanic, _loop):
+    log.info("[redis] connecting")
+    _app.ctx.redis = await aioredis.from_url(_app.config.get('REDIS'))
+@app.listener('after_server_stop')
+async def close_redis(_app, _loop):
+    log.info("[redis] closing")
+    # TODO: gracefull close?
+    #if _app.ctx.redis:
+    #    await _app.ctx.redis.close()
 
 
 @app.get("/")
 async def basic(request):
-    #return response.text("foo")
-    r = request.app.ctx.redis
-    await r.set('key2', 'value2')
-    result = await r.get('key2')
+    redis = request.app.ctx.redis
+    await redis.set('key2', 'value2')
+    result = await redis.get('key2')
     return response.text(str(result))
-
 
 
 if __name__ == '__main__':
