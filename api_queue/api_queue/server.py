@@ -25,7 +25,7 @@ async def aio_redis_configure(_app: Sanic, _loop):
     log.info("[redis] connecting")
     _app.ctx.redis = await aioredis.from_url(_app.config.get('REDIS'))
 @app.listener('after_server_stop')
-async def close_redis(_app, _loop):
+async def aio_redis_close(_app, _loop):
     log.info("[redis] closing")
     # TODO: gracefull close?
     #if _app.ctx.redis:

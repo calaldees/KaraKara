@@ -9,8 +9,9 @@ api_queue
 
 
 * asgi
-    * [aiopyramid](https://aiopyramid.readthedocs.io/index.html)
-    * [pyramid asgi](https://docs.pylonsproject.org/projects/pyramid-cookbook/en/latest/deployment/asgi.html)
+    * [sanic](https://sanic.dev/en/plugins/sanic-ext/getting-started.html#features)
+    * https://aioredis.readthedocs.io/en/latest/getting-started/
+    * [sanic-jwt](https://sanic-jwt.readthedocs.io/en/latest/pages/simpleusage.html)
 * mqtt
     * [aiormq](https://github.com/mosquito/aiormq) - Pure python AMQP 0.9.1 asynchronous client library 
     * [paho-mqtt](https://pypi.org/project/paho-mqtt/) - MQTT version 5.0/3.1.1 client class
