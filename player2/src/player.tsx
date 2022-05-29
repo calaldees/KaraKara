@@ -45,7 +45,6 @@ const state: State = {
         "karakara.player.autoplay.seconds": 0, // Autoplay after X seconds
         "karakara.player.subs_on_screen": true, // Set false if using podium
         "karakara.event.end": null,
-        "karakara.podium.video_lag": 0.5, // adjust to get podium and projector in sync
     },
 
     // loading screen
