@@ -65,15 +65,14 @@ def main(
 
     # Read config.json values
     config = {}
-    if kwargs_cmd.get('config') and not os.path.isfile(kwargs_cmd['config']):
-        raise Exception(f"config file does not exist {kwargs_cmd['config']}")
     config_filename = kwargs_cmd.get('config') or os.environ.get('KARAKARA_PROCESSMEDIA2_CONFIG') or DEFAULT_kwargs['config']
-    if os.path.isfile(config_filename):
+    if config_filename:
+        assert os.path.isfile(config_filename), f"config file does not exist {config_filename}"
         with open(config_filename, 'rt') as config_filehandle:
             config = json.load(config_filehandle)
             #kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
 
-    # Merge kwargs in order of precidence
+    # Merge kwargs in order of precedence
     kwargs = merge_dicts(DEFAULT_kwargs, config, kwargs_cmd)
 
     # Format all strings with string formatter/replacer - this overlays ENV variables too

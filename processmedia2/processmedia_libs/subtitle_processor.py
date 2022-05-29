@@ -3,7 +3,7 @@
 import re
 from collections import namedtuple, OrderedDict
 from datetime import time
-from itertools import zip_longest, tee
+from itertools import zip_longest, tee, chain
 
 import logging
 log = logging.getLogger(__name__)
@@ -402,11 +402,10 @@ def pairwise(iterable, fillvalue=None):
     s -> (s0,s1), (s1,s2), (s2, s3), ...
 
     >>> tuple(pairwise((1,2,3)))
-    ((1, 2), (2, 3), (3, None))
+    ((None, 1), (1, 2), (2, 3), (3, None))
     """
     a, b = tee(iterable)
-    next(b, None)
-    return zip_longest(a, b, fillvalue=fillvalue)
+    return chain(((None, next(b,None)),), zip_longest(a, b, fillvalue=fillvalue))
 
 def create_vtt(subtitles):
     r"""
@@ -415,7 +414,7 @@ def create_vtt(subtitles):
     https://caniuse.com/?search=vtt
 
     >>> vtt = create_vtt((
-    ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
+    ...     Subtitle(time(0,1,0,0), time(0,2,0,0), 'first'),
     ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second'),
     ... ))
     >>> print(vtt)
@@ -423,10 +422,15 @@ def create_vtt(subtitles):
     <BLANKLINE>
     1
     00:00:00.000 --> 00:01:00.000
+    <v active>
+    <v next>first
+    <BLANKLINE>
+    2
+    00:01:00.000 --> 00:02:00.000
     <v active>first
     <v next>second
     <BLANKLINE>
-    2
+    3
     00:02:00.000 --> 00:03:00.510
     <v active>second
     <v next>
@@ -439,9 +443,9 @@ def create_vtt(subtitles):
     return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
         SRT_FORMAT.format(
             index=index+1,
-            start=_vtt_time(subtitle1.start),
-            end=_vtt_time(subtitle1.end),
-            text=VTT_FORMAT.format(active=subtitle1.text, next=getattr(subtitle2,'text','')),
+            start=_vtt_time(getattr(subtitle1, 'start', time(0,0,0))),
+            end=_vtt_time(getattr(subtitle1, 'end', None) or getattr(subtitle2, 'start')),
+            text=VTT_FORMAT.format(active=getattr(subtitle1,'text',''), next=getattr(subtitle2,'text','')),
         )
         for index, (subtitle1, subtitle2) in enumerate(pairwise(subtitles))
     )

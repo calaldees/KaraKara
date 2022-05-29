@@ -33,6 +33,7 @@ def export_track_data(**kwargs):
 
             # Abort if any missing files
             missing_processed_files = frozenset(str(f.relative) for f in m.processed_files.values()) - processed_files_lookup
+            missing_processed_files = False  # HACK!
             if missing_processed_files:
                 log.debug(f'{missing_processed_files=}')
                 # If we are missing any files but we have a source hash,
@@ -68,14 +69,14 @@ def export_track_data(**kwargs):
                 with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
                     return tag_file.read().strip().strip("\ufeff")
 
-            yield m.source_hash, {
+            yield m.name, { # TODO: I wanted `m.name` to be `m.source_hash`, but that appears to return `null`? Investigate
                 'source_filename': name,
                 'duration': m.source_details.get('duration'),
                 'attachments': tuple(
                     {
                         'use': processed_file.type.attachment_type,
                         'mime': processed_file.type.mime,
-                        'url': str(processed_file.relative),
+                        'path': str(processed_file.relative),
                     }
                     for processed_file in m.processed_files.values()
                 ),
@@ -85,6 +86,7 @@ def export_track_data(**kwargs):
             }
             stats['meta_exported'].add(name)
 
+    assert kwargs['path_static_track_list']
     with open(kwargs['path_static_track_list'], 'wt') as filehandle:
         json.dump(dict(_tracks()), filehandle)
 
@@ -92,7 +94,7 @@ def export_track_data(**kwargs):
 
 
 def additional_arguments(parser):
-    parser.add_argument('--path_static_track_list', action='store', help='the path to output json data', required=True)
+    parser.add_argument('--path_static_track_list', action='store', help='the path to output json data')
 
 
 if __name__ == "__main__":

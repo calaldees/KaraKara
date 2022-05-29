@@ -154,6 +154,7 @@ class MetaFile(object):
             log.info('Unlinking {} {}'.format(key, file_data['relative']))
             del self.scan_data[key]
 
+    # TODO: BROKEN? Investigate how this is updated? This is not return the correct up-to-date value
     @property
     def source_hashs(self):
         return self.source_details.setdefault(self.SOURCE_HASHS_KEY, {})
