@@ -2,10 +2,12 @@ import pytest
 import subprocess
 from io import BytesIO
 from pathlib import Path
+from functools import partial
 
 from PIL import Image
 
-from calaldees.color import color_distance, color_close
+from calaldees.color import color_distance, color_close as _color_close
+color_close = partial(_color_close, threshold=30)
 
 import processmedia_libs.subtitle_processor as subtitle_processor
 from ._base import MockEncodeExternalCalls
@@ -107,6 +109,9 @@ def test_encode_video_simple(ProcessMediaTestManager, TEST1_VIDEO_FILES, externa
         # We sample at '20% 40% 60% %80' - in out 30 second video that is 'RED, GREEN, GREEN, BLUE'
         for image_num, color in enumerate((COLOR_RED, COLOR_GREEN, COLOR_GREEN, COLOR_BLUE)):
             assert color_close(color, Image.open(processed_files[f'image{image_num+1}_webp'].file).getpixel(SAMPLE_COORDINATE))
+
+        # Assert subtitles
+        assert processed_files[f'subtitle'].file.stat().st_size > 0, 'subtitle file was created and has content'
 
 
 

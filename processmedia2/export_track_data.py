@@ -7,6 +7,7 @@ from calaldees.files.scan import fast_scan
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import PENDING_ACTION
+from processmedia_libs.subtitle_processor_with_codecs import parse_subtitles
 
 import logging
 log = logging.getLogger(__name__)
@@ -46,13 +47,21 @@ def export_track_data(**kwargs):
 
             log.debug(f'Export: {name}')
 
-            def _get_srt():
+            # def _get_srt():
+            #     source_file_sub = m.source_files.get('sub')
+            #     if not source_file_sub or not source_file_sub.file.is_file():
+            #         log.debug(f'{source_file_sub=} missing - unable to import srt')
+            #         return
+            #     with source_file_sub.file.open('rt', encoding='utf-8', errors='ignore') as srt_file:
+            #         return srt_file.read()
+            def _get_lyrics():
                 source_file_sub = m.source_files.get('sub')
                 if not source_file_sub or not source_file_sub.file.is_file():
                     log.debug(f'{source_file_sub=} missing - unable to import srt')
                     return
-                with source_file_sub.file.open('rt', encoding='utf-8', errors='ignore') as srt_file:
-                    return srt_file.read()
+                with source_file_sub.file.open('rt') as filehandle:
+                    subtitles = parse_subtitles(filehandle=filehandle)
+                return '\n'.join(subtitle.text for subtitle in subtitles)
 
             def _get_tags():
                 source_file_tag = m.source_files.get('tag')
@@ -70,7 +79,8 @@ def export_track_data(**kwargs):
                     }
                     for processed_file in m.processed_files.values()
                 ),
-                'srt': _get_srt(),
+                #'srt': _get_srt(),
+                'lyrics': _get_lyrics(),
                 'tags': _get_tags(),
             }
             stats['meta_exported'].add(name)

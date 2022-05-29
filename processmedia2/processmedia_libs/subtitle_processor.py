@@ -3,7 +3,7 @@
 import re
 from collections import namedtuple, OrderedDict
 from datetime import time
-from itertools import zip_longest
+from itertools import zip_longest, tee
 
 import logging
 log = logging.getLogger(__name__)
@@ -68,6 +68,18 @@ def _srt_time(t):
     '01:02:03,050'
     """
     return '{:02d}:{:02d}:{:02d},{:03d}'.format(t.hour, t.minute, t.second, int(t.microsecond/1000))
+
+
+def _vtt_time(t):
+    """
+    >>> _vtt_time(time(1, 23, 45, 671000))
+    '01:23:45.671'
+    >>> _vtt_time(time(0, 0, 0, 0))
+    '00:00:00.000'
+    >>> _vtt_time(time(1, 2, 3, 50000))
+    '01:02:03.050'
+    """
+    return '{:02d}:{:02d}:{:02d}.{:03d}'.format(t.hour, t.minute, t.second, int(t.microsecond/1000))
 
 
 def _parse_time(time_str):
@@ -378,4 +390,58 @@ def create_srt(subtitles):
         )
         for index, subtitle in enumerate(subtitles)
         if subtitle.text
+    )
+
+
+
+
+def pairwise(iterable, fillvalue=None):
+    """
+    now part of standard lib itertools.pairwise
+    https://stackoverflow.com/a/5434936/3356840
+    s -> (s0,s1), (s1,s2), (s2, s3), ...
+
+    >>> tuple(pairwise((1,2,3)))
+    ((1, 2), (2, 3), (3, None))
+    """
+    a, b = tee(iterable)
+    next(b, None)
+    return zip_longest(a, b, fillvalue=fillvalue)
+
+def create_vtt(subtitles):
+    r"""
+    https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
+    https://w3c.github.io/webvtt/
+    https://caniuse.com/?search=vtt
+
+    >>> vtt = create_vtt((
+    ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'first'),
+    ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second'),
+    ... ))
+    >>> print(vtt)
+    WEBVTT - KaraKara Subtitle
+    <BLANKLINE>
+    1
+    00:00:00.000 --> 00:01:00.000
+    <v active>first
+    <v next>second
+    <BLANKLINE>
+    2
+    00:02:00.000 --> 00:03:00.510
+    <v active>second
+    <v next>
+    <BLANKLINE>
+    <BLANKLINE>
+    """
+    VTT_FORMAT = """\
+<v active>{active}
+<v next>{next}"""
+    return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
+        SRT_FORMAT.format(
+            index=index+1,
+            start=_vtt_time(subtitle1.start),
+            end=_vtt_time(subtitle1.end),
+            text=VTT_FORMAT.format(active=subtitle1.text, next=getattr(subtitle2,'text','')),
+        )
+        for index, (subtitle1, subtitle2) in enumerate(pairwise(subtitles))
     )

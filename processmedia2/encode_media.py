@@ -10,6 +10,9 @@ from processmedia_libs import EXTS, PENDING_ACTION
 from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 from processmedia_libs.meta_overlay import MetaManagerExtended
 
+from processmedia_libs.subtitle_processor_with_codecs import parse_subtitles
+from processmedia_libs.subtitle_processor import create_vtt
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -166,6 +169,16 @@ class Encoder(object):
                 source=uncompressed_image_file,
                 destination=destination,
             )
+        # Subtitle
+        elif target_file.type.attachment_type in ('subtitle',):
+            with m.source_files['sub'].file.open('rt') as filehandle:
+                subtitles = parse_subtitles(filehandle=filehandle)
+            if target_file.type.mime == 'text/vtt':
+                with destination.open('wt') as filehandle:
+                    filehandle.write(create_vtt(subtitles))
+            else:
+                raise Exception('unknown subtitle output type')
+        # Unknown Error
         else:
             raise Exception(f'unknown target file {target_file.type}')
         target_file.move(destination)

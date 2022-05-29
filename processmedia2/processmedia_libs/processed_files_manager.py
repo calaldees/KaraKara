@@ -14,7 +14,7 @@ from calaldees.files.scan import fast_scan
 # ffmpeg reuseable args
 VF_SCALE_TEMPLATE = "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'"
 SCALE_IMAGE=dict(
-    vf=VF_SCALE_TEMPLATE.format(412),
+    vf=VF_SCALE_TEMPLATE.format(512),
 )
 PREVIEW=dict(
     ab='24k',
@@ -137,6 +137,7 @@ class ProcessedFilesManager(object):
         ProcessedFileType('image2_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
         ProcessedFileType('image3_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
         ProcessedFileType('image4_webp', 'image', 'webp', 'image/webp', SCALE_IMAGE),
+        ProcessedFileType('subtitle', 'subtitle', 'vtt', 'text/vtt', dict()),
     )})
 
     def __init__(self, path):
