@@ -28,7 +28,7 @@ export function s_to_mns(t: number): string {
  *
  * eg get_attachment(track, "preview") -> {type: "video", location: "asdfasdfa.mp4"}
  */
- export function get_attachment(
+export function get_attachment(
     track: Track,
     type: string,
 ): Attachment {

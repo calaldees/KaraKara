@@ -16,11 +16,10 @@ export const PreviewScreen = ({ state }: { state: State }): VNode => (
     <PreviewInternal
         state={state}
         track={state.track_list[state.queue[0].track_id]}
-        queue_item={state.queue[0]}
-        />
+    />
 );
 
-const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
+const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNode => (
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <video

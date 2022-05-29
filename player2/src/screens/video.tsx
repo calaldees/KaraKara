@@ -7,7 +7,7 @@ export const VideoScreen = ({ state }: { state: State }): VNode => (
         state={state}
         track={state.track_list[state.queue[0].track_id]}
         queue_item={state.queue[0]}
-        />
+    />
 );
 
 const VideoInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (

@@ -74,10 +74,10 @@ const subscriptions = (state: State) => [
     KeyboardListener,
     getOpenMQTTListener(state),
     state.audio_allowed &&
-        !state.paused &&
-        !state.playing &&
-        state.settings["karakara.player.autoplay.seconds"] !== 0 &&
-        IntervalListener,
+    !state.paused &&
+    !state.playing &&
+    state.settings["karakara.player.autoplay.seconds"] !== 0 &&
+    IntervalListener,
     FetchTrackList(state.room_name),
 ];
 
