@@ -115,15 +115,15 @@ function apiRequestEffect(dispatch, props) {
                 (state, result) => [
                     {
                         ...state,
-                        session_id: (result.identity && result.identity.id) ? result.identity.id : state.session_id,
+                        session_id: result?.identity?.id || state.session_id,
                         loading: false,
                     },
                 ],
                 result,
             );
 
-            if (result.status == "ok") {
-                if (result.messages.length > 0) {
+            if ((result.status ?? "ok") == "ok") {
+                if (result.messages?.length > 0) {
                     dispatch((state) => [
                         {
                             ...state,
