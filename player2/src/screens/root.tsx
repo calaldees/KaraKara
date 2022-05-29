@@ -5,6 +5,10 @@ import { PodiumScreen } from "./podium";
 import { SettingsMenu } from "./settings";
 import { PreviewScreen } from "./preview";
 
+function percent(a: number, b: number): string {
+    return Math.round((a / b) * 100) + "%";
+}
+
 export function Root(state: State): VNode {
     let screen = <section>Unknown state :(</section>;
 
@@ -19,6 +23,12 @@ export function Root(state: State): VNode {
         screen = (
             <section key="title" class={"screen_title"}>
                 <h1>KaraKara</h1>
+            </section>
+        );
+    else if (state.download_size)
+        screen = (
+            <section key="title" class={"screen_title"}>
+                <h1>Loading {percent(state.download_done, state.download_size)}</h1>
             </section>
         );
     else if (state.queue.length === 0) screen = <TitleScreen state={state} />;
