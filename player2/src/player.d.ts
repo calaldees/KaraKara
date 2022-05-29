@@ -51,6 +51,7 @@ type State = {
     room_password: string,
     room_password_edit: string,
     podium: boolean,
+    track_list: Dictionary<Track>,
 
     // global temporary
     show_settings: boolean,
@@ -58,6 +59,10 @@ type State = {
     fullscreen: false,
     audio_allowed: boolean,
     settings: Dictionary<any>,
+
+    // loading screen
+    download_size: number | null,
+    download_done: number,
 
     // title screen
     images: Array<WaterfallImage>,

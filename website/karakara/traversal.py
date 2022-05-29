@@ -66,7 +66,6 @@ class QueueContext(QueueResourceMixin, NextContextMixin):
                     QueueSettingsContext,
                     SearchListContext,
                     SearchTagsContext,
-                    RandomImagesContext,
                     RemoteControlContext,
                     QueueAdminContext,
                     QueuePriorityTokenContext,
@@ -131,14 +130,6 @@ class SearchTagsContext(QueueResourceMixin):
     def __getitem__(self, key):
         self.tags.append(key)
         return self
-
-
-class RandomImagesContext(QueueResourceMixin):
-    __template__ = 'queue_random_images'
-    __name__ = 'random_images'
-
-    def __init__(self, parent=None):
-        self.__parent__ = parent
 
 
 class RemoteControlContext(QueueResourceMixin):

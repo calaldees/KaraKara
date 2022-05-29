@@ -8,7 +8,7 @@ import {
     getOpenMQTTListener,
     IntervalListener,
     KeyboardListener,
-    FetchRandomImages,
+    FetchTrackList,
 } from "./subs";
 
 // If we're running stand-alone, then use the main karakara.uk
@@ -28,6 +28,7 @@ const state: State = {
     room_password: "",
     room_password_edit: "",
     podium: false,
+    track_list: {},
 
     // global temporary
     show_settings: false,
@@ -47,6 +48,10 @@ const state: State = {
         "karakara.podium.video_lag": 0.5, // adjust to get podium and projector in sync
         "karakara.podium.soft_sub_lag": 0.35, // adjust to get soft-subs and hard-subs in sync
     },
+
+    // loading screen
+    download_size: null,
+    download_done: 0,
 
     // title screen
     images: [],
@@ -75,7 +80,7 @@ const subscriptions = (state: State) => [
         !state.playing &&
         state.settings["karakara.player.autoplay.seconds"] !== 0 &&
         IntervalListener,
-    FetchRandomImages(state.room_name),
+    FetchTrackList(state.room_name),
 ];
 
 app({
