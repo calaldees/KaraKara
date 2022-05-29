@@ -2,25 +2,13 @@ ARG PYTHON_IMAGE_VERSION=3.10
 FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
     ARG PYTHON_IMAGE_VERSION
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
-#FROM ubuntu as base
-    #ENV PATH_SITE_PACKAGES=/usr/local/lib/python3.8/dist-packages/
 
     # System Dependencies ------------------------------------------------------
 
-    # old ubuntu
-    # COPY --from=jrottenberg/ffmpeg /usr/local /usr/local
-    # ENV DEBIAN_FRONTEND=noninteractive
-    # ENV TZ=Etc/UTC
-    # RUN apt-get update && apt-get install -y \
-    #     git \
-    #     python3-pip \
-    #     jpegoptim \
-    #     sox \
-    #     tesseract-ocr-eng \
-    # && apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt
-
-    #RUN apt-get update && apt-get install -y \
-    #&& apt-get clean && rm -rf /var/lib/apt/lists /var/cache/apt \
+    # ffmpeg (staticly compiled) with libsvtav1 + h265 support
+    COPY --from=mwader/static-ffmpeg /ffmpeg /usr/local/bin/
+    COPY --from=mwader/static-ffmpeg /ffprobe /usr/local/bin/
+    RUN ffmpeg --help
 
     RUN apk add --no-cache \
         curl \
@@ -28,18 +16,10 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
         less \
         bash \
         git \
-        sox \
-        ffmpeg \
-        jpegoptim \
+        imagemagick \
         # test dependenceies - but unpicking/moving them is too hard
-        tesseract-ocr \
         jpeg-dev \
         zlib-dev \
-        # `Arial` font is needed - maybe this can be changed to `sans-serif`?
-        msttcorefonts-installer \
-        fontconfig \
-    # build font ms-fonts
-    && update-ms-fonts && fc-cache -f \
     && pip3 install --no-cache-dir --upgrade \
         pip \
         setuptools \
@@ -62,13 +42,14 @@ FROM base as python_dependencies
 
 FROM python_dependencies as python_dependencies_test
 
-    # hack for install pillow - https://genji-games.medium.com/dockerizing-an-app-that-uses-pillow-is-not-a-good-intro-to-docker-a026aa67ce1c
-    RUN apk add --no-cache --virtual .build-deps \
-        build-base \
-        linux-headers \
-    && pip install Pillow \
-    && apk del .build-deps \
-    && true
+    # hack for install pillow
+    # https://genji-games.medium.com/dockerizing-an-app-that-uses-pillow-is-not-a-good-intro-to-docker-a026aa67ce1c
+    #RUN apk add --no-cache --virtual .build-deps \
+    #    build-base \
+    #    linux-headers \
+    #&& pip install Pillow \
+    #&& apk del .build-deps \
+    #&& true
 
     COPY ./requirements.test.txt ./
     RUN pip install --no-cache-dir -r requirements.test.txt
@@ -95,18 +76,5 @@ FROM code as test
 
 FROM code as production
   CMD ./processmedia2.sh
-  # It is possible that encoding could really take more than 30 mins
-  HEALTHCHECK --interval=1m --timeout=3s CMD touch -d"-30min" /tmp/marker && [ /processmedia2/data/.heartbeat -nt /tmp/marker ]
-
-
-
-#RUN mkdir -p /media/source /media/meta /media/processed && chmod -R 777 /media/
-
-#COPY --from=krallin/ubuntu-tini /usr/local/bin/tini /usr/local/bin/tini
-#ENTRYPOINT ["/usr/local/bin/tini", "--", "/processmedia2/docker-compose.yml.processmedia2.sh"]
-#https://github.com/docker-library/mysql/issues/47#issuecomment-140339288
-#CMD /processmedia2/processmedia2.sh
-
-# docker build -t processmedia2:latest --file .\processmedia2.base.dockerfile .
-# docker run -it --rm -v ../:/processmedia2:ro -v /var/run/docker.sock:/var/run/docker.sock docker.io processmedia2:latest
-  # Windows -v //var/run/docker.sock:/var/run/docker.sock
+  # It is possible that encoding could really take more than 120 mins?
+  HEALTHCHECK --interval=1m --timeout=3s CMD touch -d"-120min" /tmp/marker && [ /processmedia2/data/.heartbeat -nt /tmp/marker ]

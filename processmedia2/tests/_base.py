@@ -2,13 +2,12 @@ import os
 import tempfile
 import json
 from pathlib import Path
-#from shutil import copyfile
 
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs.external_tools import ProcessMediaFilesWithExternalTools
 
 from scan_media import scan_media
-from encode_media import encode_media, Encoder
+from encode_media import encode_media
 from cleanup_media import cleanup_media
 
 
@@ -30,6 +29,7 @@ class ProcessMediaTestManagerBase(object):
             )
 
     def __enter__(self):
+        self._temp_heartbeat = tempfile.NamedTemporaryFile()
         self._temp_scan = tempfile.TemporaryDirectory()
         self._temp_meta = tempfile.TemporaryDirectory()
         self._temp_processed = tempfile.TemporaryDirectory()
@@ -41,12 +41,21 @@ class ProcessMediaTestManagerBase(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self._temp_heartbeat.close()
         self._temp_scan.cleanup()
         self._temp_meta.cleanup()
         self._temp_processed.cleanup()
         self.meta_manager = None
         self.processed_manager = None
         self.source_files_manager = None
+
+    @property
+    def heartbeat_mtime(self):
+        return Path(self.path_heartbeat).stat().st_mtime
+
+    @property
+    def path_heartbeat(self):
+        return self._temp_heartbeat.name
 
     @property
     def path_source(self):
@@ -62,8 +71,7 @@ class ProcessMediaTestManagerBase(object):
 
     @property
     def commandline_kwargs(self):
-        # TODO: Do we need to set `cmd_ffmpeg`, etc here? or are we happy with the defaults?
-        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed, force=True)  # , postmortem=True
+        return dict(path_meta=self.path_meta, path_source=self.path_source, path_processed=self.path_processed, force=True, heartbeat_file=self.path_heartbeat)  # , postmortem=True
 
     def scan_media(self):
         self.meta_manager._release_cache()
@@ -77,9 +85,9 @@ class ProcessMediaTestManagerBase(object):
         else:
             encode_media(**self.commandline_kwargs)
 
-    def cleanup_media(self):
+    def cleanup_media(self, **kwargs):
         self.meta_manager._release_cache()
-        cleanup_media(**self.commandline_kwargs)
+        cleanup_media(**(self.commandline_kwargs | kwargs))
 
     @property
     def meta(self):
@@ -131,10 +139,10 @@ class MockEncodeExternalCalls(object):
         """
         self.method_returns = dict(
             probe_media=self._mock_command_return_probe,
+            encode_image_to_video=self._mock_command_return_success,
             encode_video=self._mock_command_return_success,
-            encode_audio=self._mock_command_return_success,
-            encode_preview_video=self._mock_command_return_success,
             extract_image=self._mock_command_return_success,
+            compress_image=self._mock_command_return_success,
         )
         self.method_returns.update({
             method_name: self._mock_command_return_success if return_ok_or_fail else self._mock_command_return_fail

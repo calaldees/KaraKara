@@ -60,10 +60,6 @@ def get_file_collection(folder_structure, primary_file):
             for data_filename in _load_yaml(primary_file.absolute)
         }
 
-    # Get tags.txt from different folder if importing legacy files
-    if folder.name == 'source' and folder.parent and folder.parent.get('tags.txt'):
-        file_collection.add(folder.parent.get('tags.txt'))
-
     return file_collection
 
 

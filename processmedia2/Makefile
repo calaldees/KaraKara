@@ -19,7 +19,13 @@ build_prod:  ##
 	docker build --tag ${DOCKER_IMAGE} .
 
 DOCKER_RUN_LOCAL:=docker run -it --rm \
+	--env KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json \
 	--volume=${PWD}:/processmedia2/:ro \
+	--volume=processmedia2_data:/data/:rw \
+	--volume=/mnt/c/Users/ac954/Downloads:/Downloads/:rw \
+	--volume=/mnt/c/Users/ac954/code/KaraKara/kk-source-test:/media/source:ro \
+	--volume=/mnt/c/Users/ac954/code/KaraKara/kk-processed:/media/processed:rw \
+	--volume=/mnt/c/Users/ac954/code/KaraKara/kk-static:/static:rw \
 	${DOCKER_IMAGE}
 run:  ##
 	${DOCKER_RUN_LOCAL} processmedia2.sh

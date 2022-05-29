@@ -1,11 +1,12 @@
 ## -*- coding: utf-8 -*-
 
 import re
-from collections import namedtuple, OrderedDict
 from datetime import time
-from itertools import zip_longest
+from itertools import zip_longest, tee, chain
+from typing import NamedTuple
 
 import logging
+from typing import NamedTuple
 log = logging.getLogger(__name__)
 
 
@@ -24,10 +25,15 @@ re_time = re.compile(r'(?P<hour>\d{1,2}):(?P<min>\d{2}):(?P<sec>\d{2})[\.,](?P<m
 re_srt_line = re.compile(r'(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*)(\n\n|$)', flags=re.MULTILINE)
 re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),(?P<style>.*?),(?P<name>.*?),(?P<marginL>.*?),(?P<marginR>.*?),(?P<marginV>.*?),(?P<effect>.*?),(?P<text>.+)[\n$]')
 
-Subtitle = namedtuple('Subtitle', ('start', 'end', 'text'))
+class Subtitle(NamedTuple):
+    start: time = time()
+    end: time = time()
+    text: str = ''
 
 
-TextOverlap = namedtuple('TextOverlap', ('index', 'text'))
+class TextOverlap(NamedTuple):
+    index: int
+    text: str
 def commonOverlap(text1, text2):
     """
     https://neil.fraser.name/news/2010/11/04/
@@ -68,6 +74,18 @@ def _srt_time(t):
     '01:02:03,050'
     """
     return '{:02d}:{:02d}:{:02d},{:03d}'.format(t.hour, t.minute, t.second, int(t.microsecond/1000))
+
+
+def _vtt_time(t):
+    """
+    >>> _vtt_time(time(1, 23, 45, 671000))
+    '01:23:45.671'
+    >>> _vtt_time(time(0, 0, 0, 0))
+    '00:00:00.000'
+    >>> _vtt_time(time(1, 2, 3, 50000))
+    '01:02:03.050'
+    """
+    return '{:02d}:{:02d}:{:02d}.{:03d}'.format(t.hour, t.minute, t.second, int(t.microsecond/1000))
 
 
 def _parse_time(time_str):
@@ -230,9 +248,10 @@ def parse_subtitles(data):
     return _parse_srt(data) or _parse_ssa(data)
 
 
-SSASection = namedtuple('SSASection', ('name', 'line', 'format_order'))
-
-
+class SSASection(NamedTuple):
+    name: str
+    line: int
+    format_order: tuple
 def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size_multiplyer=1, margin_v_size_multiplyer=1, font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO):
     r"""
     >>> ssa = create_ssa((
@@ -269,7 +288,7 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
         font_size = height / font_ratio
     if not font_size:
         font_size = font_ratio
-    header = OrderedDict((
+    header = dict((
         ('Title', '<untitled>'),
         ('Original Script', '<unknown>'),
         ('ScriptType', 'v4.00'),
@@ -278,7 +297,7 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
         header['PlayResX'] = width
     if height:
         header['PlayResY'] = height
-    ssa_template = OrderedDict((
+    ssa_template = dict((
         ('Script Info', header),
         (SSASection('V4 Styles', 'Style', ('Name', 'Fontname', 'Fontsize', 'PrimaryColour', 'SecondaryColour', 'TertiaryColour', 'BackColour', 'Bold', 'Italic', 'BorderStyle', 'Outline', 'Shadow', 'Alignment', 'MarginL', 'MarginR', 'MarginV', 'AlphaLevel', 'Encoding')), (
             {
@@ -378,4 +397,62 @@ def create_srt(subtitles):
         )
         for index, subtitle in enumerate(subtitles)
         if subtitle.text
+    )
+
+
+
+
+def pairwise(iterable, fillvalue=None):
+    """
+    now part of standard lib itertools.pairwise
+    https://stackoverflow.com/a/5434936/3356840
+    s -> (s0,s1), (s1,s2), (s2, s3), ...
+
+    >>> tuple(pairwise((1,2,3)))
+    ((None, 1), (1, 2), (2, 3), (3, None))
+    """
+    a, b = tee(iterable)
+    return chain(((fillvalue, next(b, fillvalue)),), zip_longest(a, b, fillvalue=fillvalue))
+
+def create_vtt(subtitles):
+    r"""
+    https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
+    https://w3c.github.io/webvtt/
+    https://caniuse.com/?search=vtt
+
+    >>> vtt = create_vtt((
+    ...     Subtitle(time(0,1,0,0), time(0,2,0,0), 'first'),
+    ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second'),
+    ... ))
+    >>> print(vtt)
+    WEBVTT - KaraKara Subtitle
+    <BLANKLINE>
+    1
+    00:00:00.000 --> 00:01:00.000
+    <v active>
+    <v next>first
+    <BLANKLINE>
+    2
+    00:01:00.000 --> 00:02:00.000
+    <v active>first
+    <v next>second
+    <BLANKLINE>
+    3
+    00:02:00.000 --> 00:03:00.510
+    <v active>second
+    <v next>
+    <BLANKLINE>
+    <BLANKLINE>
+    """
+    VTT_FORMAT = """\
+<v active>{active}
+<v next>{next}"""
+    return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
+        SRT_FORMAT.format(
+            index=index+1,
+            start=_vtt_time(subtitle1.start),
+            end=_vtt_time(subtitle1.end if subtitle1.end != time() else subtitle2.start),
+            text=VTT_FORMAT.format(active=subtitle1.text, next=subtitle2.text),
+        )
+        for index, (subtitle1, subtitle2) in enumerate(pairwise(subtitles, fillvalue=Subtitle()))
     )

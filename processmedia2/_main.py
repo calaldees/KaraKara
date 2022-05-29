@@ -24,7 +24,6 @@ DEFAULT_kwargs = {
     'loggingconf': os.path.join(DEFAULT_DATA_PATH, 'logging.json'),
     'mtime_store_path': os.path.join(DEFAULT_DATA_PATH, 'mtimes.json'),
     'heartbeat_file': os.path.join(DEFAULT_DATA_PATH, '.heartbeat'),
-    'cmd_ffmpeg': 'nice ffmpeg',
 }
 
 
@@ -45,7 +44,7 @@ def main(
         description=description,
         epilog=epilog,
     )
-    parser.add_argument('--config', action='store', help=f" default:{DEFAULT_kwargs['config']}")
+    parser.add_argument('--config', action='store', help=f"try env KARAKARA_PROCESSMEDIA2_CONFIG then default:{DEFAULT_kwargs['config']}")
 
     parser.add_argument('--path_source', action='store', help='')
     parser.add_argument('--path_processed', action='store', help='')
@@ -58,9 +57,6 @@ def main(
     parser.add_argument('--mtime_store_path', action='store', help=f"optimisation file that tracks the last time processing was done on a folder. default:{DEFAULT_kwargs['mtime_store_path']}")
     parser.add_argument('--heartbeat_file', action='store', help=f"touch this file on each action default:{DEFAULT_kwargs['heartbeat_file']}")
 
-    # TODO: is this needed? It was a consideration for containerisation, but the container has the relevant binaries now
-    parser.add_argument('--cmd_ffmpeg', action='store', help=f"cmd for ffmpegdefault:{DEFAULT_kwargs['cmd_ffmpeg']}")
-
     parser.add_argument('--postmortem', action='store_true', help='drop into pdb on fail')
     parser.add_argument('--version', action='version', version=version)
 
@@ -69,15 +65,14 @@ def main(
 
     # Read config.json values
     config = {}
-    if kwargs_cmd.get('config') and not os.path.isfile(kwargs_cmd['config']):
-        raise Exception(f"config file does not exist {kwargs_cmd['config']}")
-    config_filename = kwargs_cmd.get('config', DEFAULT_kwargs['config'])
-    if os.path.isfile(config_filename):
+    config_filename = kwargs_cmd.get('config') or os.environ.get('KARAKARA_PROCESSMEDIA2_CONFIG') or DEFAULT_kwargs['config']
+    if config_filename:
+        assert os.path.isfile(config_filename), f"config file does not exist {config_filename}"
         with open(config_filename, 'rt') as config_filehandle:
             config = json.load(config_filehandle)
             #kwargs = {k: v or config.get(k) for k, v in kwargs.items()}
 
-    # Merge kwargs in order of precidence
+    # Merge kwargs in order of precedence
     kwargs = merge_dicts(DEFAULT_kwargs, config, kwargs_cmd)
 
     # Format all strings with string formatter/replacer - this overlays ENV variables too
@@ -101,6 +96,7 @@ def main(
     # Setup logging.json
     with open(kwargs['loggingconf'], 'rt') as filehandle:
         logging.config.dictConfig(json.load(filehandle))
+    #logging.basicConfig(level=logging.DEBUG)
 
     # Heartbeat
     if kwargs['heartbeat_file']:

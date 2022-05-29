@@ -1,16 +1,14 @@
 {
     "loggingconf": "logging.json.dist",
-    "lockfile": "data/.lock",
-    "heartbeat_file": "data/.heartbeat",
-    "mtime_store_path": "data/mtimes.json",
+    "lockfile": "/data/.lock",
+    "heartbeat_file": "/data/.heartbeat",
+    "mtime_store_path": "/data/mtimes.json",
 
     "path_source": "/media/source",
     "path_meta": "/media/meta",
     "path_processed": "/media/processed",
 
     "path_static_track_list": "/static/tracks.json",
-
-    "api_host": "website:6543",
 
     "process_order_function": "random",
     "disable_meta_write_safety": true

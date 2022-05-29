@@ -1,19 +1,33 @@
-import os
-from collections import ChainMap
+from pathlib import Path
+from typing import NamedTuple
+from types import MappingProxyType
+from functools import cached_property
 
-from calaldees.data import first
-from calaldees.files.exts import file_ext
-
-from . import EXTS
+from . import EXT_TO_TYPE
 
 import logging
 log = logging.getLogger(__name__)
 
-FILETYPES = {
-    'media': {'video', 'audio', 'sub', 'image'},
-    'data': {'tag', 'sub'}
-}
-FILETYPES['all'] = FILETYPES['media'] | FILETYPES['data']   # TODO: set merge .values()?
+
+class SourceFile(NamedTuple):
+    root: Path
+    file: Path
+    hash: str
+    mtime: float
+    @classmethod
+    def new(cls, root, relative=None, hash=None, mtime=None):
+        file = root.joinpath(relative)
+        #assert file.is_file()
+        return cls(root, file, hash, mtime)
+    @property
+    def relative(self) -> Path:
+        return self.file.relative_to(self.root)
+    @property
+    def ext(self) -> str:
+        return self.file.suffix.replace('.','')
+    @property
+    def type(self) -> str:
+        return EXT_TO_TYPE[self.ext]
 
 
 class SourceFilesManager(object):
@@ -25,43 +39,26 @@ class SourceFilesManager(object):
     for any complex coupling or communication between the object types.
     How about we create a Mixin of MetaDataManager that can inited with a source path and have @property source_files
     """
-    def __init__(self, source_path):
-        self.source_path = source_path
+    def __init__(self, path):
+        self.path = Path(path)
+        assert self.path.is_dir()
 
-    def get_source_files(self, metafile, file_type=None):
-        return self._wrap_scan_data(metafile, FILETYPES[file_type or 'all'])
-
-    def _wrap_scan_data(self, metafile, filetypes):
-        wrapped_scan_data = tuple(self._wrap_scan_data_item(d) for d in metafile.scan_data.values())
-        return {k: self._get_file_for(k, wrapped_scan_data) for k in filetypes}
-
-    def _wrap_scan_data_item(self, data):
+    def get_source_files(self, metafile) -> MappingProxyType[str, SourceFile]:
         """
-        Wrap the stored source data dict item in a ChainMap that adds additional common derived fields
+        >>> from unittest.mock import Mock
+        >>> metafile = Mock()
+        >>> metafile.scan_data.values = Mock(return_value=(
+        ...     {'relative': 'test.mp4', 'mtime': 101.00, 'hash': '123'},
+        ...     {'relative': 'test.srt', 'mtime': 102.00, 'hash': '456'},
+        ...     {'relative': 'test.txt', 'mtime': 103.00, 'hash': '789'},
+        ... ))
+        >>> source_files_manager = SourceFilesManager('/tmp')
+        >>> source_files_manager.get_source_files(metafile)
+        mappingproxy({'video': SourceFile(root=PosixPath('/tmp'), file=PosixPath('/tmp/test.mp4'), hash='123', mtime=101.0), 'sub': SourceFile(root=PosixPath('/tmp'), file=PosixPath('/tmp/test.srt'), hash='456', mtime=102.0), 'tag': SourceFile(root=PosixPath('/tmp'), file=PosixPath('/tmp/test.txt'), hash='789', mtime=103.0)})
         """
-        if not data:
-            return {}
-        file_no_ext, ext = file_ext(data['relative'])
-        return ChainMap(
-            dict(
-                absolute=os.path.abspath(os.path.join(self.source_path, data['relative'])),
-                ext=ext,
-                file_no_ext=file_no_ext,
-            ),
-            # IMPORTANT! Any modification to a chainmap is ALWAYS made to the first dict.
-            # We DON'T want any changes to the underlying data from a wrapper
-            data,
-        )
-
-    def _get_file_for(self, file_type, wrapped_scan_data):
-        assert file_type in EXTS.keys(), 'file_type: {0} must be one of {1}'.format(file_type, EXTS.keys())
-        exts = EXTS[file_type]
-        files_for_type = sorted(
-            (v for v in wrapped_scan_data if v['ext'] in exts),
-            key=lambda v: exts.index(v['ext']),
-            reverse=True
-        )
-        if len(files_for_type) > 1:
-            log.warning('Multiple files for type %s identifyed %s. This may be a mistake. Using only first one', file_type, [f['relative'] for f in files_for_type])
-        return first(files_for_type) or {}
-
+        return MappingProxyType({
+            source_file.type: source_file
+            for source_file in (
+                SourceFile.new(self.path, **scan_file) for scan_file in metafile.scan_data.values()
+            )
+        })

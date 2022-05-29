@@ -52,7 +52,7 @@ class MetaManager(object):
             return
 
         # If meta file modified since scan - abort
-        _check_meta_mtime_safety = False
+        _check_meta_mtime_safety = False  # TODO: this appears to not use `disable_meta_write_safety` in config? Investigate
         if _check_meta_mtime_safety and os.path.exists(filepath):
             mtime_expected = self._meta_timestamps[name]
             mtime_current = os.stat(filepath).st_mtime
@@ -88,7 +88,7 @@ class MetaManager(object):
 
     @property
     def source_hashs(self):
-        return (m.source_hash for m in self.meta.values() if m.source_hash)
+        return (m.source_hash for m in self.meta.values())  #  if m.source_hash
 
 
 class MetaFile(object):
@@ -102,7 +102,7 @@ class MetaFile(object):
 
         self.scan_data = self.data.setdefault('scan', {})
         self.pending_actions = self.data.setdefault('actions', [])
-        self.source_details = self.data.setdefault('processed', {})
+        self.source_details = self.data.setdefault('source_details', {})
         self.data_hash = freeze(data).__hash__()
 
         self.file_collection = set()
@@ -135,9 +135,9 @@ class MetaFile(object):
         file_data['hash'] = filehash
 
         #self.pending_actions = list(set(self.pending_actions) | {f.ext})
-        if self.SOURCE_HASHS_KEY in self.source_details:
-            log.debug('{} source changed, clearing source hashs'.format(self.name))
-            del self.source_details[self.SOURCE_HASHS_KEY]
+        #if self.SOURCE_HASHS_KEY in self.source_details:
+        #    log.debug('{} source changed, clearing source hashs'.format(self.name))
+        #    del self.source_details[self.SOURCE_HASHS_KEY]
 
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()
@@ -153,11 +153,3 @@ class MetaFile(object):
         for key, file_data in self.unassociated_files.items():
             log.info('Unlinking {} {}'.format(key, file_data['relative']))
             del self.scan_data[key]
-
-    @property
-    def source_hashs(self):
-        return self.source_details.setdefault(self.SOURCE_HASHS_KEY, {})
-
-    @property
-    def source_hash(self):
-        return self.source_hashs.get(self.SOURCE_HASH_FULL_KEY)
