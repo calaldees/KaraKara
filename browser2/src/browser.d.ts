@@ -43,15 +43,8 @@ type Track = {
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,
-    description: string,
     attachments: Array<Attachment>,
     lyrics: Array<SrtLine>,
-    image: string,
-    source_filename: string,
-    queue: {
-        played: Array<any>,
-        pending: Array<any>,
-    }
 }
 
 type QueueItem = {
