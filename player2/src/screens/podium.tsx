@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { get_attachment, get_tag, s_to_mns, title_case } from "../utils";
-import { Lyrics, AutoplayCountdown } from "./common";
+import { AutoplayCountdown } from "./common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
 import { SendCommand } from "../effects";
 
@@ -29,9 +29,14 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
                 autoPlay={true}
                 muted={true}
                 key={state.playing}
-            />
+            >
+                <track
+                    kind="subtitles"
+                    src={get_attachment(state, state.queue[0].track, "subtitle")}
+                    default={true}
+                />
+            </video>
         </div>
-        <Lyrics state={state} />
 
         {state.playing ? (
             <div

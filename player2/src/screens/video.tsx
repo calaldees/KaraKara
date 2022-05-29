@@ -1,5 +1,4 @@
 import h from "hyperapp-jsx-pragma";
-import { Lyrics } from "./common";
 import { get_attachment, get_tag, title_case } from "../utils";
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
@@ -11,7 +10,13 @@ export const VideoScreen = ({ state }: { state: State }): VNode => (
             ontimeupdate={UpdateProgress}
             // TODO: Action + Effect at once?
             onended={MarkTrackPlayed}
-        />
+        >
+            <track
+                kind="subtitles"
+                src={get_attachment(state, state.queue[0].track, "subtitle")}
+                default={state.settings["karakara.player.subs_on_screen"]}
+            />
+        </video>
         <div
             id="seekbar"
             style={{
@@ -33,7 +38,5 @@ export const VideoScreen = ({ state }: { state: State }): VNode => (
             Contributed by {get_tag(state.queue[0].track.tags.contributor)}
         </div>
         */}
-        {state.settings["karakara.player.subs_on_screen"] &&
-            state.queue[0].track.lyrics && <Lyrics state={state} />}
     </section>
 );

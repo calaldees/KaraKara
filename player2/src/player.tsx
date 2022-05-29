@@ -46,7 +46,6 @@ const state: State = {
         "karakara.player.subs_on_screen": true, // Set false if using podium
         "karakara.event.end": null,
         "karakara.podium.video_lag": 0.5, // adjust to get podium and projector in sync
-        "karakara.podium.soft_sub_lag": 0.35, // adjust to get soft-subs and hard-subs in sync
     },
 
     // loading screen
