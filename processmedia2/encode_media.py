@@ -36,12 +36,13 @@ def encode_media(process_order_function=PROCESS_ORDER_FUNCS[DEFAULT_ORDER_FUNC],
 
     encoder = Encoder(meta_manager, **kwargs)
 
-    # In the full system, encode will probably be driven from a rabitmq endpoint.
-    # For testing locally we are monitoring the 'pendings_actions' list
     for name in progress_bar(
         process_order_function(
             m.name for m in meta_manager.meta.values()
-            if PENDING_ACTION['encode'] in m.pending_actions or not m.source_hashs
+            if 
+                PENDING_ACTION['encode'] in m.pending_actions  # if explitily marked for encoding
+                or                                             # or
+                not m.source_details.get('duration')           # no duration
         #(
             #'AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu',
             #'Cuticle Tantei Inaba - OP - Haruka Nichijou no Naka de',

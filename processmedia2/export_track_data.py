@@ -31,9 +31,14 @@ def export_track_data(**kwargs):
             meta_manager.load(name)
             m = meta_manager.get(name)
 
+            # Abort if duration not known
+            if not m.source_details.get('duration'):
+                log.warning('Missing (duration) abort import: {name}')
+                stats['missing_processed_aborted'].add(name)  # TODO: rename
+                continue
+
             # Abort if any missing files
             missing_processed_files = frozenset(str(f.relative) for f in m.processed_files.values()) - processed_files_lookup
-            missing_processed_files = False  # HACK!
             if missing_processed_files:
                 log.debug(f'{missing_processed_files=}')
                 # If we are missing any files but we have a source hash,
@@ -42,19 +47,12 @@ def export_track_data(**kwargs):
                 if PENDING_ACTION['encode'] not in m.pending_actions:  # Feels clunky to manage this as a list? maybe a set?
                     m.pending_actions.append(PENDING_ACTION['encode'])
                     #meta_manager.save(name)  # Feels clunky
-                log.warning('Missing (processed files) abort import: %s', name)
+                log.warning('Missing (processed files) abort import: {name}')
                 stats['missing_processed_aborted'].add(name)
                 continue
 
             log.debug(f'Export: {name}')
 
-            # def _get_srt():
-            #     source_file_sub = m.source_files.get('sub')
-            #     if not source_file_sub or not source_file_sub.file.is_file():
-            #         log.debug(f'{source_file_sub=} missing - unable to import srt')
-            #         return
-            #     with source_file_sub.file.open('rt', encoding='utf-8', errors='ignore') as srt_file:
-            #         return srt_file.read()
             def _get_lyrics():
                 source_file_sub = m.source_files.get('sub')
                 if not source_file_sub or not source_file_sub.file.is_file():
@@ -69,9 +67,10 @@ def export_track_data(**kwargs):
                 with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
                     return tag_file.read().strip().strip("\ufeff")
 
-            yield m.name, { # TODO: I wanted `m.name` to be `m.source_hash`, but that appears to return `null`? Investigate
+            yield m.source_hash, {
+                'source_hash': m.source_hash,
                 'source_filename': name,
-                'duration': m.source_details.get('duration'),
+                'duration': m.source_details['duration'],
                 'attachments': tuple(
                     {
                         'use': processed_file.type.attachment_type,
@@ -80,7 +79,6 @@ def export_track_data(**kwargs):
                     }
                     for processed_file in m.processed_files.values()
                 ),
-                #'srt': _get_srt(),
                 'lyrics': _get_lyrics(),
                 'tags': _get_tags(),
             }

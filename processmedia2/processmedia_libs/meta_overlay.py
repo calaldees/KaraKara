@@ -2,7 +2,8 @@ from functools import cached_property, lru_cache
 
 from .meta_manager import MetaManager, MetaFile
 from .source_files_manager import SourceFilesManager
-from .processed_files_manager import ProcessedFilesManager, gen_string_hash
+from .hash import gen_string_hash
+from .processed_files_manager import ProcessedFilesManager
 
 
 class MetaManagerExtended(MetaManager):
@@ -32,8 +33,16 @@ class MetaManagerExtended(MetaManager):
 
         @cached_property
         def processed_files(self):
-            return self.processed_files_manager.get_processed_files((
+            return self.processed_files_manager.get_processed_files(self.source_hashs)
+
+        @property
+        def source_hashs(self):
+            return frozenset((
                 source_file.hash
                 for source_file_type, source_file in self.source_files.items()
                 if source_file_type in ('video', 'audio', 'image')  # only source media types modify the processed_file hash
             ))
+
+        @property
+        def source_hash(self):
+            return gen_string_hash(self.source_hashs)

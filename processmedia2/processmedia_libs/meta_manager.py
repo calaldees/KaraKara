@@ -88,7 +88,7 @@ class MetaManager(object):
 
     @property
     def source_hashs(self):
-        return (m.source_hash for m in self.meta.values() if m.source_hash)
+        return (m.source_hash for m in self.meta.values())  #  if m.source_hash
 
 
 class MetaFile(object):
@@ -102,7 +102,7 @@ class MetaFile(object):
 
         self.scan_data = self.data.setdefault('scan', {})
         self.pending_actions = self.data.setdefault('actions', [])
-        self.source_details = self.data.setdefault('processed', {})
+        self.source_details = self.data.setdefault('source_details', {})
         self.data_hash = freeze(data).__hash__()
 
         self.file_collection = set()
@@ -135,9 +135,9 @@ class MetaFile(object):
         file_data['hash'] = filehash
 
         #self.pending_actions = list(set(self.pending_actions) | {f.ext})
-        if self.SOURCE_HASHS_KEY in self.source_details:
-            log.debug('{} source changed, clearing source hashs'.format(self.name))
-            del self.source_details[self.SOURCE_HASHS_KEY]
+        #if self.SOURCE_HASHS_KEY in self.source_details:
+        #    log.debug('{} source changed, clearing source hashs'.format(self.name))
+        #    del self.source_details[self.SOURCE_HASHS_KEY]
 
     def has_updated(self):
         return self.data_hash != freeze(self.data).__hash__()
@@ -153,12 +153,3 @@ class MetaFile(object):
         for key, file_data in self.unassociated_files.items():
             log.info('Unlinking {} {}'.format(key, file_data['relative']))
             del self.scan_data[key]
-
-    # TODO: BROKEN? Investigate how this is updated? This is not return the correct up-to-date value
-    @property
-    def source_hashs(self):
-        return self.source_details.setdefault(self.SOURCE_HASHS_KEY, {})
-
-    @property
-    def source_hash(self):
-        return self.source_hashs.get(self.SOURCE_HASH_FULL_KEY)

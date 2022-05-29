@@ -193,7 +193,7 @@ def test_encode_with_already_existing_files_still_extracts_duration(ProcessMedia
             manager.encode_media()
             assert patches['probe_media'].call_count == 1, 'Even though the processed files exists, the source media should have been probed'
 
-        assert manager.meta['test1.json']['processed']['duration'] == 1, 'The relinked meta should have probed a duration'
+        assert manager.meta['test1.json']['source_details']['duration'] == 1, 'The relinked meta should have probed a duration'
 
 
 def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TEST1_VIDEO_FILES):

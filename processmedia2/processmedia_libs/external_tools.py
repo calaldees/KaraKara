@@ -107,11 +107,9 @@ class ProcessMediaFilesWithExternalTools:
             '-i', audio_source,
             *cmd_args(
                 t=duration,
-
                 r=1,  # 1 fps
                 bf=0,  # wha dis do?
                 qmax=1,  # wha dis do?
-                #vf=self.config['scale_even'],  # .format(width=width, height=height),  # ,pad={TODO}:{TODO}:(ow-iw)/2:(oh-ih)/2,setsar=1:1
                 **encode_args,
             ),
             destination,

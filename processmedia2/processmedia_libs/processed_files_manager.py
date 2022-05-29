@@ -1,7 +1,4 @@
 import shutil
-import hashlib
-import base64
-import re
 from itertools import chain
 from pathlib import Path
 from typing import NamedTuple
@@ -10,11 +7,16 @@ from types import MappingProxyType
 
 from calaldees.files.scan import fast_scan
 
+from .hash import gen_string_hash
+
 
 # ffmpeg reuseable args
 VF_SCALE_TEMPLATE = "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'"
 SCALE_IMAGE=dict(
     vf=VF_SCALE_TEMPLATE.format(512),
+)
+SCALE_EVEN=dict(
+    vf='scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # 264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
 )
 PREVIEW=dict(
     ab='24k',
@@ -30,25 +32,6 @@ NORMALIZE_AUDIO=dict(
     # highpass=f=120,acompressor=threshold=0.3:makeup=3:release=50:attack=5:knee=4:ratio=10:detection=peak,alimiter=limit=0.95
 )
 # 'scale_even': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2',  # h264 codec can only handle dimension a multiple of 2. Some input does not adhere to this and need correction.
-
-def gen_string_hash(hashs: Sequence[str]):
-    """
-    >>> gen_string_hash(('1', '2', '3'))
-    'pmWkWSBCL51'
-    """
-    #if isinstance(hashs, str):
-    #    return hashs
-
-    hasher = hashlib.sha256()
-    hasher.update(''.join(sorted(hashs)).encode('utf-8'))
-    #hash_str = hasher.hexdigest()
-
-    # Use base62 string rather than hex
-    # re.sub('[+/=]','_', base64.b64encode(hashlib.sha256().digest()).decode('utf8'))[:11]
-    # This is filesystem safe, but not bi-directional as some data is lost
-    # pow(62, 11) == 52036560683837093888  # this is 4 times more-ish than int64 pow(2,64)
-    # pow(62, 10) ==   839299365868340224
-    return re.sub('[+/=]','_', base64.b64encode(hasher.digest()).decode('utf8'))[:11]
 
 
 class ProcessedFileType(NamedTuple):
@@ -107,6 +90,7 @@ class ProcessedFilesManager(object):
             g=240,
             acodec='libopus',
             ac=2,
+            **SCALE_EVEN,
             **NORMALIZE_AUDIO,
         )),
         ProcessedFileType('preview_av1', 'preview', 'webm', 'video/webm; codecs=av01.0.05M.08,opus', dict(

@@ -36,12 +36,15 @@ def test_cleanup_media(ProcessMediaTestManager):
             # remove "test12.json" metadata
         }
 
+        assert all(f.is_file() for f in processed_files_for_test11), f'All files from test11 should still be present {processed_files_for_test11}'
+        assert all(f.is_file() for f in processed_files_for_test12), f'All files from test12 should still be present {processed_files_for_test12}'
+
         # Test cleanup grace period - no files should be deleted
-        manager.cleanup_media(grace_timedelta=datetime.timedelta(-7), now=datetime.datetime.now())
+        manager.cleanup_media(grace_timedelta=datetime.timedelta(-7), now=datetime.datetime.now(), force=False)
         assert all(f.is_file() for f in processed_files_for_test11), f'All files from test11 should still be present {processed_files_for_test11}'
         assert all(f.is_file() for f in processed_files_for_test12), f'All files from test12 should still be present {processed_files_for_test12}'
 
         # Test cleanup - grace period over - files should be deleted
-        manager.cleanup_media(grace_timedelta=datetime.timedelta(-7), now=datetime.datetime.now()+datetime.timedelta(-10))
+        manager.cleanup_media(grace_timedelta=datetime.timedelta(-7), now=datetime.datetime.now()+datetime.timedelta(-10), force=False)
         assert all(f.is_file() for f in processed_files_for_test11), f'All files from test11 should still be present {processed_files_for_test11}'
         assert not any(f.is_file() for f in processed_files_for_test12), f'All files from test12 should have been deleted {processed_files_for_test12}'

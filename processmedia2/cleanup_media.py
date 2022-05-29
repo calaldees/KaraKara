@@ -13,7 +13,7 @@ VERSION = '0.0.0'
 # Main -------------------------------------------------------------------------
 
 
-def cleanup_media(grace_timedelta=timedelta(), now=datetime.now(), **kwargs):
+def cleanup_media(grace_timedelta=timedelta(), now=datetime.now(), force=False, **kwargs):
     assert grace_timedelta.days <=0, 'only negative timedeltas'
     meta_manager = MetaManagerExtended(**kwargs)
     meta_manager.load_all()
@@ -31,13 +31,15 @@ def cleanup_media(grace_timedelta=timedelta(), now=datetime.now(), **kwargs):
 
     count = 0
     for unlinked_file in unlinked_files:
-        log.debug(unlinked_file.relative)
         if kwargs.get('dryrun'):
             pass
         else:
             mtime = datetime.fromtimestamp(unlinked_file.stats.st_mtime)
-            if (now - mtime) < grace_timedelta:
+            if ((now - mtime) < grace_timedelta) or force:
+                log.debug(f'removing - {unlinked_file.relative}')
                 os.remove(unlinked_file.absolute)
+            else:
+                log.debug(f'keeping grace - {unlinked_file.relative}')
         count += 1
     log.info('Cleaned up - {} files'.format(count))
 

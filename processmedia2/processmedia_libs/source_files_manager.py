@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import NamedTuple
 from types import MappingProxyType
-
+from functools import cached_property
 
 from . import EXT_TO_TYPE
 
