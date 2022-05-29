@@ -16,11 +16,45 @@ function apiRequestEffect(dispatch, props) {
     }));
 
     fetch(props.url, props.options)
-        .then(function (response) {
-            return response;
+        .then((response) => response.body)
+        .then((rb) => {
+            if (!rb) return;
+            const reader = rb.getReader();
+            let download_done = 0;
+            let download_size = 7500000; // TODO: add content-length to track_list.json
+
+            return new ReadableStream({
+                start(controller) {
+                    function push() {
+                        reader.read().then(({ done, value }) => {
+                            if (done) {
+                                controller.close();
+                                return;
+                            }
+                            if (value) {
+                                download_done += value.byteLength;
+                                if (props.progress) {
+                                    dispatch(props.progress, {
+                                        done: download_done,
+                                        size: download_size,
+                                    });
+                                }
+                            }
+                            controller.enqueue(value);
+                            push();
+                        });
+                    }
+                    push();
+                },
+            });
+        })
+        .then((stream) => {
+            return new Response(stream, {
+                headers: { "Content-Type": "text/json" },
+            }).text();
         })
         .then(function (response) {
-            return response.json();
+            return JSON.parse(response);
         })
         .then(function (result) {
             console.groupCollapsed("api_request(", props.url, ")");
@@ -31,13 +65,14 @@ function apiRequestEffect(dispatch, props) {
                 (state, result) => [
                     {
                         ...state,
+                        session_id: result?.identity?.id || state.session_id,
                         loading: false,
                     },
                 ],
                 result,
             );
 
-            if (result.status != "ok") {
+            if ((result.status ?? "ok") != "ok") {
                 dispatch((state) => [
                     {
                         ...state,
@@ -53,7 +88,7 @@ function apiRequestEffect(dispatch, props) {
             }
         })
         .catch(function (error) {
-            console.groupCollapsed("api_request(", props.url, ")");
+            console.groupCollapsed("api_request(", props.url, ") [error]");
             console.log(error);
             console.groupEnd();
 
@@ -70,6 +105,9 @@ function apiRequestEffect(dispatch, props) {
                 ],
                 error,
             );
+            if (props.exception) {
+                dispatch(props.exception);
+            }
         });
 }
 

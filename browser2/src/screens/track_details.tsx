@@ -15,20 +15,20 @@ import { PopScrollPos, PushScrollPos } from "../effects";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
-        {state.queue.find((i) => i.track.id == track.id) && (
+        {state.queue.find((i) => i.track.source_hash == track.source_hash) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
                 onclick={ActivateEnqueue()}
-                disabled={state.queue.find((i) => i.track.id == track.id)}
+                disabled={state.queue.find((i) => i.track.source_hash == track.source_hash)}
             >
                 Enqueue
             </button>
-            {state.bookmarks.includes(track.id) ? (
-                <button onclick={RemoveBookmark(track.id)}>Un-Bookmark</button>
+            {state.bookmarks.includes(track.source_hash) ? (
+                <button onclick={RemoveBookmark(track.source_hash)}>Un-Bookmark</button>
             ) : (
-                <button onclick={AddBookmark(track.id)}>Bookmark</button>
+                <button onclick={AddBookmark(track.source_hash)}>Bookmark</button>
             )}
         </div>
     </footer>
@@ -98,7 +98,7 @@ export const TrackDetails = ({
             {get_attachments(track, "preview").map(a => 
                 <source
                     src={attachment_path(state.root, a)}
-                    type={a.type}
+                    type={a.mime}
                 />)}
         </video>
 

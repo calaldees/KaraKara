@@ -1,7 +1,7 @@
 /**
  * turn milliseconds into {X}min / {X}sec
  */
- export function timedelta_str(timedelta: number): String {
+export function timedelta_str(timedelta: number): String {
     const seconds_total = Math.floor(timedelta / 1000);
     const seconds = seconds_total % 60;
     const minutes = Math.floor(seconds_total / 60);
@@ -32,17 +32,17 @@ export function title_case(str: string): string {
  *
  * eg get_attachment(track, "preview") -> {type: "video", location: "asdfasdfa.mp4"}
  */
- export function get_attachment(
+export function get_attachment(
     track: Track,
     type: string,
 ): Attachment {
     for (let i = 0; i < track.attachments.length; i++) {
         let a = track.attachments[i];
-        if (a.type == type) {
+        if (a.use == type) {
             return a;
         }
     }
-    throw `Unable to find an attachment of type ${type} for track ${track.id}`;
+    throw `Unable to find an attachment of type ${type} for track ${track.source_hash}`;
 }
 
 /**
@@ -53,14 +53,14 @@ export function title_case(str: string): string {
  *    {type: "video", location: "dhfghdfgh.webm"},
  * ]
  */
- export function get_attachments(
+export function get_attachments(
     track: Track,
     type: string,
 ): Array<Attachment> {
     let as: Array<Attachment> = [];
     for (let i = 0; i < track.attachments.length; i++) {
         let a = track.attachments[i];
-        if (a.type == type) {
+        if (a.use == type) {
             as.push(a);
         }
     }
@@ -72,8 +72,8 @@ export function title_case(str: string): string {
  *
  * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
  */
- export function attachment_path(root: string, attachment: Attachment): string {
-    return root + "/files/" + attachment.location;
+export function attachment_path(root: string, attachment: Attachment): string {
+    return root + "/files/" + attachment.path;
 }
 
 /**

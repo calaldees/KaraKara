@@ -69,7 +69,7 @@ export const PrintableList = ({ state }: { state: State }): VNode => (
         {Object.values(state.track_list).map((track: Track) => (
             <p>
                 <code>
-                    {track.id.substring(
+                    {track.source_hash.substring(
                         0,
                         state.settings[
                             "karakara.print_tracks.short_id_length"

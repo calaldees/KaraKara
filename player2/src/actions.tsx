@@ -74,6 +74,14 @@ export function SeekBackwards(state: State, value: number | null): Dispatchable 
 
 // Playlist controls
 export function UpdateQueue(state: State, new_queue: Array<QueueItem>): Dispatchable {
+    // still waiting for the queue to return the new format, hard-coding for now
+    return {...state, queue: [{
+        id: 1,
+        track_id: "v_wvprHM_2F",
+        performer_name: "testo",
+        total_duration: 123,
+    }
+    ]};
     // if the first song in the queue has changed, stop playing
     if (
         state.queue.length === 0 ||

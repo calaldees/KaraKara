@@ -11,7 +11,7 @@ import {
 import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
-import { get_attachment, http2ws } from "./utils";
+import { attachment_path, get_attachment, http2ws } from "./utils";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -140,24 +140,34 @@ export const IntervalListener = Interval({
     },
 });
 
-function track_list_to_map(raw_list: Array<Track>): Dictionary<Track> {
-    let map = {};
-    for (let i = 0; i < raw_list.length; i++) {
-        map[raw_list[i].id] = raw_list[i];
-    }
-    return map;
-}
-
-function track_list_to_images(state: State, raw_list: Array<Track>): Array<WaterfallImage> {
+function track_list_to_images(state: State, raw_list: Dictionary<Track>): Array<WaterfallImage> {
     // TODO: pick a random 25 tracks (will people even notice if it's
     // the same 25 every time?)
     let num = 25;
-    return raw_list.slice(0, num).map((track, n) => ({
-        filename: get_attachment(state, track, "image"),
+    return Object.values(raw_list).slice(0, num).map((track, n) => ({
+        filename: attachment_path(state.root, get_attachment(track, "image")),
         x: n / num,
         delay: Math.random() * 10,
     }));
 }
+
+function split_tags(s: string): Dictionary<Array<string>> {
+    let tags = {};
+    s.split("\n").map(line => {
+        let parts = line.split(":");
+        for (let i = 0; i < parts.length - 1; i++) {
+            tags[parts[i]] = (tags[parts[i]] || []).concat([parts[i + 1]]);
+        }
+    });
+    return tags;
+}
+function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
+    Object.keys(dict).map(k => {
+        dict[k].tags = split_tags(dict[k].tags)
+    });
+    return dict;
+}
+
 
 function _ftlSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,
@@ -176,20 +186,15 @@ function _ftlSubscriber(dispatch, props) {
                             download_size: size,
                         },
                     ],
-                    action: (state, response): State =>
-                        response.status == "ok"
-                            ? {
-                                  ...state,
-                                  track_list: track_list_to_map(response.data.list),
-                                  images: track_list_to_images(state, response.data.list),
-                                  download_done: 0,
-                                  download_size: null,
-                              }
-                            : {
-                                  ...state,
-                                  download_done: 0,
-                                  download_size: null,
-                              },
+                    action: (state, response) => [
+                        {
+                            ...state,
+                            track_list: set_tags(response),
+                            images: track_list_to_images(state, response),
+                            download_done: 0,
+                            download_size: null,
+                        },
+                    ],
                 })
             ]);
         }, 0);

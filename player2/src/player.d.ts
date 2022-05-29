@@ -7,13 +7,13 @@ type FormInputEvent = {
 };
 
 type Attachment = {
-    id: number,
-    location: string,
-    type: string,
+    use: string,
+    mime: string,
+    path: string,
 }
 
 type Track = {
-    id: string,
+    source_hash: string,
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,
@@ -23,7 +23,7 @@ type Track = {
 
 type QueueItem = {
     id: number,
-    track: Track,
+    track_id: string,
     performer_name: string,
     total_duration: number,
 }

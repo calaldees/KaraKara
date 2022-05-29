@@ -45,7 +45,7 @@ function track_info(state: State, track: Track): string {
  * List individual tracks
  */
 const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
-    <li class={"track_item"} onclick={SelectTrack(track.id)}>
+    <li class={"track_item"} onclick={SelectTrack(track.source_hash)}>
         <div class={"thumb"}>
             <div
                 style={{

@@ -209,20 +209,22 @@ export function SendCommand(state: State, command: string): Effect {
     });
 }
 
-function track_list_to_map(room_name: string, raw_list: Array<Track>): Dictionary<Track> {
-    let map = {};
-    for (let i = 0; i < raw_list.length; i++) {
-        // temporary hack for minami 2022 when server-side track_list.json
-        // wasn't filtering properly, delete this ASAP
-        if(room_name == "minami") {
-            if(raw_list[i].tags['category'].length == 1 && raw_list[i].tags['category'].includes("cartoon")) continue;
+function split_tags(s: string): Dictionary<Array<string>> {
+    let tags = {};
+    s.split("\n").map(line => {
+        let parts = line.split(":");
+        for(let i=0; i<parts.length-1; i++) {
+            tags[parts[i]] = (tags[parts[i]] || []).concat([parts[i+1]]);
         }
-        if(room_name == "retro") {
-            if(!raw_list[i].tags['null'].includes("retro")) continue;
-        }
-        map[raw_list[i].id] = raw_list[i];
-    }
-    return map;
+    });
+    return tags;
+}
+function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
+    Object.keys(dict).map(k => {
+        dict[k].tags = split_tags(dict[k].tags)
+    });
+    console.log(dict);
+    return dict;
 }
 
 export const FetchTrackList = (state: State): Effect =>
@@ -236,19 +238,14 @@ export const FetchTrackList = (state: State): Effect =>
                 download_size: size,
             },
         ],
-        action: (state, response) =>
-            response.status == "ok"
-                ? {
-                      ...state,
-                      track_list: track_list_to_map(state.room_name, response.data.list),
-                      download_done: 0,
-                      download_size: null,
-                  }
-                : {
-                      ...state,
-                      download_done: 0,
-                      download_size: null,
-                  },
+        action: (state, response) => [
+            {
+                ...state,
+                track_list: set_tags(response),
+                download_done: 0,
+                download_size: null,
+            },
+        ],
     });
 
 export const LoginThenFetchTrackList = (state: State): Effect =>

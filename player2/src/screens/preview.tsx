@@ -1,6 +1,8 @@
 import h from "hyperapp-jsx-pragma";
 import {
+    attachment_path,
     get_attachment,
+    get_attachments,
     get_tag,
     timedelta_str,
     title_case,
@@ -12,37 +14,57 @@ import { SetPreviewVolume } from "../actions";
 const show_tracks = 5;
 
 export const PreviewScreen = ({ state }: { state: State }): VNode => (
+    <PreviewInternal
+        state={state}
+        track={state.track_list[state.queue[0].track_id]}
+        queue_item={state.queue[0]}
+        />
+);
+
+const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <video
-                src={get_attachment(state, state.queue[0].track, "video")}
                 preload={"auto"}
                 muted={true}
                 style={{ display: "none" }}
-            />
-            <video
-                src={get_attachment(state, state.queue[0].track, "preview")}
-                poster={get_attachment(
-                    state,
-                    state.queue[0].track,
-                    "thumbnail",
+            >
+                {get_attachments(track, "video").map(a =>
+                    <source src={attachment_path(state.root, a)} type={a.mime} />
                 )}
+            </video>
+            <video
+                poster={attachment_path(state.root, get_attachment(
+                    track,
+                    "image",
+                ))}
                 autoPlay={true}
                 onloadstart={SetPreviewVolume}
                 loop={true}
-            />
+            >
+                {get_attachments(track, "preview").map(a =>
+                    <source src={attachment_path(state.root, a)} type={a.mime} />
+                )}
+                {get_attachments(track, "subtitle").map(a =>
+                    <track
+                        kind="subtitles"
+                        src={attachment_path(state.root, a)}
+                        default={true}
+                    />
+                )}
+            </video>
             <AutoplayCountdown state={state} show_if_disabled={false} />
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>
                 {state.queue.slice(0, show_tracks).map((item) => (
                     <li key={item.id}>
-                        <img src={get_attachment(state, item.track, "image")} />
+                        <img src={attachment_path(state.root, get_attachment(state.track_list[item.track_id], "image"))} />
                         <p class="title">
-                            {title_case(get_tag(item.track.tags.title))}
+                            {title_case(get_tag(state.track_list[item.track_id].tags.title))}
                         </p>
                         <p class="from">
-                            {title_case(get_tag(item.track.tags.from))}
+                            {title_case(get_tag(state.track_list[item.track_id].tags.from))}
                         </p>
                         <p class="performer">{item.performer_name}</p>
                         <p class="time">

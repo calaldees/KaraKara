@@ -1,20 +1,28 @@
 import h from "hyperapp-jsx-pragma";
-import { get_attachment, get_tag, s_to_mns, title_case } from "../utils";
+import { attachment_path, get_attachments, get_tag, s_to_mns, title_case } from "../utils";
 import { AutoplayCountdown } from "./common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
 import { SendCommand } from "../effects";
 
 export const PodiumScreen = ({ state }: { state: State }): VNode => (
-    <section
+    <PodiumInternal
+        state={state}
+        track={state.track_list[state.queue[0].track_id]}
+        queue_item={state.queue[0]}
+        />
+);
+
+const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
+        <section
         key="podium"
         class={
-            "screen_podium" + (state.queue[0].track.lyrics ? "" : " no_lyrics")
+            "screen_podium" + (track.lyrics ? "" : " no_lyrics")
         }
     >
         <h1>
-            {title_case(get_tag(state.queue[0].track.tags.title))}
+            {title_case(get_tag(track.tags.title))}
             <br />
-            Performed by <strong>{state.queue[0].performer_name}</strong>
+            Performed by <strong>{queue_item.performer_name}</strong>
         </h1>
 
         {/*
@@ -23,18 +31,22 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
          */}
         <div class="preview_holder">
             <video
-                src={get_attachment(state, state.queue[0].track, "preview")}
                 ontimeupdate={UpdatePodiumProgress}
                 onended={state.playing ? Dequeue : Stop}
                 autoPlay={true}
                 muted={true}
                 key={state.playing}
             >
-                <track
-                    kind="subtitles"
-                    src={get_attachment(state, state.queue[0].track, "subtitle")}
-                    default={true}
-                />
+                {get_attachments(track, "video").map(a =>
+                    <source src={attachment_path(state.root, a)} type={a.mime} />
+                )}
+                {get_attachments(track, "subtitle").map(a =>
+                    <track
+                        kind="subtitles"
+                        src={attachment_path(state.root, a)}
+                        default={true}
+                    />
+                )}
             </video>
         </div>
 
@@ -44,14 +56,14 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
                 style={{
                     "background-position":
                         100 -
-                        (state.progress / state.queue[0].track.duration) * 100 +
+                        (state.progress / track.duration) * 100 +
                         "%",
                 }}
             >
                 Track Playing
                 <small>
                     ({s_to_mns(state.progress)} /{" "}
-                    {s_to_mns(state.queue[0].track.duration)})
+                    {s_to_mns(track.duration)})
                 </small>
             </div>
         ) : (
@@ -63,9 +75,9 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
                         100 -
                         (state.progress /
                             state.settings[
-                                "karakara.player.autoplay.seconds"
+                            "karakara.player.autoplay.seconds"
                             ]) *
-                            100 +
+                        100 +
                         "%",
                 }}
             >

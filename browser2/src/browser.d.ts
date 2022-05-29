@@ -25,13 +25,13 @@ type ApiResponse = {
 }
 
 type Attachment = {
-    id: number,
-    location: string,
-    type: string,
+    use: string,
+    mime: string,
+    path: string,
 }
 
 type Track = {
-    id: string,
+    source_hash: string,
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,
