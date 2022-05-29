@@ -36,7 +36,7 @@ function track_info(state: State, track: Track): string {
     );
     let info = info_data.join(" - ");
     if(track.tags['vocaltrack'][0] == "off") {
-        info += " (No vocal)"
+        info += " (Instrumental)"
     }
     return info;
 }
