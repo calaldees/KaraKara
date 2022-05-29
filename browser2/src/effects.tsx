@@ -115,7 +115,7 @@ function apiRequestEffect(dispatch, props) {
                 (state, result) => [
                     {
                         ...state,
-                        session_id: result.identity.id,
+                        session_id: (result.identity && result.identity.id) ? result.identity.id : state.session_id,
                         loading: false,
                     },
                 ],
