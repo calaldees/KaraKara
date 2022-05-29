@@ -57,8 +57,6 @@ type PriorityToken = {
 }
 
 type State = {
-    version: number,
-
     // global
     root: string,
     root_edit: string,

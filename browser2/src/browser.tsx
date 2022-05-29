@@ -26,10 +26,6 @@ function isWidescreen() {
 }
 
 let state: State = {
-    // bump this each time the schema changes to
-    // invalidate anybody's saved state
-    version: 1,
-
     // global
     root: auto_root,
     root_edit: auto_root,
