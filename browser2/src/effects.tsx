@@ -115,6 +115,7 @@ function apiRequestEffect(dispatch, props) {
                 (state, result) => [
                     {
                         ...state,
+                        session_id: result.identity.id,
                         loading: false,
                     },
                 ],
@@ -239,7 +240,6 @@ export const FetchTrackList = (state: State): Effect =>
             response.status == "ok"
                 ? {
                       ...state,
-                      session_id: response.identity.id,
                       track_list: track_list_to_map(state.room_name, response.data.list),
                       download_done: 0,
                       download_size: null,
