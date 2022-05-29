@@ -28,7 +28,6 @@ type Attachment = {
     id: number,
     location: string,
     type: string,
-    extra_fields: Dictionary<any>,
 }
 
 type Track = {
