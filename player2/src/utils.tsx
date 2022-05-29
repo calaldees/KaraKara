@@ -54,7 +54,6 @@ export function get_attachments(
     type: string,
 ): Array<Attachment> {
     let as: Array<Attachment> = [];
-    console.log(track);
     for (let i = 0; i < track.attachments.length; i++) {
         let a = track.attachments[i];
         if (a.use == type) {

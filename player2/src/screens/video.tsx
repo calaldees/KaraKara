@@ -26,6 +26,8 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
                     kind="subtitles"
                     src={attachment_path(state.root, a)}
                     default={true}
+                    label="English"
+                    srclang="en"
                 />
             )}
         </video>

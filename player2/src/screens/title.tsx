@@ -5,7 +5,7 @@ export const TitleScreen = ({ state }: { state: State }): VNode => (
         <div id={"splash"}>
             {state.images.map((item) => (
                 <img
-                    src={state.root + "/files/" + item.filename}
+                    src={item.filename}
                     style={{
                         animationDelay: item.delay + "s",
                         left: item.x * 90 + "vw",
@@ -15,8 +15,8 @@ export const TitleScreen = ({ state }: { state: State }): VNode => (
         </div>
         <h1>{state.settings["karakara.player.title"]}</h1>
         <div id="join_info">
-            Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.room_name}</strong>
+            Join at <strong>{state.root.replace("https://", "")}</strong> -
+            Room Name is <strong>{state.room_name}</strong>
         </div>
     </section>
 );

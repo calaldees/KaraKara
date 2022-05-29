@@ -24,15 +24,6 @@ const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Tr
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <video
-                preload={"auto"}
-                muted={true}
-                style={{ display: "none" }}
-            >
-                {get_attachments(track, "video").map(a =>
-                    <source src={attachment_path(state.root, a)} type={a.mime} />
-                )}
-            </video>
-            <video
                 poster={attachment_path(state.root, get_attachment(
                     track,
                     "image",
@@ -41,7 +32,7 @@ const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Tr
                 onloadstart={SetPreviewVolume}
                 loop={true}
             >
-                {get_attachments(track, "preview").map(a =>
+                {get_attachments(track, "video").map(a =>
                     <source src={attachment_path(state.root, a)} type={a.mime} />
                 )}
                 {get_attachments(track, "subtitle").map(a =>
@@ -49,6 +40,8 @@ const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Tr
                         kind="subtitles"
                         src={attachment_path(state.root, a)}
                         default={true}
+                        label="English"
+                        srclang="en"
                     />
                 )}
             </video>
@@ -87,8 +80,8 @@ const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Tr
 
         {/* key= to make sure this element stays put while the above may disappear */}
         <div id="join_info" key={"join_info"}>
-            Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.room_name}</strong>
+            Join at <strong>{state.root.replace("https://", "")}</strong> -
+            Room Name is <strong>{state.room_name}</strong>
             {state.settings["karakara.event.end"] && (
                 <span>
                     <br />

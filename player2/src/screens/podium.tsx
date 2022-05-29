@@ -13,11 +13,9 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
 );
 
 const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
-        <section
+    <section
         key="podium"
-        class={
-            "screen_podium" + (track.lyrics ? "" : " no_lyrics")
-        }
+        class={"screen_podium"}
     >
         <h1>
             {get_tag(track.tags.title)}
@@ -45,6 +43,8 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                         kind="subtitles"
                         src={attachment_path(state.root, a)}
                         default={true}
+                        label="English"
+                        srclang="en"
                     />
                 )}
             </video>
