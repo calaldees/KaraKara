@@ -26,6 +26,14 @@ $LIGHT: #29EDF2;
 	// animation, be at 100%
 	animation-fill-mode: both;
 }
+::cue {
+	font-family: metalghosts, sans-serif;
+	text-shadow:
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+}
 
 .theme-metalghosts,
 .theme-metalghosts-lite {
@@ -408,24 +416,6 @@ $LIGHT: #29EDF2;
 			bottom: 5vh;
 			left: 5vw;
 			animation-name: popleft;
-		}
-
-		.lyrics.top OL {
-			top: 7vh;
-		}
-		.lyrics.bottom OL {
-			bottom: 7vh;
-		}
-		.lyrics OL {
-			position: absolute;
-			font-size: 7vh;
-			width: 100%;
-			LI {text-align: center; display: none;}
-			.past {color: gray;}
-			.present {color: #FF0;}
-			.future {color: white;}
-			.present, .present + .future {display: block;}
-			LI SPAN {background: black; padding: 0 1vw;}
 		}
 	}
 
