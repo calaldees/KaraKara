@@ -48,9 +48,9 @@ export function get_attachment(
 /**
  * Looking at a Track, find all matching attachments
  *
- * eg get_attachments(track, "preview") -> [
- *    {type: "video", location: "asdfasdfa.mp4"},
- *    {type: "video", location: "dhfghdfgh.webm"},
+ * eg get_attachments(track, "video") -> [
+ *    {use: "video", mime: "video/mp4", path: "asdfasdfa.mp4"},
+ *    {use: "video", mime: "video/webm", path: "dhfghdfgh.webm"},
  * ]
  */
 export function get_attachments(
