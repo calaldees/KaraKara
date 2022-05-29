@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_attachments, get_tag, title_case } from "../utils";
+import { attachment_path, get_attachments, get_tag } from "../utils";
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
 export const VideoScreen = ({ state }: { state: State }): VNode => (
@@ -41,7 +41,7 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
             KaraKara
         </div>
         <div id="pimpsong" class="pimp">
-            {title_case(get_tag(track.tags.title))}
+            {get_tag(track.tags.title)}
             <br />
             Performed by {queue_item.performer_name}
         </div>

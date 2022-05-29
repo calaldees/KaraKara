@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_attachments, get_tag, s_to_mns, title_case } from "../utils";
+import { attachment_path, get_attachments, get_tag, s_to_mns } from "../utils";
 import { AutoplayCountdown } from "./common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
 import { SendCommand } from "../effects";
@@ -20,7 +20,7 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
         }
     >
         <h1>
-            {title_case(get_tag(track.tags.title))}
+            {get_tag(track.tags.title)}
             <br />
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>

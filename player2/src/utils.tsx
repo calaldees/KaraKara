@@ -82,19 +82,6 @@ export function get_tag(tag: Array<string>): string {
 }
 
 /**
- * Make track titles look nicer, as the database has them all lowercase
- */
-export function title_case(str: string) {
-    return str
-        .toLowerCase()
-        .split(" ")
-        .map(function (word) {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        })
-        .join(" ");
-}
-
-/**
  * Looking at the data URL, figure out the websocket URL
  */
 export function http2ws(str: string) {

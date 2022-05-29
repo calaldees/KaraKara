@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore } from "./base";
-import { attachment_path, get_attachment, title_case, shuffle } from "../utils";
+import { attachment_path, get_attachment, shuffle } from "../utils";
 import { RemoveTrack } from "../actions";
 
 const QueueItemRender = ({
@@ -29,7 +29,7 @@ const QueueItemRender = ({
         </span>
         <span class={"text queue_info"}>
             <span class={"title"}>
-                {title_case(item.track.tags["title"][0])}
+                {item.track.tags["title"][0]}
             </span>
             <br />
             <span class={"performer"}>{item.performer_name}</span>

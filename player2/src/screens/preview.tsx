@@ -5,7 +5,6 @@ import {
     get_attachments,
     get_tag,
     timedelta_str,
-    title_case,
     short_date,
 } from "../utils";
 import { AutoplayCountdown } from "./common";
@@ -61,10 +60,10 @@ const PreviewInternal = ({ state, track, queue_item }: { state: State, track: Tr
                     <li key={item.id}>
                         <img src={attachment_path(state.root, get_attachment(state.track_list[item.track_id], "image"))} />
                         <p class="title">
-                            {title_case(get_tag(state.track_list[item.track_id].tags.title))}
+                            {get_tag(state.track_list[item.track_id].tags.title)}
                         </p>
                         <p class="from">
-                            {title_case(get_tag(state.track_list[item.track_id].tags.from))}
+                            {get_tag(state.track_list[item.track_id].tags.from)}
                         </p>
                         <p class="performer">{item.performer_name}</p>
                         <p class="time">

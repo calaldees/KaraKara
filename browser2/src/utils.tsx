@@ -15,22 +15,9 @@ export function timedelta_str(timedelta: number): String {
 }
 
 /**
- * Make track titles look nicer, as the database has them all lowercase
- */
-export function title_case(str: string): string {
-    return str
-        .toLowerCase()
-        .split(" ")
-        .map(function (word) {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        })
-        .join(" ");
-}
-
-/**
  * Looking at a Track, find the first matching attachment, or throw an exception
  *
- * eg get_attachment(track, "preview") -> {type: "video", location: "asdfasdfa.mp4"}
+ * eg get_attachment(track, "video") -> {use: "video", mime: "video/mp4", path: "asdfasdfa.mp4"}
  */
 export function get_attachment(
     track: Track,

@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { attachment_path, get_attachment, get_attachments, title_case } from "../utils";
+import { attachment_path, get_attachment, get_attachments } from "../utils";
 import {
     GoToScreen,
     ActivateEnqueue,
@@ -77,7 +77,7 @@ export const TrackDetails = ({
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
-        title={title_case(track.tags["title"][0])}
+        title={track.tags["title"][0]}
         navRight={
             !state.widescreen && (
                 <a onclick={GoToScreen("queue", [PushScrollPos()])}>
@@ -109,9 +109,9 @@ export const TrackDetails = ({
                 .filter((key) => BLOCKED_KEYS.indexOf(key) == -1)
                 .map((key) => (
                     <div class={"tag"}>
-                        <div class={"tag_key"}>{title_case(key)}</div>
+                        <div class={"tag_key"}>{key}</div>
                         <div class={"tag_value"}>
-                            {title_case(track.tags[key].join(", "))}
+                            {track.tags[key].join(", ")}
                         </div>
                     </div>
                 ))}

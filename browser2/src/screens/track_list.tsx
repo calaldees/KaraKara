@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { attachment_path, get_attachment, title_case } from "../utils";
+import { attachment_path, get_attachment } from "../utils";
 import {
     ClearScrollPos,
     ApiRequest,
@@ -32,7 +32,7 @@ function track_info(state: State, track: Track): string {
         // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
         .filter(x => x != "from" || !search_from.includes(track.tags[x][0]))
         // Format a list of tags
-        .map(x => title_case(track.tags[x].join(", ")))
+        .map(x => track.tags[x].join(", "))
     );
     let info = info_data.join(" - ");
     if(track.tags['vocaltrack'][0] == "off") {
@@ -57,7 +57,7 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
             />
         </div>
         <span class={"text track_info"}>
-            <span class={"title"}>{title_case(track.tags["title"][0])}</span>
+            <span class={"title"}>{track.tags["title"][0]}</span>
             <br />
             <span class={"info"}>
                 {track_info(state, track)}
@@ -105,7 +105,7 @@ const GroupedFilterList = ({ heading, filters, expanded }): Array<VNode> =>
                         count={Object.keys(filters[group]).length}
                         expanded={true}
                     >
-                        {title_case(group)}
+                        {group}
                     </FilterListGroupHeader>
                     <FilterList heading={heading} filters={filters[group]} />
                 </div>
@@ -115,7 +115,7 @@ const GroupedFilterList = ({ heading, filters, expanded }): Array<VNode> =>
                     count={Object.keys(filters[group]).length}
                     expanded={false}
                 >
-                    {title_case(group)}
+                    {group}
                 </FilterListGroupHeader>
             ),
         );
@@ -125,7 +125,7 @@ const FilterList = ({ heading, filters }): Array<VNode> =>
         .sort()
         .map((child) => (
             <AddFilter filter={heading + ":" + child} count={filters[child]}>
-                {title_case(child)}
+                {child}
             </AddFilter>
         ));
 
@@ -355,7 +355,7 @@ function show_list(state: State) {
         }
         sections.push(
             <div>
-                <h2>{title_case(tag_key)}</h2>
+                <h2>{tag_key}</h2>
                 <ul>{filter_list}</ul>
             </div>,
         );
