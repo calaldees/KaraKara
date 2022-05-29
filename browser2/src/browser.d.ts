@@ -31,20 +31,13 @@ type Attachment = {
     extra_fields: Dictionary<any>,
 }
 
-type SrtLine = {
-    id: string,
-    text: string,
-    start: number,
-    end: number,
-}
-
 type Track = {
     id: string,
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,
     attachments: Array<Attachment>,
-    lyrics: Array<SrtLine>,
+    lyrics: String,
 }
 
 type QueueItem = {
