@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { get_attachment, title_case } from "../utils";
+import { attachment_path, get_attachment, title_case } from "../utils";
 import {
     ClearScrollPos,
     ApiRequest,
@@ -51,7 +51,7 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
                 style={{
                     "background-image":
                         "url(" +
-                        get_attachment(state.root, track, "image") +
+                        attachment_path(state.root, get_attachment(track, "image")) +
                         ")",
                 }}
             />

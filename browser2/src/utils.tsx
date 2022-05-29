@@ -28,22 +28,52 @@ export function title_case(str: string): string {
 }
 
 /**
- * Looking at a Track, find the first matching attachment, or null
+ * Looking at a Track, find the first matching attachment, or throw an exception
  *
- * eg get_attachment(track, "preview") -> https://karakara.uk/files/asdfasdfa.mp4
+ * eg get_attachment(track, "preview") -> {type: "video", location: "asdfasdfa.mp4"}
  */
-export function get_attachment(
-    root: string,
+ export function get_attachment(
     track: Track,
     type: string,
-): string | null {
+): Attachment {
     for (let i = 0; i < track.attachments.length; i++) {
         let a = track.attachments[i];
         if (a.type == type) {
-            return root + "/files/" + a.location;
+            return a;
         }
     }
-    return null;
+    throw `Unable to find an attachment of type ${type} for track ${track.id}`;
+}
+
+/**
+ * Looking at a Track, find all matching attachments
+ *
+ * eg get_attachments(track, "preview") -> [
+ *    {type: "video", location: "asdfasdfa.mp4"},
+ *    {type: "video", location: "dhfghdfgh.webm"},
+ * ]
+ */
+ export function get_attachments(
+    track: Track,
+    type: string,
+): Array<Attachment> {
+    let as: Array<Attachment> = [];
+    for (let i = 0; i < track.attachments.length; i++) {
+        let a = track.attachments[i];
+        if (a.type == type) {
+            as.push(a);
+        }
+    }
+    return as;
+}
+
+/**
+ * Looking at an Attachment, get the full URL
+ *
+ * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
+ */
+ export function attachment_path(root: string, attachment: Attachment): string {
+    return root + "/files/" + attachment.location;
 }
 
 /**

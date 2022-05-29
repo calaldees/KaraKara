@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { get_attachment, title_case } from "../utils";
+import { attachment_path, get_attachment, get_attachments, title_case } from "../utils";
 import {
     GoToScreen,
     ActivateEnqueue,
@@ -91,14 +91,15 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={get_attachment(state.root, track, "image")}
+            poster={attachment_path(state.root, get_attachment(track, "image"))}
             durationHint={track.duration}
             controls={true}
         >
-            <source
-                src={get_attachment(state.root, track, "preview")}
-                type={"video/mp4"}
-            />
+            {get_attachments(track, "preview").map(a => 
+                <source
+                    src={attachment_path(state.root, a)}
+                    type={a.type}
+                />)}
         </video>
 
         {/* Tags */}

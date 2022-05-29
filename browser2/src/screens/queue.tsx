@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore } from "./base";
-import { get_attachment, title_case, shuffle } from "../utils";
+import { attachment_path, get_attachment, title_case, shuffle } from "../utils";
 import { RemoveTrack } from "../actions";
 
 const QueueItemRender = ({
@@ -22,7 +22,7 @@ const QueueItemRender = ({
                 style={{
                     "background-image":
                         "url(" +
-                        get_attachment(state.root, item.track, "image") +
+                        attachment_path(state.root, get_attachment(item.track, "image")) +
                         ")",
                 }}
             />

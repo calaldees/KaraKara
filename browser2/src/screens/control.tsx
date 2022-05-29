@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore } from "./base";
-import { get_attachment, title_case } from "../utils";
+import { attachment_path, get_attachment, title_case } from "../utils";
 import { ApiRequest } from "../effects";
 import { RemoveTrack, Command } from "../actions";
 
@@ -183,7 +183,7 @@ const QueueItemRender = ({
                 style={{
                     "background-image":
                         "url(" +
-                        get_attachment(state.root, item.track, "image") +
+                        attachment_path(state.root, get_attachment(item.track, "image")) +
                         ")",
                 }}
             />
