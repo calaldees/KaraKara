@@ -1,4 +1,4 @@
-from functools import partial
+from functools import partial, reduce
 import json
 
 from clint.textui.progress import bar as progress_bar
@@ -8,6 +8,7 @@ from calaldees.files.scan import fast_scan
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import PENDING_ACTION
 from processmedia_libs.subtitle_processor_with_codecs import parse_subtitles
+from processmedia_libs.tag_processor import parse_tags
 
 import logging
 log = logging.getLogger(__name__)
@@ -53,6 +54,15 @@ def export_track_data(**kwargs):
 
             log.debug(f'Export: {name}')
 
+            def _get_attachments():
+                def _reduce(accumulator, processed_file):
+                    accumulator.setdefault(processed_file.type.attachment_type, []).append({
+                        'mime': processed_file.type.mime,
+                        'path': str(processed_file.relative),
+                    })
+                    return accumulator
+                return reduce(_reduce, m.processed_files.values(), {})
+
             def _get_lyrics():
                 source_file_sub = m.source_files.get('sub')
                 if not source_file_sub or not source_file_sub.file.is_file():
@@ -65,20 +75,13 @@ def export_track_data(**kwargs):
             def _get_tags():
                 source_file_tag = m.source_files.get('tag')
                 with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
-                    return tag_file.read().strip().strip("\ufeff")
+                    return parse_tags(tag_file.read())
 
             yield m.source_hash, {
                 'source_hash': m.source_hash,
                 'source_filename': name,
                 'duration': m.source_details['duration'],
-                'attachments': tuple(
-                    {
-                        'use': processed_file.type.attachment_type,
-                        'mime': processed_file.type.mime,
-                        'path': str(processed_file.relative),
-                    }
-                    for processed_file in m.processed_files.values()
-                ),
+                'attachments': _get_attachments(),
                 'lyrics': _get_lyrics(),
                 'tags': _get_tags(),
             }
@@ -86,7 +89,7 @@ def export_track_data(**kwargs):
 
     assert kwargs['path_static_track_list']
     with open(kwargs['path_static_track_list'], 'wt') as filehandle:
-        json.dump(dict(_tracks()), filehandle)
+        json.dump(dict(_tracks()), filehandle, default=tuple)
 
     return stats
 
