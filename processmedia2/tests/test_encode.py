@@ -205,7 +205,8 @@ def test_update_to_tag_file_does_not_reencode_video(ProcessMediaTestManager, TES
         hash_dict_before = manager.get('test1').source_hashs
 
         # Modify the tags file ---------
-        with Path(manager.path_source, 'test1.txt').open('w') as f:
+        with Path(manager.path_source, 'test1.txt').open('a') as f:
+            f.write('\n')
             f.write('the tags file has changed')
 
         manager.scan_media()
