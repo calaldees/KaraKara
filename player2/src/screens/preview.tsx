@@ -1,8 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import {
     attachment_path,
-    get_attachment,
-    get_attachments,
     get_tag,
     timedelta_str,
     short_date,
@@ -23,18 +21,15 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <video
-                poster={attachment_path(state.root, get_attachment(
-                    track,
-                    "image",
-                ))}
+                poster={attachment_path(state.root, track.attachments.image?.[0])}
                 autoPlay={true}
                 onloadstart={SetPreviewVolume}
                 loop={true}
             >
-                {get_attachments(track, "video").map(a =>
+                {track.attachments.video?.map(a =>
                     <source src={attachment_path(state.root, a)} type={a.mime} />
                 )}
-                {get_attachments(track, "subtitle").map(a =>
+                {track.attachments.subtitle?.map(a =>
                     <track
                         kind="subtitles"
                         src={attachment_path(state.root, a)}
@@ -50,7 +45,7 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
             <ol>
                 {state.queue.slice(0, show_tracks).map((item) => (
                     <li key={item.id}>
-                        <img src={attachment_path(state.root, get_attachment(state.track_list[item.track_id], "image"))} />
+                        <img src={attachment_path(state.root, state.track_list[item.track_id].attachments.image?.[0])} />
                         <p class="title">
                             {get_tag(state.track_list[item.track_id].tags.title)}
                         </p>

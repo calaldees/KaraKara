@@ -15,52 +15,12 @@ export function timedelta_str(timedelta: number): String {
 }
 
 /**
- * Looking at a Track, find the first matching attachment, or throw an exception
- *
- * eg get_attachment(track, "video") -> {use: "video", mime: "video/mp4", path: "asdfasdfa.mp4"}
- */
-export function get_attachment(
-    track: Track,
-    type: string,
-): Attachment {
-    for (let i = 0; i < track.attachments.length; i++) {
-        let a = track.attachments[i];
-        if (a.use == type) {
-            return a;
-        }
-    }
-    throw `Unable to find an attachment of type ${type} for track ${track.source_hash}`;
-}
-
-/**
- * Looking at a Track, find all matching attachments
- *
- * eg get_attachments(track, "video") -> [
- *    {use: "video", mime: "video/mp4", path: "asdfasdfa.mp4"},
- *    {use: "video", mime: "video/webm", path: "dhfghdfgh.webm"},
- * ]
- */
-export function get_attachments(
-    track: Track,
-    type: string,
-): Array<Attachment> {
-    let as: Array<Attachment> = [];
-    for (let i = 0; i < track.attachments.length; i++) {
-        let a = track.attachments[i];
-        if (a.use == type) {
-            as.push(a);
-        }
-    }
-    return as;
-}
-
-/**
  * Looking at an Attachment, get the full URL
  *
  * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
  */
-export function attachment_path(root: string, attachment: Attachment): string {
-    return root + "/files/" + attachment.path;
+export function attachment_path(root: string, attachment?: Attachment): string | null {
+    return attachment ? root + "/files/" + attachment.path : null;
 }
 
 /**

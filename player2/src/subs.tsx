@@ -11,7 +11,7 @@ import {
 import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
-import { attachment_path, get_attachment, http2ws } from "./utils";
+import { attachment_path, http2ws } from "./utils";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -145,7 +145,7 @@ function track_list_to_images(state: State, raw_list: Dictionary<Track>): Array<
     // the same 25 every time?)
     let num = 25;
     return Object.values(raw_list).slice(0, num).map((track, n) => ({
-        filename: attachment_path(state.root, get_attachment(track, "image")),
+        filename: attachment_path(state.root, track.attachments.image?.[0]),
         x: n / num,
         delay: Math.random() * 10,
     }));
@@ -161,9 +161,18 @@ function split_tags(s: string): Dictionary<Array<string>> {
     });
     return tags;
 }
+function group_attachments(as: Array<Attachment>): Dictionary<Array<Attachment>> {
+    let groups = {};
+    as.map(a => {
+        if(!groups[a.use]) groups[a.use] = [];
+        groups[a.use].push(a);
+    });
+    return groups;
+}
 function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
     Object.keys(dict).map(k => {
         dict[k].tags = split_tags(dict[k].tags)
+        dict[k].attachments = group_attachments(dict[k].attachments)
     });
     return dict;
 }

@@ -53,12 +53,12 @@ function isMySong(state: State, n: number): boolean {
 export const YoureNext = ({ state }: { state: State }): VNode =>
     (isMySong(state, 0) && (
         <h2 class="main-only upnext">
-            Your song "{state.queue[0].track.title}" is up now!
+            Your song "{state.track_list[state.queue[0].track_id].tags.title[0]}" is up now!
         </h2>
     )) ||
     (isMySong(state, 1) && (
         <h2 class="main-only upnext">
-            Your song "{state.queue[1].track.title}" is up next!
+            Your song "{state.track_list[state.queue[1].track_id].tags.title[0]}" is up next!
         </h2>
     ));
 

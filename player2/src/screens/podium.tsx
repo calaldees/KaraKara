@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_attachments, get_tag, s_to_mns } from "../utils";
+import { attachment_path, get_tag, s_to_mns } from "../utils";
 import { AutoplayCountdown } from "./common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
 import { SendCommand } from "../effects";
@@ -35,10 +35,10 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                 muted={true}
                 key={state.playing}
             >
-                {get_attachments(track, "video").map(a =>
+                {track.attachments.video?.map(a =>
                     <source src={attachment_path(state.root, a)} type={a.mime} />
                 )}
-                {get_attachments(track, "subtitle").map(a =>
+                {track.attachments.subtitle?.map(a =>
                     <track
                         kind="subtitles"
                         src={attachment_path(state.root, a)}

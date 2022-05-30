@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore } from "./base";
-import { attachment_path, get_attachment, shuffle } from "../utils";
+import { attachment_path, shuffle } from "../utils";
 import { RemoveTrack } from "../actions";
 
 const QueueItemRender = ({
@@ -22,14 +22,14 @@ const QueueItemRender = ({
                 style={{
                     "background-image":
                         "url(" +
-                        attachment_path(state.root, get_attachment(state.track_list[item.track_id], "image")) +
+                        attachment_path(state.root, state.track_list[item.track_id].attachments.image?.[0]) +
                         ")",
                 }}
             />
         </span>
         <span class={"text queue_info"}>
             <span class={"title"}>
-                {state.track_list[item.track_id].tags["title"][0]}
+                {state.track_list[item.track_id].tags.title[0]}
             </span>
             <br />
             <span class={"performer"}>{item.performer_name}</span>

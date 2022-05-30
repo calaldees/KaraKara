@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_attachments, get_tag } from "../utils";
+import { attachment_path, get_tag } from "../utils";
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
 export const VideoScreen = ({ state }: { state: State }): VNode => (
@@ -18,10 +18,10 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
             // TODO: Action + Effect at once?
             onended={MarkTrackPlayed}
         >
-            {get_attachments(track, "video").map(a =>
+            {track.attachments.video?.map(a =>
                 <source src={attachment_path(state.root, a)} type={a.mime} />
             )}
-            {get_attachments(track, "subtitle").map(a =>
+            {track.attachments.subtitle?.map(a =>
                 <track
                     kind="subtitles"
                     src={attachment_path(state.root, a)}

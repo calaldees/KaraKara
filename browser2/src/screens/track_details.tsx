@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./base";
-import { attachment_path, get_attachment, get_attachments } from "../utils";
+import { attachment_path } from "../utils";
 import {
     GoToScreen,
     ActivateEnqueue,
@@ -11,7 +11,7 @@ import {
     RemoveBookmark,
     SetPerformerName,
 } from "../actions";
-import { PopScrollPos, PushScrollPos } from "../effects";
+import { PushScrollPos } from "../effects";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
@@ -34,7 +34,7 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode =
     </footer>
 );
 
-const EnqueueButtons = ({ state, track }: { state: State; track: Track }): VNode => (
+const EnqueueButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <input
             type="text"
@@ -57,10 +57,10 @@ function get_buttons(state: State, track: Track) {
     if (state.action == null)
         return <TrackButtons state={state} track={track} />;
     if (state.action == "enqueue")
-        return <EnqueueButtons state={state} track={track} />;
+        return <EnqueueButtons state={state} />;
 }
 
-const BLOCKED_KEYS = [null, "null", "title", "from"];
+const BLOCKED_KEYS = [null, "null", "", "title", "from"];
 
 export const TrackDetails = ({
     state,
@@ -77,7 +77,7 @@ export const TrackDetails = ({
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
-        title={track.tags["title"][0]}
+        title={track.tags.title[0]}
         navRight={
             !state.widescreen && (
                 <a onclick={GoToScreen("queue", [PushScrollPos()])}>
@@ -91,11 +91,11 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={attachment_path(state.root, get_attachment(track, "image"))}
+            poster={attachment_path(state.root, track.attachments.image?.[0])}
             durationHint={track.duration}
             controls={true}
         >
-            {get_attachments(track, "preview").map(a => 
+            {track.attachments.preview?.map(a => 
                 <source
                     src={attachment_path(state.root, a)}
                     type={a.mime}

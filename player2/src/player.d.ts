@@ -17,7 +17,12 @@ type Track = {
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,
-    attachments: Array<Attachment>,
+    attachments: {
+        video?: Array<Attachment>,
+        preview?: Array<Attachment>,
+        subtitle?: Array<Attachment>,
+        image?: Array<Attachment>,
+    },
     lyrics: String,
 }
 

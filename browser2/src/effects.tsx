@@ -219,9 +219,18 @@ function split_tags(s: string): Dictionary<Array<string>> {
     });
     return tags;
 }
+function group_attachments(as: Array<Attachment>): Dictionary<Array<Attachment>> {
+    let groups = {};
+    as.map(a => {
+        if(!groups[a.use]) groups[a.use] = [];
+        groups[a.use].push(a);
+    });
+    return groups;
+}
 function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
     Object.keys(dict).map(k => {
         dict[k].tags = split_tags(dict[k].tags)
+        dict[k].attachments = group_attachments(dict[k].attachments)
     });
     console.log(dict);
     return dict;
