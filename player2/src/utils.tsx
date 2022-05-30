@@ -28,8 +28,8 @@ export function s_to_mns(t: number): string {
  *
  * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
  */
-export function attachment_path(root: string, attachment?: Attachment): string | null {
-    return attachment ? root + "/files/" + attachment.path : null;
+export function attachment_path(root: string, attachment: Attachment): string {
+    return root + "/files/" + attachment.path;
 }
 
 /**

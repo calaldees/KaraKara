@@ -144,39 +144,16 @@ function track_list_to_images(state: State, raw_list: Dictionary<Track>): Array<
     // TODO: pick a random 25 tracks (will people even notice if it's
     // the same 25 every time?)
     let num = 25;
-    return Object.values(raw_list).slice(0, num).map((track, n) => ({
-        filename: attachment_path(state.root, track.attachments.image?.[0]),
-        x: n / num,
-        delay: Math.random() * 10,
-    }));
+    return Object
+        .values(raw_list)
+        .slice(0, num)
+        .map(track => track.attachments.image[0])
+        .map((image, n) => ({
+            filename: attachment_path(state.root, image),
+            x: n / num,
+            delay: Math.random() * 10,
+        }));
 }
-
-function split_tags(s: string): Dictionary<Array<string>> {
-    let tags = {};
-    s.split("\n").map(line => {
-        let parts = line.split(":");
-        for (let i = 0; i < parts.length - 1; i++) {
-            tags[parts[i]] = (tags[parts[i]] || []).concat([parts[i + 1]]);
-        }
-    });
-    return tags;
-}
-function group_attachments(as: Array<Attachment>): Dictionary<Array<Attachment>> {
-    let groups = {};
-    as.map(a => {
-        if(!groups[a.use]) groups[a.use] = [];
-        groups[a.use].push(a);
-    });
-    return groups;
-}
-function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
-    Object.keys(dict).map(k => {
-        dict[k].tags = split_tags(dict[k].tags)
-        dict[k].attachments = group_attachments(dict[k].attachments)
-    });
-    return dict;
-}
-
 
 function _ftlSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,
@@ -198,7 +175,7 @@ function _ftlSubscriber(dispatch, props) {
                     action: (state, response) => [
                         {
                             ...state,
-                            track_list: set_tags(response),
+                            track_list: response,
                             images: track_list_to_images(state, response),
                             download_done: 0,
                             download_size: null,

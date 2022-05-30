@@ -35,7 +35,7 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                 muted={true}
                 key={state.playing}
             >
-                {track.attachments.video?.map(a =>
+                {track.attachments.video.map(a =>
                     <source src={attachment_path(state.root, a)} type={a.mime} />
                 )}
                 {track.attachments.subtitle?.map(a =>

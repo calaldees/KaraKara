@@ -91,11 +91,11 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={attachment_path(state.root, track.attachments.image?.[0])}
+            poster={attachment_path(state.root, track.attachments.image[0])}
             durationHint={track.duration}
             controls={true}
         >
-            {track.attachments.preview?.map(a => 
+            {track.attachments.preview.map(a => 
                 <source
                     src={attachment_path(state.root, a)}
                     type={a.mime}

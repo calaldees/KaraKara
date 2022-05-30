@@ -21,12 +21,12 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <video
-                poster={attachment_path(state.root, track.attachments.image?.[0])}
+                poster={attachment_path(state.root, track.attachments.image[0])}
                 autoPlay={true}
                 onloadstart={SetPreviewVolume}
                 loop={true}
             >
-                {track.attachments.video?.map(a =>
+                {track.attachments.video.map(a =>
                     <source src={attachment_path(state.root, a)} type={a.mime} />
                 )}
                 {track.attachments.subtitle?.map(a =>
@@ -45,7 +45,7 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
             <ol>
                 {state.queue.slice(0, show_tracks).map((item) => (
                     <li key={item.id}>
-                        <img src={attachment_path(state.root, state.track_list[item.track_id].attachments.image?.[0])} />
+                        <img src={attachment_path(state.root, state.track_list[item.track_id].attachments.image[0])} />
                         <p class="title">
                             {get_tag(state.track_list[item.track_id].tags.title)}
                         </p>

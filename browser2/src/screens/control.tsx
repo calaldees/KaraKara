@@ -180,7 +180,7 @@ const QueueItemRender = ({
             ontouchcancel={createTouchCancel()}
         >
             <picture>
-                {state.track_list[item.track_id].attachments.image?.map(a => 
+                {state.track_list[item.track_id].attachments.image.map(a => 
                 <source
                     src={attachment_path(state.root, a)}
                     type={a.mime}

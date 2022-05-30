@@ -25,7 +25,6 @@ type ApiResponse = {
 }
 
 type Attachment = {
-    use: string,
     mime: string,
     path: string,
 }
@@ -36,10 +35,10 @@ type Track = {
     duration: number,
     tags: Dictionary<Array<string>>,
     attachments: {
-        video?: Array<Attachment>,
-        preview?: Array<Attachment>,
+        video: Array<Attachment>,
+        preview: Array<Attachment>,
+        image: Array<Attachment>,
         subtitle?: Array<Attachment>,
-        image?: Array<Attachment>,
     },
     lyrics: String,
 }

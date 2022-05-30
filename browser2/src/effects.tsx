@@ -209,33 +209,6 @@ export function SendCommand(state: State, command: string): Effect {
     });
 }
 
-function split_tags(s: string): Dictionary<Array<string>> {
-    let tags = {};
-    s.split("\n").map(line => {
-        let parts = line.split(":");
-        for(let i=0; i<parts.length-1; i++) {
-            tags[parts[i]] = (tags[parts[i]] || []).concat([parts[i+1]]);
-        }
-    });
-    return tags;
-}
-function group_attachments(as: Array<Attachment>): Dictionary<Array<Attachment>> {
-    let groups = {};
-    as.map(a => {
-        if(!groups[a.use]) groups[a.use] = [];
-        groups[a.use].push(a);
-    });
-    return groups;
-}
-function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
-    Object.keys(dict).map(k => {
-        dict[k].tags = split_tags(dict[k].tags)
-        dict[k].attachments = group_attachments(dict[k].attachments)
-    });
-    console.log(dict);
-    return dict;
-}
-
 export const FetchTrackList = (state: State): Effect =>
     ApiRequest({
         function: "track_list",
@@ -250,7 +223,7 @@ export const FetchTrackList = (state: State): Effect =>
         action: (state, response) => [
             {
                 ...state,
-                track_list: set_tags(response),
+                track_list: response,
                 download_done: 0,
                 download_size: null,
             },
