@@ -15,13 +15,13 @@ import { PopScrollPos, PushScrollPos } from "../effects";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
-        {state.queue.find((i) => i.track.source_hash == track.source_hash) && (
+        {state.queue.find((i) => i.track_id == track.source_hash) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
                 onclick={ActivateEnqueue()}
-                disabled={state.queue.find((i) => i.track.source_hash == track.source_hash)}
+                disabled={state.queue.find((i) => i.track_id == track.source_hash)}
             >
                 Enqueue
             </button>

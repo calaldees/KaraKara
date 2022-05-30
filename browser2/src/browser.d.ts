@@ -41,7 +41,7 @@ type Track = {
 
 type QueueItem = {
     id: number,
-    track: Track,
+    track_id: string,
     performer_name: string,
     total_duration: number,
     session_owner: string,

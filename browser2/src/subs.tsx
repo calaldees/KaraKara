@@ -16,7 +16,7 @@ export function getMQTTListener(state: State): Subscription {
         error(state: State, err): State {
             console.log(
                 "Got an unrecoverable MQTT error, " +
-                    "returning to login screen",
+                "returning to login screen",
                 err,
             );
             return {
@@ -54,7 +54,16 @@ export function getMQTTListener(state: State): Subscription {
                 case "queue":
                     return {
                         ...state,
-                        queue: JSON.parse(data),
+                        queue:     // still waiting for the queue to return the new format, hard-coding for now
+                            [{
+                                id: 1,
+                                track_id: "v_wvprHM_2F",
+                                performer_name: "testo",
+                                total_duration: 123,
+                                session_owner: "xxx"
+                            }]
+
+                        // JSON.parse(data),
                     };
                 default:
                     return state;
