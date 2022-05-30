@@ -179,14 +179,13 @@ const QueueItemRender = ({
             ontouchend={createTouchEnd()}
             ontouchcancel={createTouchCancel()}
         >
-            <div
-                style={{
-                    "background-image":
-                        "url(" +
-                        attachment_path(state.root, state.track_list[item.track_id].attachments.image?.[0]) +
-                        ")",
-                }}
-            />
+            <picture>
+                {state.track_list[item.track_id].attachments.image?.map(a => 
+                <source
+                    src={attachment_path(state.root, a)}
+                    type={a.mime}
+                />)}
+            </picture>
             <span class={"drag-handle"}>
                 <i class="fas fa-grip-vertical" />
             </span>

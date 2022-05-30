@@ -47,14 +47,13 @@ function track_info(state: State, track: Track): string {
 const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
     <li class={"track_item"} onclick={SelectTrack(track.source_hash)}>
         <div class={"thumb"}>
-            <div
-                style={{
-                    "background-image":
-                        "url(" +
-                        attachment_path(state.root, track.attachments.image?.[0]) +
-                        ")",
-                }}
-            />
+            <picture>
+            {track.attachments.image?.map(a => 
+                <source
+                    src={attachment_path(state.root, a)}
+                    type={a.mime}
+                />)}
+            </picture>
         </div>
         <span class={"text track_info"}>
             <span class={"title"}>{track.tags.title[0]}</span>

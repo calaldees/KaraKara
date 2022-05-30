@@ -18,14 +18,13 @@ const QueueItemRender = ({
         }
     >
         <span class={"thumb"}>
-            <div
-                style={{
-                    "background-image":
-                        "url(" +
-                        attachment_path(state.root, state.track_list[item.track_id].attachments.image?.[0]) +
-                        ")",
-                }}
-            />
+            <picture>
+                {state.track_list[item.track_id].attachments.image?.map(a => 
+                <source
+                    src={attachment_path(state.root, a)}
+                    type={a.mime}
+                />)}
+            </picture>
         </span>
         <span class={"text queue_info"}>
             <span class={"title"}>
