@@ -44,16 +44,19 @@ function track_info(state: State, track: Track): string {
 /*
  * List individual tracks
  */
+import * as placeholder from "data-url:../static/placeholder.svg";
+
 const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
     <li class={"track_item"} onclick={SelectTrack(track.source_hash)}>
         <div class={"thumb"}>
+            <img src={placeholder} />
             <picture>
-            {track.attachments.image.map(a => 
-                <source
-                    src={attachment_path(state.root, a)}
+                {track.attachments.image.map(a => 
+                    <source
+                    srcset={attachment_path(state.root, a)}
                     type={a.mime}
-                />)}
-                <img src="data-url:../static/placeholder.svg" />
+                    />)}
+                <img src={placeholder} />
             </picture>
         </div>
         <span class={"text track_info"}>
