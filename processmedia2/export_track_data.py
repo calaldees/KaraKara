@@ -1,6 +1,7 @@
 from functools import partial, reduce
 import json
 import re
+import gzip
 
 from clint.textui.progress import bar as progress_bar
 
@@ -91,14 +92,19 @@ def export_track_data(**kwargs):
             stats['meta_exported'].add(name)
 
     assert kwargs['path_static_track_list']
+    data = json.dumps(dict(_tracks()), default=tuple)
     with open(kwargs['path_static_track_list'], 'wt') as filehandle:
-        json.dump(dict(_tracks()), filehandle, default=tuple)
+        filehandle.write(data)
+    if kwargs['gzip']:
+        with gzip.open(kwargs['path_static_track_list']+".gz", 'wb') as filehandle:
+            filehandle.write(data.encode('utf8'))
 
     return stats
 
 
 def additional_arguments(parser):
     parser.add_argument('--path_static_track_list', action='store', help='the path to output json data')
+    parser.add_argument('--gzip', action='store_true', default=False, help='also write out track_list.json.gz')
 
 
 if __name__ == "__main__":

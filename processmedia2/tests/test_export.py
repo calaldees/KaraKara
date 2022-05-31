@@ -16,7 +16,7 @@ def test_export_full(ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FIL
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
         manager.encode_media(mock=True)
-        stats = export_track_data(path_static_track_list=track_file, **manager.commandline_kwargs)
+        stats = export_track_data(path_static_track_list=track_file, gzip=False, **manager.commandline_kwargs)
 
         assert stats == {
             'meta_exported': {'test2', 'test1'},

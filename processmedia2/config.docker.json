@@ -9,6 +9,7 @@
     "path_processed": "/media/processed",
 
     "path_static_track_list": "/static/tracks.json",
+    "gzip": true,
 
     "process_order_function": "random",
     "disable_meta_write_safety": true
