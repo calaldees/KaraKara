@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_tag } from "../utils";
+import { Video } from "./common"
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
 export const VideoScreen = ({ state }: { state: State }): VNode => (
@@ -12,25 +12,12 @@ export const VideoScreen = ({ state }: { state: State }): VNode => (
 
 const VideoInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
     <section key="video" class={"screen_video"}>
-        <video
-            autoPlay={true}
+        <Video
+            state={state}
+            track={track}
             ontimeupdate={UpdateProgress}
-            // TODO: Action + Effect at once?
             onended={MarkTrackPlayed}
-        >
-            {track.attachments.video.map(a =>
-                <source src={attachment_path(state.root, a)} type={a.mime} />
-            )}
-            {track.attachments.subtitle?.map(a =>
-                <track
-                    kind="subtitles"
-                    src={attachment_path(state.root, a)}
-                    default={true}
-                    label="English"
-                    srclang="en"
-                />
-            )}
-        </video>
+        />
         <div
             id="seekbar"
             style={{
@@ -43,7 +30,7 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
             KaraKara
         </div>
         <div id="pimpsong" class="pimp">
-            {get_tag(track.tags.title)}
+            {track.tags.title[0]}
             <br />
             Performed by {queue_item.performer_name}
         </div>

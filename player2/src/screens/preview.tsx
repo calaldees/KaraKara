@@ -1,11 +1,10 @@
 import h from "hyperapp-jsx-pragma";
 import {
     attachment_path,
-    get_tag,
     timedelta_str,
     short_date,
 } from "../utils";
-import { AutoplayCountdown } from "./common";
+import { AutoplayCountdown, Video } from "./common";
 import { SetPreviewVolume } from "../actions";
 
 const show_tracks = 5;
@@ -20,25 +19,12 @@ export const PreviewScreen = ({ state }: { state: State }): VNode => (
 const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNode => (
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
-            <video
-                poster={attachment_path(state.root, track.attachments.image[0])}
-                autoPlay={true}
+            <Video
+                state={state}
+                track={track}
                 onloadstart={SetPreviewVolume}
                 loop={true}
-            >
-                {track.attachments.video.map(a =>
-                    <source src={attachment_path(state.root, a)} type={a.mime} />
-                )}
-                {track.attachments.subtitle?.map(a =>
-                    <track
-                        kind="subtitles"
-                        src={attachment_path(state.root, a)}
-                        default={true}
-                        label="English"
-                        srclang="en"
-                    />
-                )}
-            </video>
+            />
             <AutoplayCountdown state={state} show_if_disabled={false} />
         </div>
         <div id="playlist" key={"playlist"}>
@@ -47,10 +33,14 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
                     <li key={item.id}>
                         <img src={attachment_path(state.root, state.track_list[item.track_id].attachments.image[0])} />
                         <p class="title">
-                            {get_tag(state.track_list[item.track_id].tags.title)}
+                            {state.track_list[item.track_id].tags.title[0]}
                         </p>
                         <p class="from">
-                            {get_tag(state.track_list[item.track_id].tags.from)}
+                            {
+                                state.track_list[item.track_id].tags.from?.[0] ||
+                                state.track_list[item.track_id].tags.artist?.join(", ") ||
+                                ""
+                            }
                         </p>
                         <p class="performer">{item.performer_name}</p>
                         <p class="time">

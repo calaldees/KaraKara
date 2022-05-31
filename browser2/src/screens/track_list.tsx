@@ -1,6 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
-import { attachment_path } from "../utils";
+import { Screen, Thumb } from "./base";
 import {
     ClearScrollPos,
     ApiRequest,
@@ -44,21 +43,9 @@ function track_info(state: State, track: Track): string {
 /*
  * List individual tracks
  */
-import * as placeholder from "data-url:../static/placeholder.svg";
-
 const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
     <li class={"track_item"} onclick={SelectTrack(track.source_hash)}>
-        <div class={"thumb"}>
-            <img src={placeholder} />
-            <picture>
-                {track.attachments.image.map(a => 
-                    <source
-                    srcset={attachment_path(state.root, a)}
-                    type={a.mime}
-                    />)}
-                <img src={placeholder} />
-            </picture>
-        </div>
+        <Thumb state={state} track={track} />
         <span class={"text track_info"}>
             <span class={"title"}>{track.tags.title[0]}</span>
             <br />

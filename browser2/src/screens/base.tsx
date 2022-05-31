@@ -1,7 +1,8 @@
 import h from "hyperapp-jsx-pragma";
 import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
 import { PopScrollPos } from "../effects";
-import { timedelta_str } from "../utils";
+import { attachment_path } from "../utils";
+import * as placeholder from "data-url:../static/placeholder.svg";
 
 export const Notification = ({ state }: { state: State }): VNode =>
     state.notification && (
@@ -100,4 +101,27 @@ export const BackToExplore = (): VNode => (
     <a onclick={GoToScreen("explore", [PopScrollPos()])}>
         <i class={"fas fa-2x fa-chevron-circle-left"} />
     </a>
+);
+
+// I don't know how to type ...kwargs correctly
+export const Thumb = (
+    {
+        state,
+        track,
+        ...kwargs
+    },
+    children,
+): VNode => (
+    <div class={"thumb"} {...kwargs}>
+        <img src={placeholder} />
+        <picture>
+            {track.attachments.image.map(a => 
+                <source
+                srcset={attachment_path(state.root, a)}
+                type={a.mime}
+                />)}
+            <img src={placeholder} />
+        </picture>
+        {children}
+    </div>
 );

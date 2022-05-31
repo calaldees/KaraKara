@@ -1,4 +1,5 @@
 import h from "hyperapp-jsx-pragma";
+import { attachment_path } from "../utils";
 
 export const AutoplayCountdown = ({
     state,
@@ -19,3 +20,25 @@ export const AutoplayCountdown = ({
             seconds)
         </small>
     );
+
+export const Video = ({state, track, ...kwargs}) => (
+    <video
+        autoPlay={true}
+        poster={attachment_path(state.root, track.attachments.image[0])}
+        {...kwargs}
+    >
+        {track.attachments.video.map(a =>
+            <source src={attachment_path(state.root, a)} type={a.mime} />
+        )}
+        {track.attachments.subtitle?.map(a =>
+            <track
+                kind="subtitles"
+                src={attachment_path(state.root, a)}
+                default={true}
+                label="English"
+                srclang="en"
+            />
+        )}
+    </video>
+);
+    

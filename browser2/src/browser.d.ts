@@ -1,4 +1,5 @@
 declare module '*.jpg';
+declare module '*.svg';
 
 declare module "*.json" {
     const value: any;

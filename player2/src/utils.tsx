@@ -33,14 +33,6 @@ export function attachment_path(root: string, attachment: Attachment): string {
 }
 
 /**
- * get a tag if it is defined, else blank
- */
-export function get_tag(tag: Array<string>): string {
-    if (tag) return tag[0];
-    else return "";
-}
-
-/**
  * Looking at the data URL, figure out the websocket URL
  */
 export function http2ws(str: string) {

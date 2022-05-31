@@ -1,26 +1,10 @@
 /**
- * turn milliseconds into {X}min / {X}sec
- */
-export function timedelta_str(timedelta: number): String {
-    const seconds_total = Math.floor(timedelta / 1000);
-    const seconds = seconds_total % 60;
-    const minutes = Math.floor(seconds_total / 60);
-    if (minutes >= 1) {
-        return minutes + "min";
-    }
-    if (seconds === 0) {
-        return "Now";
-    }
-    return seconds + "sec";
-}
-
-/**
  * Looking at an Attachment, get the full URL
  *
  * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
  */
-export function attachment_path(root: string, attachment?: Attachment): string | null {
-    return attachment ? root + "/files/" + attachment.path : null;
+export function attachment_path(root: string, attachment: Attachment): string {
+    return root + "/files/" + attachment.path;
 }
 
 /**

@@ -1,6 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen, BackToExplore } from "./base";
-import { attachment_path } from "../utils";
+import { Screen, BackToExplore, Thumb } from "./base";
 import { ApiRequest } from "../effects";
 import { RemoveTrack, Command } from "../actions";
 
@@ -172,24 +171,18 @@ const QueueItemRender = ({
         ondragover={createDragOver(item.id)}
         ondrop={createDrop(item.id)}
     >
-        <span
-            class={"thumb"}
+        <Thumb
+            state={state}
+            track={state.track_list[item.track_id]}
             ontouchstart={createTouchStart(item.id)}
             ontouchmove={createTouchMove()}
             ontouchend={createTouchEnd()}
             ontouchcancel={createTouchCancel()}
         >
-            <picture>
-                {state.track_list[item.track_id].attachments.image.map(a => 
-                <source
-                    src={attachment_path(state.root, a)}
-                    type={a.mime}
-                />)}
-            </picture>
             <span class={"drag-handle"}>
                 <i class="fas fa-grip-vertical" />
             </span>
-        </span>
+        </Thumb>
         <span class={"text queue_info"}>
             <span class={"title"}>
                 {state.track_list[item.track_id].tags.title[0]}
@@ -210,27 +203,20 @@ const QueueItemRender = ({
     </li>
 );
 
-const ControlButtons = ({ state }: { state: State }): VNode => (
+const ControlButton = ({ command, style }: { command: string, style: string }): VNode => (
+    <button onclick={Command(command)}>
+        <i class={"fas fa-"+style} />
+    </button>
+);
+const ControlButtons = (): VNode => (
     <footer>
         <div class={"buttons"}>
-            <button onclick={Command("seek_backwards")}>
-                <i class={"fas fa-backward"} />
-            </button>
-            <button onclick={Command("seek_forwards")}>
-                <i class={"fas fa-forward"} />
-            </button>
-            <button onclick={Command("play")}>
-                <i class={"fas fa-play"} />
-            </button>
-            <button onclick={Command("pause")}>
-                <i class={"fas fa-pause"} />
-            </button>
-            <button onclick={Command("stop")}>
-                <i class={"fas fa-stop"} />
-            </button>
-            <button onclick={Command("skip")}>
-                <i class={"fas fa-step-forward"} />
-            </button>
+            <ControlButton command={"seek_backwards"} style={"backward"} />
+            <ControlButton command={"seek_forwards"} style={"forward"} />
+            <ControlButton command={"play"} style={"play"} />
+            <ControlButton command={"pause"} style={"pause"} />
+            <ControlButton command={"stop"} style={"stop"} />
+            <ControlButton command={"skip"} style={"step-forward"} />
         </div>
     </footer>
 );
@@ -242,7 +228,7 @@ export const Control = ({ state }: { state: State }): VNode => (
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Remote Control"}
         // navRight={}
-        footer={<ControlButtons state={state} />}
+        footer={<ControlButtons />}
     >
         {state.queue.length == 0 ? (
             <div class="readme">
