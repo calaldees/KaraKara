@@ -30,6 +30,7 @@ type QueueItem = {
     track_id: string,
     performer_name: string,
     total_duration: number,
+    session_owner: string,
 }
 
 type WaterfallImage = {

@@ -31,7 +31,7 @@ type Attachment = {
 }
 
 type Track = {
-    source_hash: string,
+    id: string,
     title: string,
     duration: number,
     tags: Dictionary<Array<string>>,

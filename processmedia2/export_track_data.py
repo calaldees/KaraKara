@@ -1,5 +1,6 @@
 from functools import partial, reduce
 import json
+import re
 
 from clint.textui.progress import bar as progress_bar
 
@@ -77,7 +78,9 @@ def export_track_data(**kwargs):
                 with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
                     return parse_tags(tag_file.read())
 
-            yield m.source_hash, {
+            track_id = re.sub('[^0-9a-zA-Z]+', '_', name)
+            yield track_id, {
+                'id': track_id,
                 'source_hash': m.source_hash,
                 'source_filename': name,
                 'duration': m.source_details['duration'],

@@ -52,34 +52,32 @@ export function getMQTTListener(state: State): Subscription {
                         },
                     };
                 case "queue":
-                    return {
-                        ...state,
-                        // still waiting for the queue to return the new format, hard-coding for now
-                        // queue: JSON.parse(data),
-                        queue: [
-                            {
-                                id: 1,
-                                track_id: "rgll4djKoy9",
-                                performer_name: "testo",
-                                total_duration: 123,
-                                session_owner: "12345",
-                            },
-                            {
-                                id: 2,
-                                track_id: "jWBWalw4cbn",
-                                performer_name: "alice",
-                                total_duration: 123,
-                                session_owner: "12345",
-                            },
-                            {
-                                id: 3,
-                                track_id: "GjwjyEGOUtz",
-                                performer_name: "bob",
-                                total_duration: 123,
-                                session_owner: "12345",
-                            },
-                        ]
-                    };
+                    // still waiting for the queue to return the new format, hard-coding for now
+                    // let queue = JSON.parse(data),
+                    let queue = [
+                        {
+                            id: 1,
+                            track_id: "Metal_Gear_Rising_Revengeance_The_Only_Thing_I_Know_For_Real",
+                            performer_name: "testo",
+                            total_duration: 123,
+                            session_owner: "12345",
+                        },
+                        {
+                            id: 2,
+                            track_id: "Plants_vs_Zombies_ED_Zombies_on_Your_Lawn",
+                            performer_name: "alice",
+                            total_duration: 123,
+                            session_owner: "12345",
+                        },
+                        {
+                            id: 3,
+                            track_id: "Yakuza_0_insert_song_24_Hour_Cinderella",
+                            performer_name: "bob",
+                            total_duration: 123,
+                            session_owner: "12345",
+                        },
+                    ];
+                    return { ...state, queue };
                 default:
                     return state;
             }

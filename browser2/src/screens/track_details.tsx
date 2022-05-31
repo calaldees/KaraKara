@@ -15,20 +15,20 @@ import { PushScrollPos } from "../effects";
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
-        {state.queue.find((i) => i.track_id == track.source_hash) && (
+        {state.queue.find((i) => i.track_id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
                 onclick={ActivateEnqueue()}
-                disabled={state.queue.find((i) => i.track_id == track.source_hash)}
+                disabled={state.queue.find((i) => i.track_id == track.id)}
             >
                 Enqueue
             </button>
-            {state.bookmarks.includes(track.source_hash) ? (
-                <button onclick={RemoveBookmark(track.source_hash)}>Un-Bookmark</button>
+            {state.bookmarks.includes(track.id) ? (
+                <button onclick={RemoveBookmark(track.id)}>Un-Bookmark</button>
             ) : (
-                <button onclick={AddBookmark(track.source_hash)}>Bookmark</button>
+                <button onclick={AddBookmark(track.id)}>Bookmark</button>
             )}
         </div>
     </footer>
