@@ -29,6 +29,7 @@ class Subtitle(NamedTuple):
     start: time = time()
     end: time = time()
     text: str = ''
+    top: bool = False
 
 
 class TextOverlap(NamedTuple):
@@ -117,16 +118,20 @@ def _parse_time(time_str):
     return time(*(time_dict[k] for k in ('hour', 'min', 'sec', 'ms')))
 
 
+def clean_line(text):
+    text = re.sub(r'{.*?}', '', text)
+    return '\n'.join(l.strip() for l in text.split('\\N'))
+
 def _parse_srt(source):
-    """
-    >>> srt = '''
+    r"""
+    >>> srt = r'''
     ... 1
     ... 00:00:13,500 --> 00:00:22,343
     ... test, it's, キ
     ...
     ... 2
     ... 00:00:22,343 --> 00:00:25,792
-    ... second
+    ... {\a6}second {\c&HFFFF80&}coloured bit
     ...
     ... 3
     ... 00:00:30,000 --> 00:00:40,000
@@ -134,13 +139,14 @@ def _parse_srt(source):
     ...
     ... '''
     >>> _parse_srt(srt)
-    [Subtitle(start=datetime.time(0, 0, 13, 500000), end=datetime.time(0, 0, 22, 343000), text="test, it's, キ"), Subtitle(start=datetime.time(0, 0, 22, 343000), end=datetime.time(0, 0, 25, 792000), text='second')]
+    [Subtitle(start=datetime.time(0, 0, 13, 500000), end=datetime.time(0, 0, 22, 343000), text="test, it's, キ", top=False), Subtitle(start=datetime.time(0, 0, 22, 343000), end=datetime.time(0, 0, 25, 792000), text='second coloured bit', top=True)]
     """
     def parse_line(line):
         return Subtitle(
             _parse_time(line['start']),
             _parse_time(line['end']),
-            line['text'],
+            clean_line(line['text']),
+            "\\a6" in line['text'],
         )
     lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
     return [line for line in lines if line.text]
@@ -148,73 +154,56 @@ def _parse_srt(source):
 
 def _parse_ssa(source):
     r"""
-
-    Ignore text on top of screen
-    Remove duplication
-
     >>> ssa = r'''
     ... [Events]
     ... Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     ... Dialogue: Marked=0,0:00:00.00,0:00:05.00,*Default,NTP,0000,0000,0000,!Effect,{\a6}Ishida Yoko - {\c&HFFFF00&}Towa no Hana{\c&HFFFF&}\N{\c&HFFFFFF&}{\c&H8080FF&}Ai Yori Aoshi OP
     ... Dialogue: Marked=0,0:00:07.00,0:00:13.25,*Default,NTP,0000,0000,0000,!Effect,awaku saita hana no kao\N{\c&HFFFFFF&}nokoshi kisetsu wa sugimasu
-    ... Dialogue: Marked=0,0:00:13.25,0:00:19.20,*Default,NTP,0000,0000,0000,!Effect,nokoshi kisetsu wa sugimasu\N{\c&HFFFFFF&}ame mo agari sora ni kumo
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao'), Subtitle(start=datetime.time(0, 0, 13, 250000), end=datetime.time(0, 0, 19, 200000), text='nokoshi kisetsu wa sugimasu\name mo agari sora ni kumo')]
-
-    Overlap of subtitles should be removed
-
-    >>> ssa = r'''
-    ... Dialogue: Marked=0,0:00:06.91,0:00:12.39,*Default,NTP,0000,0000,0000,!Effect,Tooi hi no kioku wo \N {\c&HFFFFFF&} Kanashimi no iki no ne wo
-    ... Dialogue: Marked=0,0:00:12.49,0:00:21.53,*Default,NTP,0000,0000,0000,!Effect,Kanashimi no iki no ne wo tometekure yo \N {\c&HFFFFFF&} Saa ai ni kogareta mune
-    ... '''
-    >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0, 6, 910000), end=datetime.time(0, 0, 12, 390000), text='Tooi hi no kioku wo'), Subtitle(start=datetime.time(0, 0, 12, 490000), end=datetime.time(0, 0, 21, 530000), text='Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune')]
-
-    A file with almost all toptitles should be parsed normally
-
-    >>> ssa = r'''
-    ... Dialogue: Marked=0,0:00:01.00,0:00:02.00,*Default,NTP,0000,0000,0000,!Effect,{\someControlShit\a6}First
-    ... Dialogue: Marked=0,0:00:02.00,0:00:03.00,*Default,NTP,0000,0000,0000,!Effect,{\a6}Second
-    ... Dialogue: Marked=0,0:00:03.00,0:00:04.00,*Default,NTP,0000,0000,0000,!Effect,{\a6}Third
-    ... '''
-    >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text='First'), Subtitle(start=datetime.time(0, 0, 2), end=datetime.time(0, 0, 3), text='Second'), Subtitle(start=datetime.time(0, 0, 3), end=datetime.time(0, 0, 4), text='Third')]
-
-    Small Overlap is rejected
-
-    >>> ssa = r'''
-    ... Dialogue: Marked=0,0:00:01.00,0:00:02.00,*Default,NTP,0000,0000,0000,!Effect, ga takaraMON da \N {\c&HFFFFFF&} ase mamire wa
-    ... Dialogue: Marked=0,0:00:02.00,0:00:03.00,*Default,NTP,0000,0000,0000,!Effect,ase mamire
-    ... '''
-    >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text='ga takaraMON da\nase mamire wa'), Subtitle(start=datetime.time(0, 0, 2), end=datetime.time(0, 0, 3), text='ase mamire')]
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 5), text='Ishida Yoko - Towa no Hana\nAi Yori Aoshi OP', top=True), Subtitle(start=datetime.time(0, 0, 7), end=datetime.time(0, 0, 13, 250000), text='awaku saita hana no kao\nnokoshi kisetsu wa sugimasu', top=False)]
 
     >>> ssa = r'''
     ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='this is, text on same line')]
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='this is, text on same line', top=False)]
 
     """
     lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
 
-    # Keep 'toptitles' if the majority of the files are toptitles.
-    toptitle_count = '\n'.join(line_dict['text'] for line_dict in lines).count('\\a6')
-    remove_toptitles = toptitle_count < int(len(lines) * 0.8)
-
-    def clean_line(text):
-        if remove_toptitles and '\\a6' in text:
-            return ''
-        text = re.sub(r'{.*?}', '', text)
-        return '\n'.join(l.strip() for l in text.split('\\N'))
     def parse_line(line):
         return Subtitle(
             _parse_time(line['start']),
             _parse_time(line['end']),
             clean_line(line['text']),
+            '\\a6' in line['text'],
         )
-    lines = [parse_line(line_dict) for line_dict in lines]
+    return [parse_line(line_dict) for line_dict in lines]
+
+
+def _remove_duplicate_lines(lines):
+    r"""
+    Overlap of subtitles should be removed
+
+    >>> import datetime
+    >>> lines = [
+    ...     Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text='Tooi hi no kioku wo\nKanashimi no iki no ne wo'),
+    ...     Subtitle(start=datetime.time(0, 0, 3), end=datetime.time(0, 0, 4), text='Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune'),
+    ... ]
+    >>> [l.text for l in _remove_duplicate_lines(lines)]
+    ['Tooi hi no kioku wo', 'Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune']
+
+    Small Overlap is rejected
+
+    >>> lines = [
+    ...     Subtitle(start=datetime.time(0, 0, 1), end=datetime.time(0, 0, 2), text=' ga takaraMON da\nase mamire wa'),
+    ...     Subtitle(start=datetime.time(0, 0, 2), end=datetime.time(0, 0, 3), text='ase mamire'),
+    ... ]
+    >>> [l.text for l in _remove_duplicate_lines(lines)]
+    ['ga takaraMON da\nase mamire wa', 'ase mamire']
+
+    """
     def remove_duplicate_line(line_current, line_next):
         if not line_next:
             return line_current
@@ -222,10 +211,39 @@ def _parse_ssa(source):
         if len(overlap_text) < int(len(line_next.text) * 0.3):
             log.debug('Subtitle text overlap is suspiciously small, ignoring the overlap current:"{}" - next:"{}" - overlap:"{}"'.format(line_current.text, line_next.text, overlap_text))
             overlap_text = ''
-        return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip())
+        return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip(), line_current.top)
     lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
     return [line for line in lines if line.text]
 
+def _strip_toptitles(lines):
+    r"""
+    If there are many subs on top, keep them (they're normally trying
+    to get out of the way of something on the bottom of the screen)
+
+    >>> import datetime
+    >>> lines = [
+    ...     Subtitle(text='First', top=True),
+    ...     Subtitle(text='Second', top=True),
+    ...     Subtitle(text='Third', top=True),
+    ... ]
+    >>> [(l.text, l.top) for l in _strip_toptitles(lines)]
+    [('First', True), ('Second', True), ('Third', True)]
+
+    If there are only a few subs on top, strip them (they're normally
+    duplicates of the song title)
+
+    >>> lines = [
+    ...     Subtitle(text='First', top=True),
+    ...     Subtitle(text='Second', top=False),
+    ...     Subtitle(text='Third', top=False),
+    ... ]
+    >>> [(l.text, l.top) for l in _strip_toptitles(lines)]
+    [('Second', False), ('Third', False)]
+
+    """
+    if len([s for s in lines if s.top]) < len(lines) * 0.8:
+        lines = [s for s in lines if not s.top]
+    return lines
 
 def parse_subtitles(data):
     """
@@ -234,18 +252,24 @@ def parse_subtitles(data):
     ... 00:00:00,000 --> 00:00:01,000
     ... srt
     ... '''
+    >>> parse_subtitles(srt)
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='srt', top=False)]
+
     >>> ssa = '''
     ... Dialogue: Marked=0,0:00:00.00,0:00:01.00,*Default,NTP,0000,0000,0000,!Effect,ssa
     ... '''
-    >>> parse_subtitles(srt)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='srt')]
     >>> parse_subtitles(ssa)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='ssa')]
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 0, 1), text='ssa', top=False)]
+
     >>> parse_subtitles('not real subtitles')
     []
     """
     assert isinstance(data, str), 'Subtitle data should be a string'
-    return _parse_srt(data) or _parse_ssa(data)
+    # Only two tracks actually have duplicate lines - the two .ssa ones.
+    # Other tracks have intentionally repeated lyrics, don't mess with those.
+    lines = _parse_srt(data) or _remove_duplicate_lines(_parse_ssa(data))
+    lines = _strip_toptitles(lines)
+    return lines
 
 
 class SSASection(NamedTuple):
@@ -274,8 +298,8 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
     Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,second
     <BLANKLINE>
 
-    >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
+    >>> _remove_duplicate_lines(_parse_ssa(ssa))
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first', top=False), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second', top=False)]
 
     >>> ssa = create_ssa((
     ...     Subtitle(time(0,0,0,0), time(0,1,0,0), 'newline\ntest'),
@@ -386,7 +410,7 @@ def create_srt(subtitles):
     <BLANKLINE>
 
     >>> _parse_srt(srt)
-    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first'), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second')]
+    [Subtitle(start=datetime.time(0, 0), end=datetime.time(0, 1), text='first', top=False), Subtitle(start=datetime.time(0, 2), end=datetime.time(0, 3, 0, 510000), text='second', top=False)]
     """
     return ''.join(
         SRT_FORMAT.format(
@@ -443,16 +467,46 @@ def create_vtt(subtitles):
     <v next>
     <BLANKLINE>
     <BLANKLINE>
+
+    >>> vtt = create_vtt((
+    ...     Subtitle(time(0,1,0,0), time(0,2,0,0), 'first', top=True),
+    ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second', top=True),
+    ... ))
+    >>> print(vtt)
+    WEBVTT - KaraKara Subtitle
+    <BLANKLINE>
+    1
+    00:00:00.000 --> 00:01:00.000 line:1
+    <v active>
+    <v next>first
+    <BLANKLINE>
+    2
+    00:01:00.000 --> 00:02:00.000 line:1
+    <v active>first
+    <v next>second
+    <BLANKLINE>
+    3
+    00:02:00.000 --> 00:03:00.510 line:1
+    <v active>second
+    <v next>
+    <BLANKLINE>
+    <BLANKLINE>
     """
     VTT_FORMAT = """\
+{index}
+{start} --> {end}{format}
 <v active>{active}
-<v next>{next}"""
+<v next>{next}
+
+"""
     return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
-        SRT_FORMAT.format(
+        VTT_FORMAT.format(
             index=index+1,
             start=_vtt_time(subtitle1.start),
             end=_vtt_time(subtitle1.end if subtitle1.end != time() else subtitle2.start),
-            text=VTT_FORMAT.format(active=subtitle1.text, next=subtitle2.text),
+            format=" line:1" if subtitle1.top or subtitle2.top else "",
+            active=subtitle1.text,
+            next=subtitle2.text,
         )
         for index, (subtitle1, subtitle2) in enumerate(pairwise(subtitles, fillvalue=Subtitle()))
     )
