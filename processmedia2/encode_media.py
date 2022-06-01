@@ -75,7 +75,7 @@ class Encoder(object):
     """
     """
 
-    def __init__(self, meta_manager=None, heartbeat_file=None, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+    def __init__(self, meta_manager: MetaManagerExtended=None, heartbeat_file=None, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
         self.external_tools = ProcessMediaFilesWithExternalTools(
             **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_imagemagick_convert') and v}
