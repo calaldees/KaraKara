@@ -25,6 +25,8 @@ export const Video = ({state, track, ...kwargs}) => (
     <video
         autoPlay={true}
         poster={attachment_path(state.root, track.attachments.image[0])}
+        // ensure the video element gets re-created when <source> changes
+        key={track.id}
         {...kwargs}
     >
         {track.attachments.video.map(a =>
