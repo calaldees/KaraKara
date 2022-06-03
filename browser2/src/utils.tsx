@@ -78,7 +78,7 @@ export function is_logged_in(state: State): boolean {
 
 export function is_my_song(state: State, item?: QueueItem): boolean {
     return (
-        item?.session_owner == state.session_id ||
-        item?.performer_name == state.performer_name
+        item?.session_owner === state.session_id ||
+        item?.performer_name === state.performer_name
     );
 }
