@@ -34,9 +34,6 @@ function track_info(state: State, track: Track): string {
         .map(x => track.tags[x].join(", "))
     );
     let info = info_data.join(" - ");
-    if(track.tags['vocaltrack'][0] == "off") {
-        info += " (Instrumental)"
-    }
     return info;
 }
 
@@ -47,7 +44,10 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
     <li class={"track_item"} onclick={SelectTrack(track.id)}>
         <Thumb state={state} track={track} />
         <span class={"text track_info"}>
-            <span class={"title"}>{track.tags.title[0]}</span>
+            <span class={"title"}>
+                {track.tags.title[0]}
+                {track.tags['vocaltrack'][0] == "off" && "(Instrumental)"}
+            </span>
             <br />
             <span class={"info"}>
                 {track_info(state, track)}
