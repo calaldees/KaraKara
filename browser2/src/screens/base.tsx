@@ -45,9 +45,8 @@ export function PriorityToken({ state }: { state: State }): VNode | null {
 
 function isMySong(state: State, n: number): boolean {
     return (
-        state.queue.length > n &&
-        (state.queue[n].session_owner == state.session_id ||
-            state.queue[n].performer_name == state.performer_name)
+        state.queue[n]?.session_owner == state.session_id ||
+        state.queue[n]?.performer_name == state.performer_name
     );
 }
 
