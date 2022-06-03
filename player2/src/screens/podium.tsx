@@ -23,10 +23,6 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>
 
-        {/*
-        Give the video key=playing so that it creates a new
-        object when switching from preview to play
-         */}
         <div class="preview_holder">
             <Video
                 state={state}
@@ -35,7 +31,6 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                 onended={state.playing ? Dequeue : Stop}
                 autoPlay={true}
                 muted={true}
-                key={state.playing}
             />
         </div>
 
