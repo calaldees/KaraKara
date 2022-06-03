@@ -121,9 +121,7 @@ export const TrackDetails = ({
         {track.lyrics && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {track.lyrics.split("\n").map((item) => (
-                    <div>{item.replace(/^\{.*?\}/, "")}</div>
-                ))}
+                {track.lyrics.split("\n").map(item => <div>{item}</div>)}
             </div>
         )}
     </Screen>

@@ -62,11 +62,9 @@ export const Queue = ({ state }: { state: State }): VNode => (
                     {state.track_list[state.queue[0].track_id].lyrics && (
                         <li>
                             <span class={"lyrics"}>
-                                {state.track_list[state.queue[0].track_id].lyrics.split("\n").map((line) => (
-                                    <div>
-                                        {line.replace(/^\{.*?\}/, "")}
-                                    </div>
-                                ))}
+                                {state.track_list[state.queue[0].track_id].lyrics.split("\n").map(line =>
+                                    <div>{line}</div>
+                                )}
                             </span>
                         </li>
                     )}
