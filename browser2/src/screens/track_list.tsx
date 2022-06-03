@@ -46,7 +46,7 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
         <span class={"text track_info"}>
             <span class={"title"}>
                 {track.tags.title[0]}
-                {track.tags['vocaltrack'][0] == "off" && "(Instrumental)"}
+                {track.tags['vocaltrack'][0] == "off" && " (Instrumental)"}
             </span>
             <br />
             <span class={"info"}>
