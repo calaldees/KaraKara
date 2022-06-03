@@ -38,8 +38,8 @@ export function attachment_path(root: string, attachment: Attachment): string {
 export function mqtt_login_info(state: State): Dictionary<string> {
     return {
         url: state.root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt",
-        username: state.room_password ? "kk-admin" : "kk-user", // state.room_name,
-        password: state.room_password ? "kk-admin" : "kk-user",
+        username: state.room_name,
+        password: state.room_password,
     };
 }
 
