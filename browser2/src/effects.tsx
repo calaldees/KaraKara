@@ -270,7 +270,7 @@ export function AutoLogin() {
 export const SaveSettings = (state: State): Dispatchable => [
     { ...state },
     ApiRequest({
-        title: "Saving setting...",
+        title: "Saving settings...",
         function: "settings",
         state: state,
         options: {

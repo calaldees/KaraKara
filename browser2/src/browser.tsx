@@ -66,7 +66,9 @@ let state: State = {
     bookmarks: [],
 
     // settings
-    settings: {},
+    settings: {
+        "karakara.template.input.performer_name": "Enter Name",
+    },
 
     // priority_tokens
     priority_tokens: [],
