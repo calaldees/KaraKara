@@ -3,7 +3,7 @@
  */
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { http2ws, flatten_settings, is_logged_in } from "./utils";
+import { mqtt_login_info, flatten_settings, is_logged_in } from "./utils";
 
 // get article
 function _get_article() {
@@ -201,9 +201,7 @@ export function ApiRequest(props): Effect {
 export function SendCommand(state: State, command: string): Effect {
     console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
-        url: http2ws(state.root) + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });

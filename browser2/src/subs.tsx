@@ -2,16 +2,14 @@
  * Subscriptions: functions which take data from the outside world
  */
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
-import { http2ws } from "./utils";
+import { mqtt_login_info } from "./utils";
 
 /**
  * Connect to the MQTT server, listen for updates to queue / settings
  */
 export function getMQTTListener(state: State): Subscription {
     return MQTTSubscribe({
-        url: http2ws(state.root) + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/#",
         error(state: State, err): State {
             console.log(

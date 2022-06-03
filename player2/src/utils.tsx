@@ -33,10 +33,14 @@ export function attachment_path(root: string, attachment: Attachment): string {
 }
 
 /**
- * Looking at the data URL, figure out the websocket URL
+ * Get the URL, username, and password to be passed to MQTTSubscribe or MQTTPublish
  */
-export function http2ws(str: string) {
-    return str.replace("https://", "wss://").replace("http://", "ws://");
+export function mqtt_login_info(state: State): Dictionary<string> {
+    return {
+        url: state.root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt",
+        username: state.room_password ? "kk-admin" : "kk-user", // state.room_name,
+        password: state.room_password ? "kk-admin" : "kk-user",
+    };
 }
 
 /**

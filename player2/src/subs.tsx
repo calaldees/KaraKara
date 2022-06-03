@@ -11,7 +11,7 @@ import {
 import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
-import { attachment_path, http2ws } from "./utils";
+import { attachment_path, mqtt_login_info } from "./utils";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -25,9 +25,7 @@ export function getOpenMQTTListener(
     }
 
     return MQTTSubscribe({
-        url: http2ws(state.root) + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/#",
         connect(state: State): Dispatchable {
             return { ...state, connected: true };

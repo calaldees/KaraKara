@@ -4,7 +4,7 @@
  * later, after we get a response.
  */
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
-import { http2ws } from "./utils";
+import { mqtt_login_info } from "./utils";
 
 function apiRequestEffect(dispatch, props) {
     dispatch((state) => ({
@@ -132,9 +132,7 @@ export function ApiRequest(props): Effect {
 export function SendCommand(state: State, command: string): Effect {
     console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
-        url: http2ws(state.root) + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });
