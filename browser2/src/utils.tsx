@@ -75,3 +75,10 @@ export function short_date(long_date: string): string {
 export function is_logged_in(state: State): boolean {
     return (state.room_name !== "" && Object.keys(state.track_list).length > 0);
 }
+
+export function is_my_song(state: State, item?: QueueItem): boolean {
+    return (
+        item?.session_owner == state.session_id ||
+        item?.performer_name == state.performer_name
+    );
+}

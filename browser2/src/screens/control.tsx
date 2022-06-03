@@ -124,16 +124,10 @@ function moveTrack(
     ];
 }
 
-const Playlist = ({
-    state,
-    items,
-}: {
-    state: State;
-    items: Array<QueueItem>;
-}): VNode => (
+const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
     <section>
         <ul ondragleave={createDragLeave()}>
-            {items.map((item) => (
+            {queue.map((item) => (
                 <QueueItemRender state={state} item={item} />
             ))}
             {state.drop_source && (
@@ -153,13 +147,7 @@ const Playlist = ({
     </section>
 );
 
-const QueueItemRender = ({
-    state,
-    item,
-}: {
-    state: State;
-    item: QueueItem;
-}): VNode => (
+const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
     <li
         class={{
             queue_item: true,
@@ -205,7 +193,7 @@ const QueueItemRender = ({
 
 const ControlButton = ({ command, style }: { command: string, style: string }): VNode => (
     <button onclick={Command(command)}>
-        <i class={"fas fa-"+style} />
+        <i class={"fas fa-" + style} />
     </button>
 );
 const ControlButtons = (): VNode => (
@@ -235,20 +223,20 @@ export const Control = ({ state }: { state: State }): VNode => (
                 <h1>READ ME :)</h1>
                 <ol>
                     <li>Please use hand sanitiser, a lot of different people
-                    are going to use this laptop and the microphones :)</li>
+                        are going to use this laptop and the microphones :)</li>
                     <li>To avoid feedback loops, don't hold the microphone
-                    directly in front of the speaker!</li>
+                        directly in front of the speaker!</li>
                     <li>This admin laptop can drag &amp; drop to rearrange
-                    tracks in the queue</li>
+                        tracks in the queue</li>
                     <li>Either use your phone (open <b>{state.root}</b> and
-                    enter room <b>{state.room_name}</b>) or use the menu on the
-                    right to queue up tracks.</li>
+                        enter room <b>{state.room_name}</b>) or use the menu on the
+                        right to queue up tracks.</li>
                     <li>Push the play button (<i class={"fas fa-play"} />) down
-                    below when you're ready to start singing.</li>
+                        below when you're ready to start singing.</li>
                 </ol>
             </div>
         ) : (
-            <Playlist state={state} items={state.queue} />
+            <Playlist state={state} queue={state.queue} />
         )}
     </Screen>
 );

@@ -1,21 +1,14 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./base";
-import { shuffle } from "../utils";
+import { shuffle, is_my_song } from "../utils";
 import { RemoveTrack } from "../actions";
 
-const QueueItemRender = ({
-    state,
-    item,
-}: {
-    state: State;
-    item: QueueItem;
-}): VNode => (
+const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
     <li
-        class={
-            state.session_id == item.session_owner
-                ? "queue_item me"
-                : "queue_item"
-        }
+        class={{
+            queue_item: true,
+            me: is_my_song(state, item)
+        }}
     >
         <Thumb state={state} track={state.track_list[item.track_id]} />
         <span class={"text queue_info"}>
@@ -49,20 +42,26 @@ export const Queue = ({ state }: { state: State }): VNode => (
         className={"queue"}
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Now Playing"}
-        // navRight={}
+    // navRight={}
     >
+        <Playlist state={state} queue={state.queue} />
+    </Screen>
+);
+
+const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
+    <div>
         {/* No items */}
-        {state.queue.length == 0 && <h2>Queue Empty</h2>}
+        {queue.length == 0 && <h2>Queue Empty</h2>}
 
         {/* At least one item */}
-        {state.queue.length > 0 && (
+        {queue.length > 0 && (
             <div>
                 <ul>
-                    <QueueItemRender state={state} item={state.queue[0]} />
-                    {state.track_list[state.queue[0].track_id].lyrics && (
+                    <QueueItemRender state={state} item={queue[0]} />
+                    {state.track_list[queue[0].track_id].lyrics && (
                         <li>
                             <span class={"lyrics"}>
-                                {state.track_list[state.queue[0].track_id].lyrics.split("\n").map(line =>
+                                {state.track_list[queue[0].track_id].lyrics.split("\n").map(line =>
                                     <div>{line}</div>
                                 )}
                             </span>
@@ -73,11 +72,11 @@ export const Queue = ({ state }: { state: State }): VNode => (
         )}
 
         {/* Some items */}
-        {state.queue.length > 1 && (
+        {queue.length > 1 && (
             <section>
                 <h2>Coming Soon</h2>
                 <ul>
-                    {state.queue.slice(1, 6).map((item) => (
+                    {queue.slice(1, 6).map((item) => (
                         <QueueItemRender state={state} item={item} />
                     ))}
                 </ul>
@@ -85,15 +84,15 @@ export const Queue = ({ state }: { state: State }): VNode => (
         )}
 
         {/* Many items */}
-        {state.queue.length > 6 && (
+        {queue.length > 6 && (
             <section>
                 <h2>Coming Later</h2>
                 <div class={"coming_later"}>
-                    {shuffle(state.queue.slice(6)).map((item) => (
+                    {shuffle(queue.slice(6)).map((item) => (
                         <span>{item.performer_name}</span>
                     ))}
                 </div>
             </section>
         )}
-    </Screen>
+    </div>
 );
