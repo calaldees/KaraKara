@@ -386,19 +386,8 @@ function show_bookmarks(state: State) {
 }
 
 function back(state: State): Dispatchable {
-    var effect;
-    if (state.filters.length > 0) {
-        state.filters.pop();
-        effect = PopScrollPos();
-    } else {
-        // if we're at the start of the exploring process and
-        // go back, go to the login screen
-        state.room_name = "";
-        state.queue = [];
-        state.track_list = {};
-        effect = ClearScrollPos();
-    }
-    return [{ ...state }, effect];
+    state.filters.pop();
+    return [{ ...state }, PopScrollPos()];
 }
 
 const GoToPriorityTokens = (state: State): Dispatchable => [
