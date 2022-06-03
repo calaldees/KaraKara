@@ -6,7 +6,6 @@ import {
     SeekBackwards,
     SeekForwards,
     Stop,
-    UpdateQueue,
 } from "./actions";
 import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
@@ -80,7 +79,23 @@ export function getOpenMQTTListener(
                         },
                     };
                 case "queue":
-                    return UpdateQueue(state, JSON.parse(data));
+                    const new_queue = JSON.parse(data).filter(track => state.track_list.hasOwnProperty(track.id));
+                    // if the first song in the queue has changed, stop playing
+                    if (
+                        state.queue.length === 0 ||
+                        new_queue.length === 0 ||
+                        state.queue[0].id !== new_queue[0].id
+                    ) {
+                        return {
+                            ...state,
+                            queue: new_queue,
+                            playing: false,
+                            paused: false,
+                            progress: 0,
+                        };
+                    } else {
+                        return { ...state, queue: new_queue };
+                    }
                 default:
                     return state;
             }

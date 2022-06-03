@@ -73,49 +73,6 @@ export function SeekBackwards(state: State, value: number | null): Dispatchable 
 }
 
 // Playlist controls
-export function UpdateQueue(state: State, new_queue: Array<QueueItem>): Dispatchable {
-    // still waiting for the queue to return the new format, hard-coding for now
-    new_queue = [
-        {
-            id: 1,
-            track_id: "Metal_Gear_Rising_Revengeance_The_Only_Thing_I_Know_For_Real",
-            performer_name: "testo",
-            total_duration: 123,
-            session_owner: "12345",
-        },
-        {
-            id: 2,
-            track_id: "Plants_vs_Zombies_ED_Zombies_on_Your_Lawn",
-            performer_name: "alice",
-            total_duration: 123,
-            session_owner: "12345",
-        },
-        {
-            id: 3,
-            track_id: "Yakuza_0_insert_song_24_Hour_Cinderella",
-            performer_name: "bob",
-            total_duration: 123,
-            session_owner: "12345",
-        },
-    ];
-    // if the first song in the queue has changed, stop playing
-    if (
-        state.queue.length === 0 ||
-        new_queue.length === 0 ||
-        state.queue[0].id !== new_queue[0].id
-    ) {
-        return {
-            ...state,
-            queue: new_queue,
-            playing: false,
-            paused: false,
-            progress: 0,
-        };
-    } else {
-        return { ...state, queue: new_queue };
-    }
-}
-
 function _dequeue(state: State): State {
     return {
         ...state,

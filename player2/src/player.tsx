@@ -71,7 +71,7 @@ const subscriptions = (state: State) => [
         state,
     ),
     KeyboardListener,
-    getOpenMQTTListener(state),
+    Object.keys(state.track_list).length > 0 && getOpenMQTTListener(state),
     state.audio_allowed &&
     !state.paused &&
     !state.playing &&
