@@ -36,7 +36,7 @@ def export_track_data(**kwargs):
 
             # Abort if duration not known
             if not m.source_details.get('duration'):
-                log.warning('Missing (duration) abort import: {name}')
+                log.warning(f'Missing (duration) abort import: {name}')
                 stats['missing_processed_aborted'].add(name)  # TODO: rename
                 continue
 
@@ -50,7 +50,7 @@ def export_track_data(**kwargs):
                 if PENDING_ACTION['encode'] not in m.pending_actions:  # Feels clunky to manage this as a list? maybe a set?
                     m.pending_actions.append(PENDING_ACTION['encode'])
                     #meta_manager.save(name)  # Feels clunky
-                log.warning('Missing (processed files) abort import: {name}')
+                log.warning(f'Missing (processed files) abort import: {name}')
                 stats['missing_processed_aborted'].add(name)
                 continue
 
