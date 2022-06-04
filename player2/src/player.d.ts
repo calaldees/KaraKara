@@ -22,7 +22,7 @@ type Track = {
         image: Array<Attachment>,
         subtitle?: Array<Attachment>,
     },
-    lyrics: String,
+    lyrics: Array<string>,
 }
 
 type QueueItem = {

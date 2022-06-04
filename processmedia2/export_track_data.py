@@ -69,10 +69,10 @@ def export_track_data(**kwargs):
                 source_file_sub = m.source_files.get('sub')
                 if not source_file_sub or not source_file_sub.file.is_file():
                     log.debug(f'{source_file_sub=} missing - unable to import srt')
-                    return
+                    return []
                 with source_file_sub.file.open('rt') as filehandle:
                     subtitles = parse_subtitles(filehandle=filehandle)
-                return '\n'.join(subtitle.text for subtitle in subtitles)
+                return [subtitle.text for subtitle in subtitles]
 
             def _get_tags():
                 source_file_tag = m.source_files.get('tag')

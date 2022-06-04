@@ -118,10 +118,10 @@ export const TrackDetails = ({
         </div>
 
         {/* Lyrics */}
-        {track.lyrics && (
+        {track.lyrics.length && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {track.lyrics.split("\n").map(item => <div>{item}</div>)}
+                {track.lyrics.map(item => <div>{item}</div>)}
             </div>
         )}
     </Screen>
