@@ -1,12 +1,12 @@
 from types import MappingProxyType
 
 EXTS = MappingProxyType(dict(
-    video=('rm', 'mpg', 'avi', 'mkv', 'ogm', 'mp4', 'webm'),
-    audio=('mp2', 'mp3', 'ogg', 'flac'),
-    image=('jpg', 'png', 'avif', 'bmp', 'jp2', 'webp'),
-    sub=('ssa', 'srt'),
-    data=('yml', 'yaml'),
-    tag=('txt', )
+    video=['rm', 'mpg', 'avi', 'mkv', 'ogm', 'mp4', 'webm'],
+    audio=['mp2', 'mp3', 'ogg', 'flac'],
+    image=['jpg', 'png', 'avif', 'bmp', 'jp2', 'webp'],
+    sub=['ssa', 'srt'],
+    data=['yml', 'yaml'],
+    tag=['txt', ]
 ))
 ALL_EXTS = tuple(j for i in EXTS.values() for j in i)
 

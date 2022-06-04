@@ -1,10 +1,6 @@
-import re
 import os.path
 
 import yaml
-
-from calaldees.data import duplicates
-from calaldees.files.exts import file_extension_regex
 
 from . import EXTS
 
