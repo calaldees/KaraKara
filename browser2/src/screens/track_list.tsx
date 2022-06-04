@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen, Thumb } from "./base";
+import { Screen, Thumb } from "./_common";
 import {
     ClearScrollPos,
     ApiRequest,

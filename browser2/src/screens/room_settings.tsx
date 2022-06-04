@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { BackToExplore, Screen } from "./base";
+import { BackToExplore, Screen } from "./_common";
 import { SaveSettings } from "../effects";
 import { UpdateSettings } from "../actions";
 

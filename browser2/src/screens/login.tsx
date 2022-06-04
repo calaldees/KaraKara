@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { Screen } from "./_common";
 import { TryLogin } from "../actions";
 
 function percent(a: number, b: number): string {

@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen, BackToExplore, Thumb } from "./base";
+import { Screen, BackToExplore, Thumb } from "./_common";
 import { shuffle, is_my_song } from "../utils";
 import { RemoveTrack } from "../actions";
 

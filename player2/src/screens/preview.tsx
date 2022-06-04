@@ -4,7 +4,7 @@ import {
     timedelta_str,
     short_date,
 } from "../utils";
-import { AutoplayCountdown, Video } from "./common";
+import { AutoplayCountdown, Video } from "./_common";
 import { SetPreviewVolume } from "../actions";
 
 const show_tracks = 5;

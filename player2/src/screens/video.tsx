@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Video } from "./common"
+import { Video } from "./_common"
 import { MarkTrackPlayed, UpdateProgress } from "../actions";
 
 export const VideoScreen = ({ state }: { state: State }): VNode => (

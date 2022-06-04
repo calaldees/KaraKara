@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
+import { Screen } from "./_common";
 import { attachment_path } from "../utils";
 import {
     GoToScreen,

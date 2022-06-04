@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { s_to_mns } from "../utils";
-import { AutoplayCountdown, Video } from "./common";
+import { AutoplayCountdown, Video } from "./_common";
 import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
 import { SendCommand } from "../effects";
 
