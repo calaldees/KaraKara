@@ -164,7 +164,7 @@ function track_list_to_images(state: State, raw_list: Dictionary<Track>): Array<
         .map((image, n) => ({
             filename: attachment_path(state.root, image),
             x: n / num,
-            delay: Math.random() * 10,
+            delay: ((n % 5) + Math.random()) * 2,
         }));
 }
 
