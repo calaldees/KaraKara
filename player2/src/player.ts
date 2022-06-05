@@ -1,7 +1,6 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
-import { SurviveHMR } from "@shish2k/hyperapp-survive-hmr";
 
 import { Root } from "./screens/root";
 import {
@@ -81,7 +80,7 @@ const subscriptions = (state: State) => [
 ];
 
 app({
-    init: [state, SurviveHMR(module, [])],
+    init: [state],
     view: Root,
     subscriptions: subscriptions,
     node: document.body,

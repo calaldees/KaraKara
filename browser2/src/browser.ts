@@ -2,7 +2,6 @@
 import Cookies from 'js-cookie'
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
-import { SurviveHMR } from "@shish2k/hyperapp-survive-hmr";
 import {
     LocalStorageLoader,
     LocalStorageSaver,
@@ -130,9 +129,7 @@ app({
             ...state,
             bookmarks: x,
         })),
-        SurviveHMR(module, [
-            AutoLogin(),
-        ]),
+        AutoLogin(),
     ],
     view: Root,
     subscriptions: subscriptions,
