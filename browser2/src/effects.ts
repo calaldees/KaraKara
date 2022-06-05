@@ -3,7 +3,7 @@
  */
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { mqtt_login_info, flatten_settings, is_logged_in } from "./utils";
+import { mqtt_login_info, flatten_settings } from "./utils";
 
 // get article
 function _get_article() {
@@ -243,13 +243,13 @@ export const LoginThenFetchTrackList = (state: State): Effect =>
             }),
         },
         action: (state, response) =>
-            response.status == "ok" ? [state, FetchTrackList(state)] : state,
+            response.status == "ok" ?
+                [{...state, is_admin: true}, FetchTrackList(state)] :
+                {...state, is_admin: false},
     });
 
 function _autoLoginEffect(dispatch, props) {
     dispatch(function(state: State) {
-        // HMR already loaded our data for us
-        if(is_logged_in(state)) return state;
         // No room name was set, so prompt the user
         if(state.room_name === "") return state;
         // console.log("Autologin", state.room_name);

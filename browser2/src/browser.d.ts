@@ -85,6 +85,7 @@ type State = {
     room_password: string,
     room_password_edit: string,
     loading: boolean,
+    is_admin: boolean,
 
     // track list
     track_list: Dictionary<Track>,

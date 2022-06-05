@@ -448,7 +448,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
             )
         }
         footer={
-            state.room_password &&
+            state.is_admin &&
             !state.booth && <AdminButtons state={state} />
         }
     >

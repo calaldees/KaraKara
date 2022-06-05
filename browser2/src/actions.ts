@@ -51,16 +51,19 @@ export const SelectTrack =
 
 export const TryLogin =
     (): Action =>
-    (state: State): Dispatchable =>
-        [
-            {
-                ...state,
-                room_name: state.room_name_edit.toLowerCase().trim(),
-            },
+    function(state: State, event: SubmitEvent): Dispatchable {
+        event.preventDefault();
+        let new_state = {
+            ...state,
+            room_name: state.room_name_edit.toLowerCase().trim(),
+        };
+        return [
+            new_state,
             state.room_password
-                ? LoginThenFetchTrackList(state)
-                : FetchTrackList(state),
+                ? LoginThenFetchTrackList(new_state)
+                : FetchTrackList(new_state),
         ];
+    }
 
 /*
  * User inputs
