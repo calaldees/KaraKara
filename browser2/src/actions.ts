@@ -41,13 +41,6 @@ export const ShowSettings =
         show_settings: true,
     });
 
-export const HideSettings =
-    (): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        show_settings: false,
-    });
-
 export const SelectTrack =
     (track_id: string | null): Action =>
     (state: State): Dispatchable =>
@@ -60,7 +53,10 @@ export const TryLogin =
     (): Action =>
     (state: State): Dispatchable =>
         [
-            state,
+            {
+                ...state,
+                room_name: state.room_name_edit.toLowerCase().trim(),
+            },
             state.room_password
                 ? LoginThenFetchTrackList(state)
                 : FetchTrackList(state),

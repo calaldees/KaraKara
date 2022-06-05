@@ -13,15 +13,15 @@ export const Login = ({ state }: { state: State }): VNode => (
                 <input
                     type={"text"}
                     placeholder={"Room Name"}
-                    value={state.room_name}
+                    value={state.room_name_edit}
                     oninput={(state, event) => ({
                         ...state,
-                        room_name: event.target.value.toLowerCase().trim(),
+                        room_name_edit: event.target.value,
                     })}
                     disabled={state.loading}
                     required={true}
                 />
-                <button disabled={!state.room_name || state.loading}>
+                <button disabled={!state.room_name_edit.trim() || state.loading}>
                     {state.loading ? (
                         <span>
                             Loading Tracks{" "}

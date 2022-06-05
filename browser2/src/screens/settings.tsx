@@ -1,5 +1,4 @@
 import h from "hyperapp-jsx-pragma";
-import { HideSettings } from "../actions";
 
 export const SettingsMenu = ({ state }: { state: State }): VNode => (
     <div class={"settings"}>
@@ -13,7 +12,16 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
             >
                 Settings
             </h2>
-            <form onsubmit={HideSettings()}>
+            <form onsubmit={function(state, event) {
+                event.preventDefault();
+                return {
+                    ...state,
+                    show_settings: false,
+                    root: state.root_edit,
+                    room_name: state.room_name_edit,
+                    room_password: state.room_password_edit,
+                };
+            }}>
                 <table>
                     <tr>
                         <td>Server</td>
@@ -27,8 +35,20 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                                     root_edit: event.target.value,
                                 } as State)
                                 }
-                                onchange={(state: State, event: FormInputEvent) =>
-                                    ({ ...state, root: state.root_edit } as State)
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Room</td>
+                        <td>
+                            <input
+                                value={state.room_name_edit}
+                                type={"text"}
+                                oninput={(state: State, event: FormInputEvent) =>
+                                ({
+                                    ...state,
+                                    room_name_edit: event.target.value,
+                                } as State)
                                 }
                             />
                         </td>
@@ -43,12 +63,6 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                                 ({
                                     ...state,
                                     room_password_edit: event.target.value,
-                                } as State)
-                                }
-                                onchange={(state: State, event: FormInputEvent) =>
-                                ({
-                                    ...state,
-                                    room_password: state.room_password_edit,
                                 } as State)
                                 }
                             />

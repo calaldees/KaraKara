@@ -41,6 +41,7 @@ let state: State = {
     // login
     session_id: null,
     room_name: "",
+    room_name_edit: "",
     room_password: "",
     room_password_edit: "",
     loading: false,
@@ -95,7 +96,7 @@ const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
         {
             push: ["root", "filters", "track_id", "room_name"],
-            replace: ["search", "booth", "widescreen"],
+            replace: ["search", "booth", "widescreen", "room_name_edit"],
         },
         state,
     ),
