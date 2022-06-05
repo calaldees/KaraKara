@@ -53,7 +53,7 @@ type State = {
     // global temporary
     show_settings: boolean,
     connected: boolean,
-    fullscreen: false,
+    fullscreen: boolean,
     audio_allowed: boolean,
     settings: Dictionary<any>,
 

@@ -4,7 +4,7 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
     <div class={"settings"}>
         <div>
             <h2
-                onclick={function (state) {
+                onclick={function (state: State): State {
                     console.log(state);
                     (window as any).state = state;
                     return state;
@@ -12,13 +12,13 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
             >
                 Settings
             </h2>
-            <form onsubmit={function(state, event) {
+            <form onsubmit={function (state: State, event: SubmitEvent): State {
                 event.preventDefault();
                 return {
                     ...state,
                     show_settings: false,
                     root: state.root_edit,
-                    room_name: state.room_name_edit,
+                    room_name: state.room_name_edit.toLowerCase().trim(),
                     room_password: state.room_password_edit,
                 };
             }}>
@@ -29,12 +29,10 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             <input
                                 value={state.root_edit}
                                 type={"text"}
-                                oninput={(state: State, event: FormInputEvent) =>
-                                ({
+                                oninput={(state: State, event: FormInputEvent): State => ({
                                     ...state,
                                     root_edit: event.target.value,
-                                } as State)
-                                }
+                                })}
                             />
                         </td>
                     </tr>
@@ -44,12 +42,10 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             <input
                                 value={state.room_name_edit}
                                 type={"text"}
-                                oninput={(state: State, event: FormInputEvent) =>
-                                ({
+                                oninput={(state: State, event: FormInputEvent): State => ({
                                     ...state,
                                     room_name_edit: event.target.value,
-                                } as State)
-                                }
+                                })}
                             />
                         </td>
                     </tr>
@@ -59,12 +55,10 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             <input
                                 value={state.room_password_edit}
                                 type={"password"}
-                                oninput={(state: State, event: FormInputEvent) =>
-                                ({
+                                oninput={(state: State, event: FormInputEvent) => ({
                                     ...state,
                                     room_password_edit: event.target.value,
-                                } as State)
-                                }
+                                })}
                             />
                         </td>
                     </tr>
@@ -74,12 +68,10 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             <input
                                 checked={state.booth}
                                 type={"checkbox"}
-                                onchange={(state: State, event: FormInputEvent) =>
-                                ({
+                                onchange={(state: State, event: FormInputEvent): State => ({
                                     ...state,
                                     booth: !state.booth,
-                                } as State)
-                                }
+                                })}
                             />
                         </td>
                     </tr>

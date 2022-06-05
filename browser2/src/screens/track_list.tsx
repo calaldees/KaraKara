@@ -24,14 +24,14 @@ function track_info(state: State, track: Track): string {
     let search_from = state.filters.filter(x => x.startsWith("from:")).map(x => x.replace("from:", ""));
     let info_data = (
         info_tags
-        // Ignore undefined tags
-        .filter(x => track.tags[x])
-        // We always display track title, so ignore any tags which duplicate that
-        .filter(x => track.tags[x][0] != track.tags["title"][0])
-        // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
-        .filter(x => x != "from" || !search_from.includes(track.tags[x][0]))
-        // Format a list of tags
-        .map(x => track.tags[x].join(", "))
+            // Ignore undefined tags
+            .filter(x => track.tags[x])
+            // We always display track title, so ignore any tags which duplicate that
+            .filter(x => track.tags[x][0] != track.tags["title"][0])
+            // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
+            .filter(x => x != "from" || !search_from.includes(track.tags[x][0]))
+            // Format a list of tags
+            .map(x => track.tags[x].join(", "))
     );
     let info = info_data.join(" - ");
     return info;
@@ -398,17 +398,17 @@ const GoToPriorityTokens = (state: State): Dispatchable => [
         action: (state, response): Dispatchable =>
             response.status == "ok"
                 ? [
-                      {
-                          ...state,
-                          screen: "priority_tokens",
-                          priority_tokens: response.data.priority_tokens,
-                      },
-                      PushScrollPos(),
-                  ]
+                    {
+                        ...state,
+                        screen: "priority_tokens",
+                        priority_tokens: response.data.priority_tokens,
+                    },
+                    PushScrollPos(),
+                ]
                 : {
-                      ...state,
-                      priority_tokens: [],
-                  },
+                    ...state,
+                    priority_tokens: [],
+                },
     }),
 ];
 
@@ -458,12 +458,10 @@ export const TrackList = ({ state }: { state: State }): VNode => (
             type={"text"}
             placeholder={"Add search keywords"}
             value={state.search}
-            oninput={(state: State, event: FormInputEvent) =>
-                ({
-                    ...state,
-                    search: event.target.value,
-                } as State)
-            }
+            oninput={(state: State, event: FormInputEvent): Dispatchable => ({
+                ...state,
+                search: event.target.value,
+            })}
         />
 
         {/* List active filters */}
@@ -471,7 +469,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
             {state.filters.map((filter) => (
                 <a
                     class={"active_filter"}
-                    onclick={(state) => [
+                    onclick={(state: State): Dispatchable => [
                         {
                             ...state,
                             expanded: null,
