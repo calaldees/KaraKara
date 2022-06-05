@@ -8,6 +8,7 @@ import {
 
 import { Root } from "./screens/root";
 import {
+    BeLoggedIn,
     getOpenMQTTListener,
     IntervalListener,
     KeyboardListener,
@@ -91,6 +92,7 @@ const subscriptions = (state: State) => [
     state.settings["karakara.player.autoplay.seconds"] !== 0 &&
     IntervalListener,
     FetchTrackList(state.room_name),
+    BeLoggedIn(state.room_name, state.room_password),
 ];
 
 app({

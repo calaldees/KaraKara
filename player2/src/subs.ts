@@ -207,3 +207,42 @@ function _ftlSubscriber(dispatch, props) {
 export function FetchTrackList(room_name: string): Subscription {
     return [_ftlSubscriber, { room: room_name }];
 }
+
+function _bleSubscriber(dispatch, props) {
+    // subscription is restarted whenever props changes,
+    if (props.room_name && props.room_password) {
+        setTimeout(function () {
+            dispatch((state) => [
+                state,
+                ApiRequest({
+                    function: "admin",
+                    state: state,
+                    options: {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({
+                            password: state.room_password,
+                            fixme: "true",
+                        }),
+                    },
+                    action: (state, response) => ({...state, is_admin: response.status == "ok"}),
+                })
+            ]);
+        }, 0);
+    }
+    else {
+        setTimeout(function () {
+            dispatch((state) => ({...state, is_admin: false}));
+        }, 0);
+    }
+
+    return function () {
+        // no unsubscribe
+    };
+}
+
+export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+    return [_bleSubscriber, { room_name, room_password }];
+}
