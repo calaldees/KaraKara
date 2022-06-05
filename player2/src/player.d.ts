@@ -33,12 +33,6 @@ type QueueItem = {
     session_owner: string,
 }
 
-type WaterfallImage = {
-    filename: string,
-    delay: number,
-    x: number,
-}
-
 type State = {
     // global persistent
     root: string,
@@ -49,6 +43,7 @@ type State = {
     room_password_edit: string,
     podium: boolean,
     track_list: Dictionary<Track>,
+    is_admin: boolean,
 
     // global temporary
     show_settings: boolean,
@@ -60,9 +55,6 @@ type State = {
     // loading screen
     download_size: number | null,
     download_done: number,
-
-    // title screen
-    images: Array<WaterfallImage>,
 
     // playlist screen
     queue: Array<QueueItem>,

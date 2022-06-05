@@ -14,7 +14,6 @@ import {
     KeyboardListener,
 } from "./subs";
 import { ApiRequest } from "./effects";
-import { attachment_path } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -34,6 +33,7 @@ const state: State = {
     room_password_edit: "",
     podium: false,
     track_list: {},
+    is_admin: false,
 
     // global temporary
     show_settings: false,
@@ -55,9 +55,6 @@ const state: State = {
     download_size: null,
     download_done: 0,
 
-    // title screen
-    images: [],
-
     // playlist screen
     queue: [],
 
@@ -77,30 +74,21 @@ const init: Dispatchable = [
     ApiRequest({
         url: `${state.root}/tracks.json`,
         state: state,
-        progress: (state, { done, size }) => [
+        progress: (state, { done, size }): State => (
             {
                 ...state,
                 download_done: done,
                 download_size: size,
-            },
-        ],
-        action: (state, response: Dictionary<Track>) => [
+            }
+        ),
+        action: (state, response: Dictionary<Track>): State => (
             {
                 ...state,
                 track_list: response,
-                images: Object
-                    .values(response)
-                    .slice(0, 25)
-                    .map(track => track.attachments.image[0])
-                    .map((image, n, arr) => ({
-                        filename: attachment_path(state.root, image),
-                        x: n / arr.length,
-                        delay: ((n % 5) + Math.random()) * 2,
-                    })),
                 download_done: 0,
                 download_size: null,
-            },
-        ],
+            }
+        ),
     }),
 ];
 
