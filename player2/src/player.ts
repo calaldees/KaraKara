@@ -1,6 +1,10 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
+import {
+    LocalStorageLoader,
+    LocalStorageSaver,
+} from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
 import {
@@ -69,6 +73,7 @@ const subscriptions = (state: State) => [
         },
         state,
     ),
+    LocalStorageSaver("room_password", state.room_password),
     KeyboardListener,
     Object.keys(state.track_list).length > 0 && getOpenMQTTListener(state),
     state.audio_allowed &&
@@ -80,7 +85,14 @@ const subscriptions = (state: State) => [
 ];
 
 app({
-    init: [state],
+    init: [
+        state,
+        LocalStorageLoader("room_password", (state, x) => ({
+            ...state,
+            room_password_edit: x,
+            room_password: x,
+        })),
+    ],
     view: Root,
     subscriptions: subscriptions,
     node: document.body,
