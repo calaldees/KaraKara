@@ -6,7 +6,6 @@
 import {
     ApiRequest,
     SendCommand,
-    FetchTrackList,
     PushScrollPos,
     PopScrollPos,
 } from "./effects";
@@ -47,20 +46,6 @@ export const SelectTrack =
             { ...state, track_id },
             track_id ? PushScrollPos() : PopScrollPos(),
         ];
-
-export const TryLogin =
-    (): Action =>
-    function(state: State, event: SubmitEvent): Dispatchable {
-        event.preventDefault();
-        let new_state = {
-            ...state,
-            room_name: state.room_name_edit.toLowerCase().trim(),
-        };
-        return [
-            new_state,
-            FetchTrackList(new_state),
-        ];
-    }
 
 /*
  * User inputs

@@ -10,7 +10,7 @@ import {
 import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
-import { attachment_path, mqtt_login_info } from "./utils";
+import { mqtt_login_info } from "./utils";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -152,61 +152,6 @@ export const IntervalListener = Interval({
         }
     },
 });
-
-function track_list_to_images(state: State, raw_list: Dictionary<Track>): Array<WaterfallImage> {
-    // TODO: pick a random 25 tracks (will people even notice if it's
-    // the same 25 every time?)
-    let num = 25;
-    return Object
-        .values(raw_list)
-        .slice(0, num)
-        .map(track => track.attachments.image[0])
-        .map((image, n) => ({
-            filename: attachment_path(state.root, image),
-            x: n / num,
-            delay: ((n % 5) + Math.random()) * 2,
-        }));
-}
-
-function _ftlSubscriber(dispatch, props) {
-    // subscription is restarted whenever props changes,
-    // and props is just {room: state.room_name}
-    if (props.room) {
-        setTimeout(function () {
-            dispatch((state) => [
-                state,
-                ApiRequest({
-                    function: "track_list",
-                    state: state,
-                    progress: (state, { done, size }) => [
-                        {
-                            ...state,
-                            download_done: done,
-                            download_size: size,
-                        },
-                    ],
-                    action: (state, response) => [
-                        {
-                            ...state,
-                            track_list: response,
-                            images: track_list_to_images(state, response),
-                            download_done: 0,
-                            download_size: null,
-                        },
-                    ],
-                })
-            ]);
-        }, 0);
-    }
-
-    return function () {
-        // no unsubscribe
-    };
-}
-
-export function FetchTrackList(room_name: string): Subscription {
-    return [_ftlSubscriber, { room: room_name }];
-}
 
 function _bleSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,

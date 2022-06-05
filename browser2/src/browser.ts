@@ -8,6 +8,7 @@ import {
 
 import { Root } from "./screens/root";
 import { BeLoggedIn, CookieListener, getMQTTListener, ResizeListener } from "./subs";
+import { ApiRequest } from "./effects";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -87,6 +88,25 @@ const init: Dispatchable = [
         ...state,
         bookmarks: x,
     })),
+    ApiRequest({
+        url: `${state.root}/tracks.json`,
+        state: state,
+        progress: (state, { done, size }) => [
+            {
+                ...state,
+                download_done: done,
+                download_size: size,
+            },
+        ],
+        action: (state, response) => [
+            {
+                ...state,
+                track_list: response,
+                download_done: 0,
+                download_size: null,
+            },
+        ],
+    }),
 ];
 
 const subscriptions = (state: State): Array<Subscription> => [

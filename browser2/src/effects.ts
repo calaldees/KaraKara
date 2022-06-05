@@ -207,27 +207,6 @@ export function SendCommand(state: State, command: string): Effect {
     });
 }
 
-export const FetchTrackList = (state: State): Effect =>
-    ApiRequest({
-        function: "track_list",
-        state: state,
-        progress: (state, { done, size }) => [
-            {
-                ...state,
-                download_done: done,
-                download_size: size,
-            },
-        ],
-        action: (state, response) => [
-            {
-                ...state,
-                track_list: response,
-                download_done: 0,
-                download_size: null,
-            },
-        ],
-    });
-
 export const SaveSettings = (state: State): Dispatchable => [
     { ...state },
     ApiRequest({

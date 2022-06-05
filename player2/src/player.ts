@@ -12,8 +12,9 @@ import {
     getOpenMQTTListener,
     IntervalListener,
     KeyboardListener,
-    FetchTrackList,
 } from "./subs";
+import { ApiRequest } from "./effects";
+import { attachment_path } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -73,6 +74,34 @@ const init: Dispatchable = [
         room_password_edit: x,
         room_password: x,
     })),
+    ApiRequest({
+        url: `${state.root}/tracks.json`,
+        state: state,
+        progress: (state, { done, size }) => [
+            {
+                ...state,
+                download_done: done,
+                download_size: size,
+            },
+        ],
+        action: (state, response: Dictionary<Track>) => [
+            {
+                ...state,
+                track_list: response,
+                images: Object
+                    .values(response)
+                    .slice(0, 25)
+                    .map(track => track.attachments.image[0])
+                    .map((image, n, arr) => ({
+                        filename: attachment_path(state.root, image),
+                        x: n / arr.length,
+                        delay: ((n % 5) + Math.random()) * 2,
+                    })),
+                download_done: 0,
+                download_size: null,
+            },
+        ],
+    }),
 ];
 
 const subscriptions = (state: State) => [
@@ -85,13 +114,12 @@ const subscriptions = (state: State) => [
     ),
     LocalStorageSaver("room_password", state.room_password),
     KeyboardListener,
-    Object.keys(state.track_list).length > 0 && getOpenMQTTListener(state),
+    state.room_name && Object.keys(state.track_list).length > 0 && getOpenMQTTListener(state),
     state.audio_allowed &&
     !state.paused &&
     !state.playing &&
     state.settings["karakara.player.autoplay.seconds"] !== 0 &&
     IntervalListener,
-    FetchTrackList(state.room_name),
     BeLoggedIn(state.room_name, state.room_password),
 ];
 
