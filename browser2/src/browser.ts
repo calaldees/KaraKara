@@ -1,5 +1,4 @@
 /// <reference path='./browser.d.ts'/>
-import Cookies from 'js-cookie'
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
 import {
@@ -8,7 +7,7 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
+import { BeLoggedIn, CookieListener, getMQTTListener, ResizeListener } from "./subs";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -73,23 +72,22 @@ let state: State = {
     priority_tokens: [],
 };
 
-function _cookieListener(dispatch, props) {
-    let oldCookieVal: string | null = null;
-    let cookieTimer = setInterval(function() {
-        let cookieVal = Cookies.get(props.name);
-        if(cookieVal != oldCookieVal) {
-            oldCookieVal = cookieVal;
-            console.log(props.name + " has new cookie val: " + cookieVal);
-            dispatch(props.callback, cookieVal);
-        }
-    }, 1000);
-    return function() {
-        clearInterval(cookieTimer);
-    };
-}
-function CookieListener(name, callback) {
-    return [_cookieListener, {name: name, callback: callback}];
-}
+const init: Dispatchable = [
+    state,
+    LocalStorageLoader("performer_name", (state, x) => ({
+        ...state,
+        performer_name: x,
+    })),
+    LocalStorageLoader("room_password", (state, x) => ({
+        ...state,
+        room_password_edit: x,
+        room_password: x,
+    })),
+    LocalStorageLoader("bookmarks", (state, x) => ({
+        ...state,
+        bookmarks: x,
+    })),
+];
 
 const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
@@ -115,22 +113,7 @@ const subscriptions = (state: State): Array<Subscription> => [
 ];
 
 app({
-    init: [
-        state,
-        LocalStorageLoader("performer_name", (state, x) => ({
-            ...state,
-            performer_name: x,
-        })),
-        LocalStorageLoader("room_password", (state, x) => ({
-            ...state,
-            room_password_edit: x,
-            room_password: x,
-        })),
-        LocalStorageLoader("bookmarks", (state, x) => ({
-            ...state,
-            bookmarks: x,
-        })),
-    ],
+    init: init,
     view: Root,
     subscriptions: subscriptions,
     node: document.body,

@@ -65,6 +65,15 @@ const state: State = {
     progress: 0,
 };
 
+const init: Dispatchable = [
+    state,
+    LocalStorageLoader("room_password", (state, x) => ({
+        ...state,
+        room_password_edit: x,
+        room_password: x,
+    })),
+];
+
 const subscriptions = (state: State) => [
     HashStateManager(
         {
@@ -85,14 +94,7 @@ const subscriptions = (state: State) => [
 ];
 
 app({
-    init: [
-        state,
-        LocalStorageLoader("room_password", (state, x) => ({
-            ...state,
-            room_password_edit: x,
-            room_password: x,
-        })),
-    ],
+    init: init,
     view: Root,
     subscriptions: subscriptions,
     node: document.body,
