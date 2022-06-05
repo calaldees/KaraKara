@@ -117,13 +117,7 @@ export function ApiRequest(props): Effect {
         {
             options: {},
             response: "json",
-            url:
-                props.state.root +
-                "/queue/" +
-                (props.state.room_name || props.state.room_name_edit) +
-                "/" +
-                props.function +
-                ".json",
+            url: `${props.state.root}/queue/${props.state.room_name}/${props.function}.json`,
             ...props,
         },
     ];
