@@ -228,43 +228,6 @@ export const FetchTrackList = (state: State): Effect =>
         ],
     });
 
-export const LoginThenFetchTrackList = (state: State): Effect =>
-    ApiRequest({
-        function: "admin",
-        state: state,
-        options: {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                password: state.room_password,
-                fixme: "true",
-            }),
-        },
-        action: (state, response) =>
-            response.status == "ok" ?
-                [{...state, is_admin: true}, FetchTrackList(state)] :
-                {...state, is_admin: false},
-    });
-
-function _autoLoginEffect(dispatch, props) {
-    dispatch(function(state: State) {
-        // No room name was set, so prompt the user
-        if(state.room_name === "") return state;
-        // console.log("Autologin", state.room_name);
-        return [
-            state,
-            state.room_password
-                ? LoginThenFetchTrackList(state)
-                : FetchTrackList(state),
-        ];
-    });
-}
-export function AutoLogin() {
-    return [_autoLoginEffect, {}]
-}
-
 export const SaveSettings = (state: State): Dispatchable => [
     { ...state },
     ApiRequest({

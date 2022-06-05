@@ -3,6 +3,7 @@
  */
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
+import { ApiRequest } from "./effects";
 
 /**
  * Connect to the MQTT server, listen for updates to queue / settings
@@ -73,4 +74,43 @@ function _resizeSubscriber(dispatch, props) {
 
 export function ResizeListener(callback: Dispatchable): Subscription {
     return [_resizeSubscriber, { onresize: callback }];
+}
+
+function _bleSubscriber(dispatch, props) {
+    // subscription is restarted whenever props changes,
+    if (props.room_name && props.room_password) {
+        setTimeout(function () {
+            dispatch((state) => [
+                state,
+                ApiRequest({
+                    function: "admin",
+                    state: state,
+                    options: {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({
+                            password: state.room_password,
+                            fixme: "true",
+                        }),
+                    },
+                    action: (state, response) => ({...state, is_admin: response.status == "ok"}),
+                })
+            ]);
+        }, 0);
+    }
+    else {
+        setTimeout(function () {
+            dispatch((state) => ({...state, is_admin: false}));
+        }, 0);
+    }
+
+    return function () {
+        // no unsubscribe
+    };
+}
+
+export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+    return [_bleSubscriber, { room_name, room_password }];
 }

@@ -6,7 +6,6 @@
 import {
     ApiRequest,
     SendCommand,
-    LoginThenFetchTrackList,
     FetchTrackList,
     PushScrollPos,
     PopScrollPos,
@@ -59,9 +58,7 @@ export const TryLogin =
         };
         return [
             new_state,
-            state.room_password
-                ? LoginThenFetchTrackList(new_state)
-                : FetchTrackList(new_state),
+            FetchTrackList(new_state),
         ];
     }
 

@@ -8,8 +8,7 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { getMQTTListener, ResizeListener } from "./subs";
-import { AutoLogin } from "./effects";
+import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -112,6 +111,7 @@ const subscriptions = (state: State): Array<Subscription> => [
         ...state,
         priority_token: cookie ? JSON.parse(cookie) : null,
     })),
+    BeLoggedIn(state.room_name, state.room_password),
 ];
 
 app({
@@ -130,7 +130,6 @@ app({
             ...state,
             bookmarks: x,
         })),
-        AutoLogin(),
     ],
     view: Root,
     subscriptions: subscriptions,
