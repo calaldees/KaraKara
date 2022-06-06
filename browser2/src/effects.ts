@@ -66,10 +66,9 @@ function apiRequestEffect(dispatch, props) {
     }));
 
     fetch(props.url, props.options)
-        .then((response) => response.body)
-        .then((rb) => {
-            if (!rb) return;
-            const reader = rb.getReader();
+        .then((response) => {
+            if (!response.body) return;
+            const reader = response.body.getReader();
             let download_done = 0;
             let download_size = 7500000; // TODO: add content-length to track_list.json
 
@@ -101,10 +100,7 @@ function apiRequestEffect(dispatch, props) {
         .then((stream) => {
             return new Response(stream, {
                 headers: { "Content-Type": "text/json" },
-            }).text();
-        })
-        .then(function (response) {
-            return JSON.parse(response);
+            }).json();
         })
         .then(function (result) {
             console.groupCollapsed("api_request(", props.url, ")");
