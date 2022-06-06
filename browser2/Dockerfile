@@ -1,4 +1,4 @@
-FROM node:16 AS build
+FROM node:18 AS build
 RUN apt-get update && apt-get install -y util-linux git && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies

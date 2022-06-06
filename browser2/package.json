@@ -24,9 +24,13 @@
         "@parcel/packager-xml": "^2.0.0",
         "@parcel/transformer-inline-string": "^2.0.0",
         "@parcel/transformer-sass": "^2.0.0",
+        "events": "^3.3.0",
         "parcel": "^2.0.0",
         "parcel-config-pwa-manifest": "^0.1.0",
-        "prettier": "^2.4.1"
+        "prettier": "^2.4.1",
+        "process": "^0.11.10",
+        "querystring-es3": "^0.2.1",
+        "url": "^0.11.0"
     },
     "pwaManifest": {
         "development": {

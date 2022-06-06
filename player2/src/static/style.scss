@@ -55,15 +55,6 @@ MAIN {
   border-bottom: 0;
   width: 4px;
 }
-::cue(v[voice='active']) {
-  color: yellow;
-}
-::cue(v[voice='next']) {
-  color: white;
-}
-.screen_podium ::cue {
-	font-size: 2em;
-}
 
 @import 'metalghosts';
 @import 'original';

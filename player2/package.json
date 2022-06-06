@@ -18,7 +18,11 @@
     "devDependencies": {
         "@parcel/transformer-image": "^2.0.0",
         "@parcel/transformer-sass": "^2.0.0",
+        "events": "^3.3.0",
         "parcel": "^2.0.0",
-        "prettier": "^2.4.1"
+        "prettier": "^2.4.1",
+        "process": "^0.11.10",
+        "querystring-es3": "^0.2.1",
+        "url": "^0.11.0"
     }
 }
