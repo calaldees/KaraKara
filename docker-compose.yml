@@ -60,7 +60,6 @@ services:
         # healthcheck: 
         #     interval: 0m  # TODO: disbale healthcheck
 
-
     mosquitto:
         image: karakara/mosquitto
         build:
@@ -94,8 +93,6 @@ services:
             - processmedia
         build:
             context: ./processmedia2
-        links:
-            - website
         environment:
             - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
         env_file:
