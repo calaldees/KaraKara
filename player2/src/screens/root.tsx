@@ -49,7 +49,7 @@ export function Root(state: State): VNode {
             ondblclick={(state) => ({ ...state, show_settings: true })}
         >
             <main class={"theme-" + state.settings["karakara.player.theme"]}>
-                {errors.length && <h1 id={"error"}>{errors.join(", ")}</h1>}
+                {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
                 {screen}
             </main>
             {state.show_settings && <SettingsMenu state={state} />}
