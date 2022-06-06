@@ -34,7 +34,10 @@ type Track = {
     id: string,
     title: string,
     duration: number,
-    tags: Dictionary<Array<string>>,
+    tags: {
+        title: Array<string>,
+        vocaltrack?: Array<string>,
+    },
     attachments: {
         video: Array<Attachment>,
         preview: Array<Attachment>,

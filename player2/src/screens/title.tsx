@@ -2,7 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { memo } from "hyperapp";
 import { attachment_path } from "../utils";
 
-export const Splash = ({ track_list, root }: { track_list: Dictionary<Track>, root: string }) => (
+export const Splash = ({ track_list, root }: { track_list: Dictionary<Track>, root: string }): VNode => (
     <div id={"splash"}>
         {Object
             .values(track_list)
@@ -20,6 +20,7 @@ export const Splash = ({ track_list, root }: { track_list: Dictionary<Track>, ro
             ))}
     </div>
 );
+
 export const TitleScreen = ({ state }: { state: State }): VNode => (
     <section key="title" class={"screen_title"}>
         {memo(Splash, {track_list: state.track_list, root: state.root})}

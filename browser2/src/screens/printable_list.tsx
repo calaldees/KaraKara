@@ -2,20 +2,9 @@ import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./_common";
 import * as qrcode from "qrcode-generator";
 
-const PrintButtons = (): VNode => (
-    <footer>
-        <div class={"buttons"}>
-            <button
-                onclick={function (state) {
-                    window.print();
-                    return state;
-                }}
-            >
-                Print
-            </button>
-        </div>
-    </footer>
-);
+
+///////////////////////////////////////////////////////////////////////
+// Utils
 
 function shortest_tag(n: Array<string>): string {
     if (n === undefined) {
@@ -42,6 +31,25 @@ function last_tag(tags: Dictionary<Array<string>>, start: string): string {
     }
     return tag;
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
+
+const PrintButtons = (): VNode => (
+    <footer>
+        <div class={"buttons"}>
+            <button
+                onclick={function (state) {
+                    window.print();
+                    return state;
+                }}
+            >
+                Print
+            </button>
+        </div>
+    </footer>
+);
 
 // You'd think this needs memoising to avoid heavy CPU load,
 // but it actually renders in under 15ms (60fps)

@@ -1,8 +1,21 @@
 import h from "hyperapp-jsx-pragma";
 import { s_to_mns } from "../utils";
 import { AutoplayCountdown, Video } from "./_common";
-import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
+import { Dequeue, Stop } from "../actions";
 import { SendCommand } from "../effects";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function UpdatePodiumProgress(state: State, event): Dispatchable {
+    if (state.playing) return { ...state, progress: event.target.currentTime };
+    return state;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 export const PodiumScreen = ({ state }: { state: State }): VNode => (
     <PodiumInternal

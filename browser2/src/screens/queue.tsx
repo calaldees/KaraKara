@@ -33,21 +33,6 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
     </li>
 );
 
-/*
- * Page Layout
- */
-export const Queue = ({ state }: { state: State }): VNode => (
-    <Screen
-        state={state}
-        className={"queue"}
-        navLeft={!state.widescreen && <BackToExplore />}
-        title={"Now Playing"}
-    // navRight={}
-    >
-        <Playlist state={state} queue={state.queue} />
-    </Screen>
-);
-
 const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
     <div>
         {/* No items */}
@@ -95,4 +80,15 @@ const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): 
             </section>
         )}
     </div>
+);
+
+export const Queue = ({ state }: { state: State }): VNode => (
+    <Screen
+        state={state}
+        className={"queue"}
+        navLeft={!state.widescreen && <BackToExplore />}
+        title={"Now Playing"}
+    >
+        <Playlist state={state} queue={state.queue} />
+    </Screen>
 );

@@ -6,12 +6,16 @@ import {
     PushScrollPos,
     PopScrollPos,
 } from "../effects";
-import { GoToScreen, SelectTrack } from "../actions";
+import { GoToScreen } from "../actions";
 
-/*
-Figure out what extra info is relevant for a given track, given what the
-user is currently searching for
-*/
+
+///////////////////////////////////////////////////////////////////////
+// Utils
+
+/**
+ * Figure out what extra info is relevant for a given track, given what the
+ * user is currently searching for
+ */
 let title_tags_for_category: Dictionary<Array<string>> = {
     'DEFAULT': ['from', 'use', 'length'],
     'vocaloid': ['artist'],
@@ -25,9 +29,9 @@ function track_info(state: State, track: Track): string {
     let info_data = (
         info_tags
             // Ignore undefined tags
-            .filter(x => track.tags[x])
+            .filter(x => track.tags.hasOwnProperty(x))
             // We always display track title, so ignore any tags which duplicate that
-            .filter(x => track.tags[x][0] != track.tags["title"][0])
+            .filter(x => track.tags[x][0] != track.tags.title[0])
             // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
             .filter(x => x != "from" || !search_from.includes(track.tags[x][0]))
             // Format a list of tags
@@ -36,111 +40,6 @@ function track_info(state: State, track: Track): string {
     let info = info_data.join(" - ");
     return info;
 }
-
-/*
- * List individual tracks
- */
-const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
-    <li class={"track_item"} onclick={SelectTrack(track.id)}>
-        <Thumb state={state} track={track} />
-        <span class={"text track_info"}>
-            <span class={"title"}>
-                {track.tags.title[0]}
-                {track.tags['vocaltrack'][0] == "off" && " (Instrumental)"}
-            </span>
-            <br />
-            <span class={"info"}>
-                {track_info(state, track)}
-            </span>
-        </span>
-        <span class={"go_arrow"}>
-            <i class={"fas fa-chevron-circle-right"} />
-        </span>
-    </li>
-);
-
-/*
- * List groups of tracks
- */
-const FilterListGroupHeader = (
-    {
-        filter,
-        count,
-        expanded,
-    }: { filter: string; count: number; expanded: boolean },
-    children,
-): VNode => (
-    <li
-        class={"filter_list_group_header"}
-        onclick={(state) => ({ ...state, expanded: expanded ? null : filter })}
-    >
-        <span class={"text"}>{children}</span>
-        <span class={"count"}>{count}</span>
-        <span class={"go_arrow"}>
-            <i
-                class={expanded ? "fas fa-minus-circle" : "fas fa-plus-circle"}
-            />
-        </span>
-    </li>
-);
-
-const GroupedFilterList = ({ heading, filters, expanded }): Array<VNode> =>
-    Object.keys(filters)
-        .sort()
-        .map((group) =>
-            group == expanded ? (
-                <div class={"filter_list_group"}>
-                    <FilterListGroupHeader
-                        filter={group}
-                        count={Object.keys(filters[group]).length}
-                        expanded={true}
-                    >
-                        {group}
-                    </FilterListGroupHeader>
-                    <FilterList heading={heading} filters={filters[group]} />
-                </div>
-            ) : (
-                <FilterListGroupHeader
-                    filter={group}
-                    count={Object.keys(filters[group]).length}
-                    expanded={false}
-                >
-                    {group}
-                </FilterListGroupHeader>
-            ),
-        );
-
-const FilterList = ({ heading, filters }): Array<VNode> =>
-    Object.keys(filters)
-        .sort()
-        .map((child) => (
-            <AddFilter filter={heading + ":" + child} count={filters[child]}>
-                {child}
-            </AddFilter>
-        ));
-
-const AddFilter = (
-    { filter, count }: { filter: string; count: number },
-    children,
-): VNode => (
-    <li
-        class={"add_filter"}
-        onclick={(state) => [
-            {
-                ...state,
-                expanded: null,
-                filters: state.filters.concat([filter]),
-            },
-            PushScrollPos(),
-        ]}
-    >
-        <span class={"text"}>{children}</span>
-        <span class={"count"}>{count}</span>
-        <span class={"go_arrow"}>
-            <i class={"fas fa-chevron-circle-right"} />
-        </span>
-    </li>
-);
 
 /**
  * Search the full list of all known tracks based on tags + full-text search,
@@ -263,8 +162,8 @@ function choose_section_names(state: State, groups: {}): Array<string> {
  *     ...
  *  }
  */
-function find_all_tags(tracks: Array<Track>) {
-    let tags = {};
+function find_all_tags(tracks: Array<Track>): Dictionary<Dictionary<number>> {
+    let tags: Dictionary<Dictionary<number>> = {};
     for (let n in tracks) {
         for (let tag in tracks[n].tags) {
             if (tag == "title") {
@@ -280,6 +179,151 @@ function find_all_tags(tracks: Array<Track>) {
     }
     return tags;
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function Back(state: State): Dispatchable {
+    state.filters.pop();
+    return [{ ...state }, PopScrollPos()];
+}
+
+const GoToPriorityTokens = (state: State): Dispatchable => [
+    state,
+    ApiRequest({
+        function: "priority_tokens",
+        state: state,
+        action: (state, response): Dispatchable =>
+            response.status == "ok"
+                ? [
+                    {
+                        ...state,
+                        screen: "priority_tokens",
+                        priority_tokens: response.data.priority_tokens,
+                    },
+                    PushScrollPos(),
+                ]
+                : {
+                    ...state,
+                    priority_tokens: [],
+                },
+    }),
+];
+
+const SelectTrack = (state: State, track_id: string): Dispatchable => [
+    { ...state, track_id },
+    PushScrollPos(),
+];
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
+
+/*
+ * List individual tracks
+ */
+const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
+    <li class={"track_item"} onclick={[SelectTrack, track.id]}>
+        <Thumb state={state} track={track} />
+        <span class={"text track_info"}>
+            <span class={"title"}>
+                {track.tags.title[0]}
+                {track.tags.vocaltrack?.[0] == "off" && " (Instrumental)"}
+            </span>
+            <br />
+            <span class={"info"}>
+                {track_info(state, track)}
+            </span>
+        </span>
+        <span class={"go_arrow"}>
+            <i class={"fas fa-chevron-circle-right"} />
+        </span>
+    </li>
+);
+
+/*
+ * List groups of tracks
+ */
+const FilterListGroupHeader = (
+    {
+        filter,
+        count,
+        expanded,
+    }: { filter: string; count: number; expanded: boolean },
+    children,
+): VNode => (
+    <li
+        class={"filter_list_group_header"}
+        onclick={(state) => ({ ...state, expanded: expanded ? null : filter })}
+    >
+        <span class={"text"}>{children}</span>
+        <span class={"count"}>{count}</span>
+        <span class={"go_arrow"}>
+            <i
+                class={expanded ? "fas fa-minus-circle" : "fas fa-plus-circle"}
+            />
+        </span>
+    </li>
+);
+
+const GroupedFilterList = ({ heading, filters, expanded }): Array<VNode> =>
+    Object.keys(filters)
+        .sort()
+        .map((group) =>
+            group == expanded ? (
+                <div class={"filter_list_group"}>
+                    <FilterListGroupHeader
+                        filter={group}
+                        count={Object.keys(filters[group]).length}
+                        expanded={true}
+                    >
+                        {group}
+                    </FilterListGroupHeader>
+                    <FilterList heading={heading} filters={filters[group]} />
+                </div>
+            ) : (
+                <FilterListGroupHeader
+                    filter={group}
+                    count={Object.keys(filters[group]).length}
+                    expanded={false}
+                >
+                    {group}
+                </FilterListGroupHeader>
+            ),
+        );
+
+const FilterList = ({ heading, filters }): Array<VNode> =>
+    Object.keys(filters)
+        .sort()
+        .map((child) => (
+            <AddFilter filter={heading + ":" + child} count={filters[child]}>
+                {child}
+            </AddFilter>
+        ));
+
+const AddFilter = (
+    { filter, count }: { filter: string; count: number },
+    children,
+): VNode => (
+    <li
+        class={"add_filter"}
+        onclick={(state) => [
+            {
+                ...state,
+                expanded: null,
+                filters: state.filters.concat([filter]),
+            },
+            PushScrollPos(),
+        ]}
+    >
+        <span class={"text"}>{children}</span>
+        <span class={"count"}>{count}</span>
+        <span class={"go_arrow"}>
+            <i class={"fas fa-chevron-circle-right"} />
+        </span>
+    </li>
+);
 
 /**
  * Search for tracks given the user's conditions
@@ -368,49 +412,20 @@ function show_list(state: State) {
     return sections;
 }
 
-function show_bookmarks(state: State) {
-    return (
-        state.bookmarks.length > 0 &&
-        state.filters.length == 0 &&
-        state.search == "" && (
-            <div>
-                <h2>Bookmarks</h2>
-                <ul>
-                    {state.bookmarks.map((bm) => (
-                        <TrackItem state={state} track={state.track_list[bm]} />
-                    ))}
-                </ul>
-            </div>
-        )
-    );
-}
-
-function back(state: State): Dispatchable {
-    state.filters.pop();
-    return [{ ...state }, PopScrollPos()];
-}
-
-const GoToPriorityTokens = (state: State): Dispatchable => [
-    state,
-    ApiRequest({
-        function: "priority_tokens",
-        state: state,
-        action: (state, response): Dispatchable =>
-            response.status == "ok"
-                ? [
-                    {
-                        ...state,
-                        screen: "priority_tokens",
-                        priority_tokens: response.data.priority_tokens,
-                    },
-                    PushScrollPos(),
-                ]
-                : {
-                    ...state,
-                    priority_tokens: [],
-                },
-    }),
-];
+const Bookmarks = ({ state }: { state: State }) => (
+    state.bookmarks.length > 0 &&
+    state.filters.length == 0 &&
+    state.search == "" && (
+        <div>
+            <h2>Bookmarks</h2>
+            <ul>
+                {state.bookmarks.map((bm) => (
+                    <TrackItem state={state} track={state.track_list[bm]} />
+                ))}
+            </ul>
+        </div>
+    )
+);
 
 const AdminButtons = ({ state }: { state: State }): VNode => (
     <footer>
@@ -434,7 +449,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         className={"track_list"}
         navLeft={
             (state.filters.length > 0) && (
-                <a onclick={back}>
+                <a onclick={Back}>
                     <i class={"fas fa-2x fa-chevron-circle-left"} />
                 </a>
             )
@@ -492,6 +507,6 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         {show_list(state)}
 
         {/* If no filters, show bookmarks */}
-        {show_bookmarks(state)}
+        <Bookmarks state={state} />
     </Screen>
 );

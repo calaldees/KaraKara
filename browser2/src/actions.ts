@@ -5,9 +5,6 @@
  */
 import {
     ApiRequest,
-    SendCommand,
-    PushScrollPos,
-    PopScrollPos,
 } from "./effects";
 
 /*
@@ -25,98 +22,9 @@ export const GoToScreen =
             ...effects,
         ];
 
-export const ClearNotification =
-    (): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        notification: null,
-    });
-
-export const ShowSettings =
-    (): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        show_settings: true,
-    });
-
-export const SelectTrack =
-    (track_id: string | null): Action =>
-    (state: State): Dispatchable =>
-        [
-            { ...state, track_id },
-            track_id ? PushScrollPos() : PopScrollPos(),
-        ];
-
-/*
- * User inputs
- */
-export const SetPerformerName =
-    (): Action =>
-    (state: State, event: FormInputEvent): Dispatchable => ({
-        ...state,
-        performer_name: event.target.value,
-    });
-
-export function UpdateSettings(
-    state: State,
-    event: FormInputEvent,
-): Dispatchable {
-    if (Array.isArray(state.settings[event.target.name])) {
-        state.settings[event.target.name] = event.target.value.split(",");
-    } else {
-        state.settings[event.target.name] = event.target.value;
-    }
-    return state;
-}
-
-/*
- * Player controls
- */
-export const Command =
-    (command: string): Action =>
-    (state: State): Dispatchable =>
-        [state, SendCommand(state, command)];
-
 /*
  * Add / remove tracks
  */
-export const ActivateEnqueue =
-    (): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        action: "enqueue",
-    });
-
-export const CancelEnqueue =
-    (): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        action: null,
-    });
-
-export const EnqueueCurrentTrack =
-    (): Action =>
-    (state: State): Dispatchable =>
-        [
-            state,
-            ApiRequest({
-                title: "Adding to queue...",
-                function: "queue_items",
-                state: state,
-                options: {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({
-                        track_id: state.track_id || "error",
-                        performer_name: state.performer_name,
-                    }),
-                },
-                action: (state, response) => [{ ...state, action: null }],
-            }),
-        ];
-
 export const RemoveTrack =
     (queue_item_id: number): Action =>
     (state: State): Dispatchable =>
@@ -137,20 +45,3 @@ export const RemoveTrack =
                 },
             }),
         ];
-
-/*
- * Bookmarks
- */
-export const AddBookmark =
-    (track_id: string): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        bookmarks: state.bookmarks.concat([track_id]),
-    });
-
-export const RemoveBookmark =
-    (track_id: string): Action =>
-    (state: State): Dispatchable => ({
-        ...state,
-        bookmarks: state.bookmarks.filter((x) => x != track_id),
-    });

@@ -3,7 +3,7 @@
  */
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { mqtt_login_info, flatten_settings } from "./utils";
+import { mqtt_login_info } from "./utils";
 
 // get article
 function _get_article() {
@@ -200,20 +200,3 @@ export function SendCommand(state: State, command: string): Effect {
         payload: command,
     });
 }
-
-export const SaveSettings = (state: State): Dispatchable => [
-    { ...state },
-    ApiRequest({
-        title: "Saving settings...",
-        function: "settings",
-        state: state,
-        options: {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams(flatten_settings(state.settings)),
-        },
-        // action: (state, response) => [{ ...state }],
-    }),
-];

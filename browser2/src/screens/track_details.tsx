@@ -1,17 +1,57 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./_common";
 import { attachment_path } from "../utils";
-import {
-    GoToScreen,
-    ActivateEnqueue,
-    CancelEnqueue,
-    EnqueueCurrentTrack,
-    SelectTrack,
-    AddBookmark,
-    RemoveBookmark,
-    SetPerformerName,
-} from "../actions";
-import { PushScrollPos } from "../effects";
+import { GoToScreen } from "../actions";
+import { PushScrollPos, PopScrollPos, ApiRequest } from "../effects";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+const AddBookmark = (state: State, track_id: string, event): State => ({
+    ...state,
+    notification: { text: "" + event, style: "warning" },
+    bookmarks: state.bookmarks.concat([track_id]),
+});
+
+const RemoveBookmark = (state: State, track_id: string): State => ({
+    ...state,
+    bookmarks: state.bookmarks.filter((x) => x != track_id),
+});
+
+const SetPerformerName = (state: State, event: FormInputEvent): State => ({
+    ...state,
+    performer_name: event.target.value,
+});
+
+const EnqueueCurrentTrack = (state: State): Dispatchable => [
+    state,
+    ApiRequest({
+        title: "Adding to queue...",
+        function: "queue_items",
+        state: state,
+        options: {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                track_id: state.track_id || "error",
+                performer_name: state.performer_name,
+            }),
+        },
+        action: (state, response) => [{ ...state, action: null }],
+    }),
+];
+
+const UnselectTrack = (state: State): Dispatchable => [
+    { ...state, track_id: null },
+    PopScrollPos(),
+];
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
@@ -20,15 +60,15 @@ const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode =
         )}
         <div class={"buttons"}>
             <button
-                onclick={ActivateEnqueue()}
+                onclick={(state: State): State => ({ ...state, action: "enqueue" })}
                 disabled={state.queue.find((i) => i.track_id == track.id)}
             >
                 Enqueue
             </button>
             {state.bookmarks.includes(track.id) ? (
-                <button onclick={RemoveBookmark(track.id)}>Un-Bookmark</button>
+                <button onclick={[RemoveBookmark, track.id]}>Un-Bookmark</button>
             ) : (
-                <button onclick={AddBookmark(track.id)}>Bookmark</button>
+                <button onclick={[AddBookmark, track.id]}>Bookmark</button>
             )}
         </div>
     </footer>
@@ -44,11 +84,11 @@ const EnqueueButtons = ({ state }: { state: State }): VNode => (
                 state.settings["karakara.template.input.performer_name"]
             }
             required={true}
-            oninput={SetPerformerName()}
+            oninput={SetPerformerName}
         />
         <div class={"buttons"}>
-            <button onclick={CancelEnqueue()}>Cancel</button>
-            <button onclick={EnqueueCurrentTrack()}>Confirm</button>
+            <button onclick={(state: State): State => ({ ...state, action: null })}>Cancel</button>
+            <button onclick={EnqueueCurrentTrack}>Confirm</button>
         </div>
     </footer>
 );
@@ -73,7 +113,7 @@ export const TrackDetails = ({
         state={state}
         className={"track_details"}
         navLeft={
-            <a onclick={SelectTrack(null)}>
+            <a onclick={UnselectTrack}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
@@ -95,7 +135,7 @@ export const TrackDetails = ({
             durationHint={track.duration}
             controls={true}
         >
-            {track.attachments.preview.map(a => 
+            {track.attachments.preview.map(a =>
                 <source
                     src={attachment_path(state.root, a)}
                     type={a.mime}

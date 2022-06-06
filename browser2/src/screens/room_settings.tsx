@@ -1,7 +1,44 @@
 import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./_common";
-import { SaveSettings } from "../effects";
-import { UpdateSettings } from "../actions";
+import { ApiRequest } from "../effects";
+import { flatten_settings } from "../utils";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function UpdateSettings(
+    state: State,
+    event: FormInputEvent,
+): Dispatchable {
+    if (Array.isArray(state.settings[event.target.name])) {
+        state.settings[event.target.name] = event.target.value.split(",");
+    } else {
+        state.settings[event.target.name] = event.target.value;
+    }
+    return state;
+}
+
+const SaveSettings = (state: State): Dispatchable => [
+    { ...state },
+    ApiRequest({
+        title: "Saving settings...",
+        function: "settings",
+        state: state,
+        options: {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(flatten_settings(state.settings)),
+        },
+        // action: (state, response) => [{ ...state }],
+    }),
+];
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 const SettingsButtons = ({ state }: { state: State }): VNode => (
     <footer>

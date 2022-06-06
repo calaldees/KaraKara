@@ -5,26 +5,6 @@
  */
 import { SetTrackState } from "./effects";
 
-// App controls
-export function SetRoom(state: State, room: string): Dispatchable {
-    return { ...state, room_name: room };
-}
-
-export function SetPreviewVolume(state: State, event): Dispatchable {
-    event.target.volume =
-        state.settings["karakara.player.video.preview_volume"];
-    return state;
-}
-
-export function UpdateProgress(state: State, event): Dispatchable {
-    return { ...state, progress: event.target.currentTime };
-}
-
-export function UpdatePodiumProgress(state: State, event): Dispatchable {
-    if (state.playing) return { ...state, progress: event.target.currentTime };
-    return state;
-}
-
 // Current track controls
 export function Play(state: State): Dispatchable {
     return {

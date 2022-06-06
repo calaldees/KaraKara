@@ -1,9 +1,17 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./_common";
 
+
+///////////////////////////////////////////////////////////////////////
+// Utils
+
 function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
 
 function TryLogin(state: State, event: SubmitEvent): State {
     event.preventDefault();
@@ -12,6 +20,10 @@ function TryLogin(state: State, event: SubmitEvent): State {
         room_name: state.room_name_edit.toLowerCase().trim(),
     };
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 export const Login = ({ state }: { state: State }): VNode => (
     <Screen state={state} className={"login"} title={"Welcome to KaraKara"}>

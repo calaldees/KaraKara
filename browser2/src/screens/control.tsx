@@ -1,7 +1,11 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import { ApiRequest } from "../effects";
-import { RemoveTrack, Command } from "../actions";
+import { ApiRequest, SendCommand } from "../effects";
+import { RemoveTrack } from "../actions";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
 
 function createDragStart(src_id) {
     return function (state, event) {
@@ -124,6 +128,10 @@ function moveTrack(
     ];
 }
 
+
+///////////////////////////////////////////////////////////////////////
+// Views
+
 const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
     <section>
         <ul ondragleave={createDragLeave()}>
@@ -192,7 +200,7 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
 );
 
 const ControlButton = ({ command, style }: { command: string, style: string }): VNode => (
-    <button onclick={Command(command)}>
+    <button onclick={(state: State): Dispatchable => [state, SendCommand(state, command)]}>
         <i class={"fas fa-" + style} />
     </button>
 );

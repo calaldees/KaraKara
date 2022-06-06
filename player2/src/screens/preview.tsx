@@ -5,9 +5,23 @@ import {
     short_date,
 } from "../utils";
 import { AutoplayCountdown, Video } from "./_common";
-import { SetPreviewVolume } from "../actions";
+
 
 const show_tracks = 5;
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function SetPreviewVolume(state: State, event): Dispatchable {
+    event.target.volume =
+        state.settings["karakara.player.video.preview_volume"];
+    return state;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 export const PreviewScreen = ({ state }: { state: State }): VNode => (
     <PreviewInternal

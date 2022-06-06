@@ -15,7 +15,11 @@ type Track = {
     source_hash: string,
     title: string,
     duration: number,
-    tags: Dictionary<Array<string>>,
+    tags: {
+        title: Array<string>,
+        from?: Array<string>,
+        artist?: Array<string>,
+    }
     attachments: {
         video: Array<Attachment>,
         preview: Array<Attachment>,

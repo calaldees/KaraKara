@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
+import { GoToScreen } from "../actions";
 import { PopScrollPos } from "../effects";
 import { attachment_path, is_my_song } from "../utils";
 import * as placeholder from "data-url:../static/placeholder.svg";
@@ -8,12 +8,13 @@ export const Notification = ({ state }: { state: State }): VNode =>
     state.notification && (
         <div
             class={"main-only notification " + state.notification.style}
-            onclick={ClearNotification()}
+            onclick={(state: State): State => ({...state, notification: null})}
         >
             <span>{state.notification.text}</span>
             <i class={"fas fa-times-circle"} />
         </div>
     );
+
 function hhmm(d: Date): string {
     function twoz(n: number): string {
         return n.toString().padStart(2, "0");
@@ -78,7 +79,7 @@ export const Screen = (
     <main class={className}>
         <header>
             {navLeft}
-            <h1 ondblclick={ShowSettings()}>{title}</h1>
+            <h1 ondblclick={(state: State): State => ({...state, show_settings: true})}>{title}</h1>
             {navRight}
         </header>
         <Notification state={state} />
