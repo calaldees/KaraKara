@@ -16,10 +16,8 @@ import { mqtt_login_info } from "./utils";
  * Connect to the MQTT server, listen for queue / settings state updates,
  * and react to commands on the command channel
  */
-export function getOpenMQTTListener(
-    state: State,
-): Subscription | null {
-    if (!state.room_name) {
+export function getMQTTListener(state: State): Subscription | null {
+    if (!state.room_name || !Object.keys(state.track_list).length) {
         return null;
     }
 

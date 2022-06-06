@@ -9,7 +9,11 @@ import Cookies from 'js-cookie'
 /**
  * Connect to the MQTT server, listen for updates to queue / settings
  */
-export function getMQTTListener(state: State): Subscription {
+export function getMQTTListener(state: State): Subscription | null {
+    if (!state.room_name || !Object.keys(state.track_list).length) {
+        return null;
+    }
+
     return MQTTSubscribe({
         ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/#",

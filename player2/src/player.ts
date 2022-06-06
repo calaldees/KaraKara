@@ -9,7 +9,7 @@ import {
 import { Root } from "./screens/root";
 import {
     BeLoggedIn,
-    getOpenMQTTListener,
+    getMQTTListener,
     IntervalListener,
     KeyboardListener,
 } from "./subs";
@@ -90,7 +90,7 @@ const init: Dispatchable = [
     }),
 ];
 
-const subscriptions = (state: State) => [
+const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
         {
             push: ["root", "room_name"],
@@ -100,7 +100,7 @@ const subscriptions = (state: State) => [
     ),
     LocalStorageSaver("room_password", state.room_password),
     KeyboardListener,
-    state.room_name && Object.keys(state.track_list).length > 0 && getOpenMQTTListener(state),
+    getMQTTListener(state),
     state.audio_allowed &&
     !state.paused &&
     !state.playing &&

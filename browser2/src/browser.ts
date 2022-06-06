@@ -117,7 +117,7 @@ const subscriptions = (state: State): Array<Subscription> => [
         },
         state,
     ),
-    state.room_name && Object.keys(state.track_list).length && getMQTTListener(state),
+    getMQTTListener(state),
     LocalStorageSaver("performer_name", state.performer_name),
     LocalStorageSaver("room_password", state.room_password),
     LocalStorageSaver("bookmarks", state.bookmarks),
