@@ -34,7 +34,7 @@ type QueueItem = {
 }
 
 type State = {
-    // global persistent
+    // global
     root: string,
     root_edit: string,
     room_name: string,
@@ -44,8 +44,6 @@ type State = {
     podium: boolean,
     track_list: Dictionary<Track>,
     is_admin: boolean,
-
-    // global temporary
     show_settings: boolean,
     connected: boolean,
     fullscreen: boolean,

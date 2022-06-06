@@ -24,7 +24,7 @@ const auto_root =
         : window.location.protocol + "//" + window.location.host;
 
 const state: State = {
-    // global persistent
+    // global
     root: auto_root,
     root_edit: auto_root,
     room_name: "",
@@ -34,8 +34,6 @@ const state: State = {
     podium: false,
     track_list: {},
     is_admin: false,
-
-    // global temporary
     show_settings: false,
     connected: false,
     fullscreen: false,
