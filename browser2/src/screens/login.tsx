@@ -38,9 +38,10 @@ export const Login = ({ state }: { state: State }): VNode => (
                         room_name_edit: event.target.value,
                     })}
                     required={true}
+                    disabled={state.room_name !== ""}
                 />
-                <button disabled={!state.room_name_edit.trim() || state.loading}>
-                    {state.loading ? (
+                <button disabled={!state.room_name_edit.trim() || state.room_name !== ""}>
+                    {state.room_name !== "" ? (
                         <span>
                             Loading Tracks{" "}
                             {state.download_size ? (

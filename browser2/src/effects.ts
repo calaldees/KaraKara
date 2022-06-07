@@ -70,7 +70,9 @@ function apiRequestEffect(dispatch, props) {
             if (!response.body) return;
             const reader = response.body.getReader();
             let download_done = 0;
-            let download_size = 7500000; // TODO: add content-length to track_list.json
+            // Content-Length shows us the compressed size, we can only
+            // guess the real size :(
+            let download_size = 10*1024*1024;
 
             return new ReadableStream({
                 start(controller) {
