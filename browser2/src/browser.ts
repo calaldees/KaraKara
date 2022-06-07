@@ -67,6 +67,8 @@ let state: State = {
     // settings
     settings: {
         "karakara.template.input.performer_name": "Enter Name",
+        "karakara.search.tag.silent_forced": [],
+        "karakara.search.tag.silent_hidden": [],
     },
 
     // priority_tokens

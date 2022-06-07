@@ -36,7 +36,8 @@ type Track = {
     duration: number,
     tags: {
         title: Array<string>,
-        vocaltrack?: Array<string>,
+        // vocaltrack?: Array<string>
+        [x: string]: Array<string> | undefined,
     },
     attachments: {
         video: Array<Attachment>,

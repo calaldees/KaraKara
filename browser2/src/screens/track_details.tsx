@@ -151,7 +151,7 @@ export const TrackDetails = ({
                     <div class={"tag"}>
                         <div class={"tag_key"}>{key}</div>
                         <div class={"tag_value"}>
-                            {track.tags[key].join(", ")}
+                            {track.tags[key]?.join(", ")}
                         </div>
                     </div>
                 ))}

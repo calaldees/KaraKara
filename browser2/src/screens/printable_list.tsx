@@ -6,7 +6,7 @@ import * as qrcode from "qrcode-generator";
 ///////////////////////////////////////////////////////////////////////
 // Utils
 
-function shortest_tag(n: Array<string>): string {
+function shortest_tag(n: Array<string> | undefined): string {
     if (n === undefined) {
         return "";
     }
@@ -24,10 +24,10 @@ Given a tag set like
 
 we want last_tag("from") to get "macross frontier"
 */
-function last_tag(tags: Dictionary<Array<string>>, start: string): string {
+function last_tag(tags: Dictionary<Array<string> | undefined>, start: string): string {
     let tag = start;
     while(tags[tag]) {
-        tag = tags[tag][0];
+        tag = tags[tag]?.[0] || "";
     }
     return tag;
 }

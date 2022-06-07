@@ -23,7 +23,7 @@ let title_tags_for_category: Dictionary<Array<string>> = {
     'meme': ['from'],
 };
 function track_info(state: State, track: Track): string {
-    let info_tags = title_tags_for_category[track.tags['category'][0]] || title_tags_for_category["DEFAULT"];
+    let info_tags = title_tags_for_category[track.tags['category']?.[0] || "DEFAULT"];
     // look at series that are in the search box
     let search_from = state.filters.filter(x => x.startsWith("from:")).map(x => x.replace("from:", ""));
     let info_data = (
@@ -31,11 +31,11 @@ function track_info(state: State, track: Track): string {
             // Ignore undefined tags
             .filter(x => track.tags.hasOwnProperty(x))
             // We always display track title, so ignore any tags which duplicate that
-            .filter(x => track.tags[x][0] != track.tags.title[0])
+            .filter(x => track.tags[x]?.[0] != track.tags.title[0])
             // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
-            .filter(x => x != "from" || !search_from.includes(track.tags[x][0]))
+            .filter(x => x != "from" || !search_from.includes(track.tags[x]?.[0] || ""))
             // Format a list of tags
-            .map(x => track.tags[x].join(", "))
+            .map(x => track.tags[x]?.join(", "))
     );
     let info = info_data.join(" - ");
     return info;
@@ -47,36 +47,79 @@ function track_info(state: State, track: Track): string {
  */
 function find_tracks(
     track_list: Dictionary<Track>,
-    filters: Array<string>,
+    settings: Dictionary<any>,
+    user_filters: Array<string>,
     search: string,
 ): Array<Track> {
     let tracks: any[] = [];
+
+    // translate hidden=category:anime,category:retro,broken into
+    // {"category": ["anime", "retro"], "broken": []}
+    let hidden: Dictionary<Array<string>> = {};
+    settings['karakara.search.tag.silent_hidden'].map(x => {
+        let [k, v] = x.split(":");
+        if(!hidden[k]) hidden[k] = [];
+        if(v) hidden[k].push(v);
+    });
+
+    // translate eg "retro" to ":retro" so that all filters
+    // consistently use the "key:value" syntax
+    let forced = settings['karakara.search.tag.silent_forced'].map(x => x.includes(":") ? x : ":"+x);
+    let filters = user_filters.concat(forced);
+
     tracks: for (let track_id in track_list) {
         let track = track_list[track_id];
-        if (filters.length > 0) {
-            for (let filter_n = 0; filter_n < filters.length; filter_n++) {
-                let filter = filters[filter_n].split(":");
-                let filter_key = filter[0];
-                let filter_value = filter[1];
-                if (track.tags[filter_key] == undefined) {
-                    continue tracks;
-                }
-                if (
-                    track.tags[filter_key].filter((x) => x == filter_value)
-                        .length == 0
+
+        // If track has a 'hidden' tag, then skip it, UNLESS it also has
+        // other non-hidden tags with the same parent. Consider top-level
+        // tags to have different parents.
+        let hidden_keys = Object.keys(hidden);
+        for(let i=0; i<hidden_keys.length; i++) {
+            let hidden_key = hidden_keys[i];
+            let hidden_values = hidden[hidden_key];
+
+            // If
+            //   hidden = {"category": ["anime", "cartoon"]}
+            // then remove any track where:
+            //   tags["category"].length > 0 &&
+            //   tags["category"] - {"anime", "cartoon"} == set()
+            if(hidden_values.length > 0) {
+                if(
+                    track.tags[hidden_key]?.length &&
+                    !track.tags[hidden_key]?.filter(x => !hidden_values.includes(x)).length
                 ) {
+                    continue tracks;
+                }    
+            }
+
+            // If
+            //   hidden = {"broken": []}
+            // then remove any track where:
+            //   tags[""].includes("broken")
+            else {
+                if(track.tags[""]?.includes(hidden_key)) {
                     continue tracks;
                 }
             }
         }
+
+        // If user filters for from:macross, then check
+        //   track.tags["from"].includes("macross")
+        for (let i = 0; i < filters.length; i++) {
+            let [filter_key, filter_value] = filters[i].split(":");
+            if (!track.tags[filter_key]?.includes(filter_value)) {
+                continue tracks;
+            }
+        }
+
+        // If the user uses free-text search, then check all tag values
+        // for matching text, and skip if we have no matches
         if (search != "") {
             search = search.toLowerCase();
             let any_match = false;
-            if (track_id.startsWith(search)) any_match = true;
-            fts_match: for (let tag in track.tags) {
-                if (!track.tags.hasOwnProperty(tag)) continue;
-                for (let i = 0; i < track.tags[tag].length; i++) {
-                    if (track.tags[tag][i].toLowerCase().indexOf(search) >= 0) {
+            fts_match: for (let tag_values in Object.values(track.tags)) {
+                for (let i = 0; i < tag_values.length; i++) {
+                    if (tag_values[i].toLowerCase().indexOf(search) >= 0) {
                         any_match = true;
                         break fts_match;
                     }
@@ -84,9 +127,10 @@ function find_tracks(
             }
             if (!any_match) continue;
         }
+
         tracks.push(track);
     }
-    tracks.sort((a, b) => (a.title > b.title ? 1 : -1));
+    tracks.sort((a, b) => (a.tags.title[0] > b.tags.title[0] ? 1 : -1));
     return tracks;
 }
 
@@ -169,12 +213,11 @@ function find_all_tags(tracks: Array<Track>): Dictionary<Dictionary<number>> {
             if (tag == "title") {
                 continue;
             }
-            for (let value_n in tracks[n].tags[tag]) {
-                let value = tracks[n].tags[tag][value_n];
+            tracks[n].tags[tag]?.map(value => {
                 if (tags[tag] == undefined) tags[tag] = {};
                 if (tags[tag][value] == undefined) tags[tag][value] = 0;
                 tags[tag][value]++;
-            }
+            });
         }
     }
     return tags;
@@ -331,7 +374,7 @@ const AddFilter = (
  * - If we have a lot of tracks, prompt for more filters
  */
 function show_list(state: State) {
-    let tracks = find_tracks(state.track_list, state.filters, state.search);
+    let tracks = find_tracks(state.track_list, state.settings, state.filters, state.search);
     // console.log("Found", tracks.length, "tracks matching", state.filters, state.search);
 
     // If we have a few tracks, just list them
