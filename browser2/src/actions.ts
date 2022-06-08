@@ -3,9 +3,7 @@
  * and return modified state (optionally including
  * side effects) as output
  */
-import {
-    ApiRequest,
-} from "./effects";
+import { ApiRequest } from "./effects";
 
 /*
  * App navigation

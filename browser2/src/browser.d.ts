@@ -30,13 +30,19 @@ type Attachment = {
     path: string,
 }
 
+type TrackListSection = {
+    tracks?: Array<Track>,
+    groups?: any,
+    filters?: any,
+};
+
 type Track = {
     id: string,
     duration: number,
     tags: {
         title: Array<string>,
-        vocaltrack?: Array<string>
-        category?: Array<string>
+        category?: Array<string>,
+        vocaltrack?: Array<string>,
         [x: string]: Array<string> | undefined,
     },
     attachments: {

@@ -7,7 +7,7 @@ import {
     PopScrollPos,
 } from "../effects";
 import { GoToScreen } from "../actions";
-import { track_info, find_tracks, choose_section_names, summarise_tags } from "../utils";
+import { track_info, find_tracks, calculate_list_sections } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
             </span>
             <br />
             <span class={"info"}>
-                {track_info(state, track)}
+                {track_info(state.filters, track)}
             </span>
         </span>
         <span class={"go_arrow"}>
@@ -96,40 +96,44 @@ const FilterListGroupHeader = (
     </li>
 );
 
-const GroupedFilterList = ({ heading, filters, expanded }): Array<VNode> =>
-    Object.keys(filters)
-        .sort()
-        .map((group) =>
-            group == expanded ? (
-                <div class={"filter_list_group"}>
+const GroupedFilterList = ({ heading, filters, expanded }): VNode =>
+    <ul>
+        {Object.keys(filters)
+            .sort()
+            .map((group) =>
+                group == expanded ? (
+                    <div class={"filter_list_group"}>
+                        <FilterListGroupHeader
+                            filter={group}
+                            count={Object.keys(filters[group]).length}
+                            expanded={true}
+                        >
+                            {group}
+                        </FilterListGroupHeader>
+                        <FilterList heading={heading} filters={filters[group]} />
+                    </div>
+                ) : (
                     <FilterListGroupHeader
                         filter={group}
                         count={Object.keys(filters[group]).length}
-                        expanded={true}
+                        expanded={false}
                     >
                         {group}
                     </FilterListGroupHeader>
-                    <FilterList heading={heading} filters={filters[group]} />
-                </div>
-            ) : (
-                <FilterListGroupHeader
-                    filter={group}
-                    count={Object.keys(filters[group]).length}
-                    expanded={false}
-                >
-                    {group}
-                </FilterListGroupHeader>
-            ),
-        );
+                ),
+            )}
+    </ul>;
 
-const FilterList = ({ heading, filters }): Array<VNode> =>
-    Object.keys(filters)
-        .sort()
-        .map((child) => (
-            <AddFilter filter={heading + ":" + child} count={filters[child]}>
-                {child}
-            </AddFilter>
-        ));
+const FilterList = ({ heading, filters }): VNode =>
+    <ul>
+        {Object.keys(filters)
+            .sort()
+            .map((child) => (
+                <AddFilter filter={heading + ":" + child} count={filters[child]}>
+                    {child}
+                </AddFilter>
+            ))}
+    </ul>;
 
 const AddFilter = (
     { filter, count }: { filter: string; count: number },
@@ -160,91 +164,36 @@ const AddFilter = (
  * - If we have a lot of tracks, prompt for more filters
  */
 function show_list(state: State) {
-    let tracks = find_tracks(
-        state.track_list,
-        state.settings['karakara.search.tag.silent_hidden'],
-        state.settings['karakara.search.tag.silent_forced'],
-        state.filters,
-        state.search,
-    );
+    let tracks = find_tracks(state);
     // console.log("Found", tracks.length, "tracks matching", state.filters, state.search);
-
-    // If we have a few tracks, just list them
-    if (tracks.length < 20) {
-        return (
-            <ul>
-                {tracks.map((track) => (
-                    <TrackItem state={state} track={track} />
-                ))}
-            </ul>
-        );
-    }
-    let all_tags = summarise_tags(tracks);
-    let section_names = choose_section_names(state.filters, all_tags);
-
-    /*
-     * If we're looking at a tag with few values (eg vocaltrack=on/off),
-     * then show the full list.
-     *
-     * <FilterList filters={{"on": 2003, "off": 255}} />
-     *
-     * If we're looking at a tag with a lot of values (eg artist=...),
-     * then group those values like:
-     *
-     * <GroupedFilterList filters={{
-     *     "a": {"a little snow fairy sugar": 41, "a.d. police": 22, ...},
-     *     "b": {"baka and test": 2, "bakemonogatari": 1, ...},
-     *     ...
-     * }} />
-     */
-    let leftover_tracks: Track[] = tracks;
-    let sections: any[] = [];
-    for (let i = 0; i < section_names.length; i++) {
-        let tag_key = section_names[i]; // eg "vocaltrack"
-        let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
-        let filter_list = null;
-        // remove all tracks which would be discovered by this sub-query
-        leftover_tracks = leftover_tracks.filter((t) => !(tag_key in t.tags));
-        if (Object.keys(tag_values).length > 50) {
-            let grouped_groups = {};
-            Object.keys(tag_values).forEach(function (x) {
-                if (grouped_groups[x[0]] == undefined)
-                    grouped_groups[x[0]] = {};
-                grouped_groups[x[0]][x] = tag_values[x];
-            });
-            filter_list = (
-                <GroupedFilterList
-                    heading={tag_key}
-                    filters={grouped_groups}
+    let sections = calculate_list_sections(state.filters, tracks);
+    return sections.map(
+        ([heading, section]) => {
+            let body = null;
+            if (section.groups) {
+                body = <GroupedFilterList
+                    heading={heading}
+                    filters={section.groups}
                     expanded={state.expanded}
-                />
-            );
-        } else {
-            filter_list = <FilterList heading={tag_key} filters={tag_values} />;
+                />;
+            }
+            if (section.filters) {
+                body = <FilterList
+                    heading={heading}
+                    filters={section.filters}
+                />;
+            }
+            if (section.tracks) {
+                body = <ul>{section.tracks.map((track) => (
+                    <TrackItem state={state} track={track} />
+                ))}</ul>;
+            }
+            return <div>
+                {heading && <h2>{heading}</h2>}
+                {body}
+            </div>
         }
-        sections.push(
-            <div>
-                <h2>{tag_key}</h2>
-                <ul>{filter_list}</ul>
-            </div>,
-        );
-    }
-
-    // if there are tracks which wouldn't be found if we used any
-    // of the above filters, show them now
-    if (leftover_tracks.length > 0) {
-        sections.push(
-            <div>
-                <h2>Tracks</h2>
-                <ul>
-                    {leftover_tracks.map((track) => (
-                        <TrackItem state={state} track={track} />
-                    ))}
-                </ul>
-            </div>,
-        );
-    }
-    return sections;
+    );
 }
 
 const Bookmarks = ({ state }: { state: State }) => (

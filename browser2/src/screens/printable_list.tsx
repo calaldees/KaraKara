@@ -46,7 +46,7 @@ export const PrintableList = ({ state }: { state: State }): VNode => (
         <br/><QrCode text={state.root + "/browser2/#" + JSON.stringify({room_name: state.room_name})} />
         {Object.values(state.track_list).map((track: Track) => (
             <p>
-                {last_tag(track.tags, "from")} ({shortest_tag(track.tags["use"])}){": "}
+                {last_tag(track.tags as Dictionary<Array<string>>, "from")} ({shortest_tag(track.tags["use"])}){": "}
                 {shortest_tag(track.tags.title)}
                 {" - "}
                 {track.tags["artist"] || "No Artist"} (
