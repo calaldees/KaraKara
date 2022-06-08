@@ -15,7 +15,7 @@
         "watch": "parcel watch --public-url . src/index.html",
         "serve": "parcel serve --port 1234 src/index.html",
         "format": "prettier --write 'src/**/*.tsx' --tab-width 4 --trailing-comma all",
-        "test": "jest"
+        "test": "jest --verbose"
     },
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",

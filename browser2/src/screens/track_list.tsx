@@ -7,7 +7,9 @@ import {
     PopScrollPos,
 } from "../effects";
 import { GoToScreen } from "../actions";
-import { track_info, find_tracks, calculate_list_sections } from "../utils";
+import { track_info } from "../utils";
+import { find_tracks } from "../track_finder";
+import { group_tracks } from "../track_grouper";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -166,7 +168,7 @@ const AddFilter = (
 function show_list(state: State) {
     let tracks = find_tracks(state);
     // console.log("Found", tracks.length, "tracks matching", state.filters, state.search);
-    let sections = calculate_list_sections(state.filters, tracks);
+    let sections = group_tracks(state.filters, tracks);
     return sections.map(
         ([heading, section]) => {
             let body = null;
