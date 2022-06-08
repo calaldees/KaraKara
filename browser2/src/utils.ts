@@ -218,7 +218,7 @@ export function find_tracks(
         if (search != "") {
             search = search.toLowerCase();
             let any_match = Object.values(track.tags).some(
-                tag_values => tag_values.some(
+                tag_values => (tag_values || []).some(
                     value => value.toLowerCase().indexOf(search) >= 0
                 )
             )
@@ -240,10 +240,14 @@ export function find_tracks(
  *                     vocal (on, off)
  *   category:anime -> from (gundam, macross, one piece)
  *   category:jpop  -> artist (akb48, mell, x japan)
+ *                     from (gundam, macross, one piece)
  *   from:gundam    -> gundam (wing, waltz, unicorn)
  */
- export function choose_section_names(state: Pick<State, "filters">, groups: {}): Array<string> {
-    let last_filter = state.filters[state.filters.length - 1];
+export function choose_section_names(
+    filters: Array<string>,
+    groups: Dictionary<Dictionary<number>>
+): Array<string> {
+    let last_filter = filters[filters.length - 1];
 
     // if no search, show a sensible selection
     if (last_filter == undefined) {
@@ -303,7 +307,7 @@ export function find_tracks(
  *     ...
  *  }
  */
-export function find_all_tags(
+export function summarise_tags(
     tracks: Array<Pick<Track, "tags">>
 ): Dictionary<Dictionary<number>> {
     let tags: Dictionary<Dictionary<number>> = {};

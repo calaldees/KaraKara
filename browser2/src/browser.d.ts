@@ -37,7 +37,7 @@ type Track = {
         title: Array<string>,
         vocaltrack?: Array<string>
         category?: Array<string>
-        // [x: string]: Array<string>,
+        [x: string]: Array<string> | undefined,
     },
     attachments: {
         video: Array<Attachment>,

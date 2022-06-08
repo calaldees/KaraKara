@@ -7,7 +7,7 @@ import {
     PopScrollPos,
 } from "../effects";
 import { GoToScreen } from "../actions";
-import { track_info, find_tracks, choose_section_names, find_all_tags } from "../utils";
+import { track_info, find_tracks, choose_section_names, summarise_tags } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -179,8 +179,8 @@ function show_list(state: State) {
             </ul>
         );
     }
-    let all_tags = find_all_tags(tracks);
-    let section_names = choose_section_names(state, all_tags);
+    let all_tags = summarise_tags(tracks);
+    let section_names = choose_section_names(state.filters, all_tags);
 
     /*
      * If we're looking at a tag with few values (eg vocaltrack=on/off),

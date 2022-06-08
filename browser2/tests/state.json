@@ -1,15 +1,15 @@
 {
-    "root": "https://example.com",
-    "room_name": "test",
-    "room_password": "password-example",
-    "settings": {
-      "test.string": "foo",
-      "test.int": 42,
-      "test.array": ["yo", "ho", "ho"]
-    },
-    "filters": ["from:One Piece"],
-    "session_id": "test-session-id",
-    "performer_name": "test-performer-name",
-    "queue": [],
-    "track_list": {}
-  }
+  "root": "https://example.com",
+  "room_name": "test",
+  "room_password": "password-example",
+  "settings": {
+    "test.string": "foo",
+    "test.int": 42,
+    "test.array": ["yo", "ho", "ho"]
+  },
+  "filters": ["from:One Piece"],
+  "session_id": "test-session-id",
+  "performer_name": "test-performer-name",
+  "queue": [],
+  "track_list": {}
+}

@@ -95,9 +95,46 @@ describe('track_info', () => {
   test('should basically work', () => {
     expect(utils.track_info(
       { filters: [] },
-      state.track_list["track_id_1"]
+      {
+        tags: {
+          "title": ["Fake Track Name"],
+          "from": ["Macross"],
+          "Macross": ["Do You Remember Love?"],
+          "use": ["opening", "op1"],
+          "length": ["short"],
+        }
+      }
     ))
       .toEqual("Macross - opening, op1 - short");
+  });
+  test('searching for a series should avoid showing that series', () => {
+    expect(utils.track_info(
+      { filters: ["from:Macross"] },
+      {
+        tags: {
+          "title": ["Fake Track Name"],
+          "from": ["Macross"],
+          "Macross": ["Do You Remember Love?"],
+          "use": ["opening", "op1"],
+          "length": ["short"],
+        }
+      }
+    ))
+      .toEqual("opening, op1 - short");
+  });
+  test('avoid duplicating the title in the info', () => {
+    expect(utils.track_info(
+      { filters: [] },
+      {
+        tags: {
+          "title": ["Fake Track Name"],
+          "from": ["Fake Track Name"],
+          "use": ["opening", "op1"],
+          "length": ["short"],
+        }
+      }
+    ))
+      .toEqual("opening, op1 - short");
   });
 });
 
@@ -175,32 +212,36 @@ describe('find_tracks (forced)', () => {
 });
 
 describe('choose_section_names', () => {
-  const groups = {
-    macross: ["movie 1", "movie 2"],
-    pokemon: ["johto"],
+  const summary = {
+    macross: {
+      "movie 1": 2,
+      "movie 2": 1,
+    },
+    pokemon: {
+      "johto": 2
+    },
   };
   test('with no filters, return default sections', () => {
-    expect(utils.choose_section_names({ filters: [] }, groups))
+    expect(utils.choose_section_names([], summary))
       .toEqual(["category", "vocalstyle", "vocaltrack", "lang"]);
   });
   test('with a known filter, return known sections', () => {
-    expect(utils.choose_section_names({ filters: ["category:jpop"] }, groups))
+    expect(utils.choose_section_names(["category:jpop"], summary))
       .toEqual(["artist", "from"]);
   });
-  test('when searching for a tag which has children', () => {
-    expect(utils.choose_section_names({ filters: ["from:macross"] }, groups))
+  test('when searching for a tag which has children, show that tag as the parent', () => {
+    expect(utils.choose_section_names(["from:macross"], summary))
       .toEqual(["macross"]);
   });
-  // is this right??
-  test('when searching for a tag which doesn\'t have children', () => {
-    expect(utils.choose_section_names({ filters: ["from:gundam"] }, groups))
+  test("when searching for a tag which doesn't have children, show full summary", () => {
+    expect(utils.choose_section_names(["category:anime"], summary))
       .toEqual(["macross", "pokemon"]);
   });
 });
 
-describe('find_all_tags', () => {
+describe('summarise_tags', () => {
   test('should basically work', () => {
-    expect(utils.find_all_tags(Object.values(state.track_list)))
+    expect(utils.summarise_tags(Object.values(state.track_list)))
       .toEqual({
         "": {
           "minami": 1,
