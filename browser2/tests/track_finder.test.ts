@@ -24,7 +24,12 @@ describe('apply_tags', () => {
                 "track_id_2",
             ]);
     });
-    test('query for a non-existing tag returns nothing', () => {
+    test('query for a non-existing tag key returns nothing', () => {
+        expect(finder.apply_tags(tracks, ["asdf:anime"]).map(track => track.id))
+            .toEqual([
+            ]);
+    });
+    test('query for a non-existing tag value returns nothing', () => {
         expect(finder.apply_tags(tracks, ["from:asdfa"]).map(track => track.id))
             .toEqual([
             ]);

@@ -57,7 +57,7 @@ export function apply_tags(tracks: Array<Track>, tags: Array<string>): Array<Tra
         // ... every ...
         track => tag_pairs.every(
             // ... tag-pair that we're looking for is found in the track
-            ([tag_key, tag_value]) => (track.tags[tag_key] as Array<string>).includes(tag_value)
+            ([tag_key, tag_value]) => track.tags[tag_key]?.includes(tag_value)
         )
     );
 }
