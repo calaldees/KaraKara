@@ -8,6 +8,8 @@
 **/*.egg-info
 **/_env
 
+**/coverage
+
 *.log
 *.pid
 

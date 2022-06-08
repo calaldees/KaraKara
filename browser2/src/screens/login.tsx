@@ -1,13 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./_common";
-
-
-///////////////////////////////////////////////////////////////////////
-// Utils
-
-function percent(a: number, b: number): string {
-    return Math.round((a / b) * 100) + "%";
-}
+import { percent } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////

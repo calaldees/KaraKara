@@ -1,0 +1,45 @@
+{
+    "track_id_1": {
+      "id": "track_id_1",
+      "tags": {
+        "title": ["Fake Track Name"],
+        "from": ["Macross"],
+        "Macross": ["Do You Remember Love?"],
+        "use": ["opening", "op1"],
+        "length": ["short"],
+        "category": ["anime"],
+        "": ["retro", "minami"]
+      },
+      "duration": 231.4,
+      "attachments": {
+        "video": [
+          {
+            "path": "f/foo.mp4",
+            "mime": "video/mp4"
+          }
+        ],
+        "image": [],
+        "preview": [],
+        "subtitle": []
+      },
+      "lyrics": []
+    },
+    "track_id_2": {
+      "id": "track_id_2",
+      "tags": {
+        "title": ["Fake Track Name 2"],
+        "from": ["Gundam"],
+        "use": ["opening", "op2"],
+        "category": ["anime", "cartoon"],
+        "length": ["short"]
+      },
+      "duration": 231.4,
+      "attachments": {
+        "video": [],
+        "image": [],
+        "preview": [],
+        "subtitle": []
+      },
+      "lyrics": []
+    }
+  }

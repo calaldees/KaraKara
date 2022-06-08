@@ -32,12 +32,12 @@ type Attachment = {
 
 type Track = {
     id: string,
-    title: string,
     duration: number,
     tags: {
         title: Array<string>,
-        // vocaltrack?: Array<string>
-        [x: string]: Array<string> | undefined,
+        vocaltrack?: Array<string>
+        category?: Array<string>
+        // [x: string]: Array<string>,
     },
     attachments: {
         video: Array<Attachment>,

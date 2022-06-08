@@ -1,36 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./_common";
 import * as qrcode from "qrcode-generator";
-
-
-///////////////////////////////////////////////////////////////////////
-// Utils
-
-function shortest_tag(n: Array<string> | undefined): string {
-    if (n === undefined) {
-        return "";
-    }
-    if (typeof n === "string") {
-        return n;
-    }
-    return n.sort((a, b) => a.length > b.length ? 1 : -1)[0];
-}
-
-/*
-Given a tag set like
-
-  from:macross
-  macross:macross frontier
-
-we want last_tag("from") to get "macross frontier"
-*/
-function last_tag(tags: Dictionary<Array<string> | undefined>, start: string): string {
-    let tag = start;
-    while(tags[tag]) {
-        tag = tags[tag]?.[0] || "";
-    }
-    return tag;
-}
+import { shortest_tag, last_tag } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////

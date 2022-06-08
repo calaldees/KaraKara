@@ -12,8 +12,7 @@ type Attachment = {
 }
 
 type Track = {
-    source_hash: string,
-    title: string,
+    id: string,
     duration: number,
     tags: {
         title: Array<string>,
