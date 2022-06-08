@@ -306,6 +306,50 @@ describe('apply_hidden', () => {
   });
 });
 
+// find_tracks = apply_hidden + apply_tags(forced) + apply_tags(user) + apply_search
+// I want one function which does it all for performance testing
+describe('find_tracks', () => {
+  // generate a large dataset, but do it outside of the test
+  // so that it doesn't contribute to the test's performance
+  let big_tracks: Dictionary<Track> = {};
+  for (let i = 0; i < 10000; i++) {
+    big_tracks["track_id_" + i] = {
+      id: "track_id_" + i,
+      duration: 123,
+      tags: {
+        title: ["Test Track " + i],
+        from: ["Macross"],
+        category: ["anime"],
+        "": ["retro"],
+      },
+      attachments: {
+        video: [],
+        preview: [],
+        image: [],
+        subtitle: [],
+      },
+      lyrics: [""]
+    };
+  }
+  let big_state: State = {
+    ...state,
+    settings: {
+      "karakara.search.tag.silent_forced": ["retro"],
+      "karakara.search.tag.silent_hidden": ["todo", "delete", "broken"],
+    },
+    filters: ["category:anime"],
+    search: "mac",
+    track_list: big_tracks,
+  };
+  test("Performance is OK with many active filters", () => {
+    // check that even though we have all the types of filters, and
+    // none of them are narrowing down the list at all, we're still
+    // doing ok
+    let tracks = utils.find_tracks(big_state);
+    expect(tracks.length).toEqual(10000);
+  });
+});
+
 
 ///////////////////////////////////////////////////////////////////////
 // Track List Rendering
@@ -430,47 +474,5 @@ describe('calculate_list_sections', () => {
     expect(results[0][1].filters).toBeDefined();
     expect(results[1][0]).toEqual("Tracks");
     expect(results[1][1].tracks).toBeDefined();
-  });
-});
-
-describe('find_tracks', () => {
-  // generate a large dataset, but do it outside of the test
-  // so that it doesn't contribute to the test's performance
-  let big_tracks: Dictionary<Track> = {};
-  for (let i = 0; i < 10000; i++) {
-    big_tracks["track_id_" + i] = {
-      id: "track_id_" + i,
-      duration: 123,
-      tags: {
-        title: ["Test Track " + i],
-        from: ["Macross"],
-        category: ["anime"],
-        "": ["retro"],
-      },
-      attachments: {
-        video: [],
-        preview: [],
-        image: [],
-        subtitle: [],
-      },
-      lyrics: [""]
-    };
-  }
-  let big_state: State = {
-    ...state,
-    settings: {
-      "karakara.search.tag.silent_forced": ["retro"],
-      "karakara.search.tag.silent_hidden": ["todo", "delete", "broken"],
-    },
-    filters: ["category:anime"],
-    search: "mac",
-    track_list: big_tracks,
-  };
-  test("Performance is OK with many active filters", () => {
-    // check that even though we have all the types of filters, and
-    // none of them are narrowing down the list at all, we're still
-    // doing ok
-    let tracks = utils.find_tracks(big_state);
-    expect(tracks.length).toEqual(10000);
   });
 });
