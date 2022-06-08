@@ -10,6 +10,7 @@ RUN npm install
 COPY . /app
 # pwa-manifest is broken in dev-mode, only use it for prod builds
 RUN echo '{"extends": ["@parcel/config-default", "parcel-config-pwa-manifest"]}' > .parcelrc
+RUN npm run test
 RUN npm run build
 
 # Copy built app to minimal-httpd container
