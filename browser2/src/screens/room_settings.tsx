@@ -19,22 +19,25 @@ function UpdateSettings(
     return state;
 }
 
-const SaveSettings = (state: State): Dispatchable => [
-    { ...state },
-    ApiRequest({
-        title: "Saving settings...",
-        function: "settings",
-        state: state,
-        options: {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+const SaveSettings = (state: State, event: SubmitEvent): Dispatchable => {
+    event.preventDefault();
+    return [
+        { ...state },
+        ApiRequest({
+            title: "Saving settings...",
+            function: "settings",
+            state: state,
+            options: {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(flatten_settings(state.settings)),
             },
-            body: new URLSearchParams(flatten_settings(state.settings)),
-        },
-        // action: (state, response) => [{ ...state }],
-    }),
-];
+            // action: (state, response) => [{ ...state }],
+        }),
+    ]
+};
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -51,25 +54,27 @@ const SettingsButtons = ({ state }: { state: State }): VNode => (
 );
 
 export const RoomSettings = ({ state }: { state: State }): VNode => (
-    <Screen
-        state={state}
-        className={"room_settings"}
-        navLeft={<BackToExplore />}
-        title={"Room Settings"}
-        //navRight={}
-        footer={<SettingsButtons state={state} />}
-    >
-        {Object.entries(state.settings).map(([key, value]) => (
-            <p>
-                {key.replace("karakara.", "")}:
-                <br />
-                <input
-                    type={"text"}
-                    name={key}
-                    value={value}
-                    onchange={UpdateSettings}
-                />
-            </p>
-        ))}
-    </Screen>
+    <form onsubmit={SaveSettings}>
+        <Screen
+            state={state}
+            className={"room_settings"}
+            navLeft={<BackToExplore />}
+            title={"Room Settings"}
+            //navRight={}
+            footer={<SettingsButtons state={state} />}
+        >
+            {Object.entries(state.settings).map(([key, value]) => (
+                <p>
+                    {key.replace("karakara.", "")}:
+                    <br />
+                    <input
+                        type={"text"}
+                        name={key}
+                        value={value}
+                        onchange={UpdateSettings}
+                    />
+                </p>
+            ))}
+        </Screen>
+    </form>
 );
