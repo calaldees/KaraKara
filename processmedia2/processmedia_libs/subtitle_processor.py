@@ -1,8 +1,9 @@
 ## -*- coding: utf-8 -*-
 
 import re
-from datetime import time
+from datetime import time, timedelta
 from itertools import zip_longest, tee, chain
+from sqlite3 import Timestamp
 from typing import NamedTuple
 
 import logging
@@ -471,12 +472,14 @@ def create_vtt(subtitles):
     >>> vtt = create_vtt((
     ...     Subtitle(time(0,1,0,0), time(0,2,0,0), 'first', top=True),
     ...     Subtitle(time(0,2,0,0), time(0,3,0,510000), 'second', top=True),
+    ...     Subtitle(time(0,4,0,0), time(0,5,0,0), 'thrid', top=True),
+    ...     Subtitle(time(0,5,0,0), time(0,6,0,510000), 'fourth', top=True),
     ... ))
     >>> print(vtt)
     WEBVTT - KaraKara Subtitle
     <BLANKLINE>
     1
-    00:00:00.000 --> 00:01:00.000 line:1
+    00:00:55.000 --> 00:01:00.000 line:1
     <v active>
     <v next>first
     <BLANKLINE>
@@ -490,6 +493,21 @@ def create_vtt(subtitles):
     <v active>second
     <v next>
     <BLANKLINE>
+    4
+    00:00:55.000 --> 00:04:00.000 line:1
+    <v active>
+    <v next>third
+    <BLANKLINE>
+    5
+    00:04:00.000 --> 00:05:00.000 line:1
+    <v active>thrid
+    <v next>fourth
+    <BLANKLINE>
+    6
+    00:05:00.000 --> 00:06:00.510 line:1
+    <v active>fourth
+    <v next>
+    <BLANKLINE>
     <BLANKLINE>
     """
     VTT_FORMAT = """\
@@ -499,6 +517,18 @@ def create_vtt(subtitles):
 <v next>{next}
 
 """
+    last_end = time(0, 0, 0, 0)
+    padded_lines = []
+    for line in subtitles:
+        if line.start - last_end > timedelta(second=5):
+            padded_lines.append(Subtitle(
+                start=line.start - timedelta(seconds=5),
+                end=line.start,
+                text="",
+            ))
+        padded_lines.append(line)
+    padded_lines.append(Subtitle())
+
     return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
         VTT_FORMAT.format(
             index=index+1,
@@ -508,5 +538,5 @@ def create_vtt(subtitles):
             active=subtitle1.text,
             next=subtitle2.text,
         )
-        for index, (subtitle1, subtitle2) in enumerate(pairwise(subtitles, fillvalue=Subtitle()))
+        for index, (subtitle1, subtitle2) in enumerate(zip(padded_lines[:-1], padded_lines[1:]))
     )
