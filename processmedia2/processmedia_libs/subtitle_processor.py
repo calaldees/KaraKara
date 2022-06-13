@@ -3,6 +3,7 @@
 import re
 from datetime import timedelta
 from itertools import zip_longest, tee, chain
+from sqlite3 import Timestamp
 from typing import NamedTuple
 
 import logging
@@ -429,20 +430,6 @@ def create_srt(subtitles):
     )
 
 
-
-
-def pairwise(iterable, fillvalue=None):
-    """
-    now part of standard lib itertools.pairwise
-    https://stackoverflow.com/a/5434936/3356840
-    s -> (s0,s1), (s1,s2), (s2, s3), ...
-
-    >>> tuple(pairwise((1,2,3)))
-    ((None, 1), (1, 2), (2, 3), (3, None))
-    """
-    a, b = tee(iterable)
-    return chain(((fillvalue, next(b, fillvalue)),), zip_longest(a, b, fillvalue=fillvalue))
-
 def create_vtt(subtitles):
     r"""
     https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
@@ -457,7 +444,7 @@ def create_vtt(subtitles):
     WEBVTT - KaraKara Subtitle
     <BLANKLINE>
     1
-    00:00:00.000 --> 00:01:00.000
+    00:00:55.000 --> 00:01:00.000
     <v active>
     <v next>first
     <BLANKLINE>
@@ -475,13 +462,15 @@ def create_vtt(subtitles):
 
     >>> vtt = create_vtt((
     ...     Subtitle(timedelta(minutes=1), timedelta(minutes=2), 'first', top=True),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, milliseconds=510), 'second', top=True),
+    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, microseconds=510000), 'second', top=True),
+    ...     Subtitle(timedelta(minutes=4), timedelta(minutes=5), 'third', top=True),
+    ...     Subtitle(timedelta(minutes=5), timedelta(minutes=6, microseconds=510000), 'fourth', top=True),
     ... ))
     >>> print(vtt)
     WEBVTT - KaraKara Subtitle
     <BLANKLINE>
     1
-    00:00:00.000 --> 00:01:00.000 line:1
+    00:00:55.000 --> 00:01:00.000 line:1
     <v active>
     <v next>first
     <BLANKLINE>
@@ -495,6 +484,21 @@ def create_vtt(subtitles):
     <v active>second
     <v next>
     <BLANKLINE>
+    4
+    00:03:55.000 --> 00:04:00.000 line:1
+    <v active>
+    <v next>third
+    <BLANKLINE>
+    5
+    00:04:00.000 --> 00:05:00.000 line:1
+    <v active>third
+    <v next>fourth
+    <BLANKLINE>
+    6
+    00:05:00.000 --> 00:06:00.510 line:1
+    <v active>fourth
+    <v next>
+    <BLANKLINE>
     <BLANKLINE>
     """
     VTT_FORMAT = """\
@@ -504,14 +508,32 @@ def create_vtt(subtitles):
 <v next>{next}
 
 """
+    last_end = timedelta(0)
+    padded_lines = []
+    for line in subtitles:
+        if line.start - last_end > timedelta(seconds=5):
+            padded_lines.append(Subtitle(
+                start=line.start - timedelta(seconds=5),
+                end=line.start,
+                text="",
+                top=line.top,
+            ))
+        padded_lines.append(line)
+        last_end = line.end
+    padded_lines.append(Subtitle(
+        start=last_end,
+        end=last_end,
+        text=""
+    ))
+
     return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
         VTT_FORMAT.format(
             index=index+1,
             start=_vtt_time(subtitle1.start),
-            end=_vtt_time(subtitle1.end if subtitle1.end != timedelta() else subtitle2.start),
-            format=" line:1" if subtitle1.top or subtitle2.top else "",
+            end=_vtt_time(subtitle1.end),
+            format=" line:1" if subtitle1.top else "",
             active=subtitle1.text,
             next=subtitle2.text,
         )
-        for index, (subtitle1, subtitle2) in enumerate(pairwise(subtitles, fillvalue=Subtitle()))
+        for index, (subtitle1, subtitle2) in enumerate(zip(padded_lines[:-1], padded_lines[1:]))
     )
