@@ -27,6 +27,15 @@ $LIGHT: #29EDF2;
 	animation-fill-mode: both;
 }
 
+::cue {
+	font-family: metalghosts, sans-serif;
+	text-shadow:
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+}
+
 .theme-metalghosts,
 .theme-metalghosts-lite {
 	color: white;

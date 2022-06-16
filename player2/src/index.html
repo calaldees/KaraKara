@@ -6,31 +6,6 @@
         <meta name="viewport" content="width=device-width">
         <link rel="icon" type="image/svg+xml" href="static/favicon.svg">
         <link href="static/style.scss" rel="stylesheet" type="text/css" />
-		<script>
-// This belongs in style.css and _metalghosts.css, but parcel-css
-// can't parse it as CSS, so we include it as JS...
-const style = document.createElement('style');
-style.textContent = `
-::cue(v[voice='active']) {
-  color: yellow;
-}
-::cue(v[voice='next']) {
-  color: white;
-}
-.screen_podium ::cue {
-	font-size: 2em;
-}
-::cue {
-	font-family: metalghosts, sans-serif;
-	text-shadow:
-		-1px -1px 0 #000,
-		1px -1px 0 #000,
-		-1px 1px 0 #000,
-		1px 1px 0 #000;
-}
-`;
-document.head.appendChild(style);
-		</script>
     </head>
     <body><noscript>This page requires JavaScript</noscript></body>
     <script type="module" src="player.ts"></script>
