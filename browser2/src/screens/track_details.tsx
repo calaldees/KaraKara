@@ -158,7 +158,7 @@ export const TrackDetails = ({
         </div>
 
         {/* Lyrics */}
-        {track.lyrics.length && (
+        {track.lyrics.length > 0 && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
                 {track.lyrics.map(item => <div>{item}</div>)}

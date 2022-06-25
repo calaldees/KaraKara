@@ -43,7 +43,7 @@ const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): 
             <div>
                 <ul>
                     <QueueItemRender state={state} item={queue[0]} />
-                    {state.track_list[queue[0].track_id].lyrics.length && (
+                    {state.track_list[queue[0].track_id].lyrics.length > 0 && (
                         <li>
                             <span class={"lyrics"}>
                                 {state.track_list[queue[0].track_id].lyrics.map(line =>
