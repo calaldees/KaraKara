@@ -238,6 +238,7 @@ class Encoder(object):
 
 def additional_arguments(parser):
     parser.add_argument('--process_order_function', choices=PROCESS_ORDER_FUNCS.keys(), help='', default=DEFAULT_ORDER_FUNC)
+    parser.add_argument('--process_timeout_seconds', type=int, help='timeout for external-tools/ffmpeg (default 6000 == 1h40)', default=6000)
 
 
 def process_arguments(kwargs):

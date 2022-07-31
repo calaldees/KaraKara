@@ -12,5 +12,6 @@
     "gzip": true,
 
     "process_order_function": "random",
+    "process_timeout_seconds": 15000,
     "disable_meta_write_safety": true
 }
