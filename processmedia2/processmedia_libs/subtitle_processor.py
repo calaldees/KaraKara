@@ -436,6 +436,12 @@ def create_vtt(subtitles):
     https://w3c.github.io/webvtt/
     https://caniuse.com/?search=vtt
 
+    >>> vtt = create_vtt(tuple())
+    >>> print(vtt)
+    WEBVTT - KaraKara Subtitle
+    <BLANKLINE>
+    <BLANKLINE>
+
     >>> vtt = create_vtt((
     ...     Subtitle(timedelta(minutes=1), timedelta(minutes=2), 'first'),
     ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, milliseconds=510), 'second'),
