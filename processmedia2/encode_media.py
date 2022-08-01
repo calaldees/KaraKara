@@ -173,7 +173,7 @@ class Encoder(object):
         # Subtitle
         elif target_file.type.attachment_type in ('subtitle',):
             subtitles = ()
-            if not m.source_files.get('sub'):
+            if m.source_files.get('sub'):
                 with m.source_files['sub'].file.open('rt') as filehandle:
                     subtitles = parse_subtitles(filehandle=filehandle)
             
