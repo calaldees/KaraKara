@@ -7,6 +7,13 @@ services:
     image: redis:alpine
     volumes:
       - redis_data:/data:rw
+    #ports:
+    #  - 6379:6379
+
+  mqtt:
+    image: eclipse-mosquitto
+    #ports:
+    #  - 1883:1883
 
   api_queue:
     build:
@@ -16,5 +23,6 @@ services:
       - 1337:1337
     links:
       - redis
+      - mqtt
     volumes:
       - ${PWD}:/app/:ro

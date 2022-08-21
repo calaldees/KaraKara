@@ -23,38 +23,39 @@ queue datamodel
 ---------------
 
 Don't need JSON - newline text? split? No need for field names? `test/csv` records? (no heading?)
+
+```csv
+track_id,performer_name,session_owner,timestamp_play
+abc123,MahName1,xyz456,1661094171425
+def456,MahName2,xyz457,1661094271426
 ```
-QUEUE_KEY: [
-    {
-        "track_id": "BASE64HASH",
-        "performer_name": 'str',
-        "session_owner": '',
-        "weight": float,
-    }
-    "timestamp_play": int,
-]
-```
+
 
 api
 ---
 
-* queue
-    * new
+* /queue/
+    * GET (admin)
+        * list
+    * POST
         * new queue (demo - 10 tracks?)
         * new queue (transient)
         * new named queue (admin)
-    * get_settings
-    * set_settings (admin)
+* /queue/XYZ/
+    * DELETE queue
+* /queue/XYZ/settings
+    * GET
+    * POST/PUT (admin)
         * queue limit model (priority token or points)
-    * del queue
-    * get_tracks
-        * redirect to static track_datafile from hash of filter_tags
-* queue_items operations
-    * get (only used for testing - this is pushed to mosquito)
-    * add (limit owner or admin)
-        * No validation of track_id
-    * del (owner or admin only)
-    * update (admin)
+* /queue/XYZ/tracks
+    * GET
+        * 302 redirect to static track_datafile from hash of filter_tags
+* /queue/XYZ/items
+    * GET (only used for testing - this is pushed to mqtt)
+    * POST (limit owner or admin)
+        * name, trackid
+        * return id
+* /queue/XYZ/items/ABC
+    * DELETE (owner or admin only)
+    * PUT (admin)
         * (weight, timestamp_play)
-* root
-    * queues (admin)
