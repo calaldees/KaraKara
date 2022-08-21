@@ -22,7 +22,7 @@ class MetaManagerExtended(MetaManager):
         return (self.get(name) for name in self.meta.keys())
 
     class MetaFileWithSourceFiles(MetaFile):
-        def __init__(self, metafile, source_files_manager, processed_files_manager):
+        def __init__(self, metafile, source_files_manager: SourceFilesManager, processed_files_manager: ProcessedFilesManager):
             self.__dict__ = metafile.__dict__
             self.source_files_manager = source_files_manager
             self.processed_files_manager = processed_files_manager

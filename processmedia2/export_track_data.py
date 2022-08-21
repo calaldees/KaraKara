@@ -1,5 +1,7 @@
-from functools import partial
+from functools import partial, reduce
 import json
+import re
+import gzip
 
 from clint.textui.progress import bar as progress_bar
 
@@ -8,6 +10,7 @@ from calaldees.files.scan import fast_scan
 from processmedia_libs.meta_overlay import MetaManagerExtended
 from processmedia_libs import PENDING_ACTION
 from processmedia_libs.subtitle_processor_with_codecs import parse_subtitles
+from processmedia_libs.tag_processor import parse_tags
 
 import logging
 log = logging.getLogger(__name__)
@@ -33,7 +36,7 @@ def export_track_data(**kwargs):
 
             # Abort if duration not known
             if not m.source_details.get('duration'):
-                log.warning('Missing (duration) abort import: {name}')
+                log.warning(f'Missing (duration) abort import: {name}')
                 stats['missing_processed_aborted'].add(name)  # TODO: rename
                 continue
 
@@ -47,52 +50,61 @@ def export_track_data(**kwargs):
                 if PENDING_ACTION['encode'] not in m.pending_actions:  # Feels clunky to manage this as a list? maybe a set?
                     m.pending_actions.append(PENDING_ACTION['encode'])
                     #meta_manager.save(name)  # Feels clunky
-                log.warning('Missing (processed files) abort import: {name}')
+                log.warning(f'Missing (processed files) abort import: {name}')
                 stats['missing_processed_aborted'].add(name)
                 continue
 
             log.debug(f'Export: {name}')
 
+            def _get_attachments():
+                def _reduce(accumulator, processed_file):
+                    accumulator.setdefault(processed_file.type.attachment_type, []).append({
+                        'mime': processed_file.type.mime,
+                        'path': str(processed_file.relative),
+                    })
+                    return accumulator
+                return reduce(_reduce, m.processed_files.values(), {})
+
             def _get_lyrics():
                 source_file_sub = m.source_files.get('sub')
                 if not source_file_sub or not source_file_sub.file.is_file():
                     log.debug(f'{source_file_sub=} missing - unable to import srt')
-                    return
+                    return []
                 with source_file_sub.file.open('rt') as filehandle:
                     subtitles = parse_subtitles(filehandle=filehandle)
-                return '\n'.join(subtitle.text for subtitle in subtitles)
+                return [subtitle.text for subtitle in subtitles]
 
             def _get_tags():
                 source_file_tag = m.source_files.get('tag')
                 with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
-                    return tag_file.read().strip().strip("\ufeff")
+                    return parse_tags(tag_file.read())
 
-            yield m.source_hash, {
+            track_id = re.sub('[^0-9a-zA-Z]+', '_', name)
+            yield track_id, {
+                'id': track_id,
                 'source_hash': m.source_hash,
                 'source_filename': name,
                 'duration': m.source_details['duration'],
-                'attachments': tuple(
-                    {
-                        'use': processed_file.type.attachment_type,
-                        'mime': processed_file.type.mime,
-                        'path': str(processed_file.relative),
-                    }
-                    for processed_file in m.processed_files.values()
-                ),
+                'attachments': _get_attachments(),
                 'lyrics': _get_lyrics(),
                 'tags': _get_tags(),
             }
             stats['meta_exported'].add(name)
 
     assert kwargs['path_static_track_list']
+    data = json.dumps(dict(_tracks()), default=tuple)
     with open(kwargs['path_static_track_list'], 'wt') as filehandle:
-        json.dump(dict(_tracks()), filehandle)
+        filehandle.write(data)
+    if kwargs['gzip']:
+        with gzip.open(kwargs['path_static_track_list']+".gz", 'wb') as filehandle:
+            filehandle.write(data.encode('utf8'))
 
     return stats
 
 
 def additional_arguments(parser):
     parser.add_argument('--path_static_track_list', action='store', help='the path to output json data')
+    parser.add_argument('--gzip', action='store_true', default=False, help='also write out track_list.json.gz')
 
 
 if __name__ == "__main__":

@@ -1,17 +1,14 @@
 /// <reference path='./browser.d.ts'/>
-import Cookies from 'js-cookie'
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
-import { SurviveHMR } from "@shish2k/hyperapp-survive-hmr";
 import {
     LocalStorageLoader,
     LocalStorageSaver,
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { getMQTTListener, ResizeListener } from "./subs";
-import { AutoLogin } from "./effects";
-import { is_logged_in } from "./utils";
+import { BeLoggedIn, CookieListener, getMQTTListener, ResizeListener } from "./subs";
+import { ApiRequest } from "./effects";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -42,9 +39,11 @@ let state: State = {
     // login
     session_id: null,
     room_name: "",
+    room_name_edit: "",
     room_password: "",
     room_password_edit: "",
     loading: false,
+    is_admin: false,
 
     // track list
     track_list: {},
@@ -66,39 +65,61 @@ let state: State = {
     bookmarks: [],
 
     // settings
-    settings: {},
+    settings: {
+        "karakara.template.input.performer_name": "Enter Name",
+        "karakara.search.tag.silent_forced": [],
+        "karakara.search.tag.silent_hidden": [],
+    },
 
     // priority_tokens
     priority_tokens: [],
 };
 
-function _cookieListener(dispatch, props) {
-    let oldCookieVal: string | null = null;
-    let cookieTimer = setInterval(function() {
-        let cookieVal = Cookies.get(props.name);
-        if(cookieVal != oldCookieVal) {
-            oldCookieVal = cookieVal;
-            console.log(props.name + " has new cookie val: " + cookieVal);
-            dispatch(props.callback, cookieVal);
-        }
-    }, 1000);
-    return function() {
-        clearInterval(cookieTimer);
-    };
-}
-function CookieListener(name, callback) {
-    return [_cookieListener, {name: name, callback: callback}];
-}
+const init: Dispatchable = [
+    state,
+    LocalStorageLoader("performer_name", (state, x) => ({
+        ...state,
+        performer_name: x,
+    })),
+    LocalStorageLoader("room_password", (state, x) => ({
+        ...state,
+        room_password_edit: x,
+        room_password: x,
+    })),
+    LocalStorageLoader("bookmarks", (state, x) => ({
+        ...state,
+        bookmarks: x,
+    })),
+    ApiRequest({
+        url: `${state.root}/tracks.json`,
+        state: state,
+        progress: (state, { done, size }) => [
+            {
+                ...state,
+                download_done: done,
+                download_size: size,
+            },
+        ],
+        action: (state, response) => [
+            {
+                ...state,
+                track_list: response,
+                download_done: 0,
+                download_size: null,
+            },
+        ],
+    }),
+];
 
 const subscriptions = (state: State): Array<Subscription> => [
     HashStateManager(
         {
             push: ["root", "filters", "track_id", "room_name"],
-            replace: ["search", "booth", "widescreen"],
+            replace: ["search", "booth", "widescreen", "room_name_edit"],
         },
         state,
     ),
-    is_logged_in(state) && getMQTTListener(state),
+    getMQTTListener(state),
     LocalStorageSaver("performer_name", state.performer_name),
     LocalStorageSaver("room_password", state.room_password),
     LocalStorageSaver("bookmarks", state.bookmarks),
@@ -110,28 +131,11 @@ const subscriptions = (state: State): Array<Subscription> => [
         ...state,
         priority_token: cookie ? JSON.parse(cookie) : null,
     })),
+    BeLoggedIn(state.room_name, state.room_password),
 ];
 
 app({
-    init: [
-        state,
-        LocalStorageLoader("performer_name", (state, x) => ({
-            ...state,
-            performer_name: x,
-        })),
-        LocalStorageLoader("room_password", (state, x) => ({
-            ...state,
-            room_password_edit: x,
-            room_password: x,
-        })),
-        LocalStorageLoader("bookmarks", (state, x) => ({
-            ...state,
-            bookmarks: x,
-        })),
-        SurviveHMR(module, [
-            AutoLogin(),
-        ]),
-    ],
+    init: init,
     view: Root,
     subscriptions: subscriptions,
     node: document.body,

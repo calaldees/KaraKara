@@ -5,26 +5,6 @@
  */
 import { SetTrackState } from "./effects";
 
-// App controls
-export function SetRoom(state: State, room: string): Dispatchable {
-    return { ...state, room_name: room };
-}
-
-export function SetPreviewVolume(state: State, event): Dispatchable {
-    event.target.volume =
-        state.settings["karakara.player.video.preview_volume"];
-    return state;
-}
-
-export function UpdateProgress(state: State, event): Dispatchable {
-    return { ...state, progress: event.target.currentTime };
-}
-
-export function UpdatePodiumProgress(state: State, event): Dispatchable {
-    if (state.playing) return { ...state, progress: event.target.currentTime };
-    return state;
-}
-
 // Current track controls
 export function Play(state: State): Dispatchable {
     return {
@@ -73,33 +53,6 @@ export function SeekBackwards(state: State, value: number | null): Dispatchable 
 }
 
 // Playlist controls
-export function UpdateQueue(state: State, new_queue: Array<QueueItem>): Dispatchable {
-    // still waiting for the queue to return the new format, hard-coding for now
-    return {...state, queue: [{
-        id: 1,
-        track_id: "v_wvprHM_2F",
-        performer_name: "testo",
-        total_duration: 123,
-    }
-    ]};
-    // if the first song in the queue has changed, stop playing
-    if (
-        state.queue.length === 0 ||
-        new_queue.length === 0 ||
-        state.queue[0].id !== new_queue[0].id
-    ) {
-        return {
-            ...state,
-            queue: new_queue,
-            playing: false,
-            paused: false,
-            progress: 0,
-        };
-    } else {
-        return { ...state, queue: new_queue };
-    }
-}
-
 function _dequeue(state: State): State {
     return {
         ...state,

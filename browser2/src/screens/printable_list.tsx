@@ -1,6 +1,11 @@
 import h from "hyperapp-jsx-pragma";
-import { BackToExplore, Screen } from "./base";
+import { BackToExplore, Screen } from "./_common";
 import * as qrcode from "qrcode-generator";
+import { shortest_tag, last_tag } from "../utils";
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 const PrintButtons = (): VNode => (
     <footer>
@@ -16,32 +21,6 @@ const PrintButtons = (): VNode => (
         </div>
     </footer>
 );
-
-function shortest_tag(n: Array<string>): string {
-    if (n === undefined) {
-        return "";
-    }
-    if (typeof n === "string") {
-        return n;
-    }
-    return n.sort((a, b) => a.length > b.length ? 1 : -1)[0];
-}
-
-/*
-Given a tag set like
-
-  from:macross
-  macross:macross frontier
-
-we want last_tag("from") to get "macross frontier"
-*/
-function last_tag(tags: Dictionary<Array<string>>, start: string): string {
-    let tag = start;
-    while(tags[tag]) {
-        tag = tags[tag][0];
-    }
-    return tag;
-}
 
 // You'd think this needs memoising to avoid heavy CPU load,
 // but it actually renders in under 15ms (60fps)
@@ -65,20 +44,10 @@ export const PrintableList = ({ state }: { state: State }): VNode => (
         To get an interactive track list on your phone, scan this QR code or
         visit {state.root} and use room name "{state.room_name}".
         <br/><QrCode text={state.root + "/browser2/#" + JSON.stringify({room_name: state.room_name})} />
-        {/* fields = ['id_short'] + settings['karakara.print_tracks.fields'] */}
         {Object.values(state.track_list).map((track: Track) => (
             <p>
-                <code>
-                    {track.source_hash.substring(
-                        0,
-                        state.settings[
-                            "karakara.print_tracks.short_id_length"
-                        ] || 6,
-                    )}
-                </code>
-                {": "}
-                {last_tag(track.tags, "from")} ({shortest_tag(track.tags["use"])}){": "}
-                {shortest_tag(track.tags["title"])}
+                {last_tag(track.tags as Dictionary<Array<string>>, "from")} ({shortest_tag(track.tags["use"])}){": "}
+                {shortest_tag(track.tags.title)}
                 {" - "}
                 {track.tags["artist"] || "No Artist"} (
                 {Math.floor(track.duration / 60)}m

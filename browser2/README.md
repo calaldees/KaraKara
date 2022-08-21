@@ -71,3 +71,10 @@ hot-reloaded, no need to even hit refresh in the browser :)
 
 After double-clicking any title to get to the app settings, click on
 "Settings" to write out the current state to the debug console.
+
+Unit tests for the more processing-heavy parts of the code can
+be run with:
+
+```
+npm run test
+```

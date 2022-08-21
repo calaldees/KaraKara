@@ -1,28 +1,40 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
-import { TryLogin } from "../actions";
+import { Screen } from "./_common";
+import { percent } from "../utils";
 
-function percent(a: number, b: number): string {
-    return Math.round((a / b) * 100) + "%";
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function TryLogin(state: State, event: SubmitEvent): State {
+    event.preventDefault();
+    return {
+        ...state,
+        room_name: state.room_name_edit.toLowerCase().trim(),
+    };
 }
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 export const Login = ({ state }: { state: State }): VNode => (
     <Screen state={state} className={"login"} title={"Welcome to KaraKara"}>
         <div class={"flex-center"}>
-            <form onsubmit={TryLogin()}>
+            <form onsubmit={TryLogin}>
                 <input
                     type={"text"}
                     placeholder={"Room Name"}
-                    value={state.room_name}
-                    oninput={(state, event) => ({
+                    value={state.room_name_edit}
+                    oninput={(state: State, event: FormInputEvent): State => ({
                         ...state,
-                        room_name: event.target.value.toLowerCase().trim(),
+                        room_name_edit: event.target.value,
                     })}
-                    disabled={state.loading}
                     required={true}
+                    disabled={state.room_name !== ""}
                 />
-                <button disabled={!state.room_name || state.loading}>
-                    {state.loading ? (
+                <button disabled={!state.room_name_edit.trim() || state.room_name !== ""}>
+                    {state.room_name !== "" ? (
                         <span>
                             Loading Tracks{" "}
                             {state.download_size ? (

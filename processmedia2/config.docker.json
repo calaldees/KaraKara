@@ -9,7 +9,9 @@
     "path_processed": "/media/processed",
 
     "path_static_track_list": "/static/tracks.json",
+    "gzip": true,
 
     "process_order_function": "random",
+    "process_timeout_seconds": 25000,
     "disable_meta_write_safety": true
 }

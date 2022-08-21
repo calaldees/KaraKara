@@ -6,28 +6,23 @@ import {
     SeekBackwards,
     SeekForwards,
     Stop,
-    UpdateQueue,
 } from "./actions";
 import { ApiRequest, SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
-import { attachment_path, get_attachment, http2ws } from "./utils";
+import { mqtt_login_info } from "./utils";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
  * and react to commands on the command channel
  */
-export function getOpenMQTTListener(
-    state: State,
-): Subscription | null {
-    if (!state.room_name) {
+export function getMQTTListener(state: State): Subscription | null {
+    if (!state.room_name || !Object.keys(state.track_list).length) {
         return null;
     }
 
     return MQTTSubscribe({
-        url: http2ws(state.root) + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/#",
         connect(state: State): Dispatchable {
             return { ...state, connected: true };
@@ -82,7 +77,23 @@ export function getOpenMQTTListener(
                         },
                     };
                 case "queue":
-                    return UpdateQueue(state, JSON.parse(data));
+                    const new_queue = JSON.parse(data).filter(track => state.track_list.hasOwnProperty(track.id));
+                    // if the first song in the queue has changed, stop playing
+                    if (
+                        state.queue.length === 0 ||
+                        new_queue.length === 0 ||
+                        state.queue[0].id !== new_queue[0].id
+                    ) {
+                        return {
+                            ...state,
+                            queue: new_queue,
+                            playing: false,
+                            paused: false,
+                            progress: 0,
+                        };
+                    } else {
+                        return { ...state, queue: new_queue };
+                    }
                 default:
                     return state;
             }
@@ -140,63 +151,33 @@ export const IntervalListener = Interval({
     },
 });
 
-function track_list_to_images(state: State, raw_list: Dictionary<Track>): Array<WaterfallImage> {
-    // TODO: pick a random 25 tracks (will people even notice if it's
-    // the same 25 every time?)
-    let num = 25;
-    return Object.values(raw_list).slice(0, num).map((track, n) => ({
-        filename: attachment_path(state.root, get_attachment(track, "image")),
-        x: n / num,
-        delay: Math.random() * 10,
-    }));
-}
-
-function split_tags(s: string): Dictionary<Array<string>> {
-    let tags = {};
-    s.split("\n").map(line => {
-        let parts = line.split(":");
-        for (let i = 0; i < parts.length - 1; i++) {
-            tags[parts[i]] = (tags[parts[i]] || []).concat([parts[i + 1]]);
-        }
-    });
-    return tags;
-}
-function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
-    Object.keys(dict).map(k => {
-        dict[k].tags = split_tags(dict[k].tags)
-    });
-    return dict;
-}
-
-
-function _ftlSubscriber(dispatch, props) {
+function _bleSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,
-    // and props is just {room: state.room_name}
-    if (props.room) {
+    if (props.room_name && props.room_password) {
         setTimeout(function () {
             dispatch((state) => [
                 state,
                 ApiRequest({
-                    function: "track_list",
+                    function: "admin",
                     state: state,
-                    progress: (state, { done, size }) => [
-                        {
-                            ...state,
-                            download_done: done,
-                            download_size: size,
+                    options: {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
                         },
-                    ],
-                    action: (state, response) => [
-                        {
-                            ...state,
-                            track_list: set_tags(response),
-                            images: track_list_to_images(state, response),
-                            download_done: 0,
-                            download_size: null,
-                        },
-                    ],
+                        body: new URLSearchParams({
+                            password: state.room_password,
+                            fixme: "true",
+                        }),
+                    },
+                    action: (state, response) => ({...state, is_admin: response.status == "ok"}),
                 })
             ]);
+        }, 0);
+    }
+    else {
+        setTimeout(function () {
+            dispatch((state) => ({...state, is_admin: false}));
         }, 0);
     }
 
@@ -205,6 +186,6 @@ function _ftlSubscriber(dispatch, props) {
     };
 }
 
-export function FetchTrackList(room_name: string): Subscription {
-    return [_ftlSubscriber, { room: room_name }];
+export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+    return [_bleSubscriber, { room_name, room_password }];
 }

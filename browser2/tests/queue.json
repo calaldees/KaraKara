@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "track_id": "track_id_1",
+        "performer_name": "Bob",
+        "total_duration": 123,
+        "session_owner": "test-session-id"
+    },
+    {
+        "id": 1,
+        "track_id": "track_id_1",
+        "performer_name": "Fred",
+        "total_duration": 123,
+        "session_owner": "test-session2-id"
+    }
+]

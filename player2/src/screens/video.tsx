@@ -1,36 +1,35 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_attachments, get_tag } from "../utils";
-import { MarkTrackPlayed, UpdateProgress } from "../actions";
+import { Video } from "./_common"
+import { MarkTrackPlayed } from "../actions";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function UpdateProgress(state: State, event): Dispatchable {
+    return { ...state, progress: event.target.currentTime };
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 export const VideoScreen = ({ state }: { state: State }): VNode => (
     <VideoInternal
         state={state}
         track={state.track_list[state.queue[0].track_id]}
         queue_item={state.queue[0]}
-        />
+    />
 );
 
 const VideoInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
     <section key="video" class={"screen_video"}>
-        <video
-            autoPlay={true}
+        <Video
+            state={state}
+            track={track}
             ontimeupdate={UpdateProgress}
-            // TODO: Action + Effect at once?
             onended={MarkTrackPlayed}
-        >
-            {get_attachments(track, "video").map(a =>
-                <source src={attachment_path(state.root, a)} type={a.mime} />
-            )}
-            {get_attachments(track, "subtitle").map(a =>
-                <track
-                    kind="subtitles"
-                    src={attachment_path(state.root, a)}
-                    default={true}
-                    label="English"
-                    srclang="en"
-                />
-            )}
-        </video>
+        />
         <div
             id="seekbar"
             style={{
@@ -43,7 +42,7 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
             KaraKara
         </div>
         <div id="pimpsong" class="pimp">
-            {get_tag(track.tags.title)}
+            {track.tags.title[0]}
             <br />
             Performed by {queue_item.performer_name}
         </div>

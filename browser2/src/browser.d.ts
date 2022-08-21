@@ -1,4 +1,5 @@
 declare module '*.jpg';
+declare module '*.svg';
 
 declare module "*.json" {
     const value: any;
@@ -25,23 +26,37 @@ type ApiResponse = {
 }
 
 type Attachment = {
-    use: string,
     mime: string,
     path: string,
 }
 
+type TrackListSection = {
+    tracks?: Array<Track>,
+    groups?: any,
+    filters?: any,
+};
+
 type Track = {
-    source_hash: string,
-    title: string,
+    id: string,
     duration: number,
-    tags: Dictionary<Array<string>>,
-    attachments: Array<Attachment>,
-    lyrics: String,
+    tags: {
+        title: Array<string>,
+        category?: Array<string>,
+        vocaltrack?: Array<string>,
+        [x: string]: Array<string> | undefined,
+    },
+    attachments: {
+        video: Array<Attachment>,
+        preview: Array<Attachment>,
+        image: Array<Attachment>,
+        subtitle?: Array<Attachment>,
+    },
+    lyrics: Array<string>,
 }
 
 type QueueItem = {
     id: number,
-    track: Track,
+    track_id: string,
     performer_name: string,
     total_duration: number,
     session_owner: string,
@@ -76,9 +91,11 @@ type State = {
     // login
     session_id: string | null,
     room_name: string,
+    room_name_edit: string,
     room_password: string,
     room_password_edit: string,
     loading: boolean,
+    is_admin: boolean,
 
     // track list
     track_list: Dictionary<Track>,

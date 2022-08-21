@@ -7,18 +7,25 @@ type FormInputEvent = {
 };
 
 type Attachment = {
-    use: string,
     mime: string,
     path: string,
 }
 
 type Track = {
-    source_hash: string,
-    title: string,
+    id: string,
     duration: number,
-    tags: Dictionary<Array<string>>,
-    attachments: Array<Attachment>,
-    lyrics: String,
+    tags: {
+        title: Array<string>,
+        from?: Array<string>,
+        artist?: Array<string>,
+    }
+    attachments: {
+        video: Array<Attachment>,
+        preview: Array<Attachment>,
+        image: Array<Attachment>,
+        subtitle?: Array<Attachment>,
+    },
+    lyrics: Array<string>,
 }
 
 type QueueItem = {
@@ -26,16 +33,11 @@ type QueueItem = {
     track_id: string,
     performer_name: string,
     total_duration: number,
-}
-
-type WaterfallImage = {
-    filename: string,
-    delay: number,
-    x: number,
+    session_owner: string,
 }
 
 type State = {
-    // global persistent
+    // global
     root: string,
     root_edit: string,
     room_name: string,
@@ -44,20 +46,16 @@ type State = {
     room_password_edit: string,
     podium: boolean,
     track_list: Dictionary<Track>,
-
-    // global temporary
+    is_admin: boolean,
     show_settings: boolean,
     connected: boolean,
-    fullscreen: false,
+    fullscreen: boolean,
     audio_allowed: boolean,
     settings: Dictionary<any>,
 
     // loading screen
     download_size: number | null,
     download_done: number,
-
-    // title screen
-    images: Array<WaterfallImage>,
 
     // playlist screen
     queue: Array<QueueItem>,

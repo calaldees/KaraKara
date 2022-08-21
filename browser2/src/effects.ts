@@ -3,7 +3,7 @@
  */
 import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { http2ws, flatten_settings, is_logged_in } from "./utils";
+import { mqtt_login_info } from "./utils";
 
 // get article
 function _get_article() {
@@ -66,12 +66,13 @@ function apiRequestEffect(dispatch, props) {
     }));
 
     fetch(props.url, props.options)
-        .then((response) => response.body)
-        .then((rb) => {
-            if (!rb) return;
-            const reader = rb.getReader();
+        .then((response) => {
+            if (!response.body) return;
+            const reader = response.body.getReader();
             let download_done = 0;
-            let download_size = 7500000; // TODO: add content-length to track_list.json
+            // Content-Length shows us the compressed size, we can only
+            // guess the real size :(
+            let download_size = 10*1024*1024;
 
             return new ReadableStream({
                 start(controller) {
@@ -101,10 +102,7 @@ function apiRequestEffect(dispatch, props) {
         .then((stream) => {
             return new Response(stream, {
                 headers: { "Content-Type": "text/json" },
-            }).text();
-        })
-        .then(function (response) {
-            return JSON.parse(response);
+            }).json();
         })
         .then(function (result) {
             console.groupCollapsed("api_request(", props.url, ")");
@@ -186,13 +184,7 @@ export function ApiRequest(props): Effect {
         {
             options: {},
             response: "json",
-            url:
-                props.state.root +
-                "/queue/" +
-                props.state.room_name +
-                "/" +
-                props.function +
-                ".json",
+            url: `${props.state.root}/queue/${props.state.room_name}/${props.function}.json`,
             ...props,
         },
     ];
@@ -201,103 +193,8 @@ export function ApiRequest(props): Effect {
 export function SendCommand(state: State, command: string): Effect {
     console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
-        url: http2ws(state.root) + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        ...mqtt_login_info(state),
         topic: "karakara/room/" + state.room_name + "/commands",
         payload: command,
     });
 }
-
-function split_tags(s: string): Dictionary<Array<string>> {
-    let tags = {};
-    s.split("\n").map(line => {
-        let parts = line.split(":");
-        for(let i=0; i<parts.length-1; i++) {
-            tags[parts[i]] = (tags[parts[i]] || []).concat([parts[i+1]]);
-        }
-    });
-    return tags;
-}
-function set_tags(dict: Dictionary<Track>): Dictionary<Track> {
-    Object.keys(dict).map(k => {
-        dict[k].tags = split_tags(dict[k].tags)
-    });
-    console.log(dict);
-    return dict;
-}
-
-export const FetchTrackList = (state: State): Effect =>
-    ApiRequest({
-        function: "track_list",
-        state: state,
-        progress: (state, { done, size }) => [
-            {
-                ...state,
-                download_done: done,
-                download_size: size,
-            },
-        ],
-        action: (state, response) => [
-            {
-                ...state,
-                track_list: set_tags(response),
-                download_done: 0,
-                download_size: null,
-            },
-        ],
-    });
-
-export const LoginThenFetchTrackList = (state: State): Effect =>
-    ApiRequest({
-        function: "admin",
-        state: state,
-        options: {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                password: state.room_password,
-                fixme: "true",
-            }),
-        },
-        action: (state, response) =>
-            response.status == "ok" ? [state, FetchTrackList(state)] : state,
-    });
-
-function _autoLoginEffect(dispatch, props) {
-    dispatch(function(state: State) {
-        // HMR already loaded our data for us
-        if(is_logged_in(state)) return state;
-        // No room name was set, so prompt the user
-        if(state.room_name === "") return state;
-        // console.log("Autologin", state.room_name);
-        return [
-            state,
-            state.room_password
-                ? LoginThenFetchTrackList(state)
-                : FetchTrackList(state),
-        ];
-    });
-}
-export function AutoLogin() {
-    return [_autoLoginEffect, {}]
-}
-
-export const SaveSettings = (state: State): Dispatchable => [
-    { ...state },
-    ApiRequest({
-        title: "Saving setting...",
-        function: "settings",
-        state: state,
-        options: {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams(flatten_settings(state.settings)),
-        },
-        // action: (state, response) => [{ ...state }],
-    }),
-];

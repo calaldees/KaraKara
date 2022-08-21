@@ -1,7 +1,5 @@
 import os
 import json
-import time
-import re
 
 from calaldees.data import freeze
 from calaldees.files.scan import fast_scan

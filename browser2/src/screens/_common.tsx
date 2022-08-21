@@ -1,18 +1,20 @@
 import h from "hyperapp-jsx-pragma";
-import { GoToScreen, ShowSettings, ClearNotification } from "../actions";
+import { GoToScreen } from "../actions";
 import { PopScrollPos } from "../effects";
-import { timedelta_str } from "../utils";
+import { attachment_path, is_my_song } from "../utils";
+import * as placeholder from "data-url:../static/placeholder.svg";
 
 export const Notification = ({ state }: { state: State }): VNode =>
     state.notification && (
         <div
             class={"main-only notification " + state.notification.style}
-            onclick={ClearNotification()}
+            onclick={(state: State): State => ({...state, notification: null})}
         >
             <span>{state.notification.text}</span>
             <i class={"fas fa-times-circle"} />
         </div>
     );
+
 function hhmm(d: Date): string {
     function twoz(n: number): string {
         return n.toString().padStart(2, "0");
@@ -42,23 +44,15 @@ export function PriorityToken({ state }: { state: State }): VNode | null {
     return null;
 }
 
-function isMySong(state: State, n: number): boolean {
-    return (
-        state.queue.length > n &&
-        (state.queue[n].session_owner == state.session_id ||
-            state.queue[n].performer_name == state.performer_name)
-    );
-}
-
-export const YoureNext = ({ state }: { state: State }): VNode =>
-    (isMySong(state, 0) && (
+export const YoureNext = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode =>
+    (is_my_song(state, queue[0]) && (
         <h2 class="main-only upnext">
-            Your song "{state.queue[0].track.title}" is up now!
+            Your song "{state.track_list[queue[0].track_id].tags.title[0]}" is up now!
         </h2>
     )) ||
-    (isMySong(state, 1) && (
+    (is_my_song(state, queue[1]) && (
         <h2 class="main-only upnext">
-            Your song "{state.queue[1].track.title}" is up next!
+            Your song "{state.track_list[queue[1].track_id].tags.title[0]}" is up next!
         </h2>
     ));
 
@@ -85,12 +79,12 @@ export const Screen = (
     <main class={className}>
         <header>
             {navLeft}
-            <h1 ondblclick={ShowSettings()}>{title}</h1>
+            <h1 ondblclick={(state: State): State => ({...state, show_settings: true})}>{title}</h1>
             {navRight}
         </header>
         <Notification state={state} />
         <PriorityToken state={state} />
-        <YoureNext state={state} />
+        <YoureNext state={state} queue={state.queue} />
         <article>{children}</article>
         {footer}
     </main>
@@ -100,4 +94,27 @@ export const BackToExplore = (): VNode => (
     <a onclick={GoToScreen("explore", [PopScrollPos()])}>
         <i class={"fas fa-2x fa-chevron-circle-left"} />
     </a>
+);
+
+// I don't know how to type ...kwargs correctly
+export const Thumb = (
+    {
+        state,
+        track,
+        ...kwargs
+    },
+    children,
+): VNode => (
+    <div class={"thumb"} {...kwargs}>
+        <img src={placeholder} />
+        <picture>
+            {track.attachments.image.map(a => 
+                <source
+                srcset={attachment_path(state.root, a)}
+                type={a.mime}
+                />)}
+            <img src={placeholder} />
+        </picture>
+        {children}
+    </div>
 );

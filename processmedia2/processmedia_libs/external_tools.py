@@ -40,6 +40,9 @@ class ProcessMediaFilesWithExternalTools:
         # parse cmd_xxx into tuples
         for key in ('cmd_ffmpeg', 'cmd_ffprobe', 'cmd_imagemagick_convert'):
             self.config[key] = tuple(self.config[key].split(' ')) if isinstance(self.config[key], str) else self.config[key]
+        # parse other types (cmd args are always str)
+        self.config['process_timeout_seconds'] = int(self.config['process_timeout_seconds'])
+        #
         self.config.update({
             'ffmpeg_base_args': self.config['cmd_ffmpeg'] + cmd_args(
                 loglevel=self.config['log_level'],

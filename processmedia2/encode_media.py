@@ -75,10 +75,10 @@ class Encoder(object):
     """
     """
 
-    def __init__(self, meta_manager=None, heartbeat_file=None, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
+    def __init__(self, meta_manager: MetaManagerExtended=None, heartbeat_file=None, **kwargs):  #  ,path_meta=None, path_processed=None, path_source=None, **kwargs
         self.meta_manager = meta_manager  # or MetaManagerExtended(path_meta=path_meta, path_source=path_source, path_processed=path_processed)  # This 'or' needs to go
         self.external_tools = ProcessMediaFilesWithExternalTools(
-            **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_imagemagick_convert') and v}
+            **{k: v for k, v in kwargs.items() if k in ('cmd_ffpmeg', 'cmd_ffprobe', 'cmd_imagemagick_convert', 'process_timeout_seconds') and v}
         )
         self._heartbeat_file = Path(heartbeat_file) if heartbeat_file else None
 
@@ -172,8 +172,11 @@ class Encoder(object):
             )
         # Subtitle
         elif target_file.type.attachment_type in ('subtitle',):
-            with m.source_files['sub'].file.open('rt') as filehandle:
-                subtitles = parse_subtitles(filehandle=filehandle)
+            subtitles = ()
+            if m.source_files.get('sub'):
+                with m.source_files['sub'].file.open('rt') as filehandle:
+                    subtitles = parse_subtitles(filehandle=filehandle)
+            
             if target_file.type.mime == 'text/vtt':
                 with destination.open('wt') as filehandle:
                     filehandle.write(create_vtt(subtitles))
@@ -238,6 +241,9 @@ class Encoder(object):
 
 def additional_arguments(parser):
     parser.add_argument('--process_order_function', choices=PROCESS_ORDER_FUNCS.keys(), help='', default=DEFAULT_ORDER_FUNC)
+    parser.add_argument('--process_timeout_seconds', type=int, help='timeout for external-tools/ffmpeg (default 6000 == 1h40)')
+    from _main import DEFAULT_kwargs
+    DEFAULT_kwargs['process_timeout_seconds'] = 6000
 
 
 def process_arguments(kwargs):

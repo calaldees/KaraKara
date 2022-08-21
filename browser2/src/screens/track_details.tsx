@@ -1,40 +1,80 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen } from "./base";
-import { attachment_path, get_attachment, get_attachments } from "../utils";
-import {
-    GoToScreen,
-    ActivateEnqueue,
-    CancelEnqueue,
-    EnqueueCurrentTrack,
-    SelectTrack,
-    AddBookmark,
-    RemoveBookmark,
-    SetPerformerName,
-} from "../actions";
-import { PopScrollPos, PushScrollPos } from "../effects";
+import { Screen } from "./_common";
+import { attachment_path } from "../utils";
+import { GoToScreen } from "../actions";
+import { PushScrollPos, PopScrollPos, ApiRequest } from "../effects";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+const AddBookmark = (state: State, track_id: string, event): State => ({
+    ...state,
+    notification: { text: "" + event, style: "warning" },
+    bookmarks: state.bookmarks.concat([track_id]),
+});
+
+const RemoveBookmark = (state: State, track_id: string): State => ({
+    ...state,
+    bookmarks: state.bookmarks.filter((x) => x != track_id),
+});
+
+const SetPerformerName = (state: State, event: FormInputEvent): State => ({
+    ...state,
+    performer_name: event.target.value,
+});
+
+const EnqueueCurrentTrack = (state: State): Dispatchable => [
+    state,
+    ApiRequest({
+        title: "Adding to queue...",
+        function: "queue_items",
+        state: state,
+        options: {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                track_id: state.track_id || "error",
+                performer_name: state.performer_name,
+            }),
+        },
+        action: (state, response) => [{ ...state, action: null }],
+    }),
+];
+
+const UnselectTrack = (state: State): Dispatchable => [
+    { ...state, track_id: null },
+    PopScrollPos(),
+];
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
-        {state.queue.find((i) => i.track.source_hash == track.source_hash) && (
+        {state.queue.find((i) => i.track_id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
-                onclick={ActivateEnqueue()}
-                disabled={state.queue.find((i) => i.track.source_hash == track.source_hash)}
+                onclick={(state: State): State => ({ ...state, action: "enqueue" })}
+                disabled={state.queue.find((i) => i.track_id == track.id)}
             >
                 Enqueue
             </button>
-            {state.bookmarks.includes(track.source_hash) ? (
-                <button onclick={RemoveBookmark(track.source_hash)}>Un-Bookmark</button>
+            {state.bookmarks.includes(track.id) ? (
+                <button onclick={[RemoveBookmark, track.id]}>Un-Bookmark</button>
             ) : (
-                <button onclick={AddBookmark(track.source_hash)}>Bookmark</button>
+                <button onclick={[AddBookmark, track.id]}>Bookmark</button>
             )}
         </div>
     </footer>
 );
 
-const EnqueueButtons = ({ state, track }: { state: State; track: Track }): VNode => (
+const EnqueueButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <input
             type="text"
@@ -44,11 +84,11 @@ const EnqueueButtons = ({ state, track }: { state: State; track: Track }): VNode
                 state.settings["karakara.template.input.performer_name"]
             }
             required={true}
-            oninput={SetPerformerName()}
+            oninput={SetPerformerName}
         />
         <div class={"buttons"}>
-            <button onclick={CancelEnqueue()}>Cancel</button>
-            <button onclick={EnqueueCurrentTrack()}>Confirm</button>
+            <button onclick={(state: State): State => ({ ...state, action: null })}>Cancel</button>
+            <button onclick={EnqueueCurrentTrack}>Confirm</button>
         </div>
     </footer>
 );
@@ -57,10 +97,10 @@ function get_buttons(state: State, track: Track) {
     if (state.action == null)
         return <TrackButtons state={state} track={track} />;
     if (state.action == "enqueue")
-        return <EnqueueButtons state={state} track={track} />;
+        return <EnqueueButtons state={state} />;
 }
 
-const BLOCKED_KEYS = [null, "null", "title", "from"];
+const BLOCKED_KEYS = [null, "null", "", "title", "from"];
 
 export const TrackDetails = ({
     state,
@@ -73,11 +113,11 @@ export const TrackDetails = ({
         state={state}
         className={"track_details"}
         navLeft={
-            <a onclick={SelectTrack(null)}>
+            <a onclick={UnselectTrack}>
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }
-        title={track.tags["title"][0]}
+        title={track.tags.title[0]}
         navRight={
             !state.widescreen && (
                 <a onclick={GoToScreen("queue", [PushScrollPos()])}>
@@ -91,11 +131,11 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={attachment_path(state.root, get_attachment(track, "image"))}
+            poster={attachment_path(state.root, track.attachments.image[0])}
             durationHint={track.duration}
             controls={true}
         >
-            {get_attachments(track, "preview").map(a => 
+            {track.attachments.preview.map(a =>
                 <source
                     src={attachment_path(state.root, a)}
                     type={a.mime}
@@ -111,19 +151,17 @@ export const TrackDetails = ({
                     <div class={"tag"}>
                         <div class={"tag_key"}>{key}</div>
                         <div class={"tag_value"}>
-                            {track.tags[key].join(", ")}
+                            {track.tags[key]?.join(", ")}
                         </div>
                     </div>
                 ))}
         </div>
 
         {/* Lyrics */}
-        {track.lyrics && (
+        {track.lyrics.length > 0 && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {track.lyrics.split("\n").map((item) => (
-                    <div>{item.replace(/^\{.*?\}/, "")}</div>
-                ))}
+                {track.lyrics.map(item => <div>{item}</div>)}
             </div>
         )}
     </Screen>

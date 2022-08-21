@@ -1,15 +1,28 @@
 import h from "hyperapp-jsx-pragma";
-import { attachment_path, get_attachments, get_tag, s_to_mns } from "../utils";
-import { AutoplayCountdown } from "./common";
-import { Dequeue, Stop, UpdatePodiumProgress } from "../actions";
+import { s_to_mns } from "../utils";
+import { AutoplayCountdown, Video } from "./_common";
+import { Dequeue, Stop } from "../actions";
 import { SendCommand } from "../effects";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
+
+function UpdatePodiumProgress(state: State, event): Dispatchable {
+    if (state.playing) return { ...state, progress: event.target.currentTime };
+    return state;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Views
 
 export const PodiumScreen = ({ state }: { state: State }): VNode => (
     <PodiumInternal
         state={state}
         track={state.track_list[state.queue[0].track_id]}
         queue_item={state.queue[0]}
-        />
+    />
 );
 
 const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
@@ -18,36 +31,20 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
         class={"screen_podium"}
     >
         <h1>
-            {get_tag(track.tags.title)}
+            {track.tags.title[0]}
             <br />
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>
 
-        {/*
-        Give the video key=playing so that it creates a new
-        object when switching from preview to play
-         */}
         <div class="preview_holder">
-            <video
+            <Video
+                state={state}
+                track={track}
                 ontimeupdate={UpdatePodiumProgress}
                 onended={state.playing ? Dequeue : Stop}
                 autoPlay={true}
                 muted={true}
-                key={state.playing}
-            >
-                {get_attachments(track, "video").map(a =>
-                    <source src={attachment_path(state.root, a)} type={a.mime} />
-                )}
-                {get_attachments(track, "subtitle").map(a =>
-                    <track
-                        kind="subtitles"
-                        src={attachment_path(state.root, a)}
-                        default={true}
-                        label="English"
-                        srclang="en"
-                    />
-                )}
-            </video>
+            />
         </div>
 
         {state.playing ? (

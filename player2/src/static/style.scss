@@ -55,6 +55,7 @@ MAIN {
   border-bottom: 0;
   width: 4px;
 }
+
 ::cue(v[voice='active']) {
   color: yellow;
 }

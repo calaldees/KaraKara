@@ -1,8 +1,11 @@
 import h from "hyperapp-jsx-pragma";
-import { Screen, BackToExplore } from "./base";
-import { attachment_path, get_attachment } from "../utils";
-import { ApiRequest } from "../effects";
-import { RemoveTrack, Command } from "../actions";
+import { Screen, BackToExplore, Thumb } from "./_common";
+import { ApiRequest, SendCommand } from "../effects";
+import { RemoveTrack } from "../actions";
+
+
+///////////////////////////////////////////////////////////////////////
+// Actions
 
 function createDragStart(src_id) {
     return function (state, event) {
@@ -125,16 +128,14 @@ function moveTrack(
     ];
 }
 
-const Playlist = ({
-    state,
-    items,
-}: {
-    state: State;
-    items: Array<QueueItem>;
-}): VNode => (
+
+///////////////////////////////////////////////////////////////////////
+// Views
+
+const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
     <section>
         <ul ondragleave={createDragLeave()}>
-            {items.map((item) => (
+            {queue.map((item) => (
                 <QueueItemRender state={state} item={item} />
             ))}
             {state.drop_source && (
@@ -154,13 +155,7 @@ const Playlist = ({
     </section>
 );
 
-const QueueItemRender = ({
-    state,
-    item,
-}: {
-    state: State;
-    item: QueueItem;
-}): VNode => (
+const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
     <li
         class={{
             queue_item: true,
@@ -172,28 +167,21 @@ const QueueItemRender = ({
         ondragover={createDragOver(item.id)}
         ondrop={createDrop(item.id)}
     >
-        <span
-            class={"thumb"}
+        <Thumb
+            state={state}
+            track={state.track_list[item.track_id]}
             ontouchstart={createTouchStart(item.id)}
             ontouchmove={createTouchMove()}
             ontouchend={createTouchEnd()}
             ontouchcancel={createTouchCancel()}
         >
-            <div
-                style={{
-                    "background-image":
-                        "url(" +
-                        attachment_path(state.root, get_attachment(item.track, "image")) +
-                        ")",
-                }}
-            />
             <span class={"drag-handle"}>
                 <i class="fas fa-grip-vertical" />
             </span>
-        </span>
+        </Thumb>
         <span class={"text queue_info"}>
             <span class={"title"}>
-                {item.track.tags["title"][0]}
+                {state.track_list[item.track_id].tags.title[0]}
             </span>
             <br />
             <span class={"performer"}>{item.performer_name}</span>
@@ -211,27 +199,20 @@ const QueueItemRender = ({
     </li>
 );
 
-const ControlButtons = ({ state }: { state: State }): VNode => (
+const ControlButton = ({ command, style }: { command: string, style: string }): VNode => (
+    <button onclick={(state: State): Dispatchable => [state, SendCommand(state, command)]}>
+        <i class={"fas fa-" + style} />
+    </button>
+);
+const ControlButtons = (): VNode => (
     <footer>
         <div class={"buttons"}>
-            <button onclick={Command("seek_backwards")}>
-                <i class={"fas fa-backward"} />
-            </button>
-            <button onclick={Command("seek_forwards")}>
-                <i class={"fas fa-forward"} />
-            </button>
-            <button onclick={Command("play")}>
-                <i class={"fas fa-play"} />
-            </button>
-            <button onclick={Command("pause")}>
-                <i class={"fas fa-pause"} />
-            </button>
-            <button onclick={Command("stop")}>
-                <i class={"fas fa-stop"} />
-            </button>
-            <button onclick={Command("skip")}>
-                <i class={"fas fa-step-forward"} />
-            </button>
+            <ControlButton command={"seek_backwards"} style={"backward"} />
+            <ControlButton command={"seek_forwards"} style={"forward"} />
+            <ControlButton command={"play"} style={"play"} />
+            <ControlButton command={"pause"} style={"pause"} />
+            <ControlButton command={"stop"} style={"stop"} />
+            <ControlButton command={"skip"} style={"step-forward"} />
         </div>
     </footer>
 );
@@ -243,27 +224,27 @@ export const Control = ({ state }: { state: State }): VNode => (
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Remote Control"}
         // navRight={}
-        footer={<ControlButtons state={state} />}
+        footer={<ControlButtons />}
     >
         {state.queue.length == 0 ? (
             <div class="readme">
                 <h1>READ ME :)</h1>
                 <ol>
                     <li>Please use hand sanitiser, a lot of different people
-                    are going to use this laptop and the microphones :)</li>
+                        are going to use this laptop and the microphones :)</li>
                     <li>To avoid feedback loops, don't hold the microphone
-                    directly in front of the speaker!</li>
+                        directly in front of the speaker!</li>
                     <li>This admin laptop can drag &amp; drop to rearrange
-                    tracks in the queue</li>
+                        tracks in the queue</li>
                     <li>Either use your phone (open <b>{state.root}</b> and
-                    enter room <b>{state.room_name}</b>) or use the menu on the
-                    right to queue up tracks.</li>
+                        enter room <b>{state.room_name}</b>) or use the menu on the
+                        right to queue up tracks.</li>
                     <li>Push the play button (<i class={"fas fa-play"} />) down
-                    below when you're ready to start singing.</li>
+                        below when you're ready to start singing.</li>
                 </ol>
             </div>
         ) : (
-            <Playlist state={state} items={state.queue} />
+            <Playlist state={state} queue={state.queue} />
         )}
     </Screen>
 );

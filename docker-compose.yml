@@ -29,7 +29,7 @@ services:
             - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
             - "traefik.http.routers.karakara.middlewares=kkcors,kkredir"
             - "traefik.http.middlewares.kkcors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
-            - "traefik.http.middlewares.kkcors.headers.accesscontrolalloworigin=*"
+            - "traefik.http.middlewares.kkcors.headers.accesscontrolalloworiginlist=*"
             - "traefik.http.middlewares.kkcors.headers.accesscontrolmaxage=100"
             - "traefik.http.middlewares.kkcors.headers.addvaryheader=true"
             - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
@@ -59,7 +59,6 @@ services:
         # #command: pserve ${PATH_CONFIG}/development.ini
         # healthcheck: 
         #     interval: 0m  # TODO: disbale healthcheck
-
 
     mosquitto:
         image: karakara/mosquitto
@@ -94,8 +93,6 @@ services:
             - processmedia
         build:
             context: ./processmedia2
-        links:
-            - website
         environment:
             - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
         env_file:

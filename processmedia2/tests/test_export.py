@@ -3,6 +3,7 @@ import tempfile
 import json
 import operator
 import numbers
+from itertools import chain
 
 from export_track_data import export_track_data
 
@@ -15,7 +16,7 @@ def test_export_full(ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FIL
     with ProcessMediaTestManager(TEST1_VIDEO_FILES | TEST2_AUDIO_FILES) as manager:
         manager.scan_media()
         manager.encode_media(mock=True)
-        stats = export_track_data(path_static_track_list=track_file, **manager.commandline_kwargs)
+        stats = export_track_data(path_static_track_list=track_file, gzip=False, **manager.commandline_kwargs)
 
         assert stats == {
             'meta_exported': {'test2', 'test1'},
@@ -33,16 +34,20 @@ def test_export_full(ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FIL
         mm.load_all()
 
         # Check that expected source files are in the exported data
-        EXPECTED_TRACKS = frozenset(('track1', 'track2'))
-        for track in data.values():
-            name = track['source_filename']
-            name in EXPECTED_TRACKS
-            assert frozenset(track.keys()) == {"source_hash", "source_filename", "duration", "attachments", "lyrics", "tags"}
-            assert frozenset(map(operator.itemgetter('use'), track['attachments'])) == {'image', 'video', 'preview', 'subtitle'}
-            assert frozenset(map(operator.itemgetter('mime'), track['attachments'])) > {'image/avif', 'image/webp', 'text/vtt'}  # TODO: codecs as substring match? 'av01.0.05M.08'
+        assert frozenset(('test1', 'test2')) == frozenset(track['source_filename'] for track in data.values())
+
+        for track_id, track in data.items():
+            assert track_id == track['id']
+            assert frozenset(track.keys()) == {"id", "source_hash", "source_filename", "duration", "attachments", "lyrics", "tags"}
+
             assert track['duration']
             assert isinstance(track['duration'], numbers.Number)
+
+            track['attachments'].keys() == {'video', 'preview', 'image', 'subtitle'}
+
+            mimes = frozenset(map(operator.itemgetter('mime'), chain.from_iterable(track['attachments'].values())))
+            #{'image/avif', 'image/webp', 'text/vtt'}  # TODO: assert something about mimes
+
             assert track['lyrics']
             # Check tag content
-            with mm.get(name).source_files['tag'].file.open('rt') as filehandle:
-                assert track['tags'] in filehandle.read()
+            assert frozenset(track['tags'].keys()) >= frozenset(('title', 'category', 'artist', 'from'))

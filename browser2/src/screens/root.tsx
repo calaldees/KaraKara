@@ -9,10 +9,9 @@ import { SettingsMenu } from "./settings";
 import { PrintableList } from "./printable_list";
 import { RoomSettings } from "./room_settings";
 import { PriorityTokens } from "./priority_tokens";
-import { is_logged_in } from "../utils";
 
 export const QueueOrControl = ({ state }: { state: State }): VNode =>
-    state.room_password ? <Control state={state} /> : <Queue state={state} />;
+    state.is_admin ? <Control state={state} /> : <Queue state={state} />;
 
 export const Explore = ({ state }: { state: State }): VNode =>
     state.track_id ? (
@@ -23,7 +22,7 @@ export const Explore = ({ state }: { state: State }): VNode =>
 
 export function Root(state: State): VNode {
     let body = null;
-    if (!is_logged_in(state)) {
+    if (!state.room_name || !Object.keys(state.track_list).length) {
         body = <Login state={state} />;
     } else if (state.screen == "printable_list") {
         body = <PrintableList state={state} />;

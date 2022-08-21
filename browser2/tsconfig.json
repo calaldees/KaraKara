@@ -12,5 +12,5 @@
     "noEmit": true,
     "strictNullChecks": true,
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*", "tests/utils.test.ts"]
 }

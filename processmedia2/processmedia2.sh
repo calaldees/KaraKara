@@ -15,10 +15,7 @@ function run() {
 }
 
 while true ; do
-    touch data/.heartbeat || true
     run || true
-    touch data/.heartbeat || true
-    #echo "sleep ..."
     sleep ${KARAKARA_RESCAN_INTERVAL_SECONDS:-600}  # 600 = 10min
     test $? -gt 128 && exit 0  # https://unix.stackexchange.com/questions/42287/terminating-an-infinite-loop
 done
