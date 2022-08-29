@@ -8,41 +8,55 @@ from itertools import pairwise
 from typing import Iterator
 import csv
 from pathlib import Path
+import io
 
 
 class QueueManager():
-    def __init__(self, path: Path = Path('.')):
-        assert path.is_dir()
-        self.path = path
+    def __init__(self):
         self.queue_settings = {
             'test': {
                 'track_space': datetime.timedelta(seconds=15),
             }
         }
-    @contextlib.asynccontextmanager
-    def async_queue_modify_context(self, name):
-        # open
-        yield None
-        # save
-        # push to mqtt?
+
+    @contextlib.contextmanager
+    def _queue_modify_context(self, filehandle, settings):
+        queue = Queue([QueueItem(**row) for row in csv.DictReader(filehandle)], **settings)
+        yield queue
+        if queue.modified:
+            filehandle.seek(0)
+            filehandle.truncate(0)
+            fields = tuple(field.name for field in dataclasses.fields(QueueItem))
+            writer = csv.DictWriter(filehandle, fields)
+            writer.writeheader()
+            for row in queue.items:
+                writer.writerow(dataclasses.asdict(row, dict_factory=QueueItem.dict_factory))
+
+class QueueManagerCSV(QueueManager):
+    def __init__(self, path: Path = Path('.')):
+        super().__init__()
+        assert path.is_dir()
+        self.path = path
+
     @contextlib.contextmanager
     def queue_modify_context(self, name):
         path_csv = self.path.joinpath(f'{name}.csv')
         path_csv.touch()
         with path_csv.open('r+', encoding='utf8') as filehandle:
-            queue = Queue(
-                [QueueItem(**row) for row in csv.DictReader(filehandle)],
-                **self.queue_settings.get(name, {}),
-            )
+            with self._queue_modify_context(filehandle, self.queue_settings.get(name, {})) as queue:
+                yield queue
+
+class QueueManagerStringIO(QueueManager):
+    #@contextlib.asynccontextmanager
+    @contextlib.contextmanager
+    def queue_modify_context(self, name):
+        filehandle = io.StringIO()
+        with self._queue_modify_context(filehandle, self.queue_settings.get(name, {})) as queue:
             yield queue
-            if queue.modified:
-                filehandle.seek(0)
-                filehandle.truncate(0)
-                fields = tuple(field.name for field in dataclasses.fields(QueueItem))
-                writer = csv.DictWriter(filehandle, fields)
-                writer.writeheader()
-                for row in queue.items:
-                    writer.writerow(dataclasses.asdict(row, dict_factory=QueueItem.dict_factory))
+        print('StringIO')
+        print(filehandle.getvalue())
+
+
 
 
 @dataclasses.dataclass
@@ -145,3 +159,9 @@ class Queue():
         for i_prev, i_next in pairwise(future):
             i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None
         self.modified = True
+
+
+if __name__ == "__main__":
+    manager = QueueManagerStringIO()
+    with manager.queue_modify_context('test') as qu:
+        qu.add(QueueItem('Track6', 60, 'TestSession6'))
