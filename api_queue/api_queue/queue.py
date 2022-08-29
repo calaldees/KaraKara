@@ -9,10 +9,12 @@ from typing import Iterator
 import csv
 from pathlib import Path
 import io
-
+import asyncio
+from collections import defaultdict
 
 class QueueManager():
     def __init__(self):
+        super().__init__()
         self.queue_settings = {
             'test': {
                 'track_space': datetime.timedelta(seconds=15),
@@ -32,6 +34,15 @@ class QueueManager():
             for row in queue.items:
                 writer.writerow(dataclasses.asdict(row, dict_factory=QueueItem.dict_factory))
 
+class QueryManagerAsyncLockMixin():
+    def __init__(self):
+        super().__init__()
+        self.queue_async_locks = defaultdict(asyncio.Lock)
+    @contextlib.asynccontextmanager
+    async def lock_resource(self, name):
+        async with self.queue_async_locks[name]:
+            yield
+
 class QueueManagerCSV(QueueManager):
     def __init__(self, path: Path = Path('.')):
         super().__init__()
@@ -44,6 +55,13 @@ class QueueManagerCSV(QueueManager):
         path_csv.touch()
         with path_csv.open('r+', encoding='utf8') as filehandle:
             with self._queue_modify_context(filehandle, self.queue_settings.get(name, {})) as queue:
+                yield queue
+
+class QueueManagerCSVAsync(QueueManagerCSV, QueryManagerAsyncLockMixin):
+    @contextlib.asynccontextmanager
+    async def async_queue_modify_context(self, name):
+        async with self.lock_resource(name):
+            with self.queue_modify_context(name) as queue:
                 yield queue
 
 class QueueManagerStringIO(QueueManager):

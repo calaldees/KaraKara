@@ -17,3 +17,6 @@ _build:
 	docker build --tag ${DOCKER_IMAGE} --target test .
 _shell:
 	docker run ${DOCKER_RUN_ARGS} -it ${DOCKER_IMAGE} /bin/sh
+
+local_run:
+	python3 -m sanic api_queue.server.app --host 0.0.0.0 --port 1337 --workers 4 --debug

@@ -14,8 +14,8 @@ app = sanic.Sanic("karakara_queue")
 
 app.config.update(
     {
-        'REDIS': "redis://redis:6379/0",
-        'MQTT': 'mqtt:1883',
+        #'REDIS': "redis://redis:6379/0",
+        #'MQTT': 'mqtt:1883',
         'TRACKS': 'tracks.json'
     }
 )
@@ -28,11 +28,12 @@ app.config.update(
 
 # Startup ----------------------------------------------------------------------
 
-from redis import asyncio as aioredis
 @app.listener('before_server_start')
 async def aio_redis_configure(_app: sanic.Sanic, _loop):
     log.info("[redis] connecting")
-    _app.ctx.redis = await aioredis.from_url(_app.config.get('REDIS'))
+    if _app.config.get('REDIS'):
+        from redis import asyncio as aioredis
+        _app.ctx.redis = await aioredis.from_url(_app.config.get('REDIS'))
 @app.listener('after_server_stop')
 async def aio_redis_close(_app, _loop):
     log.info("[redis] closing")
@@ -41,11 +42,12 @@ async def aio_redis_close(_app, _loop):
     #    await _app.ctx.redis.close()
 
 
-from asyncio_mqtt import Client as MqttClient, MqttError
 @app.listener('before_server_start')
 async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
     log.info("[mqtt] connecting")
-    _app.ctx.mqtt = MqttClient(_app.config.get('MQTT'))
+    if _app.config.get('MQTT'):
+        from asyncio_mqtt import Client as MqttClient, MqttError
+        _app.ctx.mqtt = MqttClient(_app.config.get('MQTT'))
 # await request.app.ctx.mqtt.publish(topic, message, qos=1)
 #"karakara/room/"+request.queue.id+"/"+topic, message, retain=True
 
@@ -57,11 +59,19 @@ async def tracks_load(_app: sanic.Sanic, _loop):
         _app.ctx.tracks = harden(json.load(filehandle))
 
 
+
+from .queue import QueueManagerCSVAsync, QueueItem
+@app.listener('before_server_start')
+async def queue_manager(_app: sanic.Sanic, _loop):
+    log.info("[queue_manager]")
+    _app.ctx.queue_manager = QueueManagerCSVAsync()
+
+
 # Queue ------------------------------------------------------------------------
 
-@app.middleware("request")
-async def extract_user(request):
-    request.ctx.user = await extract_user_from_request(request)
+#@app.middleware("request")
+#async def extract_user(request):
+#    request.ctx.user = await extract_user_from_request(request)
 
 
 
@@ -89,7 +99,10 @@ async def tracks(request, queue_id):
 
 @app.get("/queue/<queue_id:str>/queue_items/")
 async def queue_items(request, queue_id):
-    return sanic.response.text('ok')
+    #return sanic.response.text('ok')
+    async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+        queue.add(QueueItem('Track7', 60, 'TestSession7'))
+        return sanic.response.text('ok')
 
 
 
