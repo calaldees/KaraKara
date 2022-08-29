@@ -26,6 +26,8 @@ app.config.update(
 #redis = SanicRedis(config_name="REDIS")
 #redis.init_app(app)
 
+# Startup ----------------------------------------------------------------------
+
 from redis import asyncio as aioredis
 @app.listener('before_server_start')
 async def aio_redis_configure(_app: sanic.Sanic, _loop):
@@ -55,6 +57,17 @@ async def tracks_load(_app: sanic.Sanic, _loop):
         _app.ctx.tracks = harden(json.load(filehandle))
 
 
+# Queue ------------------------------------------------------------------------
+
+@app.middleware("request")
+async def extract_user(request):
+    request.ctx.user = await extract_user_from_request(request)
+
+
+
+
+# Routes -----------------------------------------------------------------------
+
 @app.get("/")
 async def root(request):
     redis = request.app.ctx.redis
@@ -70,8 +83,8 @@ async def root(request):
 
 @app.get("/queue/<queue_id:str>/tracks/")
 async def tracks(request, queue_id):
+    return await sanic.response.file(request.app.config.get('TRACKS'))
     # TODO: replace 302 redirect to static file from nginx? Could be useful to have this as a fallback?
-    return await sanic.response.file('tracks.json')
 
 
 @app.get("/queue/<queue_id:str>/queue_items/")
