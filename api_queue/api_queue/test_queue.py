@@ -1,5 +1,5 @@
 import datetime
-from .queue import Queue, QueueItem
+from .queue import Queue, QueueItem, QueueManager
 
 def test_queue():
     qu = Queue([], track_space=datetime.timedelta(seconds=10))
@@ -97,3 +97,8 @@ def test_queue():
     qu.add(QueueItem('Track8', 60, 'TestSession8'))
     qu.add(QueueItem('Track9', 60, 'TestSession9'))
     assert qu.end_time == qu.now + (datetime.timedelta(seconds=60)*2) + (qu.track_space*2)
+
+def test_queue_manager():
+    manager = QueueManager()
+    with manager.queue_modify_context('test') as qu:
+        qu.add(QueueItem('Track6', 60, 'TestSession6'))
