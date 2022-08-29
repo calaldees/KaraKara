@@ -1,4 +1,6 @@
 import json
+import csv
+
 
 import sanic
 #from sanic import Sanic, response
@@ -96,14 +98,22 @@ async def tracks(request, queue_id):
     return await sanic.response.file(request.app.config.get('TRACKS'))
     # TODO: replace 302 redirect to static file from nginx? Could be useful to have this as a fallback?
 
+@app.get("/queue/<queue_id:str>/queue_items.csv")
+async def queue_items_csv(request, queue_id):
+    return await sanic.response.file(f'{queue_id}.csv')
+@app.get("/queue/<queue_id:str>/queue_items.json")
+async def queue_items_json(request, queue_id):
+    with open(f'{queue_id}.csv', 'r') as filehandle:
+        # TODO: convert numeric types? dataclass asdict?
+        return sanic.response.json(tuple(csv.DictReader(filehandle)))
 
-@app.get("/queue/<queue_id:str>/queue_items/")
+
+@app.get("/queue/<queue_id:str>/add_test/")
 async def queue_items(request, queue_id):
     #return sanic.response.text('ok')
     async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
         queue.add(QueueItem('Track7', 60, 'TestSession7'))
         return sanic.response.text('ok')
-
 
 
 
