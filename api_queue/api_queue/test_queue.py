@@ -11,7 +11,7 @@ def test_queue():
     qu.add(QueueItem('Track1', 60, 'TestSession1'))
     assert [i.track_id for i in qu.items] == ['Track1']
     assert qu.current.track_id == 'Track1'
-    assert not qu.current.playtime
+    assert not qu.current.start_time
     qu.add(QueueItem('Track2', 60, 'TestSession2'))
     assert [i.track_id for i in qu.items] == ['Track1', 'Track2']
     assert qu.current.track_id == 'Track1'
@@ -51,7 +51,7 @@ def test_queue():
     qu.delete(past_track_id)
     assert [i.track_id for i in qu.past] == ['Track1', 'Track2']
 
-    # Adding tracks while playing populates the playtime
+    # Adding tracks while playing populates the start_time
     qu._now += datetime.timedelta(seconds=30)
     assert not qu.playing
     assert qu.current.track_id == 'Track4'
@@ -61,7 +61,7 @@ def test_queue():
     assert qu.playing.track_id == 'Track4'
     qu.add(QueueItem('Track5', 60, 'TestSession5'))
     assert qu.last.track_id == 'Track5'
-    assert qu.last.playtime > qu.now
+    assert qu.last.start_time > qu.now
     qu._now += datetime.timedelta(seconds=60)
     assert  qu.playing.track_id == 'Track5'
     qu._now += datetime.timedelta(seconds=60)
@@ -78,9 +78,9 @@ def test_queue():
     assert qu.playing.track_id == 'Track6'
     qu.stop()
     assert not qu.playing
-    assert all([i.playtime for i in qu.past])
+    assert all([i.start_time for i in qu.past])
 
-    assert [i.playtime for i in qu.future] == [None, None]
+    assert [i.start_time for i in qu.future] == [None, None]
     qu._now += datetime.timedelta(seconds=60)
     assert not qu.playing
     assert [i.track_id for i in qu.future] == ['Track6', 'Track7']
