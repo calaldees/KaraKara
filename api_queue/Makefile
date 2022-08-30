@@ -19,4 +19,4 @@ _shell:
 	docker run ${DOCKER_RUN_ARGS} -it ${DOCKER_IMAGE} /bin/sh
 
 local_run:
-	python3 -m sanic api_queue.server.app --host 0.0.0.0 --port 8000 --workers 4 --debug --auto-reload
+	python3 -m sanic api_queue.server.app --host 0.0.0.0 --port 8000 --workers 4 --debug --auto-reload --access-logs

@@ -2,6 +2,7 @@ sanic
 #sanic-redis  # sanic-redis usese aioredis which is depricated?
 #sanic-jwt    #
 sanic-openapi
+ujson
 
 jwt     # can this be replaced with sanic-jwt?
 redis

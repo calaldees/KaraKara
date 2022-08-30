@@ -59,8 +59,8 @@ class QueueManager():
             fields = tuple(field.name for field in dataclasses.fields(QueueItem))
             writer = csv.DictWriter(filehandle, fields)
             writer.writeheader()
-            for row in queue.items:
-                writer.writerow(dataclasses.asdict(row, dict_factory=QueueItem.dict_factory))
+            for i in queue.items:
+                writer.writerow(i.asdict())
 
 class QueryManagerAsyncLockMixin():
     def __init__(self, *args, **kwargs):
@@ -82,10 +82,7 @@ class QueueManagerCSV(QueueManager):
 
     def for_json(self, name):
         with self.path_csv(name).open('r', encoding='utf8') as filehandle:
-            return tuple(
-                dataclasses.asdict(QueueItem(**row), dict_factory=QueueItem.dict_factory)
-                for row in csv.DictReader(filehandle)
-            )
+            return tuple(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))
 
     @contextlib.contextmanager
     def queue_modify_context(self, name):
@@ -143,11 +140,13 @@ class QueueItem():
             self.start_time = float(self.start_time)
         self.start_time = datetime.datetime.fromtimestamp(self.start_time) if isinstance(self.start_time, numbers.Number) else self.start_time
         self.id = float(self.id)
+    def asdict(self):
+        return dataclasses.asdict(self, dict_factory=self.dict_factory)
     @staticmethod
     def dict_factory(key_values):
         """
         >>> i = QueueItem('Track1', 60.25, 'Session1', 123456789.123456789, 0.123456789)
-        >>> dataclasses.asdict(i, dict_factory=QueueItem.dict_factory)
+        >>> i.asdict()
         {'track_id': 'Track1', 'track_duration': 60.25, 'owner': 'Session1', 'start_time': 123456789.123457, 'id': 0.123456789}
         """
         def _parse(dd):

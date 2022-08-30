@@ -1,11 +1,14 @@
 import json
+import random
+import contextlib
 
 import sanic
 
 from ._utils import harden
 
-import logging
-log = logging.getLogger(__name__)
+#import logging
+#log = logging.getLogger(__name__)
+from sanic.log import logger as log
 
 
 app = sanic.Sanic("karakara_queue")
@@ -20,7 +23,7 @@ app.config.update(
     {
         #'REDIS': "redis://redis:6379/0",
         #'MQTT': 'mqtt:1883',
-        'TRACKS': 'tracks.json'
+        'TRACKS': 'tracks.json',
     }
 )
 
@@ -52,8 +55,6 @@ async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
     if _app.config.get('MQTT'):
         from asyncio_mqtt import Client as MqttClient, MqttError
         _app.ctx.mqtt = MqttClient(_app.config.get('MQTT'))
-# await request.app.ctx.mqtt.publish(topic, message, qos=1)
-#"karakara/room/"+request.queue.id+"/"+topic, message, retain=True
 
 
 @app.listener('before_server_start')
@@ -72,16 +73,16 @@ async def queue_manager(_app: sanic.Sanic, _loop):
     _app.ctx.queue_manager = QueueManagerCSVAsync(settings=_app.ctx.settings_manager)
 
 
-# Queue ------------------------------------------------------------------------
-
-#@app.middleware("request")
-#async def extract_user(request):
-#    request.ctx.user = await extract_user_from_request(request)
-
-# add queue to request
-# auto output to mqtt on queue.modify
+# Middleware -------------------------------------------------------------------
 
 
+@app.middleware("request")
+async def attach_session_id_request(request):
+    request.ctx.session_id = request.cookies.get("session_id") or str(random.random())
+@app.middleware("response")
+async def attach_session_id(request, response):
+    if not request.cookies.get("session_id"):
+        response.cookies["session_id"] = request.ctx.session_id
 
 
 # Routes -----------------------------------------------------------------------
@@ -94,57 +95,44 @@ async def root(request):
     return sanic.response.text(str(result))
 
 
-#@app.get("/tracks/")
-#async def tracks(request):
+#@app.get("/queue/<queue_id:str>/tracks.json")
+#async def tracks_from_memory(request):
 #    return sanic.response.json(request.app.ctx.tracks)
-
-
-@app.get("/queue/<queue_id:str>/tracks/")
-async def tracks(request, queue_id):
+@app.get("/queue/<queue_id:str>/tracks.json")
+async def tracks_from_disk(request, queue_id):
     return await sanic.response.file(request.app.config.get('TRACKS'))
     # TODO: replace 302 redirect to static file from nginx? Could be useful to have this as a fallback?
-
-@app.get("/queue/<queue_id:str>/queue_items.csv")
-async def queue_items_csv(request, queue_id):
+@app.get("/queue/<queue_id:str>/queue.csv")
+async def queue_csv(request, queue_id):
     return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
-@app.get("/queue/<queue_id:str>/queue_items.json")
-async def queue_items_json(request, queue_id):
+@app.get("/queue/<queue_id:str>/queue.json")
+async def queue_json(request, queue_id):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
 @app.get("/queue/<queue_id:str>/settings.json")
 async def queue_settings_json(request, queue_id):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
 
+@contextlib.asynccontextmanager
+async def push_queue_to_mqtt(request, queue_id):
+    yield
+    if hasattr(request.app.ctx, 'mqtt'):
+        log.info("push_queue_to_mqtt")
+        await request.app.ctx.mqtt.publish(f"karakara/room/{queue_id}/queue", request.app.ctx.queue_manager.for_json(queue_id), retain=True)
 
-
-@app.get("/queue/<queue_id:str>/add_test/")
-async def add_test(request, queue_id):
-    """This is a simple foo handler
-
-    Now we will add some more details
-
-    openapi:
-    ---
-    operationId: fooDots
-    tags:
-      - one
-      - two
-    parameters:
-      - name: limit
-        in: query
-        description: How many items to return at one time (max 100)
-        required: false
-        schema:
-          type: integer
-          format: int32
-    responses:
-      '200':
-        description: Just some dots
-    """
-    #return sanic.response.text('ok')
-    async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
-        queue.add(QueueItem('Track7', 60, 'TestSession7'))
-        return sanic.response.text('ok')
-
+@app.post("/queue/<queue_id:str>/")
+async def add_queue_item(request, queue_id):
+    # Validation
+    if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
+        raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
+    track_id = request.json['track_id']
+    if track_id not in request.app.ctx.tracks:
+        raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
+    # Queue update
+    async with push_queue_to_mqtt(request, queue_id):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+            queue_item = QueueItem(track_id, request.app.ctx.tracks[track_id]["duration"], request.ctx.session_id)
+            queue.add(queue_item)
+            return sanic.response.json(queue_item.asdict())
 
 
 if __name__ == '__main__':
