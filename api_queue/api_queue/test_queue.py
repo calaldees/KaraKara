@@ -98,7 +98,9 @@ def test_queue():
     qu.add(QueueItem('Track9', 60, 'TestSession9'))
     assert qu.end_time == qu.now + (datetime.timedelta(seconds=60)*2) + (qu.track_space*2)
 
+
 def test_queue_manager():
+    # TODO: finish
     manager = QueueManagerCSV()
     with manager.queue_modify_context('test') as qu:
         qu.add(QueueItem('Track6', 60, 'TestSession6'))

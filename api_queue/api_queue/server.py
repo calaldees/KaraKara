@@ -75,6 +75,9 @@ async def queue_manager(_app: sanic.Sanic, _loop):
 #async def extract_user(request):
 #    request.ctx.user = await extract_user_from_request(request)
 
+# add queue to request
+# auto output to mqtt on queue.modify
+
 
 
 
@@ -100,12 +103,10 @@ async def tracks(request, queue_id):
 
 @app.get("/queue/<queue_id:str>/queue_items.csv")
 async def queue_items_csv(request, queue_id):
-    return await sanic.response.file(f'{queue_id}.csv')
+    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
 @app.get("/queue/<queue_id:str>/queue_items.json")
 async def queue_items_json(request, queue_id):
-    with open(f'{queue_id}.csv', 'r') as filehandle:
-        # TODO: convert numeric types? dataclass asdict?
-        return sanic.response.json(tuple(csv.DictReader(filehandle)))
+    return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
 
 
 @app.get("/queue/<queue_id:str>/add_test/")

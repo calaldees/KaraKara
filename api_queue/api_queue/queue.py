@@ -49,9 +49,19 @@ class QueueManagerCSV(QueueManager):
         assert path.is_dir()
         self.path = path
 
+    def path_csv(self, name):
+        return self.path.joinpath(f'{name}.csv')
+
+    def for_json(self, name):
+        with self.path_csv(name).open('r', encoding='utf8') as filehandle:
+            return tuple(
+                dataclasses.asdict(QueueItem(**row), dict_factory=QueueItem.dict_factory)
+                for row in csv.DictReader(filehandle)
+            )
+
     @contextlib.contextmanager
     def queue_modify_context(self, name):
-        path_csv = self.path.joinpath(f'{name}.csv')
+        path_csv = self.path_csv(name)
         path_csv.touch()
         with path_csv.open('r+', encoding='utf8') as filehandle:
             with self._queue_modify_context(filehandle, self.queue_settings.get(name, {})) as queue:
@@ -65,7 +75,6 @@ class QueueManagerCSVAsync(QueueManagerCSV, QueryManagerAsyncLockMixin):
                 yield queue
 
 class QueueManagerStringIO(QueueManager):
-    #@contextlib.asynccontextmanager
     @contextlib.contextmanager
     def queue_modify_context(self, name):
         filehandle = io.StringIO()
@@ -76,7 +85,8 @@ class QueueManagerStringIO(QueueManager):
 
 
 
-
+# dataclasses are ment to be this cool hip new happening pattern in python
+# have I missed the point here? this feels like verbose rubbish for such a simple class
 @dataclasses.dataclass
 class QueueItem():
     track_id: str
@@ -88,22 +98,34 @@ class QueueItem():
     def __post_init__(self):
         """
         >>> QueueItem('Track1', 60.25, 'Session1', 123456789.123456789, 0.123456789)
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), owner='Session1', start_time=123456789.12345679, id=0.123456789)
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), owner='Session1', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
+        >>> QueueItem('Track1', '60.25', 'Session1', '123456789.123456789', '0.123456789')
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), owner='Session1', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
+        >>> QueueItem('', '', '', '', 0.123456789)
+        QueueItem(track_id='', track_duration=datetime.timedelta(0), owner='', start_time=None, id=0.123456789)
         """
+        if not self.track_duration:
+            self.track_duration = 0.0
+        if isinstance(self.track_duration, str):
+            self.track_duration = float(self.track_duration)
         self.track_duration = datetime.timedelta(seconds=self.track_duration) if isinstance(self.track_duration, numbers.Number) else self.track_duration
-        self.start_time = datetime.datetime.fromtimestamp(self.start_time) if isinstance(self.track_duration, numbers.Number) else self.start_time
+        if not self.start_time:
+            self.start_time = None
+        if isinstance(self.start_time, str):
+            self.start_time = float(self.start_time)
+        self.start_time = datetime.datetime.fromtimestamp(self.start_time) if isinstance(self.start_time, numbers.Number) else self.start_time
         self.id = float(self.id)
     @staticmethod
     def dict_factory(key_values):
         """
         >>> i = QueueItem('Track1', 60.25, 'Session1', 123456789.123456789, 0.123456789)
         >>> dataclasses.asdict(i, dict_factory=QueueItem.dict_factory)
-        {'track_id': 'Track1', 'track_duration': 60.25, 'owner': 'Session1', 'start_time': 123456789.12345679, 'id': 0.123456789}
+        {'track_id': 'Track1', 'track_duration': 60.25, 'owner': 'Session1', 'start_time': 123456789.123457, 'id': 0.123456789}
         """
         def _parse(dd):
             k, v = dd
             if isinstance(v, datetime.timedelta):
-                v= v.total_seconds()
+                v = v.total_seconds()
             elif isinstance(v, datetime.datetime):
                 v = v.timestamp()
             return (k, v)
