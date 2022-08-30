@@ -11,6 +11,7 @@ from ._utils import harden
 from sanic.log import logger as log
 
 
+
 app = sanic.Sanic("karakara_queue")
 
 # OpenAPI3 Extension
@@ -28,12 +29,22 @@ app.config.update(
 )
 
 
+
+
 # sanic_redis uses `aioredis` and this has been deprecated`
 #from sanic_redis import SanicRedis
 #redis = SanicRedis(config_name="REDIS")
 #redis.init_app(app)
 
 # Startup ----------------------------------------------------------------------
+
+@app.listener('main_process_start')
+async def tracks_load(_app: sanic.Sanic, _loop):
+    log.info("[tracks] loading")
+    with open(_app.config.get('TRACKS')) as filehandle:
+        _app.ctx.tracks = harden(json.load(filehandle))
+
+
 
 @app.listener('before_server_start')
 async def aio_redis_configure(_app: sanic.Sanic, _loop):
@@ -55,13 +66,6 @@ async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
     if _app.config.get('MQTT'):
         from asyncio_mqtt import Client as MqttClient, MqttError
         _app.ctx.mqtt = MqttClient(_app.config.get('MQTT'))
-
-
-@app.listener('before_server_start')
-async def tracks_load(_app: sanic.Sanic, _loop):
-    log.info("[tracks] loading")
-    with open(_app.config.get('TRACKS')) as filehandle:
-        _app.ctx.tracks = harden(json.load(filehandle))
 
 
 
