@@ -1,9 +1,6 @@
 import json
-import csv
-
 
 import sanic
-#from sanic import Sanic, response
 
 from ._utils import harden
 
@@ -13,6 +10,10 @@ log = logging.getLogger(__name__)
 
 app = sanic.Sanic("karakara_queue")
 
+# OpenAPI3 Extension
+from sanic_openapi import openapi, openapi3_blueprint
+app.blueprint(openapi3_blueprint)  # Register - https://*/swagger/
+# https://github.com/sanic-org/sanic-openapi/blob/main/examples/cars_oas3/blueprints/car.py
 
 app.config.update(
     {
@@ -110,7 +111,7 @@ async def queue_items_json(request, queue_id):
 
 
 @app.get("/queue/<queue_id:str>/add_test/")
-async def queue_items(request, queue_id):
+async def add_test(request, queue_id):
     #return sanic.response.text('ok')
     async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
         queue.add(QueueItem('Track7', 60, 'TestSession7'))
@@ -119,4 +120,4 @@ async def queue_items(request, queue_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=1337, workers=4, dev=True)
+    app.run(host='0.0.0.0', port=1337, workers=4, dev=True, access_log=True, auto_reload=True)
