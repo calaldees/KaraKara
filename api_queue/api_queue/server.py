@@ -14,6 +14,7 @@ app = sanic.Sanic("karakara_queue")
 from sanic_openapi import openapi, openapi3_blueprint
 app.blueprint(openapi3_blueprint)  # Register - https://*/swagger/
 # https://github.com/sanic-org/sanic-openapi/blob/main/examples/cars_oas3/blueprints/car.py
+# https://sanic.dev/en/plugins/sanic-ext/openapi/autodoc.html#operation-level-yaml
 
 app.config.update(
     {
@@ -63,11 +64,12 @@ async def tracks_load(_app: sanic.Sanic, _loop):
 
 
 
-from .queue import QueueManagerCSVAsync, QueueItem
+from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     log.info("[queue_manager]")
-    _app.ctx.queue_manager = QueueManagerCSVAsync()
+    _app.ctx.settings_manager = SettingsManager()
+    _app.ctx.queue_manager = QueueManagerCSVAsync(settings=_app.ctx.settings_manager)
 
 
 # Queue ------------------------------------------------------------------------
@@ -108,10 +110,36 @@ async def queue_items_csv(request, queue_id):
 @app.get("/queue/<queue_id:str>/queue_items.json")
 async def queue_items_json(request, queue_id):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
+@app.get("/queue/<queue_id:str>/settings.json")
+async def queue_settings_json(request, queue_id):
+    return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
+
 
 
 @app.get("/queue/<queue_id:str>/add_test/")
 async def add_test(request, queue_id):
+    """This is a simple foo handler
+
+    Now we will add some more details
+
+    openapi:
+    ---
+    operationId: fooDots
+    tags:
+      - one
+      - two
+    parameters:
+      - name: limit
+        in: query
+        description: How many items to return at one time (max 100)
+        required: false
+        schema:
+          type: integer
+          format: int32
+    responses:
+      '200':
+        description: Just some dots
+    """
     #return sanic.response.text('ok')
     async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
         queue.add(QueueItem('Track7', 60, 'TestSession7'))
@@ -120,4 +148,4 @@ async def add_test(request, queue_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=1337, workers=4, dev=True, access_log=True, auto_reload=True)
+    app.run(host='0.0.0.0', port=8000, workers=4, dev=True, access_log=True, auto_reload=True)

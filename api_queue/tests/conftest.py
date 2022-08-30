@@ -2,11 +2,11 @@ import pytest
 from unittest.mock import patch, AsyncMock
 
 
-@pytest.fixture
-async def mock_redis():
-    import api_queue.server
-    with patch.object(api_queue.server.aioredis, 'from_url', side_effect=AsyncMock()) as mock_redis:
-        yield await mock_redis()
+#@pytest.fixture
+#async def mock_redis():
+#    import api_queue.server
+#    with patch.object(api_queue.server.aioredis, 'from_url', side_effect=AsyncMock()) as mock_redis:
+#        yield await mock_redis()
 
 
 @pytest.fixture

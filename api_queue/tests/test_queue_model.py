@@ -1,5 +1,5 @@
 import datetime
-from .queue import Queue, QueueItem, QueueManagerCSV
+from api_queue.queue import Queue, QueueItem, QueueManagerCSV, SettingsManager
 
 def test_queue():
     qu = Queue([], track_space=datetime.timedelta(seconds=10))
@@ -101,6 +101,6 @@ def test_queue():
 
 def test_queue_manager():
     # TODO: finish
-    manager = QueueManagerCSV()
+    manager = QueueManagerCSV(settings=SettingsManager())
     with manager.queue_modify_context('test') as qu:
         qu.add(QueueItem('Track6', 60, 'TestSession6'))

@@ -7,23 +7,51 @@ from functools import reduce
 from itertools import pairwise
 from typing import Iterator
 import csv
+import json
 from pathlib import Path
 import io
 import asyncio
-from collections import defaultdict
+from collections import defaultdict, ChainMap
+from functools import cache
 
-class QueueManager():
-    def __init__(self):
-        super().__init__()
-        self.queue_settings = {
-            'test': {
-                'track_space': datetime.timedelta(seconds=15),
-            }
+
+DEFAULT_QUEUE_SETTINGS = {
+    "track_space": 15.0,
+}
+QUEUE_SETTING_TYPES = {
+    "track_space": lambda x: datetime.timedelta(seconds=x),
+}
+
+class SettingsManager():
+    def __init__(self, path: Path = Path('.')):
+        assert path.is_dir()
+        self.path = path
+
+    @cache
+    def get_json(self, name) -> dict:
+        path = self.path.joinpath(f'{name}_settings.json')
+        if not path.is_file():
+            return DEFAULT_QUEUE_SETTINGS
+        with path.open('r') as filehandle:
+            return {**DEFAULT_QUEUE_SETTINGS, **json.load(filehandle)}
+    @cache
+    def get(self, name) -> dict:
+        return {
+            k: QUEUE_SETTING_TYPES.get(k, lambda x: x)(v)
+            for k, v in self.get_json(name).items()
         }
 
+
+
+class QueueManager():
+    def __init__(self, *args, settings: SettingsManager = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.settings = settings
+        assert isinstance(settings, SettingsManager)
+
     @contextlib.contextmanager
-    def _queue_modify_context(self, filehandle, settings):
-        queue = Queue([QueueItem(**row) for row in csv.DictReader(filehandle)], **settings)
+    def _queue_modify_context(self, name, filehandle):
+        queue = Queue([QueueItem(**row) for row in csv.DictReader(filehandle)], **self.settings.get(name))
         yield queue
         if queue.modified:
             filehandle.seek(0)
@@ -35,8 +63,8 @@ class QueueManager():
                 writer.writerow(dataclasses.asdict(row, dict_factory=QueueItem.dict_factory))
 
 class QueryManagerAsyncLockMixin():
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.queue_async_locks = defaultdict(asyncio.Lock)
     @contextlib.asynccontextmanager
     async def lock_resource(self, name):
@@ -44,8 +72,8 @@ class QueryManagerAsyncLockMixin():
             yield
 
 class QueueManagerCSV(QueueManager):
-    def __init__(self, path: Path = Path('.')):
-        super().__init__()
+    def __init__(self, path: Path = Path('.'), **kwargs):
+        super().__init__(**kwargs)
         assert path.is_dir()
         self.path = path
 
@@ -64,7 +92,7 @@ class QueueManagerCSV(QueueManager):
         path_csv = self.path_csv(name)
         path_csv.touch()
         with path_csv.open('r+', encoding='utf8') as filehandle:
-            with self._queue_modify_context(filehandle, self.queue_settings.get(name, {})) as queue:
+            with self._queue_modify_context(name, filehandle) as queue:
                 yield queue
 
 class QueueManagerCSVAsync(QueueManagerCSV, QueryManagerAsyncLockMixin):
@@ -78,7 +106,7 @@ class QueueManagerStringIO(QueueManager):
     @contextlib.contextmanager
     def queue_modify_context(self, name):
         filehandle = io.StringIO()
-        with self._queue_modify_context(filehandle, self.queue_settings.get(name, {})) as queue:
+        with self._queue_modify_context(name, filehandle) as queue:
             yield queue
         print('StringIO')
         print(filehandle.getvalue())

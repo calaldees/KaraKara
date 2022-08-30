@@ -4,7 +4,7 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
 
     WORKDIR /app/
-    EXPOSE 1337
+    EXPOSE 8000
 
     RUN apk add --no-cache \
         curl \
@@ -34,5 +34,5 @@ FROM code as test
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
-    CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "1337", "--workers", "4"]
-    HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:1337/ || exit 1
+    CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+    HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:8000/ || exit 1

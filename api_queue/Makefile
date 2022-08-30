@@ -8,7 +8,7 @@ DOCKER_IMAGE:=api_queue
 DOCKER_RUN_ARGS:=\
 	--rm \
 	--volume ${PWD}:/app/:ro \
-	--publish 1337:1337 \
+	--publish 8000:8000 \
 
 _run:
 	docker build --tag ${DOCKER_IMAGE}_production --target production .
@@ -19,4 +19,4 @@ _shell:
 	docker run ${DOCKER_RUN_ARGS} -it ${DOCKER_IMAGE} /bin/sh
 
 local_run:
-	python3 -m sanic api_queue.server.app --host 0.0.0.0 --port 1337 --workers 4 --debug --auto-reload
+	python3 -m sanic api_queue.server.app --host 0.0.0.0 --port 8000 --workers 4 --debug --auto-reload
