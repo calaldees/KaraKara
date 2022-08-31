@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import io
 import asyncio
-from collections import defaultdict, ChainMap
+from collections import defaultdict
 from functools import cache
 
 
@@ -44,7 +44,7 @@ class SettingsManager():
 
 
 class QueueManager():
-    def __init__(self, *args, settings: SettingsManager = None, **kwargs):
+    def __init__(self, *args, settings: SettingsManager=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.settings = settings
         assert isinstance(settings, SettingsManager)
@@ -185,6 +185,14 @@ class Queue():
     def current(self) -> QueueItem:
         return self.playing or next(self.future, None)
     @property
+    def current_future(self) -> Iterator[QueueItem]:
+        # fugly mess - you can do this in less lines
+        current = self.current
+        future = list(self.future)
+        if future and future[0] != current:
+            future.insert(0, current)
+        return future
+    @property
     def last(self) -> QueueItem:
         return self.items[-1] if self.items else None
     @property
@@ -211,24 +219,23 @@ class Queue():
     def add(self, queue_item: QueueItem) -> None:
         self.items.append(queue_item)
         self._recalculate_start_times()
-    def move(self, id_source: float, id_destination: float) -> None:
-        raise NotImplementedError()
+    def move(self, id1: float, id2: float) -> None:
+        assert {id1, id2} < {i.id for i in self.current_future}, 'track_ids are not future tracks'
+        index1, queue_item = self.get(id1)
+        del self.items[index1]
+        index2, _ = self.get(id2)
+        if index2 == None:
+            index2 = len(self.items)
+        queue_item.start_time = None
+        self.items.insert(index2, queue_item)
         self._recalculate_start_times()
+    def get(self, id: float) -> tuple[int, QueueItem]:
+        return next(((index, queue_item) for index, queue_item in enumerate(self.items) if queue_item.id==id), (None, None))
     def delete(self, id: float) -> None:
         now = self.now
         self.items[:] = [i for i in self.items if (i.start_time and i.start_time < now) or i.id != id]
         self._recalculate_start_times()
     def _recalculate_start_times(self) -> None:
-        current = self.current
-        future = list(self.future)
-        if future and future[0] != current:
-            future.insert(0, current)
-        for i_prev, i_next in pairwise(future):
+        for i_prev, i_next in pairwise(self.current_future):
             i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None
         self.modified = True
-
-
-if __name__ == "__main__":
-    manager = QueueManagerStringIO()
-    with manager.queue_modify_context('test') as qu:
-        qu.add(QueueItem('Track6', 60, 'TestSession6'))

@@ -6,8 +6,6 @@ import sanic
 
 from ._utils import harden
 
-#import logging
-#log = logging.getLogger(__name__)
 from sanic.log import logger as log
 
 
@@ -27,14 +25,6 @@ app.config.update(
         'TRACKS': 'tracks.json',
     }
 )
-
-
-
-
-# sanic_redis uses `aioredis` and this has been deprecated`
-#from sanic_redis import SanicRedis
-#redis = SanicRedis(config_name="REDIS")
-#redis.init_app(app)
 
 # Startup ----------------------------------------------------------------------
 
@@ -89,14 +79,22 @@ async def attach_session_id(request, response):
         response.cookies["session_id"] = request.ctx.session_id
 
 
+@contextlib.asynccontextmanager
+async def push_queue_to_mqtt(request, queue_id):
+    yield
+    if hasattr(request.app.ctx, 'mqtt'):
+        log.info(f"push_queue_to_mqtt {queue_id}")
+        await request.app.ctx.mqtt.publish(f"karakara/room/{queue_id}/queue", request.app.ctx.queue_manager.for_json(queue_id), retain=True)
+
+
 # Routes -----------------------------------------------------------------------
 
-@app.get("/")
-async def root(request):
-    redis = request.app.ctx.redis
-    await redis.set('key2', 'value2')
-    result = await redis.get('key2')
-    return sanic.response.text(str(result))
+#@app.get("/")
+#async def root(request):
+#    redis = request.app.ctx.redis
+#    await redis.set('key2', 'value2')
+#    result = await redis.get('key2')
+#    return sanic.response.text(str(result))
 
 
 #@app.get("/queue/<queue_id:str>/tracks.json")
@@ -116,12 +114,6 @@ async def queue_json(request, queue_id):
 async def queue_settings_json(request, queue_id):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
 
-@contextlib.asynccontextmanager
-async def push_queue_to_mqtt(request, queue_id):
-    yield
-    if hasattr(request.app.ctx, 'mqtt'):
-        log.info("push_queue_to_mqtt")
-        await request.app.ctx.mqtt.publish(f"karakara/room/{queue_id}/queue", request.app.ctx.queue_manager.for_json(queue_id), retain=True)
 
 @app.post("/queue/<queue_id:str>/")
 async def add_queue_item(request, queue_id):
@@ -131,12 +123,54 @@ async def add_queue_item(request, queue_id):
     track_id = request.json['track_id']
     if track_id not in request.app.ctx.tracks:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
+    # TODO:
+    #   Check performer name in performer name list?
+    #   Check event start
     # Queue update
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+            # TODO:
+            #   Check duplicate performer
+            #   Check duplicate tracks
+            #   Check event end
+            #   Check queue limit (priority token?)
             queue_item = QueueItem(track_id, request.app.ctx.tracks[track_id]["duration"], request.ctx.session_id)
             queue.add(queue_item)
             return sanic.response.json(queue_item.asdict())
+
+@app.put("/queue/<queue_id:str>/")
+async def update_queue_item(request, queue_id):
+    if request.ctx.session_id != 'admin':
+        raise sanic.exceptions.Forbidden(message="updates are for admin only")
+    async with push_queue_to_mqtt(request, queue_id):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+            raise NotImplementedError()
+            # TODO: queue.move
+            return sanic.response.json()
+
+@app.delete("/queue/<queue_id:str>/queue/<queue_item_id:float>")
+async def delete_queue_item(request, queue_id, queue_item_id):
+    async with push_queue_to_mqtt(request, queue_id):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+            _, queue_item = queue.get(queue_item_id)
+            if not queue_item:
+                raise sanic.exceptions.NotFound()
+            if queue_item.owner != request.ctx.session_id and request.ctx.session_id != 'admin':
+                raise sanic.exceptions.Forbidden(message="queue_item.owner does not match session_id")
+            queue.delete(queue_item_id)
+            return sanic.response.json(queue_item.asdict())
+
+@app.get("/queue/<queue_id:str>/command/<command:str>")
+async def queue_command(request, queue_id, command):
+    if request.ctx.session_id != 'admin':
+        raise sanic.exceptions.Forbidden(message="commands are for admin only")
+    if command not in {'play', 'stop'}:
+        raise sanic.exceptions.NotFound(message='invalid command')
+    async with push_queue_to_mqtt(request, queue_id):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+            getattr(queue, command)()
+            return sanic.response.json({'is_playing': queue.is_playing()})
+
 
 
 if __name__ == '__main__':

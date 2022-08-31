@@ -1,10 +1,16 @@
+import pytest
+
 import datetime
 from api_queue.queue import Queue, QueueItem, QueueManagerCSV, SettingsManager
 
-def test_queue():
+
+@pytest.fixture
+def qu():
     qu = Queue([], track_space=datetime.timedelta(seconds=10))
     qu._now = datetime.datetime.now()
+    return qu
 
+def test_queue(qu):
     assert not qu.current
     assert not qu.playing
 
@@ -92,11 +98,47 @@ def test_queue():
     qu._now += datetime.timedelta(seconds=60)
     assert not qu.playing
 
+    # .end_time
     last = qu.last
     assert qu.end_time == last.end_time
     qu.add(QueueItem('Track8', 60, 'TestSession8'))
     qu.add(QueueItem('Track9', 60, 'TestSession9'))
     assert qu.end_time == qu.now + (datetime.timedelta(seconds=60)*2) + (qu.track_space*2)
+
+    # TODO: try to break this test up .. I originally made it as a doctest and it got too big
+
+
+def test_queue_get(qu):
+    # .get(id)
+    track10 = QueueItem('Track10', 60, 'TestSession10')
+    qu.add(track10)
+    index, queue_item = qu.get(track10.id)
+    assert queue_item.track_id == 'Track10'
+
+def test_queue_move(qu):
+    t1 = QueueItem('Track11', 60, 'TestSession11')
+    t2 = QueueItem('Track12', 60, 'TestSession12')
+    t3 = QueueItem('Track13', 60, 'TestSession13')
+    t4 = QueueItem('Track14', 60, 'TestSession14')
+    qu.add(t1)
+    qu.add(t2)
+    qu.add(t3)
+    qu.add(t4)
+    assert qu.items == [t1,t2,t3,t4]
+    
+    qu.move(t3.id, t1.id)
+    assert qu.items == [t3,t1,t2,t4]
+
+    qu.move(t4.id, t3.id)
+    assert qu.items == [t4,t3,t1,t2]
+
+    qu.move(t4.id, t2.id)
+    assert qu.items == [t3,t1,t4,t2,'implement move to end of queue']
+
+    qu.play()
+    qu._now += datetime.timedelta(seconds=60 * 5)
+    with pytest.raises(AssertionError) as exc_info:
+        qu.move(t4.id, t3.id)
 
 
 def test_queue_manager():
