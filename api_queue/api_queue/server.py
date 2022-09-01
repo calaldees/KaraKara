@@ -140,16 +140,24 @@ async def add_queue_item(request, queue_id):
 
 @app.put("/queue/<queue_id:str>/")
 async def update_queue_item(request, queue_id):
+    try:
+        queue_item_id_1 = float(request.args.get('queue_item_id_1'))
+        queue_item_id_2 = float(request.args.get('queue_item_id_2'))
+    except (ValueError, TypeError):
+        raise sanic.exceptions.InvalidUsage(message="queue_item_id_1 and queue_item_id_2 args required", context=request.args)
     if request.ctx.session_id != 'admin':
-        raise sanic.exceptions.Forbidden(message="updates are for admin only")
+        raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
-            raise NotImplementedError()
-            # TODO: queue.move
-            return sanic.response.json()
+            queue.move(queue_item_id_1, queue_item_id_2)
+            return sanic.response.json({})
 
-@app.delete("/queue/<queue_id:str>/queue/<queue_item_id:float>")
-async def delete_queue_item(request, queue_id, queue_item_id):
+@app.delete("/queue/<queue_id:str>/")
+async def delete_queue_item(request, queue_id):
+    try:
+        queue_item_id = float(request.args.get('queue_item_id'))
+    except ValueError:
+        raise sanic.exceptions.InvalidUsage(message="queue_item_id arg required")
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
             _, queue_item = queue.get(queue_item_id)

@@ -132,8 +132,8 @@ def test_queue_move(qu):
     qu.move(t4.id, t3.id)
     assert qu.items == [t4,t3,t1,t2]
 
-    qu.move(t4.id, t2.id)
-    assert qu.items == [t3,t1,t4,t2,'implement move to end of queue']
+    qu.move(t3.id, 1)
+    assert qu.items == [t4,t1,t2,t3]
 
     qu.play()
     qu._now += datetime.timedelta(seconds=60 * 5)
