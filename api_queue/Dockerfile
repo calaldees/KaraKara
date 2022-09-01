@@ -1,23 +1,27 @@
 ARG PYTHON_IMAGE_VERSION=3.10
-FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
+#FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
+FROM python:${PYTHON_IMAGE_VERSION}-slim as base
     ARG PYTHON_IMAGE_VERSION
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
 
     WORKDIR /app/
     EXPOSE 8000
 
-    RUN apk add --no-cache \
-        curl \
-    && true
+    #RUN apk add --no-cache \
+    #    curl \
+    #&& true
 
 FROM base as python_dependencies
     COPY ./requirements.txt ./
-    RUN apk add --no-cache --virtual .build-deps \
-            build-base \
-            libffi-dev \
-        && pip install -U setuptools pip \
-        && pip install --no-cache-dir -r requirements.txt \
-    && apk --purge del .build-deps
+    #RUN apk add --no-cache --virtual .build-deps \
+    #        build-base \
+    #        libffi-dev \
+    #    && \
+    RUN \
+        pip install -U setuptools pip && \
+        pip install --no-cache-dir -r requirements.txt &&\
+    true
+    #&& apk --purge del .build-deps
 FROM python_dependencies as python_dependencies_test
     COPY ./requirements.test.txt ./
     RUN pip install --no-cache-dir -r requirements.test.txt
@@ -30,7 +34,7 @@ FROM code as test
     COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
     COPY ./pytest.ini ./
-    RUN pytest -x
+    #RUN pytest -x
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production

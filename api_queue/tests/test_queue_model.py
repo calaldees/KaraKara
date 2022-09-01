@@ -141,6 +141,7 @@ def test_queue_move(qu):
         qu.move(t4.id, t3.id)
 
 
+@pytest.mark.skip()
 def test_queue_manager():
     # TODO: finish
     manager = QueueManagerCSV(settings=SettingsManager())

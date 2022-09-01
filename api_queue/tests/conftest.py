@@ -10,7 +10,7 @@ from unittest.mock import patch, AsyncMock
 
 
 @pytest.fixture
-async def app(mock_redis):
+async def app():  #mock_redis
     # get the single registered app - is this needed? can we just import app from server?
     #from sanic import Sanic
     #app = Sanic.get_app()
