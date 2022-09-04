@@ -20,3 +20,8 @@ _shell:
 
 local_run:
 	python3 -m sanic api_queue.server.app --host 0.0.0.0 --port 8000 --workers 4 --debug --auto-reload --access-logs
+
+
+.PHONY: cloc
+cloc:
+	cloc --vcs=git

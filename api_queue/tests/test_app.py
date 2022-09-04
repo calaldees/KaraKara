@@ -11,3 +11,9 @@ async def test_basic_asgi_client(app):  # mock_redis,
     #assert request.method.lower() == "get"
     #assert response.body == b"foo"
     #assert response.status == 200
+
+
+@pytest.mark.asyncio
+async def test_tracks(app):
+    request, response = await app.asgi_client.get("/queue/test/tracks.json")
+    assert 'KAT_TUN_Your_side_Instrumental_' in response.json.keys()

@@ -1,0 +1,139 @@
+{
+	"KAT_TUN_Your_side_Instrumental_": {
+		"id": "KAT_TUN_Your_side_Instrumental_",
+		"source_hash": "jWBWalw4cbn",
+		"source_filename": "KAT-TUN Your side [Instrumental]",
+		"duration": 212.5,
+		"attachments": {
+			"video": [
+				{
+					"mime": "video/webm; codecs=av01.0.05M.08,opus",
+					"path": "n/n8VOU9DQFaP.webm"
+				}
+			],
+			"preview": [
+				{
+					"mime": "video/webm; codecs=av01.0.05M.08,opus",
+					"path": "w/w19CmOBGNMj.webm"
+				},
+				{
+					"mime": "video/mp4; codecs=avc1.4D401E,mp4a.40.2",
+					"path": "a/awBOL5H4wWk.mp4"
+				}
+			],
+			"image": [
+				{
+					"mime": "image/avif",
+					"path": "a/aZZEKto94P3.avif"
+				},
+				{
+					"mime": "image/avif",
+					"path": "w/w2YUTI1JDdv.avif"
+				},
+				{
+					"mime": "image/avif",
+					"path": "T/TOTxamGRB_s.avif"
+				},
+				{
+					"mime": "image/avif",
+					"path": "_/_6VRCXsrvbP.avif"
+				},
+				{
+					"mime": "image/webp",
+					"path": "B/BV5QE9uIQYc.webp"
+				},
+				{
+					"mime": "image/webp",
+					"path": "X/X56Tg0QUKGp.webp"
+				},
+				{
+					"mime": "image/webp",
+					"path": "b/bZk_k7Kx792.webp"
+				},
+				{
+					"mime": "image/webp",
+					"path": "F/F9GQBHGxkbA.webp"
+				}
+			],
+			"subtitle": [
+				{
+					"mime": "text/vtt",
+					"path": "N/N8_5V4HMlM0.vtt"
+				}
+			]
+		},
+		"lyrics": [
+			"It's a little funny story",
+			"sou mou modorenai",
+			"Iie wo dete I miss your heart",
+			"Kimi no tame sagashiteta Present",
+			"Nakusanu you ni",
+			"mune ni shimau Oh nono...",
+			"Kuchibiru karamete ita ase iki zukai",
+			"Ikisou de You kiss so smart",
+			"Yurusarenai futari no koi wa",
+			"choppoke na guuzen demo",
+			"If you love I imagine you",
+			"kimi no kanashimi zembu",
+			"Kakushiteru namida no wake",
+			"Subete wo tsutsumi kimi wo ai su yo~",
+			"Sore kurai shika dekinai kedo",
+			"I'm on your side",
+			"Nisemono no yubiwa ga ima sei ippai",
+			"Nani mo nai I hate myself",
+			"Sore nanoni kimi wa ore ni dake",
+			"subete yurusu dakishimetai",
+			"If you love I imagine you",
+			"Kimi no yasashisa sagashi",
+			"Mayotteta toki wa sugite",
+			"Neru made ore wa",
+			"kimi wo aisu yo~",
+			"Sore kurai shikai ienai kedo",
+			"(I'm on your side) Baby, I can see in your eyes",
+			"It's a holy slowly night",
+			"Hold you tight, shiritai kokoro no kizuato",
+			"Know the last chance. I cannot miss this shot",
+			"Whenever, wherever, futari forever...",
+			"Sore nanoni ore ni dake...",
+			"Kimi to ikiruu..",
+			"If you love I imagine you",
+			"Kimi no kanashimi zembu",
+			"Kakushiteru namida no wake",
+			"Subete wo tsutsumi kimi wo aisu yo~",
+			"Sore kurai shika dekinai kedo",
+			"If you love I imagine you",
+			"Kimi no yasashisa sagashi",
+			"Mayotteta toki wa sugite",
+			"Neru made ore wa kimi wo aisu yo",
+			"Sore kurai shikai ienai kedo",
+			"I?m on your side",
+			"Ooooh......"
+		],
+		"tags": {
+			"category": [
+				"jpop"
+			],
+			"artist": [
+				"Kat-tun"
+			],
+			"lang": [
+				"jp"
+			],
+			"vocalstyle": [
+				"male"
+			],
+			"title": [
+				"Your Side (instrumental)"
+			],
+			"vocaltrack": [
+				"off"
+			],
+			"length": [
+				"full"
+			],
+			"contributor": [
+				"Lucy"
+			]
+		}
+	}
+}
