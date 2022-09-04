@@ -81,7 +81,8 @@ class QueueManagerCSV(QueueManager):
         return self.path.joinpath(f'{name}.csv')
 
     def for_json(self, name):
-        with self.path_csv(name).open('r', encoding='utf8') as filehandle:
+        file_context = self.path_csv(name).open('r', encoding='utf8') if self.path_csv(name).is_file() else io.StringIO('')
+        with file_context as filehandle:
             return tuple(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))
 
     @contextlib.contextmanager

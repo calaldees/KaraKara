@@ -23,6 +23,7 @@ app.config.update(
         #'REDIS': "redis://redis:6379/0",
         #'MQTT': 'mqtt:1883',
         'TRACKS': 'tracks.json',
+        'path_queue': '_queue_data',
     }
 )
 
@@ -63,8 +64,8 @@ from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     log.info("[queue_manager]")
-    _app.ctx.settings_manager = SettingsManager()
-    _app.ctx.queue_manager = QueueManagerCSVAsync(settings=_app.ctx.settings_manager)
+    _app.ctx.settings_manager = SettingsManager(path=_app.config.get('path_queue'))
+    _app.ctx.queue_manager = QueueManagerCSVAsync(path=_app.config.get('path_queue'), settings=_app.ctx.settings_manager)
 
 
 # Middleware -------------------------------------------------------------------
