@@ -29,6 +29,7 @@ async def app(tmp_path):  #mock_redis
         {
             'TRACKS': temp_path_tracks,
             'path_queue': tmp_path,
+            'DEBUG': True,
         }
     )
     yield app

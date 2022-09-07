@@ -14,11 +14,11 @@ def test_queue(qu):
     assert not qu.current
     assert not qu.playing
 
-    qu.add(QueueItem('Track1', 60, 'TestSession1'))
+    qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     assert [i.track_id for i in qu.items] == ['Track1']
     assert qu.current.track_id == 'Track1'
     assert not qu.current.start_time
-    qu.add(QueueItem('Track2', 60, 'TestSession2'))
+    qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
     assert [i.track_id for i in qu.items] == ['Track1', 'Track2']
     assert qu.current.track_id == 'Track1'
 
@@ -42,8 +42,8 @@ def test_queue(qu):
     assert [i.track_id for i in qu.future] == []
 
     # Adding + Deleting + Future + current tracks work after played past tracks
-    qu.add(QueueItem('Track3', 60, 'TestSession3'))
-    qu.add(QueueItem('Track4', 60, 'TestSession4'))
+    qu.add(QueueItem('Track3', 60, 'TestSession3', 'test_name'))
+    qu.add(QueueItem('Track4', 60, 'TestSession4', 'test_name'))
     assert not qu.playing
     assert qu.current.track_id == 'Track3'
     assert [i.track_id for i in qu.future] == ['Track3', 'Track4']
@@ -65,7 +65,7 @@ def test_queue(qu):
     assert qu.playing.track_id == 'Track4'
     qu._now += datetime.timedelta(seconds=30)
     assert qu.playing.track_id == 'Track4'
-    qu.add(QueueItem('Track5', 60, 'TestSession5'))
+    qu.add(QueueItem('Track5', 60, 'TestSession5', 'test_name'))
     assert qu.last.track_id == 'Track5'
     assert qu.last.start_time > qu.now
     qu._now += datetime.timedelta(seconds=60)
@@ -74,8 +74,8 @@ def test_queue(qu):
     assert not qu.playing
 
     # Stop functions correctly
-    qu.add(QueueItem('Track6', 60, 'TestSession6'))
-    qu.add(QueueItem('Track7', 60, 'TestSession7'))
+    qu.add(QueueItem('Track6', 60, 'TestSession6', 'test_name'))
+    qu.add(QueueItem('Track7', 60, 'TestSession7', 'test_name'))
     assert not qu.playing
     qu._now += datetime.timedelta(seconds=60)
     assert not qu.playing
@@ -101,8 +101,8 @@ def test_queue(qu):
     # .end_time
     last = qu.last
     assert qu.end_time == last.end_time
-    qu.add(QueueItem('Track8', 60, 'TestSession8'))
-    qu.add(QueueItem('Track9', 60, 'TestSession9'))
+    qu.add(QueueItem('Track8', 60, 'TestSession8', 'test_name'))
+    qu.add(QueueItem('Track9', 60, 'TestSession9', 'test_name'))
     assert qu.end_time == qu.now + (datetime.timedelta(seconds=60)*2) + (qu.track_space*2)
 
     # TODO: try to break this test up .. I originally made it as a doctest and it got too big
@@ -110,16 +110,16 @@ def test_queue(qu):
 
 def test_queue_get(qu):
     # .get(id)
-    track10 = QueueItem('Track10', 60, 'TestSession10')
+    track10 = QueueItem('Track10', 60, 'TestSession10', 'test_name')
     qu.add(track10)
     index, queue_item = qu.get(track10.id)
     assert queue_item.track_id == 'Track10'
 
 def test_queue_move(qu):
-    t1 = QueueItem('Track11', 60, 'TestSession11')
-    t2 = QueueItem('Track12', 60, 'TestSession12')
-    t3 = QueueItem('Track13', 60, 'TestSession13')
-    t4 = QueueItem('Track14', 60, 'TestSession14')
+    t1 = QueueItem('Track11', 60, 'TestSession11', 'test_name')
+    t2 = QueueItem('Track12', 60, 'TestSession12', 'test_name')
+    t3 = QueueItem('Track13', 60, 'TestSession13', 'test_name')
+    t4 = QueueItem('Track14', 60, 'TestSession14', 'test_name')
     qu.add(t1)
     qu.add(t2)
     qu.add(t3)
@@ -146,4 +146,4 @@ def test_queue_manager():
     # TODO: finish
     manager = QueueManagerCSV(settings=SettingsManager())
     with manager.queue_modify_context('test') as qu:
-        qu.add(QueueItem('Track6', 60, 'TestSession6'))
+        qu.add(QueueItem('Track6', 60, 'TestSession6', 'test_name'))

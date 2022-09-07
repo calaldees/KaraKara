@@ -117,18 +117,19 @@ class QueueManagerStringIO(QueueManager):
 class QueueItem():
     track_id: str
     track_duration: datetime.timedelta
-    owner: str
+    session_id: str
+    performer_name: str
     start_time: datetime.datetime = None
     id: float = dataclasses.field(default_factory=random.random)
 
     def __post_init__(self):
         """
-        >>> QueueItem('Track1', 60.25, 'Session1', 123456789.123456789, 0.123456789)
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), owner='Session1', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
-        >>> QueueItem('Track1', '60.25', 'Session1', '123456789.123456789', '0.123456789')
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), owner='Session1', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
-        >>> QueueItem('', '', '', '', 0.123456789)
-        QueueItem(track_id='', track_duration=datetime.timedelta(0), owner='', start_time=None, id=0.123456789)
+        >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 0.123456789)
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
+        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '123456789.123456789', '0.123456789')
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
+        >>> QueueItem('', '', '', '', '', 0.123456789)
+        QueueItem(track_id='', track_duration=datetime.timedelta(0), session_id='', performer_name='', start_time=None, id=0.123456789)
         """
         if not self.track_duration:
             self.track_duration = 0.0
@@ -146,9 +147,9 @@ class QueueItem():
     @staticmethod
     def dict_factory(key_values):
         """
-        >>> i = QueueItem('Track1', 60.25, 'Session1', 123456789.123456789, 0.123456789)
+        >>> i = QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 0.123456789)
         >>> i.asdict()
-        {'track_id': 'Track1', 'track_duration': 60.25, 'owner': 'Session1', 'start_time': 123456789.123457, 'id': 0.123456789}
+        {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 0.123456789}
         """
         def _parse(dd):
             k, v = dd

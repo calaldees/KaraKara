@@ -52,11 +52,11 @@ api
         * 302 redirect to static track_datafile from hash of filter_tags
 * /queue/XYZ/items
     * GET (only used for testing - this is pushed to mqtt)
-    * POST (limit owner or admin)
+    * POST (limit performer_name or admin)
         * name, trackid
         * return id
 * /queue/XYZ/items/ABC
-    * DELETE (owner or admin only)
+    * DELETE (session_id or admin only)
     * PUT (admin)
         * (weight, timestamp_play)
 

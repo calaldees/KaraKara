@@ -29,7 +29,8 @@ app.config.update(
 
 # Startup ----------------------------------------------------------------------
 
-@app.listener('main_process_start')
+#@app.listener('main_process_start')
+@app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
     log.info("[tracks] loading")
     with open(_app.config.get('TRACKS')) as filehandle:
@@ -69,6 +70,17 @@ async def queue_manager(_app: sanic.Sanic, _loop):
 
 
 # Middleware -------------------------------------------------------------------
+
+# pytest debugging - This is needed to see exceptions on failed tests. DEBUG=True wont give me json exceptions. SO CLUMSY!
+# https://sanic.dev/en/guide/best-practices/exceptions.html#custom-error-handling
+class CustomErrorHandler(sanic.handlers.ErrorHandler):
+    def default(self, request, exception):
+        if isinstance(exception, sanic.exceptions.SanicException):
+            return super().default(request, exception)
+        import traceback
+        return sanic.response.json({'exception': "".join(traceback.TracebackException.from_exception(exception).format())}, status=500)
+app.error_handler = CustomErrorHandler()
+
 
 
 @app.middleware("request")
@@ -124,6 +136,7 @@ async def add_queue_item(request, queue_id):
     track_id = request.json['track_id']
     if track_id not in request.app.ctx.tracks:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
+    performer_name = request.json['performer_name']
     # TODO:
     #   Check performer name in performer name list?
     #   Check event start
@@ -135,7 +148,12 @@ async def add_queue_item(request, queue_id):
             #   Check duplicate tracks
             #   Check event end
             #   Check queue limit (priority token?)
-            queue_item = QueueItem(track_id, request.app.ctx.tracks[track_id]["duration"], request.ctx.session_id)
+            queue_item = QueueItem(
+                track_id=track_id,
+                track_duration=request.app.ctx.tracks[track_id]["duration"],
+                session_id=request.ctx.session_id,
+                performer_name=request.json['performer_name'],
+            )
             queue.add(queue_item)
             return sanic.response.json(queue_item.asdict())
 
@@ -164,8 +182,8 @@ async def delete_queue_item(request, queue_id):
             _, queue_item = queue.get(queue_item_id)
             if not queue_item:
                 raise sanic.exceptions.NotFound()
-            if queue_item.owner != request.ctx.session_id and request.ctx.session_id != 'admin':
-                raise sanic.exceptions.Forbidden(message="queue_item.owner does not match session_id")
+            if queue_item.session_id != request.ctx.session_id and request.ctx.session_id != 'admin':
+                raise sanic.exceptions.Forbidden(message="queue_item.session_id does not match session_id")
             queue.delete(queue_item_id)
             return sanic.response.json(queue_item.asdict())
 
