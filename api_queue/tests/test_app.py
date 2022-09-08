@@ -1,18 +1,14 @@
 import pytest
 import collections.abc
-import json
 
-# https://sanic.dev/en/plugins/sanic-testing/getting-started.html#basic-usage
+
 @pytest.mark.asyncio
-async def test_basic_asgi_client(app):  # mock_redis,
+async def test_root(app):  # mock_redis,
     #mock_redis.get.side_effect = ['foo',]
-
     request, response = await app.asgi_client.get("/")
-
     #assert request.method.lower() == "get"
     #assert response.body == b"foo"
     #assert response.status == 200
-
 
 @pytest.mark.asyncio
 async def test_tracks(queue_model):
@@ -77,3 +73,15 @@ async def test_queue_delete(queue_model, mock_mqtt):
     queue = await queue_model.queue
     assert len(queue) == 1
     assert queue[0]['track_id'] == 'Animaniacs_OP'
+
+    # session_id owner reject
+    queue_model.session_id = 'not_real'
+    response = await queue_model.delete(queue_item_id=queue[0]['id'])
+    response.status == 403
+
+    # session_id admin can delete
+    queue_model.session_id = 'admin'
+    response = await queue_model.delete(queue_item_id=queue[0]['id'])
+    response.status == 200
+    queue = await queue_model.queue
+    assert len(queue) == 0

@@ -40,13 +40,13 @@ async def tracks_load(_app: sanic.Sanic, _loop):
 
 @app.listener('before_server_start')
 async def aio_redis_configure(_app: sanic.Sanic, _loop):
-    log.info("[redis] connecting")
     if _app.config.get('REDIS'):
+        log.info("[redis] connecting")
         from redis import asyncio as aioredis
         _app.ctx.redis = await aioredis.from_url(_app.config.get('REDIS'))
-@app.listener('after_server_stop')
-async def aio_redis_close(_app, _loop):
-    log.info("[redis] closing")
+#@app.listener('after_server_stop')
+#async def aio_redis_close(_app, _loop):
+    #log.info("[redis] closing")
     # TODO: gracefull close?
     #if _app.ctx.redis:
     #    await _app.ctx.redis.close()
@@ -54,12 +54,12 @@ async def aio_redis_close(_app, _loop):
 
 @app.listener('before_server_start')
 async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
-    log.info("[mqtt] connecting")
     mqtt = _app.config.get('MQTT')
     if isinstance(mqtt, str):
+        log.info("[mqtt] connecting")
         from asyncio_mqtt import Client as MqttClient, MqttError
         _app.ctx.mqtt = MqttClient(mqtt)
-    else:  # normally pass-through for mock mqtt object
+    elif mqtt:  # normally pass-through for mock mqtt object
         _app.ctx.mqtt = mqtt
 
 
@@ -155,7 +155,7 @@ async def add_queue_item(request, queue_id):
                 track_id=track_id,
                 track_duration=request.app.ctx.tracks[track_id]["duration"],
                 session_id=request.ctx.session_id,
-                performer_name=request.json['performer_name'],
+                performer_name=performer_name,
             )
             queue.add(queue_item)
             return sanic.response.json(queue_item.asdict())
