@@ -34,6 +34,8 @@ async def test_queue_add(queue_model, mock_mqtt):
     assert len(await queue_model.queue) == 0
 
     # reject add tracks that are not in track list
+    response = await queue_model.add()
+    assert response.status == 400
     response = await queue_model.add(track_id='NotRealTrackId', performer_name='test')
     assert response.status == 400
 
@@ -51,13 +53,24 @@ async def test_queue_add(queue_model, mock_mqtt):
 
 @pytest.mark.asyncio
 async def test_queue_delete(queue_model, mock_mqtt):
+    # populate queue
     assert len(await queue_model.queue) == 0
     await queue_model.add(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test1')
     await queue_model.add(track_id='Animaniacs_OP', performer_name='test2')
     queue = await queue_model.queue
     assert len(queue) == 2
+
+    # try to delete invalid
     mock_mqtt.publish.reset_mock()
+    response = await queue_model.delete()
+    assert response.status == 400
+    response = await queue_model.delete(queue_item_id='NotReal')
+    assert response.status == 400
+    response = await queue_model.delete(queue_item_id=999)
+    assert response.status == 404
     mock_mqtt.publish.assert_not_awaited()
+
+    # delete
     response = await queue_model.delete(queue_item_id=queue[0]['id'])
     assert response.status == 200
     mock_mqtt.publish.assert_awaited_once()
