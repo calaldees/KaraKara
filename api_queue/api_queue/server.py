@@ -80,6 +80,8 @@ class CustomErrorHandler(sanic.handlers.ErrorHandler):
     def default(self, request, exception):
         if isinstance(exception, sanic.exceptions.SanicException):
             return super().default(request, exception)
+        if isinstance(exception, AssertionError):
+            return super().default(request, sanic.exceptions.InvalidUsage(*exception.args))
         import traceback
         return sanic.response.json({'exception': "".join(traceback.TracebackException.from_exception(exception).format())}, status=500)
 app.error_handler = CustomErrorHandler()
@@ -172,7 +174,7 @@ async def update_queue_item(request, queue_id):
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
             queue.move(queue_item_id_1, queue_item_id_2)
-            return sanic.response.json({})
+            return sanic.response.json({}, status=201)
 
 @app.delete("/queue/<queue_id:str>/")
 async def delete_queue_item(request, queue_id):

@@ -43,30 +43,39 @@ class QueueModel():
     def __init__(self, app, queue):
         self.app = app
         self._queue = queue
-        self.session_id = None
+        del self.session_id
     @property
-    def cookies(self):
-        if self.session_id:
-            return {'session_id': self.session_id}
-        return {}
+    def session_id(self):
+        return self.app.asgi_client.cookies.get('session_id')
+    @session_id.setter
+    def session_id(self, value):
+        self.app.asgi_client.cookies.delete('session_id')
+        self.app.asgi_client.cookies.set('session_id', value)
+    @session_id.deleter
+    def session_id(self):
+        self.app.asgi_client.cookies.delete('session_id')
     @property
     async def queue(self):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/queue.json", cookies=self.cookies)
+        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/queue.json")
         return response.json
     @property
     async def tracks(self):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/tracks.json", cookies=self.cookies)
+        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/tracks.json")
         return response.json
     @property
     async def settings(self):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/settings.json", cookies=self.cookies)
+        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/settings.json")
         return response.json
-    async def add(self, **kwargs):
-        request, response = await self.app.asgi_client.post(f"/queue/{self._queue}/", data=json.dumps(kwargs), cookies=self.cookies)
+    async def post(self, **kwargs):
+        request, response = await self.app.asgi_client.post(f"/queue/{self._queue}/", data=json.dumps(kwargs))
         return response
     async def delete(self, **kwargs):
-        request, response = await self.app.asgi_client.delete(f"/queue/{self._queue}/?{urlencode(kwargs)}", cookies=self.cookies)
+        request, response = await self.app.asgi_client.delete(f"/queue/{self._queue}/?{urlencode(kwargs)}")
         return response
+    async def put(self, **kwargs):
+        request, response = await self.app.asgi_client.put(f"/queue/{self._queue}/?{urlencode(kwargs)}")
+        return response
+
 
 
 @pytest.fixture

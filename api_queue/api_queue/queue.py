@@ -222,7 +222,7 @@ class Queue():
         self.items.append(queue_item)
         self._recalculate_start_times()
     def move(self, id1: float, id2: float) -> None:
-        assert {id1, id2} < {i.id for i in self.current_future}|{1,}, 'track_ids are not future tracks'
+        assert {id1, id2} < {i.id for i in self.current_future}|{1,}, 'move track_ids are not in future track list'
         index1, queue_item = self.get(id1)
         del self.items[index1]
         index2, _ = self.get(id2) if id2<1 else (len(self.items), None)  # id's are always between 0 and 1. `1` is a special sentinel value for end of list
