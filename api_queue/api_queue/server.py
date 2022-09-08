@@ -55,9 +55,12 @@ async def aio_redis_close(_app, _loop):
 @app.listener('before_server_start')
 async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
     log.info("[mqtt] connecting")
-    if _app.config.get('MQTT'):
+    mqtt = _app.config.get('MQTT')
+    if isinstance(mqtt, str):
         from asyncio_mqtt import Client as MqttClient, MqttError
-        _app.ctx.mqtt = MqttClient(_app.config.get('MQTT'))
+        _app.ctx.mqtt = MqttClient(mqtt)
+    else:  # normally pass-through for mock mqtt object
+        _app.ctx.mqtt = mqtt
 
 
 
@@ -175,7 +178,7 @@ async def update_queue_item(request, queue_id):
 async def delete_queue_item(request, queue_id):
     try:
         queue_item_id = float(request.args.get('queue_item_id'))
-    except ValueError:
+    except (ValueError, TypeError):
         raise sanic.exceptions.InvalidUsage(message="queue_item_id arg required")
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:

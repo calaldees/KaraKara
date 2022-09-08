@@ -15,39 +15,52 @@ async def test_basic_asgi_client(app):  # mock_redis,
 
 
 @pytest.mark.asyncio
-async def test_tracks(app):
-    request, response = await app.asgi_client.get("/queue/test/tracks.json")
-    assert 'KAT_TUN_Your_side_Instrumental_' in response.json.keys()
+async def test_tracks(queue_model):
+    assert 'KAT_TUN_Your_side_Instrumental_' in (await queue_model.tracks).keys()
 
 @pytest.mark.asyncio
-async def test_queue_null(app):
-    request, response = await app.asgi_client.get("/queue/test/queue.json")
-    assert isinstance(response.json, collections.abc.Sequence)
+async def test_queue_null(queue_model):
+    assert isinstance(await queue_model.queue, collections.abc.Sequence)
 
 @pytest.mark.asyncio
-async def test_queue_settings_default(app):
-    request, response = await app.asgi_client.get("/queue/test/settings.json")
-    assert isinstance(response.json, collections.abc.Mapping)
-    assert 'track_space' in response.json
+async def test_queue_settings_default(queue_model):
+    settings = await queue_model.settings
+    assert isinstance(settings, collections.abc.Mapping)
+    assert 'track_space' in settings
 
 @pytest.mark.asyncio
-async def test_queue_add(app):
+async def test_queue_add(queue_model, mock_mqtt):
     # queue is empty
-    request, response = await app.asgi_client.get("/queue/test/queue.json")
-    assert len(response.json) == 0
+    assert len(await queue_model.queue) == 0
 
     # reject add tracks that are not in track list
-    request, response = await app.asgi_client.post("/queue/test/", data=json.dumps(
-        {'track_id': 'NotRealTrackId', 'performer_name':'test'}
-    ))
+    response = await queue_model.add(track_id='NotRealTrackId', performer_name='test')
     assert response.status == 400
 
+    mock_mqtt.publish.assert_not_awaited()
     # add track
-    request, response = await app.asgi_client.post("/queue/test/", data=json.dumps(
-        {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}
-    ))
+    response = await queue_model.add(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test')
     assert response.status == 200
+    mock_mqtt.publish.assert_awaited_once()
     # check track now in queue
-    request, response = await app.asgi_client.get("/queue/test/queue.json")
-    assert len(response.json) == 1
-    assert {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}.items() <= response.json[0].items()
+    queue = await queue_model.queue
+    assert len(queue) == 1
+    assert {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}.items() <= queue[0].items()
+    assert mock_mqtt.publish.await_args.args == ("karakara/room/test/queue", tuple(queue))
+    assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
+
+@pytest.mark.asyncio
+async def test_queue_delete(queue_model, mock_mqtt):
+    assert len(await queue_model.queue) == 0
+    await queue_model.add(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test1')
+    await queue_model.add(track_id='Animaniacs_OP', performer_name='test2')
+    queue = await queue_model.queue
+    assert len(queue) == 2
+    mock_mqtt.publish.reset_mock()
+    mock_mqtt.publish.assert_not_awaited()
+    response = await queue_model.delete(queue_item_id=queue[0]['id'])
+    assert response.status == 200
+    mock_mqtt.publish.assert_awaited_once()
+    queue = await queue_model.queue
+    assert len(queue) == 1
+    assert queue[0]['track_id'] == 'Animaniacs_OP'
