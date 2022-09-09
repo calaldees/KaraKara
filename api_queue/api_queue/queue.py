@@ -7,12 +7,16 @@ from functools import reduce
 from itertools import pairwise
 from typing import Iterator
 import csv
-import json
 from pathlib import Path
 import io
 import asyncio
 from collections import defaultdict
 from functools import cache
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 
 DEFAULT_QUEUE_SETTINGS = {
@@ -24,6 +28,7 @@ QUEUE_SETTING_TYPES = {
 
 class SettingsManager():
     def __init__(self, path: Path = Path('.')):
+        path = path if isinstance(path, Path) else Path(path)
         assert path.is_dir()
         self.path = path
 
@@ -74,6 +79,7 @@ class QueryManagerAsyncLockMixin():
 class QueueManagerCSV(QueueManager):
     def __init__(self, path: Path = Path('.'), **kwargs):
         super().__init__(**kwargs)
+        path = path if isinstance(path, Path) else Path(path)
         assert path.is_dir()
         self.path = path
 

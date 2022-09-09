@@ -1,6 +1,10 @@
-import json
 import random
 import contextlib
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 import sanic
 
@@ -21,9 +25,9 @@ app.blueprint(openapi3_blueprint)  # Register - https://*/swagger/
 app.config.update(
     {
         #'REDIS': "redis://redis:6379/0",
-        #'MQTT': 'mqtt:1883',
+        'MQTT': 'mqtt',  #:1883
         'TRACKS': 'tracks.json',
-        'path_queue': '_queue_data',
+        'path_queue': '_data',
     }
 )
 
@@ -59,8 +63,16 @@ async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
         log.info("[mqtt] connecting")
         from asyncio_mqtt import Client as MqttClient, MqttError
         _app.ctx.mqtt = MqttClient(mqtt)
+        await _app.ctx.mqtt.connect()
     elif mqtt:  # normally pass-through for mock mqtt object
         _app.ctx.mqtt = mqtt
+@app.listener('after_server_stop')
+async def aio_mqtt_close(_app, _loop):
+    mqtt = _app.config.get('MQTT')
+    if isinstance(mqtt, str):
+        log.info("[mqtt] closing")
+        await _app.ctx.mqtt.disconnect()
+
 
 
 
@@ -102,13 +114,14 @@ async def push_queue_to_mqtt(request, queue_id):
     yield
     if hasattr(request.app.ctx, 'mqtt'):
         log.info(f"push_queue_to_mqtt {queue_id}")
-        await request.app.ctx.mqtt.publish(f"karakara/room/{queue_id}/queue", request.app.ctx.queue_manager.for_json(queue_id), retain=True)
+        await request.app.ctx.mqtt.publish(f"karakara/room/{queue_id}/queue", json.dumps(request.app.ctx.queue_manager.for_json(queue_id)), retain=True)
 
 
 # Routes -----------------------------------------------------------------------
 
-#@app.get("/")
-#async def root(request):
+@app.get("/")
+async def root(request):
+    return sanic.response.text('')
 #    redis = request.app.ctx.redis
 #    await redis.set('key2', 'value2')
 #    result = await redis.get('key2')

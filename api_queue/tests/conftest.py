@@ -3,8 +3,12 @@ from unittest.mock import patch, AsyncMock
 
 import pathlib
 import shutil
-import json
 from urllib.parse import urlencode
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 
 #@pytest.fixture

@@ -1,28 +1,27 @@
 volumes:
-  redis_data:
+  queue_data:
+  mosquitto_data:
 
 services:
 
-  redis:
-    image: redis:alpine
-    volumes:
-      - redis_data:/data:rw
-    #ports:
-    #  - 6379:6379
-
   mqtt:
     image: eclipse-mosquitto
-    #ports:
-    #  - 1883:1883
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - ${PWD}/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
 
   api_queue:
     build:
       context: ./
-      target: test
+      #target: test
     ports:
-      - 1337:1337
+      - 8000:8000
     links:
-      - redis
       - mqtt
     volumes:
       - ${PWD}:/app/:ro
+      - ${PWD}/tests/tracks.json:/app/tracks.json:ro
+      - queue_data:/app/_data/:rw
