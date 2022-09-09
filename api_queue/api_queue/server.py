@@ -1,5 +1,6 @@
 import random
 import contextlib
+from textwrap import dedent
 
 try:
     import ujson as json
@@ -7,33 +8,32 @@ except ImportError:
     import json
 
 import sanic
+from sanic_ext import openapi
+from sanic.log import logger as log
 
 from ._utils import harden
-
-from sanic.log import logger as log
 
 
 
 app = sanic.Sanic("karakara_queue")
-
-# OpenAPI3 Extension
-from sanic_openapi import openapi, openapi3_blueprint
-app.blueprint(openapi3_blueprint)  # Register - https://*/swagger/
-# https://github.com/sanic-org/sanic-openapi/blob/main/examples/cars_oas3/blueprints/car.py
-# https://sanic.dev/en/plugins/sanic-ext/openapi/autodoc.html#operation-level-yaml
-
 app.config.update(
     {
         #'REDIS': "redis://redis:6379/0",
-        'MQTT': 'mqtt',  #:1883
+        #'MQTT': 'mqtt',  #:1883
         'TRACKS': 'tracks.json',
         'path_queue': '_data',
     }
 )
+app.ext.openapi.describe(
+    "KaraKara Queue API",
+    version="0.0.0",
+    description=dedent("""
+    """),  # TODO: Markdown
+)
+
 
 # Startup ----------------------------------------------------------------------
 
-#@app.listener('main_process_start')
 @app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
     log.info("[tracks] loading")
@@ -41,19 +41,12 @@ async def tracks_load(_app: sanic.Sanic, _loop):
         _app.ctx.tracks = harden(json.load(filehandle))
 
 
-
+from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
 @app.listener('before_server_start')
-async def aio_redis_configure(_app: sanic.Sanic, _loop):
-    if _app.config.get('REDIS'):
-        log.info("[redis] connecting")
-        from redis import asyncio as aioredis
-        _app.ctx.redis = await aioredis.from_url(_app.config.get('REDIS'))
-#@app.listener('after_server_stop')
-#async def aio_redis_close(_app, _loop):
-    #log.info("[redis] closing")
-    # TODO: gracefull close?
-    #if _app.ctx.redis:
-    #    await _app.ctx.redis.close()
+async def queue_manager(_app: sanic.Sanic, _loop):
+    log.info("[queue_manager]")
+    _app.ctx.settings_manager = SettingsManager(path=_app.config.get('path_queue'))
+    _app.ctx.queue_manager = QueueManagerCSVAsync(path=_app.config.get('path_queue'), settings=_app.ctx.settings_manager)
 
 
 @app.listener('before_server_start')
@@ -74,14 +67,6 @@ async def aio_mqtt_close(_app, _loop):
         await _app.ctx.mqtt.disconnect()
 
 
-
-
-from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
-@app.listener('before_server_start')
-async def queue_manager(_app: sanic.Sanic, _loop):
-    log.info("[queue_manager]")
-    _app.ctx.settings_manager = SettingsManager(path=_app.config.get('path_queue'))
-    _app.ctx.queue_manager = QueueManagerCSVAsync(path=_app.config.get('path_queue'), settings=_app.ctx.settings_manager)
 
 
 # Middleware -------------------------------------------------------------------
@@ -109,6 +94,8 @@ async def attach_session_id(request, response):
         response.cookies["session_id"] = request.ctx.session_id
 
 
+
+
 @contextlib.asynccontextmanager
 async def push_queue_to_mqtt(request, queue_id):
     yield
@@ -119,34 +106,87 @@ async def push_queue_to_mqtt(request, queue_id):
 
 # Routes -----------------------------------------------------------------------
 
+
+
 @app.get("/")
+#@queue_blueprint.get("/")
+#@openapi.summary("Root")
+#@openapi.body()
+#@openapi.response(200, {"text/html" : str})
 async def root(request):
     return sanic.response.text('')
-#    redis = request.app.ctx.redis
-#    await redis.set('key2', 'value2')
-#    result = await redis.get('key2')
-#    return sanic.response.text(str(result))
+
+
+# Queue ------------------------------------------------------------------------
+
+queue_blueprint = sanic.blueprints.Blueprint('queue', url_prefix='/queue')
+app.blueprint(queue_blueprint)
+
+
+class NullObjectJson:
+    pass
+class QueueItemJson:
+    track_id: str
+    track_duration: float
+    session_id: str
+    performer_name: str
+    start_time: float
+    id: float
+#    on = bool
+#    doors = int
+#    color = str
+#    make = Manufacturer
+#    driver = Driver
+#    passengers = openapi.Array(Driver, required=["name", "birthday"])
+
+
 
 
 #@app.get("/queue/<queue_id:str>/tracks.json")
 #async def tracks_from_memory(request):
 #    return sanic.response.json(request.app.ctx.tracks)
-@app.get("/queue/<queue_id:str>/tracks.json")
+@queue_blueprint.get("/<queue_id:str>/tracks.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": NullObjectJson}),
+)
 async def tracks_from_disk(request, queue_id):
     return await sanic.response.file(request.app.config.get('TRACKS'))
     # TODO: replace 302 redirect to static file from nginx? Could be useful to have this as a fallback?
-@app.get("/queue/<queue_id:str>/queue.csv")
+
+@queue_blueprint.get("/<queue_id:str>/queue.csv")
+@openapi.definition(
+    response=openapi.definitions.Response({"text/csv": str}),
+)
 async def queue_csv(request, queue_id):
     return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
-@app.get("/queue/<queue_id:str>/queue.json")
+
+@queue_blueprint.get("/<queue_id:str>/queue.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
+)
 async def queue_json(request, queue_id):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
-@app.get("/queue/<queue_id:str>/settings.json")
+
+@queue_blueprint.get("/<queue_id:str>/settings.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": NullObjectJson}),
+)
 async def queue_settings_json(request, queue_id):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
 
 
-@app.post("/queue/<queue_id:str>/")
+class QueueItemAdd:
+    track_id: str
+    performer_name: str
+@queue_blueprint.post("/<queue_id:str>/")
+@openapi.definition(
+    body={"application/json": QueueItemAdd},
+    response=[
+        openapi.definitions.Response({"application/json": QueueItemJson}, status=200),
+        openapi.definitions.Response('missing fields', status=400),
+        openapi.definitions.Response('track_id invalid', status=400),
+    ],
+)
 async def add_queue_item(request, queue_id):
     # Validation
     if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
@@ -175,21 +215,12 @@ async def add_queue_item(request, queue_id):
             queue.add(queue_item)
             return sanic.response.json(queue_item.asdict())
 
-@app.put("/queue/<queue_id:str>/")
-async def update_queue_item(request, queue_id):
-    try:
-        queue_item_id_1 = float(request.args.get('queue_item_id_1'))
-        queue_item_id_2 = float(request.args.get('queue_item_id_2'))
-    except (ValueError, TypeError):
-        raise sanic.exceptions.InvalidUsage(message="queue_item_id_1 and queue_item_id_2 args required", context=request.args)
-    if request.ctx.session_id != 'admin':
-        raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
-    async with push_queue_to_mqtt(request, queue_id):
-        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
-            queue.move(queue_item_id_1, queue_item_id_2)
-            return sanic.response.json({}, status=201)
 
-@app.delete("/queue/<queue_id:str>/")
+@queue_blueprint.delete("/<queue_id:str>/")
+@openapi.definition(
+    parameter=openapi.definitions.Parameter('queue_item_id', float, required=True, allowEmptyValue=False, location='query'),
+    response=openapi.definitions.Response({"application/json": QueueItemJson}),
+)
 async def delete_queue_item(request, queue_id):
     try:
         queue_item_id = float(request.args.get('queue_item_id'))
@@ -205,7 +236,37 @@ async def delete_queue_item(request, queue_id):
             queue.delete(queue_item_id)
             return sanic.response.json(queue_item.asdict())
 
-@app.get("/queue/<queue_id:str>/command/<command:str>")
+
+class QueueItemMove:
+    queue_item_id_1: float
+    queue_item_id_2: float
+@queue_blueprint.put("/<queue_id:str>/")
+@openapi.definition(
+    body={"application/json": QueueItemMove},
+    response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
+)
+async def move_queue_item(request, queue_id):
+    try:
+        queue_item_id_1 = float(request.args.get('queue_item_id_1'))
+        queue_item_id_2 = float(request.args.get('queue_item_id_2'))
+    except (ValueError, TypeError):
+        raise sanic.exceptions.InvalidUsage(message="queue_item_id_1 and queue_item_id_2 args required", context=request.args)
+    if request.ctx.session_id != 'admin':
+        raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
+    async with push_queue_to_mqtt(request, queue_id):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+            queue.move(queue_item_id_1, queue_item_id_2)
+            return sanic.response.json({}, status=201)
+
+
+@queue_blueprint.get("/<queue_id:str>/command/<command:str>")
+@openapi.definition(
+    response=[
+        openapi.definitions.Response({"application/json": {'is_playing': bool}},),
+        openapi.definitions.Response('invalid command', status=400),
+        openapi.definitions.Response('admin required', status=403),
+    ]
+)
 async def queue_command(request, queue_id, command):
     if request.ctx.session_id != 'admin':
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
@@ -215,6 +276,8 @@ async def queue_command(request, queue_id, command):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
             getattr(queue, command)()
             return sanic.response.json({'is_playing': bool(queue.is_playing)})
+
+# end Queue --------------------------------------------------------------------
 
 
 

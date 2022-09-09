@@ -1,6 +1,7 @@
 sanic
 #sanic-redis  # sanic-redis usese aioredis which is depricated?
 #sanic-jwt    #
+sanic-ext
 sanic-openapi
 ujson
 
