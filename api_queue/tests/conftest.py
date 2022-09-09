@@ -44,6 +44,7 @@ class QueueModel():
         self.app = app
         self._queue = queue
         del self.session_id
+
     @property
     def session_id(self):
         return self.app.asgi_client.cookies.get('session_id')
@@ -54,6 +55,7 @@ class QueueModel():
     @session_id.deleter
     def session_id(self):
         self.app.asgi_client.cookies.delete('session_id')
+
     @property
     async def queue(self):
         request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/queue.json")
@@ -66,6 +68,7 @@ class QueueModel():
     async def settings(self):
         request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/settings.json")
         return response.json
+
     async def post(self, **kwargs):
         request, response = await self.app.asgi_client.post(f"/queue/{self._queue}/", data=json.dumps(kwargs))
         return response
@@ -74,6 +77,10 @@ class QueueModel():
         return response
     async def put(self, **kwargs):
         request, response = await self.app.asgi_client.put(f"/queue/{self._queue}/?{urlencode(kwargs)}")
+        return response
+
+    async def command(self, command):
+        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/command/{command}")
         return response
 
 

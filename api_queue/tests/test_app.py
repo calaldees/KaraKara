@@ -116,3 +116,35 @@ async def test_queue_move(queue_model, mock_mqtt):
     response = await queue_model.put(queue_item_id_1=queue[0]['id'], queue_item_id_2=1)
     queue = await queue_model.queue
     assert [i['track_id'] for i in queue] == ['KAT_TUN_Your_side_Instrumental_', 'Macross_Dynamite7_OP_Dynamite_Explosion', 'Animaniacs_OP']
+
+@pytest.mark.asyncio
+async def test_queue_command(queue_model, mock_mqtt):
+    # populate tracks
+    await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test1')
+    await queue_model.post(track_id='Animaniacs_OP', performer_name='test2')
+    await queue_model.post(track_id='Macross_Dynamite7_OP_Dynamite_Explosion', performer_name='test3')
+    queue = await queue_model.queue
+    assert not any(queue_item['start_time'] for queue_item in queue), 'no tracks should have a start time'
+
+    # invalid commands
+    mock_mqtt.publish.reset_mock()
+    response = await queue_model.command('play')
+    assert response.status == 403
+    queue_model.session_id = 'admin'
+    response = await queue_model.command('not_real_command')
+    assert response.status == 404
+    mock_mqtt.publish.assert_not_awaited()
+
+    # play
+    response = await queue_model.command('play')
+    assert response.status == 200
+    mock_mqtt.publish.assert_awaited_once()
+
+    queue = await queue_model.queue
+    assert all(queue_item['start_time'] for queue_item in queue), 'all tracks should have a start time'
+
+    # stop
+    response = await queue_model.command('stop')
+    assert response.status == 200
+    queue = await queue_model.queue
+    assert not any(queue_item['start_time'] for queue_item in queue), 'no tracks should have a start time'

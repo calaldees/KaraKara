@@ -201,7 +201,7 @@ async def queue_command(request, queue_id, command):
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
             getattr(queue, command)()
-            return sanic.response.json({'is_playing': queue.is_playing()})
+            return sanic.response.json({'is_playing': bool(queue.is_playing)})
 
 
 

@@ -7,10 +7,6 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim as base
     WORKDIR /app/
     EXPOSE 8000
 
-    #RUN apk add --no-cache \
-    #    curl \
-    #&& true
-
 FROM base as python_dependencies
     COPY ./requirements.txt ./
     #RUN apk add --no-cache --virtual .build-deps \
@@ -34,9 +30,15 @@ FROM code as test
     COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
     COPY ./pytest.ini ./
-    #RUN pytest -x
+    RUN pytest -x
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
+    #RUN apk add --no-cache \
+    #    curl \
+    #&& true
+    RUN apt-get update && apt-get install -y \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
     CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
     HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:8000/ || exit 1
