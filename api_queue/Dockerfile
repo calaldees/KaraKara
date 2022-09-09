@@ -1,5 +1,4 @@
 ARG PYTHON_IMAGE_VERSION=3.10
-#FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
 FROM python:${PYTHON_IMAGE_VERSION}-slim as base
     ARG PYTHON_IMAGE_VERSION
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
@@ -9,15 +8,7 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim as base
 
 FROM base as python_dependencies
     COPY ./requirements.txt ./
-    #RUN apk add --no-cache --virtual .build-deps \
-    #        build-base \
-    #        libffi-dev \
-    #    && \
-    RUN \
-        pip install -U setuptools pip && \
-        pip install --no-cache-dir -r requirements.txt &&\
-    true
-    #&& apk --purge del .build-deps
+    RUN pip install --no-cache-dir -r requirements.txt
 FROM python_dependencies as python_dependencies_test
     COPY ./requirements.test.txt ./
     RUN pip install --no-cache-dir -r requirements.test.txt
@@ -34,9 +25,6 @@ FROM code as test
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
-    #RUN apk add --no-cache \
-    #    curl \
-    #&& true
     RUN apt-get update && apt-get install -y \
         curl \
     && rm -rf /var/lib/apt/lists/*
