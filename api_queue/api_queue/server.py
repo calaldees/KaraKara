@@ -109,12 +109,11 @@ async def push_queue_to_mqtt(request, queue_id):
 
 
 @app.get("/")
-#@queue_blueprint.get("/")
-#@openapi.summary("Root")
-#@openapi.body()
-#@openapi.response(200, {"text/html" : str})
+@openapi.definition(
+    response=openapi.definitions.Response('redirect to openapi spec', status=302),
+)
 async def root(request):
-    return sanic.response.text('')
+    return sanic.response.redirect('/docs')
 
 
 # Queue ------------------------------------------------------------------------

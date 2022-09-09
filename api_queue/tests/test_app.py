@@ -10,12 +10,9 @@ except ImportError:
 
 @pytest.mark.asyncio
 async def test_root(app):  # mock_redis,
-    #mock_redis.get.side_effect = ['foo',]
     request, response = await app.asgi_client.get("/")
-    assert response.status == 200
-    #assert request.method.lower() == "get"
-    #assert response.body == b"foo"
-    #assert response.status == 200
+    assert response.status == 302
+
 
 @pytest.mark.asyncio
 async def test_tracks(queue_model):
