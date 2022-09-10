@@ -1,3 +1,6 @@
+# for solo dev-testings api_queue
+# uner normal use, use the Dockerfile in the root of the project
+
 volumes:
   queue_data:
   mosquitto_data:
