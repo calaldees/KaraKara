@@ -19,12 +19,16 @@ services:
   api_queue:
     build:
       context: ./
-      #target: test
+      target: test
     ports:
       - 8000:8000
     links:
       - mqtt
     volumes:
       - ${PWD}:/app/:ro
-      - ${PWD}/tests/tracks.json:/app/tracks.json:ro
-      - queue_data:/app/_data/:rw
+      #- ${PWD}/tests/tracks.json:/app/tracks.json:ro
+      - queue_data:/data/queue/:rw
+    environment:
+        SANIC_MQTT: mqtt
+        SANIC_PATH_TRACKS: /app/tests/tracks.json
+        SANIC_PATH_QUEUE: /data/queue/

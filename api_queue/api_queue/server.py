@@ -67,6 +67,7 @@ async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
         _app.ctx.mqtt = MqttClient(mqtt)
         await _app.ctx.mqtt.connect()
     elif mqtt:  # normally pass-through for mock mqtt object
+        log.info("[mqtt] bypassed")
         _app.ctx.mqtt = mqtt
 @app.listener('after_server_stop')
 async def aio_mqtt_close(_app, _loop):
@@ -74,7 +75,6 @@ async def aio_mqtt_close(_app, _loop):
     if isinstance(mqtt, str):
         log.info("[mqtt] closing")
         await _app.ctx.mqtt.disconnect()
-
 
 
 

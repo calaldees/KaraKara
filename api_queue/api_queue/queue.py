@@ -29,6 +29,7 @@ QUEUE_SETTING_TYPES = {
 class SettingsManager():
     def __init__(self, path: Path = Path('.')):
         path = path if isinstance(path, Path) else Path(path)
+        path.mkdir(parents=True, exist_ok=True)  # is this safe?
         assert path.is_dir()
         self.path = path
 

@@ -1,5 +1,8 @@
 shell:
-	docker-compose run --rm --service-ports api_queue /bin/sh
+	docker-compose build api_queue
+	docker-compose run --rm --service-ports api_queue
+
+# /bin/bash
 
 
 # Standalone api_queue container -----------------------------------------------
@@ -8,6 +11,7 @@ DOCKER_IMAGE:=api_queue
 DOCKER_RUN_ARGS:=\
 	--rm \
 	--volume ${PWD}:/app/:ro \
+	--env SANIC_PATH_QUEUE=/data/queue/ \
 	--publish 8000:8000 \
 
 _run:
