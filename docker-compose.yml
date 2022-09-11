@@ -1,7 +1,7 @@
 version: '3.5'
 
 volumes:
-    website_static:
+    #website_static:
     #website_db:
     processmedia2_data:
     logs:
@@ -17,7 +17,7 @@ services:
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
-            - website_static:/static:ro
+            #- website_static:/static:ro
             - logs:/logs
             - ${PATH_HOST_processed}:/media/processed:ro
             #- ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro  # for local development
@@ -77,14 +77,15 @@ services:
             context: ./api_queue
         environment:
             SANIC_MQTT: mqtt
-            SANIC_PATH_TRACKS: /static/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
+            SANIC_PATH_TRACKS: /media/processed/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
             SANIC_PATH_QUEUE: /data/queue/   # See volumes below
         #ports:  # for local dev
         #    - 8000:8000
         links:
             - mqtt
         volumes:
-            - website_static:/static:ro
+            #- website_static:/static:ro
+            - ${PATH_HOST_processed}:/media/processed:ro
             - logs:/logs
             - queue_data:/data/queue/:rw
             #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
@@ -134,7 +135,7 @@ services:
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw
-            - website_static:/static:rw
+            #- website_static:/static:rw
 
         # Force import
         #docker-compose exec processmedia2 /bin/bash

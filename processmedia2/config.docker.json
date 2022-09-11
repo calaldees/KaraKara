@@ -8,7 +8,7 @@
     "path_meta": "/media/meta",
     "path_processed": "/media/processed",
 
-    "path_static_track_list": "/static/tracks.json",
+    "path_static_track_list": "/media/processed/tracks.json",
     "gzip": true,
 
     "process_order_function": "random",
