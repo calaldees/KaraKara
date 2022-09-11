@@ -1,6 +1,7 @@
 import random
 import contextlib
 from textwrap import dedent
+from pathlib import Path
 
 try:
     import ujson as json
@@ -21,7 +22,7 @@ app.config.update(
         #'REDIS': "redis://redis:6379/0",
         #'MQTT': 'mqtt',  #:1883
         'TRACKS': 'tracks.json',
-        'path_queue': '_data',
+        'PATH_QUEUE': '_data',
     }
 )
 app.ext.openapi.describe(
@@ -37,7 +38,10 @@ app.ext.openapi.describe(
 @app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
     log.info("[tracks] loading")
-    with open(_app.config.get('TRACKS')) as filehandle:
+    tracks_path = Path(_app.config.get('TRACKS'))
+    if not tracks_path.is_file():
+        log.error('No tracks.json file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. processmedia2 should output this file when encoding is complete')
+    with tracks_path.open() as filehandle:
         _app.ctx.tracks = harden(json.load(filehandle))
 
 
@@ -45,8 +49,8 @@ from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     log.info("[queue_manager]")
-    _app.ctx.settings_manager = SettingsManager(path=_app.config.get('path_queue'))
-    _app.ctx.queue_manager = QueueManagerCSVAsync(path=_app.config.get('path_queue'), settings=_app.ctx.settings_manager)
+    _app.ctx.settings_manager = SettingsManager(path=_app.config.get('PATH_QUEUE'))
+    _app.ctx.queue_manager = QueueManagerCSVAsync(path=_app.config.get('PATH_QUEUE'), settings=_app.ctx.settings_manager)
 
 
 @app.listener('before_server_start')

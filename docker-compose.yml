@@ -75,14 +75,18 @@ services:
         image: karakara/api_queue
         build:
             context: ./api_queue
-        ports:
-            - 8000:8000
+        environment:
+            SANIC_MQTT: mqtt
+            SANIC_TRACKS: /static/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
+            SANIC_PATH_QUEUE: /data/queue/   # See volumes below
+        #ports:  # for local dev
+        #    - 8000:8000
         links:
             - mqtt
         volumes:
             - website_static:/static:ro
             - logs:/logs
-            - queue_data:/app/_data/:rw
+            - queue_data:/data/queue/:rw
 
     mqtt:
         image: karakara/mqtt
@@ -120,6 +124,7 @@ services:
             context: ./processmedia2
         environment:
             - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
+            # TODO "path_static_track_list" from env to link with `api_queue` location and maybe even `nginx`?
         env_file:
             - .env
         volumes:
