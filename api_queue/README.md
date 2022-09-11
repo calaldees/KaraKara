@@ -23,38 +23,55 @@ queue datamodel
 ---------------
 
 Don't need JSON - newline text? split? No need for field names? `test/csv` records? (no heading?)
+
+```csv
+track_id,performer_name,session_owner,timestamp_play
+abc123,MahName1,xyz456,1661094171425
+def456,MahName2,xyz457,1661094271426
 ```
-QUEUE_KEY: [
-    {
-        "track_id": "BASE64HASH",
-        "performer_name": 'str',
-        "session_owner": '',
-        "weight": float,
-    }
-    "timestamp_play": int,
-]
-```
+
 
 api
 ---
 
-* queue
-    * new
+* /queue/
+    * GET (admin)
+        * list
+    * POST
         * new queue (demo - 10 tracks?)
         * new queue (transient)
         * new named queue (admin)
-    * get_settings
-    * set_settings (admin)
+* /queue/XYZ/
+    * DELETE queue
+* /queue/XYZ/settings
+    * GET
+    * POST/PUT (admin)
         * queue limit model (priority token or points)
-    * del queue
-    * get_tracks
-        * redirect to static track_datafile from hash of filter_tags
-* queue_items operations
-    * get (only used for testing - this is pushed to mosquito)
-    * add (limit owner or admin)
-        * No validation of track_id
-    * del (owner or admin only)
-    * update (admin)
+* /queue/XYZ/tracks
+    * GET
+        * 302 redirect to static track_datafile from hash of filter_tags
+* /queue/XYZ/items
+    * GET (only used for testing - this is pushed to mqtt)
+    * POST (limit performer_name or admin)
+        * name, trackid
+        * return id
+* /queue/XYZ/items/ABC
+    * DELETE (session_id or admin only)
+    * PUT (admin)
         * (weight, timestamp_play)
-* root
-    * queues (admin)
+
+
+curls
+-----
+
+```
+curl -X GET http://localhost:8000/queue/test/tracks.json
+curl -X GET http://localhost:8000/queue/test/queue.csv
+curl -X GET http://localhost:8000/queue/test/queue.json
+curl -X GET http://localhost:8000/queue/test/settings.json
+curl -X POST --cookie "session_id=test" http://localhost:8000/queue/test/ -d '{"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}'
+curl -X DELETE --cookie "session_id=admin" http://localhost:8000/queue/test/?queue_item_id=0.8684541502363635
+curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play
+curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop
+curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/?queue_item_id_1=0.1&queue_item_id_2=0.2
+```

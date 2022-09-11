@@ -1,23 +1,18 @@
 ARG PYTHON_IMAGE_VERSION=3.10
-FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
+FROM python:${PYTHON_IMAGE_VERSION}-slim as base
     ARG PYTHON_IMAGE_VERSION
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
 
     WORKDIR /app/
-    EXPOSE 1337
+    EXPOSE 8000
 
-    RUN apk add --no-cache \
+    RUN apt-get update && apt-get install -y \
         curl \
-    && true
+    && rm -rf /var/lib/apt/lists/*
 
 FROM base as python_dependencies
     COPY ./requirements.txt ./
-    RUN apk add --no-cache --virtual .build-deps \
-            build-base \
-            libffi-dev \
-        && pip install -U setuptools pip \
-        && pip install --no-cache-dir -r requirements.txt \
-    && apk --purge del .build-deps
+    RUN pip install --no-cache-dir -r requirements.txt
 FROM python_dependencies as python_dependencies_test
     COPY ./requirements.test.txt ./
     RUN pip install --no-cache-dir -r requirements.test.txt
@@ -34,5 +29,5 @@ FROM code as test
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
-    CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "1337", "--workers", "4"]
-    HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:1337/ || exit 1
+    CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+    HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:8000/ || exit 1

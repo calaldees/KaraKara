@@ -2,12 +2,14 @@ version: '3.5'
 
 volumes:
     website_static:
-    website_db:
+    #website_db:
     processmedia2_data:
     logs:
-    mosquitto_data:
+    mqtt_data:
+    queue_data:
 
 services:
+
     nginx:
         image: karakara/nginx
         build:
@@ -20,8 +22,10 @@ services:
             - ${PATH_HOST_processed}:/media/processed:ro
             #- ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro  # for local development
         links:
-            - website
-            - mosquitto
+            #- website
+            #- mosquitto
+            - api_queue
+            - mqtt
             - player2
             - browser2
         labels:
@@ -35,21 +39,21 @@ services:
             - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
             - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser2/"
 
-    website:
-        image: karakara/website
-        build:
-            context: ./website
-        env_file:
-            - .env
-        links:
-            - postgres
-            - redis
-            - mosquitto
-        volumes:
-            - website_static:/static:rw  # website writes staic files to overlay
-            - logs:/logs
-            - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
-            - ${PATH_HOST_meta}:/media/meta:ro
+    # website:
+    #     image: karakara/website
+    #     build:
+    #         context: ./website
+    #     env_file:
+    #         - .env
+    #     links:
+    #         - postgres
+    #         - redis
+    #         - mosquitto
+    #     volumes:
+    #         - website_static:/static:rw  # website writes staic files to overlay
+    #         - logs:/logs
+    #         - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
+    #         - ${PATH_HOST_meta}:/media/meta:ro
 
         ## for local development
         ##  docker-compose run --rm --entrypoint /bin/bash --service-ports website
@@ -60,12 +64,38 @@ services:
         # healthcheck: 
         #     interval: 0m  # TODO: disbale healthcheck
 
-    mosquitto:
-        image: karakara/mosquitto
+    #mosquitto:
+    #    image: karakara/mosquitto
+    #    build:
+    #        context: ./mosquitto
+    #    volumes:
+    #        - mosquitto_data:/mosquitto/data
+
+    api_queue:
+        image: karakara/api_queue
         build:
-            context: ./mosquitto
+            context: ./api_queue
+        environment:
+            SANIC_MQTT: mqtt
+            SANIC_PATH_TRACKS: /static/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
+            SANIC_PATH_QUEUE: /data/queue/   # See volumes below
+        #ports:  # for local dev
+        #    - 8000:8000
+        links:
+            - mqtt
         volumes:
-            - mosquitto_data:/mosquitto/data
+            - website_static:/static:ro
+            - logs:/logs
+            - queue_data:/data/queue/:rw
+            #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
+
+    mqtt:
+        image: karakara/mqtt
+        build:
+            context: ./mqtt
+        volumes:
+            - mqtt_data:/mosquitto/data
+
 
     player2:
         image: karakara/player2
@@ -77,15 +107,15 @@ services:
         build:
             context: ./browser2
 
-    postgres:
-        image: karakara/postgres
-        build:
-            context: ./postgres
-        volumes:
-            - website_db:/var/lib/postgresql/data
+    # postgres:
+    #     image: karakara/postgres
+    #     build:
+    #         context: ./postgres
+    #     volumes:
+    #         - website_db:/var/lib/postgresql/data
 
-    redis:
-        image: redis
+    # redis:
+    #     image: redis
 
     processmedia2:
         image: karakara/processmedia2
@@ -95,6 +125,7 @@ services:
             context: ./processmedia2
         environment:
             - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
+            # TODO "path_static_track_list" from env to link with `api_queue` location and maybe even `nginx`?
         env_file:
             - .env
         volumes:
