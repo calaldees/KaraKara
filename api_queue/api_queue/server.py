@@ -17,14 +17,16 @@ from ._utils import harden
 
 
 app = sanic.Sanic("karakara_queue")
-app.config.update(
-    {
+app.config.update({
+    k: v
+    for k, v in {
         #'REDIS': "redis://redis:6379/0",
         #'MQTT': 'mqtt',  #:1883
-        'TRACKS': 'tracks.json',
+        'PATH_TRACKS': 'tracks.json',
         'PATH_QUEUE': '_data',
-    }
-)
+    }.items()
+    if k not in app.config.keys()
+})
 app.ext.openapi.describe(
     "KaraKara Queue API",
     version="0.0.0",
@@ -37,20 +39,23 @@ app.ext.openapi.describe(
 
 @app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
-    log.info("[tracks] loading")
-    tracks_path = Path(_app.config.get('TRACKS'))
-    if not tracks_path.is_file():
+    path_tracks = Path(_app.config.get('PATH_TRACKS'))
+    log.info(f"[tracks] loading - {path_tracks=}")
+    if path_tracks.is_file():
+        with path_tracks.open() as filehandle:
+            _app.ctx.tracks = harden(json.load(filehandle))
+    else:
         log.error('No tracks.json file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. processmedia2 should output this file when encoding is complete')
-    with tracks_path.open() as filehandle:
-        _app.ctx.tracks = harden(json.load(filehandle))
+        _app.ctx.tracks = {}
 
 
 from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
-    log.info("[queue_manager]")
-    _app.ctx.settings_manager = SettingsManager(path=_app.config.get('PATH_QUEUE'))
-    _app.ctx.queue_manager = QueueManagerCSVAsync(path=_app.config.get('PATH_QUEUE'), settings=_app.ctx.settings_manager)
+    path_queue = _app.config.get('PATH_QUEUE')
+    log.info(f"[queue_manager] - {path_queue=}")
+    _app.ctx.settings_manager = SettingsManager(path=path_queue)
+    _app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=_app.ctx.settings_manager)
 
 
 @app.listener('before_server_start')
@@ -153,7 +158,7 @@ class QueueItemJson:
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
 async def tracks_from_disk(request, queue_id):
-    return await sanic.response.file(request.app.config.get('TRACKS'))
+    return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
     # TODO: replace 302 redirect to static file from nginx? Could be useful to have this as a fallback?
 
 @queue_blueprint.get("/<queue_id:str>/queue.csv")

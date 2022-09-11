@@ -36,7 +36,7 @@ async def app(tmp_path, mock_mqtt):  #mock_redis
     app = api_queue.server.app
     app.config.update(
         {
-            'TRACKS': temp_path_tracks,
+            'PATH_TRACKS': temp_path_tracks,
             'PATH_QUEUE': tmp_path,
             'MQTT': mock_mqtt,
         }

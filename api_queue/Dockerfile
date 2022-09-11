@@ -6,6 +6,10 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim as base
     WORKDIR /app/
     EXPOSE 8000
 
+    RUN apt-get update && apt-get install -y \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
 FROM base as python_dependencies
     COPY ./requirements.txt ./
     RUN pip install --no-cache-dir -r requirements.txt
@@ -25,8 +29,5 @@ FROM code as test
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
-    RUN apt-get update && apt-get install -y \
-        curl \
-    && rm -rf /var/lib/apt/lists/*
     CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
     HEALTHCHECK --interval=1m --timeout=3s CMD curl --fail http://127.0.0.1:8000/ || exit 1

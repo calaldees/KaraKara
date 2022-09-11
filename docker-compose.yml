@@ -77,7 +77,7 @@ services:
             context: ./api_queue
         environment:
             SANIC_MQTT: mqtt
-            SANIC_TRACKS: /static/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
+            SANIC_PATH_TRACKS: /static/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
             SANIC_PATH_QUEUE: /data/queue/   # See volumes below
         #ports:  # for local dev
         #    - 8000:8000
@@ -87,6 +87,7 @@ services:
             - website_static:/static:ro
             - logs:/logs
             - queue_data:/data/queue/:rw
+            #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
 
     mqtt:
         image: karakara/mqtt
