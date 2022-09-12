@@ -6,7 +6,7 @@ from api_queue.queue import Queue, QueueItem, QueueManagerCSV, SettingsManager
 
 @pytest.fixture
 def qu():
-    qu = Queue([], track_space=datetime.timedelta(seconds=10))
+    qu = Queue([], settings={"track_space": datetime.timedelta(seconds=10)})
     qu._now = datetime.datetime.now()
     return qu
 

@@ -88,6 +88,7 @@ class CustomErrorHandler(sanic.handlers.ErrorHandler):
             return super().default(request, exception)
         if isinstance(exception, AssertionError):
             return super().default(request, sanic.exceptions.InvalidUsage(*exception.args))
+        log.exception("Error:")
         import traceback
         return sanic.response.json({'exception': "".join(traceback.TracebackException.from_exception(exception).format())}, status=500)
 app.error_handler = CustomErrorHandler()

@@ -63,7 +63,7 @@ class QueueManager():
 
     @contextlib.contextmanager
     def _queue_modify_context(self, name, filehandle):
-        queue = Queue([QueueItem(**row) for row in csv.DictReader(filehandle)], **self.settings.get(name))
+        queue = Queue([QueueItem(**row) for row in csv.DictReader(filehandle)], self.settings.get(name))
         yield queue
         if queue.modified:
             filehandle.seek(0)
@@ -180,9 +180,9 @@ class QueueItem():
 
 
 class Queue():
-    def __init__(self, items: list[QueueItem], track_space: datetime.timedelta):
+    def __init__(self, items: list[QueueItem], settings: dict):
         self.items = items
-        self.track_space = track_space
+        self.track_space = settings["track_space"]
         self.modified = False
         self._now = None
     @property
