@@ -25,7 +25,7 @@ State is updated in two ways:
     "When I click this track name, update state so that it's the same
     as it was except for state.track_id being abcd"
 - An MQTT subscription (in `src/subs.tsx`) to topics under
-  `/karakara/room/<roomname>/...`:
+  `/room/<roomname>/...`:
   - `queue` - JSON, each update goes to `state.queue`
   - `settings` - JSON, each update goes to `state.settings`
   - `notifications` - Text, each message is turned into a notification

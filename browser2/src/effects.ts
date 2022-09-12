@@ -196,7 +196,7 @@ export function SendCommand(state: State, command: string): Effect {
     console.log("mqtt_send(", "commands", command, ")");
     return MQTTPublish({
         ...mqtt_login_info(state),
-        topic: "karakara/room/" + state.room_name + "/commands",
+        topic: "room/" + state.room_name + "/commands",
         payload: command,
     });
 }

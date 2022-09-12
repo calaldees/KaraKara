@@ -48,7 +48,7 @@ async def test_queue_add(queue_model, mock_mqtt):
     queue = await queue_model.queue
     assert len(queue) == 1
     assert {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}.items() <= queue[0].items()
-    assert mock_mqtt.publish.await_args.args == ("karakara/room/test/queue", json.dumps(queue))
+    assert mock_mqtt.publish.await_args.args == ("room/test/queue", json.dumps(queue))
     assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
 
 @pytest.mark.asyncio

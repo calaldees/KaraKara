@@ -23,7 +23,7 @@ export function getMQTTListener(state: State): Subscription | null {
 
     return MQTTSubscribe({
         ...mqtt_login_info(state),
-        topic: "karakara/room/" + state.room_name + "/#",
+        topic: "room/" + state.room_name + "/#",
         connect(state: State): Dispatchable {
             return { ...state, connected: true };
         },

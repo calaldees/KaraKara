@@ -110,7 +110,7 @@ async def push_queue_to_mqtt(request, queue_id):
     yield
     if hasattr(request.app.ctx, 'mqtt'):
         log.info(f"push_queue_to_mqtt {queue_id}")
-        await request.app.ctx.mqtt.publish(f"karakara/room/{queue_id}/queue", json.dumps(request.app.ctx.queue_manager.for_json(queue_id)), retain=True)
+        await request.app.ctx.mqtt.publish(f"room/{queue_id}/queue", json.dumps(request.app.ctx.queue_manager.for_json(queue_id)), retain=True)
 
 
 # Routes -----------------------------------------------------------------------
