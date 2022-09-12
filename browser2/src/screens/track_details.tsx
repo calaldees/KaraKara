@@ -80,9 +80,7 @@ const EnqueueButtons = ({ state }: { state: State }): VNode => (
             type="text"
             name="performer_name"
             value={state.performer_name}
-            placeholder={
-                state.settings["karakara.template.input.performer_name"]
-            }
+            placeholder={"Enter Name"}
             required={true}
             oninput={SetPerformerName}
         />

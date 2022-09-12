@@ -89,8 +89,8 @@ export function apply_search(tracks: Array<Track>, search: string): Array<Track>
  */
  export function find_tracks(state: State): Array<Track> {
     let tracks = Object.values(state.track_list);
-    tracks = apply_hidden(tracks, state.settings['karakara.search.tag.silent_hidden']);
-    tracks = apply_tags(tracks, state.settings['karakara.search.tag.silent_forced']);
+    tracks = apply_hidden(tracks, state.settings['hidden_tags']);
+    tracks = apply_tags(tracks, state.settings['forced_tags']);
     tracks = apply_tags(tracks, state.filters);
     tracks = apply_search(tracks, state.search);
     tracks.sort((a, b) => (a.tags.title[0] > b.tags.title[0] ? 1 : -1));

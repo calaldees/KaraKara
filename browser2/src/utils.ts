@@ -76,10 +76,10 @@ export function short_date(long_date: string): string {
 
 export function is_my_song(
     state: Pick<State, "session_id" | "performer_name">,
-    item?: Pick<QueueItem, "session_owner" | "performer_name">
+    item?: Pick<QueueItem, "session_id" | "performer_name">
 ): boolean {
     return (
-        item?.session_owner === state.session_id ||
+        item?.session_id === state.session_id ||
         item?.performer_name === state.performer_name
     );
 }

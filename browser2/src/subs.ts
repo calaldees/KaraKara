@@ -58,7 +58,7 @@ export function getMQTTListener(state: State): Subscription | null {
                 case "queue":
                     return {
                         ...state,
-                        queue: JSON.parse(data).filter(track => state.track_list.hasOwnProperty(track.id))
+                        queue: JSON.parse(data).filter(track => state.track_list.hasOwnProperty(track.track_id))
                     };
                 default:
                     return state;

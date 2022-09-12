@@ -25,7 +25,7 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             </span>
         )}
 
-        {state.session_id == item.session_owner && (
+        {state.session_id == item.session_id && (
             <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
                 <i class={"fas fa-times-circle"} />
             </span>
