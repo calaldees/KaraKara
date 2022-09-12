@@ -3,13 +3,13 @@
  * other non-hidden tags with the same parent. Consider top-level
  * tags to have different parents.
  */
- export function apply_hidden(tracks: Array<Track>, silent_hidden: Array<string>): Array<Track> {
+ export function apply_hidden(tracks: Array<Track>, hidden_tags: Array<string>): Array<Track> {
     // Translate
     //   hidden=category:anime,category:retro,broken
     // into
     //   {"category": ["anime", "retro"], "broken": []}
     let hidden: Dictionary<Array<string>> = {};
-    silent_hidden.map(x => {
+    hidden_tags.map(x => {
         let [k, v] = x.split(":");
         if (!hidden[k]) hidden[k] = [];
         if (v) hidden[k].push(v);

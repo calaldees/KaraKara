@@ -55,25 +55,25 @@ describe('is_my_song', () => {
     test('match based only on session ID', () => {
         expect(utils.is_my_song(
             { session_id: "sess1", performer_name: "Jim" },
-            { session_owner: "sess1", performer_name: "Bob" },
+            { session_id: "sess1", performer_name: "Bob" },
         )).toEqual(true);
     });
     test('match based only on performer name', () => {
         expect(utils.is_my_song(
             { session_id: "sess1", performer_name: "Jim" },
-            { session_owner: "sess2", performer_name: "Jim" },
+            { session_id: "sess2", performer_name: "Jim" },
         )).toEqual(true);
     });
     test('match based on both', () => {
         expect(utils.is_my_song(
             { session_id: "sess1", performer_name: "Jim" },
-            { session_owner: "sess1", performer_name: "Jim" },
+            { session_id: "sess1", performer_name: "Jim" },
         )).toEqual(true);
     });
     test('no-match based only on neither', () => {
         expect(utils.is_my_song(
             { session_id: "sess1", performer_name: "Jim" },
-            { session_owner: "sess2", performer_name: "Bob" },
+            { session_id: "sess2", performer_name: "Bob" },
         )).toEqual(false);
     });
     test('no-match when track is missing', () => {

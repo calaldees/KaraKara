@@ -67,7 +67,7 @@ type PriorityToken = {
     id: string,
     issued: string,  // ISO8601 Date,
     used: boolean,
-    session_owner: string,
+    session_id: string,
     valid_start: string,  // ISO8601 Date,
     valid_end: string,  // ISO8601 Date,
 }

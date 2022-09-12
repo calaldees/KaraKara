@@ -133,8 +133,8 @@ describe('find_tracks', () => {
     let big_state: State = {
         ...state,
         settings: {
-            "karakara.search.tag.silent_forced": ["retro"],
-            "karakara.search.tag.silent_hidden": ["todo", "delete", "broken"],
+            "forced_tags": ["retro"],
+            "hidden_tags": ["todo", "delete", "broken"],
         },
         filters: ["category:anime", "from:Macross"],
         search: "mac",
