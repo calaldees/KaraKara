@@ -8,6 +8,27 @@ export function attachment_path(root: string, attachment: Attachment): string {
 }
 
 /**
+ * turn ISO date into into "{X}min / {X}sec [in the future]"
+ */
+export function time_until(time: string|null): string {
+    if(!time) return "";
+
+    const seconds_total = Math.floor((Date.parse(time) - (new Date()).getTime()) / 1000);
+    const seconds = seconds_total % 60;
+    const minutes = Math.floor(seconds_total / 60);
+    if (minutes > 1) {
+        return minutes + "mins";
+    }
+    if (minutes == 1) {
+        return minutes + "min";
+    }
+    if (seconds === 0) {
+        return "Now";
+    }
+    return seconds + "secs";
+}
+
+/**
  * Generic function to shuffle an array, modifying it in-place
  * and also returning it
  */

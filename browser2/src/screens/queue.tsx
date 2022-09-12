@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import { shuffle, is_my_song } from "../utils";
+import { shuffle, is_my_song, time_until } from "../utils";
 import { RemoveTrack } from "../actions";
 
 const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
@@ -18,12 +18,9 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        {item.total_duration > 0 && (
-            <span class={"count"}>
-                In {Math.floor(item.total_duration / 60)} min
-                {item.total_duration > 120 ? "s" : ""}
-            </span>
-        )}
+        <span class={"count"}>
+            In {time_until(item.start_time)}
+        </span>
 
         {state.session_id == item.session_id && (
             <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>

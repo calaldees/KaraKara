@@ -7,13 +7,16 @@
     const seconds_total = Math.floor((Date.parse(time) - (new Date()).getTime()) / 1000);
     const seconds = seconds_total % 60;
     const minutes = Math.floor(seconds_total / 60);
-    if (minutes >= 1) {
+    if (minutes > 1) {
+        return minutes + "mins";
+    }
+    if (minutes == 1) {
         return minutes + "min";
     }
     if (seconds === 0) {
         return "Now";
     }
-    return seconds + "sec";
+    return seconds + "secs";
 }
 
 /**

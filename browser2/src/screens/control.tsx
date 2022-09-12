@@ -2,6 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./_common";
 import { ApiRequest, SendCommand } from "../effects";
 import { RemoveTrack } from "../actions";
+import { time_until } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -186,12 +187,9 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        {item.total_duration > 0 && (
-            <span class={"count"}>
-                In {Math.floor(item.total_duration / 60)} min
-                {item.total_duration > 120 ? "s" : ""}
-            </span>
-        )}
+        <span class={"count"}>
+            In {time_until(item.start_time)}
+        </span>
 
         <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
             <i class={"fas fa-times-circle"} />
