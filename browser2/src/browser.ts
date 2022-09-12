@@ -91,7 +91,7 @@ const init: Dispatchable = [
         bookmarks: x,
     })),
     ApiRequest({
-        url: `${state.root}/tracks.json`,
+        url: `${state.root}/files/tracks.json`,
         state: state,
         progress: (state, { done, size }) => [
             {

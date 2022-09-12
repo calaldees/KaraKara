@@ -59,8 +59,8 @@ type QueueItem = {
     performer_name: string,
     session_id: string,
     start_time: string | null,
-    track_id: string,
     track_duration: number,
+    track_id: string,
 }
 
 type PriorityToken = {

@@ -70,7 +70,7 @@ const init: Dispatchable = [
         room_password: x,
     })),
     ApiRequest({
-        url: `${state.root}/tracks.json`,
+        url: `${state.root}/files/tracks.json`,
         state: state,
         progress: (state, { done, size }): State => (
             {

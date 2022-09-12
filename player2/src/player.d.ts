@@ -30,10 +30,11 @@ type Track = {
 
 type QueueItem = {
     id: number,
-    track_id: string,
     performer_name: string,
-    total_duration: number,
-    session_owner: string,
+    session_id: string,
+    start_time: string | null,
+    track_duration: number,
+    track_id: string,
 }
 
 type State = {
