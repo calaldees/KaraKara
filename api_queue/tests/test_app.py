@@ -103,10 +103,10 @@ async def test_queue_move(queue_model, mock_mqtt):
     mock_mqtt.publish.reset_mock()
     response = await queue_model.put()
     assert response.status == 400
-    response = await queue_model.put(queue_item_id_1=0.0, queue_item_id_2=0.0)
+    response = await queue_model.put(queue_item_id_1=0, queue_item_id_2=0)
     assert response.status == 403
     queue_model.session_id = 'admin'
-    response = await queue_model.put(queue_item_id_1=0.0, queue_item_id_2=0.0)
+    response = await queue_model.put(queue_item_id_1=0, queue_item_id_2=0)
     assert response.status == 400
     mock_mqtt.publish.assert_not_awaited()
 
