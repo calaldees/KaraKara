@@ -8,7 +8,6 @@ import {
 
 import { Root } from "./screens/root";
 import {
-    BeLoggedIn,
     getMQTTListener,
     IntervalListener,
     KeyboardListener,
@@ -106,7 +105,6 @@ const subscriptions = (state: State): Array<Subscription> => [
     !state.playing &&
     state.settings["autoplay_seconds"] !== 0 &&
     IntervalListener,
-    BeLoggedIn(state.room_name, state.room_password),
 ];
 
 app({
