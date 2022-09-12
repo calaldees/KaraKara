@@ -1,7 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./_common";
 import { ApiRequest } from "../effects";
-import { flatten_settings } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -30,9 +29,9 @@ const SaveSettings = (state: State, event: SubmitEvent): Dispatchable => {
             options: {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Content-Type": "application/json",
                 },
-                body: new URLSearchParams(flatten_settings(state.settings)),
+                body: JSON.stringify(state.settings),
             },
             // action: (state, response) => [{ ...state }],
         }),

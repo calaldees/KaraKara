@@ -65,28 +65,6 @@ export function mqtt_login_info(
 }
 
 /**
- * Take a setting (string, int, list) and turn it into a string in
- * a format that the karakara server will understand
- */
-export function flatten_setting(val: any): string {
-    if (Array.isArray(val)) {
-        return "[" + val.join(",") + "]";
-    }
-    return "" + val;
-}
-
-/**
- * Takes a settings dictionary and returns string:string pairs suitable
- * for submitting as an HTTP form
- */
-export function flatten_settings(settings: Dictionary<any>): string[][] {
-    return Object.entries(settings).map(([key, value]) => [
-        key,
-        flatten_setting(value),
-    ]);
-}
-
-/**
  * Turn an ISO8601 date into a nicer time
  *
  * eg "2021-01-03T14:00:00" -> "14:00"

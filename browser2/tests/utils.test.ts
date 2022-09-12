@@ -104,28 +104,6 @@ describe('last_tag', () => {
     });
 });
 
-describe('flatten_setting', () => {
-    test('should handle strings', () => {
-        expect(utils.flatten_setting("foo")).toEqual("foo");
-    });
-    test('should handle numbers', () => {
-        expect(utils.flatten_setting(42)).toEqual("42");
-    });
-    test('should handle arrays', () => {
-        expect(utils.flatten_setting(["foo", "bar"])).toEqual("[foo,bar]");
-    });
-});
-
-describe('flatten_settings', () => {
-    test('should basically work', () => {
-        expect(utils.flatten_settings(state.settings)).toEqual([
-            ["test.string", "foo"],
-            ["test.int", "42"],
-            ["test.array", "[yo,ho,ho]"],
-        ]);
-    });
-});
-
 describe('track_info', () => {
     test('should basically work', () => {
         expect(utils.track_info(
