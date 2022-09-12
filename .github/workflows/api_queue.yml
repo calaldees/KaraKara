@@ -1,15 +1,17 @@
-name: api_queue
+name: Queue API
 
 on:
   push:
     paths:
     - 'api_queue/**'
+    - '.github/workflows/api_queue.yml'
 
 jobs:
   publish:
-    name: Docker build
+    name: Docker Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout
+      uses: actions/checkout@master
     - name: Test build
       run: make --directory=api_queue _build
