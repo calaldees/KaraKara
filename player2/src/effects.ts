@@ -131,19 +131,3 @@ export function SendCommand(state: State, command: string): Effect {
         payload: command,
     });
 }
-
-export function SetTrackState(state: State, value: string): Effect {
-    return ApiRequest({
-        function: "queue_items",
-        state: state,
-        options: {
-            method: "PUT",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                "queue_item.id": state.queue[0].id.toString(),
-                status: value,
-                uncache: new Date().getTime().toString(),
-            }),
-        },
-    });
-}

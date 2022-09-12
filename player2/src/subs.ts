@@ -1,6 +1,5 @@
 import {
     Dequeue,
-    MarkTrackSkipped,
     Pause,
     Play,
     SeekBackwards,
@@ -59,12 +58,8 @@ export function getMQTTListener(state: State): Subscription | null {
                             return SeekBackwards(state, 20);
                         case "played":
                             return Dequeue(state);
-                        // Only one instance should mark the current track as skipped, to avoid
-                        // skipping two tracks
                         case "skip":
-                            return state.podium
-                                ? Dequeue(state)
-                                : MarkTrackSkipped(state);
+                            return Dequeue(state);
                         default:
                             return state;
                     }

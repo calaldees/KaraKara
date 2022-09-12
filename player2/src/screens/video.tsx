@@ -1,6 +1,5 @@
 import h from "hyperapp-jsx-pragma";
 import { Video } from "./_common"
-import { MarkTrackPlayed } from "../actions";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -28,7 +27,6 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
             state={state}
             track={track}
             ontimeupdate={UpdateProgress}
-            onended={MarkTrackPlayed}
         />
         <div
             id="seekbar"

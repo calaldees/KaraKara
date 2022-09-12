@@ -3,7 +3,6 @@
  * and return modified state (optionally including
  * side effects) as output
  */
-import { SetTrackState } from "./effects";
 
 // Current track controls
 export function Play(state: State): Dispatchable {
@@ -67,12 +66,4 @@ function _dequeue(state: State): State {
 
 export function Dequeue(state: State): Dispatchable {
     return _dequeue(state);
-}
-
-export function MarkTrackPlayed(state: State): Dispatchable {
-    return [_dequeue(state), SetTrackState(state, "played")];
-}
-
-export function MarkTrackSkipped(state: State): Dispatchable {
-    return [_dequeue(state), SetTrackState(state, "skipped")];
 }
