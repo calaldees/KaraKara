@@ -197,7 +197,7 @@ async def queue_settings_json(request, queue_id):
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
 async def queue_settings_update(request, queue_id):
-    if request.ctx.session_id != 'admin':
+    if not request.ctx.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request, queue_id):
         log.info(f"Updating settings for {queue_id} to {request.json}")
