@@ -7,15 +7,13 @@ volumes:
 services:
 
     nginx:
-        image: karakara/nginx
-        build:
-            context: ./nginx
+        image: nginx:alpine
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
             - logs:/logs
             - ${PATH_HOST_processed}:/media/processed:ro
-            #- ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro  # for local development
+            - ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro
         links:
             - api_queue
             - mqtt
@@ -31,7 +29,6 @@ services:
             - "traefik.http.middlewares.kkcors.headers.addvaryheader=true"
             - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
             - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser2/"
-
 
     api_queue:
         image: karakara/api_queue
@@ -52,12 +49,10 @@ services:
             #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
 
     mqtt:
-        image: karakara/mqtt
-        build:
-            context: ./mqtt
+        image: eclipse-mosquitto
         volumes:
             - mqtt_data:/mosquitto/data
-
+            - ${PWD}/mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
 
     player2:
         image: karakara/player2
