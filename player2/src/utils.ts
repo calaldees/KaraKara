@@ -1,10 +1,10 @@
 /**
- * turn ISO date into into "{X}min / {X}sec [in the future]"
+ * turn timestamp into into "{X}min / {X}sec [in the future]"
  */
- export function time_until(time: string|null): string {
+ export function time_until(time: number|null): string {
     if(!time) return "";
 
-    const seconds_total = Math.floor((Date.parse(time) - (new Date()).getTime()) / 1000);
+    const seconds_total = Math.floor(time - Date.now()/1000);
     const seconds = seconds_total % 60;
     const minutes = Math.floor(seconds_total / 60);
     if (minutes > 1) {
@@ -13,7 +13,7 @@
     if (minutes == 1) {
         return minutes + "min";
     }
-    if (seconds === 0) {
+    if (seconds < 5) {
         return "Now";
     }
     return seconds + "secs";

@@ -58,7 +58,7 @@ type QueueItem = {
     id: number,
     performer_name: string,
     session_id: string,
-    start_time: string | null,
+    start_time: number | null,
     track_duration: number,
     track_id: string,
 }

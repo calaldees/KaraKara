@@ -42,6 +42,16 @@ describe('short_date', () => {
     });
 });
 
+describe('time_until', () => {
+    test('should basically work', () => {
+        expect(utils.time_until((Date.now()/1000) + 120)).toEqual("2mins");
+        expect(utils.time_until((Date.now()/1000) + 60)).toEqual("1min");
+        expect(utils.time_until((Date.now()/1000) + 30)).toEqual("30secs");
+        expect(utils.time_until((Date.now()/1000) + 1)).toEqual("Now");
+        expect(utils.time_until(null)).toEqual("");
+    });
+});
+
 describe('percent', () => {
     test('should basically work', () => {
         expect(utils.percent(0, 2)).toEqual("0%");
