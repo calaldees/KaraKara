@@ -4,17 +4,15 @@ on:
   push:
     paths:
     - 'processmedia2/**'
+    - '.github/workflows/processmedia2.yml'
 
 jobs:
   publish:
-    name: Docker Push
+    name: Docker Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: karakara/processmedia2
-        workdir: processmedia2
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Build
+      run: docker build .
+      working-directory: processmedia2

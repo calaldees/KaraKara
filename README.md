@@ -70,13 +70,7 @@ $ cp .env.example .env
 ```
 Then edit settings in .env
 
-Pre-built software, if you just want to run the site:
-```console
-$ docker-compose pull
-$ docker-compose up
-```
-
-Compile your own software, if you want to make customisations or build new features:
+Then build and run the software:
 ```console
 $ docker-compose build
 $ docker-compose up
