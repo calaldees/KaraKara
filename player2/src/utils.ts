@@ -1,8 +1,10 @@
 /**
- * turn milliseconds into {X}min / {X}sec
+ * turn ISO date into into "{X}min / {X}sec [in the future]"
  */
-export function timedelta_str(timedelta: number): String {
-    const seconds_total = Math.floor(timedelta / 1000);
+ export function time_until(time: string|null): string {
+    if(!time) return "";
+
+    const seconds_total = Math.floor((Date.parse(time) - (new Date()).getTime()) / 1000);
     const seconds = seconds_total % 60;
     const minutes = Math.floor(seconds_total / 60);
     if (minutes >= 1) {

@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import {
     attachment_path,
-    timedelta_str,
+    time_until,
     short_date,
 } from "../utils";
 import { AutoplayCountdown, Video } from "./_common";
@@ -58,7 +58,7 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
                         <p class="performer">{item.performer_name}</p>
                         <p class="time">
                             <span>
-                                {timedelta_str(item.total_duration * 1000)}
+                                {time_until(item.start_time)}
                             </span>
                         </p>
                     </li>
