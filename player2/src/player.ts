@@ -44,7 +44,7 @@ const state: State = {
         "theme": "metalghosts",
         "preview_volume": 0.2,
         "skip_seconds": 20,
-        "autoplay_seconds": 0,
+        "track_space": 0,
         "event_end": null,
     },
 
@@ -103,7 +103,7 @@ const subscriptions = (state: State): Array<Subscription> => [
     state.audio_allowed &&
     !state.paused &&
     !state.playing &&
-    state.settings["autoplay_seconds"] !== 0 &&
+    state.settings["track_space"] !== 0 &&
     IntervalListener,
 ];
 

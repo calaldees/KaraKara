@@ -71,7 +71,7 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                     "background-position":
                         100 -
                         (state.progress /
-                            state.settings["autoplay_seconds"]) *
+                            state.settings["track_space"]) *
                         100 +
                         "%",
                 }}
