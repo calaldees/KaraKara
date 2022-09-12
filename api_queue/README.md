@@ -69,7 +69,7 @@ curl -X GET http://localhost:8000/queue/test/tracks.json
 curl -X GET http://localhost:8000/queue/test/queue.csv
 curl -X GET http://localhost:8000/queue/test/queue.json
 curl -X GET http://localhost:8000/queue/test/settings.json
-curl -X POST --cookie "session_id=test" http://localhost:8000/queue/test/ -d '{"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}'
+curl -X POST --cookie "session_id=test" http://localhost:8000/queue/test/queue.json -d '{"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}'
 curl -X DELETE --cookie "session_id=admin" http://localhost:8000/queue/test/?queue_item_id=0.8684541502363635
 curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play
 curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop

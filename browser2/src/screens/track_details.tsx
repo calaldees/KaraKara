@@ -28,14 +28,14 @@ const EnqueueCurrentTrack = (state: State): Dispatchable => [
     state,
     ApiRequest({
         title: "Adding to queue...",
-        function: "queue_items",
+        function: "queue",
         state: state,
         options: {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
+                "Content-Type": "application/json",
             },
-            body: new URLSearchParams({
+            body: JSON.stringify({
                 track_id: state.track_id || "error",
                 performer_name: state.performer_name,
             }),

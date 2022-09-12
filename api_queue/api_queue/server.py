@@ -187,7 +187,7 @@ async def queue_settings_json(request, queue_id):
 class QueueItemAdd:
     track_id: str
     performer_name: str
-@queue_blueprint.post("/<queue_id:str>/")
+@queue_blueprint.post("/<queue_id:str>/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemAdd},
     response=[
