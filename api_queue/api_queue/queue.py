@@ -21,6 +21,12 @@ except ImportError:
 
 DEFAULT_QUEUE_SETTINGS = {
     "track_space": 15.0,
+    "hidden_tags": ["red:duplicate"],
+    "forced_tags": [],
+    "title": "KaraKara",
+    "theme": "metalghosts",
+    "preview_volume": 0.2,
+    "event_end": None,
 }
 QUEUE_SETTING_TYPES = {
     "track_space": lambda x: datetime.timedelta(seconds=x),
