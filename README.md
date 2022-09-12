@@ -33,7 +33,7 @@ Admins can walk around the room, remotely controlling when tracks are played ful
         * english, group, anime
         * jpop, artist: bob
         * vocal-less, short, male
-* Priority Token System
+* Priority Token System (in progress)
     * We want to prevent the situation where an event opens at 7pm and within 10 minuets we have a full queue till 11pm. Users will know their track will start at 9:45, leave then room, and only return for their track.
     * When adding a track once the queue becomes full (e.g 30 mins [configurable] of tracks), the user gets issued a 'priority token' and informed that in 'x minuets' their device will have priority to queue a track.
     * Visual feedback counts down for the user to identify this time window.
@@ -44,10 +44,6 @@ Admins can walk around the room, remotely controlling when tracks are played ful
     * We want users to know if they will be performing within the next 30 minuets (configurable) to know a rough time. If we provide the entire queue list with estimated times and an administrator identifies 3 long boring slow songs queued next to each other and decides to reorder the playlist slightly to assist the flow / mood of the event. Some users could see they have been put back a few tracks and become disgruntled (because of course it's their god given right to queue a track, how dare their sacred performance be postponed for lesser mortals).
     * Track estimations are displayed up to a configurable time (e.g 30 mins). After that point tracks are displayed in a deliberate random order. Users who have queued track passed this 'obfuscation threshold' see their request clearly listed and acknowledged, yet provides admins with curated control.
 * Notable Settings
-    * Disable mobile queuing
-        * If the mobile interface is being abused or an event organiser wants to engage with users face to face before queuing a track, users can still view tracks / lyrics with their mobiles but not queue them directly.
-    * Disable mobile interface
-        * If the interface is being abused or is causing a performance problem for the projector. The system can remain running for admins and the interface can be disabled.
     * Performer name limit
         * Performer 'bob' can't queue more than 2 tracks within a time-period
     * Track repeat limit
@@ -65,6 +61,8 @@ Admins can walk around the room, remotely controlling when tracks are played ful
 
 Local Machine Setup
 -------------------
+
+TODO: refine
 
 Configure site settings (eg which folders contain your media):
 ```
@@ -87,8 +85,12 @@ $ docker-compose up
 Core components
 ---------------
 
+TODO: Update diagram (suggest `mermaid`)
+
 ![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/docs/architecture.png)
 
+* api_queue
+  * TODO
 * processmedia2 ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
   * Takes folders of source data (video, image+mp3, subtitles)
   * Hard subbed final video
@@ -97,22 +99,12 @@ Core components
     * Currently just mp4 but could support other formats in future.
   * Thumbnail images
     * Each video has 4 images taken at even intervals
-  * SRT subtitles
+  * VTT subtitles
     * regardless of input format, a normalised srt will be created for each video
   * JSON metadata
     * Once scanned, each item will have JSON data containing the hashes of
       source data
-  * Pushes / Imports track data by calling `website` api.
-* website ![Website](https://github.com/calaldees/KaraKara/workflows/Website/badge.svg)
-  * API server
-    * `track`, `search`, `queue`, `settings`
-    * `track_import` endpoint (for imports from processmedia2)
-  * Produces printable hard copy track lists for use without mobile interface
-  * Community interface
-    * A dynamic web app to facilitate the duration of track content
-      * preview high and low res encoded videos
-      * tag videos
-      * edit subtitles
+  * creates single datafile `tracks.json`
 * browser2 ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
   * Mobile webapp interface to search / preview / queue tracks
   * Gets data from website / `track_list` api
@@ -125,5 +117,3 @@ Core components
   * Queue order is obscured past a configurable time
 * nginx ![Nginx](https://github.com/calaldees/KaraKara/workflows/Nginx/badge.svg)
   * Accepts HTTP requests and forwards them to the API / various GUIs as appropriate
-* postgres ![Postgres](https://github.com/calaldees/KaraKara/workflows/Postgres/badge.svg)
-  * Main database / long-term data storage for the track database and queues

@@ -1,0 +1,15 @@
+name: api_queue
+
+on:
+  push:
+    paths:
+    - 'api_queue/**'
+
+jobs:
+  publish:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Test build
+      run: make --directory=api_queue _build
