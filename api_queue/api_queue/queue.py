@@ -46,6 +46,13 @@ class SettingsManager():
             return DEFAULT_QUEUE_SETTINGS
         with path.open('r') as filehandle:
             return {**DEFAULT_QUEUE_SETTINGS, **json.load(filehandle)}
+
+    def set_json(self, name, settings) -> None:
+        old_settings = self.get_json(name)
+        path = self.path.joinpath(f'{name}_settings.json')
+        with path.open('w') as filehandle:
+            json.dump({**old_settings, **settings}, filehandle)
+
     @cache
     def get(self, name) -> dict:
         return {

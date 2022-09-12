@@ -114,6 +114,13 @@ async def push_queue_to_mqtt(request, queue_id):
         log.info(f"push_queue_to_mqtt {queue_id}")
         await request.app.ctx.mqtt.publish(f"room/{queue_id}/queue", json.dumps(request.app.ctx.queue_manager.for_json(queue_id)), retain=True)
 
+@contextlib.asynccontextmanager
+async def push_settings_to_mqtt(request, queue_id):
+    yield
+    if hasattr(request.app.ctx, 'mqtt'):
+        log.info(f"push_settings_to_mqtt {queue_id}")
+        await request.app.ctx.mqtt.publish(f"room/{queue_id}/settings", json.dumps(request.app.ctx.queue_manager.settings.get_json(queue_id)), retain=True)
+
 
 # Routes -----------------------------------------------------------------------
 
@@ -183,6 +190,20 @@ async def queue_json(request, queue_id):
 )
 async def queue_settings_json(request, queue_id):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
+
+@queue_blueprint.put("/<queue_id:str>/settings.json")
+@openapi.definition(
+    body={"application/json": {}},
+    response=openapi.definitions.Response({"application/json": NullObjectJson}),
+)
+async def queue_settings_update(request, queue_id):
+    if request.ctx.session_id != 'admin':
+        raise sanic.exceptions.Forbidden(message="Only admins can update settings")
+    async with push_settings_to_mqtt(request, queue_id):
+        log.info(f"Updating settings for {queue_id} to {request.json}")
+        request.app.ctx.settings_manager.set_json(queue_id, request.json)
+        return sanic.response.json({})
+
 
 
 class QueueItemAdd:

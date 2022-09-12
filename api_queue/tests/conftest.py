@@ -73,6 +73,9 @@ class QueueModel():
         request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/settings.json")
         return response.json
 
+    async def settings_put(self, payload):
+        request, response = await self.app.asgi_client.put(f"/queue/{self._queue}/settings.json", data=json.dumps(payload))
+        return response
     async def post(self, **kwargs):
         request, response = await self.app.asgi_client.post(f"/queue/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
