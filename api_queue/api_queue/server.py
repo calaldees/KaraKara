@@ -98,6 +98,7 @@ app.error_handler = CustomErrorHandler()
 @app.middleware("request")
 async def attach_session_id_request(request):
     request.ctx.session_id = request.cookies.get("session_id") or str(random.random())
+    request.ctx.is_admin = request.ctx.session_id == "admin"
 @app.middleware("response")
 async def attach_session_id(request, response):
     if not request.cookies.get("session_id"):
@@ -240,7 +241,7 @@ async def delete_queue_item(request, queue_id):
             _, queue_item = queue.get(queue_item_id)
             if not queue_item:
                 raise sanic.exceptions.NotFound()
-            if queue_item.session_id != request.ctx.session_id and request.ctx.session_id != 'admin':
+            if queue_item.session_id != request.ctx.session_id and not request.ctx.is_admin:
                 raise sanic.exceptions.Forbidden(message="queue_item.session_id does not match session_id")
             queue.delete(queue_item_id)
             return sanic.response.json(queue_item.asdict())
@@ -260,7 +261,7 @@ async def move_queue_item(request, queue_id):
         queue_item_id_2 = int(request.args.get('queue_item_id_2'))
     except (ValueError, TypeError):
         raise sanic.exceptions.InvalidUsage(message="queue_item_id_1 and queue_item_id_2 args required", context=request.args)
-    if request.ctx.session_id != 'admin':
+    if not request.ctx.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
@@ -277,7 +278,7 @@ async def move_queue_item(request, queue_id):
     ]
 )
 async def queue_command(request, queue_id, command):
-    if request.ctx.session_id != 'admin':
+    if not request.ctx.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
     if command not in {'play', 'stop'}:
         raise sanic.exceptions.NotFound(message='invalid command')
