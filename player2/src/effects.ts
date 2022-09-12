@@ -113,7 +113,9 @@ export function ApiRequest(props): Effect {
     return [
         apiRequestEffect,
         {
-            options: {},
+            options: {
+                credentials: 'include',
+            },
             response: "json",
             url: `${props.state.root}/queue/${props.state.room_name}/${props.function}.json`,
             ...props,
