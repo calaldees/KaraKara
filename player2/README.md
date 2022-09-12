@@ -21,9 +21,8 @@ contains the logic which decides which screen we're on (title, preview,
 video, etc)
 
 State is mostly updated by `src/subs.tsx` - we have an MQTT subscription
-which listens to topics under `/karakara/room/<roomname>/...`:
+which listens to topics under `/room/<roomname>/...`:
 
-- `commands` - Text, commands like "play", "pause", "skip", etc
 - `queue` - JSON, each update goes to `state.queue`
 - `settings` - JSON, each update goes to `state.settings`
 
@@ -51,11 +50,3 @@ hot-reloaded, no need to even hit refresh in the browser :)
 If you want to see the whole state for the app, you can double-click
 anywhere on the screen to open the settings menu, and then click the
 "Settings" heading to write the state to the debug console.
-
-## Developer Notes
-
-- The big screen is the source of truth for "track ended",
-  who will send that message to the server. The podium will
-  automatically move to the next track in the list and
-  begin the auto-play countdown, but it will not send the
-  "track ended" signal itself.

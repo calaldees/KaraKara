@@ -6,7 +6,6 @@ import {
     SeekForwards,
     Stop,
 } from "./actions";
-import { SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
@@ -43,26 +42,6 @@ export function getMQTTListener(state: State): Subscription | null {
             console.groupEnd();
 
             switch (topic) {
-                case "commands":
-                    const cmd = data.trim();
-                    switch (cmd) {
-                        case "play":
-                            return Play(state);
-                        case "stop":
-                            return Stop(state);
-                        case "pause":
-                            return Pause(state);
-                        case "seek_forwards":
-                            return SeekForwards(state, 20);
-                        case "seek_backwards":
-                            return SeekBackwards(state, 20);
-                        case "played":
-                            return Dequeue(state);
-                        case "skip":
-                            return Dequeue(state);
-                        default:
-                            return state;
-                    }
                 case "settings":
                     return {
                         ...state,
@@ -136,10 +115,6 @@ export const KeyboardListener = Keyboard({
 export const IntervalListener = Interval({
     every: 200,
     action(state: State, timestamp): Dispatchable {
-        if (state.progress >= state.settings["track_space"]) {
-            return [state, SendCommand(state, "play")];
-        } else {
-            return { ...state, progress: state.progress + 1 / 5 };
-        }
+        return { ...state, progress: state.progress + 1 / 5 };
     },
 });
