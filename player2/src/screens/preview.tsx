@@ -14,8 +14,7 @@ const show_tracks = 5;
 // Actions
 
 function SetPreviewVolume(state: State, event): Dispatchable {
-    event.target.volume =
-        state.settings["karakara.player.video.preview_volume"];
+    event.target.volume = state.settings["preview_volume"];
     return state;
 }
 
@@ -80,12 +79,12 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
         <div id="join_info" key={"join_info"}>
             Join at <strong>{state.root.replace("https://", "")}</strong> -
             Room Name is <strong>{state.room_name}</strong>
-            {state.settings["karakara.event.end"] && (
+            {state.settings["event_end"] && (
                 <span>
                     <br />
                     Event ends at{" "}
                     <strong>
-                        {short_date(state.settings["karakara.event.end"])}
+                        {short_date(state.settings["event_end"])}
                     </strong>
                 </span>
             )}

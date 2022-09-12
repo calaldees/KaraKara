@@ -48,7 +48,7 @@ export function Root(state: State): VNode {
             onclick={(state) => ({ ...state, audio_allowed: true })}
             ondblclick={(state) => ({ ...state, show_settings: true })}
         >
-            <main class={"theme-" + state.settings["karakara.player.theme"]}>
+            <main class={"theme-" + state.settings["theme"]}>
                 {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
                 {screen}
             </main>

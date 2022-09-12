@@ -24,7 +24,7 @@ export const Splash = ({ track_list, root }: { track_list: Dictionary<Track>, ro
 export const TitleScreen = ({ state }: { state: State }): VNode => (
     <section key="title" class={"screen_title"}>
         {memo(Splash, {track_list: state.track_list, root: state.root})}
-        <h1>{state.settings["karakara.player.title"]}</h1>
+        <h1>{state.settings["title"]}</h1>
         <div id="join_info">
             Join at <strong>{state.root.replace("https://", "")}</strong> -
             Room Name is <strong>{state.room_name}</strong>

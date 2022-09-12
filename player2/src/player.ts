@@ -41,12 +41,12 @@ const state: State = {
         window.AudioContext == undefined ||
         new AudioContext().state === "running",
     settings: {
-        "karakara.player.title": "KaraKara",
-        "karakara.player.theme": "metalghosts",
-        "karakara.player.video.preview_volume": 0.2,
-        "karakara.player.video.skip.seconds": 20,
-        "karakara.player.autoplay.seconds": 0,
-        "karakara.event.end": null,
+        "title": "KaraKara",
+        "theme": "metalghosts",
+        "preview_volume": 0.2,
+        "skip_seconds": 20,
+        "autoplay_seconds": 0,
+        "event_end": null,
     },
 
     // loading screen
@@ -104,7 +104,7 @@ const subscriptions = (state: State): Array<Subscription> => [
     state.audio_allowed &&
     !state.paused &&
     !state.playing &&
-    state.settings["karakara.player.autoplay.seconds"] !== 0 &&
+    state.settings["autoplay_seconds"] !== 0 &&
     IntervalListener,
     BeLoggedIn(state.room_name, state.room_password),
 ];

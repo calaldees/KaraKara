@@ -71,9 +71,7 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                     "background-position":
                         100 -
                         (state.progress /
-                            state.settings[
-                            "karakara.player.autoplay.seconds"
-                            ]) *
+                            state.settings["autoplay_seconds"]) *
                         100 +
                         "%",
                 }}
