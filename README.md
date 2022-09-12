@@ -83,7 +83,7 @@ TODO: Update diagram (suggest `mermaid`)
 
 ![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/docs/architecture.png)
 
-* api_queue
+* api_queue ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
   * TODO
 * processmedia2 ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
   * Takes folders of source data (video, image+mp3, subtitles)
