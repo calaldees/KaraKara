@@ -11,7 +11,6 @@ from pathlib import Path
 import io
 import asyncio
 from collections import defaultdict
-from functools import cache
 
 try:
     import ujson as json
@@ -39,7 +38,6 @@ class SettingsManager():
         assert path.is_dir()
         self.path = path
 
-    @cache
     def get_json(self, name) -> dict:
         path = self.path.joinpath(f'{name}_settings.json')
         if not path.is_file():
@@ -53,7 +51,6 @@ class SettingsManager():
         with path.open('w') as filehandle:
             json.dump({**old_settings, **settings}, filehandle)
 
-    @cache
     def get(self, name) -> dict:
         return {
             k: QUEUE_SETTING_TYPES.get(k, lambda x: x)(v)
