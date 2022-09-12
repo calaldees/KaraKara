@@ -13,7 +13,7 @@ services:
         volumes:
             - logs:/logs
             - ${PATH_HOST_processed}:/media/processed:ro
-            - ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro
+            - ${PWD}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
         links:
             - api_queue
             - mqtt
