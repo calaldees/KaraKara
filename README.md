@@ -79,9 +79,45 @@ $ docker-compose up
 Core components
 ---------------
 
-TODO: Update diagram (suggest `mermaid`)
 
-![Diagram](https://raw.githubusercontent.com/calaldees/KaraKara/master/docs/architecture.png)
+```mermaid
+graph TD
+    internet{{internet}}
+
+    internet -- http 443 ---> violet --http 80-->nginx
+    subgraph docker-compose [docker-compose]
+        nginx
+        mqtt
+        processmedia2
+        browser2
+        player2
+
+        logs[(/logs/)]
+        nginx..->logs
+        processmedia2..->logs
+        api_queue..->logs
+
+        nginx -- http 80 --> browser2
+        nginx -- http 80 --> player2
+        nginx -- http 8000 --> api_queue
+        api_queue --mqtt 1887--> mqtt
+        mqtt -- websocket 9001 --> nginx
+    end
+
+    syncthing --> /media/source/
+
+    subgraph filesystem
+      /media/source/[(/media/source/)]
+      /media/meta/[(/media/meta/)]
+      /media/processed/[(/media/processed/)]
+    end
+
+    /media/processed/--> nginx
+    /media/processed/ --> api_queue
+    /media/source/ --> processmedia2 --> /media/processed/
+    /media/meta/ <--> processmedia2
+```
+
 
 * api_queue ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
   * TODO
