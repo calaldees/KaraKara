@@ -133,16 +133,16 @@ class QueueItem():
     session_id: str
     performer_name: str
     start_time: datetime.datetime = None
-    id: float = dataclasses.field(default_factory=random.random)
+    id: int = dataclasses.field(default_factory=lambda:random.randint(4,2**30))
 
     def __post_init__(self):
         """
-        >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 0.123456789)
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
-        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '123456789.123456789', '0.123456789')
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=0.123456789)
-        >>> QueueItem('', '', '', '', '', 0.123456789)
-        QueueItem(track_id='', track_duration=datetime.timedelta(0), session_id='', performer_name='', start_time=None, id=0.123456789)
+        >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789)
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789)
+        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '123456789.123456789', '123456789')
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789)
+        >>> QueueItem('', '', '', '', '', 123456789)
+        QueueItem(track_id='', track_duration=datetime.timedelta(0), session_id='', performer_name='', start_time=None, id=123456789)
         """
         if not self.track_duration:
             self.track_duration = 0.0
@@ -154,15 +154,15 @@ class QueueItem():
         if isinstance(self.start_time, str):
             self.start_time = float(self.start_time)
         self.start_time = datetime.datetime.fromtimestamp(self.start_time) if isinstance(self.start_time, numbers.Number) else self.start_time
-        self.id = float(self.id)
+        self.id = int(self.id)
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
     @staticmethod
     def dict_factory(key_values):
         """
-        >>> i = QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 0.123456789)
+        >>> i = QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789)
         >>> i.asdict()
-        {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 0.123456789}
+        {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789}
         """
         def _parse(dd):
             k, v = dd
@@ -234,17 +234,17 @@ class Queue():
     def add(self, queue_item: QueueItem) -> None:
         self.items.append(queue_item)
         self._recalculate_start_times()
-    def move(self, id1: float, id2: float) -> None:
+    def move(self, id1: int, id2: int) -> None:
         assert {id1, id2} < {i.id for i in self.current_future}|{1,}, 'move track_ids are not in future track list'
         index1, queue_item = self.get(id1)
         del self.items[index1]
-        index2, _ = self.get(id2) if id2<1 else (len(self.items), None)  # id's are always between 0 and 1. `1` is a special sentinel value for end of list
+        index2, _ = self.get(id2) if id2 != 1 else (len(self.items), None) # id's are always above 4. `1` is a special sentinel value for end of list
         queue_item.start_time = None
         self.items.insert(index2, queue_item)
         self._recalculate_start_times()
-    def get(self, id: float) -> tuple[int, QueueItem]:
+    def get(self, id: int) -> tuple[int, QueueItem]:
         return next(((index, queue_item) for index, queue_item in enumerate(self.items) if queue_item.id==id), (None, None))
-    def delete(self, id: float) -> None:
+    def delete(self, id: int) -> None:
         now = self.now
         self.items[:] = [i for i in self.items if (i.start_time and i.start_time < now) or i.id != id]
         self._recalculate_start_times()

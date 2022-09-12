@@ -140,7 +140,7 @@ class QueueItemJson:
     session_id: str
     performer_name: str
     start_time: float
-    id: float
+    id: int
 #    on = bool
 #    doors = int
 #    color = str
@@ -227,12 +227,12 @@ async def add_queue_item(request, queue_id):
 
 @queue_blueprint.delete("/<queue_id:str>/")
 @openapi.definition(
-    parameter=openapi.definitions.Parameter('queue_item_id', float, required=True, allowEmptyValue=False, location='query'),
+    parameter=openapi.definitions.Parameter('queue_item_id', int, required=True, allowEmptyValue=False, location='query'),
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
 async def delete_queue_item(request, queue_id):
     try:
-        queue_item_id = float(request.args.get('queue_item_id'))
+        queue_item_id = int(request.args.get('queue_item_id'))
     except (ValueError, TypeError):
         raise sanic.exceptions.InvalidUsage(message="queue_item_id arg required")
     async with push_queue_to_mqtt(request, queue_id):
@@ -247,8 +247,8 @@ async def delete_queue_item(request, queue_id):
 
 
 class QueueItemMove:
-    queue_item_id_1: float
-    queue_item_id_2: float
+    queue_item_id_1: int
+    queue_item_id_2: int
 @queue_blueprint.put("/<queue_id:str>/")
 @openapi.definition(
     body={"application/json": QueueItemMove},
@@ -256,8 +256,8 @@ class QueueItemMove:
 )
 async def move_queue_item(request, queue_id):
     try:
-        queue_item_id_1 = float(request.args.get('queue_item_id_1'))
-        queue_item_id_2 = float(request.args.get('queue_item_id_2'))
+        queue_item_id_1 = int(request.args.get('queue_item_id_1'))
+        queue_item_id_2 = int(request.args.get('queue_item_id_2'))
     except (ValueError, TypeError):
         raise sanic.exceptions.InvalidUsage(message="queue_item_id_1 and queue_item_id_2 args required", context=request.args)
     if request.ctx.session_id != 'admin':
