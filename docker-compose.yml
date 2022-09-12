@@ -1,8 +1,4 @@
-version: '3.5'
-
 volumes:
-    #website_static:
-    #website_db:
     processmedia2_data:
     logs:
     mqtt_data:
@@ -17,13 +13,10 @@ services:
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
         volumes:
-            #- website_static:/static:ro
             - logs:/logs
             - ${PATH_HOST_processed}:/media/processed:ro
             #- ${PWD}/nginx/nginx.conf:/etc/ngin/nginx.conf:ro  # for local development
         links:
-            #- website
-            #- mosquitto
             - api_queue
             - mqtt
             - player2
@@ -39,37 +32,6 @@ services:
             - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
             - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser2/"
 
-    # website:
-    #     image: karakara/website
-    #     build:
-    #         context: ./website
-    #     env_file:
-    #         - .env
-    #     links:
-    #         - postgres
-    #         - redis
-    #         - mosquitto
-    #     volumes:
-    #         - website_static:/static:rw  # website writes staic files to overlay
-    #         - logs:/logs
-    #         - ${PATH_HOST_source}:/media/source:ro  # The Community interface writes to this location, not too happy about this. Will discuss this with content creators.
-    #         - ${PATH_HOST_meta}:/media/meta:ro
-
-        ## for local development
-        ##  docker-compose run --rm --entrypoint /bin/bash --service-ports website
-        #     - ${PWD}/website:/app:ro
-        # ports:
-        #     - 6543:6543
-        # #command: pserve ${PATH_CONFIG}/development.ini
-        # healthcheck: 
-        #     interval: 0m  # TODO: disbale healthcheck
-
-    #mosquitto:
-    #    image: karakara/mosquitto
-    #    build:
-    #        context: ./mosquitto
-    #    volumes:
-    #        - mosquitto_data:/mosquitto/data
 
     api_queue:
         image: karakara/api_queue
@@ -84,7 +46,6 @@ services:
         links:
             - mqtt
         volumes:
-            #- website_static:/static:ro
             - ${PATH_HOST_processed}:/media/processed:ro
             - logs:/logs
             - queue_data:/data/queue/:rw
@@ -108,16 +69,6 @@ services:
         build:
             context: ./browser2
 
-    # postgres:
-    #     image: karakara/postgres
-    #     build:
-    #         context: ./postgres
-    #     volumes:
-    #         - website_db:/var/lib/postgresql/data
-
-    # redis:
-    #     image: redis
-
     processmedia2:
         image: karakara/processmedia2
         profiles:
@@ -135,11 +86,3 @@ services:
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw
-            #- website_static:/static:rw
-
-        # Force import
-        #docker-compose exec processmedia2 /bin/bash
-        #root@245ee075bf91:/processmedia2# python3 import_media.py  --config config.docker.json --force
-
-# docker-compose run --rm processmedia2 bash
-# docker run -it --rm --entrypoint bash -v //C//Users/calal/code/personal/KaraKara/processmedia2/tests/source:/tmp/workdir jrottenberg/ffmpeg

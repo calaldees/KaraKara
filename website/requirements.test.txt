@@ -1,5 +1,0 @@
-pytest
-pytest-mock
-webtest
-mypy
-sqlalchemy-stubs
