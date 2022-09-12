@@ -43,8 +43,7 @@ const state: State = {
         "title": "KaraKara",
         "theme": "metalghosts",
         "preview_volume": 0.2,
-        "skip_seconds": 20,
-        "track_space": 0,
+        "track_space": 10,
         "event_end": null,
     },
 

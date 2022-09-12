@@ -38,15 +38,13 @@ export function Stop(state: State): Dispatchable {
     };
 }
 
-export function SeekForwards(state: State, value: number | null): Dispatchable {
-    const skip = value || state.settings["skip_seconds"];
+export function SeekForwards(state: State, skip: number): Dispatchable {
     const video = document.getElementsByTagName("video")[0];
     if (video) video.currentTime += skip;
     return { ...state, progress: state.progress + skip };
 }
 
-export function SeekBackwards(state: State, value: number | null): Dispatchable {
-    const skip = value || state.settings["skip_seconds"];
+export function SeekBackwards(state: State, skip: number): Dispatchable {
     const video = document.getElementsByTagName("video")[0];
     if (video) video.currentTime -= skip;
     return { ...state, progress: state.progress - skip };

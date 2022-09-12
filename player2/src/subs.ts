@@ -7,7 +7,7 @@ import {
     SeekForwards,
     Stop,
 } from "./actions";
-import { ApiRequest, SendCommand } from "./effects";
+import { SendCommand } from "./effects";
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
@@ -54,9 +54,9 @@ export function getMQTTListener(state: State): Subscription | null {
                         case "pause":
                             return Pause(state);
                         case "seek_forwards":
-                            return SeekForwards(state, null);
+                            return SeekForwards(state, 20);
                         case "seek_backwards":
-                            return SeekBackwards(state, null);
+                            return SeekBackwards(state, 20);
                         case "played":
                             return Dequeue(state);
                         // Only one instance should mark the current track as skipped, to avoid
