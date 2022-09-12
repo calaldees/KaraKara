@@ -22,7 +22,7 @@ function apiRequestEffect(dispatch, props) {
             let download_done = 0;
             // Content-Length shows us the compressed size, we can only
             // guess the real size :(
-            let download_size = 10*1024*1024;
+            let download_size = 5*1024*1024;
 
             return new ReadableStream({
                 start(controller) {
