@@ -66,12 +66,16 @@ curls
 
 ```
 curl -X GET http://localhost:8000/queue/test/tracks.json
+
 curl -X GET http://localhost:8000/queue/test/queue.csv
 curl -X GET http://localhost:8000/queue/test/queue.json
-curl -X GET http://localhost:8000/queue/test/settings.json
 curl -X POST --cookie "session_id=test" http://localhost:8000/queue/test/queue.json -d '{"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}'
 curl -X DELETE --cookie "session_id=admin" http://localhost:8000/queue/test/queue/8684541502363635.json
+curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/queue.json -d '{"source": 543, "target": 223}'
+
+curl -X GET http://localhost:8000/queue/test/settings.json
+curl -X PUT --cookie "session_id=admin" https://karakara.uk/queue/test/settings.json -d '{"track_space": 42}'
+
 curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play
 curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop
-curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/queue.json -d '{"source": 543, "target": 223}'
 ```

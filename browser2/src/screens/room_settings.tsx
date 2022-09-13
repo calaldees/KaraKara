@@ -63,7 +63,7 @@ export const RoomSettings = ({ state }: { state: State }): VNode => (
         <form onsubmit={SaveSettings}>
             {Object.entries(state.settings).map(([key, value]) => (
                 <p>
-                    {key.replace("karakara.", "")}:
+                    {key.replace("_", " ")}:
                     <br />
                     <input
                         type={"text"}
