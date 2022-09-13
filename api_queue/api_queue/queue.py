@@ -64,8 +64,12 @@ class User:
 
 class LoginManager:
     @staticmethod
-    def login(queue_id: str, username: Optional[str], password: str) -> User:
+    def login(session_id: str, queue_id: str, username: Optional[str], password: str) -> User:
         return User(is_admin = password==queue_id)
+
+    @staticmethod
+    def from_session(session_id: str) -> User:
+        return User(is_admin = session_id=="admin")
 
 
 class QueueManager():

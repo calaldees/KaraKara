@@ -95,10 +95,11 @@ app.error_handler = CustomErrorHandler()
 
 
 
+from .queue import LoginManager, User
 @app.middleware("request")
 async def attach_session_id_request(request):
     request.ctx.session_id = request.cookies.get("session_id") or str(random.random())
-    request.ctx.is_admin = request.ctx.session_id == "admin"
+    request.ctx.user = LoginManager.from_session(request.ctx.session_id)
 @app.middleware("response")
 async def attach_session_id(request, response):
     if request.cookies.get("session_id") != request.ctx.session_id:
@@ -151,7 +152,6 @@ class QueueItemJson:
 
 # Queue / Login ---------------------------------------------------------------
 
-from .queue import LoginManager, User
 class LoginRequest:
     password: str
 @queue_blueprint.post("/<queue_id:str>/login.json")
@@ -162,7 +162,7 @@ class LoginRequest:
     ],
 )
 async def login(request, queue_id):
-    user = LoginManager.login(queue_id, None, request.json["password"])
+    user = LoginManager.login(request.ctx.session_id, queue_id, None, request.json["password"])
     if user.is_admin:
         request.ctx.session_id = "admin"
     else:
@@ -195,7 +195,7 @@ async def get_settings(request, queue_id):
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
 async def update_settings(request, queue_id):
-    if not request.ctx.is_admin:
+    if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request, queue_id):
         log.info(f"Updating settings for {queue_id} to {request.json}")
@@ -272,7 +272,7 @@ async def delete_queue_item(request, queue_id, queue_item_id):
             _, queue_item = queue.get(queue_item_id)
             if not queue_item:
                 raise sanic.exceptions.NotFound()
-            if queue_item.session_id != request.ctx.session_id and not request.ctx.is_admin:
+            if queue_item.session_id != request.ctx.session_id and not request.ctx.user.is_admin:
                 raise sanic.exceptions.Forbidden(message="queue_item.session_id does not match session_id")
             queue.delete(queue_item_id)
             return sanic.response.json(queue_item.asdict())
@@ -292,7 +292,7 @@ async def move_queue_item(request, queue_id):
         target = int(request.json.get('target'))
     except (ValueError, TypeError):
         raise sanic.exceptions.InvalidUsage(message="source and target args required", context=request.json)
-    if not request.ctx.is_admin:
+    if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
@@ -311,7 +311,7 @@ async def move_queue_item(request, queue_id):
     ]
 )
 async def queue_command(request, queue_id, command):
-    if not request.ctx.is_admin:
+    if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
     if command not in {'play', 'stop'}:
         raise sanic.exceptions.NotFound(message='invalid command')
