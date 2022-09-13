@@ -99,8 +99,7 @@ function _bleSubscriber(dispatch, props) {
                             password: state.room_password,
                         }),
                     },
-                    action: (state, response) => ({ ...state, is_admin: true }),
-                    exception: (state) => ({ ...state, is_admin: false })
+                    action: (state, response) => ({ ...state, is_admin: response.is_admin }),
                 })
             ]);
         }, 0);
