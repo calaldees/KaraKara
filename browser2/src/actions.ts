@@ -29,7 +29,8 @@ export const RemoveTrack =
         [
             state,
             ApiRequest({
-                title: "Removing track...",
+                notify: "Removing track...",
+                notify_ok: "Track removed!",
                 function: "queue/"+queue_item_id.toString(),
                 state: state,
                 options: {

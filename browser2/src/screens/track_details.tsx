@@ -27,7 +27,8 @@ const SetPerformerName = (state: State, event: FormInputEvent): State => ({
 const EnqueueCurrentTrack = (state: State): Dispatchable => [
     state,
     ApiRequest({
-        title: "Adding to queue...",
+        notify: "Adding to queue...",
+        notify_ok: "Added to queue!",
         function: "queue",
         state: state,
         options: {

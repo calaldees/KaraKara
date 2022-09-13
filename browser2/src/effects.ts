@@ -1,9 +1,7 @@
 /*
  * Effects: functions which send data to the outside world
  */
-import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
 import { Delay } from "hyperapp-fx";
-import { mqtt_login_info } from "./utils";
 
 // get article
 function _get_article() {
@@ -60,8 +58,8 @@ function apiRequestEffect(dispatch, props) {
     dispatch((state) => ({
         ...state,
         loading: true,
-        notification: props.title
-            ? { text: props.title, style: "warning" }
+        notification: props.notify
+            ? { text: props.notify, style: "warning" }
             : null,
     }));
 
@@ -114,7 +112,17 @@ function apiRequestEffect(dispatch, props) {
                     {
                         ...state,
                         loading: false,
+                        notification: props.notify_ok
+                            ? { text: props.notify_ok, style: "ok" }
+                            : null,
                     },
+                    Delay({
+                        wait: 2000,
+                        action: (state) => ({
+                            ...state,
+                            notification: null,
+                        }),
+                    }),
                 ],
                 result,
             );

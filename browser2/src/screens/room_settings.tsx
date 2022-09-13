@@ -22,7 +22,8 @@ const SaveSettings = (state: State, event: SubmitEvent): Dispatchable => {
     return [
         { ...state },
         ApiRequest({
-            title: "Saving settings...",
+            notify: "Saving settings...",
+            notify_ok: "Settings saved!",
             function: "settings",
             state: state,
             options: {
