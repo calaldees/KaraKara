@@ -29,6 +29,18 @@ async def test_queue_settings_default(queue_model):
     assert 'track_space' in settings
 
 @pytest.mark.asyncio
+async def test_queue_settings_change(queue_model, mock_mqtt):
+    settings = await queue_model.settings
+    assert settings['track_space'] == 15.0
+
+    queue_model.session_id = 'admin'
+    response = await queue_model.settings_put(payload={"track_space": 10.0})
+    assert response.status == 200
+
+    settings = await queue_model.settings
+    assert settings['track_space'] == 10.0
+
+@pytest.mark.asyncio
 async def test_queue_add(queue_model, mock_mqtt):
     # queue is empty
     assert len(await queue_model.queue) == 0
