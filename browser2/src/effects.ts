@@ -113,43 +113,12 @@ function apiRequestEffect(dispatch, props) {
                 (state, result) => [
                     {
                         ...state,
-                        session_id: result?.identity?.id || state.session_id,
                         loading: false,
                     },
                 ],
                 result,
             );
 
-            if ((result.status ?? "ok") == "ok") {
-                if (result.messages?.length > 0) {
-                    dispatch((state) => [
-                        {
-                            ...state,
-                            notification: {
-                                text: result.messages[0],
-                                style: "ok",
-                            },
-                        },
-                        Delay({
-                            wait: 2000,
-                            action: (state) => ({
-                                ...state,
-                                notification: null,
-                            }),
-                        }),
-                    ]);
-                }
-            } else {
-                dispatch((state) => [
-                    {
-                        ...state,
-                        notification: {
-                            text: result.messages[0],
-                            style: "error",
-                        },
-                    },
-                ]);
-            }
             if (props.action) {
                 dispatch(props.action, result);
             }
@@ -172,6 +141,7 @@ function apiRequestEffect(dispatch, props) {
                 ],
                 error,
             );
+
             if (props.exception) {
                 dispatch(props.exception);
             }
@@ -179,12 +149,11 @@ function apiRequestEffect(dispatch, props) {
 }
 
 export function ApiRequest(props): Effect {
+    if(!props.options) props.options = {};
+    props.options["credentials"] = "include";
     return [
         apiRequestEffect,
         {
-            options: {
-                credentials: 'include',
-            },
             response: "json",
             url: `${props.state.root}/queue/${props.state.room_name}/${props.function}.json`,
             ...props,
