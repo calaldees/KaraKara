@@ -244,24 +244,24 @@ async def delete_queue_item(request, queue_id, queue_item_id):
 
 
 class QueueItemMove:
-    queue_item_id_1: int
-    queue_item_id_2: int
-@queue_blueprint.put("/<queue_id:str>/")
+    source: int
+    target: int
+@queue_blueprint.put("/<queue_id:str>/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemMove},
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
 )
 async def move_queue_item(request, queue_id):
     try:
-        queue_item_id_1 = int(request.args.get('queue_item_id_1'))
-        queue_item_id_2 = int(request.args.get('queue_item_id_2'))
+        source = int(request.json.get('source'))
+        target = int(request.json.get('target'))
     except (ValueError, TypeError):
-        raise sanic.exceptions.InvalidUsage(message="queue_item_id_1 and queue_item_id_2 args required", context=request.args)
+        raise sanic.exceptions.InvalidUsage(message="source and target args required", context=request.json)
     if not request.ctx.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
-            queue.move(queue_item_id_1, queue_item_id_2)
+            queue.move(source, target)
             return sanic.response.json({}, status=201)
 
 

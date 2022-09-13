@@ -104,22 +104,17 @@ function moveTrack(
             drop_target: null,
         },
         ApiRequest({
-            function: "queue_items",
+            function: "queue",
             state: state,
             options: {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Content-Type": "application/json",
                 },
-                body: new URLSearchParams({
-                    "queue_item.id": "" + src_id,
-                    "queue_item.move.target_id": "" + dst_id,
+                body: JSON.stringify({
+                    "source": "" + src_id,
+                    "target": "" + dst_id,
                 }),
-            },
-            // on server-side error, revert to original queue
-            action: function (state, response) {
-                if (response.status == "ok") return state;
-                return { ...state, queue: original_queue };
             },
             // on network error, revert to original queue
             exception: function (state) {

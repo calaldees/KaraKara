@@ -99,21 +99,21 @@ async def test_queue_move(queue_model, mock_mqtt):
     mock_mqtt.publish.reset_mock()
     response = await queue_model.put()
     assert response.status == 400
-    response = await queue_model.put(queue_item_id_1=0, queue_item_id_2=0)
+    response = await queue_model.put(source=0, target=0)
     assert response.status == 403
     queue_model.session_id = 'admin'
-    response = await queue_model.put(queue_item_id_1=0, queue_item_id_2=0)
+    response = await queue_model.put(source=0, target=0)
     assert response.status == 400
     mock_mqtt.publish.assert_not_awaited()
 
     # move
-    response = await queue_model.put(queue_item_id_1=queue[0]['id'], queue_item_id_2=queue[2]['id'])
+    response = await queue_model.put(source=queue[0]['id'], target=queue[2]['id'])
     assert response.status == 201
     mock_mqtt.publish.assert_awaited_once()
     queue = await queue_model.queue
     assert [i['track_id'] for i in queue] == ['Animaniacs_OP', 'KAT_TUN_Your_side_Instrumental_', 'Macross_Dynamite7_OP_Dynamite_Explosion']
     # move to end
-    response = await queue_model.put(queue_item_id_1=queue[0]['id'], queue_item_id_2=1)
+    response = await queue_model.put(source=queue[0]['id'], target=1)
     queue = await queue_model.queue
     assert [i['track_id'] for i in queue] == ['KAT_TUN_Your_side_Instrumental_', 'Macross_Dynamite7_OP_Dynamite_Explosion', 'Animaniacs_OP']
 

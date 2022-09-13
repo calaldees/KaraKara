@@ -73,5 +73,5 @@ curl -X POST --cookie "session_id=test" http://localhost:8000/queue/test/queue.j
 curl -X DELETE --cookie "session_id=admin" http://localhost:8000/queue/test/queue/8684541502363635.json
 curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play
 curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop
-curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/?queue_item_id_1=0.1&queue_item_id_2=0.2
+curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/queue.json -d '{"source": 543, "target": 223}'
 ```
