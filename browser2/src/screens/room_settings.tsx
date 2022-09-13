@@ -1,6 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { BackToExplore, Screen } from "./_common";
 import { ApiRequest } from "../effects";
+import { copy_type } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -10,13 +11,9 @@ function UpdateSettings(
     state: State,
     event: FormInputEvent,
 ): Dispatchable {
-    if (Array.isArray(state.settings[event.target.name])) {
-        state.settings[event.target.name] = event.target.value.split(",");
-    } else if(typeof state.settings[event.target.name] == 'number') {
-        state.settings[event.target.name] = parseFloat(event.target.value);
-    } else {
-        state.settings[event.target.name] = event.target.value;
-    }
+    var name = event.target.name;
+    var value = event.target.value;
+    state.settings[name] = copy_type(state.settings[name], value);
     return state;
 }
 

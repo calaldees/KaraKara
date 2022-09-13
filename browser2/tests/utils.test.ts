@@ -188,3 +188,18 @@ describe('track_info', () => {
             .toEqual("Macross - opening, op1 - short");
     });
 });
+
+describe('copy_type', () => {
+    test('default', () => {
+        expect(utils.copy_type("Macross", "Gundam")).toEqual("Gundam");
+    });
+    test('array', () => {
+        expect(utils.copy_type(["Macross", "Gundam"], "Gundam,Cake")).toEqual(["Gundam", "Cake"]);
+    });
+    test('int', () => {
+        expect(utils.copy_type(2, "42")).toEqual(42);
+    });
+    test('float', () => {
+        expect(utils.copy_type(12.34, "43.21")).toEqual(43.21);
+    });
+});

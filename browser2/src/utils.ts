@@ -140,3 +140,17 @@ export function track_info(filters: Array<string>, track: Pick<Track, "tags">): 
     let info = info_data.join(" - ");
     return info;
 }
+
+/*
+ * Given a string value from the settings form, check what data
+ * type the setting is now, and try to keep that type
+ */
+export function copy_type(original, value) {
+    if (Array.isArray(original)) {
+        return value.split(",");
+    } else if(typeof original == 'number') {
+        return parseFloat(value);
+    } else {
+        return value;
+    }
+}
