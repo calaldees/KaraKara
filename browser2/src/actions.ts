@@ -30,16 +30,10 @@ export const RemoveTrack =
             state,
             ApiRequest({
                 title: "Removing track...",
-                function: "queue_items",
+                function: "queue/"+queue_item_id.toString()+"/item",
                 state: state,
                 options: {
                     method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: new URLSearchParams({
-                        "queue_item.id": queue_item_id.toString(),
-                    }),
                 },
             }),
         ];

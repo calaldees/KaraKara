@@ -62,10 +62,6 @@ async def test_queue_delete(queue_model, mock_mqtt):
 
     # try to delete invalid
     mock_mqtt.publish.reset_mock()
-    response = await queue_model.delete()
-    assert response.status == 400
-    response = await queue_model.delete(queue_item_id='NotReal')
-    assert response.status == 400
     response = await queue_model.delete(queue_item_id=999)
     assert response.status == 404
     mock_mqtt.publish.assert_not_awaited()

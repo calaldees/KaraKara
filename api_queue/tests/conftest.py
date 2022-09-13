@@ -76,8 +76,8 @@ class QueueModel():
     async def post(self, **kwargs):
         request, response = await self.app.asgi_client.post(f"/queue/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
-    async def delete(self, **kwargs):
-        request, response = await self.app.asgi_client.delete(f"/queue/{self._queue}/?{urlencode(kwargs)}")
+    async def delete(self, queue_item_id):
+        request, response = await self.app.asgi_client.delete(f"/queue/{self._queue}/queue/{queue_item_id}/item.json")
         return response
     async def put(self, **kwargs):
         request, response = await self.app.asgi_client.put(f"/queue/{self._queue}/?{urlencode(kwargs)}")

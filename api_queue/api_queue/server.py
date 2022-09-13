@@ -226,16 +226,11 @@ async def add_queue_item(request, queue_id):
             return sanic.response.json(queue_item.asdict())
 
 
-@queue_blueprint.delete("/<queue_id:str>/")
+@queue_blueprint.delete("/<queue_id:str>/queue/<queue_item_id:int>/item.json")
 @openapi.definition(
-    parameter=openapi.definitions.Parameter('queue_item_id', int, required=True, allowEmptyValue=False, location='query'),
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
-async def delete_queue_item(request, queue_id):
-    try:
-        queue_item_id = int(request.args.get('queue_item_id'))
-    except (ValueError, TypeError):
-        raise sanic.exceptions.InvalidUsage(message="queue_item_id arg required")
+async def delete_queue_item(request, queue_id, queue_item_id):
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
             _, queue_item = queue.get(queue_item_id)
