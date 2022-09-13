@@ -5,7 +5,7 @@ import random
 import numbers
 from functools import reduce
 from itertools import pairwise
-from typing import Iterator
+from typing import Iterator, Optional
 import csv
 from pathlib import Path
 import io
@@ -57,6 +57,15 @@ class SettingsManager():
             for k, v in self.get_json(name).items()
         }
 
+
+@dataclasses.dataclass
+class User:
+    is_admin: bool
+
+class LoginManager:
+    @staticmethod
+    def login(queue_id: str, username: Optional[str], password: str) -> User:
+        return User(is_admin = password==queue_id)
 
 
 class QueueManager():

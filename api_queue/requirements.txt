@@ -1,11 +1,5 @@
 sanic
-#sanic-redis  # sanic-redis usese aioredis which is depricated?
-#sanic-jwt    #
 sanic-ext
 sanic-openapi
 ujson
-
-#jwt     # can this be replaced with sanic-jwt?
-#redis
-#hiredis # c bindings for redis (used automatically if installed)
 asyncio-mqtt

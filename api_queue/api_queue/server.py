@@ -149,44 +149,35 @@ class QueueItemJson:
     performer_name: str
     start_time: float
     id: int
-#    on = bool
-#    doors = int
-#    color = str
-#    make = Manufacturer
-#    driver = Driver
-#    passengers = openapi.Array(Driver, required=["name", "birthday"])
 
 
 
-
-class AdminLogin:
+from .queue import LoginManager, User
+class LoginRequest:
     password: str
 @queue_blueprint.post("/<queue_id:str>/login.json")
 @openapi.definition(
-    body={"application/json": AdminLogin},
+    body={"application/json": LoginRequest},
     response=[
-        openapi.definitions.Response({"application/json": {"is_admin": bool}}, status=200),
+        openapi.definitions.Response({"application/json": User}, status=200),
     ],
 )
 async def login(request, queue_id):
-    if queue_id == request.json["password"]:
+    user = LoginManager.login(queue_id, None, request.json["password"])
+    if user.is_admin:
         request.ctx.session_id = "admin"
-        return sanic.response.json({"is_admin": True})
     else:
         request.ctx.session_id = str(random.random())
-        return sanic.response.json({"is_admin": False})
+    return sanic.response.json(user.__dict__)
 
 
-#@app.get("/queue/<queue_id:str>/tracks.json")
-#async def tracks_from_memory(request):
-#    return sanic.response.json(request.app.ctx.tracks)
 @queue_blueprint.get("/<queue_id:str>/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def tracks_from_disk(request, queue_id):
+async def tracks(request, queue_id):
     return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
-    # TODO: replace 302 redirect to static file from nginx? Could be useful to have this as a fallback?
+
 
 @queue_blueprint.get("/<queue_id:str>/queue.csv")
 @openapi.definition(
@@ -206,7 +197,7 @@ async def queue_json(request, queue_id):
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def queue_settings_json(request, queue_id):
+async def get_settings(request, queue_id):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
 
 @queue_blueprint.put("/<queue_id:str>/settings.json")
@@ -214,7 +205,7 @@ async def queue_settings_json(request, queue_id):
     body={"application/json": {}},
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def queue_settings_update(request, queue_id):
+async def update_settings(request, queue_id):
     if not request.ctx.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request, queue_id):
