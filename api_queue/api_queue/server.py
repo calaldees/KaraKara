@@ -101,7 +101,7 @@ async def attach_session_id_request(request):
     request.ctx.is_admin = request.ctx.session_id == "admin"
 @app.middleware("response")
 async def attach_session_id(request, response):
-    if not request.cookies.get("session_id"):
+    if request.cookies.get("session_id") != request.ctx.session_id:
         response.cookies["session_id"] = request.ctx.session_id
 
 
@@ -157,6 +157,24 @@ class QueueItemJson:
 #    passengers = openapi.Array(Driver, required=["name", "birthday"])
 
 
+
+
+class AdminLogin:
+    password: str
+@queue_blueprint.post("/<queue_id:str>/login.json")
+@openapi.definition(
+    body={"application/json": AdminLogin},
+    response=[
+        openapi.definitions.Response({"application/json": {"is_admin": bool}}, status=200),
+    ],
+)
+async def login(request, queue_id):
+    if queue_id == request.json["password"]:
+        request.ctx.session_id = "admin"
+        return sanic.response.json({"is_admin": True})
+    else:
+        request.ctx.session_id = str(random.random())
+        return sanic.response.json({"is_admin": False})
 
 
 #@app.get("/queue/<queue_id:str>/tracks.json")
