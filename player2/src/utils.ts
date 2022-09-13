@@ -8,15 +8,15 @@
     const seconds = seconds_total % 60;
     const minutes = Math.floor(seconds_total / 60);
     if (minutes > 1) {
-        return minutes + "mins";
+        return `In ${minutes} mins`;
     }
     if (minutes == 1) {
-        return minutes + "min";
+        return `In ${minutes} min`;
     }
     if (seconds < 5) {
         return "Now";
     }
-    return seconds + "secs";
+    return `In ${seconds} secs`;
 }
 
 /**

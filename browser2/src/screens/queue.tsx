@@ -19,7 +19,7 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <span class={"performer"}>{item.performer_name}</span>
         </span>
         <span class={"count"}>
-            In {time_until(item.start_time)}
+            {time_until(item.start_time)}
         </span>
 
         {state.session_id == item.session_id && (
