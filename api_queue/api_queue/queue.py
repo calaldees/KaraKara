@@ -150,7 +150,7 @@ class QueueItem():
     session_id: str
     performer_name: str
     start_time: datetime.datetime = None
-    id: int = dataclasses.field(default_factory=lambda:random.randint(4,2**30))
+    id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
 
     def __post_init__(self):
         """
@@ -252,10 +252,10 @@ class Queue():
         self.items.append(queue_item)
         self._recalculate_start_times()
     def move(self, id1: int, id2: int) -> None:
-        assert {id1, id2} < {i.id for i in self.current_future}|{1,}, 'move track_ids are not in future track list'
+        assert {id1, id2} < {i.id for i in self.current_future}|{-1,}, 'move track_ids are not in future track list'
         index1, queue_item = self.get(id1)
         del self.items[index1]
-        index2, _ = self.get(id2) if id2 != 1 else (len(self.items), None) # id's are always above 4. `1` is a special sentinel value for end of list
+        index2, _ = self.get(id2) if id2 != -1 else (len(self.items), None) # id's are positive. `-1` is a special sentinel value for end of list
         queue_item.start_time = None
         self.items.insert(index2, queue_item)
         self._recalculate_start_times()

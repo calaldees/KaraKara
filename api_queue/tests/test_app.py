@@ -125,7 +125,7 @@ async def test_queue_move(queue_model, mock_mqtt):
     queue = await queue_model.queue
     assert [i['track_id'] for i in queue] == ['Animaniacs_OP', 'KAT_TUN_Your_side_Instrumental_', 'Macross_Dynamite7_OP_Dynamite_Explosion']
     # move to end
-    response = await queue_model.put(source=queue[0]['id'], target=1)
+    response = await queue_model.put(source=queue[0]['id'], target=-1)
     queue = await queue_model.queue
     assert [i['track_id'] for i in queue] == ['KAT_TUN_Your_side_Instrumental_', 'Macross_Dynamite7_OP_Dynamite_Explosion', 'Animaniacs_OP']
 
