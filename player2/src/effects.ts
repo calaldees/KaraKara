@@ -100,11 +100,10 @@ function apiRequestEffect(dispatch, props) {
 }
 
 export function ApiRequest(props): Effect {
-    if(!props.options) props.options = {};
-    props.options["credentials"] = "include";
     return [
         apiRequestEffect,
         {
+            options: {},
             response: "json",
             url: `${props.state.root}/queue/${props.state.room_name}/${props.function}.json`,
             ...props,
