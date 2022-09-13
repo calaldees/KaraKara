@@ -9,6 +9,7 @@ import {
 import { Keyboard, Interval } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
+import { ApiRequest } from "./effects";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -118,3 +119,41 @@ export const IntervalListener = Interval({
         return { ...state, progress: state.progress + 1 / 5 };
     },
 });
+
+function _bleSubscriber(dispatch, props) {
+    // subscription is restarted whenever props changes,
+    if(props.room_name) {
+        setTimeout(function () {
+            dispatch((state) => [
+                state,
+                ApiRequest({
+                    function: "login",
+                    state: state,
+                    options: {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            password: state.room_password,
+                        }),
+                    },
+                    action: (state, response) => ({ ...state, is_admin: response.is_admin }),
+                })
+            ]);
+        }, 0);
+    }
+    else {
+        setTimeout(function () {
+            dispatch((state) => ({...state, is_admin: false}));
+        }, 0);
+    }
+
+    return function () {
+        // no unsubscribe
+    };
+}
+
+export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+    return [_bleSubscriber, { room_name, room_password }];
+}

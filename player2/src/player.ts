@@ -11,6 +11,7 @@ import {
     getMQTTListener,
     IntervalListener,
     KeyboardListener,
+    BeLoggedIn,
 } from "./subs";
 import { ApiRequest } from "./effects";
 
@@ -104,6 +105,7 @@ const subscriptions = (state: State): Array<Subscription> => [
     !state.playing &&
     state.settings["track_space"] !== 0 &&
     IntervalListener,
+    BeLoggedIn(state.room_name, state.room_password),
 ];
 
 app({
