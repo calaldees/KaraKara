@@ -4,7 +4,6 @@
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
 import { ApiRequest } from "./effects";
-import Cookies from 'js-cookie'
 
 /**
  * Connect to the MQTT server, listen for updates to queue / settings
@@ -117,23 +116,4 @@ function _bleSubscriber(dispatch, props) {
 
 export function BeLoggedIn(room_name: string, room_password: string): Subscription {
     return [_bleSubscriber, { room_name, room_password }];
-}
-
-
-function _cookieListener(dispatch, props) {
-    let oldCookieVal: string | null = null;
-    let cookieTimer = setInterval(function() {
-        let cookieVal = Cookies.get(props.name);
-        if(cookieVal != oldCookieVal) {
-            oldCookieVal = cookieVal;
-            console.log(props.name + " has new cookie val: " + cookieVal);
-            dispatch(props.callback, cookieVal);
-        }
-    }, 1000);
-    return function() {
-        clearInterval(cookieTimer);
-    };
-}
-export function CookieListener(name, callback) {
-    return [_cookieListener, {name: name, callback: callback}];
 }

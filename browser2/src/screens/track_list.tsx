@@ -216,9 +216,11 @@ const Bookmarks = ({ state }: { state: State }) => (
 const AdminButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <div class={"buttons"}>
+            {/*
             <button onclick={GoToPriorityTokens} disabled={state.loading}>
                 Priority Tokens
             </button>
+            */}
             <button onclick={GoToScreen("room_settings", [PushScrollPos()])}>
                 Room Settings
             </button>

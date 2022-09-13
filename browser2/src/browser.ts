@@ -7,7 +7,7 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { BeLoggedIn, CookieListener, getMQTTListener, ResizeListener } from "./subs";
+import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
 import { ApiRequest } from "./effects";
 
 // If we're running stand-alone, then use the main karakara.uk
@@ -126,10 +126,6 @@ const subscriptions = (state: State): Array<Subscription> => [
     ResizeListener((state, event) => ({
         ...state,
         widescreen: isWidescreen(),
-    })),
-    CookieListener("priority_token", (state, cookie) => ({
-        ...state,
-        priority_token: cookie ? JSON.parse(cookie) : null,
     })),
     BeLoggedIn(state.room_name, state.room_password),
 ];
