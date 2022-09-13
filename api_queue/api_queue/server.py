@@ -135,7 +135,7 @@ async def root(request):
 
 # Queue -----------------------------------------------------------------------
 
-queue_blueprint = sanic.blueprints.Blueprint('queue', url_prefix='/queue')
+queue_blueprint = sanic.blueprints.Blueprint('queue', url_prefix='/queue/<queue_id:([A-Za-z0-9_-]{1,32})>')
 app.blueprint(queue_blueprint)
 
 
@@ -154,7 +154,7 @@ class QueueItemJson:
 
 class LoginRequest:
     password: str
-@queue_blueprint.post("/<queue_id:str>/login.json")
+@queue_blueprint.post("/login.json")
 @openapi.definition(
     body={"application/json": LoginRequest},
     response=[
@@ -172,7 +172,7 @@ async def login(request, queue_id):
 
 # Queue / Tracks --------------------------------------------------------------
 
-@queue_blueprint.get("/<queue_id:str>/tracks.json")
+@queue_blueprint.get("/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
@@ -182,14 +182,14 @@ async def tracks(request, queue_id):
 
 # Queue / Settings ------------------------------------------------------------
 
-@queue_blueprint.get("/<queue_id:str>/settings.json")
+@queue_blueprint.get("/settings.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
 async def get_settings(request, queue_id):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
 
-@queue_blueprint.put("/<queue_id:str>/settings.json")
+@queue_blueprint.put("/settings.json")
 @openapi.definition(
     body={"application/json": {}},
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
@@ -205,14 +205,14 @@ async def update_settings(request, queue_id):
 
 # Queue / Queue ---------------------------------------------------------------
 
-@queue_blueprint.get("/<queue_id:str>/queue.csv")
+@queue_blueprint.get("/queue.csv")
 @openapi.definition(
     response=openapi.definitions.Response({"text/csv": str}),
 )
 async def queue_csv(request, queue_id):
     return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
 
-@queue_blueprint.get("/<queue_id:str>/queue.json")
+@queue_blueprint.get("/queue.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
 )
@@ -223,7 +223,7 @@ async def queue_json(request, queue_id):
 class QueueItemAdd:
     track_id: str
     performer_name: str
-@queue_blueprint.post("/<queue_id:str>/queue.json")
+@queue_blueprint.post("/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemAdd},
     response=[
@@ -261,7 +261,7 @@ async def add_queue_item(request, queue_id):
             return sanic.response.json(queue_item.asdict())
 
 
-@queue_blueprint.delete(r"/<queue_id:str>/queue/<queue_item_id:(\d+).json>")
+@queue_blueprint.delete(r"/queue/<queue_item_id:(\d+).json>")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
@@ -281,7 +281,7 @@ async def delete_queue_item(request, queue_id, queue_item_id):
 class QueueItemMove:
     source: int
     target: int
-@queue_blueprint.put("/<queue_id:str>/queue.json")
+@queue_blueprint.put("/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemMove},
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
@@ -302,7 +302,7 @@ async def move_queue_item(request, queue_id):
 
 # Queue / Commands ------------------------------------------------------------
 
-@queue_blueprint.get("/<queue_id:str>/command/<command:([a-z]+).json>")
+@queue_blueprint.get("/command/<command:([a-z]+).json>")
 @openapi.definition(
     response=[
         openapi.definitions.Response({"application/json": {'is_playing': bool}},),
