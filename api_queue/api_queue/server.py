@@ -226,11 +226,12 @@ async def add_queue_item(request, queue_id):
             return sanic.response.json(queue_item.asdict())
 
 
-@queue_blueprint.delete("/<queue_id:str>/queue/<queue_item_id:int>/item.json")
+@queue_blueprint.delete(r"/<queue_id:str>/queue/<queue_item_id:(\d+).json>")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
 async def delete_queue_item(request, queue_id, queue_item_id):
+    queue_item_id = int(queue_item_id)
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
             _, queue_item = queue.get(queue_item_id)
