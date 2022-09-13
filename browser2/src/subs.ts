@@ -83,26 +83,33 @@ export function ResizeListener(callback: Dispatchable): Subscription {
 
 function _bleSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,
-    setTimeout(function () {
-        dispatch((state) => [
-            state,
-            ApiRequest({
-                function: "login",
-                state: state,
-                options: {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
+    if(props.room_name) {
+        setTimeout(function () {
+            dispatch((state) => [
+                state,
+                ApiRequest({
+                    function: "login",
+                    state: state,
+                    options: {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            password: state.room_password,
+                        }),
                     },
-                    body: JSON.stringify({
-                        password: state.room_password,
-                    }),
-                },
-                action: (state, response) => ({ ...state, is_admin: true }),
-                exception: (state) => ({ ...state, is_admin: false })
-            })
-        ]);
-    }, 0);
+                    action: (state, response) => ({ ...state, is_admin: true }),
+                    exception: (state) => ({ ...state, is_admin: false })
+                })
+            ]);
+        }, 0);
+    }
+    else {
+        setTimeout(function () {
+            dispatch((state) => ({...state, is_admin: false}));
+        }, 0);
+    }
 
     return function () {
         // no unsubscribe
