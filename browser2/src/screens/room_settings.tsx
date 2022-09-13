@@ -55,15 +55,15 @@ const SettingsButtons = ({ state }: { state: State }): VNode => (
 );
 
 export const RoomSettings = ({ state }: { state: State }): VNode => (
-    <form onsubmit={SaveSettings}>
-        <Screen
-            state={state}
-            className={"room_settings"}
-            navLeft={<BackToExplore />}
-            title={"Room Settings"}
-            //navRight={}
-            footer={<SettingsButtons state={state} />}
-        >
+    <Screen
+        state={state}
+        className={"room_settings"}
+        navLeft={<BackToExplore />}
+        title={"Room Settings"}
+        //navRight={}
+        footer={<SettingsButtons state={state} />}
+    >
+        <form onsubmit={SaveSettings}>
             {Object.entries(state.settings).map(([key, value]) => (
                 <p>
                     {key.replace("karakara.", "")}:
@@ -76,6 +76,6 @@ export const RoomSettings = ({ state }: { state: State }): VNode => (
                     />
                 </p>
             ))}
-        </Screen>
-    </form>
+        </form>
+    </Screen>
 );
