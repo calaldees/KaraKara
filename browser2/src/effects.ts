@@ -161,10 +161,8 @@ export function ApiRequest(props): Effect {
 }
 
 export function SendCommand(state: State, command: string): Effect {
-    console.log("mqtt_send(", "commands", command, ")");
-    return MQTTPublish({
-        ...mqtt_login_info(state),
-        topic: "room/" + state.room_name + "/commands",
-        payload: command,
+    return ApiRequest({
+        function: `command/${command}`,
+        state: state,
     });
 }

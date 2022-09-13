@@ -84,7 +84,7 @@ class QueueModel():
         return response
 
     async def command(self, command):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/command/{command}")
+        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/command/{command}.json")
         return response
 
 

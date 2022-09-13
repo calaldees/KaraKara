@@ -265,7 +265,7 @@ async def move_queue_item(request, queue_id):
             return sanic.response.json({}, status=201)
 
 
-@queue_blueprint.get("/<queue_id:str>/command/<command:str>")
+@queue_blueprint.get("/<queue_id:str>/command/<command:([a-z]+).json>")
 @openapi.definition(
     response=[
         openapi.definitions.Response({"application/json": {'is_playing': bool}},),
