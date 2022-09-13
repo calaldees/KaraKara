@@ -192,9 +192,11 @@ describe('track_info', () => {
 describe('copy_type', () => {
     test('default', () => {
         expect(utils.copy_type("Macross", "Gundam")).toEqual("Gundam");
+        expect(utils.copy_type("Macross", "")).toEqual("");
     });
     test('array', () => {
         expect(utils.copy_type(["Macross", "Gundam"], "Gundam,Cake")).toEqual(["Gundam", "Cake"]);
+        expect(utils.copy_type(["Macross", "Gundam"], "")).toEqual([]);
     });
     test('int', () => {
         expect(utils.copy_type(2, "42")).toEqual(42);

@@ -147,7 +147,7 @@ export function track_info(filters: Array<string>, track: Pick<Track, "tags">): 
  */
 export function copy_type(original, value) {
     if (Array.isArray(original)) {
-        return value.split(",");
+        return value.split(",").filter(x => x);
     } else if(typeof original == 'number') {
         return parseFloat(value);
     } else {
