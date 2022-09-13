@@ -137,7 +137,7 @@ const subscriptions = (state: State): Array<Subscription> => [
                 // don't update time while on the settings screen, see #117
                 return state;
             }
-            window.state = state;
+            (window as any).state = state;
             return { ...state, now: Date.now()/1000 };
         },
     })
