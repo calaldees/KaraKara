@@ -182,9 +182,9 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        <span class={"count"}>
+        {item.start_time && <span class={"count"}>
             {time_until(item.start_time)}
-        </span>
+        </span>}
 
         <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
             <i class={"fas fa-times-circle"} />

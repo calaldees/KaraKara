@@ -18,9 +18,9 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        <span class={"count"}>
+        {item.start_time && <span class={"count"}>
             {time_until(item.start_time)}
-        </span>
+        </span>}
 
         {state.session_id == item.session_id && (
             <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
