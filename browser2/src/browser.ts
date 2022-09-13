@@ -5,6 +5,7 @@ import {
     LocalStorageLoader,
     LocalStorageSaver,
 } from "@shish2k/hyperapp-localstorage";
+import { Interval } from "hyperapp-fx";
 
 import { Root } from "./screens/root";
 import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
@@ -35,6 +36,7 @@ let state: State = {
     booth: false,
     widescreen: isWidescreen(),
     scroll_stack: [],
+    now: Date.now()/1000,
 
     // login
     session_id: null,
@@ -128,6 +130,13 @@ const subscriptions = (state: State): Array<Subscription> => [
         widescreen: isWidescreen(),
     })),
     BeLoggedIn(state.room_name, state.room_password),
+    Interval({
+        every: 1000,
+        action(state: State, timestamp: number): Dispatchable {
+            window.state = state;
+            return { ...state, now: Date.now()/1000 };
+        },
+    })
 ];
 
 app({

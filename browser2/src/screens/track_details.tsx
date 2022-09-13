@@ -56,13 +56,13 @@ const UnselectTrack = (state: State): Dispatchable => [
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
-        {current_and_future(state.queue).find((i) => i.track_id == track.id) && (
+        {current_and_future(state.now, state.queue).find((i) => i.track_id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
                 onclick={(state: State): State => ({ ...state, action: "enqueue" })}
-                disabled={current_and_future(state.queue).find((i) => i.track_id == track.id)}
+                disabled={current_and_future(state.now, state.queue).find((i) => i.track_id == track.id)}
             >
                 Enqueue
             </button>

@@ -183,7 +183,7 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <span class={"performer"}>{item.performer_name}</span>
         </span>
         {item.start_time && <span class={"count"}>
-            {time_until(item.start_time)}
+            {time_until(state.now, item.start_time)}
         </span>}
 
         <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
@@ -219,7 +219,7 @@ export const Control = ({ state }: { state: State }): VNode => (
         // navRight={}
         footer={<ControlButtons />}
     >
-        {state.queue.length == 0 ? (
+        {current_and_future(state.now, state.queue).length == 0 ? (
             <div class="readme">
                 <h1>READ ME :)</h1>
                 <ol>
@@ -237,7 +237,7 @@ export const Control = ({ state }: { state: State }): VNode => (
                 </ol>
             </div>
         ) : (
-            <Playlist state={state} queue={current_and_future(state.queue)} />
+            <Playlist state={state} queue={current_and_future(state.now, state.queue)} />
         )}
     </Screen>
 );

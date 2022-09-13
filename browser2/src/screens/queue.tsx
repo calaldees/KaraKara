@@ -19,7 +19,7 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <span class={"performer"}>{item.performer_name}</span>
         </span>
         {item.start_time && <span class={"count"}>
-            {time_until(item.start_time)}
+            {time_until(state.now, item.start_time)}
         </span>}
 
         {state.session_id == item.session_id && (
@@ -86,6 +86,6 @@ export const Queue = ({ state }: { state: State }): VNode => (
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Now Playing"}
     >
-        <Playlist state={state} queue={current_and_future(state.queue)} />
+        <Playlist state={state} queue={current_and_future(state.now, state.queue)} />
     </Screen>
 );

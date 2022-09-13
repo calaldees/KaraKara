@@ -84,7 +84,7 @@ export const Screen = (
         </header>
         <Notification state={state} />
         <PriorityToken state={state} />
-        <YoureNext state={state} queue={current_and_future(state.queue)} />
+        <YoureNext state={state} queue={current_and_future(state.now, state.queue)} />
         <article>{children}</article>
         {footer}
     </main>

@@ -10,10 +10,10 @@ export function attachment_path(root: string, attachment: Attachment): string {
 /**
  * turn timestamp into into "{X}min / {X}sec [in the future]"
  */
-export function time_until(time: number|null): string {
+export function time_until(now: number, time: number|null): string {
     if(!time) return "";
 
-    const seconds_total = Math.floor(time - Date.now()/1000);
+    const seconds_total = Math.floor(time - now);
     const seconds = seconds_total % 60;
     const minutes = Math.floor(seconds_total / 60);
     if (minutes > 1) {
@@ -159,6 +159,6 @@ export function copy_type(original, value) {
  * Given a list of all tracks in the queue, find which ones are in-progress
  * now or queued for the future
  */
-export function current_and_future(tracks: Array<QueueItem>): Array<QueueItem> {
-    return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > Date.now()/1000));
+export function current_and_future(now: number, tracks: Array<QueueItem>): Array<QueueItem> {
+    return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > now));
 }

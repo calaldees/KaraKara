@@ -44,11 +44,11 @@ describe('short_date', () => {
 
 describe('time_until', () => {
     test('should basically work', () => {
-        expect(utils.time_until((Date.now()/1000) + 125)).toEqual("In 2 mins");
-        expect(utils.time_until((Date.now()/1000) + 65)).toEqual("In 1 min");
-        expect(utils.time_until((Date.now()/1000) + 30)).toEqual("In 30 secs");
-        expect(utils.time_until((Date.now()/1000) + 1)).toEqual("Now");
-        expect(utils.time_until(null)).toEqual("");
+        expect(utils.time_until(0, 125)).toEqual("In 2 mins");
+        expect(utils.time_until(0, 65)).toEqual("In 1 min");
+        expect(utils.time_until(0, 30)).toEqual("In 30 secs");
+        expect(utils.time_until(0, 1)).toEqual("Now");
+        expect(utils.time_until(0, null)).toEqual("");
     });
 });
 
@@ -216,22 +216,22 @@ describe('current_and_future', () => {
         track_id: "My_Song",
     };
     test('empty', () => {
-        expect(utils.current_and_future([])).toEqual([]);
+        expect(utils.current_and_future(1000, [])).toEqual([]);
     });
     test('past', () => {
-        item.start_time = (Date.now()/1000) - 1000; // started 1000 seconds ago
-        expect(utils.current_and_future([item])).toEqual([]);
+        item.start_time = 123;
+        expect(utils.current_and_future(1000, [item])).toEqual([]);
     });
     test('present', () => {
-        item.start_time = (Date.now()/1000) - 30; // started 30 seconds ago
-        expect(utils.current_and_future([item])).toEqual([item]);
+        item.start_time = 970; // started 30 seconds ago
+        expect(utils.current_and_future(1000, [item])).toEqual([item]);
     });
     test('future', () => {
-        item.start_time = (Date.now()/1000) + 30; // starts later
-        expect(utils.current_and_future([item])).toEqual([item]);
+        item.start_time = 1030; // starts in 30 seconds
+        expect(utils.current_and_future(1000, [item])).toEqual([item]);
     });
     test('stopped', () => {
         item.start_time = null; // item is in a paused queue
-        expect(utils.current_and_future([item])).toEqual([item]);
+        expect(utils.current_and_future(1000, [item])).toEqual([item]);
     });
 });
