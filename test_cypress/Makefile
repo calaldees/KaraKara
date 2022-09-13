@@ -10,6 +10,6 @@ run:
 		-v ${PWD}:/tests:ro \
 		-w /tests \
 		--entrypoint cypress \
-		cypress/included:9.4.1 \
+		cypress/included:10.8.0 \
 			open \
 			--project .
