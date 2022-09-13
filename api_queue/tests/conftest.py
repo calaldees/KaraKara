@@ -5,10 +5,7 @@ import pathlib
 import shutil
 from urllib.parse import urlencode
 
-try:
-    import ujson as json
-except ImportError:
-    import json
+import ujson as json
 
 
 #@pytest.fixture

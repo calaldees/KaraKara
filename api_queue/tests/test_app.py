@@ -1,10 +1,7 @@
 import pytest
 import collections.abc
 
-try:
-    import ujson as json
-except ImportError:
-    import json
+import ujson as json
 
 
 

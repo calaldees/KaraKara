@@ -1,7 +1,9 @@
 import pytest
 
 import datetime
-from api_queue.queue import Queue, QueueItem, QueueManagerCSV, SettingsManager
+
+from api_queue.queue_model import Queue, QueueItem
+
 
 
 @pytest.fixture
@@ -140,10 +142,3 @@ def test_queue_move(qu):
     with pytest.raises(AssertionError) as exc_info:
         qu.move(t4.id, t3.id)
 
-
-@pytest.mark.skip()
-def test_queue_manager():
-    # TODO: finish
-    manager = QueueManagerCSV(settings=SettingsManager())
-    with manager.queue_modify_context('test') as qu:
-        qu.add(QueueItem('Track6', 60, 'TestSession6', 'test_name'))

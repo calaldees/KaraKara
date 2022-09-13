@@ -3,11 +3,7 @@ import contextlib
 from textwrap import dedent
 from pathlib import Path
 
-try:
-    import ujson as json
-except ImportError:
-    import json
-
+import ujson as json
 import sanic
 from sanic_ext import openapi
 from sanic.log import logger as log
@@ -49,7 +45,8 @@ async def tracks_load(_app: sanic.Sanic, _loop):
         _app.ctx.tracks = {}
 
 
-from .queue import QueueManagerCSVAsync, QueueItem, SettingsManager
+from .queue_model import QueueItem
+from .queue_manager import QueueManagerCSVAsync, SettingsManager
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     path_queue = _app.config.get('PATH_QUEUE')
@@ -95,7 +92,7 @@ app.error_handler = CustomErrorHandler()
 
 
 
-from .queue import LoginManager, User
+from .queue_manager import LoginManager, User
 @app.middleware("request")
 async def attach_session_id_request(request):
     request.ctx.session_id = request.cookies.get("session_id") or str(random.random())
