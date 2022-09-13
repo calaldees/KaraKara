@@ -133,6 +133,10 @@ const subscriptions = (state: State): Array<Subscription> => [
     Interval({
         every: 1000,
         action(state: State, timestamp: number): Dispatchable {
+            if(state.screen == "room_settings") {
+                // don't update time while on the settings screen, see #117
+                return state;
+            }
             window.state = state;
             return { ...state, now: Date.now()/1000 };
         },
