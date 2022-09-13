@@ -124,8 +124,6 @@ async def push_settings_to_mqtt(request, queue_id):
 
 # Routes -----------------------------------------------------------------------
 
-
-
 @app.get("/")
 @openapi.definition(
     response=openapi.definitions.Response('redirect to openapi spec', status=302),
@@ -134,7 +132,7 @@ async def root(request):
     return sanic.response.redirect('/docs')
 
 
-# Queue ------------------------------------------------------------------------
+# Queue -----------------------------------------------------------------------
 
 queue_blueprint = sanic.blueprints.Blueprint('queue', url_prefix='/queue')
 app.blueprint(queue_blueprint)
@@ -151,6 +149,7 @@ class QueueItemJson:
     id: int
 
 
+# Queue / Login ---------------------------------------------------------------
 
 from .queue import LoginManager, User
 class LoginRequest:
@@ -171,6 +170,8 @@ async def login(request, queue_id):
     return sanic.response.json(user.__dict__)
 
 
+# Queue / Tracks --------------------------------------------------------------
+
 @queue_blueprint.get("/<queue_id:str>/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
@@ -179,19 +180,7 @@ async def tracks(request, queue_id):
     return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
 
 
-@queue_blueprint.get("/<queue_id:str>/queue.csv")
-@openapi.definition(
-    response=openapi.definitions.Response({"text/csv": str}),
-)
-async def queue_csv(request, queue_id):
-    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
-
-@queue_blueprint.get("/<queue_id:str>/queue.json")
-@openapi.definition(
-    response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
-)
-async def queue_json(request, queue_id):
-    return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
+# Queue / Settings ------------------------------------------------------------
 
 @queue_blueprint.get("/<queue_id:str>/settings.json")
 @openapi.definition(
@@ -213,6 +202,22 @@ async def update_settings(request, queue_id):
         request.app.ctx.settings_manager.set_json(queue_id, request.json)
         return sanic.response.json({})
 
+
+# Queue / Queue ---------------------------------------------------------------
+
+@queue_blueprint.get("/<queue_id:str>/queue.csv")
+@openapi.definition(
+    response=openapi.definitions.Response({"text/csv": str}),
+)
+async def queue_csv(request, queue_id):
+    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
+
+@queue_blueprint.get("/<queue_id:str>/queue.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
+)
+async def queue_json(request, queue_id):
+    return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
 
 
 class QueueItemAdd:
@@ -295,6 +300,8 @@ async def move_queue_item(request, queue_id):
             return sanic.response.json({}, status=201)
 
 
+# Queue / Commands ------------------------------------------------------------
+
 @queue_blueprint.get("/<queue_id:str>/command/<command:([a-z]+).json>")
 @openapi.definition(
     response=[
@@ -313,8 +320,8 @@ async def queue_command(request, queue_id, command):
             getattr(queue, command)()
             return sanic.response.json({'is_playing': bool(queue.is_playing)})
 
-# end Queue --------------------------------------------------------------------
 
+# end Queue --------------------------------------------------------------------
 
 
 if __name__ == '__main__':
