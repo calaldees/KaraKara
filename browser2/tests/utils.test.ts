@@ -205,3 +205,33 @@ describe('copy_type', () => {
         expect(utils.copy_type(12.34, "43.21")).toEqual(43.21);
     });
 });
+
+describe('current_and_future', () => {
+    var item: QueueItem = {
+        id: 4567,
+        performer_name: "test",
+        session_id: "test",
+        start_time: 0,
+        track_duration: 100,
+        track_id: "My_Song",
+    };
+    test('empty', () => {
+        expect(utils.current_and_future([])).toEqual([]);
+    });
+    test('past', () => {
+        item.start_time = (Date.now()/1000) - 1000; // started 1000 seconds ago
+        expect(utils.current_and_future([item])).toEqual([]);
+    });
+    test('present', () => {
+        item.start_time = (Date.now()/1000) - 30; // started 30 seconds ago
+        expect(utils.current_and_future([item])).toEqual([item]);
+    });
+    test('future', () => {
+        item.start_time = (Date.now()/1000) + 30; // starts later
+        expect(utils.current_and_future([item])).toEqual([item]);
+    });
+    test('stopped', () => {
+        item.start_time = null; // item is in a paused queue
+        expect(utils.current_and_future([item])).toEqual([item]);
+    });
+});

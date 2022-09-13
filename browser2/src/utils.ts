@@ -154,3 +154,11 @@ export function copy_type(original, value) {
         return value;
     }
 }
+
+/*
+ * Given a list of all tracks in the queue, find which ones are in-progress
+ * now or queued for the future
+ */
+export function current_and_future(tracks: Array<QueueItem>): Array<QueueItem> {
+    return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > Date.now()/1000));
+}

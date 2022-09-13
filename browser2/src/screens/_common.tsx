@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { GoToScreen } from "../actions";
 import { PopScrollPos } from "../effects";
-import { attachment_path, is_my_song } from "../utils";
+import { attachment_path, current_and_future, is_my_song } from "../utils";
 import * as placeholder from "data-url:../static/placeholder.svg";
 
 export const Notification = ({ state }: { state: State }): VNode =>
@@ -84,7 +84,7 @@ export const Screen = (
         </header>
         <Notification state={state} />
         <PriorityToken state={state} />
-        <YoureNext state={state} queue={state.queue} />
+        <YoureNext state={state} queue={current_and_future(state.queue)} />
         <article>{children}</article>
         {footer}
     </main>

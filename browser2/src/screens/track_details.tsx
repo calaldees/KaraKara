@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./_common";
-import { attachment_path } from "../utils";
+import { attachment_path, current_and_future } from "../utils";
 import { GoToScreen } from "../actions";
 import { PushScrollPos, PopScrollPos, ApiRequest } from "../effects";
 
@@ -56,13 +56,13 @@ const UnselectTrack = (state: State): Dispatchable => [
 
 const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
     <footer>
-        {state.queue.find((i) => i.track_id == track.id) && (
+        {current_and_future(state.queue).find((i) => i.track_id == track.id) && (
             <div class={"already_queued"}>Track is already queued</div>
         )}
         <div class={"buttons"}>
             <button
                 onclick={(state: State): State => ({ ...state, action: "enqueue" })}
-                disabled={state.queue.find((i) => i.track_id == track.id)}
+                disabled={current_and_future(state.queue).find((i) => i.track_id == track.id)}
             >
                 Enqueue
             </button>

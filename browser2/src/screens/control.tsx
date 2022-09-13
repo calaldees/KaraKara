@@ -2,7 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./_common";
 import { ApiRequest, SendCommand } from "../effects";
 import { RemoveTrack } from "../actions";
-import { time_until } from "../utils";
+import { current_and_future, time_until } from "../utils";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -237,7 +237,7 @@ export const Control = ({ state }: { state: State }): VNode => (
                 </ol>
             </div>
         ) : (
-            <Playlist state={state} queue={state.queue} />
+            <Playlist state={state} queue={current_and_future(state.queue)} />
         )}
     </Screen>
 );

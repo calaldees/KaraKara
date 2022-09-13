@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import { shuffle, is_my_song, time_until } from "../utils";
+import { shuffle, is_my_song, time_until, current_and_future } from "../utils";
 import { RemoveTrack } from "../actions";
 
 const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
@@ -86,6 +86,6 @@ export const Queue = ({ state }: { state: State }): VNode => (
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Now Playing"}
     >
-        <Playlist state={state} queue={state.queue} />
+        <Playlist state={state} queue={current_and_future(state.queue)} />
     </Screen>
 );
