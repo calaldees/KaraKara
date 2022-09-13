@@ -3,6 +3,7 @@
  */
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
+import { ApiRequest } from "./effects";
 import Cookies from 'js-cookie'
 
 /**
@@ -79,6 +80,39 @@ function _resizeSubscriber(dispatch, props) {
 export function ResizeListener(callback: Dispatchable): Subscription {
     return [_resizeSubscriber, { onresize: callback }];
 }
+
+function _bleSubscriber(dispatch, props) {
+    // subscription is restarted whenever props changes,
+    setTimeout(function () {
+        dispatch((state) => [
+            state,
+            ApiRequest({
+                function: "login",
+                state: state,
+                options: {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        password: state.room_password,
+                    }),
+                },
+                action: (state, response) => ({ ...state, is_admin: true }),
+                exception: (state) => ({ ...state, is_admin: false })
+            })
+        ]);
+    }, 0);
+
+    return function () {
+        // no unsubscribe
+    };
+}
+
+export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+    return [_bleSubscriber, { room_name, room_password }];
+}
+
 
 function _cookieListener(dispatch, props) {
     let oldCookieVal: string | null = null;
