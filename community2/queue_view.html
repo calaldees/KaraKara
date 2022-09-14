@@ -34,6 +34,8 @@
 
 import {h, text, app} from "https://cdn.skypack.dev/hyperapp"
 
+const DATE_OPTIONS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+
 const urlParams = new URLSearchParams(window.location.search);
 const URL = (urlParams.get('url') || '').replace(/\/$/, ''); // Get api url (and remove trailing slash if present)
 
@@ -66,16 +68,22 @@ const hashChangeSubscriber = (dispatch, options) => {
 
 
 const QueueItem = data => h("tr", {}, [
-	h("td", {}, 
-		h("img", {src: `${URL}/files/${data?.attachments?.image[1].path}`})
-	),
+	h("td", {}, [
+		//h("img", {src: `${URL}/files/${data?.attachments?.image[0].path}`}),
+		h("img", {src: `${URL}/files/${data?.attachments?.image[1].path}`}),
+		//h("img", {src: `${URL}/files/${data?.attachments?.image[2].path}`}),
+		//h("img", {src: `${URL}/files/${data?.attachments?.image[3].path}`}),
+	]),
 	h("td", {}, text(data?.tags?.title)),
+	h("td", {}, text(data.track_duration)),
+	h("td", {}, text(data.performer_name)),
+	h("td", {}, text((new Date(data.start_time*1000)).toLocaleDateString("en-GB", DATE_OPTIONS))),
 ])
 
 
 const viewRoot = (state) => {
 	return h("table", {}, [
-		h("tr", {}, ['Image', 'Title'].map(heading => h("th", {}, text(heading)))),
+		h("tr", {}, ['Image', 'Title','Duration','Performer','Start'].map(heading => h("th", {}, text(heading)))),
 		...state.queue.map((queue_item) => QueueItem({...queue_item, ...state.tracks[queue_item.track_id]}))
 	])
 }
