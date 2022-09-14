@@ -1,0 +1,106 @@
+<!DOCTYPE html><html>
+<head>
+	<meta charset="utf-8" />
+	<link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,....==" />
+	<title>viewer</title>
+	<style>
+		html {
+			font-family: sans-serif;
+		}
+		p {
+			margin:0;
+			padding:0;
+		}
+		table {
+			border-spacing: 0;
+			border-collapse: collapse;
+			border:solid #000 !important;
+			border-width:1px 0 0 1px !important;
+		}
+		table td, th {
+			border:solid #000 !important;
+			border-width:0 1px 1px 0 !important;
+			vertical-align: top;
+		}
+		table img {
+			max-width: 10em;
+			max-height: 5em;
+		}
+	</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="module">
+
+import {h, text, app} from "https://cdn.skypack.dev/hyperapp"
+
+const urlParams = new URLSearchParams(window.location.search);
+const URL = (urlParams.get('url') || '').replace(/\/$/, ''); // Get api url (and remove trailing slash if present)
+
+const state = {
+	queue_id: window.location.hash,
+	queue: [],
+	tracks: {},
+}
+
+const fetchJson = (dispatch, options) => {
+	fetch(options.url)
+	.then(response => response.json())
+	.then(data => dispatch(options.action, data))
+}
+const jsonFetcher = (url, action) => [fetchJson, {url, action}]
+
+
+const actionQueueId = (state, queue_id) => ({...state, queue_id})
+
+const hashChangeSubscriber = (dispatch, options) => {
+	const handler = event => {
+		dispatch(actionQueueId, window.location.hash)
+	}
+	addEventListener('hashchange', handler)
+	return () => removeEventListener('hashchange', handler)
+}
+
+
+const QueueItem = data => h("tr", {}, [
+	h("td", {}, 
+		h("img", {src: `${URL}/files/${data?.attachments?.image[1].path}`})
+	),
+	h("td", {}, text(data?.tags?.title)),
+])
+
+
+const viewRoot = (state) => {
+	return h("table", {}, [
+		h("tr", {}, ['Image', 'Title'].map(heading => h("th", {}, text(heading)))),
+		...state.queue.map((queue_item) => QueueItem({...queue_item, ...state.tracks[queue_item.track_id]}))
+	])
+}
+
+
+const receiveQueue = (state, data) => ({...state, queue: data})
+const receiveTracks = (state, data) => ({...state, tracks: data})
+
+
+
+/*
+const Select = (state, selected) => [
+  {...state, selected},
+  jsonFetcher(`https://karakara.uk/queue/${state.queue_id}/queue.json`, receiveQueue),
+]
+*/
+
+app({
+	init: [
+		state,
+		jsonFetcher(`${URL}/files/tracks.json`, receiveTracks),
+		jsonFetcher(`${URL}/queue/test/queue.json`, receiveQueue),  // TEMP this should be state.queue_id ??? how?
+	],
+	node: document.body,
+	subscriptions: state => [
+		[hashChangeSubscriber]
+	],
+	view: viewRoot
+})
+
+</script></body></html>
