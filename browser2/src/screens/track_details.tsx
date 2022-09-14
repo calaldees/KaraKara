@@ -8,9 +8,8 @@ import { PushScrollPos, PopScrollPos, ApiRequest } from "../effects";
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
-const AddBookmark = (state: State, track_id: string, event): State => ({
+const AddBookmark = (state: State, track_id: string): State => ({
     ...state,
-    notification: { text: "" + event, style: "warning" },
     bookmarks: state.bookmarks.concat([track_id]),
 });
 
