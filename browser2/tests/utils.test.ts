@@ -47,7 +47,7 @@ describe('time_until', () => {
         expect(utils.time_until(0, 125)).toEqual("In 2 mins");
         expect(utils.time_until(0, 65)).toEqual("In 1 min");
         expect(utils.time_until(0, 30)).toEqual("In 30 secs");
-        expect(utils.time_until(0, 1)).toEqual("Now");
+        expect(utils.time_until(0, 0)).toEqual("Now");
         expect(utils.time_until(0, null)).toEqual("");
     });
 });
