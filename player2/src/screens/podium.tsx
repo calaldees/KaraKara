@@ -18,7 +18,7 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
 const ProgressBar = ({now, start_time, duration}: {now: number, start_time: number, duration: number}): VNode => (
     <div
         class={"progressBar"}
-        style={{"background-position": percent(now - start_time, duration)}}
+        style={{"background-position": percent(duration - (now - start_time), duration)}}
     >
         Track Playing
         <small>
