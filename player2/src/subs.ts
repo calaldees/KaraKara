@@ -45,20 +45,7 @@ export function getMQTTListener(state: State): Subscription | null {
                     };
                 case "queue":
                     const new_queue = JSON.parse(data).filter(queue_item => state.track_list.hasOwnProperty(queue_item.track_id));
-                    // if the first song in the queue has changed, stop playing
-                    if (
-                        state.queue.length === 0 ||
-                        new_queue.length === 0 ||
-                        state.queue[0].id !== new_queue[0].id
-                    ) {
-                        return {
-                            ...state,
-                            queue: new_queue,
-                            playing: false,
-                        };
-                    } else {
-                        return { ...state, queue: new_queue };
-                    }
+                    return { ...state, queue: new_queue };
                 default:
                     return state;
             }

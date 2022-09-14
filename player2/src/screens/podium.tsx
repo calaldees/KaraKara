@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
-import { s_to_mns } from "../utils";
-import { AutoplayCountdown, Video } from "./_common";
+import { current_and_future, s_to_mns } from "../utils";
+import { Video } from "./_common";
 import { SendCommand } from "../effects";
 
 
@@ -10,8 +10,8 @@ import { SendCommand } from "../effects";
 export const PodiumScreen = ({ state }: { state: State }): VNode => (
     <PodiumInternal
         state={state}
-        track={state.track_list[state.queue[0].track_id]}
-        queue_item={state.queue[0]}
+        track={state.track_list[current_and_future(state.now, state.queue)[0].track_id]}
+        queue_item={current_and_future(state.now, state.queue)[0]}
     />
 );
 
@@ -82,10 +82,10 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
             />
         </div>
 
-        {state.queue[0].start_time ? (
-            state.queue[0].start_time < state.now ? 
-                <ProgressBar now={state.now} start_time={state.queue[0].start_time} duration={track.duration} /> :
-                <AutoplayBar now={state.now} start_time={state.queue[0].start_time} track_space={state.settings["track_space"]} />
+        {queue_item.start_time ? (
+            queue_item.start_time < state.now ?
+                <ProgressBar now={state.now} start_time={queue_item.start_time} duration={track.duration} /> :
+                <AutoplayBar now={state.now} start_time={queue_item.start_time} track_space={state.settings["track_space"]} />
         ) : (
             <StartBar />
         )}

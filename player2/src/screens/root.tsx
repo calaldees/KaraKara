@@ -4,6 +4,7 @@ import { VideoScreen } from "./video";
 import { PodiumScreen } from "./podium";
 import { SettingsMenu } from "./settings";
 import { PreviewScreen } from "./preview";
+import { current_and_future } from "../utils";
 
 function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
@@ -11,6 +12,7 @@ function percent(a: number, b: number): string {
 
 export function Root(state: State): VNode {
     let screen = <section>Unknown state :(</section>;
+    let visible_queue_length = current_and_future(state.now, state.queue).length;
 
     if (state.download_size)
         screen = (
@@ -31,11 +33,11 @@ export function Root(state: State): VNode {
                 <h1>KaraKara</h1>
             </section>
         );
-    else if (state.queue.length === 0) screen = <TitleScreen state={state} />;
+    else if (visible_queue_length === 0) screen = <TitleScreen state={state} />;
     else if (state.podium) screen = <PodiumScreen state={state} />;
-    else if (state.queue.length > 0 && !state.playing)
+    else if (visible_queue_length > 0 && !state.playing)
         screen = <PreviewScreen state={state} />;
-    else if (state.queue.length > 0 && state.playing)
+    else if (visible_queue_length > 0 && state.playing)
         screen = <VideoScreen state={state} />;
 
     let errors: Array<string> = [];

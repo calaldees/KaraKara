@@ -3,6 +3,7 @@ import {
     attachment_path,
     time_until,
     short_date,
+    current_and_future,
 } from "../utils";
 import { AutoplayCountdown, Video } from "./_common";
 
@@ -25,11 +26,12 @@ function SetPreviewVolume(state: State, event): Dispatchable {
 export const PreviewScreen = ({ state }: { state: State }): VNode => (
     <PreviewInternal
         state={state}
-        track={state.track_list[state.queue[0].track_id]}
+        queue={current_and_future(state.now, state.queue)}
+        track={state.track_list[current_and_future(state.now, state.queue)[0].track_id]}
     />
 );
 
-const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNode => (
+const PreviewInternal = ({ state, queue, track }: { state: State, queue: Array<QueueItem>, track: Track }): VNode => (
     <section key="preview" class={"screen_preview"}>
         <div class="preview_holder">
             <Video
@@ -42,16 +44,19 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>
-                {state.queue.slice(0, show_tracks).map((item) => (
+                {queue
+                .slice(0, show_tracks)
+                .map(item => ({item: item, track: state.track_list[item.track_id]}))
+                .map(({item, track}) => (
                     <li key={item.id}>
-                        <img src={attachment_path(state.root, state.track_list[item.track_id].attachments.image[0])} />
+                        <img src={attachment_path(state.root, track.attachments.image[0])} />
                         <p class="title">
-                            {state.track_list[item.track_id].tags.title[0]}
+                            {track.tags.title[0]}
                         </p>
                         <p class="from">
                             {
-                                state.track_list[item.track_id].tags.from?.[0] ||
-                                state.track_list[item.track_id].tags.artist?.join(", ") ||
+                                track.tags.from?.[0] ||
+                                track.tags.artist?.join(", ") ||
                                 ""
                             }
                         </p>
@@ -65,10 +70,10 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
                 ))}
             </ol>
         </div>
-        {state.queue.length > show_tracks && (
+        {queue.length > show_tracks && (
             <div id="playlist_obscured" key={"playlist_obscured"}>
                 <ul>
-                    {state.queue.slice(show_tracks).map((item) => (
+                    {queue.slice(show_tracks).map((item) => (
                         <li key={item.id}>{item.performer_name}</li>
                     ))}
                 </ul>

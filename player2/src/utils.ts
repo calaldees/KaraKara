@@ -56,3 +56,11 @@ export function mqtt_login_info(state: State): Dictionary<string> {
 export function short_date(long_date: string): string {
     return long_date.split("T")[1].substring(0, 5);
 }
+
+/*
+ * Given a list of all tracks in the queue, find which ones are in-progress
+ * now or queued for the future
+ */
+export function current_and_future(now: number, tracks: Array<QueueItem>): Array<QueueItem> {
+    return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > now));
+}
