@@ -22,7 +22,7 @@ export function time_until(now: number, time: number|null): string {
     if (minutes == 1) {
         return `In ${minutes} min`;
     }
-    if (seconds < 5) {
+    if (seconds <= 0) {
         return "Now";
     }
     return `In ${seconds} secs`;

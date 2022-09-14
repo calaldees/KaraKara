@@ -13,7 +13,7 @@
     if (minutes == 1) {
         return `In ${minutes} min`;
     }
-    if (seconds < 5) {
+    if (seconds <= 0) {
         return "Now";
     }
     return `In ${seconds} secs`;
