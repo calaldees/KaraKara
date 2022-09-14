@@ -6,8 +6,7 @@ export const Video = ({state, track, ...kwargs}) => (
         autoPlay={true}
         poster={attachment_path(state.root, track.attachments.image[0])}
         // ensure the video element gets re-created when <source> changes
-        // and also when the podium switches from "preview" to "play" mode
-        key={track.id + state.playing}
+        key={track.id}
         {...kwargs}
     >
         {track.attachments.video.map(a =>

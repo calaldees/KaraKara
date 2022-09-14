@@ -68,8 +68,11 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
             <Video
                 state={state}
                 track={track}
-                autoPlay={true}
                 muted={true}
+                // ensure the video element gets re-created when switching
+                // between queue items (even if it's the same track), and
+                // also when the podium switches from "preview" to "play" mode
+                key={queue_item.id + "-" + (queue_item.start_time && queue_item.start_time < state.now)}
             />
         </div>
 
