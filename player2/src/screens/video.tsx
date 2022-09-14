@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { current_and_future } from "../utils";
+import { current_and_future, percent } from "../utils";
 import { Video } from "./_common"
 
 
@@ -22,11 +22,7 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
         />
         <div
             id="seekbar"
-            style={{
-                left:
-                    ((state.now - (queue_item.start_time ?? state.now)) / track.duration) * 100 +
-                    "%",
-            }}
+            style={{left: percent(state.now - (queue_item.start_time ?? state.now), track.duration)}}
         />
         <div id="pimpkk" class="pimp">
             KaraKara

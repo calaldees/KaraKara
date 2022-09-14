@@ -54,6 +54,8 @@ MAIN {
   border: 1px solid black;
   border-bottom: 0;
   width: 4px;
+  // NOTE: keep the time here in sync with the frequency of state updates
+  transition: left 1s linear;
 }
 
 ::cue(v[voice='active']) {

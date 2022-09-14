@@ -475,6 +475,8 @@ $LIGHT: #29EDF2;
 				rgba($DARK, 0.5) 50%
 			);
 			background-size: 200% 100%;
+			// NOTE: keep the time here in sync with the frequency of state updates
+			transition: background-position 1s linear;
 			SMALL {
 				font-size: 3vh;
 				display: block;
