@@ -8,7 +8,7 @@ import { current_and_future, percent } from "../utils";
 
 export function Root(state: State): VNode {
     let screen = <section>Unknown state :(</section>;
-    let visible_queue_length = current_and_future(state.now, state.queue).length;
+    let visible_queue = current_and_future(state.now, state.queue);
 
     if (state.download_size)
         screen = (
@@ -29,11 +29,11 @@ export function Root(state: State): VNode {
                 <h1>KaraKara</h1>
             </section>
         );
-    else if (visible_queue_length === 0) screen = <TitleScreen state={state} />;
+    else if (visible_queue.length === 0) screen = <TitleScreen state={state} />;
     else if (state.podium) screen = <PodiumScreen state={state} />;
-    else if (visible_queue_length > 0 && !state.playing)
+    else if (visible_queue[0].start_time == null || visible_queue[0].start_time > state.now)
         screen = <PreviewScreen state={state} />;
-    else if (visible_queue_length > 0 && state.playing)
+    else
         screen = <VideoScreen state={state} />;
 
     let errors: Array<string> = [];

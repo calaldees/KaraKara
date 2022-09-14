@@ -5,7 +5,7 @@ import {
     short_date,
     current_and_future,
 } from "../utils";
-import { AutoplayCountdown, Video } from "./_common";
+import { Video } from "./_common";
 
 
 const show_tracks = 5;
@@ -40,7 +40,6 @@ const PreviewInternal = ({ state, queue, track }: { state: State, queue: Array<Q
                 onloadstart={SetPreviewVolume}
                 loop={true}
             />
-            <AutoplayCountdown state={state} show_if_disabled={false} />
         </div>
         <div id="playlist" key={"playlist"}>
             <ol>

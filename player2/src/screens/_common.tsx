@@ -1,19 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { attachment_path } from "../utils";
 
-export const AutoplayCountdown = ({
-    state,
-    show_if_disabled,
-}: {
-    state: State;
-    show_if_disabled: boolean;
-}): VNode =>
-    (
-        <small>
-            (TODO: if next track has start_time set, show countdown)
-        </small>
-    );
-
 export const Video = ({state, track, ...kwargs}) => (
     <video
         autoPlay={true}

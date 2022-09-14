@@ -55,9 +55,6 @@ const state: State = {
 
     // playlist screen
     queue: [],
-
-    // video screen
-    playing: false,
 };
 
 const init: Dispatchable = [

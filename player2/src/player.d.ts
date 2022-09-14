@@ -61,9 +61,6 @@ type State = {
 
     // playlist screen
     queue: Array<QueueItem>,
-
-    // video screen
-    playing: boolean,
 }
 
 declare type Action = import('hyperapp').Action<State>;
