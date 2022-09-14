@@ -11,7 +11,7 @@ export function attachment_path(root: string, attachment: Attachment): string {
  * turn timestamp into into "{X}min / {X}sec [in the future]"
  */
 export function time_until(now: number, time: number|null): string {
-    if(!time) return "";
+    if(time === null) return "";
 
     const seconds_total = Math.floor(time - now);
     const seconds = seconds_total % 60;
