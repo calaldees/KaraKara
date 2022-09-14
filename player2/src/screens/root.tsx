@@ -4,11 +4,7 @@ import { VideoScreen } from "./video";
 import { PodiumScreen } from "./podium";
 import { SettingsMenu } from "./settings";
 import { PreviewScreen } from "./preview";
-import { current_and_future } from "../utils";
-
-function percent(a: number, b: number): string {
-    return Math.round((a / b) * 100) + "%";
-}
+import { current_and_future, percent } from "../utils";
 
 export function Root(state: State): VNode {
     let screen = <section>Unknown state :(</section>;

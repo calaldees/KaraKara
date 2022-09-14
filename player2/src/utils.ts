@@ -64,3 +64,7 @@ export function short_date(long_date: string): string {
 export function current_and_future(now: number, tracks: Array<QueueItem>): Array<QueueItem> {
     return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > now));
 }
+
+export function percent(a: number, b: number): string {
+    return Math.round((a / b) * 100) + "%";
+}

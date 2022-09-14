@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { current_and_future, s_to_mns } from "../utils";
+import { current_and_future, percent, s_to_mns } from "../utils";
 import { Video } from "./_common";
 import { SendCommand } from "../effects";
 
@@ -18,12 +18,7 @@ export const PodiumScreen = ({ state }: { state: State }): VNode => (
 const ProgressBar = ({now, start_time, duration}: {now: number, start_time: number, duration: number}): VNode => (
     <div
         class={"progressBar"}
-        style={{
-            "background-position":
-                100 -
-                ((now - start_time) / duration) * 100 +
-                "%",
-        }}
+        style={{"background-position": percent(now - start_time, duration)}}
     >
         Track Playing
         <small>
@@ -37,16 +32,11 @@ const AutoplayBar = ({now, start_time, track_space}: {now: number, start_time: n
     <div
         class={"startButton"}
         onclick={(state) => [state, SendCommand(state, "play")]}
-        style={{
-            "background-position":
-                100 -
-                ((start_time - now) / track_space) *
-                100 +
-                "%",
-        }}
+        style={{"background-position": percent(start_time - now, track_space)}}
     >
         <span>
-            Track starts in {s_to_mns(start_time - now)}
+            Press to Start
+            <small>Track autoplays in {s_to_mns(start_time - now)}</small>
         </span>
     </div>
 );
@@ -58,6 +48,7 @@ const StartBar = (): VNode => (
     >
         <span>
             Press to Start
+            <small>Autoplay Disabled</small>
         </span>
     </div>
 );
