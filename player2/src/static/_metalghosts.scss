@@ -142,7 +142,7 @@ $LIGHT: #29EDF2;
 			100% {transform: translateY(120vh) rotate(180deg);}
 		}
 		@keyframes rainccw {
-			0% {transform: translateY(-1vh) rotate(-180deg);}
+			0% {transform: translateY(-1vh) rotate(180deg);}
 			100% {transform: translateY(120vh) rotate(-180deg);}
 		}
 		IMG {
