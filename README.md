@@ -83,19 +83,20 @@ Core components
 ```mermaid
 graph TD
     internet{{internet}}
-
-    internet -- http 443 ---> violet --http 80-->nginx
+    internet -- http 443 ---> violet --http 80--> nginx
+    
     subgraph docker-compose [docker-compose]
         nginx
         mqtt
         processmedia2
         browser2
         player2
+        api_queue
 
         logs[(/logs/)]
-        nginx..->logs
-        processmedia2..->logs
-        api_queue..->logs
+        nginx ..-> logs
+        processmedia2 ..-> logs
+        api_queue ..-> logs
 
         nginx -- http 80 --> browser2
         nginx -- http 80 --> player2
@@ -107,9 +108,9 @@ graph TD
     syncthing --> /media/source/
 
     subgraph filesystem
-      /media/source/[(/media/source/)]
-      /media/meta/[(/media/meta/)]
-      /media/processed/[(/media/processed/)]
+        /media/source/[(/media/source/)]
+        /media/meta/[(/media/meta/)]
+        /media/processed/[(/media/processed/)]
     end
 
     /media/processed/--> nginx
