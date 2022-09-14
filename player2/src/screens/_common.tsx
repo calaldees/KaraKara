@@ -8,16 +8,9 @@ export const AutoplayCountdown = ({
     state: State;
     show_if_disabled: boolean;
 }): VNode =>
-    state.settings["track_space"] === 0 ? (
-        show_if_disabled && <small>(autoplay disabled)</small>
-    ) : (
+    (
         <small>
-            (autoplay in{" "}
-            {Math.ceil(
-                state.settings["track_space"] -
-                state.progress,
-            )}{" "}
-            seconds)
+            (TODO: if next track has start_time set, show countdown)
         </small>
     );
 

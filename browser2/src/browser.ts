@@ -140,7 +140,7 @@ const subscriptions = (state: State): Array<Subscription> => [
             (window as any).state = state;
             return { ...state, now: Date.now()/1000 };
         },
-    })
+    }),
 ];
 
 app({

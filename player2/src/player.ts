@@ -1,5 +1,6 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
+import { Interval } from "hyperapp-fx";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
 import {
     LocalStorageLoader,
@@ -9,7 +10,6 @@ import {
 import { Root } from "./screens/root";
 import {
     getMQTTListener,
-    IntervalListener,
     KeyboardListener,
     BeLoggedIn,
 } from "./subs";
@@ -47,6 +47,7 @@ const state: State = {
         "track_space": 10,
         "event_end": null,
     },
+    now: Date.now()/1000,
 
     // loading screen
     download_size: null,
@@ -57,8 +58,6 @@ const state: State = {
 
     // video screen
     playing: false,
-    paused: false,
-    progress: 0,
 };
 
 const init: Dispatchable = [
@@ -100,12 +99,14 @@ const subscriptions = (state: State): Array<Subscription> => [
     LocalStorageSaver("room_password", state.room_password),
     KeyboardListener,
     getMQTTListener(state),
-    state.audio_allowed &&
-    !state.paused &&
-    !state.playing &&
-    state.settings["track_space"] !== 0 &&
-    IntervalListener,
     BeLoggedIn(state.room_name, state.room_password),
+    Interval({
+        every: 1000,
+        action(state: State, timestamp: number): Dispatchable {
+            (window as any).state = state;
+            return { ...state, now: Date.now()/1000 };
+        },
+    }),
 ];
 
 app({

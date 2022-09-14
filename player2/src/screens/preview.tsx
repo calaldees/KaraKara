@@ -58,7 +58,7 @@ const PreviewInternal = ({ state, track }: { state: State, track: Track }): VNod
                         <p class="performer">{item.performer_name}</p>
                         <p class="time">
                             <span>
-                                {time_until(item.start_time)}
+                                {time_until(state.now, item.start_time)}
                             </span>
                         </p>
                     </li>

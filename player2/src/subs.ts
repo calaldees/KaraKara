@@ -1,15 +1,7 @@
-import {
-    Dequeue,
-    Pause,
-    Play,
-    SeekBackwards,
-    SeekForwards,
-    Stop,
-} from "./actions";
-import { Keyboard, Interval } from "hyperapp-fx";
+import { Keyboard } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
-import { ApiRequest } from "./effects";
+import { ApiRequest, SendCommand } from "./effects";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -63,8 +55,6 @@ export function getMQTTListener(state: State): Subscription | null {
                             ...state,
                             queue: new_queue,
                             playing: false,
-                            paused: false,
-                            progress: 0,
                         };
                     } else {
                         return { ...state, queue: new_queue };
@@ -84,41 +74,35 @@ export const KeyboardListener = Keyboard({
         if (state.show_settings) {
             return state;
         }
-        let action: CallableFunction | null = null;
+        let action: Dispatchable | null = null;
         switch (event.key) {
             case "s":
-                action = Dequeue;
-                break; // skip
+                action = [state, SendCommand(state, "skip")];
+                break;
             case "Enter":
-                action = Play;
+                action = [state, SendCommand(state, "play")];
                 break;
             case "Escape":
-                action = Stop;
+                action = [state, SendCommand(state, "stop")];
                 break;
             case "ArrowLeft":
-                action = SeekBackwards;
+                action = [state, SendCommand(state, "seek_forwards")];
                 break;
             case "ArrowRight":
-                action = SeekForwards;
+                action = [state, SendCommand(state, "seek_backwards")];
                 break;
             case " ":
-                action = Pause;
+                action = [state, SendCommand(state, "pause")];
                 break;
         }
         if (action) {
             event.preventDefault();
-            return action(state);
+            return action;
         }
         return state;
     },
 });
 
-export const IntervalListener = Interval({
-    every: 200,
-    action(state: State, timestamp): Dispatchable {
-        return { ...state, progress: state.progress + 1 / 5 };
-    },
-});
 
 function _bleSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,

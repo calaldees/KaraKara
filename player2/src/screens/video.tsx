@@ -3,14 +3,6 @@ import { Video } from "./_common"
 
 
 ///////////////////////////////////////////////////////////////////////
-// Actions
-
-function UpdateProgress(state: State, event): Dispatchable {
-    return { ...state, progress: event.target.currentTime };
-}
-
-
-///////////////////////////////////////////////////////////////////////
 // Views
 
 export const VideoScreen = ({ state }: { state: State }): VNode => (
@@ -26,13 +18,12 @@ const VideoInternal = ({ state, track, queue_item }: { state: State, track: Trac
         <Video
             state={state}
             track={track}
-            ontimeupdate={UpdateProgress}
         />
         <div
             id="seekbar"
             style={{
                 left:
-                    (state.progress / track.duration) * 100 +
+                    ((state.now - (state.queue[0].start_time ?? state.now)) / track.duration) * 100 +
                     "%",
             }}
         />

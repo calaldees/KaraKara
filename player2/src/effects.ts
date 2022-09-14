@@ -3,8 +3,6 @@
  * http request, etc) and we'll update the app state some time
  * later, after we get a response.
  */
-import { MQTTPublish } from "@shish2k/hyperapp-mqtt";
-import { mqtt_login_info } from "./utils";
 
 function apiRequestEffect(dispatch, props) {
     dispatch((state) => ({

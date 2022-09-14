@@ -53,6 +53,7 @@ type State = {
     fullscreen: boolean,
     audio_allowed: boolean,
     settings: Dictionary<any>,
+    now: number,
 
     // loading screen
     download_size: number | null,
@@ -63,8 +64,6 @@ type State = {
 
     // video screen
     playing: boolean,
-    paused: boolean,
-    progress: number,
 }
 
 declare type Action = import('hyperapp').Action<State>;
