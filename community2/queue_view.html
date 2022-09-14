@@ -38,7 +38,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const URL = (urlParams.get('url') || '').replace(/\/$/, ''); // Get api url (and remove trailing slash if present)
 
 const state = {
-	queue_id: window.location.hash,
+	queue_id: undefined,
 	queue: [],
 	tracks: {},
 }
@@ -51,11 +51,14 @@ const fetchJson = (dispatch, options) => {
 const jsonFetcher = (url, action) => [fetchJson, {url, action}]
 
 
-const actionQueueId = (state, queue_id) => ({...state, queue_id})
+const actionQueueId = (state, queue_id) => ([
+    {...state, queue_id},
+    jsonFetcher(`${URL}/queue/${queue_id}/queue.json`, receiveQueue),
+])
 
 const hashChangeSubscriber = (dispatch, options) => {
 	const handler = event => {
-		dispatch(actionQueueId, window.location.hash)
+		dispatch(actionQueueId, window.location.hash.replace('#',''))
 	}
 	addEventListener('hashchange', handler)
 	return () => removeEventListener('hashchange', handler)
@@ -82,19 +85,11 @@ const receiveQueue = (state, data) => ({...state, queue: data})
 const receiveTracks = (state, data) => ({...state, tracks: data})
 
 
-
-/*
-const Select = (state, selected) => [
-  {...state, selected},
-  jsonFetcher(`https://karakara.uk/queue/${state.queue_id}/queue.json`, receiveQueue),
-]
-*/
-
 app({
 	init: [
 		state,
 		jsonFetcher(`${URL}/files/tracks.json`, receiveTracks),
-		jsonFetcher(`${URL}/queue/test/queue.json`, receiveQueue),  // TEMP this should be state.queue_id ??? how?
+		[(dispatch, options) => dispatch(actionQueueId, options.queue_id), {queue_id: window.location.hash.replace('#','')}],  // feels fugly - simplify
 	],
 	node: document.body,
 	subscriptions: state => [
