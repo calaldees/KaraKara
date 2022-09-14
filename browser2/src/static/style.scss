@@ -393,15 +393,26 @@ MAIN.track_list ARTICLE {
   UL {
     .filter_list_group {
       border-bottom: 1px solid $BORDER;
+      background: $BG_DARK;
+      LI {
+        background: $BG_LIGHT;
+      }
+      UL {
+        margin: 0em 0em 0 1em;
+        border-radius: 0;
+        border-top: 0;
+        border-bottom: 0;
+        border-right: 0;
+        box-shadow: none;
+      }
       LI.add_filter {
-        padding-left: 2em;
+        padding-left: 1em;
       }
     }
 
     LI SPAN.track_info {
       .info {
         font-weight: normal;
-
       }
     }
   }
