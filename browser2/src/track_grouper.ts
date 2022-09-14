@@ -125,9 +125,10 @@ export function group_tracks(
         if (Object.keys(tag_values).length > 50) {
             let grouped_groups = {};
             Object.keys(tag_values).forEach(function (x) {
-                if (grouped_groups[x[0]] == undefined)
-                    grouped_groups[x[0]] = {};
-                grouped_groups[x[0]][x] = tag_values[x];
+                var initial = x[0].toUpperCase();
+                if (grouped_groups[initial] == undefined)
+                    grouped_groups[initial] = {};
+                grouped_groups[initial][x] = tag_values[x];
             });
             sections.push([tag_key, { groups: grouped_groups }]);
         }
