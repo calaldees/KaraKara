@@ -2,6 +2,7 @@
  * Subscriptions: functions which take data from the outside world
  */
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
+import { Delay } from "hyperapp-fx";
 import { mqtt_login_info } from "./utils";
 import { ApiRequest } from "./effects";
 
@@ -28,7 +29,7 @@ export function getMQTTListener(state: State): Subscription | null {
                 notification: { text: err.message, style: "error" },
             };
         },
-        message(state: State, msg): State {
+        message(state: State, msg): Dispatchable {
             const topic: string = msg.topic.split("/").pop();
             const data: string = msg.payload.toString();
 
@@ -42,10 +43,19 @@ export function getMQTTListener(state: State): Subscription | null {
 
             switch (topic) {
                 case "notifications":
-                    return {
-                        ...state,
-                        notification: { text: data, style: "warning" },
-                    };
+                    return [
+                        {
+                            ...state,
+                            notification: { text: data, style: "warning" },
+                        },
+                        Delay({
+                            wait: 10000,
+                            action: (state) => ({
+                                ...state,
+                                notification: null,
+                            }),
+                        }),
+                    ];
                 case "settings":
                     return {
                         ...state,

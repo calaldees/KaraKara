@@ -54,6 +54,10 @@ type State = {
     audio_allowed: boolean,
     settings: Dictionary<any>,
     now: number,
+    notification: null | {
+        text: string,
+        style: string,
+    },
 
     // loading screen
     download_size: number | null,

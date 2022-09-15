@@ -48,6 +48,7 @@ const state: State = {
         "event_end": null,
     },
     now: Date.now()/1000,
+    notification: null,
 
     // loading screen
     download_size: null,

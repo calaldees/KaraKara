@@ -1,4 +1,4 @@
-import { Keyboard } from "hyperapp-fx";
+import { Keyboard, Delay } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
 import { ApiRequest, SendCommand } from "./effects";
@@ -35,6 +35,20 @@ export function getMQTTListener(state: State): Subscription | null {
             console.groupEnd();
 
             switch (topic) {
+                case "notifications":
+                    return [
+                        {
+                            ...state,
+                            notification: { text: data, style: "warning" },
+                        },
+                        Delay({
+                            wait: 10000,
+                            action: (state) => ({
+                                ...state,
+                                notification: null,
+                            }),
+                        }),
+                    ];
                 case "settings":
                     return {
                         ...state,
