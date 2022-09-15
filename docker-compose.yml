@@ -23,12 +23,7 @@ services:
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
-            - "traefik.http.routers.karakara.middlewares=kkcors,kkredir"
-            - "traefik.http.middlewares.kkcors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
-            - "traefik.http.middlewares.kkcors.headers.accesscontrolalloworiginlist=*"
-            - "traefik.http.middlewares.kkcors.headers.accesscontrolallowheaders=*"
-            - "traefik.http.middlewares.kkcors.headers.accesscontrolmaxage=100"
-            - "traefik.http.middlewares.kkcors.headers.addvaryheader=true"
+            - "traefik.http.routers.karakara.middlewares=kkredir"
             - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
             - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser2/"
 
