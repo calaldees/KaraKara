@@ -67,6 +67,9 @@ const init: Dispatchable = [
     })),
     ApiRequest({
         url: `${state.root}/files/tracks.json`,
+        options: {
+            credentials: 'omit',
+        },
         state: state,
         progress: (state, { done, size }): State => (
             {

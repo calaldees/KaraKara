@@ -14,7 +14,7 @@ function apiRequestEffect(dispatch, props) {
             : null,
     }));
 
-    props.options["credentials"] = "include";
+    props.options["credentials"] ??= "include";
 
     fetch(props.url, props.options)
         .then((response) => {
