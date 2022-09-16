@@ -1,7 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { current_and_future, percent } from "../utils";
-import { Video } from "./_common"
-
+import { Video } from "./_common";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -9,20 +8,34 @@ import { Video } from "./_common"
 export const VideoScreen = ({ state }: { state: State }): VNode => (
     <VideoInternal
         state={state}
-        track={state.track_list[current_and_future(state.now, state.queue)[0].track_id]}
+        track={
+            state.track_list[
+                current_and_future(state.now, state.queue)[0].track_id
+            ]
+        }
         queue_item={current_and_future(state.now, state.queue)[0]}
     />
 );
 
-const VideoInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
+const VideoInternal = ({
+    state,
+    track,
+    queue_item,
+}: {
+    state: State;
+    track: Track;
+    queue_item: QueueItem;
+}): VNode => (
     <section key="video" class={"screen_video"}>
-        <Video
-            state={state}
-            track={track}
-        />
+        <Video state={state} track={track} />
         <div
             id="seekbar"
-            style={{left: percent(state.now - (queue_item.start_time ?? state.now), track.duration)}}
+            style={{
+                left: percent(
+                    state.now - (queue_item.start_time ?? state.now),
+                    track.duration,
+                ),
+            }}
         />
         <div id="pimpkk" class="pimp">
             KaraKara

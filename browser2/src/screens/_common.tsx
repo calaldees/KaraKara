@@ -8,7 +8,10 @@ export const Notification = ({ state }: { state: State }): VNode =>
     state.notification && (
         <div
             class={"main-only notification " + state.notification.style}
-            onclick={(state: State): State => ({...state, notification: null})}
+            onclick={(state: State): State => ({
+                ...state,
+                notification: null,
+            })}
         >
             <span>{state.notification.text}</span>
             <i class={"fas fa-times-circle"} />
@@ -22,7 +25,7 @@ function hhmm(d: Date): string {
     return twoz(d.getHours()) + ":" + twoz(d.getMinutes());
 }
 export function PriorityToken({ state }: { state: State }): VNode | null {
-    if(!state.priority_token) return null;
+    if (!state.priority_token) return null;
 
     var now = new Date(); // TODO: - server_datetime_offset;
 
@@ -32,27 +35,39 @@ export function PriorityToken({ state }: { state: State }): VNode | null {
     var delta_end = valid_end.getTime() - now.getTime();
 
     if (delta_start > 0) {
-        return <h2 class={"main-only priority_soon"}>
-            Priority mode at {hhmm(valid_start)}
-        </h2>;
+        return (
+            <h2 class={"main-only priority_soon"}>
+                Priority mode at {hhmm(valid_start)}
+            </h2>
+        );
     }
     if (delta_start < 0 && delta_end > 0) {
-        return <h2 class={"main-only priority_now"}>
-            Priority mode until {hhmm(valid_end)}
-        </h2>;
+        return (
+            <h2 class={"main-only priority_now"}>
+                Priority mode until {hhmm(valid_end)}
+            </h2>
+        );
     }
     return null;
 }
 
-export const YoureNext = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode =>
+export const YoureNext = ({
+    state,
+    queue,
+}: {
+    state: State;
+    queue: Array<QueueItem>;
+}): VNode =>
     (is_my_song(state, queue[0]) && (
         <h2 class="main-only upnext">
-            Your song "{state.track_list[queue[0].track_id].tags.title[0]}" is up now!
+            Your song "{state.track_list[queue[0].track_id].tags.title[0]}" is
+            up now!
         </h2>
     )) ||
     (is_my_song(state, queue[1]) && (
         <h2 class="main-only upnext">
-            Your song "{state.track_list[queue[1].track_id].tags.title[0]}" is up next!
+            Your song "{state.track_list[queue[1].track_id].tags.title[0]}" is
+            up next!
         </h2>
     ));
 
@@ -79,12 +94,22 @@ export const Screen = (
     <main class={className}>
         <header>
             {navLeft}
-            <h1 ondblclick={(state: State): State => ({...state, show_settings: true})}>{title}</h1>
+            <h1
+                ondblclick={(state: State): State => ({
+                    ...state,
+                    show_settings: true,
+                })}
+            >
+                {title}
+            </h1>
             {navRight}
         </header>
         <Notification state={state} />
         <PriorityToken state={state} />
-        <YoureNext state={state} queue={current_and_future(state.now, state.queue)} />
+        <YoureNext
+            state={state}
+            queue={current_and_future(state.now, state.queue)}
+        />
         <article>{children}</article>
         {footer}
     </main>
@@ -97,22 +122,13 @@ export const BackToExplore = (): VNode => (
 );
 
 // I don't know how to type ...kwargs correctly
-export const Thumb = (
-    {
-        state,
-        track,
-        ...kwargs
-    },
-    children,
-): VNode => (
+export const Thumb = ({ state, track, ...kwargs }, children): VNode => (
     <div class={"thumb"} {...kwargs}>
         <img src={placeholder} />
         <picture>
-            {track.attachments.image.map(a => 
-                <source
-                srcset={attachment_path(state.root, a)}
-                type={a.mime}
-                />)}
+            {track.attachments.image.map((a) => (
+                <source srcset={attachment_path(state.root, a)} type={a.mime} />
+            ))}
             <img src={placeholder} />
         </picture>
         {children}

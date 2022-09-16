@@ -11,7 +11,6 @@ import { track_info } from "../utils";
 import { find_tracks } from "../track_finder";
 import { group_tracks } from "../track_grouper";
 
-
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
@@ -28,17 +27,17 @@ const GoToPriorityTokens = (state: State): Dispatchable => [
         action: (state, response): Dispatchable =>
             response.status == "ok"
                 ? [
-                    {
-                        ...state,
-                        screen: "priority_tokens",
-                        priority_tokens: response.data.priority_tokens,
-                    },
-                    PushScrollPos(),
-                ]
+                      {
+                          ...state,
+                          screen: "priority_tokens",
+                          priority_tokens: response.data.priority_tokens,
+                      },
+                      PushScrollPos(),
+                  ]
                 : {
-                    ...state,
-                    priority_tokens: [],
-                },
+                      ...state,
+                      priority_tokens: [],
+                  },
     }),
 ];
 
@@ -46,7 +45,6 @@ const SelectTrack = (state: State, track_id: string): Dispatchable => [
     { ...state, track_id },
     PushScrollPos(),
 ];
-
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -63,9 +61,7 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
                 {track.tags.vocaltrack?.[0] == "off" && " (Instrumental)"}
             </span>
             <br />
-            <span class={"info"}>
-                {track_info(state.filters, track)}
-            </span>
+            <span class={"info"}>{track_info(state.filters, track)}</span>
         </span>
         <span class={"go_arrow"}>
             <i class={"fas fa-chevron-circle-right"} />
@@ -98,7 +94,7 @@ const FilterListGroupHeader = (
     </li>
 );
 
-const GroupedFilterList = ({ heading, filters, expanded }): VNode =>
+const GroupedFilterList = ({ heading, filters, expanded }): VNode => (
     <ul>
         {Object.keys(filters)
             .sort()
@@ -112,7 +108,10 @@ const GroupedFilterList = ({ heading, filters, expanded }): VNode =>
                         >
                             {group}
                         </FilterListGroupHeader>
-                        <FilterList heading={heading} filters={filters[group]} />
+                        <FilterList
+                            heading={heading}
+                            filters={filters[group]}
+                        />
                     </div>
                 ) : (
                     <FilterListGroupHeader
@@ -124,30 +123,35 @@ const GroupedFilterList = ({ heading, filters, expanded }): VNode =>
                     </FilterListGroupHeader>
                 ),
             )}
-    </ul>;
+    </ul>
+);
 
 function titleCmp(a: string, b: string): number {
     const nameA = a.toLowerCase().replace(/^(the )/, "");
     const nameB = b.toLowerCase().replace(/^(the )/, "");
     if (nameA < nameB) {
-      return -1;
+        return -1;
     }
     if (nameA > nameB) {
-      return 1;
+        return 1;
     }
     return 0;
 }
 
-const FilterList = ({ heading, filters }): VNode =>
+const FilterList = ({ heading, filters }): VNode => (
     <ul>
         {Object.keys(filters)
             .sort(titleCmp)
             .map((child) => (
-                <AddFilter filter={heading + ":" + child} count={filters[child]}>
+                <AddFilter
+                    filter={heading + ":" + child}
+                    count={filters[child]}
+                >
                     {child}
                 </AddFilter>
             ))}
-    </ul>;
+    </ul>
+);
 
 const AddFilter = (
     { filter, count }: { filter: string; count: number },
@@ -181,36 +185,39 @@ function show_list(state: State) {
     let tracks = find_tracks(state);
     // console.log("Found", tracks.length, "tracks matching", state.filters, state.search);
     let sections = group_tracks(state.filters, tracks);
-    return sections.map(
-        ([heading, section]) => {
-            let body = null;
-            if (section.groups) {
-                body = <GroupedFilterList
+    return sections.map(([heading, section]) => {
+        let body = null;
+        if (section.groups) {
+            body = (
+                <GroupedFilterList
                     heading={heading}
                     filters={section.groups}
                     expanded={state.expanded}
-                />;
-            }
-            if (section.filters) {
-                body = <FilterList
-                    heading={heading}
-                    filters={section.filters}
-                />;
-            }
-            if (section.tracks) {
-                body = <ul>{section.tracks.map((track) => (
-                    <TrackItem state={state} track={track} />
-                ))}</ul>;
-            }
-            return <div>
+                />
+            );
+        }
+        if (section.filters) {
+            body = <FilterList heading={heading} filters={section.filters} />;
+        }
+        if (section.tracks) {
+            body = (
+                <ul>
+                    {section.tracks.map((track) => (
+                        <TrackItem state={state} track={track} />
+                    ))}
+                </ul>
+            );
+        }
+        return (
+            <div>
                 {heading && <h2>{heading}</h2>}
                 {body}
             </div>
-        }
-    );
+        );
+    });
 }
 
-const Bookmarks = ({ state }: { state: State }) => (
+const Bookmarks = ({ state }: { state: State }) =>
     state.bookmarks.length > 0 &&
     state.filters.length == 0 &&
     state.search == "" && (
@@ -222,8 +229,7 @@ const Bookmarks = ({ state }: { state: State }) => (
                 ))}
             </ul>
         </div>
-    )
-);
+    );
 
 const AdminButtons = ({ state }: { state: State }): VNode => (
     <footer>
@@ -248,7 +254,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         state={state}
         className={"track_list"}
         navLeft={
-            (state.filters.length > 0) && (
+            state.filters.length > 0 && (
                 <a onclick={Back}>
                     <i class={"fas fa-2x fa-chevron-circle-left"} />
                 </a>
@@ -263,8 +269,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
             )
         }
         footer={
-            state.is_admin &&
-            !state.booth && <AdminButtons state={state} />
+            state.is_admin && !state.booth && <AdminButtons state={state} />
         }
     >
         {/* Full-text search */}

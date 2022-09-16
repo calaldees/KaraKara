@@ -4,7 +4,6 @@ import { attachment_path, current_and_future } from "../utils";
 import { GoToScreen } from "../actions";
 import { PushScrollPos, PopScrollPos, ApiRequest } from "../effects";
 
-
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
@@ -49,24 +48,36 @@ const UnselectTrack = (state: State): Dispatchable => [
     PopScrollPos(),
 ];
 
-
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-const TrackButtons = ({ state, track }: { state: State; track: Track }): VNode => (
+const TrackButtons = ({
+    state,
+    track,
+}: {
+    state: State;
+    track: Track;
+}): VNode => (
     <footer>
-        {current_and_future(state.now, state.queue).find((i) => i.track_id == track.id) && (
-            <div class={"already_queued"}>Track is already queued</div>
-        )}
+        {current_and_future(state.now, state.queue).find(
+            (i) => i.track_id == track.id,
+        ) && <div class={"already_queued"}>Track is already queued</div>}
         <div class={"buttons"}>
             <button
-                onclick={(state: State): State => ({ ...state, action: "enqueue" })}
-                disabled={current_and_future(state.now, state.queue).find((i) => i.track_id == track.id)}
+                onclick={(state: State): State => ({
+                    ...state,
+                    action: "enqueue",
+                })}
+                disabled={current_and_future(state.now, state.queue).find(
+                    (i) => i.track_id == track.id,
+                )}
             >
                 Enqueue
             </button>
             {state.bookmarks.includes(track.id) ? (
-                <button onclick={[RemoveBookmark, track.id]}>Un-Bookmark</button>
+                <button onclick={[RemoveBookmark, track.id]}>
+                    Un-Bookmark
+                </button>
             ) : (
                 <button onclick={[AddBookmark, track.id]}>Bookmark</button>
             )}
@@ -85,7 +96,11 @@ const EnqueueButtons = ({ state }: { state: State }): VNode => (
             oninput={SetPerformerName}
         />
         <div class={"buttons"}>
-            <button onclick={(state: State): State => ({ ...state, action: null })}>Cancel</button>
+            <button
+                onclick={(state: State): State => ({ ...state, action: null })}
+            >
+                Cancel
+            </button>
             <button onclick={EnqueueCurrentTrack}>Confirm</button>
         </div>
     </footer>
@@ -94,8 +109,7 @@ const EnqueueButtons = ({ state }: { state: State }): VNode => (
 function get_buttons(state: State, track: Track) {
     if (state.action == null)
         return <TrackButtons state={state} track={track} />;
-    if (state.action == "enqueue")
-        return <EnqueueButtons state={state} />;
+    if (state.action == "enqueue") return <EnqueueButtons state={state} />;
 }
 
 const BLOCKED_KEYS = [null, "null", "", "title", "from"];
@@ -133,11 +147,9 @@ export const TrackDetails = ({
             durationHint={track.duration}
             controls={true}
         >
-            {track.attachments.preview.map(a =>
-                <source
-                    src={attachment_path(state.root, a)}
-                    type={a.mime}
-                />)}
+            {track.attachments.preview.map((a) => (
+                <source src={attachment_path(state.root, a)} type={a.mime} />
+            ))}
         </video>
 
         {/* Tags */}
@@ -159,7 +171,9 @@ export const TrackDetails = ({
         {track.lyrics.length > 0 && (
             <div class={"lyrics"}>
                 <h2>Lyrics</h2>
-                {track.lyrics.map(item => <div>{item}</div>)}
+                {track.lyrics.map((item) => (
+                    <div>{item}</div>
+                ))}
             </div>
         )}
     </Screen>

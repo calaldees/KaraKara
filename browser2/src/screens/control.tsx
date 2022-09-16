@@ -4,7 +4,6 @@ import { ApiRequest, SendCommand } from "../effects";
 import { RemoveTrack } from "../actions";
 import { current_and_future, time_until } from "../utils";
 
-
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
@@ -112,8 +111,8 @@ function moveTrack(
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    "source": "" + src_id,
-                    "target": "" + dst_id,
+                    source: "" + src_id,
+                    target: "" + dst_id,
                 }),
             },
             // on network error, revert to original queue
@@ -124,11 +123,16 @@ function moveTrack(
     ];
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
+const Playlist = ({
+    state,
+    queue,
+}: {
+    state: State;
+    queue: Array<QueueItem>;
+}): VNode => (
     <section>
         <ul ondragleave={createDragLeave()}>
             {queue.map((item) => (
@@ -151,7 +155,13 @@ const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): 
     </section>
 );
 
-const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
+const QueueItemRender = ({
+    state,
+    item,
+}: {
+    state: State;
+    item: QueueItem;
+}): VNode => (
     <li
         class={{
             queue_item: true,
@@ -182,9 +192,11 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        {item.start_time && <span class={"count"}>
-            {time_until(state.now, item.start_time)}
-        </span>}
+        {item.start_time && (
+            <span class={"count"}>
+                {time_until(state.now, item.start_time)}
+            </span>
+        )}
 
         <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
             <i class={"fas fa-times-circle"} />
@@ -192,8 +204,19 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
     </li>
 );
 
-const ControlButton = ({ command, style }: { command: string, style: string }): VNode => (
-    <button onclick={(state: State): Dispatchable => [state, SendCommand(state, command)]}>
+const ControlButton = ({
+    command,
+    style,
+}: {
+    command: string;
+    style: string;
+}): VNode => (
+    <button
+        onclick={(state: State): Dispatchable => [
+            state,
+            SendCommand(state, command),
+        ]}
+    >
         <i class={"fas fa-" + style} />
     </button>
 );
@@ -223,21 +246,34 @@ export const Control = ({ state }: { state: State }): VNode => (
             <div class="readme">
                 <h1>READ ME :)</h1>
                 <ol>
-                    <li>Please use hand sanitiser, a lot of different people
-                        are going to use this laptop and the microphones :)</li>
-                    <li>To avoid feedback loops, don't hold the microphone
-                        directly in front of the speaker!</li>
-                    <li>This admin laptop can drag &amp; drop to rearrange
-                        tracks in the queue</li>
-                    <li>Either use your phone (open <b>{state.root}</b> and
-                        enter room <b>{state.room_name}</b>) or use the menu on the
-                        right to queue up tracks.</li>
-                    <li>Push the play button (<i class={"fas fa-play"} />) down
-                        below when you're ready to start singing.</li>
+                    <li>
+                        Please use hand sanitiser, a lot of different people are
+                        going to use this laptop and the microphones :)
+                    </li>
+                    <li>
+                        To avoid feedback loops, don't hold the microphone
+                        directly in front of the speaker!
+                    </li>
+                    <li>
+                        This admin laptop can drag &amp; drop to rearrange
+                        tracks in the queue
+                    </li>
+                    <li>
+                        Either use your phone (open <b>{state.root}</b> and
+                        enter room <b>{state.room_name}</b>) or use the menu on
+                        the right to queue up tracks.
+                    </li>
+                    <li>
+                        Push the play button (<i class={"fas fa-play"} />) down
+                        below when you're ready to start singing.
+                    </li>
                 </ol>
             </div>
         ) : (
-            <Playlist state={state} queue={current_and_future(state.now, state.queue)} />
+            <Playlist
+                state={state}
+                queue={current_and_future(state.now, state.queue)}
+            />
         )}
     </Screen>
 );

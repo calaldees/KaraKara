@@ -13,7 +13,9 @@ export function Root(state: State): VNode {
     if (state.download_size)
         screen = (
             <section key="title" class={"screen_title"}>
-                <h1>Loading {percent(state.download_done, state.download_size)}</h1>
+                <h1>
+                    Loading {percent(state.download_done, state.download_size)}
+                </h1>
             </section>
         );
     else if (!state.audio_allowed && !state.podium)
@@ -31,15 +33,17 @@ export function Root(state: State): VNode {
         );
     else if (visible_queue.length === 0) screen = <TitleScreen state={state} />;
     else if (state.podium) screen = <PodiumScreen state={state} />;
-    else if (visible_queue[0].start_time == null || visible_queue[0].start_time > state.now)
+    else if (
+        visible_queue[0].start_time == null ||
+        visible_queue[0].start_time > state.now
+    )
         screen = <PreviewScreen state={state} />;
-    else
-        screen = <VideoScreen state={state} />;
+    else screen = <VideoScreen state={state} />;
 
     let errors: Array<string> = [];
-    if(!state.room_name) errors.push("No Room Set");
-    if(!state.connected) errors.push("Not Connected");
-    if(!state.is_admin) errors.push("Not Admin");
+    if (!state.room_name) errors.push("No Room Set");
+    if (!state.connected) errors.push("Not Connected");
+    if (!state.is_admin) errors.push("Not Admin");
 
     return (
         <body

@@ -3,11 +3,17 @@ import { Screen, BackToExplore, Thumb } from "./_common";
 import { shuffle, is_my_song, time_until, current_and_future } from "../utils";
 import { RemoveTrack } from "../actions";
 
-const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VNode => (
+const QueueItemRender = ({
+    state,
+    item,
+}: {
+    state: State;
+    item: QueueItem;
+}): VNode => (
     <li
         class={{
             queue_item: true,
-            me: is_my_song(state, item)
+            me: is_my_song(state, item),
         }}
     >
         <Thumb state={state} track={state.track_list[item.track_id]} />
@@ -18,9 +24,11 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        {item.start_time && <span class={"count"}>
-            {time_until(state.now, item.start_time)}
-        </span>}
+        {item.start_time && (
+            <span class={"count"}>
+                {time_until(state.now, item.start_time)}
+            </span>
+        )}
 
         {state.session_id == item.session_id && (
             <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
@@ -30,7 +38,13 @@ const QueueItemRender = ({ state, item }: { state: State, item: QueueItem }): VN
     </li>
 );
 
-const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): VNode => (
+const Playlist = ({
+    state,
+    queue,
+}: {
+    state: State;
+    queue: Array<QueueItem>;
+}): VNode => (
     <div>
         {/* No items */}
         {queue.length == 0 && <h2>Queue Empty</h2>}
@@ -43,8 +57,10 @@ const Playlist = ({ state, queue }: { state: State, queue: Array<QueueItem> }): 
                     {state.track_list[queue[0].track_id].lyrics.length > 0 && (
                         <li>
                             <span class={"lyrics"}>
-                                {state.track_list[queue[0].track_id].lyrics.map(line =>
-                                    <div>{line}</div>
+                                {state.track_list[queue[0].track_id].lyrics.map(
+                                    (line) => (
+                                        <div>{line}</div>
+                                    ),
                                 )}
                             </span>
                         </li>
@@ -86,6 +102,9 @@ export const Queue = ({ state }: { state: State }): VNode => (
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Now Playing"}
     >
-        <Playlist state={state} queue={current_and_future(state.now, state.queue)} />
+        <Playlist
+            state={state}
+            queue={current_and_future(state.now, state.queue)}
+        />
     </Screen>
 );

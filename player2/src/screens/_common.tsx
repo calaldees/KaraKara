@@ -1,7 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { attachment_path } from "../utils";
 
-export const Video = ({state, track, ...kwargs}) => (
+export const Video = ({ state, track, ...kwargs }) => (
     <video
         autoPlay={true}
         poster={attachment_path(state.root, track.attachments.image[0])}
@@ -9,10 +9,10 @@ export const Video = ({state, track, ...kwargs}) => (
         key={track.id}
         {...kwargs}
     >
-        {track.attachments.video.map(a =>
+        {track.attachments.video.map((a) => (
             <source src={attachment_path(state.root, a)} type={a.mime} />
-        )}
-        {track.attachments.subtitle?.map(a =>
+        ))}
+        {track.attachments.subtitle?.map((a) => (
             <track
                 kind="subtitles"
                 src={attachment_path(state.root, a)}
@@ -20,7 +20,6 @@ export const Video = ({state, track, ...kwargs}) => (
                 label="English"
                 srclang="en"
             />
-        )}
+        ))}
     </video>
 );
-    

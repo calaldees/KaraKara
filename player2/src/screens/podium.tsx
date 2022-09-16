@@ -3,36 +3,61 @@ import { current_and_future, percent, s_to_mns } from "../utils";
 import { Video } from "./_common";
 import { SendCommand } from "../effects";
 
-
 ///////////////////////////////////////////////////////////////////////
 // Views
 
 export const PodiumScreen = ({ state }: { state: State }): VNode => (
     <PodiumInternal
         state={state}
-        track={state.track_list[current_and_future(state.now, state.queue)[0].track_id]}
+        track={
+            state.track_list[
+                current_and_future(state.now, state.queue)[0].track_id
+            ]
+        }
         queue_item={current_and_future(state.now, state.queue)[0]}
     />
 );
 
-const ProgressBar = ({now, start_time, duration}: {now: number, start_time: number, duration: number}): VNode => (
+const ProgressBar = ({
+    now,
+    start_time,
+    duration,
+}: {
+    now: number;
+    start_time: number;
+    duration: number;
+}): VNode => (
     <div
         class={"progressBar"}
-        style={{"background-position": percent(duration - (now - start_time), duration)}}
+        style={{
+            "background-position": percent(
+                duration - (now - start_time),
+                duration,
+            ),
+        }}
     >
         Track Playing
         <small>
-            ({s_to_mns(now - start_time)} /{" "}
-            {s_to_mns(duration)})
+            ({s_to_mns(now - start_time)} / {s_to_mns(duration)})
         </small>
     </div>
 );
 
-const AutoplayBar = ({now, start_time, track_space}: {now: number, start_time: number, track_space: number}): VNode => (
+const AutoplayBar = ({
+    now,
+    start_time,
+    track_space,
+}: {
+    now: number;
+    start_time: number;
+    track_space: number;
+}): VNode => (
     <div
         class={"startButton"}
         onclick={(state) => [state, SendCommand(state, "play")]}
-        style={{"background-position": percent(start_time - now, track_space)}}
+        style={{
+            "background-position": percent(start_time - now, track_space),
+        }}
     >
         <span>
             Press to Start
@@ -53,11 +78,16 @@ const StartBar = (): VNode => (
     </div>
 );
 
-const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Track, queue_item: QueueItem }): VNode => (
-    <section
-        key="podium"
-        class={"screen_podium"}
-    >
+const PodiumInternal = ({
+    state,
+    track,
+    queue_item,
+}: {
+    state: State;
+    track: Track;
+    queue_item: QueueItem;
+}): VNode => (
+    <section key="podium" class={"screen_podium"}>
         <h1>
             {track.tags.title[0]}
             <br />
@@ -72,14 +102,28 @@ const PodiumInternal = ({ state, track, queue_item }: { state: State, track: Tra
                 // ensure the video element gets re-created when switching
                 // between queue items (even if it's the same track), and
                 // also when the podium switches from "preview" to "play" mode
-                key={queue_item.id + "-" + (queue_item.start_time && queue_item.start_time < state.now)}
+                key={
+                    queue_item.id +
+                    "-" +
+                    (queue_item.start_time && queue_item.start_time < state.now)
+                }
             />
         </div>
 
         {queue_item.start_time ? (
-            queue_item.start_time < state.now ?
-                <ProgressBar now={state.now} start_time={queue_item.start_time} duration={track.duration} /> :
-                <AutoplayBar now={state.now} start_time={queue_item.start_time} track_space={state.settings["track_space"]} />
+            queue_item.start_time < state.now ? (
+                <ProgressBar
+                    now={state.now}
+                    start_time={queue_item.start_time}
+                    duration={track.duration}
+                />
+            ) : (
+                <AutoplayBar
+                    now={state.now}
+                    start_time={queue_item.start_time}
+                    track_space={state.settings["track_space"]}
+                />
+            )
         ) : (
             <StartBar />
         )}

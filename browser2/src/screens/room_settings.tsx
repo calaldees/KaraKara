@@ -3,14 +3,10 @@ import { BackToExplore, Screen } from "./_common";
 import { ApiRequest } from "../effects";
 import { copy_type } from "../utils";
 
-
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
-function UpdateSettings(
-    state: State,
-    event: FormInputEvent,
-): Dispatchable {
+function UpdateSettings(state: State, event: FormInputEvent): Dispatchable {
     var name = event.target.name;
     var value = event.target.value;
     state.settings[name] = copy_type(state.settings[name], value);
@@ -35,9 +31,8 @@ const SaveSettings = (state: State, event: SubmitEvent): Dispatchable => {
             },
             // action: (state, response) => [{ ...state }],
         }),
-    ]
+    ];
 };
-
 
 ///////////////////////////////////////////////////////////////////////
 // Views

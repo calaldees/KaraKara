@@ -2,7 +2,6 @@ import h from "hyperapp-jsx-pragma";
 import { Screen } from "./_common";
 import { percent } from "../utils";
 
-
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
@@ -13,7 +12,6 @@ function TryLogin(state: State, event: SubmitEvent): State {
         room_name: state.room_name_edit.toLowerCase().trim(),
     };
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -33,12 +31,19 @@ export const Login = ({ state }: { state: State }): VNode => (
                     required={true}
                     disabled={state.room_name !== ""}
                 />
-                <button disabled={!state.room_name_edit.trim() || state.room_name !== ""}>
+                <button
+                    disabled={
+                        !state.room_name_edit.trim() || state.room_name !== ""
+                    }
+                >
                     {state.room_name !== "" ? (
                         <span>
                             Loading Tracks{" "}
                             {state.download_size ? (
-                                percent(state.download_done, state.download_size)
+                                percent(
+                                    state.download_done,
+                                    state.download_size,
+                                )
                             ) : (
                                 <i class={"loading fas fa-sync-alt"} />
                             )}
