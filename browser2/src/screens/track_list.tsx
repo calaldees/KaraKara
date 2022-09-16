@@ -126,10 +126,22 @@ const GroupedFilterList = ({ heading, filters, expanded }): VNode =>
             )}
     </ul>;
 
+function titleCmp(a: string, b: string): number {
+    const nameA = a.toLowerCase().replace(/^(the )/, "");
+    const nameB = b.toLowerCase().replace(/^(the )/, "");
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+}
+
 const FilterList = ({ heading, filters }): VNode =>
     <ul>
         {Object.keys(filters)
-            .sort()
+            .sort(titleCmp)
             .map((child) => (
                 <AddFilter filter={heading + ":" + child} count={filters[child]}>
                     {child}

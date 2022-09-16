@@ -129,6 +129,13 @@ export function group_tracks(
                 if (grouped_groups[initial] == undefined)
                     grouped_groups[initial] = {};
                 grouped_groups[initial][x] = tag_values[x];
+                // If our title is "The X", also group us under X
+                if(x.toLowerCase().startsWith("the ") && x.length > 4) {
+                    var initial = x[4].toUpperCase();
+                    if (grouped_groups[initial] == undefined)
+                        grouped_groups[initial] = {};
+                    grouped_groups[initial][x] = tag_values[x];
+                }
             });
             sections.push([tag_key, { groups: grouped_groups }]);
         }
