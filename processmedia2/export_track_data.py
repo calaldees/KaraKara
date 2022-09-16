@@ -80,11 +80,11 @@ def export_track_data(**kwargs):
                     return parse_tags(tag_file.read())
 
             def _validate_track(track_id, track):
-                if not track['tags']['title']:
+                if 'title' not in track['tags']:
                     log.warning(f"{track_id} is missing tags.title")
                     return False
                 for atype in ['video', 'preview', 'image']:
-                    if not track['attachments'][atype]:
+                    if atype not in track['attachments']:
                         log.warning(f"{track_id} is missing attachments.{atype}")
                         return False
                 return True
