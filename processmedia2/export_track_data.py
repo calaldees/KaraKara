@@ -79,8 +79,18 @@ def export_track_data(**kwargs):
                 with source_file_tag.file.open('rt', encoding='utf-8', errors='ignore') as tag_file:
                     return parse_tags(tag_file.read())
 
+            def _validate_track(track_id, track):
+                if not track['tags']['title']:
+                    log.warning(f"{track_id} is missing tags.title")
+                    return False
+                for atype in ['video', 'preview', 'image']:
+                    if not track['attachments'][atype]:
+                        log.warning(f"{track_id} is missing attachments.{atype}")
+                        return False
+                return True
+
             track_id = re.sub('[^0-9a-zA-Z]+', '_', name)
-            yield track_id, {
+            track = {
                 'id': track_id,
                 'source_hash': m.source_hash,
                 'source_filename': name,
@@ -89,6 +99,8 @@ def export_track_data(**kwargs):
                 'lyrics': _get_lyrics(),
                 'tags': _get_tags(),
             }
+            if _validate_track(track_id, track):
+                yield track_id, track
             stats['meta_exported'].add(name)
 
     assert kwargs['path_static_track_list']
