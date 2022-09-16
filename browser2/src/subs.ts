@@ -127,3 +127,22 @@ function _bleSubscriber(dispatch, props) {
 export function BeLoggedIn(room_name: string, room_password: string): Subscription {
     return [_bleSubscriber, { room_name, room_password }];
 }
+
+function _roundedIntervalSubscriber(dispatch, props) {
+    var id: number|null|NodeJS.Timeout = null;
+    function waitForNextInterval() {
+        var now = Date.now();
+        dispatch(props.action, now);
+        id = setTimeout(waitForNextInterval, props.every - (now % props.every));
+    }
+    id = setTimeout(waitForNextInterval, props.every - (Date.now() % props.every));
+
+    return function () {
+      id && clearTimeout(id)
+    }
+  }
+  
+
+  export function RoundedInterval(props) {
+    return [_roundedIntervalSubscriber, props]
+  }

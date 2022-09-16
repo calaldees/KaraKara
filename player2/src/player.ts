@@ -1,6 +1,5 @@
 /// <reference path='./player.d.ts'/>
 import { app } from "hyperapp";
-import { Interval } from "hyperapp-fx";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
 import {
     LocalStorageLoader,
@@ -12,6 +11,7 @@ import {
     getMQTTListener,
     KeyboardListener,
     BeLoggedIn,
+    RoundedInterval,
 } from "./subs";
 import { ApiRequest } from "./effects";
 
@@ -101,7 +101,7 @@ const subscriptions = (state: State): Array<Subscription> => [
     KeyboardListener,
     getMQTTListener(state),
     BeLoggedIn(state.room_name, state.room_password),
-    Interval({
+    RoundedInterval({
         every: 1000,
         action(state: State, timestamp: number): Dispatchable {
             (window as any).state = state;

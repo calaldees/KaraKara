@@ -5,10 +5,9 @@ import {
     LocalStorageLoader,
     LocalStorageSaver,
 } from "@shish2k/hyperapp-localstorage";
-import { Interval } from "hyperapp-fx";
 
 import { Root } from "./screens/root";
-import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
+import { BeLoggedIn, getMQTTListener, ResizeListener, RoundedInterval } from "./subs";
 import { ApiRequest } from "./effects";
 
 // If we're running stand-alone, then use the main karakara.uk
@@ -133,7 +132,7 @@ const subscriptions = (state: State): Array<Subscription> => [
         widescreen: isWidescreen(),
     })),
     BeLoggedIn(state.room_name, state.room_password),
-    Interval({
+    RoundedInterval({
         every: 1000,
         action(state: State, timestamp: number): Dispatchable {
             if(state.screen == "room_settings") {
