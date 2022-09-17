@@ -59,8 +59,8 @@ export function mqtt_login_info(
 ): Dictionary<string> {
     return {
         url: state.root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt",
-        username: state.room_name,
-        password: state.room_password,
+        //username: state.room_name,
+        //password: state.room_password,
     };
 }
 
