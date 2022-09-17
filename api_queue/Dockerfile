@@ -26,6 +26,7 @@ FROM code as test
     COPY ./tests ./tests
     COPY ./pytest.ini ./
     RUN pytest -x
+    RUN mypy api_queue
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
