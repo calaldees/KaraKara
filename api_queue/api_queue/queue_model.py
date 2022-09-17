@@ -164,6 +164,9 @@ class Queue():
             else:
                 self.current.start_time += delta
         self._recalculate_start_times()
+    def skip(self) -> None:
+        # seek_forwards will stop at the end of the current track or space
+        self.seek_forwards(9999)
     def _recalculate_start_times(self) -> None:
         for i_prev, i_next in pairwise(self.current_future):
             i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None
