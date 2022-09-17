@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from typing import Iterator
+from typing import Iterator, Optional
 import random
 import numbers
 from functools import reduce
@@ -15,7 +15,7 @@ class QueueItem():
     track_duration: datetime.timedelta
     session_id: str
     performer_name: str
-    start_time: datetime.datetime = None
+    start_time: Optional[datetime.datetime] = None
     id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
 
     def __post_init__(self):
@@ -67,7 +67,7 @@ class Queue():
         self.items = items
         self.track_space = settings["track_space"]
         self.modified = False
-        self._now = None
+        self._now: Optional[datetime.datetime] = None
     @property
     def now(self) -> datetime.datetime:
         return self._now or datetime.datetime.now()
@@ -130,6 +130,39 @@ class Queue():
     def delete(self, id: int) -> None:
         now = self.now
         self.items[:] = [i for i in self.items if (i.start_time and i.start_time < now) or i.id != id]
+        self._recalculate_start_times()
+    def seek_forwards(self, seconds: float) -> None:
+        delta = datetime.timedelta(seconds=seconds)
+        # if we're in a gap, seek stops at the end of the gap
+        if self.current.start_time > self.now:
+            if self.now + delta > self.current.start_time:
+                self.current.start_time = self.now
+            else:
+                self.current.start_time -= delta
+        # if we're in a track, seek stops at the end of the track
+        else:
+            if self.now + delta > self.current.end_time:
+                self.current.start_time = self.now - self.current.track_duration
+                # also adjust the new "current"
+                if self.current:
+                    self.current.start_time = self.now + self.track_space
+            else:
+                self.current.start_time -= delta
+        self._recalculate_start_times()
+    def seek_backwards(self, seconds: float) -> None:
+        delta = datetime.timedelta(seconds=seconds)
+        # if we're in a gap, seek stops at the start of the gap
+        if self.current.start_time > self.now:
+            if self.now - delta < self.current.start_time - self.track_space:
+                self.current.start_time = self.now + self.track_space
+            else:
+                self.current.start_time += delta
+        # if we're in a track, seek stops at the start of the track
+        else:
+            if self.now - delta < self.current.start_time:
+                self.current.start_time = self.now
+            else:
+                self.current.start_time += delta
         self._recalculate_start_times()
     def _recalculate_start_times(self) -> None:
         for i_prev, i_next in pairwise(self.current_future):

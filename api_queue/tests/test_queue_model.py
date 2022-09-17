@@ -9,7 +9,7 @@ from api_queue.queue_model import Queue, QueueItem
 @pytest.fixture
 def qu():
     qu = Queue([], settings={"track_space": datetime.timedelta(seconds=10)})
-    qu._now = datetime.datetime.now()
+    qu._now = datetime.datetime(2022, 1, 1)
     return qu
 
 def test_queue_empty(qu):
@@ -127,6 +127,54 @@ def test_queue_end_time(qu: Queue):
     qu.add(QueueItem('Track3', 60, 'TestSession3', 'test_name'))
     qu.add(QueueItem('Track4', 60, 'TestSession4', 'test_name'))
     assert qu.end_time == qu.now + (datetime.timedelta(seconds=60)*2) + (qu.track_space*2)
+
+def test_queue_seek_forwards(qu: Queue):
+    qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
+    qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
+    qu.play()
+    assert qu.items[0].start_time == qu._now
+    assert qu.items[1].start_time == qu._now + datetime.timedelta(seconds=60) + qu.track_space
+    # Seeking to the middle of a track moves everything by the exact amount
+    qu.seek_forwards(20)
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=20)
+    assert qu.items[1].start_time == qu._now + datetime.timedelta(seconds=60) + qu.track_space - datetime.timedelta(seconds=20)
+    # If we seek past the end of a track, snap to the end of that track
+    qu.seek_forwards(9001)
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=60)
+    assert qu.items[1].start_time == qu._now + qu.track_space
+    # Seeking to the middle of track space moves everything by the exact amount
+    qu.seek_forwards(5)
+    assert qu.items[1].start_time == qu._now + qu.track_space - datetime.timedelta(seconds=5)
+    # If we seek past the end of track space, snap to the start of the next track
+    qu.seek_forwards(420)
+    assert qu.items[1].start_time == qu._now
+
+def test_queue_seek_backwards(qu: Queue):
+    qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
+    qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
+    qu.play()
+    # Starting from the middle of space between tracks
+    qu._now += datetime.timedelta(seconds=60) + qu.track_space/2
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=60) - qu.track_space/2
+    assert qu.items[1].start_time == qu._now + qu.track_space/2
+    # Seeking backward within track space should move exactly, without adjusting past tracks
+    qu.seek_backwards(1)
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=60) - qu.track_space/2
+    assert qu.items[1].start_time == qu._now + datetime.timedelta(seconds=1) + qu.track_space/2
+    # Seeking backwards past the start of space should go to the start of the space
+    qu.seek_backwards(1234)
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=60) - qu.track_space/2
+    assert qu.items[1].start_time == qu._now + qu.track_space
+    # From the middle of a track
+    qu._now += qu.track_space + datetime.timedelta(seconds=30)
+    # Seeking backward within track should move exactly, without adjusting past tracks
+    qu.seek_backwards(10)
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=90) - qu.track_space*1.5
+    assert qu.items[1].start_time == qu._now - datetime.timedelta(seconds=20)
+    # Seeking backwards past the start of track should go to the start of the track
+    qu.seek_backwards(1234)
+    assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=90) - qu.track_space*1.5
+    assert qu.items[1].start_time == qu._now
 
 def test_queue_get(qu):
     # .get(id)

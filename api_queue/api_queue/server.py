@@ -310,7 +310,7 @@ async def move_queue_item(request, queue_id):
 async def queue_command(request, queue_id, command):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
-    if command not in {'play', 'stop'}:
+    if command not in {'play', 'stop', 'seek_forwards', 'seek_backwards'}:
         raise sanic.exceptions.NotFound(message='invalid command')
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
