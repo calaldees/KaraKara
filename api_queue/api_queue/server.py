@@ -299,7 +299,7 @@ async def move_queue_item(request, queue_id):
 
 # Queue / Commands ------------------------------------------------------------
 
-@queue_blueprint.get("/command/<command:([a-z]+).json>")
+@queue_blueprint.get("/command/<command:([a-z_]+).json>")
 @openapi.definition(
     response=[
         openapi.definitions.Response({"application/json": {'is_playing': bool}},),
