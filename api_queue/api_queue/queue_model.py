@@ -131,7 +131,7 @@ class Queue():
         now = self.now
         self.items[:] = [i for i in self.items if (i.start_time and i.start_time < now) or i.id != id]
         self._recalculate_start_times()
-    def seek_forwards(self, seconds: float) -> None:
+    def seek_forwards(self, seconds: float=20) -> None:
         delta = datetime.timedelta(seconds=seconds)
         # if we're in a gap, seek stops at the end of the gap
         if self.current.start_time > self.now:
@@ -149,7 +149,7 @@ class Queue():
             else:
                 self.current.start_time -= delta
         self._recalculate_start_times()
-    def seek_backwards(self, seconds: float) -> None:
+    def seek_backwards(self, seconds: float=20) -> None:
         delta = datetime.timedelta(seconds=seconds)
         # if we're in a gap, seek stops at the start of the gap
         if self.current.start_time > self.now:
