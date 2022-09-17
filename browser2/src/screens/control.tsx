@@ -226,7 +226,6 @@ const ControlButtons = (): VNode => (
             <ControlButton command={"seek_backwards"} style={"backward"} />
             <ControlButton command={"seek_forwards"} style={"forward"} />
             <ControlButton command={"play"} style={"play"} />
-            <ControlButton command={"pause"} style={"pause"} />
             <ControlButton command={"stop"} style={"stop"} />
             <ControlButton command={"skip"} style={"step-forward"} />
         </div>
