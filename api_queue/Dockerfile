@@ -26,6 +26,8 @@ FROM code as test
     COPY ./tests ./tests
     COPY ./pytest.ini ./
     RUN pytest -x
+    COPY --from=python_dependencies_test /usr/local/bin/mypy /usr/local/bin/mypy
+    COPY ./.mypy.ini ./
     RUN mypy api_queue
     CMD ["python", "-m", "api_queue.server"]
 
