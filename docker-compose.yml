@@ -50,6 +50,8 @@ services:
         volumes:
             - mqtt_data:/mosquitto/data
             - ${PWD}/mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+            - ${PWD}/mqtt/tcp.acl:/mosquitto/config/tcp.acl:ro
+            - ${PWD}/mqtt/ws.acl:/mosquitto/config/ws.acl:ro
 
     player2:
         image: karakara/player2
