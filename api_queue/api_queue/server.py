@@ -35,7 +35,7 @@ app.ext.openapi.describe(
 
 @app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
-    path_tracks = Path(_app.config.get('PATH_TRACKS'))
+    path_tracks = Path(str(_app.config.get('PATH_TRACKS')))
     log.info(f"[tracks] loading - {path_tracks=}")
     if path_tracks.is_file():
         with path_tracks.open() as filehandle:
@@ -49,7 +49,7 @@ from .queue_model import QueueItem
 from .queue_manager import QueueManagerCSVAsync, SettingsManager
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
-    path_queue = _app.config.get('PATH_QUEUE')
+    path_queue = Path(str(_app.config.get('PATH_QUEUE')))
     log.info(f"[queue_manager] - {path_queue=}")
     _app.ctx.settings_manager = SettingsManager(path=path_queue)
     _app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=_app.ctx.settings_manager)
