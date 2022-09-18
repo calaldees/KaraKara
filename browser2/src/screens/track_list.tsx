@@ -296,7 +296,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
                     <span class={"remove"}>
                         <i class={"fas fa-times-circle"} />
                     </span>
-                    <span class={"name"} title={filter.split(":")[0]}>
+                    <span class={"name"} title={filter}>
                         {filter.split(":")[1]}
                     </span>
                 </a>
