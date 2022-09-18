@@ -131,7 +131,7 @@ export function group_tracks(
                 grouped_groups[initial][x] = tag_values[x];
                 // If our title is "The X", also group us under X
                 if(x.toLowerCase().startsWith("the ") && x.length > 4) {
-                    var x2 = x.substring(4) + ", The";
+                    var x2 = x.substring(4) + ", " + x.substring(0, 3);
                     var initial = x2[0].toUpperCase();
                     if (grouped_groups[initial] == undefined)
                         grouped_groups[initial] = {};

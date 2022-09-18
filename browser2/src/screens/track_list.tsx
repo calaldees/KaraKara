@@ -126,13 +126,20 @@ const GroupedFilterList = ({ heading, filters, expanded }): VNode => (
     </ul>
 );
 
+function unThe(filter: string): string {
+    if(filter.toLowerCase().endsWith(", the")) {
+        return filter.substring(filter.length-3) + " " + filter.substring(0, filter.length - 5);
+    }
+    return filter;
+}
+
 const FilterList = ({ heading, filters }): VNode => (
     <ul>
         {Object.keys(filters)
             .sort()
             .map((child) => (
                 <AddFilter
-                    filter={heading + ":" + child}
+                    filter={heading + ":" + unThe(child)}
                     count={filters[child]}
                 >
                     {child}
