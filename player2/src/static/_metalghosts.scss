@@ -237,6 +237,7 @@ $LIGHT: #29EDF2;
 				height: 22vh;
 				font-size: 2em;
 			}
+			/*
 			li:nth-child(1) .time {
 				color: rgba(0,0,0,0);
 				text-shadow: none;
@@ -254,6 +255,18 @@ $LIGHT: #29EDF2;
 				text-shadow: none;
 			}
 			li:nth-child(2) .time::before {
+				content: "Nearly there!";
+				color: #aa0;
+			}
+			*/
+			li:nth-child(1) .time {
+				color: #ff0;
+				animation-name: glow_y;
+				animation-duration: 1s;
+				animation-iteration-count: infinite;
+				animation-direction: alternate;
+			}
+			li:nth-child(2) .time {
 				content: "Nearly there!";
 				color: #aa0;
 			}
