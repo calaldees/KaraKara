@@ -6,10 +6,10 @@ import { copy_type } from "../utils";
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
-function UpdateSettings(state: State, event: FormInputEvent): Dispatchable {
+function UpdateSettingsEdit(state: State, event: FormInputEvent): Dispatchable {
     var name = event.target.name;
     var value = event.target.value;
-    state.settings[name] = copy_type(state.settings[name], value);
+    state.settings_edit[name] = copy_type(state.settings[name], value);
     return state;
 }
 
@@ -27,7 +27,7 @@ const SaveSettings = (state: State, event: SubmitEvent): Dispatchable => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(state.settings),
+                body: JSON.stringify(state.settings_edit),
             },
             // action: (state, response) => [{ ...state }],
         }),
@@ -57,7 +57,7 @@ export const RoomSettings = ({ state }: { state: State }): VNode => (
         footer={<SettingsButtons state={state} />}
     >
         <form onsubmit={SaveSettings}>
-            {Object.entries(state.settings).map(([key, value]) => (
+            {Object.entries(state.settings_edit).map(([key, value]) => (
                 <p>
                     {key.replace("_", " ")}:
                     <br />
@@ -65,7 +65,7 @@ export const RoomSettings = ({ state }: { state: State }): VNode => (
                         type={"text"}
                         name={key}
                         value={value}
-                        onchange={UpdateSettings}
+                        oninput={UpdateSettingsEdit}
                     />
                 </p>
             ))}

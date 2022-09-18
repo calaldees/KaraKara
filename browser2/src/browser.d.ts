@@ -120,6 +120,7 @@ type State = {
 
     // settings
     settings: Dictionary<any>,
+    settings_edit: Dictionary<any>,
 
     // priority_tokens
     priority_tokens: Array<PriorityToken>,

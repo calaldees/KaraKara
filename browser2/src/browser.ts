@@ -71,6 +71,7 @@ let state: State = {
         "forced_tags": [],
         "hidden_tags": ["red:duplicate"],
     },
+    settings_edit: {},
 
     // priority_tokens
     priority_tokens: [],
@@ -135,10 +136,6 @@ const subscriptions = (state: State): Array<Subscription> => [
     RoundedInterval({
         every: 1000,
         action(state: State, timestamp: number): Dispatchable {
-            if(state.screen == "room_settings") {
-                // don't update time while on the settings screen, see #117
-                return state;
-            }
             (window as any).state = state;
             return { ...state, now: Date.now()/1000 };
         },

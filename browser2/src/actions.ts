@@ -16,6 +16,8 @@ export const GoToScreen =
             {
                 ...state,
                 screen,
+                // only used when going to settings screen
+                settings_edit: state.settings,
             },
             ...effects,
         ];
