@@ -142,7 +142,7 @@ describe('group_tracks', () => {
         expect(results[0][0]).toEqual("from");
         expect(results[0][1].groups).toBeDefined();
         expect(results[0][1].groups['T']).toEqual({"The Wombles": 1});
-        expect(results[0][1].groups['W']).toEqual({"The Wombles": 1});
+        expect(results[0][1].groups['W']).toEqual({"Wombles, The": 1});
     });
     test("show leftovers if some tracks don't match the suggested sections", () => {
         let results = grouper.group_tracks(["from:Macross"], many_tracks);
