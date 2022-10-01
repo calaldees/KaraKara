@@ -1,3 +1,4 @@
+from datetime import datetime
 import random
 import contextlib
 from textwrap import dedent
@@ -128,6 +129,14 @@ async def push_settings_to_mqtt(request, queue_id):
 )
 async def root(request):
     return sanic.response.redirect('/docs')
+
+
+@app.get("/time.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": float}),
+)
+async def time(request):
+    return sanic.response.json(datetime.now().timestamp())
 
 
 # Queue -----------------------------------------------------------------------
