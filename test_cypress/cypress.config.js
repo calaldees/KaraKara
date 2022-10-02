@@ -1,6 +1,7 @@
 const { defineConfig } = require('cypress')
 module.exports = defineConfig({
     e2e: {
+        baseUrl: 'http://karakara.uk',
         supportFile: false,
         specPattern: 'cypress/**/*.cy.js',
         videoUploadOnPasses: false,
