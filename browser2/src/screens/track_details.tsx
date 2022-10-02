@@ -125,7 +125,7 @@ export const TrackDetails = ({
         state={state}
         className={"track_details"}
         navLeft={
-            <a onclick={UnselectTrack}>
+            <a onclick={UnselectTrack} data-cy="back">
                 <i class={"fas fa-2x fa-chevron-circle-left"} />
             </a>
         }

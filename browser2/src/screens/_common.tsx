@@ -116,7 +116,7 @@ export const Screen = (
 );
 
 export const BackToExplore = (): VNode => (
-    <a onclick={GoToScreen("explore", [PopScrollPos()])}>
+    <a onclick={GoToScreen("explore", [PopScrollPos()])} data-cy="back">
         <i class={"fas fa-2x fa-chevron-circle-left"} />
     </a>
 );

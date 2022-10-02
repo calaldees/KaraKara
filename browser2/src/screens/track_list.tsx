@@ -250,7 +250,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         className={"track_list"}
         navLeft={
             state.filters.length > 0 && (
-                <a onclick={Back}>
+                <a onclick={Back} data-cy="back">
                     <i class={"fas fa-2x fa-chevron-circle-left"} />
                 </a>
             )
