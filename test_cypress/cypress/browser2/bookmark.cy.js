@@ -11,13 +11,13 @@ describe('Bookmarks', () => {
     cy.contains("Birth").click()
     cy.contains("Bookmark").click()
     // Check that it was added
-    cy.contains('[data-cy="back"]').click()
-    cy.contains('[data-cy="back"]').click()
+    cy.get('[data-cy="back"]').click()
+    cy.get('[data-cy="back"]').click()
     cy.contains("Bookmarks")
     cy.contains("Birth").click()
     // Remove
     cy.contains("Un-Bookmark").click()
-    cy.contains('[data-cy="back"]').click()
+    cy.get('[data-cy="back"]').click()
     // Check that it was removed
     cy.contains("Bookmarks").should('not.exist')
     cy.contains("Birth").should('not.exist')
