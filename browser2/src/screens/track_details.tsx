@@ -132,7 +132,7 @@ export const TrackDetails = ({
         title={track.tags.title[0]}
         navRight={
             !state.widescreen && (
-                <a onclick={GoToScreen("queue", [PushScrollPos()])}>
+                <a onclick={GoToScreen("queue", [PushScrollPos()])} data-cy="queue">
                     <i class={"fas fa-2x fa-list-ol"} />
                 </a>
             )

@@ -258,7 +258,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         title={"Explore Tracks"}
         navRight={
             !state.widescreen && (
-                <a onclick={GoToScreen("queue", [PushScrollPos()])}>
+                <a onclick={GoToScreen("queue", [PushScrollPos()])} data-cy="queue">
                     <i class={"fas fa-2x fa-list-ol"} />
                 </a>
             )

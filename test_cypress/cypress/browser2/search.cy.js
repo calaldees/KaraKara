@@ -2,7 +2,7 @@ describe('Search', () => {
   beforeEach(function () {
     cy.intercept('GET', '/files/tracks.json', { fixture: 'tracks.json' })
     cy.visit('/browser2/')
-    cy.get("input").eq(0).type("demo")
+    cy.get("input").eq(0).type("test")
     cy.contains("Enter Room").click()
   })
   it('Small categories directly list tracks', () => {
