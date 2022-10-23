@@ -4,39 +4,50 @@ import re
 from datetime import timedelta
 from itertools import zip_longest, tee, chain
 from sqlite3 import Timestamp
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 import logging
 from typing import NamedTuple
+
 log = logging.getLogger(__name__)
 
 
-SSA_NEWLINE = '\\N'
-SSA_NEXT_COLOR = '{\\c&HFFFFFF&}'
+SSA_NEWLINE = "\\N"
+SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 SSA_HEIGHT_TO_FONT_SIZE_RATIO = 14
 
-SRT_FORMAT = '''\
+SRT_FORMAT = """\
 {index}
 {start} --> {end}
 {text}
 
-'''
+"""
 
-re_time = re.compile(r'(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)')
-re_srt_line = re.compile(r'(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*)(\n\n|$)', flags=re.MULTILINE)
-re_ssa_line = re.compile(r'Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),(?P<style>.*?),(?P<name>.*?),(?P<marginL>.*?),(?P<marginR>.*?),(?P<marginV>.*?),(?P<effect>.*?),(?P<text>.+)[\n$]')
+re_time = re.compile(
+    r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)"
+)
+re_srt_line = re.compile(
+    r"(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*)(\n\n|$)",
+    flags=re.MULTILINE,
+)
+re_ssa_line = re.compile(
+    r"Dialogue:.+?,(?P<start>.+?),(?P<end>.+?),(?P<style>.*?),(?P<name>.*?),(?P<marginL>.*?),(?P<marginR>.*?),(?P<marginV>.*?),(?P<effect>.*?),(?P<text>.+)[\n$]"
+)
+
 
 class Subtitle(NamedTuple):
     start: timedelta = timedelta()
     end: timedelta = timedelta()
-    text: str = ''
+    text: str = ""
     top: bool = False
 
 
 class TextOverlap(NamedTuple):
     index: int
     text: str
-def commonOverlap(text1, text2):
+
+
+def commonOverlap(text1: str, text2: str) -> TextOverlap:
     """
     https://neil.fraser.name/news/2010/11/04/
 
@@ -54,7 +65,7 @@ def commonOverlap(text1, text2):
     return TextOverlap(index, text2[:index])
 
 
-def _ssa_time(t: timedelta):
+def _ssa_time(t: timedelta) -> str:
     """
     >>> _ssa_time(timedelta(hours=1, minutes=23, seconds=45, microseconds=671000))
     '1:23:45.67'
@@ -63,14 +74,14 @@ def _ssa_time(t: timedelta):
     >>> _ssa_time(timedelta(hours=1, minutes=2, seconds=3, microseconds=50000))
     '1:02:03.05'
     """
-    return '{}:{:02d}:{:05.02f}'.format(
-        t.seconds//60//60,
-        (t.seconds%(60*60))//60,
-        t.seconds%60 + t.microseconds/1000000
+    return "{}:{:02d}:{:05.02f}".format(
+        t.seconds // 60 // 60,
+        (t.seconds % (60 * 60)) // 60,
+        t.seconds % 60 + t.microseconds / 1000000,
     )
 
 
-def _srt_time(t: timedelta):
+def _srt_time(t: timedelta) -> str:
     """
     >>> _srt_time(timedelta(hours=1, minutes=23, seconds=45, microseconds=671000))
     '01:23:45,671'
@@ -79,14 +90,14 @@ def _srt_time(t: timedelta):
     >>> _srt_time(timedelta(hours=1, minutes=2, seconds=3, microseconds=50000))
     '01:02:03,050'
     """
-    return '{:02d}:{:02d}:{:06.03f}'.format(
-        t.seconds//60//60,
-        (t.seconds%(60*60))//60,
-        t.seconds%60 + t.microseconds/1000000
+    return "{:02d}:{:02d}:{:06.03f}".format(
+        t.seconds // 60 // 60,
+        (t.seconds % (60 * 60)) // 60,
+        t.seconds % 60 + t.microseconds / 1000000,
     ).replace(".", ",")
 
 
-def _vtt_time(t: timedelta):
+def _vtt_time(t: timedelta) -> str:
     """
     >>> _vtt_time(timedelta(hours=1, minutes=23, seconds=45, microseconds=671000))
     '01:23:45.671'
@@ -95,14 +106,14 @@ def _vtt_time(t: timedelta):
     >>> _vtt_time(timedelta(hours=1, minutes=2, seconds=3, microseconds=50000))
     '01:02:03.050'
     """
-    return '{:02d}:{:02d}:{:06.03f}'.format(
-        t.seconds//60//60,
-        (t.seconds%(60*60))//60,
-        t.seconds%60 + t.microseconds/1000000
+    return "{:02d}:{:02d}:{:06.03f}".format(
+        t.seconds // 60 // 60,
+        (t.seconds % (60 * 60)) // 60,
+        t.seconds % 60 + t.microseconds / 1000000,
     )
 
 
-def _parse_time(time_str):
+def _parse_time(time_str: str) -> timedelta:
     """
     >>> _parse_time('  1:23:45.6700  ')
     datetime.timedelta(seconds=5025, microseconds=670000)
@@ -119,17 +130,18 @@ def _parse_time(time_str):
     """
     time_dict = re_time.search(time_str).groupdict()
     return timedelta(
-        hours=int(time_dict['hours']),
-        minutes=int(time_dict['minutes']),
-        seconds=float(time_dict['seconds'].replace(",", "."))
+        hours=int(time_dict["hours"]),
+        minutes=int(time_dict["minutes"]),
+        seconds=float(time_dict["seconds"].replace(",", ".")),
     )
 
 
-def clean_line(text):
-    text = re.sub(r'{.*?}', '', text)
-    return '\n'.join(l.strip() for l in text.split('\\N'))
+def clean_line(text: str) -> str:
+    text = re.sub(r"{.*?}", "", text)
+    return "\n".join(l.strip() for l in text.split("\\N"))
 
-def _parse_srt(source):
+
+def _parse_srt(source: str) -> List[Subtitle]:
     r"""
     >>> srt = r'''
     ... 1
@@ -148,18 +160,23 @@ def _parse_srt(source):
     >>> _parse_srt(srt)
     [Subtitle(start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
     """
+
     def parse_line(line):
         return Subtitle(
-            _parse_time(line['start']),
-            _parse_time(line['end']),
-            clean_line(line['text']),
-            "\\a6" in line['text'],
+            _parse_time(line["start"]),
+            _parse_time(line["end"]),
+            clean_line(line["text"]),
+            "\\a6" in line["text"],
         )
-    lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
+
+    lines = [
+        parse_line(line_match.groupdict())
+        for line_match in re_srt_line.finditer(source)
+    ]
     return [line for line in lines if line.text]
 
 
-def _parse_ssa(source):
+def _parse_ssa(source: str) -> List[Subtitle]:
     r"""
     >>> ssa = r'''
     ... [Events]
@@ -181,15 +198,16 @@ def _parse_ssa(source):
 
     def parse_line(line):
         return Subtitle(
-            _parse_time(line['start']),
-            _parse_time(line['end']),
-            clean_line(line['text']),
-            '\\a6' in line['text'],
+            _parse_time(line["start"]),
+            _parse_time(line["end"]),
+            clean_line(line["text"]),
+            "\\a6" in line["text"],
         )
+
     return [parse_line(line_dict) for line_dict in lines]
 
 
-def _remove_duplicate_lines(lines):
+def _remove_duplicate_lines(lines: List[Subtitle]) -> List[Subtitle]:
     r"""
     Overlap of subtitles should be removed
 
@@ -210,18 +228,33 @@ def _remove_duplicate_lines(lines):
     ['ga takaraMON da\nase mamire wa', 'ase mamire']
 
     """
+
     def remove_duplicate_line(line_current, line_next):
         if not line_next:
             return line_current
         _, overlap_text = commonOverlap(line_current.text, line_next.text)
         if len(overlap_text) < int(len(line_next.text) * 0.3):
-            log.debug('Subtitle text overlap is suspiciously small, ignoring the overlap current:"{}" - next:"{}" - overlap:"{}"'.format(line_current.text, line_next.text, overlap_text))
-            overlap_text = ''
-        return Subtitle(line_current.start, line_current.end, line_current.text.replace(overlap_text, '').strip(), line_current.top)
-    lines = [remove_duplicate_line(line_current, line_next) for line_current, line_next in zip_longest(lines, lines[1:])]
+            log.debug(
+                'Subtitle text overlap is suspiciously small, ignoring the overlap current:"{}" - next:"{}" - overlap:"{}"'.format(
+                    line_current.text, line_next.text, overlap_text
+                )
+            )
+            overlap_text = ""
+        return Subtitle(
+            line_current.start,
+            line_current.end,
+            line_current.text.replace(overlap_text, "").strip(),
+            line_current.top,
+        )
+
+    lines = [
+        remove_duplicate_line(line_current, line_next)
+        for line_current, line_next in zip_longest(lines, lines[1:])
+    ]
     return [line for line in lines if line.text]
 
-def _strip_toptitles(lines):
+
+def _strip_toptitles(lines: List[Subtitle]) -> List[Subtitle]:
     r"""
     If there are many subs on top, keep them (they're normally trying
     to get out of the way of something on the bottom of the screen)
@@ -251,7 +284,8 @@ def _strip_toptitles(lines):
         lines = [s for s in lines if not s.top]
     return lines
 
-def parse_subtitles(data):
+
+def parse_subtitles(data: str) -> List[Subtitle]:
     """
     >>> srt = '''
     ... 1
@@ -270,7 +304,7 @@ def parse_subtitles(data):
     >>> parse_subtitles('not real subtitles')
     []
     """
-    assert isinstance(data, str), 'Subtitle data should be a string'
+    assert isinstance(data, str), "Subtitle data should be a string"
     # Only two tracks actually have duplicate lines - the two .ssa ones.
     # Other tracks have intentionally repeated lyrics, don't mess with those.
     lines = _parse_srt(data) or _remove_duplicate_lines(_parse_ssa(data))
@@ -282,7 +316,17 @@ class SSASection(NamedTuple):
     name: str
     line: int
     format_order: tuple
-def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size_multiplyer=1, margin_v_size_multiplyer=1, font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO):
+
+
+def create_ssa(
+    subtitles,
+    font_size=None,
+    width=None,
+    height=None,
+    margin_h_size_multiplyer=1,
+    margin_v_size_multiplyer=1,
+    font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO,
+):
     r"""
     >>> ssa = create_ssa((
     ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'first'),
@@ -318,55 +362,112 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
         font_size = height / font_ratio
     if not font_size:
         font_size = font_ratio
-    header = dict((
-        ('Title', '<untitled>'),
-        ('Original Script', '<unknown>'),
-        ('ScriptType', 'v4.00'),
-    ))
+    header = dict(
+        (
+            ("Title", "<untitled>"),
+            ("Original Script", "<unknown>"),
+            ("ScriptType", "v4.00"),
+        )
+    )
     if width:
-        header['PlayResX'] = width
+        header["PlayResX"] = width
     if height:
-        header['PlayResY'] = height
-    ssa_template = dict((
-        ('Script Info', header),
-        (SSASection('V4 Styles', 'Style', ('Name', 'Fontname', 'Fontsize', 'PrimaryColour', 'SecondaryColour', 'TertiaryColour', 'BackColour', 'Bold', 'Italic', 'BorderStyle', 'Outline', 'Shadow', 'Alignment', 'MarginL', 'MarginR', 'MarginV', 'AlphaLevel', 'Encoding')), (
-            {
-                'Name': 'Default',
-                'Fontname': 'Arial',
-                'Fontsize': int(font_size),
-                'PrimaryColour': 65535,
-                'SecondaryColour': 16777215,
-                'TertiaryColour': 16777215,
-                'BackColour': 0,
-                'Bold': -1,
-                'Italic': 0,
-                'BorderStyle': 3,
-                'Outline': 1,
-                'Shadow': 1,
-                'Alignment': 2,
-                'MarginL': int(margin_h_size_multiplyer * font_size),
-                'MarginR': int(margin_h_size_multiplyer * font_size),
-                'MarginV': int(margin_v_size_multiplyer * font_size),
-                'AlphaLevel': 0,
-                'Encoding': 128,
-            },
-        )),
-        (SSASection('Events', 'Dialogue', ('Marked', 'Start', 'End', 'Style', 'Name', 'MarginL', 'MarginR', 'MarginV', 'Effect', 'Text')), (
-            {
-                'Marked': 'Marked=0',
-                'Start': _ssa_time(subtitle.start),
-                'End': _ssa_time(subtitle.end),
-                'Style': '*Default',
-                'Name': 'NTP',
-                'MarginL': '0000',
-                'MarginR': '0000',
-                'MarginV': '0000',
-                'Effect': '!Effect',
-                'Text': ('{}{}{}{}'.format(subtitle.text, SSA_NEWLINE, SSA_NEXT_COLOR, subtitle_next.text) if subtitle_next else subtitle.text).replace('\n', SSA_NEWLINE),
-            }
-            for subtitle, subtitle_next in zip_longest(subtitles, subtitles[1:])
-        )),
-    ))
+        header["PlayResY"] = height
+    ssa_template = dict(
+        (
+            ("Script Info", header),
+            (
+                SSASection(
+                    "V4 Styles",
+                    "Style",
+                    (
+                        "Name",
+                        "Fontname",
+                        "Fontsize",
+                        "PrimaryColour",
+                        "SecondaryColour",
+                        "TertiaryColour",
+                        "BackColour",
+                        "Bold",
+                        "Italic",
+                        "BorderStyle",
+                        "Outline",
+                        "Shadow",
+                        "Alignment",
+                        "MarginL",
+                        "MarginR",
+                        "MarginV",
+                        "AlphaLevel",
+                        "Encoding",
+                    ),
+                ),
+                (
+                    {
+                        "Name": "Default",
+                        "Fontname": "Arial",
+                        "Fontsize": int(font_size),
+                        "PrimaryColour": 65535,
+                        "SecondaryColour": 16777215,
+                        "TertiaryColour": 16777215,
+                        "BackColour": 0,
+                        "Bold": -1,
+                        "Italic": 0,
+                        "BorderStyle": 3,
+                        "Outline": 1,
+                        "Shadow": 1,
+                        "Alignment": 2,
+                        "MarginL": int(margin_h_size_multiplyer * font_size),
+                        "MarginR": int(margin_h_size_multiplyer * font_size),
+                        "MarginV": int(margin_v_size_multiplyer * font_size),
+                        "AlphaLevel": 0,
+                        "Encoding": 128,
+                    },
+                ),
+            ),
+            (
+                SSASection(
+                    "Events",
+                    "Dialogue",
+                    (
+                        "Marked",
+                        "Start",
+                        "End",
+                        "Style",
+                        "Name",
+                        "MarginL",
+                        "MarginR",
+                        "MarginV",
+                        "Effect",
+                        "Text",
+                    ),
+                ),
+                (
+                    {
+                        "Marked": "Marked=0",
+                        "Start": _ssa_time(subtitle.start),
+                        "End": _ssa_time(subtitle.end),
+                        "Style": "*Default",
+                        "Name": "NTP",
+                        "MarginL": "0000",
+                        "MarginR": "0000",
+                        "MarginV": "0000",
+                        "Effect": "!Effect",
+                        "Text": (
+                            "{}{}{}{}".format(
+                                subtitle.text,
+                                SSA_NEWLINE,
+                                SSA_NEXT_COLOR,
+                                subtitle_next.text,
+                            )
+                            if subtitle_next
+                            else subtitle.text
+                        ).replace("\n", SSA_NEWLINE),
+                    }
+                    for subtitle, subtitle_next in zip_longest(subtitles, subtitles[1:])
+                ),
+            ),
+        )
+    )
 
     o = []
     for key, section_data in ssa_template.items():
@@ -378,23 +479,31 @@ def create_ssa(subtitles, font_size=None, width=None, height=None, margin_h_size
             section_meta = None
 
         # Section Header
-        o.append('[{0}]'.format(section_name))
+        o.append("[{0}]".format(section_name))
 
         # No field list - just print the dict
         if section_meta is None:
             for key, value in section_data.items():
-                o.append('{0}: {1}'.format(key, value))
+                o.append("{0}: {1}".format(key, value))
         # Specific field list required for this section
         if isinstance(section_meta, SSASection):
             # Section field description
-            o.append('Format: {0}'.format(', '.join(section_meta.format_order)))
+            o.append("Format: {0}".format(", ".join(section_meta.format_order)))
             # Add each row
             for item in section_data:
-                o.append('{0}: {1}'.format(section_meta.line, ','.join(str(item[col_name]) for col_name in section_meta.format_order)))
+                o.append(
+                    "{0}: {1}".format(
+                        section_meta.line,
+                        ",".join(
+                            str(item[col_name])
+                            for col_name in section_meta.format_order
+                        ),
+                    )
+                )
 
-        o.append('')
+        o.append("")
 
-    return '\n'.join(o)
+    return "\n".join(o)
 
 
 def create_srt(subtitles):
@@ -418,9 +527,9 @@ def create_srt(subtitles):
     >>> _parse_srt(srt)
     [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=60), text='first', top=False), Subtitle(start=datetime.timedelta(seconds=120), end=datetime.timedelta(seconds=180, microseconds=510000), text='second', top=False)]
     """
-    return ''.join(
+    return "".join(
         SRT_FORMAT.format(
-            index=index+1,
+            index=index + 1,
             start=_srt_time(subtitle.start),
             end=_srt_time(subtitle.end),
             text=subtitle.text,
@@ -518,28 +627,28 @@ def create_vtt(subtitles):
     padded_lines = []
     for line in subtitles:
         if line.start - last_end > timedelta(seconds=5):
-            padded_lines.append(Subtitle(
-                start=line.start - timedelta(seconds=5),
-                end=line.start,
-                text="",
-                top=line.top,
-            ))
+            padded_lines.append(
+                Subtitle(
+                    start=line.start - timedelta(seconds=5),
+                    end=line.start,
+                    text="",
+                    top=line.top,
+                )
+            )
         padded_lines.append(line)
         last_end = line.end
-    padded_lines.append(Subtitle(
-        start=last_end,
-        end=last_end,
-        text=""
-    ))
+    padded_lines.append(Subtitle(start=last_end, end=last_end, text=""))
 
-    return 'WEBVTT - KaraKara Subtitle\n\n' + ''.join(
+    return "WEBVTT - KaraKara Subtitle\n\n" + "".join(
         VTT_FORMAT.format(
-            index=index+1,
+            index=index + 1,
             start=_vtt_time(subtitle1.start),
             end=_vtt_time(subtitle1.end),
             format=" line:1" if subtitle1.top else "",
             active=subtitle1.text,
             next=subtitle2.text,
         )
-        for index, (subtitle1, subtitle2) in enumerate(zip(padded_lines[:-1], padded_lines[1:]))
+        for index, (subtitle1, subtitle2) in enumerate(
+            zip(padded_lines[:-1], padded_lines[1:])
+        )
     )
