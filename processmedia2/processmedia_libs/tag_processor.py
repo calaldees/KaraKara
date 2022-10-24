@@ -33,3 +33,8 @@ def parse_tags(data):
         return accumulator
 
     return dict(reduce(_reduce, data.split("\n"), {}).items())
+
+
+def parse_tags_file(filename):
+    with open(filename) as fp:
+        return parse_tags(fp.read())

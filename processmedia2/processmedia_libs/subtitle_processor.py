@@ -312,6 +312,11 @@ def parse_subtitles(data: str) -> List[Subtitle]:
     return lines
 
 
+def parse_subtitles_file(filename):
+    with open(filename) as fp:
+        return parse_subtitles(fp.read())
+
+
 class SSASection(NamedTuple):
     name: str
     line: int
