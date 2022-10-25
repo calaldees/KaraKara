@@ -92,8 +92,6 @@ def export_track_data(**kwargs):
             track_id = re.sub('[^0-9a-zA-Z]+', '_', name)
             track = {
                 'id': track_id,
-                'source_hash': m.source_hash,
-                'source_filename': name,
                 'duration': m.source_details['duration'],
                 'attachments': _get_attachments(),
                 'lyrics': _get_lyrics(),
