@@ -102,7 +102,7 @@ def export_track_data(**kwargs):
             stats['meta_exported'].add(name)
 
     assert kwargs['path_static_track_list']
-    data = json.dumps(dict(_tracks()), default=tuple)
+    data = json.dumps(dict(sorted(_tracks())), default=tuple)
     with open(kwargs['path_static_track_list'], 'wt') as filehandle:
         filehandle.write(data)
     if kwargs['gzip']:
