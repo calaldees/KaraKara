@@ -19,7 +19,7 @@ Example Output
     processed/BIG-HASH4.webp * 4
 
     # Entire track dataset in single static file (with txt and srt embeded)
-    static/track.json
+    processed/track.json
 
 
 Processing Steps
@@ -29,7 +29,7 @@ Processing Steps
     * more
 * encode
     * more
-* import
+* export
     * more
 * cleanup
     * more
