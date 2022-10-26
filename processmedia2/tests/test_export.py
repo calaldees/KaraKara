@@ -34,11 +34,10 @@ def test_export_full(ProcessMediaTestManager, TEST1_VIDEO_FILES, TEST2_AUDIO_FIL
         mm.load_all()
 
         # Check that expected source files are in the exported data
-        assert frozenset(('test1', 'test2')) == frozenset(track['source_filename'] for track in data.values())
 
         for track_id, track in data.items():
             assert track_id == track['id']
-            assert frozenset(track.keys()) == {"id", "source_hash", "source_filename", "duration", "attachments", "lyrics", "tags"}
+            assert frozenset(track.keys()) == {"id", "duration", "attachments", "lyrics", "tags"}
 
             assert track['duration']
             assert isinstance(track['duration'], numbers.Number)
