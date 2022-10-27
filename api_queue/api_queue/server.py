@@ -308,10 +308,12 @@ async def move_queue_item(request, queue_id):
 
 # Queue / Commands ------------------------------------------------------------
 
+class CommandReturn():
+    is_playing: bool
 @queue_blueprint.get("/command/<command:([a-z_]+).json>")
 @openapi.definition(
     response=[
-        openapi.definitions.Response({"application/json": {'is_playing': bool}},),
+        openapi.definitions.Response({"application/json": CommandReturn}, status=200),
         openapi.definitions.Response('invalid command', status=400),
         openapi.definitions.Response('admin required', status=403),
     ]
