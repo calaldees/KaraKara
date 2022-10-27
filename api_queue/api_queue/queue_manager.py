@@ -21,9 +21,11 @@ DEFAULT_QUEUE_SETTINGS = {
     "theme": "metalghosts",
     "preview_volume": 0.2,
     "event_end": None,
+    "validation": ['event_end',],
 }
 QUEUE_SETTING_TYPES = {
     "track_space": lambda x: datetime.timedelta(seconds=x),
+    "event_end": lambda x: datetime.datetime.fromisoformat(x) if x else None,
 }
 
 class SettingsManager():

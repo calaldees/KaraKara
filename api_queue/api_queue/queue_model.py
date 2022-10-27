@@ -66,9 +66,12 @@ class QueueItem():
 class Queue():
     def __init__(self, items: list[QueueItem], settings: dict):
         self.items = items
-        self.track_space = settings["track_space"]
+        self.settings = settings
         self.modified = False
         self._now: t.Optional[datetime.datetime] = None
+    @property
+    def track_space(self):
+        return self.settings["track_space"]
     @property
     def now(self) -> datetime.datetime:
         return self._now or datetime.datetime.now()

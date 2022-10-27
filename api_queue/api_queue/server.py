@@ -48,6 +48,7 @@ async def tracks_load(_app: sanic.Sanic, _loop):
 
 from .queue_model import QueueItem
 from .queue_manager import QueueManagerCSVAsync, SettingsManager
+from . import queue_validation
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     path_queue = Path(str(_app.config.get('PATH_QUEUE')))
@@ -252,11 +253,6 @@ async def add_queue_item(request, queue_id):
     # Queue update
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
-            # TODO:
-            #   Check duplicate performer
-            #   Check duplicate tracks
-            #   Check event end
-            #   Check queue limit (priority token?)
             queue_item = QueueItem(
                 track_id=track_id,
                 track_duration=request.app.ctx.tracks[track_id]["duration"],
@@ -264,6 +260,11 @@ async def add_queue_item(request, queue_id):
                 performer_name=performer_name,
             )
             queue.add(queue_item)
+            # Validate queue state - validation functions are configurable per queue
+            for validation_scheme in queue.settings.get("validation", []):
+                validation_error = getattr(queue_validation, validation_scheme)(queue)
+                if validation_error:
+                    raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
             return sanic.response.json(queue_item.asdict())
 
 
