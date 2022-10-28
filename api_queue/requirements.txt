@@ -3,3 +3,4 @@ sanic-ext
 sanic-openapi
 ujson
 asyncio-mqtt
+pytimeparse

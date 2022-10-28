@@ -9,6 +9,7 @@ import asyncio
 from collections import defaultdict
 
 import ujson as json
+from pytimeparse.timeparse import timeparse
 
 from .queue_model import Queue, QueueItem
 
@@ -20,12 +21,22 @@ DEFAULT_QUEUE_SETTINGS = {
     "title": "KaraKara",
     "theme": "metalghosts",
     "preview_volume": 0.2,
-    "event_end": None,
-    "validation": ['event_end',],
+    "validation_event_start_datetime": None,
+    "validation_event_end_datetime": None,
+    "validation_duplicate_performer_timedelta": None,
+    "validation_duplicate_track_timedelta": None,
+    "validation_performer_names": [],
+    "validation": [],  # 'default',  # disable validation for now
 }
+def _parse_isodatetime(isoformatString):
+    return datetime.datetime.fromisoformat(isoformatString) if isoformatString else None
+def _parse_timedelta(durationString):
+    return timeparse(durationString) if durationString else None
 QUEUE_SETTING_TYPES = {
     "track_space": lambda x: datetime.timedelta(seconds=x),
-    "event_end": lambda x: datetime.datetime.fromisoformat(x) if x else None,
+    "validation_event_end_datetime": _parse_isodatetime,
+    "validation_duplicate_performer_timedelta": _parse_timedelta,
+    "validation_duplicate_track_timedelta": _parse_timedelta,
 }
 
 class SettingsManager():

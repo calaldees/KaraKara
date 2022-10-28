@@ -1,4 +1,7 @@
-import api_queue.queue_validation as queue_validation
+from api_queue.queue_model import Queue, QueueItem
+from api_queue.queue_validation import default as default_validation
 
 def test_event_end():
-    queue_validation.event_end(None)  # placeholder
+    #q = Queue()
+    #assert default_validation()
+    pass

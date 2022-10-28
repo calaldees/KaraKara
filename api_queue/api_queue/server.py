@@ -247,9 +247,6 @@ async def add_queue_item(request, queue_id):
     if track_id not in request.app.ctx.tracks:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
     performer_name = request.json['performer_name']
-    # TODO:
-    #   Check performer name in performer name list?
-    #   Check event start
     # Queue update
     async with push_queue_to_mqtt(request, queue_id):
         async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
