@@ -144,6 +144,28 @@ describe('group_tracks', () => {
         expect(results[0][1].groups['T']).toEqual({"The Wombles": 1});
         expect(results[0][1].groups['W']).toEqual({"Wombles, The": 1});
     });
+    test("group punctuated bands under their letter", () => {
+        // Generate a track list with a lot of "from:..." variants, but none
+        // of them containing a T or a W
+        function random_title(length: number): string {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSUVXYZabcdefghijklmnopqrsuvxyz';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+        let many_froms = many_tracks.map(
+            track => ({ ...track, tags: { ...track.tags, "from": [random_title(2)] } })
+        );
+        many_froms[0].tags.from = ["[t][o][w][e][l]"];
+        let results = grouper.group_tracks(["category:anime"], many_froms);
+        expect(results.length).toEqual(1);
+        expect(results[0][0]).toEqual("from");
+        expect(results[0][1].groups).toBeDefined();
+        expect(results[0][1].groups['T']).toEqual({"[t][o][w][e][l]": 1});
+    });
     test("show leftovers if some tracks don't match the suggested sections", () => {
         let results = grouper.group_tracks(["from:Macross"], many_tracks);
         expect(results.length).toBeGreaterThanOrEqual(2);

@@ -235,3 +235,30 @@ describe('current_and_future', () => {
         expect(utils.current_and_future(1000, [item])).toEqual([item]);
     });
 });
+
+describe('normalise_name', () => {
+    test('plain', () => {
+        expect(utils.normalise_name("Macross")).toEqual("MACROSS");
+    });
+    test('punctuation', () => {
+        expect(utils.normalise_name("_Macross_")).toEqual("MACROSS");
+    });
+    test('all punctuation', () => {
+        expect(utils.normalise_name("?!?")).toEqual("?!?");
+    });
+});
+
+describe('normalise_cmp', () => {
+    test('plain', () => {
+        expect(utils.normalise_cmp("A", "B")).toEqual(-1);
+        expect(utils.normalise_cmp("B", "A")).toEqual(1);
+    });
+    test('punctuation', () => {
+        expect(utils.normalise_cmp("A", "_B_")).toEqual(-1);
+        expect(utils.normalise_cmp("B", "_A_")).toEqual(1);
+    });
+    test('case', () => {
+        expect(utils.normalise_cmp("A", "b")).toEqual(-1);
+        expect(utils.normalise_cmp("B", "a")).toEqual(1);
+    });
+});

@@ -7,7 +7,7 @@ import {
     PopScrollPos,
 } from "../effects";
 import { GoToScreen } from "../actions";
-import { track_info } from "../utils";
+import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
 import { group_tracks } from "../track_grouper";
 
@@ -97,7 +97,7 @@ const FilterListGroupHeader = (
 const GroupedFilterList = ({ heading, filters, expanded }): VNode => (
     <ul>
         {Object.keys(filters)
-            .sort()
+            .sort(normalise_cmp)
             .map((group) =>
                 group == expanded ? (
                     <div class={"filter_list_group"}>
@@ -136,7 +136,7 @@ function unThe(filter: string): string {
 const FilterList = ({ heading, filters }): VNode => (
     <ul>
         {Object.keys(filters)
-            .sort()
+            .sort(normalise_cmp)
             .map((child) => (
                 <AddFilter
                     filter={heading + ":" + unThe(child)}

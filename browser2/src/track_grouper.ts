@@ -1,3 +1,5 @@
+import { normalise_name } from "./utils";
+
 /**
  * Given a selection of tracks and some search terms, figure out
  * what the user might want to search for next, eg
@@ -125,7 +127,8 @@ export function group_tracks(
         if (Object.keys(tag_values).length > 50) {
             let grouped_groups = {};
             Object.keys(tag_values).forEach(function (x) {
-                var initial = x[0].toUpperCase();
+                // Group by first alphabetic character
+                var initial = normalise_name(x)[0];
                 if (grouped_groups[initial] == undefined)
                     grouped_groups[initial] = {};
                 grouped_groups[initial][x] = tag_values[x];

@@ -1,3 +1,5 @@
+import { normalise_cmp } from "./utils";
+
 /**
  * If track has a 'hidden' tag, then skip it, UNLESS it also has
  * other non-hidden tags with the same parent. Consider top-level
@@ -93,6 +95,6 @@ export function apply_search(tracks: Array<Track>, search: string): Array<Track>
     tracks = apply_tags(tracks, state.settings['forced_tags']);
     tracks = apply_tags(tracks, state.filters);
     tracks = apply_search(tracks, state.search);
-    tracks.sort((a, b) => (a.tags.title[0] > b.tags.title[0] ? 1 : -1));
+    tracks.sort((a, b) => normalise_cmp(a.tags.title[0], b.tags.title[0]));
     return tracks;
 }

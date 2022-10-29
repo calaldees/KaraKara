@@ -162,3 +162,21 @@ export function copy_type(original, value) {
 export function current_and_future(now: number, tracks: Array<QueueItem>): Array<QueueItem> {
     return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > now));
 }
+
+/*
+ * Normalise weird band names so that they show up in the right place when
+ * sorted in alphabetic order:
+ * - case insensitive
+ * - ignore punctuation (unless punctuation is all we have)
+ */
+export function normalise_name(name: string): string {
+    return (name.replace(/[^a-zA-Z0-9]/g, "") || name).toUpperCase()
+}
+
+/*
+ * Compare two strings for sorting into alphabetic order, but after
+ * normalising with normalise_name
+ */
+export function normalise_cmp(a: string, b: string): number {
+    return normalise_name(a) > normalise_name(b) ? 1 : -1;
+}
