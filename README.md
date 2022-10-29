@@ -54,8 +54,9 @@ Admins can walk around the room, remotely controlling when tracks are played ful
     * During processing sound levels are normalized. Some tracks could be slow quiet ballads while others or ripping metal operas. Technical admins needed to often adjust the volume of the microphone at the beginning of a song to compensate for the track volume differences. While normalization does not remove the problem (as different vocalists will use the mic in different ways), it does reduce the problem.
 * Wide variety of data formats supported
     * Originally videos with subtitle files was the only way to add a track. Some vocal-less versions of the track are published or full length version that are longer than the 1:30 original intro. To facilitate this, the following formats are supported
-    * Image + MP3 + SRT
-    * Video + SRT
+    * Image + Audio + Subtitle
+    * Video + Subtitle
+    * Hard-subbed Video
         * Various formats and codecs (including RM, gah!)
 
 
@@ -88,18 +89,18 @@ graph TD
     subgraph docker-compose [docker-compose]
         nginx
         mqtt
-        processmedia2
-        browser2
-        player2
+        processmedia
+        browser
+        player
         api_queue
 
         logs[(/logs/)]
         nginx ..-> logs
-        processmedia2 ..-> logs
+        processmedia ..-> logs
         api_queue ..-> logs
 
-        nginx -- http 80 --> browser2
-        nginx -- http 80 --> player2
+        nginx -- http 80 --> browser
+        nginx -- http 80 --> player
         nginx -- http 8000 --> api_queue
         api_queue --mqtt 1887--> mqtt
         mqtt -- websocket 9001 --> nginx
@@ -109,40 +110,30 @@ graph TD
 
     subgraph filesystem
         /media/source/[(/media/source/)]
-        /media/meta/[(/media/meta/)]
         /media/processed/[(/media/processed/)]
     end
 
-    /media/processed/--> nginx
+    /media/processed/ --> nginx
     /media/processed/ --> api_queue
-    /media/source/ --> processmedia2 --> /media/processed/
-    /media/meta/ <--> processmedia2
+    /media/source/ --> processmedia --> /media/processed/
 ```
 
 
 * api_queue ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
   * TODO
 * processmedia2 ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
-  * Takes folders of source data (video, image+mp3, subtitles)
-  * Hard subbed final video
-    * this high bitrate mp4 is presented via the player interface.
-  * Low bitrate previews for mobile devices
-    * Currently just mp4 but could support other formats in future.
-  * Thumbnail images
-    * Each video has 4 images taken at even intervals
-  * VTT subtitles
-    * regardless of input format, a normalised srt will be created for each video
-  * JSON metadata
-    * Once scanned, each item will have JSON data containing the hashes of
-      source data
-  * creates single datafile `tracks.json`
+  * Takes folders of source data (video, image+audio, subtitles)
+  * Create high-bitrate video for the player interface.
+  * Create low-bitrate previews for mobile devices
+  * Create thumbnail images for the track browser
+  * Convert subtitles into a format that web browsers understand
+  * Export an index of all the created files and metadata into `tracks.json`
 * browser2 ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
   * Mobile webapp interface to search / preview / queue tracks
-  * Gets data from website / `track_list` api
+  * Gets data from `tracks.json`
 * player2 ![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
   * Displays the current queue for use on a projector
   * Gets data from website / `queue` api
   * Streams final video from `nginx` in fullscreen mode.
-  * Can be controlled via hotkeys or remotely with websockets
   * Automatically updates track list when the queue is changed.
   * Queue order is obscured past a configurable time
