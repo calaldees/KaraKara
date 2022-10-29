@@ -42,6 +42,7 @@ SCAN_IGNORE = [
     ".DS_Store",
     ".stfolder",
     ".stversions",
+    ".syncthing",
     "cache.db",
 ]
 
