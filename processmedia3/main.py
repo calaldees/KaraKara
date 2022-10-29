@@ -119,15 +119,19 @@ def encode(tracks: List[Track], threads: int = 1) -> None:
     Take a list of Track objects, and make sure that every Target exists
     """
 
-    def _encode(track: Track):
+    def _encode(target: Target):
         try:
-            for target in track.targets:
-                target.encode()
+            target.encode()
         except Exception:
-            log.exception(f"Error encoding {track.id}")
+            log.exception(f"Error encoding {target.friendly}")
 
-    tracks_todo = [t for t in tracks if t.needs_work()]
-    thread_map(_encode, tracks_todo, max_workers=threads, desc="encode")
+    targets = []
+    for tr in tracks:
+        for t in tr.targets:
+            if not t.path.exists():
+                targets.append(t)
+
+    thread_map(_encode, targets, max_workers=threads, desc="encode")
 
 
 def export(processed_dir: Path, tracks: List[Track], threads: int = 1) -> None:

@@ -175,15 +175,6 @@ class Track:
     def _sources_by_type(self, types: Set[SourceType]) -> List[Source]:
         return [s for s in self.sources if s.type in types]
 
-    def needs_work(self) -> bool:
-        # we can avoid even adding this track to the encoder queue
-        # if all of the targets exist already, which makes the encoder
-        # progress report more useful
-        for t in self.targets:
-            if not t.path.exists():
-                return True
-        return False
-
     def to_json(self) -> Dict[str, Any]:
         media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         duration = media_files[0].duration()
