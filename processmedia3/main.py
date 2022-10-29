@@ -28,14 +28,8 @@ TARGET_TYPES = [
     TargetType.PREVIEW_AV1,
     TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,
-    TargetType.IMAGE_AVIF1,
-    TargetType.IMAGE_AVIF2,
-    TargetType.IMAGE_AVIF3,
-    TargetType.IMAGE_AVIF4,
-    TargetType.IMAGE_WEBP1,
-    TargetType.IMAGE_WEBP2,
-    TargetType.IMAGE_WEBP3,
-    TargetType.IMAGE_WEBP4,
+    TargetType.IMAGE_AVIF,
+    TargetType.IMAGE_WEBP,
     TargetType.SUBTITLES_VTT,
 ]
 SCAN_IGNORE = [
