@@ -9,7 +9,7 @@ from pathlib import Path
 import json
 
 import main
-import lib.kktypes
+from lib.kktypes import SourceType, TargetType
 
 # disable progress bars in unit tests
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
@@ -20,10 +20,10 @@ class TestE2E(testslide.TestCase):
         logging.basicConfig(level=logging.DEBUG)
 
         main.TARGET_TYPES = [
-            lib.kktypes.TargetType.VIDEO_H264,
-            lib.kktypes.TargetType.PREVIEW_H264,
-            lib.kktypes.TargetType.IMAGE_WEBP,
-            lib.kktypes.TargetType.SUBTITLES_VTT,
+            TargetType.VIDEO_H264,
+            TargetType.PREVIEW_H264,
+            TargetType.IMAGE_WEBP,
+            TargetType.SUBTITLES_VTT,
         ]
 
         with tempfile.TemporaryDirectory() as processed_str:
@@ -33,10 +33,11 @@ class TestE2E(testslide.TestCase):
             tracks = main.scan(Path("./tests/source"), processed, None, {})
 
             self.assertEqual(tracks[0].id, "test1")
-            self.assertEqual(tracks[0].sources[0].type, lib.kktypes.SourceType.TAGS)
             self.assertEqual(
-                tracks[0].targets[0].type, lib.kktypes.TargetType.VIDEO_H264
+                {s.type for s in tracks[0].sources},
+                {SourceType.TAGS, SourceType.VIDEO, SourceType.SUBTITLES},
             )
+            self.assertEqual(tracks[0].targets[0].type, TargetType.VIDEO_H264)
             self.assertEqual(tracks[0].targets[0].path.stem, "XJ8S5jgxf_t")
             self.assertEqual(tracks[1].id, "test2")
 
