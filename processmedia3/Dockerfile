@@ -25,7 +25,7 @@ FROM python:3.11-alpine as production
 
     CMD python3 /app/main.py \
         --source /media/source \
-        --cache /tmp/cache.db \
+        --cache /media/processed/cache.db \
         --processed /media/processed \
         --loop 600 \
         | tee /logs/processmedia3.log

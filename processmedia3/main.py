@@ -196,7 +196,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument(
         "--cache",
         type=Path,
-        default=Path("/media/processed/cache.db"),
+        default=Path("/tmp/cache.db"),
         metavar="FILE",
         help="Where to store temporary data (Default: %(default)s)",
     )
