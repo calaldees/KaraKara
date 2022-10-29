@@ -1,21 +1,19 @@
-import testslide
-from tqdm import tqdm
-from functools import partialmethod
-import os
-import logging
-import glob
-import tempfile
-from pathlib import Path
 import json
+import logging
+import tempfile
+from functools import partialmethod
+from pathlib import Path
+import unittest
 
 import main
 from lib.kktypes import SourceType, TargetType
+from tqdm import tqdm
 
 # disable progress bars in unit tests
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
-class TestE2E(testslide.TestCase):
+class TestE2E(unittest.TestCase):
     def test_e2e(self):
         logging.basicConfig(level=logging.DEBUG)
 
@@ -103,3 +101,7 @@ class TestE2E(testslide.TestCase):
             main.cleanup(processed, [], True)
 
             self.assertEqual(list(processed.glob("*/*")), [])
+
+
+if __name__ == '__main__':
+    unittest.main()
