@@ -36,7 +36,7 @@ CODEC_AV1 = [
     "-g",
     "240",
 ]
-CODEC_H265 = ["-vcodec", "libx265", "-crf", "39", "-preset", "slow"]
+CODEC_H265 = ["-vcodec", "libx265", "-crf", "39", "-preset", "slow", "-tag:v", "hvc1"]
 CODEC_H264 = ["-vcodec", "libx264", "-crf", "39", "-preset", "fast"]
 
 CODEC_OPUS = ["-acodec", "libopus", "-ac", "2"]
@@ -137,10 +137,6 @@ class VideoToH265(_BaseVideoToVideo):
 class VideoToH265Preview(VideoToH265):
     target = TargetType.PREVIEW_H265
     category = "preview"
-    pm2_salt = [
-        "preview_h265",
-        """{'vcodec': 'libx265', 'crf': 39, 'preset': 'slow', 'acodec': 'libfdk_aac', 'ab': '24k', 'ac': 1, 'vf': "scale=w='320:h=floor((320*(1/a))/2)*2'", 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}""",
-    ]
 
 
 class VideoToH264(_BaseVideoToVideo):
