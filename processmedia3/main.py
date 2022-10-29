@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from lib.kktypes import Source, TargetType, Track
+from lib.kktypes import Source, TargetType, Track, Target
 
 log = logging.getLogger()
 
