@@ -28,7 +28,6 @@ services:
             - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser2/"
 
     api_queue:
-        image: karakara/api_queue
         build:
             context: ./api_queue
         environment:
@@ -52,17 +51,14 @@ services:
             - ${PWD}/mqtt/:/mosquitto/config/:ro
 
     player2:
-        image: karakara/player2
         build:
             context: ./player2
 
     browser2:
-        image: karakara/browser2
         build:
             context: ./browser2
 
     processmedia2:
-        image: karakara/processmedia2
         profiles:
             - processmedia
         build:
