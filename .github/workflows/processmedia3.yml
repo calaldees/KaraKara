@@ -1,0 +1,18 @@
+name: ProcessMedia3
+
+on:
+  push:
+    paths:
+    - 'processmedia3/**'
+    - '.github/workflows/processmedia3.yml'
+
+jobs:
+  publish:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Build
+      run: docker build .
+      working-directory: processmedia3
