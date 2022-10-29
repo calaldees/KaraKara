@@ -122,7 +122,7 @@ class Target:
         self.type = type
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
-        if self.encoder.category in {"video", "preview"}:
+        if self.encoder.category in {"video", "preview"} and self.encoder.pm2_salt:
             # Uses PM2-compatible hashing for video and preview so that we
             # don't spend ages re-encoding those
             parts = self.encoder.pm2_salt + [
