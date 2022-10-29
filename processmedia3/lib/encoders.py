@@ -45,6 +45,7 @@ class Encoder:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                errors="ignore",  # some files contain non-utf8 metadata
                 check=True,
             )
         except subprocess.CalledProcessError as e:
