@@ -103,5 +103,5 @@ class TestE2E(unittest.TestCase):
             self.assertEqual(list(processed.glob("*/*")), [])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

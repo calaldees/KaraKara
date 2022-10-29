@@ -42,6 +42,7 @@ SCAN_IGNORE = [
     ".DS_Store",
     ".stfolder",
     ".stversions",
+    "cache.db",
 ]
 
 
@@ -162,6 +163,7 @@ def cleanup(
     Delete any files from the processed dir that aren't included in any tracks
     """
     expected = {
+        processed_dir / "cache.db",
         processed_dir / "tracks.json",
         processed_dir / "tracks.json.gz",
     }
@@ -194,7 +196,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument(
         "--cache",
         type=Path,
-        default=Path("/tmp/cache.db"),
+        default=Path("/media/processed/cache.db"),
         metavar="FILE",
         help="Where to store temporary data (Default: %(default)s)",
     )
