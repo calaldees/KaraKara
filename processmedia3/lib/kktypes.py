@@ -34,14 +34,6 @@ class TargetType(Enum):
     IMAGE_WEBP = 30
     IMAGE_AVIF = 31
     SUBTITLES_VTT = 40
-    IMAGE_WEBP1 = 51
-    IMAGE_WEBP2 = 52
-    IMAGE_WEBP3 = 53
-    IMAGE_WEBP4 = 54
-    IMAGE_AVIF1 = 55
-    IMAGE_AVIF2 = 56
-    IMAGE_AVIF3 = 57
-    IMAGE_AVIF4 = 58
 
 
 class Source:

@@ -239,39 +239,6 @@ class VideoToAvif(_BaseVideoToImage):
     mime = "image/avif"
 
 
-class VideoToAvif1(VideoToAvif):
-    target = TargetType.IMAGE_AVIF1
-    pm2_salt = ["image1_avif", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToAvif2(VideoToAvif):
-    target = TargetType.IMAGE_AVIF2
-    pm2_salt = ["image2_avif", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToAvif3(VideoToAvif):
-    target = TargetType.IMAGE_AVIF3
-    pm2_salt = ["image3_avif", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToAvif4(VideoToAvif):
-    target = TargetType.IMAGE_AVIF4
-    pm2_salt = ["image4_avif",'{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToWebp1(VideoToWebp):
-    target = TargetType.IMAGE_WEBP1
-    pm2_salt = ["image1_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToWebp2(VideoToWebp):
-    target = TargetType.IMAGE_WEBP2
-    pm2_salt = ["image2_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToWebp3(VideoToWebp):
-    target = TargetType.IMAGE_WEBP3
-    pm2_salt = ["image3_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class VideoToWebp4(VideoToWebp):
-    target = TargetType.IMAGE_WEBP4
-    pm2_salt = ["image4_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-
 #######################################################################
 # Image to Image
 
@@ -304,38 +271,6 @@ class ImageToAvif(_BaseImageToImage):
     target = TargetType.IMAGE_AVIF
     ext = "avif"
     mime = "image/avif"
-
-class ImageToAvif1(ImageToAvif):
-    target = TargetType.IMAGE_AVIF1
-    pm2_salt = ["image1_avif", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToAvif2(ImageToAvif):
-    target = TargetType.IMAGE_AVIF2
-    pm2_salt = ["image2_avif", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToAvif3(ImageToAvif):
-    target = TargetType.IMAGE_AVIF3
-    pm2_salt = ["image3_avif", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToAvif4(ImageToAvif):
-    target = TargetType.IMAGE_AVIF4
-    pm2_salt = ["image4_avif",'{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToWebp1(ImageToWebp):
-    target = TargetType.IMAGE_WEBP1
-    pm2_salt = ["image1_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToWebp2(ImageToWebp):
-    target = TargetType.IMAGE_WEBP2
-    pm2_salt = ["image2_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToWebp3(ImageToWebp):
-    target = TargetType.IMAGE_WEBP3
-    pm2_salt = ["image3_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
-
-class ImageToWebp4(ImageToWebp):
-    target = TargetType.IMAGE_WEBP4
-    pm2_salt = ["image4_webp", '{\'vf\': "scale=w=\'512:h=floor((512*(1/a))/2)*2\'"}']
 
 
 #######################################################################
