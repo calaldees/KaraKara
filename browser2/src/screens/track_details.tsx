@@ -143,7 +143,7 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={attachment_path(state.root, track.attachments.image[0])}
+            poster={attachment_path(state.root, track.attachments.image.slice(-1)[0])}
             durationHint={track.duration}
             controls={true}
         >
