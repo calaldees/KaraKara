@@ -122,15 +122,16 @@ class Target:
         self.type = type
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
-        # FIXME: this uses the _base_ media (eg video) file's hash, even
-        # if we are encoding the subtitle file. Also we only include pm2_tag
-        # for PM2 compatibility, it doesn't actually add anything.
-        # parts = [str(self.encoder.salt())] + [s.hash() for s in self.sources]
-        parts = self.encoder.pm2_salt + [
-            s.hash()
-            for s in sources
-            if s.type in {SourceType.VIDEO, SourceType.AUDIO, SourceType.IMAGE}
-        ]
+        if self.encoder.category in {"video", "preview"}:
+            # Uses PM2-compatible hashing for video and preview so that we
+            # don't spend ages re-encoding those
+            parts = self.encoder.pm2_salt + [
+                s.hash()
+                for s in sources
+                if s.type in {SourceType.VIDEO, SourceType.AUDIO, SourceType.IMAGE}
+            ]
+        else:
+            parts = [self.encoder.salt()] + [s.hash() for s in self.sources]
         # log.info(f"Hashing based on {parts}")
         hasher = hashlib.sha256()
         hasher.update("".join(sorted(parts)).encode("utf-8"))
