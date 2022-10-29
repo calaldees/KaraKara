@@ -16,6 +16,7 @@ tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 class TestE2E(unittest.TestCase):
     def test_e2e(self):
         logging.basicConfig(level=logging.DEBUG)
+        self.maxDiff = 1000
 
         main.TARGET_TYPES = [
             TargetType.VIDEO_H264,
@@ -53,9 +54,9 @@ class TestE2E(unittest.TestCase):
 
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "X/XJ8S5jgxf_t.webp"}],
+                    "image": [{"mime": "image/webp", "path": "b/bwh2tbj66MJ.webp"}],
                     "preview": [{"mime": "video/mp4", "path": "q/qCVsvIU9PXx.mp4"}],
-                    "subtitle": [{"mime": "text/vtt", "path": "i/iukvP6xESdF.vtt"}],
+                    "subtitle": [{"mime": "text/vtt", "path": "O/OPu23UfzXY_.vtt"}],
                     "video": [{"mime": "video/mp4", "path": "X/XJ8S5jgxf_t.mp4"}],
                 },
                 "duration": 30.0,
@@ -69,12 +70,12 @@ class TestE2E(unittest.TestCase):
                     "title": ["Test1"],
                 },
             }.items():
-                self.assertEqual(tracks_json["test1"][k], v)
+                self.assertEqual(v, tracks_json["test1"][k])
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "F/FvGE73IaZ0C.webp"}],
+                    "image": [{"mime": "image/webp", "path": "H/H_HrkmYw_Uf.webp"}],
                     "preview": [{"mime": "video/mp4", "path": "F/FvGE73IaZ0C.mp4"}],
-                    "subtitle": [{"mime": "text/vtt", "path": "P/P0d_GoFdj8S.vtt"}],
+                    "subtitle": [{"mime": "text/vtt", "path": "d/dDxcwu4b9WE.vtt"}],
                     "video": [{"mime": "video/mp4", "path": "F/FvGE73IaZ0C.mp4"}],
                 },
                 "duration": 15.0,
@@ -89,7 +90,7 @@ class TestE2E(unittest.TestCase):
                     "title": ["Test2"],
                 },
             }.items():
-                self.assertEqual(tracks_json["test2"][k], v)
+                self.assertEqual(v, tracks_json["test2"][k])
 
             # Cleanup should leave expected tracks alone
             main.cleanup(processed, tracks, True)
