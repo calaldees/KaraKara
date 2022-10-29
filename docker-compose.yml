@@ -74,3 +74,13 @@ services:
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_meta}:/media/meta:rw
             - ${PATH_HOST_processed}:/media/processed:rw
+
+    processmedia3:
+        profiles:
+            - processmedia3
+        build:
+            context: ./processmedia3
+        volumes:
+            - logs:/logs
+            - ${PATH_HOST_source}:/media/source:ro
+            - ${PATH_HOST_processed}:/media/processed:rw
