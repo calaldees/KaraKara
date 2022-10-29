@@ -38,6 +38,11 @@ TARGET_TYPES = [
     TargetType.IMAGE_WEBP4,
     TargetType.SUBTITLES_VTT,
 ]
+SCAN_IGNORE = [
+    ".DS_Store",
+    ".stfolder",
+    ".stversions",
+]
 
 
 def scan(
@@ -65,6 +70,9 @@ def scan(
     # }
     grouped = defaultdict(list)
     for path in source_dir.glob("**/*"):
+        posix = path.to_posix()
+        if any((i in posix) for i in SCAN_IGNORE):
+            continue
         if path.is_file() and (match is None or match in path.stem):
             grouped[path.stem].append(path)
 
