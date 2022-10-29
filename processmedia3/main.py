@@ -70,7 +70,7 @@ def scan(
     # }
     grouped = defaultdict(list)
     for path in source_dir.glob("**/*"):
-        posix = path.to_posix()
+        posix = path.as_posix()
         if any((i in posix) for i in SCAN_IGNORE):
             continue
         if path.is_file() and (match is None or match in path.stem):
