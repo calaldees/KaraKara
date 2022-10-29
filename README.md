@@ -72,8 +72,8 @@ Then edit settings in .env
 
 Then build and run the software:
 ```console
-$ docker-compose build
-$ docker-compose up
+$ docker compose build
+$ docker compose up
 ```
 
 Core components
