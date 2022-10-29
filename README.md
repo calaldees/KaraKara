@@ -119,19 +119,22 @@ graph TD
 ```
 
 
-* api_queue ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
-  * TODO
-* processmedia2 ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
+* [api_queue](api_queue/README.md) ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
+  * An API for managing queues
+  * Users can add tracks for themselves
+  * Tracks will be validated to make sure one user isn't filling the whole queue, and nobody can add tracks past the end of the event time limit
+  * Admins can re-order and delete tracks
+* [processmedia2](processmedia2/README.md) ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
   * Takes folders of source data (video, image+audio, subtitles)
   * Create high-bitrate video for the player interface.
   * Create low-bitrate previews for mobile devices
   * Create thumbnail images for the track browser
   * Convert subtitles into a format that web browsers understand
   * Export an index of all the created files and metadata into `tracks.json`
-* browser2 ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
+* [browser2](browser2/README.md) ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
   * Mobile webapp interface to search / preview / queue tracks
   * Gets data from `tracks.json`
-* player2 ![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
+* [player2](player2/README.md) ![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
   * Displays the current queue for use on a projector
   * Gets data from website / `queue` api
   * Streams final video from `nginx` in fullscreen mode.
