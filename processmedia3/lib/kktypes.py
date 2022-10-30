@@ -122,7 +122,7 @@ class Target:
         self.type = type
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
-        if self.encoder.category in {"video", "preview"} and self.encoder.pm2_salt:
+        if self.encoder.pm2_salt:
             # Uses PM2-compatible hashing for video and preview so that we
             # don't spend ages re-encoding those
             parts = self.encoder.pm2_salt + [
@@ -132,12 +132,14 @@ class Target:
             ]
         else:
             parts = [self.encoder.salt()] + [s.hash() for s in self.sources]
-        # log.info(f"Hashing based on {parts}")
         hasher = hashlib.sha256()
         hasher.update("".join(sorted(parts)).encode("utf-8"))
         hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("utf8"))
         self.friendly = hash[0] + "/" + hash[:11] + "." + self.encoder.ext
         self.path = processed_dir / hash[0] / (hash[:11] + "." + self.encoder.ext)
+        log.debug(
+            f"Filename for {self.encoder.__class__.__name__} = {self.friendly} based on {parts}"
+        )
 
     def encode(self) -> None:
         if not self.path.exists():

@@ -60,6 +60,7 @@ class Encoder:
 
     def _run(self, *args: str):
         try:
+            log.debug(f"Calling external command: {shlex.join(args)}")
             subprocess.run(
                 ["nice"] + list(args),
                 stdout=subprocess.PIPE,
@@ -122,10 +123,7 @@ class VideoToAV1(_BaseVideoToVideo):
 
 class VideoToAV1Preview(_Preview, VideoToAV1):
     target = TargetType.PREVIEW_AV1
-    pm2_salt = [
-        "preview_av1",
-        """{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 60, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ab': '24k', 'ac': 1, 'vf': "scale=w='320:h=floor((320*(1/a))/2)*2'", 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}""",
-    ]
+    pm2_salt: List[str] = []
 
 
 class VideoToH265(_BaseVideoToVideo):
@@ -187,10 +185,6 @@ class _BaseImageToVideo(Encoder):
 class ImageToAV1(_BaseImageToVideo):
     target = TargetType.VIDEO_AV1
     ext = "webm"
-    pm2_salt = [
-        "video",
-        "{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 50, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ac': 2, 'vf': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2', 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}",
-    ]
     mime = "video/webm; codecs=av01.0.05M.08,opus"
     conf_vcodec = VCODEC_AV1
     conf_acodec = ACODEC_OPUS
@@ -198,10 +192,6 @@ class ImageToAV1(_BaseImageToVideo):
 
 class ImageToAV1Preview(_Preview, ImageToAV1):
     target = TargetType.PREVIEW_AV1
-    pm2_salt = [
-        "preview_av1",
-        """{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 60, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ab': '24k', 'ac': 1, 'vf': "scale=w='320:h=floor((320*(1/a))/2)*2'", 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}""",
-    ]
 
 
 class ImageToH265(_BaseImageToVideo):
@@ -318,7 +308,6 @@ class SubtitleToVTT(Encoder):
     sources = {SourceType.SUBTITLES}
     ext = "vtt"
     category = "subtitle"
-    pm2_salt = ["subtitle", "{}"]
     mime = "text/vtt"
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
@@ -332,7 +321,6 @@ class VoidToVTT(Encoder):
     sources: Set[SourceType] = set()
     ext = "vtt"
     category = "subtitle"
-    pm2_salt = ["subtitle", "{}"]
     mime = "text/vtt"
 
     def encode(self, target: Path, sources: Set[Source]) -> None:

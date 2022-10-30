@@ -195,9 +195,9 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument(
         "--cache",
         type=Path,
-        default=Path("/tmp/cache.db"),
+        default=Path("/media/processed/cache.db"),
         metavar="FILE",
-        help="Where to store temporary data (Default: %(default)s)",
+        help="Where to store source metadata (Default: %(default)s)",
     )
     parser.add_argument(
         "--processed",
@@ -227,6 +227,12 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         help="Actually delete files for-real during cleanup",
     )
     parser.add_argument(
+        "--debug",
+        action="store_true",
+        default=False,
+        help="Super-extra verbose logging",
+    )
+    parser.add_argument(
         "cmd", nargs="?", help="Sub-process to run (view, encode, export, cleanup)"
     )
     parser.add_argument(
@@ -237,24 +243,30 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
 
 
 @contextlib.contextmanager
-def _pickled_var(filename: str, default: Any):
+def _pickled_var(path: Path, default: Any):
     """
     Load a variable from a file on startup,
     save the variable to file on shutdown
     """
     try:
-        with open(filename, "rb") as fp:
-            var = pickle.loads(fp.read())
-    except Exception:
+        var = pickle.loads(path.read_bytes())
+    except Exception as e:
+        log.debug(f"Error loading cache: {e}")
         var = default
     yield var
-    with open(filename, "wb") as fp:
-        fp.write(pickle.dumps(var))
+    try:
+        path.with_suffix(".tmp").write_bytes(pickle.dumps(var))
+        path.with_suffix(".tmp").rename(path)
+    except Exception as e:
+        log.debug(f"Error saving cache: {e}")
 
 
 def main(argv: List[str]) -> int:
     args = parse_args(argv)
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)s %(message)s",
+    )
     last_source_change = None
 
     while True:
