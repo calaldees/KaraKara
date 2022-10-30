@@ -26,14 +26,15 @@ DEFAULT_QUEUE_SETTINGS = {
     "validation_duplicate_performer_timedelta": None,
     "validation_duplicate_track_timedelta": None,
     "validation_performer_names": [],
-    "validation": [],  # 'default',  # disable validation for now
+    "validation": ['default'],
 }
 def _parse_isodatetime(isoformatString):
     return datetime.datetime.fromisoformat(isoformatString) if isoformatString else None
 def _parse_timedelta(durationString):
-    return timeparse(durationString) if durationString else None
+    return datetime.timedelta(seconds=timeparse(durationString)) if durationString else None
 QUEUE_SETTING_TYPES = {
     "track_space": lambda x: datetime.timedelta(seconds=x),
+    "validation_event_start_datetime": _parse_isodatetime,
     "validation_event_end_datetime": _parse_isodatetime,
     "validation_duplicate_performer_timedelta": _parse_timedelta,
     "validation_duplicate_track_timedelta": _parse_timedelta,
