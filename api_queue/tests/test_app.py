@@ -166,3 +166,21 @@ async def test_queue_command(queue_model, mock_mqtt):
     assert response.status == 200
     queue = await queue_model.queue
     assert not any(queue_item['start_time'] for queue_item in queue), 'no tracks should have a start time'
+
+
+@pytest.mark.asyncio
+async def test_queue_validation(queue_model):
+    _original_session_id = queue_model.session_id
+    queue_model.session_id = 'admin'
+    response = await queue_model.settings_put(payload={
+        "validation_performer_names": ['valid_name1','valid_name2']
+    })
+    assert response.status == 200
+    queue_model.session_id = _original_session_id
+
+    settings = await queue_model.settings
+    assert settings["validation_performer_names"] == ['valid_name1','valid_name2']
+
+    response = await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test_name')
+    assert response.status == 400
+    assert 'test_name' in response.json['context']

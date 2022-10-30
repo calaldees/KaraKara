@@ -45,7 +45,7 @@ const state: State = {
         "theme": "metalghosts",
         "preview_volume": 0.2,
         "track_space": 10,
-        "event_end": null,
+        "validation_event_end_datetime": null,
     },
     now: Date.now()/1000,
     notification: null,

@@ -96,11 +96,11 @@ const PreviewInternal = ({
         <div id="join_info" key={"join_info"}>
             Join at <strong>{state.root.replace("https://", "")}</strong> - Room
             Name is <strong>{state.room_name}</strong>
-            {state.settings["event_end"] && (
+            {state.settings["validation_event_end_datetime"] && (
                 <span>
                     <br />
                     Event ends at{" "}
-                    <strong>{short_date(state.settings["event_end"])}</strong>
+                    <strong>{short_date(state.settings["validation_event_end_datetime"])}</strong>
                 </span>
             )}
         </div>
