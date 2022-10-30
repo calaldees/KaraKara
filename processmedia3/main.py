@@ -107,10 +107,14 @@ def view(tracks: List[Track]) -> None:
         print(track.id)
         for t in track.targets:
             source_list = [s.friendly for s in t.sources]
+            if t.path.exists():
+                stats = f"{OK} ({int(t.path.stat().st_size/1024):,} KB)"
+            else:
+                stats = FAIL
             print(
                 f"  - {t.type.name}: {t.friendly!r} = "
                 + f"{t.encoder.__class__.__name__}({repr(source_list)}) "
-                + (OK if t.path.exists() else FAIL)
+                + f"{stats}"
             )
 
 
@@ -285,7 +289,7 @@ def main(argv: List[str]) -> int:
                     if args.cmd == None:
                         encode(tracks, args.threads)
                         export(args.processed, tracks, args.threads)
-                        cleanup(args.processed, tracks, False, args.threads)
+                        cleanup(args.processed, tracks, args.delete, args.threads)
                     elif args.cmd == "view":
                         view(tracks)
                     elif args.cmd == "encode":

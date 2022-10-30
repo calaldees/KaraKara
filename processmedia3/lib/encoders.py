@@ -10,16 +10,15 @@ from .subtitle_processor import create_vtt, parse_subtitles
 
 log = logging.getLogger()
 
-# TODO: max size for full videos?
-# https://trac.ffmpeg.org/wiki/Encode/AAC#HE-AACversion2
-# h264 codec can only handle dimension a multiple of 2.
-# Some input does not adhere to this and need correction.
+# fmt: off
 IMAGE_QUALITY = 75
 IMAGE_WIDTH = 256
-PREVIEW_WIDTH = 320
 
-SCALE_EVEN = ["-vf", "scale=w=floor(iw/2)*2:h=-2"]
-SCALE_PREVIEW = ["-vf", f"scale=w={PREVIEW_WIDTH}:h=-2"]
+# Scale down if necessary to fit inside the given box,
+# and make sure that everything is a multiple of 2
+_RATIO = "force_original_aspect_ratio=decrease:force_divisible_by=2"
+SCALE_VIDEO = ["-vf", f"scale=w='min(iw,1280)':h='min(ih,720)':{_RATIO}"]
+SCALE_PREVIEW = ["-vf", f"scale=w='min(iw,320)':h='min(ih,240)':{_RATIO}"]
 
 NORMALIZE_AUDIO = ["-af", "loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1", "-ac", "2"]
 
@@ -34,6 +33,7 @@ VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p"]
 ACODEC_OPUS = ["-acodec", "libopus"]
 ACODEC_AAC = ["-acodec", "libfdk_aac"]
 ACODEC_MP3 = ["-acodec", "mp3"]
+# fmt: on
 
 
 class Encoder:
@@ -92,7 +92,7 @@ class _BaseVideoToVideo(Encoder):
     sources = {SourceType.VIDEO}
     category = "video"
     conf_audio = NORMALIZE_AUDIO
-    conf_video = SCALE_EVEN
+    conf_video = SCALE_VIDEO
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         # fmt: off
@@ -158,7 +158,7 @@ class _BaseImageToVideo(Encoder):
     sources = {SourceType.AUDIO, SourceType.IMAGE}
     category = "video"
     conf_audio = NORMALIZE_AUDIO
-    conf_video = SCALE_EVEN
+    conf_video = SCALE_VIDEO
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         def source_by_type(type: SourceType) -> Source:

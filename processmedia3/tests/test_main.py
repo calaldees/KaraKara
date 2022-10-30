@@ -37,7 +37,7 @@ class TestE2E(unittest.TestCase):
                 {s.type for s in tracks[0].sources},
             )
             self.assertEqual(TargetType.VIDEO_H264, tracks[0].targets[0].type)
-            self.assertEqual("dW0EmxicJbV", tracks[0].targets[0].path.stem)
+            self.assertEqual("ehai5GSd39a", tracks[0].targets[0].path.stem)
             self.assertEqual("test2", tracks[1].id)
 
             # Encode should generate output video
@@ -55,9 +55,9 @@ class TestE2E(unittest.TestCase):
             for k, v in {
                 "attachments": {
                     "image": [{"mime": "image/webp", "path": "5/5abo9Y3WIES.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "P/PUsZjt85vdu.mp4"}],
+                    "preview": [{"mime": "video/mp4", "path": "x/x9Yd879NxaT.mp4"}],
                     "subtitle": [{"mime": "text/vtt", "path": "8/8wBGB457jKT.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "d/dW0EmxicJbV.mp4"}],
+                    "video": [{"mime": "video/mp4", "path": "e/ehai5GSd39a.mp4"}],
                 },
                 "duration": 30.0,
                 "id": "test1",
@@ -74,9 +74,9 @@ class TestE2E(unittest.TestCase):
             for k, v in {
                 "attachments": {
                     "image": [{"mime": "image/webp", "path": "R/Rck_Khyvlnb.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "9/9PE7s0SDKJI.mp4"}],
+                    "preview": [{"mime": "video/mp4", "path": "L/LxKPtoHpqwi.mp4"}],
                     "subtitle": [{"mime": "text/vtt", "path": "s/saL9lNN0XFx.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "v/vyXeHO53bf9.mp4"}],
+                    "video": [{"mime": "video/mp4", "path": "v/vgO9puzSJ60.mp4"}],
                 },
                 "duration": 15.0,
                 "id": "test2",

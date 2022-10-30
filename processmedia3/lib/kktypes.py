@@ -82,14 +82,17 @@ class Source:
 
     @_cache
     def duration(self) -> float:
-        log.info(f"Probing {self.friendly}")
+        log.info(f"Parsing duration from {self.friendly}")
         probe_proc = subprocess.run(
-            ["ffprobe", self.path.as_posix()], stderr=subprocess.PIPE
+            ["ffprobe", self.path.as_posix()],
+            stderr=subprocess.PIPE,
+            text=True,
+            errors="ignore",  # some files contain non-utf8 metadata
+            check=True,
         )
-        probe_data = probe_proc.stderr.decode("utf8", errors="ignore")
-        raw_duration = re.search(r"Duration: (\d+):(\d+):(\d+.\d+)", probe_data)
+        raw_duration = re.search(r"Duration: (\d+):(\d+):(\d+.\d+)", probe_proc.stderr)
         if not raw_duration:
-            raise Exception(f"Failed to find duration in probe data:\n{probe_data}")
+            raise Exception(f"Failed to find duration in probe:\n{probe_proc.stderr}")
         hours = float(raw_duration.group(1)) * 60.0 * 60.0
         minutes = float(raw_duration.group(2)) * 60.0
         seconds = float(raw_duration.group(3))
@@ -153,6 +156,7 @@ class Target:
                 temppath = Path(tempdir) / ("out." + self.encoder.ext)
                 self.encoder.encode(temppath, self.sources)
                 self.path.parent.mkdir(exist_ok=True)
+                log.debug(f"Moving {temppath} to {self.path}")
                 shutil.move(temppath.as_posix(), self.path.as_posix())
 
 
