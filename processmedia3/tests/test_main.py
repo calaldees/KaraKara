@@ -16,7 +16,7 @@ tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 class TestE2E(unittest.TestCase):
     def test_e2e(self):
         logging.basicConfig(level=logging.DEBUG)
-        self.maxDiff = 1000
+        self.maxDiff = 2000
 
         main.TARGET_TYPES = [
             TargetType.VIDEO_H264,
@@ -31,14 +31,14 @@ class TestE2E(unittest.TestCase):
             # Scan should detect source files for two tracks
             tracks = main.scan(Path("./tests/source"), processed, None, {})
 
-            self.assertEqual(tracks[0].id, "test1")
+            self.assertEqual("test1", tracks[0].id)
             self.assertEqual(
-                {s.type for s in tracks[0].sources},
                 {SourceType.TAGS, SourceType.VIDEO, SourceType.SUBTITLES},
+                {s.type for s in tracks[0].sources},
             )
-            self.assertEqual(tracks[0].targets[0].type, TargetType.VIDEO_H264)
-            self.assertEqual(tracks[0].targets[0].path.stem, "XJ8S5jgxf_t")
-            self.assertEqual(tracks[1].id, "test2")
+            self.assertEqual(TargetType.VIDEO_H264, tracks[0].targets[0].type)
+            self.assertEqual("dW0EmxicJbV", tracks[0].targets[0].path.stem)
+            self.assertEqual("test2", tracks[1].id)
 
             # Encode should generate output video
             main.encode(tracks)
@@ -50,14 +50,14 @@ class TestE2E(unittest.TestCase):
 
             self.assertTrue((processed / "tracks.json").exists())
             tracks_json = json.loads((processed / "tracks.json").read_text())
-            self.assertEqual(len(tracks_json), 2)
+            self.assertEqual(2, len(tracks_json))
 
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "b/bwh2tbj66MJ.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "q/qCVsvIU9PXx.mp4"}],
-                    "subtitle": [{"mime": "text/vtt", "path": "O/OPu23UfzXY_.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "X/XJ8S5jgxf_t.mp4"}],
+                    "image": [{"mime": "image/webp", "path": "5/5abo9Y3WIES.webp"}],
+                    "preview": [{"mime": "video/mp4", "path": "P/PUsZjt85vdu.mp4"}],
+                    "subtitle": [{"mime": "text/vtt", "path": "8/8wBGB457jKT.vtt"}],
+                    "video": [{"mime": "video/mp4", "path": "d/dW0EmxicJbV.mp4"}],
                 },
                 "duration": 30.0,
                 "id": "test1",
@@ -73,10 +73,10 @@ class TestE2E(unittest.TestCase):
                 self.assertEqual(v, tracks_json["test1"][k])
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "H/H_HrkmYw_Uf.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "F/FvGE73IaZ0C.mp4"}],
-                    "subtitle": [{"mime": "text/vtt", "path": "d/dDxcwu4b9WE.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "F/FvGE73IaZ0C.mp4"}],
+                    "image": [{"mime": "image/webp", "path": "R/Rck_Khyvlnb.webp"}],
+                    "preview": [{"mime": "video/mp4", "path": "9/9PE7s0SDKJI.mp4"}],
+                    "subtitle": [{"mime": "text/vtt", "path": "s/saL9lNN0XFx.vtt"}],
+                    "video": [{"mime": "video/mp4", "path": "v/vyXeHO53bf9.mp4"}],
                 },
                 "duration": 15.0,
                 "id": "test2",
@@ -101,7 +101,7 @@ class TestE2E(unittest.TestCase):
             # clean up the files we created
             main.cleanup(processed, [], True)
 
-            self.assertEqual(list(processed.glob("*/*")), [])
+            self.assertEqual([], list(processed.glob("*/*")))
 
 
 if __name__ == "__main__":

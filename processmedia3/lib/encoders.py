@@ -1,3 +1,4 @@
+import itertools
 import logging
 import shlex
 import subprocess
@@ -9,39 +10,30 @@ from .subtitle_processor import create_vtt, parse_subtitles
 
 log = logging.getLogger()
 
-# TODO: "-movflags +faststart" to make mp4 streamable?
 # TODO: max size for full videos?
 # https://trac.ffmpeg.org/wiki/Encode/AAC#HE-AACversion2
 # h264 codec can only handle dimension a multiple of 2.
 # Some input does not adhere to this and need correction.
 IMAGE_QUALITY = 75
-IMAGE_SCALE = 256
-PREVIEW_SCALE = 320
+IMAGE_WIDTH = 256
+PREVIEW_WIDTH = 320
 
-SCALE_EVEN = ["-vf", "scale=w=floor(iw/2)*2:h=floor(ih/2)*2"]
-SCALE_PREVIEW = ["-vf", "scale=w='{0}:h=floor(({0}*(1/a))/2)*2'".format(PREVIEW_SCALE)]
-NORMALIZE_AUDIO = ["-af", "loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1"]
+SCALE_EVEN = ["-vf", "scale=w=floor(iw/2)*2:h=-2"]
+SCALE_PREVIEW = ["-vf", f"scale=w={PREVIEW_WIDTH}:h=-2"]
 
-CODEC_AV1 = [
-    "-vcodec",
-    "libsvtav1",
-    "-preset",
-    "4",
-    "-qp",
-    "50",
-    "-sc_detection",
-    "true",
-    "-pix_fmt",
-    "yuv420p10le",
-    "-g",
-    "240",
-]
-CODEC_H265 = ["-vcodec", "libx265", "-crf", "39", "-preset", "slow", "-tag:v", "hvc1"]
-CODEC_H264 = ["-vcodec", "libx264", "-crf", "39", "-preset", "fast"]
+NORMALIZE_AUDIO = ["-af", "loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1", "-ac", "2"]
 
-CODEC_OPUS = ["-acodec", "libopus", "-ac", "2"]
-CODEC_AAC = ["-acodec", "libfdk_aac", "-ac", "2"]
-CODEC_MP3 = ["-acodec", "mp3", "-ac", "2"]
+CONTINER_MP4 = ["-movflags", "faststart"]
+
+VCODEC_AV1 = ["-vcodec", "libsvtav1", "-pix_fmt", "yuv420p10le"]
+# tag hvc1 needed for apple software to understand it
+VCODEC_H265 = ["-vcodec", "libx265", "-tag:v", "hvc1"]
+# yuv420p needed for apple software to understand it
+VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p"]
+
+ACODEC_OPUS = ["-acodec", "libopus"]
+ACODEC_AAC = ["-acodec", "libfdk_aac"]
+ACODEC_MP3 = ["-acodec", "mp3"]
 
 
 class Encoder:
@@ -50,18 +42,24 @@ class Encoder:
     category: str
     ext: str
     mime: str
-    pm2_salt: List[str] = ["", ""]
-    settings: Dict[str, Any] = {}
+    pm2_salt: List[str] = []
+    conf_audio: List[str] = []
+    conf_video: List[str] = []
+    conf_container: List[str] = []
+    conf_acodec: List[str] = []
+    conf_vcodec: List[str] = []
 
     def salt(self) -> str:
-        return self.category + "-" + str(self.settings)
+        # sort, concatenate, and flatten all of the conf_* arrays
+        confs = [getattr(self, k) for k in sorted(dir(self)) if k.startswith("conf_")]
+        confs = list(itertools.chain.from_iterable(confs))
+        return str(confs)
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         ...
 
     def _run(self, *args: str):
         try:
-
             subprocess.run(
                 ["nice"] + list(args),
                 stdout=subprocess.PIPE,
@@ -84,21 +82,30 @@ class Encoder:
 # Video to Video
 
 
+class _Preview(Encoder):
+    category = "preview"
+    conf_video = SCALE_PREVIEW
+
+
 class _BaseVideoToVideo(Encoder):
     sources = {SourceType.VIDEO}
     category = "video"
+    conf_audio = NORMALIZE_AUDIO
+    conf_video = SCALE_EVEN
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
+        # fmt: off
         self._run(
             "ffmpeg",
-            "-i",
-            list(sources)[0].path.as_posix(),
-            *self.settings["vcodec"],
-            *self.settings["acodec"],
-            *(SCALE_EVEN if self.category == "video" else SCALE_PREVIEW),
-            *NORMALIZE_AUDIO,
+            "-i", list(sources)[0].path.as_posix(),
+            *self.conf_audio,
+            *self.conf_video,
+            *self.conf_container,
+            *self.conf_vcodec,
+            *self.conf_acodec,
             target.as_posix(),
         )
+        # fmt: on
 
 
 class VideoToAV1(_BaseVideoToVideo):
@@ -109,15 +116,12 @@ class VideoToAV1(_BaseVideoToVideo):
         "{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 50, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ac': 2, 'vf': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2', 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}",
     ]
     mime = "video/webm; codecs=av01.0.05M.08,opus"
-    settings = {
-        "vcodec": CODEC_AV1,
-        "acodec": CODEC_OPUS,
-    }
+    conf_vcodec = VCODEC_AV1
+    conf_acodec = ACODEC_OPUS
 
 
-class VideoToAV1Preview(VideoToAV1):
+class VideoToAV1Preview(_Preview, VideoToAV1):
     target = TargetType.PREVIEW_AV1
-    category = "preview"
     pm2_salt = [
         "preview_av1",
         """{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 60, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ab': '24k', 'ac': 1, 'vf': "scale=w='320:h=floor((320*(1/a))/2)*2'", 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}""",
@@ -128,31 +132,24 @@ class VideoToH265(_BaseVideoToVideo):
     target = TargetType.VIDEO_H265
     ext = "mp4"
     mime = "video/mp4; codecs=avc1.4D401E,mp4a.40.2"
-    settings = {
-        "vcodec": CODEC_H265,
-        "acodec": CODEC_AAC,
-    }
+    conf_vcodec = VCODEC_H265
+    conf_acodec = ACODEC_AAC
 
 
-class VideoToH265Preview(VideoToH265):
+class VideoToH265Preview(_Preview, VideoToH265):
     target = TargetType.PREVIEW_H265
-    category = "preview"
 
 
 class VideoToH264(_BaseVideoToVideo):
     target = TargetType.VIDEO_H264
     ext = "mp4"
     mime = "video/mp4"
-    settings = {
-        "vcodec": CODEC_H265,
-        "acodec": CODEC_MP3,
-    }
+    conf_vcodec = VCODEC_H265
+    conf_acodec = ACODEC_MP3
 
 
-class VideoToH264Preview(VideoToH264):
+class VideoToH264Preview(_Preview, VideoToH264):
     target = TargetType.PREVIEW_H264
-    category = "preview"
-    pm2_salt = ["preview"]
 
 
 #######################################################################
@@ -162,33 +159,29 @@ class VideoToH264Preview(VideoToH264):
 class _BaseImageToVideo(Encoder):
     sources = {SourceType.AUDIO, SourceType.IMAGE}
     category = "video"
+    conf_audio = NORMALIZE_AUDIO
+    conf_video = SCALE_EVEN
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         def source_by_type(type: SourceType) -> Source:
             return [s for s in sources if s.type == type][0]
 
+        # fmt: off
         self._run(
             "ffmpeg",
-            "-loop",
-            "1",
-            "-i",
-            source_by_type(SourceType.IMAGE).path.as_posix(),
-            "-i",
-            source_by_type(SourceType.AUDIO).path.as_posix(),
-            "-t",
-            str(source_by_type(SourceType.AUDIO).duration()),
-            "-r",
-            "1",  # 1 fps
-            "-bf",
-            "0",  # wha dis do?
-            "-qmax",
-            "1",  # wha dis do?
-            *self.settings["vcodec"],
-            *self.settings["acodec"],
-            *(SCALE_EVEN if self.category == "video" else SCALE_PREVIEW),
-            *NORMALIZE_AUDIO,
+            "-loop", "1",
+            "-i", source_by_type(SourceType.IMAGE).path.as_posix(),
+            "-i", source_by_type(SourceType.AUDIO).path.as_posix(),
+            "-t", str(source_by_type(SourceType.AUDIO).duration()),
+            "-r", "1",  # 1 fps
+            *self.conf_audio,
+            *self.conf_video,
+            *self.conf_container,
+            *self.conf_vcodec,
+            *self.conf_acodec,
             target.as_posix(),
         )
+        # fmt: on
 
 
 class ImageToAV1(_BaseImageToVideo):
@@ -199,15 +192,12 @@ class ImageToAV1(_BaseImageToVideo):
         "{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 50, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ac': 2, 'vf': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2', 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}",
     ]
     mime = "video/webm; codecs=av01.0.05M.08,opus"
-    settings = {
-        "vcodec": CODEC_AV1,
-        "acodec": CODEC_OPUS,
-    }
+    conf_vcodec = VCODEC_AV1
+    conf_acodec = ACODEC_OPUS
 
 
-class ImageToAV1Preview(ImageToAV1):
+class ImageToAV1Preview(_Preview, ImageToAV1):
     target = TargetType.PREVIEW_AV1
-    category = "preview"
     pm2_salt = [
         "preview_av1",
         """{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 60, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ab': '24k', 'ac': 1, 'vf': "scale=w='320:h=floor((320*(1/a))/2)*2'", 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}""",
@@ -218,34 +208,26 @@ class ImageToH265(_BaseImageToVideo):
     target = TargetType.VIDEO_H265
     ext = "mp4"
     mime = "video/mp4; codecs=avc1.4D401E,mp4a.40.2"
-    settings = {
-        "vcodec": CODEC_H265,
-        "acodec": CODEC_AAC,
-    }
+    conf_container = CONTINER_MP4
+    conf_vcodec = VCODEC_H265
+    conf_acodec = ACODEC_AAC
 
 
-class ImageToH265Preview(ImageToH265):
+class ImageToH265Preview(_Preview, ImageToH265):
     target = TargetType.PREVIEW_H265
-    category = "preview"
-    pm2_salt = [
-        "preview_h265",
-        """{'vcodec': 'libx265', 'crf': 39, 'preset': 'slow', 'acodec': 'libfdk_aac', 'ab': '24k', 'ac': 1, 'vf': "scale=w='320:h=floor((320*(1/a))/2)*2'", 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}""",
-    ]
 
 
 class ImageToH264(_BaseImageToVideo):
     target = TargetType.VIDEO_H264
     ext = "mp4"
     mime = "video/mp4"
-    settings = {
-        "vcodec": CODEC_H264,
-        "acodec": CODEC_MP3,
-    }
+    conf_container = CONTINER_MP4
+    conf_vcodec = VCODEC_H264
+    conf_acodec = ACODEC_MP3
 
 
-class ImageToH264Preview(ImageToH264):
+class ImageToH264Preview(_Preview, ImageToH264):
     target = TargetType.PREVIEW_H264
-    category = "preview"
 
 
 #######################################################################
@@ -255,31 +237,29 @@ class ImageToH264Preview(ImageToH264):
 class _BaseVideoToImage(Encoder):
     sources = {SourceType.VIDEO}
     category = "image"
-    settings = {
-        "scale": ["-vf", f"thumbnail,scale={IMAGE_SCALE}:-1"],
-        "compress": ["-quality", str(IMAGE_QUALITY)],
-    }
+    conf_video = ["-vf", f"thumbnail,scale={IMAGE_WIDTH}:-1"]
+    conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         # imagemagick supports more formats, so first we get
         # ffmpeg to pick a frame, then convert to compress
         temp_target = target.with_suffix(".bmp")
+        # fmt: off
         self._run(
             "ffmpeg",
-            "-i",
-            list(sources)[0].path.as_posix(),
-            *self.settings["scale"],
-            "-vframes",
-            "1",
+            "-i", list(sources)[0].path.as_posix(),
+            *self.conf_video,
+            "-vframes", "1",
             "-an",
             temp_target.as_posix(),
         )
         self._run(
             "convert",
             temp_target.as_posix(),
-            *self.settings["compress"],
+            *self.conf_vcodec,
             target.as_posix(),
         )
+        # fmt: on
         temp_target.unlink()
 
 
@@ -302,20 +282,19 @@ class VideoToAvif(_BaseVideoToImage):
 class _BaseImageToImage(Encoder):
     sources = {SourceType.IMAGE}
     category = "image"
-    settings = {
-        "size": str(IMAGE_SCALE),
-        "compress": ["-quality", str(IMAGE_QUALITY)],
-    }
+    conf_video = ["-thumbnail", f"{IMAGE_WIDTH}x{IMAGE_WIDTH}"]
+    conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
+        # fmt: off
         self._run(
             "convert",
             list(sources)[0].path.as_posix(),
-            "-thumbnail",
-            f"{self.settings['size']}x{self.settings['size']}",
-            *self.settings["compress"],
+            *self.conf_video,
+            *self.conf_vcodec,
             target.as_posix(),
         )
+        # fmt: on
 
 
 class ImageToWebp(_BaseImageToImage):
