@@ -42,7 +42,6 @@ class Encoder:
     category: str
     ext: str
     mime: str
-    pm2_salt: List[str] = []
     conf_audio: List[str] = []
     conf_video: List[str] = []
     conf_container: List[str] = []
@@ -112,10 +111,6 @@ class _BaseVideoToVideo(Encoder):
 class VideoToAV1(_BaseVideoToVideo):
     target = TargetType.VIDEO_AV1
     ext = "webm"
-    pm2_salt = [
-        "video",
-        "{'vcodec': 'libsvtav1', 'preset': 4, 'qp': 50, 'sc_detection': 'true', 'pix_fmt': 'yuv420p10le', 'g': 240, 'acodec': 'libopus', 'ac': 2, 'vf': 'scale=w=floor(iw/2)*2:h=floor(ih/2)*2', 'af': 'loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1'}",
-    ]
     mime = "video/webm; codecs=av01.0.05M.08,opus"
     conf_vcodec = VCODEC_AV1
     conf_acodec = ACODEC_OPUS
@@ -123,7 +118,6 @@ class VideoToAV1(_BaseVideoToVideo):
 
 class VideoToAV1Preview(_Preview, VideoToAV1):
     target = TargetType.PREVIEW_AV1
-    pm2_salt: List[str] = []
 
 
 class VideoToH265(_BaseVideoToVideo):

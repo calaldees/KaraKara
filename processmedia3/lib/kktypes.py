@@ -125,16 +125,7 @@ class Target:
         self.type = type
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
-        if self.encoder.pm2_salt:
-            # Uses PM2-compatible hashing for video and preview so that we
-            # don't spend ages re-encoding those
-            parts = self.encoder.pm2_salt + [
-                s.hash()
-                for s in sources
-                if s.type in {SourceType.VIDEO, SourceType.AUDIO, SourceType.IMAGE}
-            ]
-        else:
-            parts = [self.encoder.salt()] + [s.hash() for s in self.sources]
+        parts = [self.encoder.salt()] + [s.hash() for s in self.sources]
         hasher = hashlib.sha256()
         hasher.update("".join(sorted(parts)).encode("utf-8"))
         hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("utf8"))
@@ -206,7 +197,7 @@ class Track:
 
         return {
             "id": self.id,
-            "duration": round(duration, 1),  # FIXME: just for compatibility with pm2
+            "duration": duration,
             "attachments": attachments,
             "lyrics": lyrics,
             "tags": tags,
