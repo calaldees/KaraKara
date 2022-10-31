@@ -23,9 +23,5 @@ FROM python:3.11-alpine as production
     COPY main.py /app/
     COPY lib /app/lib/
 
-    CMD python3 /app/main.py \
-        --source /media/source \
-        --cache /media/processed/cache.db \
-        --processed /media/processed \
-        --loop 600 \
-        | tee /logs/processmedia3.log
+	ENTRYPOINT ["python3", "/app/main.py", "--source", "/media/source", "--cache", "/media/processed/cache.db", "--processed", "/media/processed"]
+	CMD ["all", "--loop", "600"]

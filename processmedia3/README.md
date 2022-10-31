@@ -65,7 +65,9 @@ specific implementation details for translating avi to webm, srt to vtt, etc.
 Debugging Tools
 ---------------
 
-* `./main.py view` to show encoding status for all tracks
-    * `./main.py view Haruhi` to only show status for Haruhi tracks
-* logs
-    * `/logs/`
+* Raw python: `./main.py <command>`
+  * You'll need to make sure the `--source` / `--processed` flags are set appropriately
+* In docker: `docker compose run -ti processmedia3 <command>`
+  * Docker automatically sets the `--source` / `--processed` flags based on `.env`
+
+Commands: scan, view, encode, export, cleanup
