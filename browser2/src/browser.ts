@@ -67,9 +67,14 @@ let state: State = {
 
     // settings
     settings: {
-        "track_space": 30.0,
+        "track_space": 15.0,
         "forced_tags": [],
         "hidden_tags": ["red:duplicate"],
+        "title": "KaraKara",
+        "preview_volume": 0.2,
+        "validation_event_start_datetime": undefined,
+        "validation_event_end_datetime": undefined,
+        "validation_performer_names": [],
     },
     settings_edit: {},
 

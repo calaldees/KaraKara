@@ -208,10 +208,11 @@ async def update_settings(request, queue_id):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request, queue_id):
-        log.info(f"Updating settings for {queue_id} to {request.json}")
         try:
             request.app.ctx.settings_manager.set_json(queue_id, request.json)
+            log.info(f"Updated settings for {queue_id} with {request.json}")
         except Exception as ex:
+            log.warning(f"Rejected settings for {queue_id} with {request.json}")
             raise sanic.exceptions.InvalidUsage(message="invalid settings", context=exception_to_dict(ex))
         return sanic.response.json({})
 
@@ -267,6 +268,7 @@ async def add_queue_item(request, queue_id):
             for validation_scheme in queue.settings.get("validation", []):
                 validation_error = getattr(queue_validation, validation_scheme)(queue)
                 if validation_error:
+                    log.info(f"add failed validation {validation_error=}")
                     raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
             return sanic.response.json(queue_item.asdict())
 
