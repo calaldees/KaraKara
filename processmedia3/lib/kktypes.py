@@ -197,7 +197,7 @@ class Track:
 
         return {
             "id": self.id,
-            "duration": duration,
+            "duration": round(duration, 1),  # for more consistent unit tests
             "attachments": attachments,
             "lyrics": lyrics,
             "tags": tags,

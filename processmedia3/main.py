@@ -138,7 +138,12 @@ def encode(tracks: List[Track], threads: int = 1) -> None:
     thread_map(_encode, targets, max_workers=threads, desc="encode")
 
 
-def export(processed_dir: Path, tracks: List[Track], threads: int = 1) -> None:
+def export(
+    processed_dir: Path,
+    tracks: List[Track],
+    update: bool = False,
+    threads: int = 1,
+) -> None:
     """
     Take a list of Track objects, and write their metadata into tracks.json
     """
@@ -151,11 +156,14 @@ def export(processed_dir: Path, tracks: List[Track], threads: int = 1) -> None:
             return None
 
     json_list = thread_map(_export, tracks, max_workers=threads, desc="export")
+    json_dict = dict(sorted((t["id"], t) for t in json_list if t))
+    if update:
+        json_dict = json.loads((processed_dir / "tracks.json").read_text()) | json_dict
 
-    data = json.dumps(dict(sorted((t["id"], t) for t in json_list if t)), default=tuple)
-    with open(os.path.join(processed_dir, "tracks.json"), "w") as fp:
+    data = json.dumps(json_dict, default=tuple)
+    with open(processed_dir / "tracks.json", "w") as fp:
         fp.write(data)
-    with gzip.open(os.path.join(processed_dir, "tracks.json.gz"), "w") as fpz:
+    with gzip.open(processed_dir / "tracks.json.gz", "w") as fpz:
         fpz.write(data.encode("utf8"))
 
 
@@ -237,7 +245,10 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         help="Super-extra verbose logging",
     )
     parser.add_argument(
-        "cmd", nargs="?", help="Sub-process to run (view, encode, export, cleanup)"
+        "cmd",
+        default="all",
+        nargs="?",
+        help="Sub-process to run (view, encode, export, cleanup)",
     )
     parser.add_argument(
         "match", nargs="?", help="Only act upon files matching this pattern"
@@ -286,16 +297,18 @@ def main(argv: List[str]) -> int:
 
                     # If no specific command is specified, then encode,
                     # export, and cleanup with the default settings
-                    if args.cmd == None:
+                    update = args.match is not None
+                    if args.cmd == "all":
                         encode(tracks, args.threads)
-                        export(args.processed, tracks, args.threads)
-                        cleanup(args.processed, tracks, args.delete, args.threads)
+                        export(args.processed, tracks, update, args.threads)
+                        if not args.match:
+                            cleanup(args.processed, tracks, args.delete, args.threads)
                     elif args.cmd == "view":
                         view(tracks)
                     elif args.cmd == "encode":
                         encode(tracks, args.threads)
                     elif args.cmd == "export":
-                        export(args.processed, tracks, args.threads)
+                        export(args.processed, tracks, update, args.threads)
                     elif args.cmd == "cleanup":
                         if args.match:
                             raise Exception("Can't use cleanup with --match")
