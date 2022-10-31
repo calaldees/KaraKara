@@ -18,6 +18,7 @@ type Track = {
         title: Array<string>,
         from?: Array<string>,
         artist?: Array<string>,
+        vocaltrack?: Array<string>,
     }
     attachments: {
         video: Array<Attachment>,

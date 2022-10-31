@@ -11,6 +11,9 @@ export const Splash = ({
 }): VNode => (
     <div id={"splash"}>
         {Object.values(track_list)
+            // ignore instrumental tracks, because instrumentals
+            // tend to have hard-subs, which makes ugly thumbnails
+            .filter((track) => track.tags.vocaltrack?.[0] != "off")
             .slice(0, 25)
             .map((track) => track.attachments.image[0])
             .map((image, n, arr) => (
