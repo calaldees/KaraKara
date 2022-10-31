@@ -47,7 +47,8 @@ async def tracks_load(_app: sanic.Sanic, _loop):
 
 
 from .queue_model import QueueItem
-from .queue_manager import QueueManagerCSVAsync, SettingsManager
+from .settings_manager import SettingsManager
+from .queue_manager import QueueManagerCSVAsync
 from . import queue_validation
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
@@ -81,6 +82,9 @@ async def aio_mqtt_close(_app, _loop):
 
 # pytest debugging - This is needed to see exceptions on failed tests. DEBUG=True wont give me json exceptions. SO CLUMSY!
 # https://sanic.dev/en/guide/best-practices/exceptions.html#custom-error-handling
+def exception_to_dict(exception):
+    import traceback
+    return {'exception': "".join(traceback.TracebackException.from_exception(exception).format())}
 class CustomErrorHandler(sanic.handlers.ErrorHandler):
     def default(self, request, exception):
         if isinstance(exception, sanic.exceptions.SanicException):
@@ -88,8 +92,7 @@ class CustomErrorHandler(sanic.handlers.ErrorHandler):
         if isinstance(exception, AssertionError):
             return super().default(request, sanic.exceptions.InvalidUsage(*exception.args))
         log.exception("Error:")
-        import traceback
-        return sanic.response.json({'exception': "".join(traceback.TracebackException.from_exception(exception).format())}, status=500)
+        return sanic.response.json(exception_to_dict(exception), status=500)
 app.error_handler = CustomErrorHandler()
 
 
@@ -206,7 +209,10 @@ async def update_settings(request, queue_id):
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request, queue_id):
         log.info(f"Updating settings for {queue_id} to {request.json}")
-        request.app.ctx.settings_manager.set_json(queue_id, request.json)
+        try:
+            request.app.ctx.settings_manager.set_json(queue_id, request.json)
+        except Exception as ex:
+            raise sanic.exceptions.InvalidUsage(message="invalid settings", context=exception_to_dict(ex))
         return sanic.response.json({})
 
 

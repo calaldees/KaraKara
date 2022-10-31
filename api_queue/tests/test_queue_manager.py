@@ -1,7 +1,8 @@
 import pytest
 
+from api_queue.settings_manager import SettingsManager
 from api_queue.queue_model import QueueItem
-from api_queue.queue_manager import QueueManagerCSV, SettingsManager
+from api_queue.queue_manager import QueueManagerCSV
 
 
 # TODO: more queue_manager tests needed

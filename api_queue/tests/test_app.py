@@ -4,11 +4,11 @@ import collections.abc
 import ujson as json
 
 
-
 @pytest.mark.asyncio
 async def test_root(app):  # mock_redis,
     request, response = await app.asgi_client.get("/")
     assert response.status == 302
+
 
 @pytest.mark.asyncio
 async def test_queue_invalid_name(app):
@@ -24,9 +24,11 @@ async def test_queue_invalid_name(app):
 async def test_tracks(queue_model):
     assert 'KAT_TUN_Your_side_Instrumental_' in (await queue_model.tracks).keys()
 
+
 @pytest.mark.asyncio
 async def test_queue_null(queue_model):
     assert isinstance(await queue_model.queue, collections.abc.Sequence)
+
 
 @pytest.mark.asyncio
 async def test_queue_settings_default(queue_model):
@@ -34,17 +36,36 @@ async def test_queue_settings_default(queue_model):
     assert isinstance(settings, collections.abc.Mapping)
     assert 'track_space' in settings
 
+
 @pytest.mark.asyncio
 async def test_queue_settings_change(queue_model, mock_mqtt):
     settings = await queue_model.settings
     assert settings['track_space'] == 15.0
 
+    mock_mqtt.publish.assert_not_awaited()
     queue_model.session_id = 'admin'
     response = await queue_model.settings_put(payload={"track_space": 10.0})
     assert response.status == 200
+    mock_mqtt.publish.assert_awaited_once()
 
     settings = await queue_model.settings
     assert settings['track_space'] == 10.0
+
+    assert mock_mqtt.publish.await_args.args == ("room/test/settings", json.dumps(settings))
+    assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
+
+
+@pytest.mark.asyncio
+async def test_queue_settings_change_invalid(queue_model, mock_mqtt):
+    settings = await queue_model.settings
+    assert settings["validation_event_end_datetime"] is None
+
+    mock_mqtt.publish.assert_not_awaited()
+    queue_model.session_id = 'admin'
+    response = await queue_model.settings_put(payload={"validation_event_end_datetime": "Some nonsense that is not a datetime"})
+    assert response.status == 400
+    mock_mqtt.publish.assert_not_awaited()
+
 
 @pytest.mark.asyncio
 async def test_queue_add(queue_model, mock_mqtt):
@@ -68,6 +89,7 @@ async def test_queue_add(queue_model, mock_mqtt):
     assert {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}.items() <= queue[0].items()
     assert mock_mqtt.publish.await_args.args == ("room/test/queue", json.dumps(queue))
     assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
+
 
 @pytest.mark.asyncio
 async def test_queue_delete(queue_model, mock_mqtt):
@@ -104,6 +126,7 @@ async def test_queue_delete(queue_model, mock_mqtt):
     queue = await queue_model.queue
     assert len(queue) == 0
 
+
 @pytest.mark.asyncio
 async def test_queue_move(queue_model, mock_mqtt):
     # populate queue
@@ -134,6 +157,7 @@ async def test_queue_move(queue_model, mock_mqtt):
     response = await queue_model.put(source=queue[0]['id'], target=-1)
     queue = await queue_model.queue
     assert [i['track_id'] for i in queue] == ['KAT_TUN_Your_side_Instrumental_', 'Macross_Dynamite7_OP_Dynamite_Explosion', 'Animaniacs_OP']
+
 
 @pytest.mark.asyncio
 async def test_queue_command(queue_model, mock_mqtt):

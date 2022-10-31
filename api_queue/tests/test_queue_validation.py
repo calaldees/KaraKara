@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 import datetime
 
-from api_queue.queue_manager import SettingsManager, DEFAULT_QUEUE_SETTINGS
+from api_queue.settings_manager import SettingsManager
 from api_queue.queue_model import Queue, QueueItem
 from api_queue.queue_validation import default as default_validation
 

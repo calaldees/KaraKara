@@ -28,7 +28,7 @@ FROM code as test
     RUN pytest -x
     COPY --from=python_dependencies_test /usr/local/bin/mypy /usr/local/bin/mypy
     COPY ./.mypy.ini ./
-    #RUN mypy api_queue  # Unable to get get `queue_validation.py` passing mypy
+    RUN mypy api_queue
     CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
