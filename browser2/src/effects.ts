@@ -105,6 +105,10 @@ function apiRequestEffect(dispatch, props) {
             }).json();
         })
         .then(function (result) {
+            if(result.status >= 400) {
+                throw result;
+            }
+
             console.groupCollapsed("api_request(", props.url, ")");
             console.log(result);
             console.groupEnd();
@@ -144,7 +148,7 @@ function apiRequestEffect(dispatch, props) {
                         ...state,
                         loading: false,
                         notification: {
-                            text: "Internal Error: " + error,
+                            text: "Internal Error: " + (error.message ?? "unknown"),
                             style: "error",
                         },
                     },
