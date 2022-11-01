@@ -37,7 +37,11 @@ SCAN_IGNORE = [
     ".stfolder",
     ".stversions",
     ".syncthing",
+    ".stignore",
+    ".stglobalignore",
     "cache.db",
+    "tracks.json",
+    "tracks.json.gz",
 ]
 
 
@@ -174,9 +178,7 @@ def cleanup(
     Delete any files from the processed dir that aren't included in any tracks
     """
     expected = {
-        processed_dir / "cache.db",
-        processed_dir / "tracks.json",
-        processed_dir / "tracks.json.gz",
+        processed_dir / n for n in SCAN_IGNORE
     }
     for track in tracks:
         for target in track.targets:
