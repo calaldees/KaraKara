@@ -73,8 +73,8 @@ class TestE2E(unittest.TestCase):
                 self.assertEqual(v, tracks_json["test1"][k])
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "R/Rck_Khyvlnb.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "L/LxKPtoHpqwi.mp4"}],
+                    "image": [{"mime": "image/webp", "path": "r/Rck_Khyvlnb.webp"}],
+                    "preview": [{"mime": "video/mp4", "path": "l/LxKPtoHpqwi.mp4"}],
                     "subtitle": [{"mime": "text/vtt", "path": "s/saL9lNN0XFx.vtt"}],
                     "video": [{"mime": "video/mp4", "path": "v/vgO9puzSJ60.mp4"}],
                 },

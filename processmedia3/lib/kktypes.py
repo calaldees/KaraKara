@@ -130,7 +130,9 @@ class Target:
         hasher.update("".join(sorted(parts)).encode("utf-8"))
         hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("utf8"))
         self.friendly = hash[0].lower() + "/" + hash[:11] + "." + self.encoder.ext
-        self.path = processed_dir / hash[0].lower() / (hash[:11] + "." + self.encoder.ext)
+        self.path = (
+            processed_dir / hash[0].lower() / (hash[:11] + "." + self.encoder.ext)
+        )
         log.debug(
             f"Filename for {self.encoder.__class__.__name__} = {self.friendly} based on {parts}"
         )
