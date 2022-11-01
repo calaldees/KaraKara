@@ -1,4 +1,9 @@
 ARG PYTHON_IMAGE_VERSION=3.10
+ARG FFMPEG_VERSION=5.1.2
+
+# Can't use ARG variables in `COPY --from`, but can use them in `FROM`...
+FROM mwader/static-ffmpeg:${FFMPEG_VERSION} as ffmpeg
+
 FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
     ARG PYTHON_IMAGE_VERSION
     ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
@@ -6,8 +11,8 @@ FROM python:${PYTHON_IMAGE_VERSION}-alpine as base
     # System Dependencies ------------------------------------------------------
 
     # ffmpeg (staticly compiled) with libsvtav1 + h265 support
-    COPY --from=mwader/static-ffmpeg /ffmpeg /usr/local/bin/
-    COPY --from=mwader/static-ffmpeg /ffprobe /usr/local/bin/
+    COPY --from=ffmpeg /ffmpeg /usr/local/bin/
+    COPY --from=ffmpeg /ffprobe /usr/local/bin/
     RUN ffmpeg --help
 
     RUN apk add --no-cache \
