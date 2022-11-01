@@ -129,15 +129,15 @@ def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> Non
 
     def _encode(target: Target):
         try:
-            target.encode()
+            if reencode or not t.path.exists():
+                target.encode()
         except Exception:
             log.exception(f"Error encoding {target.friendly}")
 
     targets = []
     for tr in tracks:
         for t in tr.targets:
-            if reencode or not t.path.exists():
-                targets.append(t)
+            targets.append(t)
 
     thread_map(_encode, targets, max_workers=threads, desc="encode")
 
