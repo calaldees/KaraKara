@@ -122,7 +122,7 @@ def view(tracks: List[Track]) -> None:
             )
 
 
-def encode(tracks: List[Track], threads: int = 1) -> None:
+def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> None:
     """
     Take a list of Track objects, and make sure that every Target exists
     """
@@ -136,7 +136,7 @@ def encode(tracks: List[Track], threads: int = 1) -> None:
     targets = []
     for tr in tracks:
         for t in tr.targets:
-            if not t.path.exists():
+            if reencode or not t.path.exists():
                 targets.append(t)
 
     thread_map(_encode, targets, max_workers=threads, desc="encode")
@@ -241,6 +241,12 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         help="Actually delete files for-real during cleanup",
     )
     parser.add_argument(
+        "--reencode",
+        action="store_true",
+        default=False,
+        help="Re-encode files, even if they already exist in the processed directory",
+    )
+    parser.add_argument(
         "--debug",
         action="store_true",
         default=False,
@@ -301,14 +307,14 @@ def main(argv: List[str]) -> int:
                     # export, and cleanup with the default settings
                     update = args.match is not None
                     if args.cmd == "all":
-                        encode(tracks, args.threads)
+                        encode(tracks, args.reencode, args.threads)
                         export(args.processed, tracks, update, args.threads)
                         if not args.match:
                             cleanup(args.processed, tracks, args.delete, args.threads)
                     elif args.cmd == "view":
                         view(tracks)
                     elif args.cmd == "encode":
-                        encode(tracks, args.threads)
+                        encode(tracks, args.reencode, args.threads)
                     elif args.cmd == "export":
                         export(args.processed, tracks, update, args.threads)
                     elif args.cmd == "cleanup":

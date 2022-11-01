@@ -138,19 +138,18 @@ class Target:
         )
 
     def encode(self) -> None:
-        if not self.path.exists():
-            log.info(
-                f"{self.encoder.__class__.__name__}("
-                f"{self.friendly!r}, "
-                f"{[s.friendly for s in self.sources]})"
-            )
+        log.info(
+            f"{self.encoder.__class__.__name__}("
+            f"{self.friendly!r}, "
+            f"{[s.friendly for s in self.sources]})"
+        )
 
-            with tempfile.TemporaryDirectory() as tempdir:
-                temppath = Path(tempdir) / ("out." + self.encoder.ext)
-                self.encoder.encode(temppath, self.sources)
-                self.path.parent.mkdir(exist_ok=True)
-                log.debug(f"Moving {temppath} to {self.path}")
-                shutil.move(temppath.as_posix(), self.path.as_posix())
+        with tempfile.TemporaryDirectory() as tempdir:
+            temppath = Path(tempdir) / ("out." + self.encoder.ext)
+            self.encoder.encode(temppath, self.sources)
+            self.path.parent.mkdir(exist_ok=True)
+            log.debug(f"Moving {temppath} to {self.path}")
+            shutil.move(temppath.as_posix(), self.path.as_posix())
 
 
 class Track:
