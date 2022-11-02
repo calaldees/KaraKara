@@ -177,9 +177,7 @@ def cleanup(
     """
     Delete any files from the processed dir that aren't included in any tracks
     """
-    expected = {
-        processed_dir / n for n in SCAN_IGNORE
-    }
+    expected = {processed_dir / n for n in SCAN_IGNORE}
     for track in tracks:
         for target in track.targets:
             expected.add(target.path)
