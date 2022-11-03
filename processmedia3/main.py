@@ -39,6 +39,7 @@ SCAN_IGNORE = [
     ".syncthing",
     ".stignore",
     ".stglobalignore",
+    ".tmp",
     "cache.db",
     "tracks.json",
     "tracks.json.gz",
@@ -164,11 +165,15 @@ def export(
     if update:
         json_dict = json.loads((processed_dir / "tracks.json").read_text()) | json_dict
 
-    data = json.dumps(json_dict, default=tuple)
-    with open(processed_dir / "tracks.json", "w") as fp:
-        fp.write(data)
-    with gzip.open(processed_dir / "tracks.json.gz", "w") as fpz:
-        fpz.write(data.encode("utf8"))
+    data = json.dumps(json_dict, default=tuple).encode('utf8')
+
+    path = processed_dir / "tracks.json"
+    path.with_suffix(".tmp").write_bytes(data)
+    path.with_suffix(".tmp").rename(path)
+
+    path = processed_dir / "tracks.json.gz"
+    path.with_suffix(".tmp").write_bytes(gzip.compress(data))
+    path.with_suffix(".tmp").rename(path)
 
 
 def cleanup(
