@@ -94,7 +94,7 @@ def scan(
             log.exception(f"Error calculating track {basename}")
             return None
 
-    maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan  ")
+    maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan   ")
 
     return [t for t in maybe_tracks if t]
 
@@ -146,7 +146,7 @@ def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> Non
         except Exception:
             log.exception(f"Error encoding {target.friendly}")
 
-    thread_map(_encode, targets, max_workers=threads, desc="encode")
+    thread_map(_encode, targets, max_workers=threads, desc="encode ")
 
 
 def export(
@@ -169,7 +169,7 @@ def export(
             log.exception(f"Error exporting {track.id}")
             return None
 
-    json_list = thread_map(_export, tracks, max_workers=threads, desc="export")
+    json_list = thread_map(_export, tracks, max_workers=threads, desc="export ")
 
     # Export in alphabetic order
     json_dict = dict(sorted((t["id"], t) for t in json_list if t))
