@@ -288,37 +288,29 @@ def main(argv: List[str]) -> int:
         level=logging.DEBUG if args.debug else logging.INFO,
         format="%(asctime)s %(message)s",
     )
-    last_source_change = None
 
     while True:
-        source_change = os.stat(args.source).st_mtime
-        if source_change != last_source_change:
-            last_source_change = source_change
+        with _pickled_var(args.cache, {}) as cache, logging_redirect_tqdm():
+            tracks = scan(args.source, args.processed, args.match, cache, args.threads)
 
-            with _pickled_var(args.cache, {}) as cache:
-                with logging_redirect_tqdm():
-                    tracks = scan(
-                        args.source, args.processed, args.match, cache, args.threads
-                    )
-
-                    # If no specific command is specified, then encode,
-                    # export, and cleanup with the default settings
-                    update = args.match is not None
-                    if args.cmd == "all":
-                        encode(tracks, args.reencode, args.threads)
-                        export(args.processed, tracks, update, args.threads)
-                        if not args.match:
-                            cleanup(args.processed, tracks, args.delete, args.threads)
-                    elif args.cmd == "view":
-                        view(tracks)
-                    elif args.cmd == "encode":
-                        encode(tracks, args.reencode, args.threads)
-                    elif args.cmd == "export":
-                        export(args.processed, tracks, update, args.threads)
-                    elif args.cmd == "cleanup":
-                        if args.match:
-                            raise Exception("Can't use cleanup with --match")
-                        cleanup(args.processed, tracks, args.delete, args.threads)
+            # If no specific command is specified, then encode,
+            # export, and cleanup with the default settings
+            update = args.match is not None
+            if args.cmd == "all":
+                encode(tracks, args.reencode, args.threads)
+                export(args.processed, tracks, update, args.threads)
+                if not args.match:
+                    cleanup(args.processed, tracks, args.delete, args.threads)
+            elif args.cmd == "view":
+                view(tracks)
+            elif args.cmd == "encode":
+                encode(tracks, args.reencode, args.threads)
+            elif args.cmd == "export":
+                export(args.processed, tracks, update, args.threads)
+            elif args.cmd == "cleanup":
+                if args.match:
+                    raise Exception("Can't use cleanup with --match")
+                cleanup(args.processed, tracks, args.delete, args.threads)
 
         if args.loop:
             log.info(f"Sleeping for {args.loop}s before checking for new inputs")
