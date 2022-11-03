@@ -213,7 +213,7 @@ def cleanup(
             else:
                 log.info(f"{rel} due to be cleaned up")
 
-    files = processed_dir.glob("**/*")
+    files = list(processed_dir.glob("**/*"))
     thread_map(_cleanup, files, max_workers=threads, desc="cleanup")
 
 
