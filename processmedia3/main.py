@@ -76,8 +76,11 @@ def scan(
             continue
         if path.is_file() and (match is None or match in path.stem):
             grouped[path.stem].append(path)
+    groups = sorted(grouped.items())
 
-    # Turn a basename and list of filenames into a Track
+    # Turn all the (basename, list of filenames) tuples into a
+    # list of Tracks (log en error and return None if we can't
+    # figure out how to turn these files into a valid Track)
     def _load_track(group: Tuple[str, List[Path]]) -> Optional[Track]:
         (basename, paths) = group
         try:
@@ -91,9 +94,8 @@ def scan(
             log.exception(f"Error calculating track {basename}")
             return None
 
-    # Turn all the files into a list of Tracks
-    groups = sorted(grouped.items())
     maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan  ")
+
     return [t for t in maybe_tracks if t]
 
 
@@ -128,17 +130,21 @@ def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> Non
     Take a list of Track objects, and make sure that every Target exists
     """
 
+    # Come up with a single list of every Target object that we can imagine
+    targets = []
+    for tr in tracks:
+        for t in tr.targets:
+            targets.append(t)
+
+    # Only check if the file exists at the last minute, not at the start,
+    # because somebody else might have finished this encode while we still
+    # had it in our own queue.
     def _encode(target: Target):
         try:
             if reencode or not t.path.exists():
                 target.encode()
         except Exception:
             log.exception(f"Error encoding {target.friendly}")
-
-    targets = []
-    for tr in tracks:
-        for t in tr.targets:
-            targets.append(t)
 
     thread_map(_encode, targets, max_workers=threads, desc="encode")
 
@@ -153,6 +159,9 @@ def export(
     Take a list of Track objects, and write their metadata into tracks.json
     """
 
+    # Exporting a Track to json can take some time, since we also need
+    # to read the tags and the subtitle files in order to include those
+    # in the index; so do it multi-threaded.
     def _export(track: Track) -> Optional[Dict[str, Any]]:
         try:
             return track.to_json()
@@ -161,11 +170,19 @@ def export(
             return None
 
     json_list = thread_map(_export, tracks, max_workers=threads, desc="export")
+
+    # Export in alphabetic order
     json_dict = dict(sorted((t["id"], t) for t in json_list if t))
+
+    # If we've only scanned & encoded a few files, then add
+    # those entries onto the end of the current tracks, don't
+    # replace the whole database.
     if update:
         json_dict = json.loads((processed_dir / "tracks.json").read_text()) | json_dict
 
-    data = json.dumps(json_dict, default=tuple).encode('utf8')
+    # Write to temp file then rename, so if the disk fills up then
+    # we don't end up with a half-written tracks.json
+    data = json.dumps(json_dict, default=tuple).encode("utf8")
 
     path = processed_dir / "tracks.json"
     path.with_suffix(".tmp").write_bytes(data)
