@@ -66,5 +66,6 @@ export function current_and_future(now: number, tracks: Array<QueueItem>): Array
 }
 
 export function percent(a: number, b: number): string {
-    return Math.round((a / b) * 100) + "%";
+    // show one decimal place, so that animations animate smoother
+    return Math.round((a / b) * 1000)/10 + "%";
 }
