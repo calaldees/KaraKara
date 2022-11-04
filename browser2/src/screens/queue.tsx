@@ -74,7 +74,7 @@ const Playlist = ({
             <section>
                 <h2>Coming Soon</h2>
                 <ul>
-                    {queue.slice(1, 1+state.settings["coming_soon_length"]).map((item) => (
+                    {queue.slice(1, 1+state.settings["coming_soon_track_count"]).map((item) => (
                         <QueueItemRender state={state} item={item} />
                     ))}
                 </ul>
@@ -82,11 +82,11 @@ const Playlist = ({
         )}
 
         {/* Many items */}
-        {queue.length > (1+state.settings["coming_soon_length"]) && (
+        {queue.length > (1+state.settings["coming_soon_track_count"]) && (
             <section>
                 <h2>Coming Later</h2>
                 <div class={"coming_later"}>
-                    {shuffle(queue.slice(1+state.settings["coming_soon_length"])).map((item) => (
+                    {shuffle(queue.slice(1+state.settings["coming_soon_track_count"])).map((item) => (
                         <span>{item.performer_name}</span>
                     ))}
                 </div>
