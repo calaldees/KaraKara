@@ -219,7 +219,7 @@ const Bookmarks = ({ state }: { state: State }) =>
         <div>
             <h2>Bookmarks</h2>
             <ul>
-                {state.bookmarks.map((bm) => (
+                {state.bookmarks.filter(bm => bm in state.track_list).map((bm) => (
                     <TrackItem state={state} track={state.track_list[bm]} />
                 ))}
             </ul>
