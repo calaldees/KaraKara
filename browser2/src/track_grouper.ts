@@ -103,53 +103,57 @@ export function group_tracks(
     filters: Array<string>,
     tracks: Array<Track>
 ): Array<[string, TrackListSection]> {
+    let sections: Array<[string, TrackListSection]> = [];
+    let leftover_tracks: Array<Track> = tracks;
+    let all_tags = summarise_tags(tracks);
+    let section_names = suggest_next_filters(filters, all_tags);
+
     // If there are no tracks, show a friendly error
     if (tracks.length == 0) {
-        return [["No Results", {}]];
+        sections.push(["No Results", {}]);
     }
 
     // If we have a few tracks, just list them all
-    if (tracks.length < 5) {
-        return [["", { tracks: tracks }]];
+    else if (tracks.length < 5) {
+        sections.push(["", { tracks: tracks }]);
+        leftover_tracks = [];
     }
 
     // If we have many tracks, prompt for more filters
-    let all_tags = summarise_tags(tracks);
-    let section_names = suggest_next_filters(filters, all_tags);
-    let leftover_tracks: Array<Track> = tracks;
-    let sections: Array<[string, TrackListSection]> = [];
-    for (let i = 0; i < section_names.length; i++) {
-        let tag_key = section_names[i]; // eg "vocaltrack"
-        let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
-        if (!tag_values) continue;
-        // If a filter has a lot of options (eg artist=...) then show options
-        // grouped alphabetically
-        if (Object.keys(tag_values).length > 50) {
-            let grouped_groups = {};
-            Object.keys(tag_values).forEach(function (x) {
-                // Group by first alphabetic character
-                var initial = normalise_name(x)[0];
-                if (grouped_groups[initial] == undefined)
-                    grouped_groups[initial] = {};
-                grouped_groups[initial][x] = tag_values[x];
-                // If our title is "The X", also group us under X
-                if(x.toLowerCase().startsWith("the ") && x.length > 4) {
-                    var x2 = x.substring(4) + ", " + x.substring(0, 3);
-                    var initial = x2[0].toUpperCase();
+    else {
+        for (let i = 0; i < section_names.length; i++) {
+            let tag_key = section_names[i]; // eg "vocaltrack"
+            let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
+            if (!tag_values) continue;
+            // If a filter has a lot of options (eg artist=...) then show options
+            // grouped alphabetically
+            if (Object.keys(tag_values).length > 50) {
+                let grouped_groups = {};
+                Object.keys(tag_values).forEach(function (x) {
+                    // Group by first alphabetic character
+                    var initial = normalise_name(x)[0];
                     if (grouped_groups[initial] == undefined)
                         grouped_groups[initial] = {};
-                    grouped_groups[initial][x2] = tag_values[x];
-                }
-            });
-            sections.push([tag_key, { groups: grouped_groups }]);
+                    grouped_groups[initial][x] = tag_values[x];
+                    // If our title is "The X", also group us under X
+                    if(x.toLowerCase().startsWith("the ") && x.length > 4) {
+                        var x2 = x.substring(4) + ", " + x.substring(0, 3);
+                        var initial = x2[0].toUpperCase();
+                        if (grouped_groups[initial] == undefined)
+                            grouped_groups[initial] = {};
+                        grouped_groups[initial][x2] = tag_values[x];
+                    }
+                });
+                sections.push([tag_key, { groups: grouped_groups }]);
+            }
+            // If a filter has a few options (eg vocaltrack=on/off), then show
+            // all the options
+            else {
+                sections.push([tag_key, { filters: tag_values }]);
+            }
+            // Remove all tracks which would be discovered by this sub-query
+            leftover_tracks = leftover_tracks.filter((t) => !(tag_key in t.tags));
         }
-        // If a filter has a few options (eg vocaltrack=on/off), then show
-        // all the options
-        else {
-            sections.push([tag_key, { filters: tag_values }]);
-        }
-        // Remove all tracks which would be discovered by this sub-query
-        leftover_tracks = leftover_tracks.filter((t) => !(tag_key in t.tags));
     }
 
     // If there are tracks which wouldn't be found if we used any
