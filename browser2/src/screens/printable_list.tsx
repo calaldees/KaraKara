@@ -56,13 +56,14 @@ export const PrintableList = ({ state }: { state: State }): VNode => (
         />
         {Object.values(state.track_list).map((track: Track) => (
             <p>
-                {last_tag(track.tags as Dictionary<Array<string>>, "from")} (
-                {shortest_tag(track.tags["use"])}){": "}
+                {track.tags["from"] && last_tag(track.tags as Dictionary<Array<string>>, "from")}
+                {track.tags["use"] && ` (${shortest_tag(track.tags["use"])})`}
+                {(track.tags["from"] || track.tags["use"]) && ": "}
                 {shortest_tag(track.tags.title)}
                 {" - "}
-                {track.tags["artist"] || "No Artist"} (
+                {track.tags["artist"]?.join(", ") || "No Artist"} (
                 {Math.floor(track.duration / 60)}m
-                {Math.floor(track.duration % 60)})
+                {(Math.floor(track.duration % 60)+"").padStart(2, '0')})
             </p>
         ))}
     </Screen>
