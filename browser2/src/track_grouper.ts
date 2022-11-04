@@ -109,7 +109,7 @@ export function group_tracks(
     }
 
     // If we have a few tracks, just list them all
-    if (tracks.length < 20) {
+    if (tracks.length < 5) {
         return [["", { tracks: tracks }]];
     }
 
