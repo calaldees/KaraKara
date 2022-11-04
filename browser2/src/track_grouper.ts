@@ -127,14 +127,14 @@ export function group_tracks(
         let section_names = suggest_next_filters(filters, all_tags);
         let found_track_ids: Array<string> = [];
         for(let i=0; i<section_names.length; i++) {
-            let tag_key = section_names[i];
-            // suggest_next_filters might suggest a filter with 0 results
-            if(!(tag_key in all_tags)) continue;
-            let tag_values = Object.keys(all_tags[tag_key]).sort(normalise_cmp);
-            for(let j=0; j<tag_values.length; j++) {
-                let tag_value = tag_values[j];
-                let tracks_in_this_section = tracks.filter(t => t.tags[tag_key]?.includes(tag_value));
-                sections.push([tag_value, { tracks: tracks_in_this_section }]);
+            let tag_key = section_names[i]; // eg "vocaltrack"
+            let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
+            if (!tag_values) continue;
+            let tag_children = Object.keys(tag_values).sort(normalise_cmp);
+            for(let j=0; j<tag_children.length; j++) {
+                let tag_child = tag_children[j];
+                let tracks_in_this_section = tracks.filter(t => t.tags[tag_key]?.includes(tag_child));
+                sections.push([tag_child, { tracks: tracks_in_this_section }]);
                 found_track_ids = found_track_ids.concat(tracks_in_this_section.map(t => t.id));
             }
         }
@@ -149,13 +149,13 @@ export function group_tracks(
         if(section_names.length == 0) section_names = Object.keys(all_tags);
         for (let i = 0; i < section_names.length; i++) {
             let tag_key = section_names[i]; // eg "vocaltrack"
+            let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
+            if (!tag_values) continue;
             // If we've fallen back to using "all tags" as sections,
             // then "all tags" includes top-level tags (with null as a
             // parent) - let's turn null into something visible so that
             // top-level tags will be grouped under this.
             let tag_key_visible = tag_key || "*";
-            let tag_values = all_tags[tag_key]; // eg {"on": 2003, "off": 255}
-            if (!tag_values) continue;
             // If a filter has a lot of options (eg artist=...) then show options
             // grouped alphabetically
             if (Object.keys(tag_values).length > 50) {
