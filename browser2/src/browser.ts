@@ -75,6 +75,7 @@ let state: State = {
         "validation_event_start_datetime": undefined,
         "validation_event_end_datetime": undefined,
         "validation_performer_names": [],
+        "coming_soon_length": 10,
     },
     settings_edit: {},
 
