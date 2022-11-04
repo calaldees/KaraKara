@@ -85,7 +85,7 @@ describe('apply_hidden', () => {
             ]);
     });
     test("multiple hidden sub-tags hide tracks with all those tags but no others", () => {
-        expect(finder.apply_hidden(tracks, ["category:anime", "category:cartoon"]).map(track => track.id))
+        expect(finder.apply_hidden(tracks, ["category:anime", "category:jpop"]).map(track => track.id))
             .toEqual([
             ]);
     });

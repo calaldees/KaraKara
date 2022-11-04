@@ -8,6 +8,7 @@
       "use": ["opening", "op1"],
       "length": ["short"],
       "category": ["anime"],
+      "artist": ["alice"],
       "": ["retro", "minami"]
     },
     "duration": 231.4,
@@ -30,7 +31,8 @@
       "title": ["Fake Track Name 2"],
       "from": ["Gundam"],
       "use": ["opening", "op2"],
-      "category": ["anime", "cartoon"],
+      "category": ["anime", "jpop"],
+      "artist": ["alice", "bob"],
       "length": ["short"]
     },
     "duration": 231.4,
