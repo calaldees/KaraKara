@@ -6,9 +6,11 @@ import { RemoveTrack } from "../actions";
 const QueueItemRender = ({
     state,
     item,
+    show_time,
 }: {
-    state: State;
-    item: QueueItem;
+    state: State,
+    item: QueueItem,
+    show_time: boolean,
 }): VNode => (
     <li
         class={{
@@ -24,12 +26,17 @@ const QueueItemRender = ({
             <br />
             <span class={"performer"}>{item.performer_name}</span>
         </span>
-        {item.start_time && (
+        {show_time && item.start_time && (
             <span class={"count"}>
                 {time_until(state.now, item.start_time)}
             </span>
         )}
 
+        {/*
+          * Specifically check ID matches, not name-or-ID matches
+          * (as in is_my_song()) because ID needs to match otherwise
+          * the server will reject it
+          */}
         {state.session_id == item.session_id && (
             <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
                 <i class={"fas fa-times-circle"} />
@@ -53,7 +60,7 @@ const Playlist = ({
         {queue.length > 0 && (
             <div>
                 <ul>
-                    <QueueItemRender state={state} item={queue[0]} />
+                    <QueueItemRender state={state} item={queue[0]} show_time={true} />
                     {state.track_list[queue[0].track_id].lyrics.length > 0 && (
                         <li>
                             <span class={"lyrics"}>
@@ -75,7 +82,7 @@ const Playlist = ({
                 <h2>Coming Soon</h2>
                 <ul>
                     {queue.slice(1, 1+state.settings["coming_soon_track_count"]).map((item) => (
-                        <QueueItemRender state={state} item={item} />
+                        <QueueItemRender state={state} item={item} show_time={true} />
                     ))}
                 </ul>
             </section>
@@ -90,6 +97,18 @@ const Playlist = ({
                         <span>{item.performer_name}</span>
                     ))}
                 </div>
+            </section>
+        )}
+
+        {/* My Stuff */}
+        {queue.filter(item => is_my_song(state, item)).length > 0 && (
+            <section>
+                <h2>My Entries</h2>
+                <ul>
+                    {queue.filter(item => is_my_song(state, item)).map((item) => (
+                        <QueueItemRender state={state} item={item} show_time={false} />
+                    ))}
+                </ul>
             </section>
         )}
     </div>
