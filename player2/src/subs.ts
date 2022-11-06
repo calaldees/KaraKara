@@ -107,7 +107,7 @@ export const KeyboardListener = Keyboard({
 
 function _bleSubscriber(dispatch, props) {
     // subscription is restarted whenever props changes,
-    if(props.room_name) {
+    if (props.room_name) {
         setTimeout(function () {
             dispatch((state) => [
                 state,
@@ -130,7 +130,7 @@ function _bleSubscriber(dispatch, props) {
     }
     else {
         setTimeout(function () {
-            dispatch((state) => ({...state, is_admin: false}));
+            dispatch((state) => ({ ...state, is_admin: false }));
         }, 0);
     }
 
@@ -145,7 +145,7 @@ export function BeLoggedIn(room_name: string, room_password: string): Subscripti
 
 
 function _roundedIntervalSubscriber(dispatch, props) {
-    var id: number|null = null;
+    var id: number | null = null;
     function waitForNextInterval() {
         var now = Date.now();
         dispatch(props.action, now);
@@ -154,11 +154,11 @@ function _roundedIntervalSubscriber(dispatch, props) {
     id = setTimeout(waitForNextInterval, props.every - (Date.now() % props.every));
 
     return function () {
-      id && clearTimeout(id)
+        id && clearTimeout(id)
     }
-  }
-  
+}
 
-  export function RoundedInterval(props) {
+
+export function RoundedInterval(props) {
     return [_roundedIntervalSubscriber, props]
-  }
+}
