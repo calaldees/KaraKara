@@ -1,4 +1,5 @@
 import h from "hyperapp-jsx-pragma";
+import { time_until } from "../utils";
 
 export const SettingsMenu = ({ state }: { state: State }): VNode => (
     <div class={"settings"}>
@@ -114,6 +115,14 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             </td>
                         </tr>
                     )}
+                    <tr>
+                        <td style={{
+                            background: [
+                                "red", "green", "yellow", "purple", "orange", "blue"
+                            ][Math.round(state.now) % 6]
+                        }}>Sync</td>
+                        <td><input disabled={true} value={Date.now() / 1000 - state.now} /></td>
+                    </tr>
                     <tr>
                         <td colspan={2}>
                             <button>Close</button>

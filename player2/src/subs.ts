@@ -146,18 +146,49 @@ export function BeLoggedIn(room_name: string, room_password: string): Subscripti
 
 function _roundedIntervalSubscriber(dispatch, props) {
     var id: number | null = null;
+    let offsets: Array<number> = [];
+
+    function offset() {
+        return offsets.length ? offsets.reduce((a, b) => a + b, 0) / offsets.length : 0;
+    }
+    function range() {
+        return Math.max(...offsets.map(o => Math.abs(o-offset())));
+    }
+    function sync() {
+        var sent = Date.now() / 1000;
+        fetch("https://karakara.uk/time.json")
+            .then(response => response.json())
+            .then(response => {
+                var recvd = Date.now() / 1000;
+                var pingpong = recvd - sent;
+                // if there's more than 200ms of network lag, don't
+                // trust the timestamp to be accurate
+                if(pingpong < 0.2) {
+                    offsets.push(response - (pingpong / 2) - sent);
+                }
+                if(offsets.length < 5) {
+                    setTimeout(sync, 1000);
+                }
+                else {
+                    console.log("Clock offset set to", offset(), "+/-", range());
+                }
+            });
+    }
     function waitForNextInterval() {
-        var now = Date.now();
+        var now = Date.now() + (offset() * 1000);
         dispatch(props.action, now);
         id = setTimeout(waitForNextInterval, props.every - (now % props.every));
     }
+
     id = setTimeout(waitForNextInterval, props.every - (Date.now() % props.every));
+    //var sync_id = setInterval(sync, props.sync);
+    sync();
 
     return function () {
-        id && clearTimeout(id)
+        id && clearTimeout(id);
+        //sync_id && clearInterval(sync_id);
     }
 }
-
 
 export function RoundedInterval(props) {
     return [_roundedIntervalSubscriber, props]

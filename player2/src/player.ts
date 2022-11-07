@@ -103,9 +103,10 @@ const subscriptions = (state: State): Array<Subscription> => [
     BeLoggedIn(state.room_name, state.room_password),
     RoundedInterval({
         every: 1000,
-        action(state: State, timestamp: number): Dispatchable {
+        sync: 5000,
+        action(state: State, timestamp_ms: number): Dispatchable {
             (window as any).state = state;
-            return { ...state, now: Date.now()/1000 };
+            return { ...state, now: timestamp_ms/1000 };
         },
     }),
 ];
