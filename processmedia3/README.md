@@ -13,28 +13,11 @@ Example input
 
 Example Output
 
-    processed/BIG-HASH1.webm (av1)
-    processed/BIG-HASH2.mp4 (h265)
-    processed/BIG-HASH3.avif * 4
-    processed/BIG-HASH4.webp * 4
-
-    # Entire track dataset in single static file (with txt and srt embeded)
+    processed/z/zrYVkuc0Sn1.webm
+    processed/g/gESd0tcze9O.mp4
+    processed/x/xP_WJ0_44mv.avif
+    processed/x/xP_WJ0_44mv.webp
     processed/track.json
-
-
-Processing Steps
-----------------
-
-* scan
-  * look through the source directory and figure out which tracks exist
-* encode
-  * ensure that all tracks have their expected attachments in the processed directory
-* export
-  * write the metadata database into tracks.json
-* cleanup
-  * delete any files which aren't associated with any known sources
-
-running main.py with no specific subcommand will run scan + encode + export + dry-run cleanup
 
 
 Use
@@ -51,12 +34,64 @@ Below describes the intended modes of use
 
 Architecture
 ------------
-`main.py` has a function for each step (scan, view, encode, export, cleanup),
-and will call one or more of those functions, optionally in a loop.
+All of the processing revolves around a single "track list" data structure,
+which looks like this:
 
-`lib/kktypes.py` has classes for `Source` (a file in the source directory),
-`Target` (a file in the processed directory) and Track (an entry in
-`tracks.json`, which connects sources to targets)
+```python
+tracks = [
+    # A Track represents an entry in tracks.json
+    Track(
+        id="My_Video",
+        targets=[
+            # A Target represents a file in the output directory
+            Target(
+                type=VIDEO_AV1,
+                sources=[
+                    # A Source is file in the input directory
+                    Source(type=VIDEO, path="Anime/My Video.mp4")
+                ]
+            ),
+            Target(
+                type=SUBTITLE,
+                sources=[
+                    Source(type=SUBTITLE, path="Anime/My Video.srt")
+                ]
+            ),
+            Target(
+                type=IMAGE_WEBP,
+                sources=[
+                    Source(type=VIDEO, path="Anime/My Video.mp4")
+                ]
+            ),
+        ]
+    ),
+    Track(
+        id="Novid",
+        targets=[
+            Target(
+                type=VIDEO_AV1,
+                sources=[
+                    Source(type=AUDIO, path="JPop/Novid.ogg")
+                    Source(type=IMAGE, path="JPop/Novid.jpg")
+                ]
+            ),
+            ...
+        ]
+    ),
+    ...
+]
+```
+
+`main.py` has a function for each step in the process:
+- `scan()` looks at the input directory and creates the above list of Tracks
+- `view()` iterates over each Track, and prints out data about them
+- `encode()` iterates over each Track, and makes sure that each `Target` file
+  exists, calling `target.encode()` to create it if needed
+- `export()` iterates over each Track, converts it to JSON, and writes `tracks.json`
+- `cleanup()` iterates over each Track, collecs a list of all Target filenames,
+  and deletes any file in the output directory that we aren't expecting to exist
+
+`lib/kktypes.py` has classes for `Source` / `Target` / `Track`
 
 The above two are all of the high-level workflow; the rest of the code is more
 specific implementation details for translating avi to webm, srt to vtt, etc.
@@ -66,8 +101,8 @@ Debugging Tools
 ---------------
 
 * Raw python: `./main.py <command>`
-  * You'll need to make sure the `--source` / `--processed` flags are set appropriately
+    * You'll need to make sure the `--source` / `--processed` flags are set appropriately
 * In docker: `docker compose run -ti processmedia3 <command>`
-  * Docker automatically sets the `--source` / `--processed` flags based on `.env`
+    * Docker automatically sets the `--source` / `--processed` flags based on `.env`
 
 Commands: scan, view, encode, export, cleanup
