@@ -1,13 +1,14 @@
 /// <reference path='./browser.d.ts'/>
 import { app } from "hyperapp";
 import { HashStateManager } from "@shish2k/hyperapp-hash-state";
+import { SyncedInterval } from "@shish2k/hyperapp-synced-interval";
 import {
     LocalStorageLoader,
     LocalStorageSaver,
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { BeLoggedIn, getMQTTListener, ResizeListener, RoundedInterval } from "./subs";
+import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
 import { ApiRequest } from "./effects";
 
 // If we're running stand-alone, then use the main karakara.uk
@@ -139,11 +140,13 @@ const subscriptions = (state: State): Array<Subscription> => [
         widescreen: isWidescreen(),
     })),
     BeLoggedIn(state.room_name, state.room_password),
-    RoundedInterval({
-        every: 1000,
-        action(state: State, timestamp: number): Dispatchable {
+    SyncedInterval({
+        server: state.root + "/time.json",
+        interval: 1000,
+        sync: 5*60*1000,
+        onInterval(state: State, timestamp_ms: number): Dispatchable {
             (window as any).state = state;
-            return { ...state, now: Date.now()/1000 };
+            return { ...state, now: timestamp_ms/1000 };
         },
     }),
 ];
