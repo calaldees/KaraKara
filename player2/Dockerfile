@@ -1,5 +1,5 @@
-FROM node:18 AS build
-RUN apt-get update && apt-get install -y util-linux git && rm -rf /var/lib/apt/lists/*
+FROM debian:unstable AS build
+RUN apt-get update && apt-get install -y util-linux git nodejs npm && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
 COPY package.json package-lock.json /app/
