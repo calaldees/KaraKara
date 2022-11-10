@@ -127,8 +127,12 @@ const GroupedFilterList = ({ heading, filters, expanded }): VNode => (
 );
 
 function unThe(filter: string): string {
-    if(filter.toLowerCase().endsWith(", the")) {
-        return filter.substring(filter.length-3) + " " + filter.substring(0, filter.length - 5);
+    if (filter.toLowerCase().endsWith(", the")) {
+        return (
+            filter.substring(filter.length - 3) +
+            " " +
+            filter.substring(0, filter.length - 5)
+        );
     }
     return filter;
 }
@@ -219,9 +223,11 @@ const Bookmarks = ({ state }: { state: State }) =>
         <div>
             <h2>Bookmarks</h2>
             <ul>
-                {state.bookmarks.filter(bm => bm in state.track_list).map((bm) => (
-                    <TrackItem state={state} track={state.track_list[bm]} />
-                ))}
+                {state.bookmarks
+                    .filter((bm) => bm in state.track_list)
+                    .map((bm) => (
+                        <TrackItem state={state} track={state.track_list[bm]} />
+                    ))}
             </ul>
         </div>
     );
@@ -258,7 +264,10 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         title={"Explore Tracks"}
         navRight={
             !state.widescreen && (
-                <a onclick={GoToScreen("queue", [PushScrollPos()])} data-cy="queue">
+                <a
+                    onclick={GoToScreen("queue", [PushScrollPos()])}
+                    data-cy="queue"
+                >
                     <i class={"fas fa-2x fa-list-ol"} />
                 </a>
             )

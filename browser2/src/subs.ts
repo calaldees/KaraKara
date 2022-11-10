@@ -9,9 +9,9 @@ import { ApiRequest } from "./effects";
 /**
  * Connect to the MQTT server, listen for updates to queue / settings
  */
-export function getMQTTListener(state: State): Subscription | null {
+export function getMQTTListener(state: State): Subscription | boolean {
     if (!state.room_name || !Object.keys(state.track_list).length) {
-        return null;
+        return false;
     }
 
     return MQTTSubscribe({
@@ -30,7 +30,7 @@ export function getMQTTListener(state: State): Subscription | null {
             };
         },
         message(state: State, msg): Dispatchable {
-            const topic: string = msg.topic.split("/").pop();
+            const topic: string = msg.topic.split("/").pop() || "";
             const data: string = msg.payload.toString();
 
             console.groupCollapsed("mqtt_onmessage(", topic, ")");

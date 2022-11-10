@@ -56,7 +56,7 @@ export function shuffle<T>(array: Array<T>): Array<T> {
  */
 export function mqtt_login_info(
     state: Pick<State, "root" | "room_name" | "room_password">
-): Dictionary<string> {
+): {url: string} {
     return {
         url: state.root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt",
         //username: state.room_name,

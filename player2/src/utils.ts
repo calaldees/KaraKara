@@ -40,7 +40,7 @@ export function attachment_path(root: string, attachment: Attachment): string {
 /**
  * Get the URL, username, and password to be passed to MQTTSubscribe or MQTTPublish
  */
-export function mqtt_login_info(state: State): Dictionary<string> {
+export function mqtt_login_info(state: State): {url: string} {
     return {
         url: state.root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt",
         //username: state.room_name,

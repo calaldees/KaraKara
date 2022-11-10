@@ -123,7 +123,7 @@ const init: Dispatchable = [
     }),
 ];
 
-const subscriptions = (state: State): Array<Subscription> => [
+const subscriptions = (state: State): Array<Subscription|boolean> => [
     HashStateManager(
         {
             push: ["root", "filters", "track_id", "room_name"],

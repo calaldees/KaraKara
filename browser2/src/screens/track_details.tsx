@@ -132,7 +132,10 @@ export const TrackDetails = ({
         title={track.tags.title[0]}
         navRight={
             !state.widescreen && (
-                <a onclick={GoToScreen("queue", [PushScrollPos()])} data-cy="queue">
+                <a
+                    onclick={GoToScreen("queue", [PushScrollPos()])}
+                    data-cy="queue"
+                >
                     <i class={"fas fa-2x fa-list-ol"} />
                 </a>
             )
@@ -143,7 +146,10 @@ export const TrackDetails = ({
         <video
             class={"video_placeholder"}
             preload={"none"}
-            poster={attachment_path(state.root, track.attachments.image.slice(-1)[0])}
+            poster={attachment_path(
+                state.root,
+                track.attachments.image.slice(-1)[0],
+            )}
             durationHint={track.duration}
             controls={true}
         >

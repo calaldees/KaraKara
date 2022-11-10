@@ -7,9 +7,9 @@ import { ApiRequest, SendCommand } from "./effects";
  * Connect to the MQTT server, listen for queue / settings state updates,
  * and react to commands on the command channel
  */
-export function getMQTTListener(state: State): Subscription | null {
+export function getMQTTListener(state: State): Subscription | boolean {
     if (!state.room_name || !Object.keys(state.track_list).length) {
-        return null;
+        return false;
     }
 
     return MQTTSubscribe({
@@ -23,7 +23,7 @@ export function getMQTTListener(state: State): Subscription | null {
         },
         message(state: State, msg): Dispatchable {
             // msg = mqtt-packet
-            const topic: string = msg.topic.split("/").pop();
+            const topic: string = msg.topic.split("/").pop() || "";
             const data: string = msg.payload.toString();
 
             console.groupCollapsed("mqtt_onmessage(", topic, ")");
@@ -105,7 +105,7 @@ export const KeyboardListener = Keyboard({
 });
 
 
-function _bleSubscriber(dispatch, props) {
+function _bleSubscriber(dispatch: Dispatch, props): Unsubscribe  {
     // subscription is restarted whenever props changes,
     if (props.room_name) {
         setTimeout(function () {
