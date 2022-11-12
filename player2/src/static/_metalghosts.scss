@@ -8,15 +8,18 @@ $LIGHT: #29EDF2;
 	font-weight: 400;
 	font-display: swap;
 }
-@mixin border {
-	padding: 2vh 2vw;
+@mixin radial {
 	background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
+}
+@mixin border {
+	@include radial;
+	padding: 2vh 2vw;
 	border: 1px solid $LIGHT;
 	border-radius: 2vh;
 }
 @mixin miniborder {
+	@include radial;
 	padding: 1vh 1vw;
-	background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
 	border: 1px solid $LIGHT;
 	border-radius: 2vh 0 2vh 0;
 }
@@ -85,19 +88,6 @@ $LIGHT: #29EDF2;
 		0% {transform: translateY(200vh);}
 		100% {transform: translateY(0vh);}
 	}
-	#join_info {
-		position: absolute;
-		left: 10vw;
-		right: 10vw;
-		text-align: center;
-		@include border;
-		color: #BBB;
-		font-size: 4vh;
-		bottom: 1vh;
-		animation-delay: 1s;
-		animation-name: slideup;
-		animation-duration: 2s;
-	}
 
 	@keyframes glow_y {
 		0% {opacity: 0.5;}
@@ -108,8 +98,30 @@ $LIGHT: #29EDF2;
 		color: red;
 		z-index: 9999;
 		position: absolute;
-		width: 100%;
 		text-align: center;
+		background: black;
+		border-radius: .5em;
+		left: 1vw;
+		right: 1vw;
+		top: 1vh;
+	}
+	#join_info, #end_time {
+		@include radial;
+		position: absolute;
+		left: 0;
+		right: 0;
+		text-align: center;
+		color: #BBB;
+		font-size: 4vh;
+		padding: 2vh 2vw;
+	}
+	#join_info {
+		top: 0;
+		border-bottom: 1px solid $LIGHT;
+	}
+	#end_time {
+		bottom: 0vh;
+		border-top: 1px solid $LIGHT;
 	}
 
 
@@ -171,7 +183,7 @@ $LIGHT: #29EDF2;
 		}
 		#playlist {
 			position: absolute;
-			top: 2vh;
+			top: 11vh;
 			left: 2vw;
 			right: 2vw;
 
@@ -237,28 +249,6 @@ $LIGHT: #29EDF2;
 				height: 22vh;
 				font-size: 2em;
 			}
-			/*
-			li:nth-child(1) .time {
-				color: rgba(0,0,0,0);
-				text-shadow: none;
-			}
-			li:nth-child(1) .time::before {
-				content: "You're up!";
-				color: #ff0;
-				animation-name: glow_y;
-				animation-duration: 1s;
-				animation-iteration-count: infinite;
-				animation-direction: alternate;
-			}
-			li:nth-child(2) .time {
-				color: rgba(0,0,0,0);
-				text-shadow: none;
-			}
-			li:nth-child(2) .time::before {
-				content: "Nearly there!";
-				color: #aa0;
-			}
-			*/
 			li:nth-child(1) .time {
 				color: #ff0;
 				animation-name: glow_y;
@@ -277,11 +267,12 @@ $LIGHT: #29EDF2;
 			100% {transform: translateX(0vw);}
 		}
 		#playlist_obscured {
+			display: none;
 			position: absolute;
 			bottom: 2vh;
 			right: 2vw;
 			width: 38vw;
-			height: 32vh;
+			height: 26vh;
 			text-align: center;
 
 			li {
@@ -325,7 +316,7 @@ $LIGHT: #29EDF2;
 		.preview_holder {
 			@include border;
 			position: absolute;
-			top: 26vh;
+			top: 35vh;
 			height: 40vh;
 			width: 38vw;
 			right: 2vw;
@@ -350,7 +341,7 @@ $LIGHT: #29EDF2;
 				text-align: center;
 			}
 		}
-
+	
 		/*---------------------------------------------------------------------------*/
 		/* Small-screen tweaks */
 		/* Draw a line between 16/10 (widescreen) and 16/12 (4:3) - by default we */
@@ -359,7 +350,7 @@ $LIGHT: #29EDF2;
 
 		@media (max-aspect-ratio: 16/11) {
 			#playlist li {
-				width: 60vw;
+				width: 59.5vw;
 			}
 			.preview_holder {
 				width: 35vw;
@@ -367,7 +358,7 @@ $LIGHT: #29EDF2;
 			}
 			#playlist_obscured {
 				width: 35vw;
-				height: 42vh;
+				height: 37vh;
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { memo } from "hyperapp";
 import { attachment_path } from "../utils";
+import { EndTime, JoinInfo } from "./_common";
 
 export const Splash = ({
     track_list,
@@ -32,10 +33,8 @@ export const Splash = ({
 export const TitleScreen = ({ state }: { state: State }): VNode => (
     <section key="title" class={"screen_title"}>
         {memo(Splash, { track_list: state.track_list, root: state.root })}
+        <JoinInfo state={state} />
         <h1>{state.settings["title"]}</h1>
-        <div id="join_info">
-            Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.room_name}</strong>
-        </div>
+        <EndTime state={state} />
     </section>
 );

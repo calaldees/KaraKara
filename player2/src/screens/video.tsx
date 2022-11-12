@@ -1,6 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 import { current_and_future, percent } from "../utils";
-import { Video } from "./_common";
+import { JoinInfo, Video } from "./_common";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -28,6 +28,7 @@ const VideoInternal = ({
 }): VNode => (
     <section key="video" class={"screen_video"}>
         <Video state={state} track={track} />
+        <JoinInfo state={state} />
         <div
             id="seekbar"
             style={{

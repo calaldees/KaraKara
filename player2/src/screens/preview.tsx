@@ -2,10 +2,8 @@ import h from "hyperapp-jsx-pragma";
 import {
     attachment_path,
     time_until,
-    short_date,
-    current_and_future,
 } from "../utils";
-import { Video } from "./_common";
+import { JoinInfo, Video, EndTime } from "./_common";
 
 const show_tracks = 5;
 
@@ -20,15 +18,11 @@ function SetPreviewVolume(state: State, event): Dispatchable {
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-export const PreviewScreen = ({ state }: { state: State }): VNode => (
+export const PreviewScreen = ({ state, visible_queue }: { state: State, visible_queue: Array<QueueItem> }): VNode => (
     <PreviewInternal
         state={state}
-        queue={current_and_future(state.now, state.queue)}
-        track={
-            state.track_list[
-                current_and_future(state.now, state.queue)[0].track_id
-            ]
-        }
+        queue={visible_queue}
+        track={state.track_list[visible_queue[0].track_id]}
     />
 );
 
@@ -42,6 +36,7 @@ const PreviewInternal = ({
     track: Track;
 }): VNode => (
     <section key="preview" class={"screen_preview"}>
+        <JoinInfo state={state} />
         <div class="preview_holder">
             <Video
                 state={state}
@@ -58,7 +53,7 @@ const PreviewInternal = ({
                         item: item,
                         track: state.track_list[item.track_id],
                     }))
-                    .map(({ item, track }) => (
+                    .map(({ item, track }, idx) => (
                         <li key={item.id}>
                             <img
                                 src={attachment_path(
@@ -75,7 +70,11 @@ const PreviewInternal = ({
                             <p class="performer">{item.performer_name}</p>
                             <p class="time">
                                 <span>
-                                    {time_until(state.now, item.start_time)}
+                                    {
+                                        time_until(state.now, item.start_time) ||
+                                        (idx == 0 && "You're up!") ||
+                                        (idx == 1 && "Nearly there!")
+                                    }
                                 </span>
                             </p>
                         </li>
@@ -91,18 +90,6 @@ const PreviewInternal = ({
                 </ul>
             </div>
         )}
-
-        {/* key= to make sure this element stays put while the above may disappear */}
-        <div id="join_info" key={"join_info"}>
-            Join at <strong>{state.root.replace("https://", "")}</strong> - Room
-            Name is <strong>{state.room_name}</strong>
-            {state.settings["validation_event_end_datetime"] && (
-                <span>
-                    <br />
-                    Event ends at{" "}
-                    <strong>{short_date(state.settings["validation_event_end_datetime"])}</strong>
-                </span>
-            )}
-        </div>
+        <EndTime state={state} />
     </section>
 );
