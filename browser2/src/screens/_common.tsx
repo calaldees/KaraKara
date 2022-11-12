@@ -79,8 +79,8 @@ export const Screen = (
         title,
         className = null,
         footer = <div />,
-        navLeft = <EmptyHeaderLink />,
-        navRight = <EmptyHeaderLink />,
+        navLeft = null,
+        navRight = null,
     }: {
         state: State;
         title: string;
@@ -93,7 +93,7 @@ export const Screen = (
 ): VNode => (
     <main class={className}>
         <header>
-            {navLeft}
+            {navLeft || <EmptyHeaderLink />}
             <h1
                 ondblclick={(state: State): State => ({
                     ...state,
@@ -102,7 +102,7 @@ export const Screen = (
             >
                 {title}
             </h1>
-            {navRight}
+            {navRight || <EmptyHeaderLink />}
         </header>
         <Notification state={state} />
         <PriorityToken state={state} />
