@@ -461,6 +461,12 @@ MAIN.queue ARTICLE {
   .me {
     background: $NOTIFICATION_WARNING;
   }
+  .me:first-child {
+    border-top-right-radius: .5em;
+  }
+  .me:last-child {
+    border-bottom-right-radius: .5em;
+  }
   UL LI {
     &.drop_source {
       display: none;
