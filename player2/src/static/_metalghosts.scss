@@ -324,21 +324,11 @@ $LIGHT: #29EDF2;
 			animation-duration: 1s;
 			animation-delay: 0.0s;
 
-			// if <video> is followed by <small>autoplay in x seconds</small>
-			// then make room for that. If <video> is the last element, then
-			// no need to make space.
 			video {
+				background: black;
 				width: 100%;
-				height: calc(100% - .5em);
-			}
-			video:last-child {
 				height: 100%;
-			}
-
-			small {
-				display: block;
-				width: 100%;
-				text-align: center;
+				object-fit: contain;
 			}
 		}
 	
