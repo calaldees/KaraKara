@@ -76,6 +76,6 @@ curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/queue.j
 curl -X GET http://localhost:8000/queue/test/settings.json
 curl -X PUT --cookie "session_id=admin" https://karakara.uk/queue/test/settings.json -d '{"track_space": 42}'
 
-curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play
-curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop
+curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play.json
+curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop/json
 ```

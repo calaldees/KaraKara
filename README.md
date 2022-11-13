@@ -114,7 +114,7 @@ graph TD
     end
 
     /media/processed/ --> nginx
-    /media/processed/ --> api_queue
+    /media/processed/ -- tracks.json --> api_queue
     /media/source/ --> processmedia --> /media/processed/
 ```
 
