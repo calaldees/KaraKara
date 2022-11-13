@@ -190,7 +190,7 @@ $LIGHT: #29EDF2;
 		  "footer footer footer footer" 10vh
 		  / 1vw    6fr     4fr    1vw;
 
-		font-size: 3vh;
+		font-size: 2.5vh;
 
 		/* main blocks */
 		@keyframes slideright {
@@ -241,7 +241,7 @@ $LIGHT: #29EDF2;
 				font-size: 0.9em;
 			}
 		}
-		.n1 {animation-delay: 0.0s; grid-area: n1; font-size: 2.3em;}
+		.n1 {animation-delay: 0.0s; grid-area: n1; font-size: 2.5em;}
 		.n2 {animation-delay: 0.2s; grid-area: n2;}
 		.n3 {animation-delay: 0.3s; grid-area: n3;}
 		.n4 {animation-delay: 0.4s; grid-area: n4;}
