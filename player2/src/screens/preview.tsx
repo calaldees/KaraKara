@@ -37,16 +37,12 @@ const PreviewInternal = ({
 }): VNode => (
     <section key="preview" class={"screen_preview"}>
         <JoinInfo state={state} />
-        <div class="preview_holder">
-            <Video
-                state={state}
-                track={track}
-                onloadstart={SetPreviewVolume}
-                loop={true}
-            />
-        </div>
-        <div id="playlist" key={"playlist"}>
-            <ol>
+        <Video
+            state={state}
+            track={track}
+            onloadstart={SetPreviewVolume}
+            loop={true}
+        />
                 {queue
                     .slice(0, show_tracks)
                     .map((item) => ({
@@ -54,7 +50,7 @@ const PreviewInternal = ({
                         track: state.track_list[item.track_id],
                     }))
                     .map(({ item, track }, idx) => (
-                        <li key={item.id}>
+                        <div class={"item n"+(idx+1)} key={item.id}>
                             <img
                                 src={attachment_path(
                                     state.root,
@@ -77,10 +73,8 @@ const PreviewInternal = ({
                                     }
                                 </span>
                             </p>
-                        </li>
+                        </div>
                     ))}
-            </ol>
-        </div>
         {queue.length > show_tracks && (
             <div id="playlist_obscured" key={"playlist_obscured"}>
                 <ul>
@@ -88,6 +82,11 @@ const PreviewInternal = ({
                         <li key={item.id}>{item.performer_name}</li>
                     ))}
                 </ul>
+            </div>
+        )}
+        {queue.length > show_tracks && (
+            <div id="n_more" key={"n_more"}>
+                <div>and <span>{queue.length - show_tracks}</span> more...</div>
             </div>
         )}
         <EndTime state={state} />

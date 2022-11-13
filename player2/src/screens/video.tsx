@@ -1,19 +1,15 @@
 import h from "hyperapp-jsx-pragma";
 import { current_and_future, percent } from "../utils";
-import { JoinInfo, Video } from "./_common";
+import { EndTime, JoinInfo, Video } from "./_common";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-export const VideoScreen = ({ state }: { state: State }): VNode => (
+export const VideoScreen = ({ state, visible_queue }: { state: State, visible_queue: Array<QueueItem> }): VNode => (
     <VideoInternal
         state={state}
-        track={
-            state.track_list[
-                current_and_future(state.now, state.queue)[0].track_id
-            ]
-        }
-        queue_item={current_and_future(state.now, state.queue)[0]}
+        track={state.track_list[visible_queue[0].track_id]}
+        queue_item={visible_queue[0]}
     />
 );
 
@@ -29,6 +25,7 @@ const VideoInternal = ({
     <section key="video" class={"screen_video"}>
         <Video state={state} track={track} />
         <JoinInfo state={state} />
+        <EndTime state={state} />
         <div
             id="seekbar"
             style={{
@@ -46,10 +43,8 @@ const VideoInternal = ({
             <br />
             Performed by {queue_item.performer_name}
         </div>
-        {/* too much on screen at once?
         <div id="pimpcontributor" class="pimp">
-            Contributed by {get_tag(track.tags.contributor)}
+            Contributed by {track.tags['contributor']?.[0]}
         </div>
-        */}
     </section>
 );

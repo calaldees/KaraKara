@@ -38,7 +38,7 @@ export function Root(state: State): VNode {
         visible_queue[0].start_time > state.now
     )
         screen = <PreviewScreen state={state} visible_queue={visible_queue} />;
-    else screen = <VideoScreen state={state} />;
+    else screen = <VideoScreen state={state} visible_queue={visible_queue} />;
 
     let errors: Array<string> = [];
     if (!state.room_name) errors.push("No Room Set");

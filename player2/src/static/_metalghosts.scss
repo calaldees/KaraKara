@@ -23,6 +23,14 @@ $LIGHT: #29EDF2;
 	border: 1px solid $LIGHT;
 	border-radius: 2vh 0 2vh 0;
 }
+@mixin header {
+	grid-area: header;
+	border-bottom: 1px solid $LIGHT;
+}
+@mixin footer {
+	grid-area: footer;
+	border-top: 1px solid $LIGHT;
+}
 
 * {
 	// before animation, be at 0%, after
@@ -59,19 +67,14 @@ $LIGHT: #29EDF2;
 		url('metalghosts/perlin.jpg');
 	background-size: 45vh, 100% 200%;
 
-	/*
-	// This destroys weak CPUs, and eats up laptop
-	// battery even on beefy CPUs...
-	animation: bgscroll 10s linear infinite;
-	@keyframes bgscroll {
-		0% {background-position: 0 0, 0 0;}
-		100% {background-position: 0 0, 0 100%;}
-	}
-	*/
-
 	/*---------------------------------------------------------------------------*/
 	/* Common */
 	/*---------------------------------------------------------------------------*/
+
+	@keyframes glow_y {
+		0% {opacity: 0.5;}
+		100% {opacity: 1.0;}
+	}
 
 	H1, H2, OL, UL, P {
 		margin: 0;
@@ -81,17 +84,6 @@ $LIGHT: #29EDF2;
 	STRONG {
 		color: #FF7;
 		font-weight: normal;
-	}
-
-	// shared between title and playlist screens
-	@keyframes slideup {
-		0% {transform: translateY(200vh);}
-		100% {transform: translateY(0vh);}
-	}
-
-	@keyframes glow_y {
-		0% {opacity: 0.5;}
-		100% {opacity: 1.0;}
 	}
 
 	#error {
@@ -105,75 +97,99 @@ $LIGHT: #29EDF2;
 		right: 1vw;
 		top: 1vh;
 	}
-	#join_info, #end_time {
-		@include radial;
+
+	SECTION {
 		position: absolute;
+		top: 0;
 		left: 0;
 		right: 0;
-		text-align: center;
-		color: #BBB;
-		font-size: 4vh;
-		padding: 2vh 2vw;
-	}
-	#join_info {
-		top: 0;
-		border-bottom: 1px solid $LIGHT;
-	}
-	#end_time {
-		bottom: 0vh;
-		border-top: 1px solid $LIGHT;
-	}
+		bottom: 0;
+		display: grid;
+		gap: 2vh;
+		overflow: hidden;
 
+		#join_info, #end_time {
+			@include radial;
+			text-align: center;
+			color: #BBB;
+			font-size: 4vh;
+			padding: 2vh 2vw;
+			z-index: 100;
+		}
+		#join_info {
+			@include header;
+		}
+		#end_time {
+			@include footer;
+		}
+	}
 
 	/*---------------------------------------------------------------------------*/
 	/* Title Screen Animation */
 	/*---------------------------------------------------------------------------*/
 
 	.screen_title {
-		overflow: hidden;
-		img {
-			position: absolute;
-			border: 1px solid black;
-		}
+		grid-template:
+		  "header" 10vh
+		  "title " 1fr
+		  "footer" 10vh
+		  / 1fr;
 
 		H1 {
+			grid-area: title;
+			justify-self: center;
+			align-self: center;
 			@include border;
-			position: fixed;
-			top: 35vh;
-			left: 25vw;
-			width: 50vw;
 			z-index: 100;
 			font-size: 10vh;
 			text-align: center;
+			padding: 2vh 4vw;
 		}
 
-		// avoid using any zero-values in transform, because scss will
-		// optimise that into matrix() which won't animate...
-		@keyframes raincw {
-			0% {transform: translateY(-1vh) rotate(-180deg);}
-			100% {transform: translateY(120vh) rotate(180deg);}
+		#splash {
+			position: absolute;
+			// avoid using any zero-values in transform, because scss will
+			// optimise that into matrix() which won't animate...
+			@keyframes raincw {
+				0% {transform: translateY(-1vh) rotate(-180deg);}
+				100% {transform: translateY(120vh) rotate(180deg);}
+			}
+			@keyframes rainccw {
+				0% {transform: translateY(-1vh) rotate(180deg);}
+				100% {transform: translateY(120vh) rotate(-180deg);}
+			}
+			IMG {
+				position: absolute;
+				border: 1px solid black;
+				top: -20vh;
+				max-width: 20vw;
+				max-height: 20vh;
+				height: auto;
+				width: auto;
+				animation: raincw 10s linear infinite;
+			}
+			IMG:nth-child(odd) {
+				animation: rainccw 10s linear infinite;
+			}
 		}
-		@keyframes rainccw {
-			0% {transform: translateY(-1vh) rotate(180deg);}
-			100% {transform: translateY(120vh) rotate(-180deg);}
-		}
-		IMG {
-			top: -20vh;
-			max-width: 20vw;
-			max-height: 20vh;
-			height: auto;
-			width: auto;
-			animation: raincw 10s linear infinite;
-		}
-		IMG:nth-child(odd) {animation: rainccw 10s linear infinite;}
 	}
-
 
 	/*---------------------------------------------------------------------------*/
 	/* Playlist */
 	/*---------------------------------------------------------------------------*/
 
 	.screen_preview {
+		grid-template:
+		  "header header header header" 10vh
+		  "   .     n1     n1     .   " 1fr
+		  "   .     n1     n1     .   " 1fr
+		  "   .     n2   video    .   " 1fr
+		  "   .     n3   video    .   " 1fr
+		  "   .     n4   video    .   " 1fr
+		  "   .     n5   n_more   .   " 1fr
+		  "footer footer footer footer" 10vh
+		  / 1vw    6fr     4fr    1vw;
+
 		font-size: 3vh;
 
 		/* main blocks */
@@ -181,85 +197,69 @@ $LIGHT: #29EDF2;
 			0% {transform: translateX(-200vw);}
 			100% {transform: translateX(0vw);}
 		}
-		#playlist {
-			position: absolute;
-			top: 11vh;
-			left: 2vw;
-			right: 2vw;
+		/* playlist detail */
+		.item {
+			@include border;
+			display: grid;
+			grid-template:
+			  "performer title" 2fr
+			  "time      from " 1fr
+			  / 1fr      2fr;
+			animation-name: slideright;
+			animation-duration: 1s;
+			padding: 1vh 1.5vw;
 
-			/* playlist detail */
-			li {
-				position: relative;
-				list-style-type: none;
-				margin-bottom: 2vh;
-				@include border;
-				height: 12vh;
-				width: 57vw;
-				animation-name: slideright;
-				animation-duration: 1s;
-				left: 0vw;
+			img {
+				grid-area: thumb;
+				display: none;
+			}
+			p {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.performer {
+				grid-area: performer;
+				align-self: end;
+				font-size: 1.8em;
+			}
+			.time {
+				grid-area: time;
+				align-self: start;
+				color: #777;
+				font-size: 0.9em;
+			}
+			.title {
+				grid-area: title;
+				align-self: end;
+				font-size: 1.8em;
+			}
+			.from {
+				grid-area: from;
+				align-self: start;
+				color: #aaa;
+				font-size: 0.9em;
+			}
+		}
+		.n1 {animation-delay: 0.0s; grid-area: n1; font-size: 2.3em;}
+		.n2 {animation-delay: 0.2s; grid-area: n2;}
+		.n3 {animation-delay: 0.3s; grid-area: n3;}
+		.n4 {animation-delay: 0.4s; grid-area: n4;}
+		.n5 {animation-delay: 0.5s; grid-area: n5;}
+		.n6 {animation-delay: 0.6s; grid-area: n6;}
+		.n7 {animation-delay: 0.7s; grid-area: n7;}
+		.n8 {animation-delay: 0.8s; grid-area: n8;}
+		.n9 {animation-delay: 0.9s; grid-area: n9;}
 
-				img {display: none;}
-				p {
-					position: absolute;
-					white-space: nowrap;
-					overflow: hidden;
-					text-overflow: ellipsis;
-				}
-				.performer {
-					left: 1vw;
-					top: 1vh;
-					width: calc(35% - 1vw);
-					font-size: 1.8em;
-					text-overflow: clip;
-				}
-				.time {
-					left: 1vw;
-					bottom: 1vh;
-					width: calc(35% - 1vw);
-					color: #777;
-					font-size: 0.9em;
-				}
-				.title {
-					top: 1vh;
-					right: 1vw;
-					width: calc(65% - 2vw);
-					font-size: 1.8em;
-				}
-				.from {
-					bottom: 1vh;
-					right: 1vh;
-					width: calc(65% - 2vw);
-					color: #aaa;
-					font-size: 0.9em;
-				}
-			}
-			li:nth-child(1) {animation-delay: 0.0s;}
-			li:nth-child(2) {animation-delay: 0.2s;}
-			li:nth-child(3) {animation-delay: 0.3s;}
-			li:nth-child(4) {animation-delay: 0.4s;}
-			li:nth-child(5) {animation-delay: 0.5s;}
-			li:nth-child(6) {animation-delay: 0.6s;}
-			li:nth-child(7) {animation-delay: 0.7s;}
-			li:nth-child(8) {animation-delay: 0.8s;}
-			li:nth-child(9) {animation-delay: 0.9s;}
-
-			li:nth-child(1) {
-				width: auto;
-				height: 22vh;
-				font-size: 2em;
-			}
-			li:nth-child(1) .time {
-				color: #ff0;
-				animation-name: glow_y;
-				animation-duration: 1s;
-				animation-iteration-count: infinite;
-				animation-direction: alternate;
-			}
-			li:nth-child(2) .time {
-				content: "Nearly there!";
-				color: #aa0;
-			}
+		.n1 .time {
+			color: #ff0;
+			animation-name: glow_y;
+			animation-duration: 1s;
+			animation-iteration-count: infinite;
+			animation-direction: alternate;
+		}
+		.n2 .time {
+			color: #aa0;
 		}
 
 		@keyframes slideleft {
@@ -268,68 +268,37 @@ $LIGHT: #29EDF2;
 		}
 		#playlist_obscured {
 			display: none;
-			position: absolute;
-			bottom: 2vh;
-			right: 2vw;
-			width: 38vw;
-			height: 26vh;
-			text-align: center;
-
-			li {
-				display: inline-block;
-				list-style-type: none;
-				margin: 4px;
-				@include miniborder;
-				max-width: 51%;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				right: 0vw;
-				animation-name: slideleft;
-				animation-duration: 1s;
-				animation-delay: 2.0s;
-				position: relative;
-			}
-			li:nth-child(1) {animation-delay: 0.5s;}
-			li:nth-child(2) {animation-delay: 0.6s;}
-			li:nth-child(3) {animation-delay: 0.7s;}
-			li:nth-child(4) {animation-delay: 0.8s;}
-			li:nth-child(5) {animation-delay: 0.9s;}
-			li:nth-child(6) {animation-delay: 1.0s;}
-			li:nth-child(7) {animation-delay: 1.1s;}
-			li:nth-child(8) {animation-delay: 1.2s;}
-			li:nth-child(9) {animation-delay: 1.3s;}
-			li:nth-child(10) {animation-delay: 1.4s;}
-			li:nth-child(11) {animation-delay: 1.5s;}
-			li:nth-child(12) {animation-delay: 1.6s;}
-			li:nth-child(13) {animation-delay: 1.7s;}
 		}
-		#playlist_obscured::before {
-			content: "Coming Soon: ";
-			right: -2000px;
+
+		#n_more {
+			@include border;
+			grid-area: n_more;
+			display: grid;
 			animation-name: slideleft;
 			animation-duration: 1s;
-			animation-delay: 0.5s;
-			position: relative;
+			animation-delay: 0.6s;
+			color: #777;
+			font-size: 1.8em;
+
+			DIV {
+				justify-self: center;
+				align-self: center;
+				SPAN {
+					color: #aa0;
+				}	
+			}
 		}
 
-		.preview_holder {
+		VIDEO {
+			grid-area: video;
 			@include border;
-			position: absolute;
-			top: 35vh;
-			height: 40vh;
-			width: 38vw;
-			right: 2vw;
 			animation-name: slideleft;
 			animation-duration: 1s;
 			animation-delay: 0.0s;
-
-			video {
-				background: black;
-				width: 100%;
-				height: 100%;
-				object-fit: contain;
-			}
+			background: black;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 	
 		/*---------------------------------------------------------------------------*/
@@ -339,26 +308,21 @@ $LIGHT: #29EDF2;
 		/*---------------------------------------------------------------------------*/
 
 		@media (max-aspect-ratio: 16/11) {
-			#playlist li {
-				width: 59.5vw;
-			}
-			.preview_holder {
-				width: 35vw;
-				height: 28vh;
-			}
-			#playlist_obscured {
-				width: 35vw;
-				height: 37vh;
-			}
+			// FIXME: tweak grid sizes
 		}
 	}
-
 
 	/*---------------------------------------------------------------------------*/
 	/* Video */
 	/*---------------------------------------------------------------------------*/
 
 	.screen_video {
+		grid-template:
+		  "header" 10vh
+		  "video " 1fr
+		  "footer" 10vh
+		  / 1fr;
+
 		background: black;
 		position: absolute;
 		top: 0;
@@ -366,12 +330,21 @@ $LIGHT: #29EDF2;
 		right: 0;
 		bottom: 0;
 
+		@keyframes fadeout {
+			0% {opacity: 1.0;}
+			100% {opacity: 0.25;}
+		}
+		#join_info, #end_time {
+			animation-name: fadeout;
+			animation-duration: 5s;
+		}
 		VIDEO {
 			width: 100%;
 			height: 100%;
 		}
 
 		.pimp {
+			max-width: 50%;
 			position: absolute;
 			animation-iteration-count: 2;
 			animation-direction: alternate;
@@ -391,15 +364,12 @@ $LIGHT: #29EDF2;
 		}
 		#pimpkk {
 			font-size: 10vh;
-			top: 5vh;
+			top: 15vh;
 			right: 5vw;
 			animation-name: popright;
 		}
 		#pimpcontributor {
-			font-size: 5vh;
-			bottom: 5vh;
-			right: -200vw;
-			animation-name: popright;
+			display: none;
 		}
 
 		@keyframes popleft {
@@ -410,60 +380,50 @@ $LIGHT: #29EDF2;
 		}
 		#pimpsong {
 			font-size: 5vh;
-			top: 5vh;
+			top: 15vh;
 			left: 5vw;
 			animation-name: popleft;
 		}
 	}
-
 
 	/*---------------------------------------------------------------------------*/
 	/* Podium Mode */
 	/*---------------------------------------------------------------------------*/
 
 	.screen_podium {
+		grid-template:
+		  "header header header" 20vh
+		  "  .    video    .   " 56vh
+		  "footer footer footer" 20vh
+		  / 1vw    1fr      1vw;
+
 		text-align: center;
 
 		H1 {
-			position: absolute;
-			top: 1vh;
-			left: 1vw;
-			right: 1vw;
-			height: 20vh;
+			@include header;
+			@include radial;
+			padding: 2vh 2vw;
 			font-size: 6vh;
-
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			overflow: hidden;
-			@include border;
 		}
 
-		.preview_holder {
+		VIDEO {
+			grid-area: video;
 			@include border;
-			position: absolute;
-			top: 22vh;
-			left: 1vw;
-			right: 1vw;
-			bottom: 16vh;
-			height: auto;
-	
-			VIDEO {
-				width: 100%;
-				height: 100%;
-				background: black;
-			}
+			height: 100%;
+			width: 100%;
+			background: black;
+			object-fit: contain;
 		}
 
 		DIV.startButton,
 		DIV.progressBar {
-			position: absolute;
-			bottom: 1vh;
-			left: 1vw;
-			right: 1vw;
-			height: 14vh;
+			@include footer;
+			@include radial;
 			font-size: 7vh;
-			@include border;
-			padding-top: 0;
+			padding-top: 3vh;
 			background: linear-gradient(
 				90deg,
 				rgba($DARK, 0.5) 0,

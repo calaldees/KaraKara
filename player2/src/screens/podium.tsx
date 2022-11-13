@@ -94,21 +94,19 @@ const PodiumInternal = ({
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>
 
-        <div class="preview_holder">
-            <Video
-                state={state}
-                track={track}
-                muted={true}
-                // ensure the video element gets re-created when switching
-                // between queue items (even if it's the same track), and
-                // also when the podium switches from "preview" to "play" mode
-                key={
-                    queue_item.id +
-                    "-" +
-                    (queue_item.start_time && queue_item.start_time < state.now)
-                }
-            />
-        </div>
+        <Video
+            state={state}
+            track={track}
+            muted={true}
+            // ensure the video element gets re-created when switching
+            // between queue items (even if it's the same track), and
+            // also when the podium switches from "preview" to "play" mode
+            key={
+                queue_item.id +
+                "-" +
+                (queue_item.start_time && queue_item.start_time < state.now)
+            }
+        />
 
         {queue_item.start_time ? (
             queue_item.start_time < state.now ? (
