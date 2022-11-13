@@ -108,7 +108,7 @@ $LIGHT: #29EDF2;
 		gap: 2vh;
 		overflow: hidden;
 
-		#join_info, #end_time {
+		#join_info, #event_info {
 			@include radial;
 			text-align: center;
 			color: #BBB;
@@ -119,7 +119,7 @@ $LIGHT: #29EDF2;
 		#join_info {
 			@include header;
 		}
-		#end_time {
+		#event_info {
 			@include footer;
 		}
 	}
@@ -222,6 +222,7 @@ $LIGHT: #29EDF2;
 				grid-area: performer;
 				align-self: end;
 				font-size: 1.8em;
+				.n {display: none;}
 			}
 			.time {
 				grid-area: time;
@@ -334,7 +335,7 @@ $LIGHT: #29EDF2;
 			0% {opacity: 1.0;}
 			100% {opacity: 0.25;}
 		}
-		#join_info, #end_time {
+		#join_info, #event_info {
 			animation-name: fadeout;
 			animation-duration: 5s;
 		}

@@ -3,7 +3,7 @@ import {
     attachment_path,
     time_until,
 } from "../utils";
-import { JoinInfo, Video, EndTime } from "./_common";
+import { JoinInfo, Video, EventInfo } from "./_common";
 
 const show_tracks = 5;
 
@@ -18,15 +18,7 @@ function SetPreviewVolume(state: State, event): Dispatchable {
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-export const PreviewScreen = ({ state, visible_queue }: { state: State, visible_queue: Array<QueueItem> }): VNode => (
-    <PreviewInternal
-        state={state}
-        queue={visible_queue}
-        track={state.track_list[visible_queue[0].track_id]}
-    />
-);
-
-const PreviewInternal = ({
+export const PreviewScreen = ({
     state,
     queue,
     track,
@@ -63,7 +55,7 @@ const PreviewInternal = ({
                                     track.tags.artist?.join(", ") ||
                                     ""}
                             </p>
-                            <p class="performer">{item.performer_name}</p>
+                            <p class="performer"><span class="n">{idx+1}</span> {item.performer_name}</p>
                             <p class="time">
                                 <span>
                                     {
@@ -89,6 +81,6 @@ const PreviewInternal = ({
                 <div>and <span>{queue.length - show_tracks}</span> more...</div>
             </div>
         )}
-        <EndTime state={state} />
+        <EventInfo state={state} />
     </section>
 );

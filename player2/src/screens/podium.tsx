@@ -6,18 +6,6 @@ import { SendCommand } from "../effects";
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-export const PodiumScreen = ({ state }: { state: State }): VNode => (
-    <PodiumInternal
-        state={state}
-        track={
-            state.track_list[
-                current_and_future(state.now, state.queue)[0].track_id
-            ]
-        }
-        queue_item={current_and_future(state.now, state.queue)[0]}
-    />
-);
-
 const ProgressBar = ({
     now,
     start_time,
@@ -78,7 +66,7 @@ const StartBar = (): VNode => (
     </div>
 );
 
-const PodiumInternal = ({
+export const PodiumScreen = ({
     state,
     track,
     queue_item,
