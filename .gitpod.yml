@@ -1,0 +1,17 @@
+# see https://www.gitpod.io/docs/config-gitpod-file
+
+tasks:
+  - init: make
+
+ports:
+  - port: 80
+    visibility: public
+
+
+# https://open-vsx.org/
+# keep these in sync with ~/.vscode/extensions.json to support people with local dev environments
+vscode:
+  extensions:
+    - ms-azuretools.vscode-docker
+    - streetsidesoftware.code-spell-checker
+    - ms-vscode.makefile-tools

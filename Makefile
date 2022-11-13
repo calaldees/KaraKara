@@ -1,8 +1,6 @@
 -include .env
 
 SHELL := $(SHELL) -e
-ENV:=_env
-PROJECTS = processmedia2 website admindashboard
 
 
 .PHONY: help
@@ -19,10 +17,11 @@ help:	## display this help
 _DOCKER_COMPOSE:=USER=$(shell id -u):$(shell id -g) docker-compose
 DOCKER_COMPOSE:=${_DOCKER_COMPOSE} --file docker-compose.yml
 
+get_example_media:  ##
+	python3 media/get_example_media.py
 
-docker_build: .env
-	docker-compose build
-
+up: .env  ##
+	docker-compose up --build
 
 test_cypress_run:  ## cypress browser tests
 	${_DOCKER_COMPOSE} --file docker-compose.test.yml run --rm test_cypress
@@ -39,5 +38,5 @@ test_cypress_run:  ## cypress browser tests
 # Cloc ------------------------------------------------------------------------
 
 .PHONY: cloc
-cloc:
+cloc:  ##
 	cloc --vcs=git
