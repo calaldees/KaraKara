@@ -38,6 +38,11 @@ $LIGHT: #29EDF2;
 	animation-fill-mode: both;
 }
 
+VIDEO {
+	background-color: black;
+	object-fit: contain;
+}
+
 ::cue {
 	font-family: metalghosts, sans-serif;
 	text-shadow:
@@ -296,10 +301,8 @@ $LIGHT: #29EDF2;
 			animation-name: slideleft;
 			animation-duration: 1s;
 			animation-delay: 0.0s;
-			background: black;
 			width: 100%;
 			height: 100%;
-			object-fit: contain;
 		}
 	
 		/*---------------------------------------------------------------------------*/
@@ -340,8 +343,9 @@ $LIGHT: #29EDF2;
 			animation-duration: 5s;
 		}
 		VIDEO {
+			grid-area: video;
 			width: 100%;
-			height: 100%;
+			height: 76vh;
 		}
 
 		.pimp {
@@ -415,8 +419,6 @@ $LIGHT: #29EDF2;
 			@include border;
 			height: 100%;
 			width: 100%;
-			background: black;
-			object-fit: contain;
 		}
 
 		DIV.startButton,
