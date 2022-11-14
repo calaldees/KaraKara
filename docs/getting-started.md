@@ -77,6 +77,7 @@ These questions are designed for a group exercise in dissecting this codebase as
 * Clients (player2 and browser2)
     * what framework is used in the clients?
     * what language is used in the clients?
+    * look at `index.html` as a file - now look at the source of one of the clients in a browser (with ctrl+u). Which of the packages below is transforming this?
     * looking in `package.json`
         * what is `prettier` and why is it used?
         * what is `parcel` and why is it used?

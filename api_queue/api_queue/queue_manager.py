@@ -28,7 +28,7 @@ class LoginManager:
 
 
 class QueueManager():
-    def __init__(self, *args, settings: SettingsManager=None, **kwargs):
+    def __init__(self, *args, settings: SettingsManager, **kwargs):
         super().__init__(*args, **kwargs)
         self.settings = settings
         assert isinstance(settings, SettingsManager)
