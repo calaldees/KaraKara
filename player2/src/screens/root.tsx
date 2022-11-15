@@ -58,6 +58,7 @@ export function Root(state: State): VNode {
     if (!state.room_name) errors.push("No Room Set");
     if (!state.connected) errors.push("Not Connected");
     if (!state.is_admin) errors.push("Not Admin");
+    if (Object.keys(state.track_list).length == 0) errors.push("No Tracks");
 
     return (
         <body

@@ -105,7 +105,7 @@ export const KeyboardListener = Keyboard({
 });
 
 
-function _bleSubscriber(dispatch: Dispatch, props): Unsubscribe  {
+function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_password: string }): Unsubscribe {
     // subscription is restarted whenever props changes,
     if (props.room_name) {
         setTimeout(function () {

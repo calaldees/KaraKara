@@ -86,6 +86,11 @@ const init: Dispatchable = [
                 download_size: null,
             }
         ),
+        exception: (state, error): State => (
+            {
+                ...state,
+            }
+        ),
     }),
 ];
 

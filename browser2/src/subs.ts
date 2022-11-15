@@ -76,7 +76,7 @@ export function getMQTTListener(state: State): Subscription | boolean {
     });
 }
 
-function _resizeSubscriber(dispatch, props) {
+function _resizeSubscriber(dispatch: Dispatch, props: { onresize: Dispatchable }): Unsubscribe {
     function handler(event) {
         dispatch(props.onresize, event);
     }
@@ -90,9 +90,9 @@ export function ResizeListener(callback: Dispatchable): Subscription {
     return [_resizeSubscriber, { onresize: callback }];
 }
 
-function _bleSubscriber(dispatch, props) {
+function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_password: string }): Unsubscribe {
     // subscription is restarted whenever props changes,
-    if(props.room_name) {
+    if (props.room_name) {
         setTimeout(function () {
             dispatch((state) => [
                 state,
@@ -115,7 +115,7 @@ function _bleSubscriber(dispatch, props) {
     }
     else {
         setTimeout(function () {
-            dispatch((state) => ({...state, is_admin: false}));
+            dispatch((state) => ({ ...state, is_admin: false }));
         }, 0);
     }
 

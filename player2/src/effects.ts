@@ -5,7 +5,15 @@
  */
 import { Delay } from "hyperapp-fx";
 
-function apiRequestEffect(dispatch, props) {
+function apiRequestEffect(dispatch: Dispatch, props: {
+    url: string,
+    options: Dictionary<any>,
+    notify?: string,
+    notify_ok?: string,
+    progress?: Dispatchable<{done: number, size: number}>,
+    action?: Dispatchable,
+    exception?: Dispatchable,
+}) {
     dispatch((state) => ({
         ...state,
         loading: true,
@@ -109,7 +117,17 @@ function apiRequestEffect(dispatch, props) {
         });
 }
 
-export function ApiRequest(props): Effect {
+export function ApiRequest(props: {
+    state: State,
+    function?: string,
+    url?: string,
+    options?: Dictionary<any>,
+    notify?: string,
+    notify_ok?: string,
+    progress?: Dispatchable<{done: number, size: number}>,
+    action?: Dispatchable,
+    exception?: Dispatchable,
+}): Effect {
     return [
         apiRequestEffect,
         {

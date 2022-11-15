@@ -68,10 +68,12 @@ type State = {
     queue: Array<QueueItem>,
 }
 
+// Our Action is like hyperapp's Action, except while theirs is generic,
+// ours specifically acts upon our State object.
 declare type Action = import('hyperapp').Action<State>;
 declare type Effect = import('hyperapp').Effect<State>;
 declare type Dispatch = import('hyperapp').Dispatch<State>;
-declare type Dispatchable = import('hyperapp').Dispatchable<State>;
+declare type Dispatchable<P=any> = import('hyperapp').Dispatchable<State, P>;
 declare type Subscription = import('hyperapp').Subscription<State>;
 declare type Unsubscribe = import('hyperapp').Unsubscribe;
 declare type VNode = import('hyperapp').VNode<State>;
