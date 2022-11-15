@@ -328,11 +328,6 @@ VIDEO {
 		  / 1fr;
 
 		background: black;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
 
 		@keyframes fadeout {
 			0% {opacity: 1.0;}
