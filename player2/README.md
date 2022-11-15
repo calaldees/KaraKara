@@ -42,11 +42,18 @@ npm install
 npm run serve
 ```
 
-And then visit the player at `http://localhost:1235/`
+(With `npm run serve`, files will automatically get rebuilt and
+hot-reloaded, no need to even hit refresh in the browser :) )
 
-With `npm run serve`, files will automatically get rebuilt and
-hot-reloaded, no need to even hit refresh in the browser :)
+With the player running, visit it at `http://localhost:1235/`
 
-If you want to see the whole state for the app, you can double-click
-anywhere on the screen to open the settings menu, and then click the
-"Settings" heading to write the state to the debug console.
+App state is saved to the `window.state` variable.
+
+Since player2 is designed to run specifically on projector screens,
+it can be useful to use the "Responsive Design Mode" developer tools
+and set the display size to either 480x360 (4:3) or 640:360 (16:9) to
+ensure that the layout works on either ratio.
+
+Everything in player2's design is measured in `vh` and `vw` CSS units,
+where `vh` = 1% of visible displayport height and `vw` is the same for
+width.
