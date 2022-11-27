@@ -14,6 +14,7 @@ import {
     BeLoggedIn,
 } from "./subs";
 import { ApiRequest } from "./effects";
+import { current_and_future } from "./utils";
 
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
@@ -94,6 +95,23 @@ const init: Dispatchable = [
     }),
 ];
 
+function syncVideo(state: State) {
+    let movie: HTMLVideoElement = document.getElementsByTagName("VIDEO")[0] as HTMLVideoElement;
+    let visible_queue = current_and_future(state.now, state.queue);
+    if(movie && visible_queue.length > 0) {
+        let queue_item = visible_queue[0];
+        if(queue_item.start_time && queue_item.start_time < state.now) {
+            let goal = state.now - queue_item.start_time;
+            let diff = Math.abs(movie.currentTime - goal);
+            // if our time is nearly-correct, leave it as-is
+            if (diff > 3) {
+                console.log(`Time is ${movie.currentTime} and should be ${goal}`);
+                movie.currentTime = goal;
+            }
+        }
+    }
+}
+
 const subscriptions = (state: State): Array<Subscription|boolean> => [
     HashStateManager(
         {
@@ -112,6 +130,7 @@ const subscriptions = (state: State): Array<Subscription|boolean> => [
         sync: 5*60*1000,
         onInterval(state: State, timestamp_ms: number): Dispatchable {
             (window as any).state = state;
+            syncVideo(state);
             return { ...state, now: timestamp_ms/1000 };
         },
     }),

@@ -42,20 +42,6 @@ export function getMQTTListener(state: State): Subscription | boolean {
             console.groupEnd();
 
             switch (topic) {
-                case "notifications":
-                    return [
-                        {
-                            ...state,
-                            notification: { text: data, style: "warning" },
-                        },
-                        Delay({
-                            wait: 10000,
-                            action: (state) => ({
-                                ...state,
-                                notification: null,
-                            }),
-                        }),
-                    ];
                 case "settings":
                     return {
                         ...state,
