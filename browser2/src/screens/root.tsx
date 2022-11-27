@@ -1,5 +1,6 @@
 import h from "hyperapp-jsx-pragma";
 
+import { About } from "./about";
 import { Login } from "./login";
 import { TrackList } from "./track_list";
 import { TrackDetails } from "./track_details";
@@ -36,6 +37,8 @@ export function Root(state: State): VNode {
             active_screen = <RoomSettings state={state} />;
         } else if (state.screen == "priority_tokens") {
             active_screen = <PriorityTokens state={state} />;
+        } else if (state.screen == "about") {
+            active_screen = <About state={state} />;
         }
 
         if (state.widescreen) {
