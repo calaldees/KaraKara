@@ -34,28 +34,28 @@ def456,MahName2,xyz457,1661094271426
 api
 ---
 
-* /queue/
+* /room/
     * GET (admin)
         * list
     * POST
-        * new queue (demo - 10 tracks?)
-        * new queue (transient)
-        * new named queue (admin)
-* /queue/XYZ/
-    * DELETE queue
-* /queue/XYZ/settings
+        * new room (demo - 10 tracks?)
+        * new room (transient)
+        * new named room (admin)
+* /room/XYZ/
+    * DELETE room
+* /room/XYZ/settings
     * GET
     * POST/PUT (admin)
         * queue limit model (priority token or points)
-* /queue/XYZ/tracks
+* /room/XYZ/tracks
     * GET
         * 302 redirect to static track_datafile from hash of filter_tags
-* /queue/XYZ/items
+* /room/XYZ/items
     * GET (only used for testing - this is pushed to mqtt)
     * POST (limit performer_name or admin)
         * name, trackid
         * return id
-* /queue/XYZ/items/ABC
+* /room/XYZ/items/ABC
     * DELETE (session_id or admin only)
     * PUT (admin)
         * (weight, timestamp_play)
@@ -65,17 +65,17 @@ curls
 -----
 
 ```
-curl -X GET http://localhost:8000/queue/test/tracks.json
+curl -X GET http://localhost:8000/room/test/tracks.json
 
-curl -X GET http://localhost:8000/queue/test/queue.csv
-curl -X GET http://localhost:8000/queue/test/queue.json
-curl -X POST --cookie "session_id=test" http://localhost:8000/queue/test/queue.json -d '{"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}'
-curl -X DELETE --cookie "session_id=admin" http://localhost:8000/queue/test/queue/8684541502363635.json
-curl -X PUT --cookie "session_id=admin" http://localhost:8000/queue/test/queue.json -d '{"source": 543, "target": 223}'
+curl -X GET http://localhost:8000/room/test/queue.csv
+curl -X GET http://localhost:8000/room/test/queue.json
+curl -X POST --cookie "session_id=test" http://localhost:8000/room/test/queue.json -d '{"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}'
+curl -X DELETE --cookie "session_id=admin" http://localhost:8000/room/test/queue/8684541502363635.json
+curl -X PUT --cookie "session_id=admin" http://localhost:8000/room/test/queue.json -d '{"source": 543, "target": 223}'
 
 curl -X GET http://localhost:8000/queue/test/settings.json
-curl -X PUT --cookie "session_id=admin" https://karakara.uk/queue/test/settings.json -d '{"track_space": 42}'
+curl -X PUT --cookie "session_id=admin" https://karakara.uk/room/test/settings.json -d '{"track_space": 42}'
 
-curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/play.json
-curl -X GET --cookie "session_id=admin" http://localhost:8000/queue/test/command/stop/json
+curl -X GET --cookie "session_id=admin" http://localhost:8000/room/test/command/play.json
+curl -X GET --cookie "session_id=admin" http://localhost:8000/room/test/command/stop/json
 ```

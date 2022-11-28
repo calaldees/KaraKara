@@ -133,7 +133,7 @@ export function ApiRequest(props: {
         {
             options: {},
             response: "json",
-            url: `${props.state.root}/queue/${props.state.room_name}/${props.function}.json`,
+            url: `${props.state.root}/room/${props.state.room_name}/${props.function}.json`,
             ...props,
         },
     ];

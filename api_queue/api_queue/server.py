@@ -111,18 +111,18 @@ async def attach_session_id(request, response):
 
 
 @contextlib.asynccontextmanager
-async def push_queue_to_mqtt(request, queue_id):
+async def push_queue_to_mqtt(request, room_name):
     yield
     if hasattr(request.app.ctx, 'mqtt'):
-        log.info(f"push_queue_to_mqtt {queue_id}")
-        await request.app.ctx.mqtt.publish(f"room/{queue_id}/queue", json.dumps(request.app.ctx.queue_manager.for_json(queue_id)), retain=True)
+        log.info(f"push_queue_to_mqtt {room_name}")
+        await request.app.ctx.mqtt.publish(f"room/{room_name}/queue", json.dumps(request.app.ctx.queue_manager.for_json(room_name)), retain=True)
 
 @contextlib.asynccontextmanager
-async def push_settings_to_mqtt(request, queue_id):
+async def push_settings_to_mqtt(request, room_name):
     yield
     if hasattr(request.app.ctx, 'mqtt'):
-        log.info(f"push_settings_to_mqtt {queue_id}")
-        await request.app.ctx.mqtt.publish(f"room/{queue_id}/settings", json.dumps(request.app.ctx.queue_manager.settings.get_json(queue_id)), retain=True)
+        log.info(f"push_settings_to_mqtt {room_name}")
+        await request.app.ctx.mqtt.publish(f"room/{room_name}/settings", json.dumps(request.app.ctx.queue_manager.settings.get_json(room_name)), retain=True)
 
 
 # Routes -----------------------------------------------------------------------
@@ -145,8 +145,8 @@ async def time(request):
 
 # Queue -----------------------------------------------------------------------
 
-queue_blueprint = sanic.blueprints.Blueprint('queue', url_prefix='/queue/<queue_id:([A-Za-z0-9_-]{1,32})>')
-app.blueprint(queue_blueprint)
+room_blueprint = sanic.blueprints.Blueprint('room', url_prefix='/room/<room_name:([A-Za-z0-9_-]{1,32})>')
+app.blueprint(room_blueprint)
 
 
 class NullObjectJson:
@@ -164,15 +164,15 @@ class QueueItemJson:
 
 class LoginRequest:
     password: str
-@queue_blueprint.post("/login.json")
+@room_blueprint.post("/login.json")
 @openapi.definition(
     body={"application/json": LoginRequest},
     response=[
         openapi.definitions.Response({"application/json": User}, status=200),
     ],
 )
-async def login(request, queue_id):
-    user = LoginManager.login(request.ctx.session_id, queue_id, None, request.json["password"])
+async def login(request, room_name):
+    user = LoginManager.login(request.ctx.session_id, room_name, None, request.json["password"])
     if user.is_admin:
         request.ctx.session_id = "admin"
     else:
@@ -182,62 +182,62 @@ async def login(request, queue_id):
 
 # Queue / Tracks --------------------------------------------------------------
 
-@queue_blueprint.get("/tracks.json")
+@room_blueprint.get("/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def tracks(request, queue_id):
+async def tracks(request, room_name):
     return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
 
 
 # Queue / Settings ------------------------------------------------------------
 
-@queue_blueprint.get("/settings.json")
+@room_blueprint.get("/settings.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def get_settings(request, queue_id):
-    return sanic.response.json(request.app.ctx.settings_manager.get_json(queue_id))
+async def get_settings(request, room_name):
+    return sanic.response.json(request.app.ctx.settings_manager.get_json(room_name))
 
-@queue_blueprint.put("/settings.json")
+@room_blueprint.put("/settings.json")
 @openapi.definition(
     body={"application/json": {}},
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def update_settings(request, queue_id):
+async def update_settings(request, room_name):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
-    async with push_settings_to_mqtt(request, queue_id):
+    async with push_settings_to_mqtt(request, room_name):
         try:
-            request.app.ctx.settings_manager.set_json(queue_id, request.json)
-            log.info(f"Updated settings for {queue_id} with {request.json}")
+            request.app.ctx.settings_manager.set_json(room_name, request.json)
+            log.info(f"Updated settings for {room_name} with {request.json}")
         except Exception as ex:
-            log.warning(f"Rejected settings for {queue_id} with {request.json}")
+            log.warning(f"Rejected settings for {room_name} with {request.json}")
             raise sanic.exceptions.InvalidUsage(message="invalid settings", context=exception_to_dict(ex))
         return sanic.response.json({})
 
 
 # Queue / Queue ---------------------------------------------------------------
 
-@queue_blueprint.get("/queue.csv")
+@room_blueprint.get("/queue.csv")
 @openapi.definition(
     response=openapi.definitions.Response({"text/csv": str}),
 )
-async def queue_csv(request, queue_id):
-    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(queue_id))
+async def queue_csv(request, room_name):
+    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(room_name))
 
-@queue_blueprint.get("/queue.json")
+@room_blueprint.get("/queue.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
 )
-async def queue_json(request, queue_id):
-    return sanic.response.json(request.app.ctx.queue_manager.for_json(queue_id))
+async def queue_json(request, room_name):
+    return sanic.response.json(request.app.ctx.queue_manager.for_json(room_name))
 
 
 class QueueItemAdd:
     track_id: str
     performer_name: str
-@queue_blueprint.post("/queue.json")
+@room_blueprint.post("/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemAdd},
     response=[
@@ -246,7 +246,7 @@ class QueueItemAdd:
         openapi.definitions.Response('track_id invalid', status=400),
     ],
 )
-async def add_queue_item(request, queue_id):
+async def add_queue_item(request, room_name):
     # Validation
     if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
         raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
@@ -255,8 +255,8 @@ async def add_queue_item(request, queue_id):
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
     performer_name = request.json['performer_name']
     # Queue update
-    async with push_queue_to_mqtt(request, queue_id):
-        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+    async with push_queue_to_mqtt(request, room_name):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
                 track_id=track_id,
                 track_duration=request.app.ctx.tracks[track_id]["duration"],
@@ -273,14 +273,14 @@ async def add_queue_item(request, queue_id):
             return sanic.response.json(queue_item.asdict())
 
 
-@queue_blueprint.delete(r"/queue/<queue_item_id:(\d+).json>")
+@room_blueprint.delete(r"/queue/<queue_item_id:(\d+).json>")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
-async def delete_queue_item(request, queue_id, queue_item_id):
+async def delete_queue_item(request, room_name, queue_item_id):
     queue_item_id = int(queue_item_id)
-    async with push_queue_to_mqtt(request, queue_id):
-        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+    async with push_queue_to_mqtt(request, room_name):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             _, queue_item = queue.get(queue_item_id)
             if not queue_item:
                 raise sanic.exceptions.NotFound()
@@ -293,12 +293,12 @@ async def delete_queue_item(request, queue_id, queue_item_id):
 class QueueItemMove:
     source: int
     target: int
-@queue_blueprint.put("/queue.json")
+@room_blueprint.put("/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemMove},
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
 )
-async def move_queue_item(request, queue_id):
+async def move_queue_item(request, room_name):
     try:
         source = int(request.json.get('source'))
         target = int(request.json.get('target'))
@@ -306,8 +306,8 @@ async def move_queue_item(request, queue_id):
         raise sanic.exceptions.InvalidUsage(message="source and target args required", context=request.json)
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
-    async with push_queue_to_mqtt(request, queue_id):
-        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+    async with push_queue_to_mqtt(request, room_name):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue.move(source, target)
             return sanic.response.json({}, status=201)
 
@@ -316,7 +316,7 @@ async def move_queue_item(request, queue_id):
 
 class CommandReturn():
     is_playing: bool
-@queue_blueprint.get("/command/<command:([a-z_]+).json>")
+@room_blueprint.get("/command/<command:([a-z_]+).json>")
 @openapi.definition(
     response=[
         openapi.definitions.Response({"application/json": CommandReturn}, status=200),
@@ -324,13 +324,13 @@ class CommandReturn():
         openapi.definitions.Response('admin required', status=403),
     ]
 )
-async def queue_command(request, queue_id, command):
+async def queue_command(request, room_name, command):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
     if command not in {'play', 'stop', 'seek_forwards', 'seek_backwards', 'skip'}:
         raise sanic.exceptions.NotFound(message='invalid command')
-    async with push_queue_to_mqtt(request, queue_id):
-        async with request.app.ctx.queue_manager.async_queue_modify_context(queue_id) as queue:
+    async with push_queue_to_mqtt(request, room_name):
+        async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             getattr(queue, command)()
             return sanic.response.json({'is_playing': bool(queue.is_playing)})
 
