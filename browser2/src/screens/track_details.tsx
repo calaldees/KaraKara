@@ -3,6 +3,7 @@ import { Screen } from "./_common";
 import { attachment_path, current_and_future } from "../utils";
 import { GoToScreen } from "../actions";
 import { PushScrollPos, PopScrollPos, ApiRequest } from "../effects";
+import * as icons from "../static/icons";
 
 ///////////////////////////////////////////////////////////////////////
 // Actions
@@ -126,7 +127,7 @@ export const TrackDetails = ({
         className={"track_details"}
         navLeft={
             <a onclick={UnselectTrack} data-cy="back">
-                <i class={"fas fa-2x fa-chevron-circle-left"} />
+                <icons.CircleChevronLeft class="x2" />
             </a>
         }
         title={track.tags.title[0]}
@@ -136,7 +137,7 @@ export const TrackDetails = ({
                     onclick={GoToScreen("queue", [PushScrollPos()])}
                     data-cy="queue"
                 >
-                    <i class={"fas fa-2x fa-list-ol"} />
+                    <icons.ListOl class="x2" />
                 </a>
             )
         }

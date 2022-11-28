@@ -3,6 +3,7 @@ import { GoToScreen } from "../actions";
 import { PopScrollPos } from "../effects";
 import { attachment_path, current_and_future, is_my_song } from "../utils";
 import * as placeholder from "data-url:../static/placeholder.svg";
+import * as icons from "../static/icons";
 
 export const Notification = ({ state }: { state: State }): VNode =>
     state.notification && (
@@ -14,7 +15,7 @@ export const Notification = ({ state }: { state: State }): VNode =>
             })}
         >
             <span>{state.notification.text}</span>
-            <i class={"fas fa-times-circle"} />
+            <icons.CircleXmark />
         </div>
     );
 
@@ -117,7 +118,7 @@ export const Screen = (
 
 export const BackToExplore = (): VNode => (
     <a onclick={GoToScreen("explore", [PopScrollPos()])} data-cy="back">
-        <i class={"fas fa-2x fa-chevron-circle-left"} />
+        <icons.CircleChevronLeft class="x2" />
     </a>
 );
 

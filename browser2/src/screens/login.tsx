@@ -1,6 +1,7 @@
 import h from "hyperapp-jsx-pragma";
 import { Screen } from "./_common";
 import { percent } from "../utils";
+import * as icons from "../static/icons";
 
 ///////////////////////////////////////////////////////////////////////
 // Actions
@@ -45,12 +46,12 @@ export const Login = ({ state }: { state: State }): VNode => (
                                     state.download_size,
                                 )
                             ) : (
-                                <i class={"loading fas fa-sync-alt"} />
+                                <icons.Rotate class={"loading"} />
                             )}
                         </span>
                     ) : (
                         <span>
-                            Enter Room <i class={"fas fa-sign-in-alt"} />
+                            Enter Room <icons.RightToBracket />
                         </span>
                     )}
                 </button>

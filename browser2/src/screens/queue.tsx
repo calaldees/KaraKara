@@ -2,6 +2,7 @@ import h from "hyperapp-jsx-pragma";
 import { Screen, BackToExplore, Thumb } from "./_common";
 import { shuffle, is_my_song, time_until, current_and_future } from "../utils";
 import { RemoveTrack } from "../actions";
+import * as icons from "../static/icons";
 
 const QueueItemRender = ({
     state,
@@ -39,7 +40,7 @@ const QueueItemRender = ({
          */}
         {state.session_id == item.session_id && (
             <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
-                <i class={"fas fa-times-circle"} />
+                <icons.CircleXmark />
             </span>
         )}
     </li>

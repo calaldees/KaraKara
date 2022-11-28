@@ -10,6 +10,7 @@ import { GoToScreen } from "../actions";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
 import { group_tracks } from "../track_grouper";
+import * as icons from "../static/icons";
 
 ///////////////////////////////////////////////////////////////////////
 // Actions
@@ -64,7 +65,7 @@ const TrackItem = ({ state, track }: { state: State; track: Track }): VNode => (
             <span class={"info"}>{track_info(state.filters, track)}</span>
         </span>
         <span class={"go_arrow"}>
-            <i class={"fas fa-chevron-circle-right"} />
+            <icons.CircleChevronRight />
         </span>
     </li>
 );
@@ -87,9 +88,7 @@ const FilterListGroupHeader = (
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
         <span class={"go_arrow"}>
-            <i
-                class={expanded ? "fas fa-minus-circle" : "fas fa-plus-circle"}
-            />
+            {expanded ? <icons.CircleMinus /> : <icons.CirclePlus />}
         </span>
     </li>
 );
@@ -170,7 +169,7 @@ const AddFilter = (
         <span class={"text"}>{children}</span>
         <span class={"count"}>{count}</span>
         <span class={"go_arrow"}>
-            <i class={"fas fa-chevron-circle-right"} />
+            <icons.CircleChevronRight />
         </span>
     </li>
 );
@@ -257,7 +256,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         navLeft={
             state.filters.length > 0 && (
                 <a onclick={Back} data-cy="back">
-                    <i class={"fas fa-2x fa-chevron-circle-left"} />
+                    <icons.CircleChevronLeft class="x2" />
                 </a>
             )
         }
@@ -268,7 +267,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
                     onclick={GoToScreen("queue", [PushScrollPos()])}
                     data-cy="queue"
                 >
-                    <i class={"fas fa-2x fa-list-ol"} />
+                    <icons.ListOl class="x2" />
                 </a>
             )
         }
@@ -303,7 +302,7 @@ export const TrackList = ({ state }: { state: State }): VNode => (
                     ]}
                 >
                     <span class={"remove"}>
-                        <i class={"fas fa-times-circle"} />
+                        <icons.CircleXmark />
                     </span>
                     <span class={"name"} title={filter}>
                         {filter.split(":")[1]}

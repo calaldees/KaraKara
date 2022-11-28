@@ -3,6 +3,7 @@ import { Screen, BackToExplore, Thumb } from "./_common";
 import { ApiRequest, SendCommand } from "../effects";
 import { RemoveTrack } from "../actions";
 import { current_and_future, time_until } from "../utils";
+import * as icons from "../static/icons";
 
 ///////////////////////////////////////////////////////////////////////
 // Actions
@@ -182,7 +183,7 @@ const QueueItemRender = ({
             ontouchcancel={createTouchCancel()}
         >
             <span class={"drag-handle"}>
-                <i class="fas fa-grip-vertical" />
+                <icons.GripVertical />
             </span>
         </Thumb>
         <span class={"text queue_info"}>
@@ -199,17 +200,17 @@ const QueueItemRender = ({
         )}
 
         <span class={"go_arrow"} onclick={RemoveTrack(item.id)}>
-            <i class={"fas fa-times-circle"} />
+            <icons.CircleXmark />
         </span>
     </li>
 );
 
 const ControlButton = ({
     command,
-    style,
+    icon,
 }: {
     command: string;
-    style: string;
+    icon: VNode;
 }): VNode => (
     <button
         onclick={(state: State): Dispatchable => [
@@ -217,17 +218,17 @@ const ControlButton = ({
             SendCommand(state, command),
         ]}
     >
-        <i class={"fas fa-" + style} />
+        {icon}
     </button>
 );
 const ControlButtons = (): VNode => (
     <footer>
         <div class={"buttons"}>
-            <ControlButton command={"seek_backwards"} style={"backward"} />
-            <ControlButton command={"seek_forwards"} style={"forward"} />
-            <ControlButton command={"play"} style={"play"} />
-            <ControlButton command={"stop"} style={"stop"} />
-            <ControlButton command={"skip"} style={"step-forward"} />
+            <ControlButton command={"seek_backwards"} icon={<icons.Backward />} />
+            <ControlButton command={"seek_forwards"} icon={<icons.Forward />} />
+            <ControlButton command={"play"} icon={<icons.Play />} />
+            <ControlButton command={"stop"} icon={<icons.Stop />} />
+            <ControlButton command={"skip"} icon={<icons.ForwardStep />} />
         </div>
     </footer>
 );
@@ -263,7 +264,7 @@ export const Control = ({ state }: { state: State }): VNode => (
                         the right to queue up tracks.
                     </li>
                     <li>
-                        Push the play button (<i class={"fas fa-play"} />) down
+                        Push the play button (<icons.Play />) down
                         below when you're ready to start singing.
                     </li>
                 </ol>
