@@ -26,15 +26,16 @@ $INPUT_BG: #EEE;
 
 /* svg wibbling */
 svg {
-  top: .125em;
-  position: relative;
   path {
     fill: currentColor;
   }
 }
 svg.x2 {
-  top: 0;
   font-size: 2em;
+}
+BUTTON svg, SPAN svg {
+  top: .125em;
+  position: relative;
 }
 
 /* Overall Layout */
@@ -248,6 +249,7 @@ UL {
   border: 1px solid $BORDER;
   margin: 0.5em 0;
   border-radius: .5em;
+  overflow: hidden;
   box-shadow: $BG_DARK 2px 2px 4px;
   padding: 0;
   LI {
@@ -305,18 +307,8 @@ UL {
       flex: 0 0 auto;
     }
   }
-  LI:first-child {
-    .thumb:first-child {
-      border-top-left-radius: 0.5em;
-      overflow: hidden;
-    }
-  }
   LI:last-child {
     border-bottom: 0;
-    .thumb:first-child {
-      border-bottom-left-radius: 0.5em;
-      overflow: hidden;
-    }
   }
 }
 
@@ -399,7 +391,7 @@ MAIN.track_list ARTICLE {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      SPAN.remove {
+      .remove {
         margin-right: 0.3em;
       }
       // SPAN.name {}
@@ -471,12 +463,6 @@ MAIN.track_details ARTICLE {
 MAIN.queue ARTICLE {
   .me {
     background: $NOTIFICATION_WARNING;
-  }
-  .me:first-child {
-    border-top-right-radius: .5em;
-  }
-  .me:last-child {
-    border-bottom-right-radius: .5em;
   }
   UL LI {
     &.drop_source {
