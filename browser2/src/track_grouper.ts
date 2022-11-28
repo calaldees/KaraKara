@@ -129,10 +129,12 @@ export function group_tracks(
     // If we have a few tracks, just list them all
     else if (tracks.length < 15) {
         let found_track_ids: Array<string> = [];
-        // Use suggest_next_filters to figure out some headings, eg
-        // if we are currently searching for "from:Macross" then it
-        // will suggest filtering by "Macross:*"
-        let next_filters = suggest_next_filters(filters, all_tags);
+        // If we are searching for something, use suggest_next_filters
+        // to figure out some headings, eg if we are currently searching
+        // for "from:Macross" then it will suggest filtering by "Macross:*".
+        // If we have no filters, then the default suggested filters
+        // aren't hugely helpful here, so better to just have a list.
+        let next_filters = filters.length > 0 ? suggest_next_filters(filters, all_tags) : [];
         // If suggest_next_filters can't come up with any suggestions,
         // or all of the suggestions are bad (eg it suggests a tag
         // which would have 0 results due to the "if user searches for

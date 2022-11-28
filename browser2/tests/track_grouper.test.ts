@@ -85,12 +85,18 @@ describe('group_tracks', () => {
     describe('with a few tracks', () => {
         let tracks = [state.track_list["track_id_1"], state.track_list["track_id_2"]];
 
-        test("show all of them under relevant headings", () => {
+        test("with no filters, just list them", () => {
             let results = grouper.group_tracks([], tracks);
-            expect(results.length).toEqual(2);
-            expect(results[0][0]).toEqual("anime");
+            expect(results.length).toEqual(1);
+            expect(results[0][0]).toEqual("");
             expect(results[0][1].tracks).toBeDefined();
-            expect(results[1][0]).toEqual("jpop");
+        });
+        test("use filters to figure out relevant subheadings", () => {
+            let results = grouper.group_tracks(["from:Macross"], tracks);
+            expect(results.length).toEqual(2);
+            expect(results[0][0]).toEqual("Do You Remember Love?");
+            expect(results[0][1].tracks).toBeDefined();
+            expect(results[1][0]).toEqual("Tracks");
             expect(results[1][1].tracks).toBeDefined();
         });
         test("if there are no relevant headings, show leftovers under a blank heading", () => {
