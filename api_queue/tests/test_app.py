@@ -12,11 +12,11 @@ async def test_root(app):  # mock_redis,
 
 @pytest.mark.asyncio
 async def test_queue_invalid_name(app):
-    request, response = await app.asgi_client.get(f"/queue/キ/queue.json")
+    request, response = await app.asgi_client.get(f"/room/キ/queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get(f"/queue/ /queue.json")
+    request, response = await app.asgi_client.get(f"/room/ /queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get(f"/queue/queueNameIsFarFarFarFarFarFarToLong/queue.json")
+    request, response = await app.asgi_client.get(f"/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
     assert response.status == 404
 
 

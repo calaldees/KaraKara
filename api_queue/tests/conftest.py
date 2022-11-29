@@ -59,32 +59,32 @@ class QueueModel():
 
     @property
     async def queue(self):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/queue.json")
+        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
         return response.json
     @property
     async def tracks(self):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/tracks.json")
+        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/tracks.json")
         return response.json
     @property
     async def settings(self):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/settings.json")
+        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
         return response.json
 
     async def settings_put(self, payload):
-        request, response = await self.app.asgi_client.put(f"/queue/{self._queue}/settings.json", data=json.dumps(payload))
+        request, response = await self.app.asgi_client.put(f"/room/{self._queue}/settings.json", data=json.dumps(payload))
         return response
     async def post(self, **kwargs):
-        request, response = await self.app.asgi_client.post(f"/queue/{self._queue}/queue.json", data=json.dumps(kwargs))
+        request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
     async def delete(self, queue_item_id):
-        request, response = await self.app.asgi_client.delete(f"/queue/{self._queue}/queue/{queue_item_id}.json")
+        request, response = await self.app.asgi_client.delete(f"/room/{self._queue}/queue/{queue_item_id}.json")
         return response
     async def put(self, **kwargs):
-        request, response = await self.app.asgi_client.put(f"/queue/{self._queue}/queue.json", data=json.dumps(kwargs))
+        request, response = await self.app.asgi_client.put(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
     async def command(self, command):
-        request, response = await self.app.asgi_client.get(f"/queue/{self._queue}/command/{command}.json")
+        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/command/{command}.json")
         return response
 
 

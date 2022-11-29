@@ -73,7 +73,7 @@ curl -X POST --cookie "session_id=test" http://localhost:8000/room/test/queue.js
 curl -X DELETE --cookie "session_id=admin" http://localhost:8000/room/test/queue/8684541502363635.json
 curl -X PUT --cookie "session_id=admin" http://localhost:8000/room/test/queue.json -d '{"source": 543, "target": 223}'
 
-curl -X GET http://localhost:8000/queue/test/settings.json
+curl -X GET http://localhost:8000/room/test/settings.json
 curl -X PUT --cookie "session_id=admin" https://karakara.uk/room/test/settings.json -d '{"track_space": 42}'
 
 curl -X GET --cookie "session_id=admin" http://localhost:8000/room/test/command/play.json
