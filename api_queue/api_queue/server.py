@@ -9,9 +9,6 @@ import sanic
 from sanic_ext import openapi
 from sanic.log import logger as log
 
-from ._utils import harden
-
-
 
 app = sanic.Sanic("karakara_queue")
 app.config.update({
@@ -34,16 +31,10 @@ app.ext.openapi.describe(
 
 # Startup ----------------------------------------------------------------------
 
+from .track_manager import TrackManager
 @app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
-    path_tracks = Path(str(_app.config.get('PATH_TRACKS')))
-    log.info(f"[tracks] loading - {path_tracks=}")
-    if path_tracks.is_file():
-        with path_tracks.open() as filehandle:
-            _app.ctx.tracks = harden(json.load(filehandle))
-    else:
-        log.error('No tracks.json file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. processmedia2 should output this file when encoding is complete')
-        _app.ctx.tracks = {}
+    _app.ctx.track_manager = TrackManager(Path(str(_app.config.get('PATH_TRACKS'))))
 
 
 from .queue_model import QueueItem
@@ -247,11 +238,12 @@ class QueueItemAdd:
     ],
 )
 async def add_queue_item(request, room_name):
+    tracks = request.app.ctx.track_manager.tracks
     # Validation
     if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
         raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
     track_id = request.json['track_id']
-    if track_id not in request.app.ctx.tracks:
+    if track_id not in tracks:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
     performer_name = request.json['performer_name']
     # Queue update
@@ -259,7 +251,7 @@ async def add_queue_item(request, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
                 track_id=track_id,
-                track_duration=request.app.ctx.tracks[track_id]["duration"],
+                track_duration=tracks[track_id]["duration"],
                 session_id=request.ctx.session_id,
                 performer_name=performer_name,
             )
