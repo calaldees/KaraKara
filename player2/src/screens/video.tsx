@@ -36,7 +36,7 @@ export const VideoScreen = ({
             Performed by {queue_item.performer_name}
         </div>
         <div id="pimpcontributor" class="pimp">
-            Contributed by {track.tags['contributor']?.[0]}
+            Contributed by {track.tags["contributor"]?.[0]}
         </div>
     </section>
 );

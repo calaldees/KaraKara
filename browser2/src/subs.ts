@@ -20,7 +20,7 @@ export function getMQTTListener(state: State): Subscription | boolean {
         error(state: State, err): State {
             console.log(
                 "Got an unrecoverable MQTT error, " +
-                "returning to login screen",
+                    "returning to login screen",
                 err,
             );
             return {
@@ -53,7 +53,9 @@ export function getMQTTListener(state: State): Subscription | boolean {
                 case "queue":
                     return {
                         ...state,
-                        queue: JSON.parse(data).filter(track => state.track_list.hasOwnProperty(track.track_id))
+                        queue: JSON.parse(data).filter((track) =>
+                            state.track_list.hasOwnProperty(track.track_id),
+                        ),
                     };
                 default:
                     return state;
@@ -62,7 +64,10 @@ export function getMQTTListener(state: State): Subscription | boolean {
     });
 }
 
-function _resizeSubscriber(dispatch: Dispatch, props: { onresize: Dispatchable }): Unsubscribe {
+function _resizeSubscriber(
+    dispatch: Dispatch,
+    props: { onresize: Dispatchable },
+): Unsubscribe {
     function handler(event) {
         dispatch(props.onresize, event);
     }
@@ -76,7 +81,10 @@ export function ResizeListener(callback: Dispatchable): Subscription {
     return [_resizeSubscriber, { onresize: callback }];
 }
 
-function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_password: string }): Unsubscribe {
+function _bleSubscriber(
+    dispatch: Dispatch,
+    props: { room_name: string; room_password: string },
+): Unsubscribe {
     // subscription is restarted whenever props changes,
     if (props.room_name) {
         setTimeout(function () {
@@ -94,12 +102,14 @@ function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_pas
                             password: state.room_password,
                         }),
                     },
-                    action: (state, response) => ({ ...state, is_admin: response.is_admin }),
-                })
+                    action: (state, response) => ({
+                        ...state,
+                        is_admin: response.is_admin,
+                    }),
+                }),
             ]);
         }, 0);
-    }
-    else {
+    } else {
         setTimeout(function () {
             dispatch((state) => ({ ...state, is_admin: false }));
         }, 0);
@@ -110,6 +120,9 @@ function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_pas
     };
 }
 
-export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+export function BeLoggedIn(
+    room_name: string,
+    room_password: string,
+): Subscription {
     return [_bleSubscriber, { room_name, room_password }];
 }

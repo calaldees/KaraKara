@@ -116,12 +116,26 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                         </tr>
                     )}
                     <tr>
-                        <td style={{
-                            background: [
-                                "red", "green", "yellow", "purple", "orange", "blue"
-                            ][Math.round(state.now) % 6]
-                        }}>Sync</td>
-                        <td><input disabled={true} value={Date.now() / 1000 - state.now} /></td>
+                        <td
+                            style={{
+                                background: [
+                                    "red",
+                                    "green",
+                                    "yellow",
+                                    "purple",
+                                    "orange",
+                                    "blue",
+                                ][Math.round(state.now) % 6],
+                            }}
+                        >
+                            Sync
+                        </td>
+                        <td>
+                            <input
+                                disabled={true}
+                                value={Date.now() / 1000 - state.now}
+                            />
+                        </td>
                     </tr>
                     <tr>
                         <td colspan={2}>

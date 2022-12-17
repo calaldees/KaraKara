@@ -33,26 +33,32 @@ export function Root(state: State): VNode {
         );
     else if (visible_queue.length === 0) screen = <TitleScreen state={state} />;
     else if (state.podium)
-        screen = <PodiumScreen
-            state={state}
-            track={state.track_list[visible_queue[0].track_id]}
-            queue_item={visible_queue[0]}
-        />;
+        screen = (
+            <PodiumScreen
+                state={state}
+                track={state.track_list[visible_queue[0].track_id]}
+                queue_item={visible_queue[0]}
+            />
+        );
     else if (
         visible_queue[0].start_time == null ||
         visible_queue[0].start_time > state.now
     )
-        screen = <PreviewScreen
-            state={state}
-            track={state.track_list[visible_queue[0].track_id]}
-            queue={visible_queue}
-        />;
+        screen = (
+            <PreviewScreen
+                state={state}
+                track={state.track_list[visible_queue[0].track_id]}
+                queue={visible_queue}
+            />
+        );
     else
-        screen = <VideoScreen
-            state={state}
-            track={state.track_list[visible_queue[0].track_id]}
-            queue_item={visible_queue[0]}
-        />;
+        screen = (
+            <VideoScreen
+                state={state}
+                track={state.track_list[visible_queue[0].track_id]}
+                queue_item={visible_queue[0]}
+            />
+        );
 
     let errors: Array<string> = [];
     if (!state.room_name) errors.push("No Room Set");

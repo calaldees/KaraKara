@@ -44,7 +44,9 @@ export function getMQTTListener(state: State): Subscription | boolean {
                         },
                     };
                 case "queue":
-                    const new_queue = JSON.parse(data).filter(queue_item => state.track_list.hasOwnProperty(queue_item.track_id));
+                    const new_queue = JSON.parse(data).filter((queue_item) =>
+                        state.track_list.hasOwnProperty(queue_item.track_id),
+                    );
                     return { ...state, queue: new_queue };
                 default:
                     return state;
@@ -90,8 +92,10 @@ export const KeyboardListener = Keyboard({
     },
 });
 
-
-function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_password: string }): Unsubscribe {
+function _bleSubscriber(
+    dispatch: Dispatch,
+    props: { room_name: string; room_password: string },
+): Unsubscribe {
     // subscription is restarted whenever props changes,
     if (props.room_name) {
         setTimeout(function () {
@@ -109,12 +113,14 @@ function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_pas
                             password: state.room_password,
                         }),
                     },
-                    action: (state, response) => ({ ...state, is_admin: response.is_admin }),
-                })
+                    action: (state, response) => ({
+                        ...state,
+                        is_admin: response.is_admin,
+                    }),
+                }),
             ]);
         }, 0);
-    }
-    else {
+    } else {
         setTimeout(function () {
             dispatch((state) => ({ ...state, is_admin: false }));
         }, 0);
@@ -125,6 +131,9 @@ function _bleSubscriber(dispatch: Dispatch, props: { room_name: string, room_pas
     };
 }
 
-export function BeLoggedIn(room_name: string, room_password: string): Subscription {
+export function BeLoggedIn(
+    room_name: string,
+    room_password: string,
+): Subscription {
     return [_bleSubscriber, { room_name, room_password }];
 }

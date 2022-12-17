@@ -38,17 +38,30 @@ export const EventInfo = ({ state }: { state: State }) => (
         {state.settings["validation_event_end_datetime"] && (
             <span>
                 Event ends at{" "}
-                <strong>{short_date(state.settings["validation_event_end_datetime"])}</strong>
+                <strong>
+                    {short_date(
+                        state.settings["validation_event_end_datetime"],
+                    )}
+                </strong>
             </span>
         )}
-        {state.settings["validation_event_end_datetime"] && state.settings["admin_list"]?.length > 0 && " - "}
+        {state.settings["validation_event_end_datetime"] &&
+            state.settings["admin_list"]?.length > 0 &&
+            " - "}
         {state.settings["admin_list"]?.length > 0 && (
             <span>
-                Admins are {state.settings["admin_list"].map((a, n, as) => <span>
-                    <strong>{a}</strong>{n == as.length - 1 ? "" : n == as.length - 2 ? " and " : ", "}
-                </span>)}
+                Admins are{" "}
+                {state.settings["admin_list"].map((a, n, as) => (
+                    <span>
+                        <strong>{a}</strong>
+                        {n == as.length - 1
+                            ? ""
+                            : n == as.length - 2
+                            ? " and "
+                            : ", "}
+                    </span>
+                ))}
             </span>
         )}
-
     </div>
 );
