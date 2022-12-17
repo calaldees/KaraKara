@@ -56,5 +56,12 @@
             ],
             "genFavicons": true
         }
+    },
+    "svgr": {
+        "jsxRuntimeImport": {
+            "source": "hyperapp-jsx-pragma",
+            "defaultSpecifier": "h"
+        },
+        "icon": true
     }
 }
