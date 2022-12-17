@@ -1,5 +1,7 @@
 {
     "name": "karakara-player",
+    "repository": "https://github.com/calaldees/KaraKara/",
+    "license": "GPL-3.0-only",
     "dependencies": {
         "@shish2k/hyperapp-hash-state": "^2.0.11",
         "@shish2k/hyperapp-localstorage": "^1.0.2",
@@ -15,8 +17,6 @@
         "serve": "parcel serve --port 1235 src/index.html",
         "format": "prettier --write 'src/**/*.ts{,x}' --tab-width 4 --trailing-comma all"
     },
-    "repository": "https://github.com/calaldees/KaraKara/",
-    "license": "GPL-3.0-only",
     "devDependencies": {
         "@parcel/transformer-sass": "^2.8.0",
         "events": "^3.3.0",
