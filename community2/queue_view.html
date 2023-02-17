@@ -69,8 +69,9 @@ const hashChangeSubscriber = (dispatch, options) => {
 
 const QueueItem = data => h("tr", {}, [
 	h("td", {}, [
-		//h("img", {src: `${URL}/files/${data?.attachments?.image[0].path}`}),
-		h("img", {src: `${URL}/files/${data?.attachments?.image[1].path}`}),
+		h("img", {src: `${URL}/files/${data?.attachments?.image[0].path}`}),
+		// deprecated - only two images avif and webp
+		//h("img", {src: `${URL}/files/${data?.attachments?.image[1].path}`}),
 		//h("img", {src: `${URL}/files/${data?.attachments?.image[2].path}`}),
 		//h("img", {src: `${URL}/files/${data?.attachments?.image[3].path}`}),
 	]),
