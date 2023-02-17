@@ -141,7 +141,7 @@ def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> Non
     # had it in our own queue.
     def _encode(target: Target):
         try:
-            if reencode or not t.path.exists():
+            if reencode or not target.path.exists():
                 target.encode()
         except Exception:
             log.exception(f"Error encoding {target.friendly}")
