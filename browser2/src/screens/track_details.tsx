@@ -168,8 +168,7 @@ export const TrackDetails = ({
                     <div class={"tag"}>
                         <div class={"tag_key"}>{key}</div>
                         <div class={"tag_value"}>
-                            {track.tags[key]?.map((value, index) =>
-                                <a onclick={SetFilter(key, value)}>{index > 0 && ", "}{value}</a>)}
+                            {track.tags[key]?.join(", ")}
                         </div>
                     </div>
                 ))}
@@ -186,14 +185,3 @@ export const TrackDetails = ({
         )}
     </Screen>
 );
-
-function SetFilter(key: string, value: string) {
-    return function (state: State): State {
-        return {
-            ...state,
-            search: "",
-            track_id: null,
-            filters: [key + ":" + value],
-        };
-    }
-}

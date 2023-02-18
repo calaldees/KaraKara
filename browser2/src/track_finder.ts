@@ -99,14 +99,30 @@ export function apply_search(
 }
 
 /**
+ * If somebody searches for "foo:bar", remove that from the text
+ * search and add it to the tag filters
+ */
+export function text_to_filters(filters: string[], search: string): [string[], string] {
+    let ret_filters = filters.map(x => x);
+    let ret_search: string[] = [];
+    search.split(" ").map((word) => {
+        let m = word.match("([a-z]+):(.*)");
+        if(m) ret_filters.push(word);
+        else ret_search.push(word);
+    });
+    return [ret_filters, ret_search.join(" ")];
+}
+
+/**
  * All the searching in one place, for benchmarking
  */
 export function find_tracks(state: State): Array<Track> {
+    let [filters, search] = text_to_filters(state.filters, state.search);
     let tracks = Object.values(state.track_list);
     tracks = apply_hidden(tracks, state.settings["hidden_tags"]);
     tracks = apply_tags(tracks, state.settings["forced_tags"]);
-    tracks = apply_tags(tracks, state.filters);
-    tracks = apply_search(tracks, state.search);
+    tracks = apply_tags(tracks, filters);
+    tracks = apply_search(tracks, search);
     tracks.sort((a, b) => normalise_cmp(a.tags.title[0], b.tags.title[0]));
     return tracks;
 }
