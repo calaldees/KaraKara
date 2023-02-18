@@ -127,7 +127,7 @@ const subscriptions = (state: State): Array<Subscription | boolean> => [
     HashStateManager(
         {
             push: ["root", "filters", "track_id", "room_name"],
-            replace: ["search", "booth", "widescreen", "room_name_edit"],
+            replace: ["search", "booth", "room_name_edit"],
         },
         state,
     ),
