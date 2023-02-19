@@ -3,11 +3,8 @@
 import re
 from datetime import timedelta
 from itertools import zip_longest, tee, chain
-from sqlite3 import Timestamp
 from typing import NamedTuple, List
-
 import logging
-from typing import NamedTuple
 
 log = logging.getLogger(__name__)
 
