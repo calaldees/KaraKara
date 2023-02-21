@@ -10,6 +10,8 @@ import os
 import pickle
 import sys
 import time
+import csv
+from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -17,7 +19,8 @@ from typing import Any, Dict, List, Optional, Tuple
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from lib.kktypes import Source, TargetType, Track, Target
+from lib.kktypes import Source, SourceType, TargetType, Track, Target
+from lib.subtitle_processor import Subtitle
 
 log = logging.getLogger()
 
@@ -123,6 +126,32 @@ def view(tracks: List[Track]) -> None:
                 + f"{t.encoder.__class__.__name__}({repr(source_list)}) "
                 + f"{stats}"
             )
+
+
+def lint(tracks: List[Track]) -> None:
+    """
+    Scan through all the data, looking for things which seem suspicious
+    and probably want a human to investigate
+    """
+    writer = csv.writer(sys.stdout)
+    for track in tracks:
+        for t in track.targets:
+            if not t.path.exists():
+                print(f"{t.friendly} missing (Sources: {[s.friendly for s in t.sources]!r})")
+        for s in track.sources:
+            if s.type == SourceType.SUBTITLES:
+                ls = s.subtitles()
+                for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
+                    gap = l1.end - l2.start
+                    if l1.end == l2.start and (l1.text == l2.text == l3.text):
+                        writer.writerow([s.friendly, index+1, "no gap between 3+ repeats", 0, l1.text])
+                for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
+                    if l2.start > l1.end:
+                        gap = l2.start - l1.end
+                    else:
+                        gap = l1.end - l2.start
+                    if gap < timedelta(microseconds=500000) and gap != timedelta(seconds=0) and not (l1.text == l2.text):
+                        writer.writerow([s.friendly, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
 
 
 def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> None:
@@ -276,7 +305,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         "cmd",
         default="all",
         nargs="?",
-        help="Sub-process to run (view, encode, export, cleanup)",
+        help="Sub-process to run (view, encode, export, lint, cleanup)",
     )
     parser.add_argument(
         "match", nargs="?", help="Only act upon files matching this pattern"
@@ -325,6 +354,8 @@ def main(argv: List[str]) -> int:
                     cleanup(args.processed, tracks, args.delete, args.threads)
             elif args.cmd == "view":
                 view(tracks)
+            elif args.cmd == "lint":
+                lint(tracks)
             elif args.cmd == "encode":
                 encode(tracks, args.reencode, args.threads)
             elif args.cmd == "export":

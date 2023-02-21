@@ -10,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
-from .subtitle_processor import parse_subtitles
+from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
 
 log = logging.getLogger()
@@ -98,10 +98,13 @@ class Source:
         seconds = float(raw_duration.group(3))
         return hours + minutes + seconds
 
-    @_cache
     def lyrics(self) -> List[str]:
-        log.info(f"Parsing lyrics from {self.friendly}")
-        return [l.text for l in parse_subtitles(self.path.read_text())]
+        return [l.text for l in self.subtitles()]
+
+    @_cache
+    def subtitles(self) -> List[Subtitle]:
+        log.info(f"Parsing subtitles from {self.friendly}")
+        return parse_subtitles(self.path.read_text())
 
     @_cache
     def tags(self) -> Dict[str, Tuple[str]]:
