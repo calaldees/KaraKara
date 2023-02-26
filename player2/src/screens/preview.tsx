@@ -30,6 +30,7 @@ export const PreviewScreen = ({
             state={state}
             track={track}
             onloadstart={SetPreviewVolume}
+            lowres={false}
             loop={true}
         />
         {queue
