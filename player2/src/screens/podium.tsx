@@ -1,5 +1,5 @@
 import h from "hyperapp-jsx-pragma";
-import { current_and_future, percent, s_to_mns } from "../utils";
+import { attachment_path, current_and_future, percent, s_to_mns } from "../utils";
 import { Video } from "./_common";
 import { SendCommand } from "../effects";
 
@@ -66,6 +66,8 @@ const StartBar = (): VNode => (
     </div>
 );
 
+const blank = new URL('../static/blank.mp4', import.meta.url);
+
 export const PodiumScreen = ({
     state,
     track,
@@ -82,20 +84,27 @@ export const PodiumScreen = ({
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>
 
-        <Video
-            state={state}
-            track={track}
+        <video
             muted={true}
-            lowres={true}
-            // ensure the video element gets re-created when switching
-            // between queue items (even if it's the same track), and
-            // also when the podium switches from "preview" to "play" mode
             key={
                 queue_item.id +
                 "-" +
                 (queue_item.start_time && queue_item.start_time < state.now)
             }
-        />
+            autoPlay={true}
+            crossorigin="anonymous"
+        >
+            <source src={blank} />
+            {track.attachments.subtitle?.map((a) => (
+                <track
+                    kind="subtitles"
+                    src={attachment_path(state.root, a)}
+                    default={true}
+                    label="English"
+                    srclang="en"
+                />
+            ))}
+        </video>
 
         {queue_item.start_time ? (
             queue_item.start_time < state.now ? (

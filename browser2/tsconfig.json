@@ -4,7 +4,7 @@
     "lib": ["es2017", "dom"],
     "sourceMap": true,
     "noImplicitAny": false,
-    "module": "es6",
+    "module": "es2022",
     "moduleResolution": "node",
     "target": "es6",
     "jsx": "react",
