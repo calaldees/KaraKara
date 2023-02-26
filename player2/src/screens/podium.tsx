@@ -86,6 +86,7 @@ export const PodiumScreen = ({
             state={state}
             track={track}
             muted={true}
+            lowres={true}
             // ensure the video element gets re-created when switching
             // between queue items (even if it's the same track), and
             // also when the podium switches from "preview" to "play" mode

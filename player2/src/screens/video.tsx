@@ -15,7 +15,7 @@ export const VideoScreen = ({
     queue_item: QueueItem;
 }): VNode => (
     <section key="video" class={"screen_video"}>
-        <Video state={state} track={track} />
+        <Video state={state} track={track} lowres={false} />
         <JoinInfo state={state} />
         <EventInfo state={state} />
         <div
