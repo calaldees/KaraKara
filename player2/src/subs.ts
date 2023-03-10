@@ -137,3 +137,46 @@ export function BeLoggedIn(
 ): Subscription {
     return [_bleSubscriber, { room_name, room_password }];
 }
+
+
+let wakeLock = null;
+function _wakeLock(dispatch: Dispatch, props: any): Unsubscribe {
+    function upd(held, status) {
+        dispatch(props.onChange, {held, status});
+    }
+    if (!("wakeLock" in navigator)) {
+        setTimeout(function () {
+            upd(false, "not supported");
+        }, 0);
+        return function () { };
+    }
+
+    function requestWakeLock() {
+        navigator.wakeLock.request('screen').then(lock => {
+            wakeLock = lock;
+            upd(!lock.released, "got: " + (!lock.released));
+        }).catch(err => {
+            upd(false, `${err.name}, ${err.message}`);
+        });
+    }
+    requestWakeLock();
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+            requestWakeLock();
+        }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return function () {
+        if (wakeLock) {
+            wakeLock.release().then(() => {
+                upd(false, "released");
+                wakeLock = null;
+            });
+        }
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+}
+export function WakeLock(props): Subscription {
+    return [_wakeLock, props];
+}

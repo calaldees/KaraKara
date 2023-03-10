@@ -59,6 +59,10 @@ type State = {
         text: string;
         style: string;
     };
+    wake_lock: {
+        held: boolean;
+        status: string;
+    };
 
     // loading screen
     download_size: number | null;

@@ -8,7 +8,7 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { getMQTTListener, KeyboardListener, BeLoggedIn } from "./subs";
+import { getMQTTListener, KeyboardListener, BeLoggedIn, WakeLock } from "./subs";
 import { ApiRequest } from "./effects";
 import { current_and_future } from "./utils";
 
@@ -46,6 +46,10 @@ const state: State = {
     },
     now: Date.now() / 1000,
     notification: null,
+    wake_lock: {
+        held: false,
+        status: "default",
+    },
 
     // loading screen
     download_size: null,
@@ -127,6 +131,16 @@ const subscriptions = (state: State): Array<Subscription | boolean> => [
             syncVideo(state);
             return { ...state, now: timestamp_ms / 1000 };
         },
+    }),
+    WakeLock({
+        onChange(state: State, {held, status}: {held: boolean, status: string}): Dispatchable {
+            return {
+                ...state, wake_lock: {
+                    held,
+                    status,
+                }
+            };
+        }
     }),
 ];
 

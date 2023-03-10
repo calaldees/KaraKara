@@ -137,6 +137,17 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             />
                         </td>
                     </tr>
+                    {navigator.wakeLock && (
+                        <tr>
+                            <td>WakeLock</td>
+                            <td>
+                                <input
+                                    disabled={true}
+                                    value={state.wake_lock.status}
+                                />
+                            </td>
+                        </tr>
+                    )}
                     <tr>
                         <td colspan={2}>
                             <button>Close</button>
