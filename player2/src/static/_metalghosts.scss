@@ -309,7 +309,7 @@ VIDEO {
 		}
 	
 		/*---------------------------------------------------------------------------*/
-		/* Small-screen tweaks */
+		/* 4:3 tweaks */
 		/* Draw a line between 16/10 (widescreen) and 16/12 (4:3) - by default we */
 		/* use the default layout, for display areas closer to 4:3 we override bits */
 		/*---------------------------------------------------------------------------*/
@@ -325,25 +325,18 @@ VIDEO {
 
 	.screen_video {
 		grid-template:
-		  "header" 10vh
 		  "video " 1fr
-		  "footer" 10vh
 		  / 1fr;
 
 		background: black;
 
-		@keyframes fadeout {
-			0% {opacity: 1.0;}
-			100% {opacity: 0.25;}
-		}
 		#join_info, #event_info {
-			animation-name: fadeout;
-			animation-duration: 5s;
+			display: none;
 		}
 		VIDEO {
 			grid-area: video;
 			width: 100%;
-			height: 76vh;
+			height: 100%;
 		}
 
 		.pimp {
@@ -367,7 +360,7 @@ VIDEO {
 		}
 		#pimpkk {
 			font-size: 10vh;
-			top: 15vh;
+			top: 5vh;
 			right: 5vw;
 			animation-name: popright;
 		}
@@ -383,9 +376,35 @@ VIDEO {
 		}
 		#pimpsong {
 			font-size: 5vh;
-			top: 15vh;
+			top: 5vh;
 			left: 5vw;
 			animation-name: popleft;
+		}
+
+		@media (max-aspect-ratio: 16/11) {
+			grid-template:
+				"header" 10vh
+				"video " 1fr
+				"footer" 10vh
+				/ 1fr;
+			#pimpkk {
+				top: 15vh;
+			}
+			#pimpsong {
+				top: 15vh;
+			}
+			VIDEO {
+				height: 76vh;
+			}
+			@keyframes fadeout {
+				0% {opacity: 1.0;}
+				100% {opacity: 0.25;}
+			}
+			#join_info, #event_info {
+				display: block;
+				animation-name: fadeout;
+				animation-duration: 5s;
+			}
 		}
 	}
 
