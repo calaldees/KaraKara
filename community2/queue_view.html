@@ -40,7 +40,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const URL = (urlParams.get('url') || '').replace(/\/$/, ''); // Get api url (and remove trailing slash if present)
 
 const state = {
-	queue_id: undefined,
+	room_name: undefined,
 	queue: [],
 	tracks: {},
 }
@@ -53,9 +53,9 @@ const fetchJson = (dispatch, options) => {
 const jsonFetcher = (url, action) => [fetchJson, {url, action}]
 
 
-const actionQueueId = (state, queue_id) => ([
-    {...state, queue_id},
-    jsonFetcher(`${URL}/queue/${queue_id}/queue.json`, receiveQueue),
+const actionQueueId = (state, room_name) => ([
+    {...state, room_name},
+    jsonFetcher(`${URL}/room/${room_name}/queue.json`, receiveQueue),
 ])
 
 const hashChangeSubscriber = (dispatch, options) => {
@@ -98,7 +98,7 @@ app({
 	init: [
 		state,
 		jsonFetcher(`${URL}/files/tracks.json`, receiveTracks),
-		[(dispatch, options) => dispatch(actionQueueId, options.queue_id), {queue_id: window.location.hash.replace('#','')}],  // feels fugly - simplify
+		[(dispatch, options) => dispatch(actionQueueId, options.room_name), {room_name: window.location.hash.replace('#','')}],  // feels fugly - simplify
 	],
 	node: document.body,
 	subscriptions: state => [
