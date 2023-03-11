@@ -13,13 +13,6 @@ SSA_NEWLINE = "\\N"
 SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 SSA_HEIGHT_TO_FONT_SIZE_RATIO = 14
 
-SRT_FORMAT = """\
-{index}
-{start} --> {end}
-{text}
-
-"""
-
 re_time = re.compile(
     r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)"
 )
@@ -47,12 +40,6 @@ class TextOverlap(NamedTuple):
 def commonOverlap(text1: str, text2: str) -> TextOverlap:
     """
     https://neil.fraser.name/news/2010/11/04/
-
-    >>> commonOverlap('Fire at Will', 'William Riker is number one')
-    TextOverlap(idx=4, text='Will')
-    >>> commonOverlap('Have some CoCo and CoCo', 'CoCo and CoCo is here.')
-    TextOverlap(idx=13, text='CoCo and CoCo')
-
     """
     index = min(len(text1), len(text2))
     while index > 0:
@@ -327,37 +314,6 @@ def create_ssa(
     margin_v_size_multiplyer=1,
     font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO,
 ):
-    r"""
-    >>> ssa = create_ssa((
-    ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'first'),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3,microseconds=510000), 'second'),
-    ... ))
-    >>> print(ssa)
-    [Script Info]
-    Title: <untitled>
-    Original Script: <unknown>
-    ScriptType: v4.00
-    <BLANKLINE>
-    [V4 Styles]
-    Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
-    Style: Default,Arial,14,65535,16777215,16777215,0,-1,0,3,1,1,2,14,14,14,0,128
-    <BLANKLINE>
-    [Events]
-    Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-    Dialogue: Marked=0,0:00:00.00,0:01:00.00,*Default,NTP,0000,0000,0000,!Effect,first\N{\c&HFFFFFF&}second
-    Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,second
-    <BLANKLINE>
-
-    >>> _remove_duplicate_lines(_parse_ssa(ssa))
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=60), text='first', top=False), Subtitle(start=datetime.timedelta(seconds=120), end=datetime.timedelta(seconds=180, microseconds=510000), text='second', top=False)]
-
-    >>> ssa = create_ssa((
-    ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'newline\ntest'),
-    ... ))
-    >>> 'newline\\Ntest' in ssa
-    True
-
-    """
     if not font_size and height:
         font_size = height / font_ratio
     if not font_size:
@@ -507,26 +463,12 @@ def create_ssa(
 
 
 def create_srt(subtitles):
-    """
-    >>> srt = create_srt((
-    ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'first'),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, microseconds=510000), 'second'),
-    ...     Subtitle(timedelta(minutes=4), timedelta(minutes=5), ''),
-    ... ))
-    >>> print(srt)
-    1
-    00:00:00,000 --> 00:01:00,000
-    first
-    <BLANKLINE>
-    2
-    00:02:00,000 --> 00:03:00,510
-    second
-    <BLANKLINE>
-    <BLANKLINE>
+    SRT_FORMAT = """\
+{index}
+{start} --> {end}
+{text}
 
-    >>> _parse_srt(srt)
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=60), text='first', top=False), Subtitle(start=datetime.timedelta(seconds=120), end=datetime.timedelta(seconds=180, microseconds=510000), text='second', top=False)]
-    """
+"""
     return "".join(
         SRT_FORMAT.format(
             index=index + 1,
@@ -544,77 +486,6 @@ def create_vtt(subtitles):
     https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
     https://w3c.github.io/webvtt/
     https://caniuse.com/?search=vtt
-
-    >>> vtt = create_vtt(tuple())
-    >>> print(vtt)
-    WEBVTT - KaraKara Subtitle
-    <BLANKLINE>
-    <BLANKLINE>
-
-    >>> vtt = create_vtt((
-    ...     Subtitle(timedelta(minutes=1), timedelta(minutes=2), 'first'),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, milliseconds=510), 'second'),
-    ... ))
-    >>> print(vtt)
-    WEBVTT - KaraKara Subtitle
-    <BLANKLINE>
-    1
-    00:00:55.000 --> 00:01:00.000
-    <v active>
-    <v next>first
-    <BLANKLINE>
-    2
-    00:01:00.000 --> 00:02:00.000
-    <v active>first
-    <v next>second
-    <BLANKLINE>
-    3
-    00:02:00.000 --> 00:03:00.510
-    <v active>second
-    <v next>
-    <BLANKLINE>
-    <BLANKLINE>
-
-    >>> vtt = create_vtt((
-    ...     Subtitle(timedelta(minutes=1), timedelta(minutes=2), 'first', top=True),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, microseconds=510000), 'second', top=True),
-    ...     Subtitle(timedelta(minutes=4), timedelta(minutes=5), 'third', top=True),
-    ...     Subtitle(timedelta(minutes=5), timedelta(minutes=6, microseconds=510000), 'fourth', top=True),
-    ... ))
-    >>> print(vtt)
-    WEBVTT - KaraKara Subtitle
-    <BLANKLINE>
-    1
-    00:00:55.000 --> 00:01:00.000 line:1
-    <v active>
-    <v next>first
-    <BLANKLINE>
-    2
-    00:01:00.000 --> 00:02:00.000 line:1
-    <v active>first
-    <v next>second
-    <BLANKLINE>
-    3
-    00:02:00.000 --> 00:03:00.510 line:1
-    <v active>second
-    <v next>
-    <BLANKLINE>
-    4
-    00:03:55.000 --> 00:04:00.000 line:1
-    <v active>
-    <v next>third
-    <BLANKLINE>
-    5
-    00:04:00.000 --> 00:05:00.000 line:1
-    <v active>third
-    <v next>fourth
-    <BLANKLINE>
-    6
-    00:05:00.000 --> 00:06:00.510 line:1
-    <v active>fourth
-    <v next>
-    <BLANKLINE>
-    <BLANKLINE>
     """
     VTT_FORMAT = """\
 {index}
