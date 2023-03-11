@@ -10,6 +10,7 @@ from lib.subtitle_processor import (
     _remove_duplicate_lines,
     parse_subtitles
 )
+from pathlib import Path
 
 
 class TestCreateSsa(unittest.TestCase):
@@ -112,19 +113,10 @@ second
 
 
 class TestCreateVtt(unittest.TestCase):
-    def _subs_match(self, case: str) -> None:
+    def test_files(self) -> None:
         self.maxDiff = 1000
-        with open(f"tests/subs/{case}.srt") as fp:
-            srt_data = fp.read()
-        with open(f"tests/subs/{case}.vtt") as fp:
-            vtt_data = fp.read()
-        self.assertEqual(
-            create_vtt(parse_subtitles(srt_data))
-            , vtt_data
-        )
-
-    def test_intro_gap(self) -> None:
-        self._subs_match("intro_gap")
-
-    def test_verse_gap(self) -> None:
-        self._subs_match("verse_gap")
+        for case in Path("tests/subs").glob("*.srt"):
+            with self.subTest(case.stem):
+                srt_data = case.read_text()
+                vtt_data = case.with_suffix(".vtt").read_text()
+                self.assertEqual(vtt_data, create_vtt(parse_subtitles(srt_data)))

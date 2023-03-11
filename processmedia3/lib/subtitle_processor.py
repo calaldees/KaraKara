@@ -497,10 +497,54 @@ def create_vtt(subtitles):
     last_end = timedelta(0)
     padded_lines = []
     for line in subtitles:
-        if line.start - last_end > timedelta(seconds=5):
+        gap = line.start - last_end
+        # if there is a big gap, then insert an explicit blank
+        # subtitle entry, so that the end of verse 1 shows
+        #
+        #   active: final line of verse 1
+        #   next:
+        #
+        # and then shortly before verse 2 begins we show
+        #
+        #   active:
+        #   next: verse 2
+        if gap > timedelta(seconds=5):
             padded_lines.append(
                 Subtitle(
                     start=line.start - timedelta(seconds=5),
+                    end=line.start,
+                    text="",
+                    top=line.top,
+                )
+            )
+
+        # If there is a short gap between line 1 and 2, add a
+        # zero-length subtitle 1.1 showing the line 2's text, so
+        # that line 1 shows "next: line 2", and then insert a
+        # gap-length subtitle 1.2 with empty text so that during
+        # the gap we see "active: blank / next: line 2", ie the
+        # end result being:
+        #
+        #   active: line 1
+        #   next: line 2
+        # 
+        #   active:
+        #   next: line 2
+        #
+        #   active: line 2
+        #   next: line 3
+        elif gap > timedelta(seconds=0):
+            padded_lines.append(
+                Subtitle(
+                    start=line.start-gap,
+                    end=line.start-gap,
+                    text=line.text,
+                    top=line.top,
+                )
+            )
+            padded_lines.append(
+                Subtitle(
+                    start=line.start - gap,
                     end=line.start,
                     text="",
                     top=line.top,
@@ -510,16 +554,19 @@ def create_vtt(subtitles):
         last_end = line.end
     padded_lines.append(Subtitle(start=last_end, end=last_end, text=""))
 
-    return "WEBVTT - KaraKara Subtitle\n\n" + "".join(
-        VTT_FORMAT.format(
-            index=index + 1,
-            start=_vtt_time(subtitle1.start),
-            end=_vtt_time(subtitle1.end),
-            format=" line:1" if subtitle1.top else "",
-            active=subtitle1.text,
-            next=subtitle2.text,
-        )
-        for index, (subtitle1, subtitle2) in enumerate(
-            zip(padded_lines[:-1], padded_lines[1:])
-        )
-    )
+    # strip out all the zero-length subtitle blocks we inserted earlier
+    index = 0
+    blocks = []
+    for (subtitle1, subtitle2) in zip(padded_lines[:-1], padded_lines[1:]):
+        if(subtitle1.start != subtitle1.end):
+            index += 1
+            blocks.append(VTT_FORMAT.format(
+                index=index,
+                start=_vtt_time(subtitle1.start),
+                end=_vtt_time(subtitle1.end),
+                format=" line:1" if subtitle1.top else "",
+                active=subtitle1.text,
+                next=subtitle2.text,
+            ))
+
+    return "WEBVTT - KaraKara Subtitle\n\n" + "".join(blocks)
