@@ -75,6 +75,7 @@ BODY {
   MAIN:nth-child(1) {
     position: relative;
     flex: 0 0 50%;
+    max-width: 50%;
     border-right: 2px solid black;
     .main-only {
       display: none;
@@ -83,6 +84,7 @@ BODY {
   MAIN:nth-child(2) {
     position: relative;
     flex: 0 0 50%;
+    max-width: 50%;
     border-left: 2px solid black;
   }  
 }
