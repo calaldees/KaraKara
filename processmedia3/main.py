@@ -141,17 +141,22 @@ def lint(tracks: List[Track]) -> None:
         for s in track.sources:
             if s.type == SourceType.SUBTITLES:
                 ls = s.subtitles()
-                for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
-                    gap = l1.end - l2.start
-                    if l1.end == l2.start and (l1.text == l2.text == l3.text):
-                        writer.writerow([s.friendly, index+1, "no gap between 3+ repeats", 0, l1.text])
-                for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
-                    if l2.start > l1.end:
-                        gap = l2.start - l1.end
-                    else:
+                toplines = [l for l in ls if l.top]
+                botlines = [l for l in ls if not l.top]
+                for ls in [toplines, botlines]:
+                    for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
                         gap = l1.end - l2.start
-                    if gap < timedelta(microseconds=500000) and gap != timedelta(seconds=0) and not (l1.text == l2.text):
-                        writer.writerow([s.friendly, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                        if l1.end == l2.start and (l1.text == l2.text == l3.text):
+                            writer.writerow([s.friendly, index+1, "no gap between 3+ repeats", 0, l1.text])
+                    for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
+                        if l2.start > l1.end:
+                            gap = l2.start - l1.end
+                            if gap < timedelta(microseconds=500_000) and not (l1.text == l2.text):
+                                writer.writerow([s.friendly, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                        elif l2.start < l1.end:
+                            gap = l1.end - l2.start
+                            if gap < timedelta(microseconds=1_000_000):
+                                writer.writerow([s.friendly, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
 
 
 def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> None:
