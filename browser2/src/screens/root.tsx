@@ -28,7 +28,9 @@ export function Root(state: State): VNode {
         body = <PrintableList state={state} />;
     } else {
         let active_screen = null;
-        if (state.screen == "explore") {
+        // if we're in widescreen mode, the queue is always visible on the
+        // left, so don't also show the queue on the right
+        if (state.screen == "explore" || (state.screen == "queue" && state.widescreen)) {
             active_screen = <Explore state={state} />;
         } else if (state.screen == "queue") {
             active_screen = <QueueOrControl state={state} />;
