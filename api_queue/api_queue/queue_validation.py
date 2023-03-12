@@ -12,11 +12,11 @@ def default(queue: Queue):
 
     _start = queue.settings["validation_event_start_datetime"]
     if _start and queue.now < _start:
-        return f"event starts at {_start}"
+        return f"Event starts at {_start}"
 
     _end = queue.settings["validation_event_end_datetime"]
     if _end and queue.end_time > _end:
-        return f"Unable to queue track as the event is ending at {_end}"
+        return f"Queue is full all the way until {_end}"
 
     queue_last = queue.last
     if not queue_last:
@@ -39,7 +39,7 @@ def default(queue: Queue):
                 queue_item != queue_last
             )
         if tuple(filter(_filter, queue.items)):
-            return f"duplicated performer {queue_last.performer_name} within {_performer_timedelta}"
+            return f"Duplicated performer {queue_last.performer_name} within {_performer_timedelta}"
 
     _track_timedelta = queue.settings["validation_duplicate_track_timedelta"]
     if _track_timedelta:
@@ -53,4 +53,4 @@ def default(queue: Queue):
                 queue_item != queue_last
             )
         if tuple(filter(_filter, queue.items)):
-            return f"duplicated track {queue_last.performer_name} within {_track_timedelta}"
+            return f"Duplicated track {queue_last.performer_name} within {_track_timedelta}"

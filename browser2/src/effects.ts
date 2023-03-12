@@ -160,9 +160,11 @@ function apiRequestEffect(
                         loading: false,
                         notification: {
                             text:
-                                "Internal Error: " +
-                                (error.message ?? "unknown") +
-                                (error.context ? ": " + error.context : ""),
+                                error.message == "queue validation failed" ?
+                                    error.context :
+                                    ("Internal Error: " +
+                                        (error.message ?? "unknown") +
+                                        (error.context ? ": " + error.context : "")),
                             style: "error",
                         },
                     },
