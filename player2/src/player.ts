@@ -8,7 +8,12 @@ import {
 } from "@shish2k/hyperapp-localstorage";
 
 import { Root } from "./screens/root";
-import { getMQTTListener, KeyboardListener, BeLoggedIn, WakeLock } from "./subs";
+import {
+    getMQTTListener,
+    KeyboardListener,
+    BeLoggedIn,
+    WakeLock,
+} from "./subs";
 import { ApiRequest } from "./effects";
 import { current_and_future } from "./utils";
 
@@ -57,6 +62,9 @@ const state: State = {
 
     // playlist screen
     queue: [],
+
+    // podium
+    starting: false,
 };
 
 const init: Dispatchable = [
@@ -133,14 +141,18 @@ const subscriptions = (state: State): Array<Subscription | boolean> => [
         },
     }),
     WakeLock({
-        onChange(state: State, {held, status}: {held: boolean, status: string}): Dispatchable {
+        onChange(
+            state: State,
+            { held, status }: { held: boolean; status: string },
+        ): Dispatchable {
             return {
-                ...state, wake_lock: {
+                ...state,
+                wake_lock: {
                     held,
                     status,
-                }
+                },
             };
-        }
+        },
     }),
 ];
 

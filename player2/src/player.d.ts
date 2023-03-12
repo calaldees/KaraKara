@@ -70,6 +70,9 @@ type State = {
 
     // playlist screen
     queue: Array<QueueItem>;
+
+    // podium
+    starting: boolean;
 };
 
 // Our Action is like hyperapp's Action, except while theirs is generic,

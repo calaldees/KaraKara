@@ -3,6 +3,7 @@
     "repository": "https://github.com/calaldees/KaraKara/",
     "license": "GPL-3.0-only",
     "dependencies": {
+        "@hyperapp/time": "^1.0.0",
         "@shish2k/hyperapp-hash-state": "^2.0.11",
         "@shish2k/hyperapp-localstorage": "^1.0.2",
         "@shish2k/hyperapp-mqtt": "^1.1.7",
