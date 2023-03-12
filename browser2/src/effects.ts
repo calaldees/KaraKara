@@ -161,7 +161,8 @@ function apiRequestEffect(
                         notification: {
                             text:
                                 "Internal Error: " +
-                                (error.message ?? "unknown"),
+                                (error.message ?? "unknown") +
+                                (error.context ? ": " + error.context : ""),
                             style: "error",
                         },
                     },
