@@ -73,6 +73,7 @@ type State = {
 
     // podium
     starting: boolean;
+    blank_podium: boolean;
 };
 
 // Our Action is like hyperapp's Action, except while theirs is generic,

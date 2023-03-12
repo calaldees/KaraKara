@@ -65,6 +65,7 @@ const state: State = {
 
     // podium
     starting: false,
+    blank_podium: false,
 };
 
 const init: Dispatchable = [
@@ -122,7 +123,7 @@ const subscriptions = (state: State): Array<Subscription | boolean> => [
     HashStateManager(
         {
             push: ["root", "room_name"],
-            replace: ["podium", "room_name_edit"],
+            replace: ["podium", "room_name_edit", "blank_podium"],
         },
         state,
     ),

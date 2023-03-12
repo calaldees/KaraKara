@@ -90,6 +90,22 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             />
                         </td>
                     </tr>
+                    <tr>
+                        <td>Blank Podium</td>
+                        <td>
+                            <input
+                                checked={state.blank_podium}
+                                type={"checkbox"}
+                                onchange={(
+                                    state: State,
+                                    event: FormInputEvent,
+                                ): State => ({
+                                    ...state,
+                                    blank_podium: !state.blank_podium,
+                                })}
+                            />
+                        </td>
+                    </tr>
                     {document.body.requestFullscreen && (
                         <tr>
                             <td>Fullscreen</td>

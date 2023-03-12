@@ -99,27 +99,36 @@ export const PodiumScreen = ({
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>
 
-        <video
-            muted={true}
-            key={
-                queue_item.id +
-                "-" +
-                (queue_item.start_time && queue_item.start_time < state.now)
-            }
-            autoPlay={true}
-            crossorigin="anonymous"
-        >
-            <source src={blank} />
-            {track.attachments.subtitle?.map((a) => (
-                <track
-                    kind="subtitles"
-                    src={attachment_path(state.root, a)}
-                    default={true}
-                    label="English"
-                    srclang="en"
-                />
-            ))}
-        </video>
+        {state.blank_podium ?
+            <video
+                muted={true}
+                key={
+                    queue_item.id +
+                    "-" +
+                    (queue_item.start_time && queue_item.start_time < state.now)
+                }
+                autoPlay={true}
+                crossorigin="anonymous"
+            >
+                <source src={blank} />
+                {track.attachments.subtitle?.map((a) => (
+                    <track
+                        kind="subtitles"
+                        src={attachment_path(state.root, a)}
+                        default={true}
+                        label="English"
+                        srclang="en"
+                    />
+                ))}
+            </video>
+            :
+            <Video
+                state={state}
+                track={track}
+                lowres={true}
+                loop={true}
+            />
+        }
 
         {state.starting ? (
             <StartingBar />
