@@ -257,15 +257,16 @@ async def add_queue_item(request, room_name):
             )
             queue.add(queue_item)
             # Validate queue state - validation functions are configurable per queue
-            for validation_scheme in queue.settings.get("validation", []):
-                validation_error = getattr(queue_validation, validation_scheme)(queue)
-                if validation_error:
-                    log.info(f"add failed validation {validation_error=}")
-                    # NOTE: the client has special behaviour for the specific
-                    # hard-coded string "queue validation failed". In the long
-                    # term we should add a more structured error format, but
-                    # for now, we require this exact string.
-                    raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
+            if not request.ctx.user.is_admin:
+                for validation_scheme in queue.settings.get("validation", []):
+                    validation_error = getattr(queue_validation, validation_scheme)(queue)
+                    if validation_error:
+                        log.info(f"add failed validation {validation_error=}")
+                        # NOTE: the client has special behaviour for the specific
+                        # hard-coded string "queue validation failed". In the long
+                        # term we should add a more structured error format, but
+                        # for now, we require this exact string.
+                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
             return sanic.response.json(queue_item.asdict())
 
 
