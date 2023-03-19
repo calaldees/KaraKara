@@ -53,8 +53,8 @@ export function getMQTTListener(state: State): Subscription | boolean {
                 case "queue":
                     return {
                         ...state,
-                        queue: JSON.parse(data).filter((track) =>
-                            state.track_list.hasOwnProperty(track.track_id),
+                        queue: JSON.parse(data).filter((queue_item: QueueItem) =>
+                            state.track_list.hasOwnProperty(queue_item.track_id),
                         ),
                     };
                 default:
@@ -68,7 +68,7 @@ function _resizeSubscriber(
     dispatch: Dispatch,
     props: { onresize: Dispatchable },
 ): Unsubscribe {
-    function handler(event) {
+    function handler(event: UIEvent) {
         dispatch(props.onresize, event);
     }
     window.addEventListener("resize", handler);

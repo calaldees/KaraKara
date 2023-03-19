@@ -1,3 +1,4 @@
+declare module 'hyperapp-jsx-pragma';
 declare module "*.jpg";
 declare module "*.svg";
 

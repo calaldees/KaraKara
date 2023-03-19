@@ -11,7 +11,7 @@ function _get_article() {
     return articles[articles.length - 1];
 }
 export function PushScrollPos(): Effect {
-    function saveScrollPos(dispatch, props) {
+    function saveScrollPos(dispatch: Dispatch, props: {}) {
         // note the scroll pos while on the original page
         var pos = _get_article().scrollTop;
         // not immediately (give the new page a chance to generate the DOM),
@@ -29,7 +29,7 @@ export function PushScrollPos(): Effect {
     return [saveScrollPos, {}];
 }
 export function PopScrollPos(): Effect {
-    function restoreScrollPos(dispatch, props) {
+    function restoreScrollPos(dispatch: Dispatch, props: {}) {
         // after the new page has loaded, scroll it
         requestAnimationFrame(() =>
             dispatch(function (state: State): State {
@@ -43,7 +43,7 @@ export function PopScrollPos(): Effect {
     return [restoreScrollPos, {}];
 }
 export function ClearScrollPos(): Effect {
-    function clearScrollPos(dispatch, props) {
+    function clearScrollPos(dispatch: Dispatch, props: {}) {
         dispatch(function (state: State): State {
             return {
                 ...state,
@@ -135,7 +135,7 @@ function apiRequestEffect(
                     },
                     Delay({
                         wait: 2000,
-                        action: (state) => ({
+                        action: (state: State) => ({
                             ...state,
                             notification: null,
                         }),

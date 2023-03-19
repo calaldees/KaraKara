@@ -73,7 +73,7 @@ describe('suggest_next_filters', () => {
 
 describe('group_tracks', () => {
     describe('with no tracks', () => {
-        let tracks = [];
+        let tracks: Track[] = [];
 
         test("show 'No Results'", () => {
             let results = grouper.group_tracks([], tracks);

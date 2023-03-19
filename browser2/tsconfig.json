@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "lib": ["es2017", "dom"],
     "sourceMap": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "module": "es2022",
     "moduleResolution": "node",
     "target": "es6",

@@ -10,7 +10,7 @@ const PrintButtons = (): VNode => (
     <footer>
         <div class={"buttons"}>
             <button
-                onclick={function (state) {
+                onclick={function (state: State) {
                     window.print();
                     return state;
                 }}
