@@ -126,6 +126,11 @@ type State = {
     priority_tokens: Array<PriorityToken>;
 };
 
+declare type SVGProps<T> = {
+    [Key: string]: any;
+    elemment?: T;
+}
+
 // Our Action is like hyperapp's Action, except while theirs is generic,
 // ours specifically acts upon our State object.
 declare type Action = import("hyperapp").Action<State>;
