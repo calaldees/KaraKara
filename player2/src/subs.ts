@@ -44,7 +44,7 @@ export function getMQTTListener(state: State): Subscription | boolean {
                         },
                     };
                 case "queue":
-                    const new_queue = JSON.parse(data).filter((queue_item) =>
+                    const new_queue = JSON.parse(data).filter((queue_item: QueueItem) =>
                         state.track_list.hasOwnProperty(queue_item.track_id),
                     );
                     return { ...state, queue: new_queue };
@@ -138,9 +138,13 @@ export function BeLoggedIn(
     return [_bleSubscriber, { room_name, room_password }];
 }
 
-let wakeLock = null;
-function _wakeLock(dispatch: Dispatch, props: any): Unsubscribe {
-    function upd(held, status) {
+type WakeLock = {
+    released: boolean,
+    release: () => Promise<boolean>,
+};
+let wakeLock: WakeLock|null = null;
+function _wakeLock(dispatch: Dispatch, props: {onChange: any}): Unsubscribe {
+    function upd(held: boolean, status: string) {
         dispatch(props.onChange, { held, status });
     }
     if (!("wakeLock" in navigator)) {
@@ -151,13 +155,13 @@ function _wakeLock(dispatch: Dispatch, props: any): Unsubscribe {
     }
 
     function requestWakeLock() {
-        navigator.wakeLock
+        (navigator as any).wakeLock
             .request("screen")
-            .then((lock) => {
+            .then((lock: WakeLock) => {
                 wakeLock = lock;
                 upd(!lock.released, "got: " + !lock.released);
             })
-            .catch((err) => {
+            .catch((err: Error) => {
                 upd(false, `${err.name}, ${err.message}`);
             });
     }
@@ -182,6 +186,6 @@ function _wakeLock(dispatch: Dispatch, props: any): Unsubscribe {
         );
     };
 }
-export function WakeLock(props): Subscription {
+export function WakeLock(props: {onChange: any}): Subscription {
     return [_wakeLock, props];
 }

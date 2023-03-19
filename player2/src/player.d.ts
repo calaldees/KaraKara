@@ -1,3 +1,7 @@
+declare module 'hyperapp-jsx-pragma';
+declare module 'hyperapp-fx';
+declare module '@hyperapp/time';
+
 interface Dictionary<T> {
     [Key: string]: T;
 }
@@ -19,6 +23,7 @@ type Track = {
         from?: Array<string>;
         artist?: Array<string>;
         vocaltrack?: Array<string>;
+        contributor?: Array<string>;
     };
     attachments: {
         video: Array<Attachment>;

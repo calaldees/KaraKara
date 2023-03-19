@@ -82,7 +82,7 @@ function apiRequestEffect(
                     },
                     Delay({
                         wait: 2000,
-                        action: (state) => ({
+                        action: (state: State) => ({
                             ...state,
                             notification: null,
                         }),
