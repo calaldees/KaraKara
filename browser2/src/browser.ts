@@ -11,6 +11,14 @@ import { Root } from "./screens/root";
 import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
 import { ApiRequest } from "./effects";
 
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            [elemName: string]: any;
+        }
+    }
+}
+
 // If we're running stand-alone, then use the main karakara.uk
 // server; else we're probably running as part of the full-stack,
 // in which case we should use server we were loaded from.
