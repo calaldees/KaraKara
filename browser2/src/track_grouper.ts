@@ -25,7 +25,7 @@ export function suggest_next_filters(
 
     // if we have an explicit map for "you searched for 'anime',
     // now search by series name", then show that
-    const search_configs = {
+    const search_configs: Record<string, string[]> = {
         "category:anime": ["from"],
         "category:cartoon": ["from"],
         "category:game": ["from"],
@@ -195,7 +195,7 @@ export function group_tracks(
             // If a tag has a lot of children (eg artist=...) then show
             // children grouped alphabetically
             if (tag_children.length > 50) {
-                let grouped_groups = {};
+                let grouped_groups: Record<string, Record<string, number>> = {};
                 tag_children.forEach(function (tag_child) {
                     // Group by first alphabetic character
                     var initial = normalise_name(tag_child)[0];
