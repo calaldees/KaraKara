@@ -9,10 +9,10 @@ import { Video } from "./_common";
 import { SendCommand } from "../effects";
 import { delay } from "@hyperapp/time";
 
-const StartAction = (state) => [
+const StartAction = (state: State) => [
     { ...state, starting: true },
     SendCommand(state, "play"),
-    delay(2000, (state) => ({ ...state, starting: false })),
+    delay(2000, (state: State) => ({ ...state, starting: false })),
 ];
 
 ///////////////////////////////////////////////////////////////////////

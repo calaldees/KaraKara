@@ -153,7 +153,7 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             />
                         </td>
                     </tr>
-                    {navigator.wakeLock && (
+                    {("wakeLock" in navigator) && (
                         <tr>
                             <td>WakeLock</td>
                             <td>

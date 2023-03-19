@@ -7,7 +7,7 @@ const show_tracks = 5;
 ///////////////////////////////////////////////////////////////////////
 // Actions
 
-function SetPreviewVolume(state: State, event): Dispatchable {
+function SetPreviewVolume(state: State, event: any): Dispatchable {
     event.target.volume = state.settings["preview_volume"];
     return state;
 }
