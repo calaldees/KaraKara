@@ -30,7 +30,9 @@ def test_queue_time_moves_forwards(qu):
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
 
     # Playing state when moving time forward
-    qu.play()
+    qu.play()  # play queues a track to start in 1s
+    assert qu.playing == None
+    qu._now += datetime.timedelta(seconds=1)
     assert qu.playing.track_id == 'Track1'
     qu._now += datetime.timedelta(seconds=30)
     assert qu.playing.track_id == 'Track1'
@@ -46,7 +48,7 @@ def test_queue_time_moves_forwards(qu):
 def test_queue_past_future(qu):
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
-    qu.play()
+    qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=150)
 
     # Past tracks
@@ -63,7 +65,7 @@ def test_queue_past_future(qu):
 def test_queue_append(qu):
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
-    qu.play()
+    qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=150)
     # Adding + Deleting + Future + current tracks work after played past tracks
     qu.add(QueueItem('Track3', 60, 'TestSession3', 'test_name'))
@@ -80,7 +82,7 @@ def test_queue_append_while_playing_populates_start_time(qu):
     qu._now += datetime.timedelta(seconds=30)
     assert not qu.playing
     assert qu.current.track_id == 'Track4'
-    qu.play()
+    qu.play(immediate=True)
     assert qu.playing.track_id == 'Track4'
     qu._now += datetime.timedelta(seconds=30)
     assert qu.playing.track_id == 'Track4'
@@ -98,7 +100,7 @@ def test_queue_stop(qu):
     assert not qu.playing
     qu._now += datetime.timedelta(seconds=60)
     assert not qu.playing
-    qu.play()
+    qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=30)
     assert qu.playing.track_id == 'Track6'
     qu.stop()
@@ -109,7 +111,7 @@ def test_queue_stop(qu):
     qu._now += datetime.timedelta(seconds=60)
     assert not qu.playing
     assert [i.track_id for i in qu.future] == ['Track6', 'Track7']
-    qu.play()
+    qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=30)
     assert qu.playing.track_id == 'Track6'
     qu._now += datetime.timedelta(seconds=60)
@@ -120,7 +122,7 @@ def test_queue_stop(qu):
 def test_queue_end_time(qu: Queue):
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
-    qu.play()
+    qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=150)
     last = qu.last
     assert qu.end_time == last.end_time
@@ -131,7 +133,7 @@ def test_queue_end_time(qu: Queue):
 def test_queue_seek_forwards(qu: Queue):
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
-    qu.play()
+    qu.play(immediate=True)
     assert qu.items[0].start_time == qu._now
     assert qu.items[1].start_time == qu._now + datetime.timedelta(seconds=60) + qu.track_space
     # Seeking to the middle of a track moves everything by the exact amount
@@ -152,7 +154,7 @@ def test_queue_seek_forwards(qu: Queue):
 def test_queue_seek_backwards(qu: Queue):
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name'))
-    qu.play()
+    qu.play(immediate=True)
     # Starting from the middle of space between tracks
     qu._now += datetime.timedelta(seconds=60) + qu.track_space/2
     assert qu.items[0].start_time == qu._now - datetime.timedelta(seconds=60) - qu.track_space/2
@@ -203,7 +205,7 @@ def test_queue_move(qu):
     qu.move(t3.id, -1)
     assert qu.items == [t4,t1,t2,t3]
 
-    qu.play()
+    qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=60 * 5)
     with pytest.raises(AssertionError) as exc_info:
         qu.move(t4.id, t3.id)

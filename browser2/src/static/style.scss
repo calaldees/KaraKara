@@ -38,6 +38,23 @@ BUTTON svg, SPAN svg {
   position: relative;
 }
 
+/* subtitle wibbling */
+::cue(v[voice='active']) {
+  color: yellow;
+}
+::cue(v[voice='next']) {
+  color: white;
+}
+::cue {
+	// font-family: metalghosts, sans-serif;
+	text-shadow:
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+  font-size: 1.5em;
+}
+
 /* Overall Layout */
 * {box-sizing: border-box;}
 BODY {
@@ -58,6 +75,7 @@ BODY {
   MAIN:nth-child(1) {
     position: relative;
     flex: 0 0 50%;
+    max-width: 50%;
     border-right: 2px solid black;
     .main-only {
       display: none;
@@ -66,6 +84,7 @@ BODY {
   MAIN:nth-child(2) {
     position: relative;
     flex: 0 0 50%;
+    max-width: 50%;
     border-left: 2px solid black;
   }  
 }

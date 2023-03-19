@@ -105,6 +105,21 @@ describe('apply_hidden', () => {
     });
 });
 
+describe('text_to_filters', () => {
+    test('leaves normal things alone', () => {
+        expect(finder.text_to_filters(["foo:bar"], "baz"))
+            .toEqual([["foo:bar"], "baz"]);
+    });
+    test('handles empty', () => {
+        expect(finder.text_to_filters([], ""))
+            .toEqual([[], ""]);
+    });
+    test('turns tag-search into filter', () => {
+        expect(finder.text_to_filters([], "foo:bar"))
+            .toEqual([["foo:bar"], ""]);
+    });
+});
+
 // find_tracks = apply_hidden + apply_tags(forced) + apply_tags(user) + apply_search
 // I want one function which does it all for performance testing
 describe('find_tracks', () => {

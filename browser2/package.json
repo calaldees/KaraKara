@@ -1,5 +1,7 @@
 {
     "name": "browser2",
+    "repository": "https://github.com/calaldees/KaraKara/",
+    "license": "GPL-3.0-only",
     "dependencies": {
         "@shish2k/hyperapp-hash-state": "^2.0.11",
         "@shish2k/hyperapp-localstorage": "^1.0.2",
@@ -14,11 +16,9 @@
         "build": "parcel build --public-url . src/index.html",
         "watch": "parcel watch --public-url . src/index.html",
         "serve": "parcel serve --port 1234 src/index.html",
-        "format": "prettier --write 'src/**/*.tsx' --tab-width 4 --trailing-comma all",
+        "format": "prettier --write 'src/**/*.ts{,x}' --tab-width 4 --trailing-comma all",
         "test": "jest --verbose"
     },
-    "repository": "https://github.com/calaldees/KaraKara/",
-    "license": "GPL-3.0-only",
     "devDependencies": {
         "@parcel/optimizer-data-url": "^2.8.0",
         "@parcel/packager-raw-url": "^2.8.0",
@@ -56,5 +56,12 @@
             ],
             "genFavicons": true
         }
+    },
+    "svgr": {
+        "jsxRuntimeImport": {
+            "source": "hyperapp-jsx-pragma",
+            "defaultSpecifier": "h"
+        },
+        "icon": true
     }
 }

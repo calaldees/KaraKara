@@ -1,8 +1,8 @@
 from datetime import datetime
-import random
 import contextlib
 from textwrap import dedent
 from pathlib import Path
+import uuid
 
 import ujson as json
 import sanic
@@ -91,7 +91,7 @@ app.error_handler = CustomErrorHandler()
 from .queue_manager import LoginManager, User
 @app.middleware("request")
 async def attach_session_id_request(request):
-    request.ctx.session_id = request.cookies.get("session_id") or str(random.random())
+    request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
     request.ctx.user = LoginManager.from_session(request.ctx.session_id)
 @app.middleware("response")
 async def attach_session_id(request, response):
@@ -167,7 +167,7 @@ async def login(request, room_name):
     if user.is_admin:
         request.ctx.session_id = "admin"
     else:
-        request.ctx.session_id = str(random.random())
+        request.ctx.session_id = str(uuid.uuid4())
     return sanic.response.json(user.__dict__)
 
 
@@ -257,11 +257,16 @@ async def add_queue_item(request, room_name):
             )
             queue.add(queue_item)
             # Validate queue state - validation functions are configurable per queue
-            for validation_scheme in queue.settings.get("validation", []):
-                validation_error = getattr(queue_validation, validation_scheme)(queue)
-                if validation_error:
-                    log.info(f"add failed validation {validation_error=}")
-                    raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
+            if not request.ctx.user.is_admin:
+                for validation_scheme in queue.settings.get("validation", []):
+                    validation_error = getattr(queue_validation, validation_scheme)(queue)
+                    if validation_error:
+                        log.info(f"add failed validation {validation_error=}")
+                        # NOTE: the client has special behaviour for the specific
+                        # hard-coded string "queue validation failed". In the long
+                        # term we should add a more structured error format, but
+                        # for now, we require this exact string.
+                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
             return sanic.response.json(queue_item.asdict())
 
 

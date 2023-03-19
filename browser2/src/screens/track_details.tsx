@@ -153,9 +153,13 @@ export const TrackDetails = ({
             )}
             durationHint={track.duration}
             controls={true}
+            crossorigin="anonymous"
         >
             {track.attachments.preview.map((a) => (
                 <source src={attachment_path(state.root, a)} type={a.mime} />
+            ))}
+            {track.attachments.subtitle?.map((a) => (
+                <track src={attachment_path(state.root, a)} default={true} />
             ))}
         </video>
 

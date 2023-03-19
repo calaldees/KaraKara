@@ -90,6 +90,22 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                             />
                         </td>
                     </tr>
+                    <tr>
+                        <td>Blank Podium</td>
+                        <td>
+                            <input
+                                checked={state.blank_podium}
+                                type={"checkbox"}
+                                onchange={(
+                                    state: State,
+                                    event: FormInputEvent,
+                                ): State => ({
+                                    ...state,
+                                    blank_podium: !state.blank_podium,
+                                })}
+                            />
+                        </td>
+                    </tr>
                     {document.body.requestFullscreen && (
                         <tr>
                             <td>Fullscreen</td>
@@ -116,13 +132,38 @@ export const SettingsMenu = ({ state }: { state: State }): VNode => (
                         </tr>
                     )}
                     <tr>
-                        <td style={{
-                            background: [
-                                "red", "green", "yellow", "purple", "orange", "blue"
-                            ][Math.round(state.now) % 6]
-                        }}>Sync</td>
-                        <td><input disabled={true} value={Date.now() / 1000 - state.now} /></td>
+                        <td
+                            style={{
+                                background: [
+                                    "red",
+                                    "green",
+                                    "yellow",
+                                    "purple",
+                                    "orange",
+                                    "blue",
+                                ][Math.round(state.now) % 6],
+                            }}
+                        >
+                            Sync
+                        </td>
+                        <td>
+                            <input
+                                disabled={true}
+                                value={Date.now() / 1000 - state.now}
+                            />
+                        </td>
                     </tr>
+                    {("wakeLock" in navigator) && (
+                        <tr>
+                            <td>WakeLock</td>
+                            <td>
+                                <input
+                                    disabled={true}
+                                    value={state.wake_lock.status}
+                                />
+                            </td>
+                        </tr>
+                    )}
                     <tr>
                         <td colspan={2}>
                             <button>Close</button>

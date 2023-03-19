@@ -3,11 +3,8 @@
 import re
 from datetime import timedelta
 from itertools import zip_longest, tee, chain
-from sqlite3 import Timestamp
 from typing import NamedTuple, List
-
 import logging
-from typing import NamedTuple
 
 log = logging.getLogger(__name__)
 
@@ -15,13 +12,6 @@ log = logging.getLogger(__name__)
 SSA_NEWLINE = "\\N"
 SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 SSA_HEIGHT_TO_FONT_SIZE_RATIO = 14
-
-SRT_FORMAT = """\
-{index}
-{start} --> {end}
-{text}
-
-"""
 
 re_time = re.compile(
     r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)"
@@ -50,12 +40,6 @@ class TextOverlap(NamedTuple):
 def commonOverlap(text1: str, text2: str) -> TextOverlap:
     """
     https://neil.fraser.name/news/2010/11/04/
-
-    >>> commonOverlap('Fire at Will', 'William Riker is number one')
-    TextOverlap(idx=4, text='Will')
-    >>> commonOverlap('Have some CoCo and CoCo', 'CoCo and CoCo is here.')
-    TextOverlap(idx=13, text='CoCo and CoCo')
-
     """
     index = min(len(text1), len(text2))
     while index > 0:
@@ -330,37 +314,6 @@ def create_ssa(
     margin_v_size_multiplyer=1,
     font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO,
 ):
-    r"""
-    >>> ssa = create_ssa((
-    ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'first'),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3,microseconds=510000), 'second'),
-    ... ))
-    >>> print(ssa)
-    [Script Info]
-    Title: <untitled>
-    Original Script: <unknown>
-    ScriptType: v4.00
-    <BLANKLINE>
-    [V4 Styles]
-    Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
-    Style: Default,Arial,14,65535,16777215,16777215,0,-1,0,3,1,1,2,14,14,14,0,128
-    <BLANKLINE>
-    [Events]
-    Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-    Dialogue: Marked=0,0:00:00.00,0:01:00.00,*Default,NTP,0000,0000,0000,!Effect,first\N{\c&HFFFFFF&}second
-    Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,second
-    <BLANKLINE>
-
-    >>> _remove_duplicate_lines(_parse_ssa(ssa))
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=60), text='first', top=False), Subtitle(start=datetime.timedelta(seconds=120), end=datetime.timedelta(seconds=180, microseconds=510000), text='second', top=False)]
-
-    >>> ssa = create_ssa((
-    ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'newline\ntest'),
-    ... ))
-    >>> 'newline\\Ntest' in ssa
-    True
-
-    """
     if not font_size and height:
         font_size = height / font_ratio
     if not font_size:
@@ -510,26 +463,12 @@ def create_ssa(
 
 
 def create_srt(subtitles):
-    """
-    >>> srt = create_srt((
-    ...     Subtitle(timedelta(minutes=0), timedelta(minutes=1), 'first'),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, microseconds=510000), 'second'),
-    ...     Subtitle(timedelta(minutes=4), timedelta(minutes=5), ''),
-    ... ))
-    >>> print(srt)
-    1
-    00:00:00,000 --> 00:01:00,000
-    first
-    <BLANKLINE>
-    2
-    00:02:00,000 --> 00:03:00,510
-    second
-    <BLANKLINE>
-    <BLANKLINE>
+    SRT_FORMAT = """\
+{index}
+{start} --> {end}
+{text}
 
-    >>> _parse_srt(srt)
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=60), text='first', top=False), Subtitle(start=datetime.timedelta(seconds=120), end=datetime.timedelta(seconds=180, microseconds=510000), text='second', top=False)]
-    """
+"""
     return "".join(
         SRT_FORMAT.format(
             index=index + 1,
@@ -547,77 +486,6 @@ def create_vtt(subtitles):
     https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
     https://w3c.github.io/webvtt/
     https://caniuse.com/?search=vtt
-
-    >>> vtt = create_vtt(tuple())
-    >>> print(vtt)
-    WEBVTT - KaraKara Subtitle
-    <BLANKLINE>
-    <BLANKLINE>
-
-    >>> vtt = create_vtt((
-    ...     Subtitle(timedelta(minutes=1), timedelta(minutes=2), 'first'),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, milliseconds=510), 'second'),
-    ... ))
-    >>> print(vtt)
-    WEBVTT - KaraKara Subtitle
-    <BLANKLINE>
-    1
-    00:00:55.000 --> 00:01:00.000
-    <v active>
-    <v next>first
-    <BLANKLINE>
-    2
-    00:01:00.000 --> 00:02:00.000
-    <v active>first
-    <v next>second
-    <BLANKLINE>
-    3
-    00:02:00.000 --> 00:03:00.510
-    <v active>second
-    <v next>
-    <BLANKLINE>
-    <BLANKLINE>
-
-    >>> vtt = create_vtt((
-    ...     Subtitle(timedelta(minutes=1), timedelta(minutes=2), 'first', top=True),
-    ...     Subtitle(timedelta(minutes=2), timedelta(minutes=3, microseconds=510000), 'second', top=True),
-    ...     Subtitle(timedelta(minutes=4), timedelta(minutes=5), 'third', top=True),
-    ...     Subtitle(timedelta(minutes=5), timedelta(minutes=6, microseconds=510000), 'fourth', top=True),
-    ... ))
-    >>> print(vtt)
-    WEBVTT - KaraKara Subtitle
-    <BLANKLINE>
-    1
-    00:00:55.000 --> 00:01:00.000 line:1
-    <v active>
-    <v next>first
-    <BLANKLINE>
-    2
-    00:01:00.000 --> 00:02:00.000 line:1
-    <v active>first
-    <v next>second
-    <BLANKLINE>
-    3
-    00:02:00.000 --> 00:03:00.510 line:1
-    <v active>second
-    <v next>
-    <BLANKLINE>
-    4
-    00:03:55.000 --> 00:04:00.000 line:1
-    <v active>
-    <v next>third
-    <BLANKLINE>
-    5
-    00:04:00.000 --> 00:05:00.000 line:1
-    <v active>third
-    <v next>fourth
-    <BLANKLINE>
-    6
-    00:05:00.000 --> 00:06:00.510 line:1
-    <v active>fourth
-    <v next>
-    <BLANKLINE>
-    <BLANKLINE>
     """
     VTT_FORMAT = """\
 {index}
@@ -629,10 +497,54 @@ def create_vtt(subtitles):
     last_end = timedelta(0)
     padded_lines = []
     for line in subtitles:
-        if line.start - last_end > timedelta(seconds=5):
+        gap = line.start - last_end
+        # if there is a big gap, then insert an explicit blank
+        # subtitle entry, so that the end of verse 1 shows
+        #
+        #   active: final line of verse 1
+        #   next:
+        #
+        # and then shortly before verse 2 begins we show
+        #
+        #   active:
+        #   next: verse 2
+        if gap > timedelta(seconds=5):
             padded_lines.append(
                 Subtitle(
                     start=line.start - timedelta(seconds=5),
+                    end=line.start,
+                    text="",
+                    top=line.top,
+                )
+            )
+
+        # If there is a short gap between line 1 and 2, add a
+        # zero-length subtitle 1.1 showing the line 2's text, so
+        # that line 1 shows "next: line 2", and then insert a
+        # gap-length subtitle 1.2 with empty text so that during
+        # the gap we see "active: blank / next: line 2", ie the
+        # end result being:
+        #
+        #   active: line 1
+        #   next: line 2
+        # 
+        #   active:
+        #   next: line 2
+        #
+        #   active: line 2
+        #   next: line 3
+        elif gap > timedelta(seconds=0):
+            padded_lines.append(
+                Subtitle(
+                    start=line.start-gap,
+                    end=line.start-gap,
+                    text=line.text,
+                    top=line.top,
+                )
+            )
+            padded_lines.append(
+                Subtitle(
+                    start=line.start - gap,
                     end=line.start,
                     text="",
                     top=line.top,
@@ -642,16 +554,19 @@ def create_vtt(subtitles):
         last_end = line.end
     padded_lines.append(Subtitle(start=last_end, end=last_end, text=""))
 
-    return "WEBVTT - KaraKara Subtitle\n\n" + "".join(
-        VTT_FORMAT.format(
-            index=index + 1,
-            start=_vtt_time(subtitle1.start),
-            end=_vtt_time(subtitle1.end),
-            format=" line:1" if subtitle1.top else "",
-            active=subtitle1.text,
-            next=subtitle2.text,
-        )
-        for index, (subtitle1, subtitle2) in enumerate(
-            zip(padded_lines[:-1], padded_lines[1:])
-        )
-    )
+    # strip out all the zero-length subtitle blocks we inserted earlier
+    index = 0
+    blocks = []
+    for (subtitle1, subtitle2) in zip(padded_lines[:-1], padded_lines[1:]):
+        if(subtitle1.start != subtitle1.end):
+            index += 1
+            blocks.append(VTT_FORMAT.format(
+                index=index,
+                start=_vtt_time(subtitle1.start),
+                end=_vtt_time(subtitle1.end),
+                format=" line:1" if subtitle1.top else "",
+                active=subtitle1.text,
+                next=subtitle2.text,
+            ))
+
+    return "WEBVTT - KaraKara Subtitle\n\n" + "".join(blocks)

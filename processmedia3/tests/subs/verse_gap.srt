@@ -1,0 +1,16 @@
+1
+00:00:00,000 --> 00:00:10,000
+If there is a long gap in between two verses, we should show
+
+2
+00:00:10,000 --> 00:00:20,000
+the "coming next" line 5 seconds before the second verse starts
+
+3
+00:01:00,000 --> 00:01:10,000
+Verse 2 line 1
+
+4
+00:01:10,000 --> 00:01:20,000
+Verse 2 line 2
+

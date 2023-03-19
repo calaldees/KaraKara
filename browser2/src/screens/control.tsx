@@ -224,7 +224,10 @@ const ControlButton = ({
 const ControlButtons = (): VNode => (
     <footer>
         <div class={"buttons"}>
-            <ControlButton command={"seek_backwards"} icon={<icons.Backward />} />
+            <ControlButton
+                command={"seek_backwards"}
+                icon={<icons.Backward />}
+            />
             <ControlButton command={"seek_forwards"} icon={<icons.Forward />} />
             <ControlButton command={"play"} icon={<icons.Play />} />
             <ControlButton command={"stop"} icon={<icons.Stop />} />
@@ -247,10 +250,6 @@ export const Control = ({ state }: { state: State }): VNode => (
                 <h1>READ ME :)</h1>
                 <ol>
                     <li>
-                        Please use hand sanitiser, a lot of different people are
-                        going to use this laptop and the microphones :)
-                    </li>
-                    <li>
                         To avoid feedback loops, don't hold the microphone
                         directly in front of the speaker!
                     </li>
@@ -264,8 +263,8 @@ export const Control = ({ state }: { state: State }): VNode => (
                         the right to queue up tracks.
                     </li>
                     <li>
-                        Push the play button (<icons.Play />) down
-                        below when you're ready to start singing.
+                        Push the play button (<icons.Play />) down below when
+                        you're ready to start singing.
                     </li>
                 </ol>
             </div>

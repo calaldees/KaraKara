@@ -36,7 +36,7 @@ let state: State = {
     booth: false,
     widescreen: isWidescreen(),
     scroll_stack: [],
-    now: Date.now()/1000,
+    now: Date.now() / 1000,
 
     // login
     session_id: null,
@@ -68,15 +68,15 @@ let state: State = {
 
     // settings
     settings: {
-        "track_space": 15.0,
-        "forced_tags": [],
-        "hidden_tags": ["red:duplicate"],
-        "title": "KaraKara",
-        "preview_volume": 0.2,
-        "validation_event_start_datetime": undefined,
-        "validation_event_end_datetime": undefined,
-        "validation_performer_names": [],
-        "coming_soon_track_count": 10,
+        track_space: 15.0,
+        forced_tags: [],
+        hidden_tags: ["red:duplicate"],
+        title: "KaraKara",
+        preview_volume: 0.2,
+        validation_event_start_datetime: undefined,
+        validation_event_end_datetime: undefined,
+        validation_performer_names: [],
+        coming_soon_track_count: 10,
     },
     settings_edit: {},
 
@@ -102,7 +102,7 @@ const init: Dispatchable = [
     ApiRequest({
         url: `${state.root}/files/tracks.json`,
         options: {
-            credentials: 'omit',
+            credentials: "omit",
         },
         state: state,
         progress: (state, { done, size }) => [
@@ -123,11 +123,11 @@ const init: Dispatchable = [
     }),
 ];
 
-const subscriptions = (state: State): Array<Subscription|boolean> => [
+const subscriptions = (state: State): Array<Subscription | boolean> => [
     HashStateManager(
         {
             push: ["root", "filters", "track_id", "room_name"],
-            replace: ["search", "booth", "widescreen", "room_name_edit"],
+            replace: ["search", "booth", "room_name_edit"],
         },
         state,
     ),
@@ -143,10 +143,10 @@ const subscriptions = (state: State): Array<Subscription|boolean> => [
     SyncedInterval({
         server: state.root + "/time.json",
         interval: 1000,
-        sync: 5*60*1000,
+        sync: 5 * 60 * 1000,
         onInterval(state: State, timestamp_ms: number): Dispatchable {
             (window as any).state = state;
-            return { ...state, now: timestamp_ms/1000 };
+            return { ...state, now: timestamp_ms / 1000 };
         },
     }),
 ];

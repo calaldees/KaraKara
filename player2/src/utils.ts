@@ -1,8 +1,8 @@
 /**
  * turn timestamp into into "{X}min / {X}sec [in the future]"
  */
- export function time_until(now: number, time: number|null): string {
-    if(time === null) return "";
+export function time_until(now: number, time: number | null): string {
+    if (time === null) return "";
 
     const seconds_total = Math.floor(time - now);
     const seconds = seconds_total % 60;
@@ -40,9 +40,12 @@ export function attachment_path(root: string, attachment: Attachment): string {
 /**
  * Get the URL, username, and password to be passed to MQTTSubscribe or MQTTPublish
  */
-export function mqtt_login_info(state: State): {url: string} {
+export function mqtt_login_info(state: State): { url: string } {
     return {
-        url: state.root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt",
+        url:
+            state.root
+                .replace("https://", "wss://")
+                .replace("http://", "ws://") + "/mqtt",
         //username: state.room_name,
         //password: state.room_password,
     };
@@ -54,18 +57,23 @@ export function mqtt_login_info(state: State): {url: string} {
  * eg "2021-01-03T14:00:00" -> "14:00"
  */
 export function short_date(long_date: string): string {
-    return long_date.split("T")[1].substring(0, 5);
+    return long_date.replace(" ", "T").split("T")[1].substring(0, 5);
 }
 
 /*
  * Given a list of all tracks in the queue, find which ones are in-progress
  * now or queued for the future
  */
-export function current_and_future(now: number, tracks: Array<QueueItem>): Array<QueueItem> {
-    return tracks.filter(t => (t.start_time == null || t.start_time + t.track_duration > now));
+export function current_and_future(
+    now: number,
+    tracks: Array<QueueItem>,
+): Array<QueueItem> {
+    return tracks.filter(
+        (t) => t.start_time == null || t.start_time + t.track_duration > now,
+    );
 }
 
 export function percent(a: number, b: number): string {
     // show one decimal place, so that animations animate smoother
-    return Math.round((a / b) * 1000)/10 + "%";
+    return Math.round((a / b) * 1000) / 10 + "%";
 }

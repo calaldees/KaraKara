@@ -15,7 +15,7 @@ export const VideoScreen = ({
     queue_item: QueueItem;
 }): VNode => (
     <section key="video" class={"screen_video"}>
-        <Video state={state} track={track} />
+        <Video state={state} track={track} lowres={false} />
         <JoinInfo state={state} />
         <EventInfo state={state} />
         <div
@@ -36,7 +36,7 @@ export const VideoScreen = ({
             Performed by {queue_item.performer_name}
         </div>
         <div id="pimpcontributor" class="pimp">
-            Contributed by {track.tags['contributor']?.[0]}
+            Contributed by {track.tags["contributor"]?.[0]}
         </div>
     </section>
 );

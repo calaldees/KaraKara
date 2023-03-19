@@ -1,7 +1,13 @@
 import h from "hyperapp-jsx-pragma";
 import { attachment_path, short_date } from "../utils";
 
-export const Video = ({ state, track, ...kwargs }) => (
+type VideoProps = {
+    state: State,
+    track: Track,
+    lowres: boolean,
+    [Key: string]: any,
+};
+export const Video = ({ state, track, lowres, ...kwargs }: VideoProps) => (
     <video
         autoPlay={true}
         poster={attachment_path(state.root, track.attachments.image[0])}
@@ -10,10 +16,12 @@ export const Video = ({ state, track, ...kwargs }) => (
         crossorigin="anonymous"
         {...kwargs}
     >
-        {track.attachments.video.map((a) => (
-            <source src={attachment_path(state.root, a)} type={a.mime} />
-        ))}
-        {track.attachments.subtitle?.map((a) => (
+        {(lowres ? track.attachments.preview : track.attachments.video).map(
+            (a: Attachment) => (
+                <source src={attachment_path(state.root, a)} type={a.mime} />
+            ),
+        )}
+        {track.attachments.subtitle?.map((a: Attachment) => (
             <track
                 kind="subtitles"
                 src={attachment_path(state.root, a)}
@@ -38,17 +46,30 @@ export const EventInfo = ({ state }: { state: State }) => (
         {state.settings["validation_event_end_datetime"] && (
             <span>
                 Event ends at{" "}
-                <strong>{short_date(state.settings["validation_event_end_datetime"])}</strong>
+                <strong>
+                    {short_date(
+                        state.settings["validation_event_end_datetime"],
+                    )}
+                </strong>
             </span>
         )}
-        {state.settings["validation_event_end_datetime"] && state.settings["admin_list"]?.length > 0 && " - "}
+        {state.settings["validation_event_end_datetime"] &&
+            state.settings["admin_list"]?.length > 0 &&
+            " - "}
         {state.settings["admin_list"]?.length > 0 && (
             <span>
-                Admins are {state.settings["admin_list"].map((a, n, as) => <span>
-                    <strong>{a}</strong>{n == as.length - 1 ? "" : n == as.length - 2 ? " and " : ", "}
-                </span>)}
+                Admins are{" "}
+                {state.settings["admin_list"].map((a: string, n: number, as: string[]) => (
+                    <span>
+                        <strong>{a}</strong>
+                        {n == as.length - 1
+                            ? ""
+                            : n == as.length - 2
+                            ? " and "
+                            : ", "}
+                    </span>
+                ))}
             </span>
         )}
-
     </div>
 );

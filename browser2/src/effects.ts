@@ -54,15 +54,18 @@ export function ClearScrollPos(): Effect {
     return [clearScrollPos, {}];
 }
 
-function apiRequestEffect(dispatch: Dispatch, props: {
-    url: string,
-    options: Dictionary<any>,
-    notify?: string,
-    notify_ok?: string,
-    progress?: Dispatchable<{done: number, size: number}>,
-    action?: Dispatchable,
-    exception?: Dispatchable,
-}) {
+function apiRequestEffect(
+    dispatch: Dispatch,
+    props: {
+        url: string;
+        options: Dictionary<any>;
+        notify?: string;
+        notify_ok?: string;
+        progress?: Dispatchable<{ done: number; size: number }>;
+        action?: Dispatchable;
+        exception?: Dispatchable;
+    },
+) {
     dispatch((state) => ({
         ...state,
         loading: true,
@@ -80,7 +83,7 @@ function apiRequestEffect(dispatch: Dispatch, props: {
             let download_done = 0;
             // Content-Length shows us the compressed size, we can only
             // guess the real size :(
-            let download_size = 5*1024*1024;
+            let download_size = 5 * 1024 * 1024;
 
             return new ReadableStream({
                 start(controller) {
@@ -113,7 +116,7 @@ function apiRequestEffect(dispatch: Dispatch, props: {
             }).json();
         })
         .then(function (result) {
-            if(result.status >= 400) {
+            if (result.status >= 400) {
                 throw result;
             }
 
@@ -156,7 +159,12 @@ function apiRequestEffect(dispatch: Dispatch, props: {
                         ...state,
                         loading: false,
                         notification: {
-                            text: "Internal Error: " + (error.message ?? "unknown"),
+                            text:
+                                error.message == "queue validation failed" ?
+                                    error.context :
+                                    ("Internal Error: " +
+                                        (error.message ?? "unknown") +
+                                        (error.context ? ": " + error.context : "")),
                             style: "error",
                         },
                     },
@@ -171,15 +179,15 @@ function apiRequestEffect(dispatch: Dispatch, props: {
 }
 
 export function ApiRequest(props: {
-    state: State,
-    function?: string,
-    url?: string,
-    options?: Dictionary<any>,
-    notify?: string,
-    notify_ok?: string,
-    progress?: Dispatchable<{done: number, size: number}>,
-    action?: Dispatchable,
-    exception?: Dispatchable,
+    state: State;
+    function?: string;
+    url?: string;
+    options?: Dictionary<any>;
+    notify?: string;
+    notify_ok?: string;
+    progress?: Dispatchable<{ done: number; size: number }>;
+    action?: Dispatchable;
+    exception?: Dispatchable;
 }): Effect {
     return [
         apiRequestEffect,

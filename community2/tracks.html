@@ -1,0 +1,94 @@
+<!DOCTYPE html><html>
+<head>
+	<meta charset="utf-8" />
+	<link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,....==" />
+	<title>viewer</title>
+	<style>
+		html {
+			font-family: sans-serif;
+		}
+		p {
+			margin:0;
+			padding:0;
+		}
+		table {
+			border-spacing: 0;
+			border-collapse: collapse;
+			border:solid #000 !important;
+			border-width:1px 0 0 1px !important;
+		}
+		table td, th {
+			border:solid #000 !important;
+			border-width:0 1px 1px 0 !important;
+			vertical-align: top;
+		}
+		table img {
+			max-width: 10em;
+			max-height: 5em;
+		}
+	</style>
+</head>
+<body>
+<div id="main"></div>
+<script type="module">
+
+import {h, text, app} from "https://cdn.skypack.dev/hyperapp"
+
+const urlParams = new URLSearchParams(window.location.search);
+const URL = (urlParams.get('url') || '').replace(/\/$/, ''); // Get api url (and remove trailing slash if present)
+
+const state = {
+	tracks: {},
+}
+
+const fetchJson = (dispatch, options) => {
+	fetch(options.url)
+	.then(response => response.json())
+	.then(data => dispatch(options.action, data))
+}
+const jsonFetcher = (url, action) => [fetchJson, {url, action}]
+
+
+const TrackItem = data => h("tr", {}, [
+    h("td", {}, //h("details", {}, 
+        //h("img", {src: `${URL}/files/${data?.attachments?.image[0].path}`, loading: "lazy"}),
+        //[...data?.attachments?.image].map(image => 
+        //    h("img", {src: `${URL}/files/${image.path}`, loading: "lazy"}),
+        //)
+    ),
+    h("td", {}, text(data?.tags?.category)),
+    h("td", {}, text(data?.tags?.from||'')),
+    h("td", {}, text(data?.tags?.use||'')),
+	h("td", {}, text(`${data?.tags?.title}${data?.tags?.vocaltrack=='off'?' (instrumental)':''}`)),
+    h("td", {}, [...data?.attachments?.video].map(video =>
+        h("a", {href: `${URL}/files/${video.path}`}, text('video')),
+    )),
+])
+
+
+const trackKey = (t) => `${t.tags.category} ${t.tags.from} ${t.tags.use}`
+const trackKeyComparator = (t1,t2) => trackKey(t1) < trackKey(t2) ? -1 : 1
+
+const viewRoot = (state) => {
+	return h("table", {}, [
+		h("tr", {}, ['img', 'category', 'from', 'use','Title', 'media'].map(heading => h("th", {}, text(heading)))),
+		...Object.values(state.tracks).sort(trackKeyComparator).map(track => TrackItem(track))
+	])
+}
+
+
+const receiveTracks = (state, data) => ({...state, tracks: data})
+
+
+app({
+	init: [
+		state,
+		jsonFetcher(`${URL}/files/tracks.json`, receiveTracks),
+	],
+	node: document.body,
+	subscriptions: state => [
+	],
+	view: viewRoot
+})
+
+</script></body></html>

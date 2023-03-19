@@ -112,9 +112,15 @@ class Queue():
             end_time += i.track_duration + self.track_space
             return end_time
         return reduce(track_duration_reducer, self.future, self.now)
-    def play(self) -> None:
+    def play(self, immediate=False) -> None:
         if self.current:
-            self.current.start_time = self.now
+            if immediate:
+                self.current.start_time = self.now
+            else:
+                # Set the current track to start playing slightly in
+                # the future, to give all the clients a chance to get
+                # the message
+                self.current.start_time = self.now + datetime.timedelta(seconds=1)
             self._recalculate_start_times()
     def stop(self) -> None:
         if self.current:

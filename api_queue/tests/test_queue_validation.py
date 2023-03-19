@@ -36,7 +36,7 @@ def test_start_time(qu):
 
 def test_end_time(qu):
     qu.settings["validation_event_end_datetime"] += datetime.timedelta(hours=-1)
-    assert 'ending' in default_validation(qu)
+    assert 'is full' in default_validation(qu)
 
 def test_performer_names(qu):
     qu.settings["validation_performer_names"] = ['TTT']
