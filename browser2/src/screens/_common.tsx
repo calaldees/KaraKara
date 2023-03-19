@@ -90,7 +90,7 @@ export const Screen = (
         navLeft?: any;
         navRight?: any;
     },
-    children,
+    children: any,
 ): VNode => (
     <main class={className}>
         <header>
@@ -123,11 +123,11 @@ export const BackToExplore = (): VNode => (
 );
 
 // I don't know how to type ...kwargs correctly
-export const Thumb = ({ state, track, ...kwargs }, children): VNode => (
+export const Thumb = ({ state, track, ...kwargs }: {state: State, track: Track}, children: any): VNode => (
     <div class={"thumb"} {...kwargs}>
         <img src={placeholder} />
         <picture>
-            {track.attachments.image.map((a) => (
+            {track.attachments.image.map((a: Attachment) => (
                 <source srcset={attachment_path(state.root, a)} type={a.mime} />
             ))}
             <img src={placeholder} />
