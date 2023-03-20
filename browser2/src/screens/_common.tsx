@@ -19,39 +19,6 @@ export const Notification = ({ state }: { state: State }): VNode =>
         </div>
     );
 
-function hhmm(d: Date): string {
-    function twoz(n: number): string {
-        return n.toString().padStart(2, "0");
-    }
-    return twoz(d.getHours()) + ":" + twoz(d.getMinutes());
-}
-export function PriorityToken({ state }: { state: State }): VNode | null {
-    if (!state.priority_token) return null;
-
-    var now = new Date(); // TODO: - server_datetime_offset;
-
-    var valid_start = new Date(state.priority_token.valid_start);
-    var valid_end = new Date(state.priority_token.valid_end);
-    var delta_start = valid_start.getTime() - now.getTime();
-    var delta_end = valid_end.getTime() - now.getTime();
-
-    if (delta_start > 0) {
-        return (
-            <h2 class={"main-only priority_soon"}>
-                Priority mode at {hhmm(valid_start)}
-            </h2>
-        );
-    }
-    if (delta_start < 0 && delta_end > 0) {
-        return (
-            <h2 class={"main-only priority_now"}>
-                Priority mode until {hhmm(valid_end)}
-            </h2>
-        );
-    }
-    return null;
-}
-
 export const YoureNext = ({
     state,
     queue,
@@ -106,7 +73,6 @@ export const Screen = (
             {navRight || <EmptyHeaderLink />}
         </header>
         <Notification state={state} />
-        <PriorityToken state={state} />
         <YoureNext
             state={state}
             queue={current_and_future(state.now, state.queue)}

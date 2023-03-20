@@ -37,7 +37,6 @@ let state: State = {
     root_edit: auto_root,
     screen: "explore",
     notification: null,
-    priority_token: null,
     show_settings: false,
     download_size: null,
     download_done: 0,
@@ -87,9 +86,6 @@ let state: State = {
         coming_soon_track_count: 10,
     },
     settings_edit: {},
-
-    // priority_tokens
-    priority_tokens: [],
 };
 
 const init: Dispatchable = [

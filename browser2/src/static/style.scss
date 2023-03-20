@@ -125,18 +125,6 @@ MAIN {
       overflow: hidden;
     }
   }
-  .priority_soon {
-    background: $NOTIFICATION_WARNING;
-    padding: 1em;
-    margin: 0;
-    border-bottom: 1px solid $BORDER;
-  }
-  .priority_now {
-    background: $NOTIFICATION_OK;
-    padding: 1em;
-    margin: 0;
-    border-bottom: 1px solid $BORDER;
-  }
   .upnext {
     background: $NOTIFICATION_WARNING;
     padding: 1em;

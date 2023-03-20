@@ -8,7 +8,6 @@ import { Control } from "./control";
 import { SettingsMenu } from "./settings";
 import { PrintableList } from "./printable_list";
 import { RoomSettings } from "./room_settings";
-import { PriorityTokens } from "./priority_tokens";
 
 export const QueueOrControl = ({ state }: { state: State }): VNode =>
     state.is_admin ? <Control state={state} /> : <Queue state={state} />;
@@ -36,8 +35,6 @@ export function Root(state: State): VNode {
             active_screen = <QueueOrControl state={state} />;
         } else if (state.screen == "room_settings") {
             active_screen = <RoomSettings state={state} />;
-        } else if (state.screen == "priority_tokens") {
-            active_screen = <PriorityTokens state={state} />;
         }
 
         if (state.widescreen) {
