@@ -15,4 +15,4 @@ jobs:
       uses: actions/checkout@master
     - name: Build
       run: docker build .
-      working-directory: browser2
+      working-directory: player2
