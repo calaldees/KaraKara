@@ -20,28 +20,6 @@ function Back(state: State): Dispatchable {
     return [{ ...state }, PopScrollPos()];
 }
 
-const GoToPriorityTokens = (state: State): Dispatchable => [
-    state,
-    ApiRequest({
-        function: "priority_tokens",
-        state: state,
-        action: (state, response): Dispatchable =>
-            response.status == "ok"
-                ? [
-                      {
-                          ...state,
-                          screen: "priority_tokens",
-                          priority_tokens: response.data.priority_tokens,
-                      },
-                      PushScrollPos(),
-                  ]
-                : {
-                      ...state,
-                      priority_tokens: [],
-                  },
-    }),
-];
-
 const SelectTrack = (state: State, track_id: string): Dispatchable => [
     { ...state, track_id },
     PushScrollPos(),
@@ -234,11 +212,6 @@ const Bookmarks = ({ state }: { state: State }) =>
 const AdminButtons = ({ state }: { state: State }): VNode => (
     <footer>
         <div class={"buttons"}>
-            {/*
-            <button onclick={GoToPriorityTokens} disabled={state.loading}>
-                Priority Tokens
-            </button>
-            */}
             <button onclick={GoToScreen("room_settings", [PushScrollPos()])}>
                 Room Settings
             </button>

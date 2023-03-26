@@ -64,15 +64,6 @@ type QueueItem = {
     track_id: string;
 };
 
-type PriorityToken = {
-    id: string;
-    issued: string; // ISO8601 Date,
-    used: boolean;
-    session_id: string;
-    valid_start: string; // ISO8601 Date,
-    valid_end: string; // ISO8601 Date,
-};
-
 type State = {
     // global
     root: string;
@@ -82,7 +73,6 @@ type State = {
         text: string;
         style: string;
     };
-    priority_token: PriorityToken | null;
     show_settings: boolean;
     download_size: number | null;
     download_done: number;
@@ -122,9 +112,6 @@ type State = {
     // settings
     settings: Dictionary<any>;
     settings_edit: Dictionary<any>;
-
-    // priority_tokens
-    priority_tokens: Array<PriorityToken>;
 };
 
 declare type SVGProps<T> = {
