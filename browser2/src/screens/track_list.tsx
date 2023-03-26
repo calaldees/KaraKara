@@ -227,9 +227,13 @@ export const TrackList = ({ state }: { state: State }): VNode => (
         state={state}
         className={"track_list"}
         navLeft={
-            state.filters.length > 0 && (
+            state.filters.length > 0 ? (
                 <a onclick={Back} data-cy="back">
                     <icons.CircleChevronLeft class="x2" />
+                </a>
+            ) : (
+                <a onclick={GoToScreen("about", [PushScrollPos()])} data-cy="about">
+                    <i class={"fas fa-2x fa-info-circle"} />
                 </a>
             )
         }

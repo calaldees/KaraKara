@@ -86,6 +86,7 @@ let state: State = {
         validation_event_end_datetime: undefined,
         validation_performer_names: [],
         coming_soon_track_count: 10,
+        event_contact: null,
     },
     settings_edit: {},
 };
