@@ -16,6 +16,7 @@ import {
 } from "./subs";
 import { ApiRequest } from "./effects";
 import { current_and_future } from "./utils";
+import { CastReceiver } from "./cc_receiver";
 
 declare global {
     namespace JSX {
@@ -163,6 +164,7 @@ const subscriptions = (state: State): Array<Subscription | boolean> => [
             };
         },
     }),
+    window.location.search.includes("chromecast=true") && CastReceiver(),
 ];
 
 app({

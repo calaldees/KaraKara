@@ -10,6 +10,7 @@ import {
 import { Root } from "./screens/root";
 import { BeLoggedIn, getMQTTListener, ResizeListener } from "./subs";
 import { ApiRequest } from "./effects";
+import { CastSender } from "./cc_sender";
 
 declare global {
     namespace JSX {
@@ -44,6 +45,7 @@ let state: State = {
     widescreen: isWidescreen(),
     scroll_stack: [],
     now: Date.now() / 1000,
+    casting: false,
 
     // login
     session_id: null,
@@ -153,6 +155,7 @@ const subscriptions = (state: State): Array<Subscription | boolean> => [
             return { ...state, now: timestamp_ms / 1000 };
         },
     }),
+    state.casting && CastSender(state.room_name, state.room_password),
 ];
 
 app({

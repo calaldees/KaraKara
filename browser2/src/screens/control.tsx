@@ -236,13 +236,20 @@ const ControlButtons = (): VNode => (
     </footer>
 );
 
+export const CastButton = ({ state }: { state: State }): VNode => (
+    (window.chrome && chrome.cast && chrome.cast.isAvailable) &&
+        <a onclick={(state) => ({...state, casting: !state.casting})}>
+            <i class={"fab fa-2x fa-chromecast"} />
+        </a>
+);
+
 export const Control = ({ state }: { state: State }): VNode => (
     <Screen
         state={state}
         className={"queue"}
         navLeft={!state.widescreen && <BackToExplore />}
         title={"Remote Control"}
-        // navRight={}
+        navRight={<CastButton state={state} />}
         footer={<ControlButtons />}
     >
         {current_and_future(state.now, state.queue).length == 0 ? (
