@@ -80,6 +80,7 @@ type State = {
     widescreen: boolean;
     scroll_stack: Array<number>;
     now: number;
+    casting: boolean;
 
     // login
     session_id: string | null;
