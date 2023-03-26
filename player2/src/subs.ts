@@ -2,6 +2,7 @@ import { Keyboard, Delay } from "hyperapp-fx";
 import { MQTTSubscribe } from "@shish2k/hyperapp-mqtt";
 import { mqtt_login_info } from "./utils";
 import { ApiRequest, SendCommand } from "./effects";
+import mqtt_client from "u8-mqtt/esm/web";
 
 /**
  * Connect to the MQTT server, listen for queue / settings state updates,
@@ -13,6 +14,7 @@ export function getMQTTListener(state: State): Subscription | boolean {
     }
 
     return MQTTSubscribe({
+        mqtt_client,
         ...mqtt_login_info(state),
         topic: "room/" + state.room_name + "/#",
         connect(state: State): Dispatchable {
@@ -24,7 +26,7 @@ export function getMQTTListener(state: State): Subscription | boolean {
         message(state: State, msg): Dispatchable {
             // msg = mqtt-packet
             const topic: string = msg.topic.split("/").pop() || "";
-            const data: string = msg.payload.toString();
+            const data: string = msg.text();
 
             console.groupCollapsed("mqtt_onmessage(", topic, ")");
             try {
