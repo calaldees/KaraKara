@@ -1,0 +1,20 @@
+{
+    "track_space": 30,
+    "hidden_tags": [
+        "category:cartoon",
+        "red:duplicate"
+    ],
+    "forced_tags": [],
+    "title": "KaraKara",
+    "theme": "metalghosts",
+    "preview_volume": 0.1,
+    "validation_event_start_datetime": "2023-03-11T10:00:00",
+    "validation_event_end_datetime": "2023-03-12T01:00:00",
+    "validation_duplicate_performer_timedelta": null,
+    "validation_duplicate_track_timedelta": null,
+    "validation_performer_names": [],
+    "validation": [
+        "default"
+    ],
+    "coming_soon_track_count": 3
+}
