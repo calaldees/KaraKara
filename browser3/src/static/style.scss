@@ -1,0 +1,550 @@
+:root {
+  --fg: #000;
+  --border: #DDD;
+  --bg-dark: #E9E9E9;
+  --bg-dark-active: #D0D0D0;
+  --bg-dark-border: #838383;
+  --bg-light: #F9F9F9;
+  --input-fg: #000;
+  --input-bg: #FFF;
+  --input-border: #999;
+  --disabled: grey;
+  --drag-handle-bg: #F9F9F9A0;
+
+  --notification-ok: #AFA;
+  --notification-ok-border: #0A0;
+  --notification-warning: #FFA;
+  --notification-warning-border: #AA0;
+  --notification-error: #FAA;
+  --notification-error-border: #A00;
+
+  --drop-target: red;
+}
+
+// @media (prefers-color-scheme: dark) {}
+
+
+/* svg wibbling */
+svg:not(.qr_code) {
+  path {
+    fill: currentColor;
+  }
+  width: 1em;
+  height: 1em;
+}
+svg.x2 {
+  font-size: 2em;
+}
+BUTTON svg, SPAN svg {
+  top: .125em;
+  position: relative;
+}
+A svg {
+  color: var(--fg);
+}
+
+/* subtitle wibbling */
+::cue(v[voice='active']) {
+  color: yellow;
+}
+::cue(v[voice='next']) {
+  color: white;
+}
+::cue {
+	// font-family: metalghosts, sans-serif;
+	text-shadow:
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+  font-size: 1.5em;
+}
+
+/* Overall Layout */
+* {box-sizing: border-box;}
+BODY {
+  color: var(--fg);
+  margin: 0;
+  padding: 0;
+  font-family: arial, sans-serif;
+  user-select: none;
+}
+.widescreen {
+  background: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  MAIN:nth-child(1) {
+    position: relative;
+    flex: 0 0 50%;
+    max-width: 50%;
+    border-right: 2px solid black;
+    .main-only {
+      display: none;
+    }
+  }
+  MAIN:nth-child(2) {
+    position: relative;
+    flex: 0 0 50%;
+    max-width: 50%;
+    border-left: 2px solid black;
+  }  
+}
+MAIN {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+
+  background: var(--bg-light);
+
+  HEADER {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    &>A, &>DIV {
+      display: block;
+      flex: 0 0 auto;
+      width: 2em;
+      height: 2em;
+    }
+    H1 {
+      width: 100%;
+      font-size: 1.5em;
+      flex: 0 1 auto;
+      text-align: center;
+      margin: 0.5em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+  .upnext {
+    background: var(--notification-warning);
+    padding: 1em;
+    margin: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .notification {
+    position: absolute;
+    left: 2em;
+    right: 2em;
+    top: 4em;
+    display: flex;
+    align-items: center;
+    border-radius: 1em;
+    padding: 1em;
+    // For some reason even though the notification appears over
+    // the top of the video, clicks act as if the video is on top?
+    // z-index appears to fix it...
+    z-index: 2;
+    SPAN {
+      flex: 1 1 auto;
+    }
+    I {
+      flex: 0 0 auto;
+      padding: 0em .5em;
+    }
+    &.ok {
+      background-color: var(--notification-ok);
+      border: 1px solid var(--notification-ok-border);
+    }
+    &.warning {
+      background-color: var(--notification-warning);
+      border: 1px solid var(--notification-warning-border);
+    }
+    &.error {
+      background-color: var(--notification-error);
+      border: 1px solid var(--notification-error-border);
+    }
+  }
+  ARTICLE {
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+  FOOTER {
+    flex: 0 0 auto;
+    display: flex;
+    flex-flow: column;
+    border-top: 1px solid var(--border);
+    background-color: var(--bg-dark);
+    padding: 0.3em 5%;
+
+    .already_queued {
+      text-align: center;
+    }
+
+    .buttons {
+      display: flex;
+      flex-flow: row;
+      justify-content: space-between;
+      BUTTON, .button {
+        flex: 1 0;
+        margin-left: .3em;
+        margin-right: .3em;
+        &:first-child {
+          margin-left: 0;
+        }
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
+
+.settings {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  DIV {
+    flex: 0 0 auto;
+    text-align: center;
+    z-index: 9999;
+    background: white;
+    border: 2px solid black;
+    border-radius: 1em;
+    box-shadow: #000 0 0 1em;
+    padding: 1em;
+    H2 {
+      margin: 0;
+    }
+    INPUT[type="text"], BUTTON {
+      width: 100%;
+    }
+  }
+}
+
+/* Common elements */
+.readme {
+  H1 {
+    text-align: center;
+    font-size: 6em;
+    margin: 0.1em;
+  }
+  LI {
+    margin: 0.5em;
+    font-size: 2em;
+  }
+}
+.flex-center {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  height: 100%;
+}
+H2 {
+  text-align: center;
+  margin-bottom: 0.5em;
+  font-size: 1.2em;
+}
+UL {
+  border: 1px solid var(--border);
+  margin: 0.5em 0;
+  border-radius: .5em;
+  overflow: hidden;
+  box-shadow: var(--bg-dark) 2px 2px 4px;
+  padding: 0;
+  LI {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0.75em;
+    font-weight: bold;
+    align-items: center;
+    .thumb {
+      height: 4em;
+      width: 6em;
+      margin: -0.75em;
+      margin-right: 0.75em;
+      background-size: cover;
+      background-position: center;
+      border-right: 1px solid var(--border);
+      flex: 0 0 auto;
+      position: relative;
+      IMG {
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .drag-handle {
+        position: absolute;
+        top: 1em;
+        left: 0;
+        bottom: 1em;
+        background: var(--drag-handle-bg);
+        border: 1px solid var(--border);
+        border-radius: 0 .5em .5em 0;
+        padding: .4em .4em .5em .2em;
+      }
+    }
+    SPAN.text {
+      flex: 1 1 auto;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      padding-right: 0.4em;
+    }
+    SPAN.count {
+      flex: 0 0 auto;
+      margin-right: 0.5em;
+      border: 1px solid var(--border);
+      background: var(--bg-light);
+      font-size: 0.75em;
+      padding: 0.2em 0.4em;
+      border-radius: 0.2em;
+    }
+    SPAN.go_arrow {
+      flex: 0 0 auto;
+    }
+  }
+  LI:last-child {
+    border-bottom: 0;
+  }
+}
+
+
+INPUT[type="text"],
+INPUT[type="password"],
+BUTTON, .button {
+  font-size: 1em;
+  width: 100%;
+  margin: 0.25em 0;
+  border-radius: 5px;
+  padding: 0.5em;
+}
+A.button {
+  text-align: center;
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: bold;
+}
+INPUT[type="checkbox"] {
+  margin: 0.5em;
+}
+INPUT[type="text"],
+INPUT[type="password"] {
+  color: var(--input-fg);
+  font-weight: bold;
+  background: var(--input-bg);
+  box-shadow: var(--input-border) 0px 1px 3px 0px inset;
+  border: 1px solid;
+  border-color: var(--input-border) #fff #fff var(--input-border);
+}
+BUTTON, .button {
+  color: var(--fg);
+  font-weight: bold;
+  background: var(--bg-dark);
+  border: 1px solid;
+  border-color: #fff var(--bg-dark-border) var(--bg-dark-border) #fff;
+}
+BUTTON:active {
+  background: var(--bg-dark-active);
+}
+BUTTON:disabled {
+  color: var(--disabled);
+}
+.loading {
+  animation: spin 1s linear infinite;
+  @keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(180deg);}
+  }
+}
+.qr_container {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.qr_code {
+  border: 1em solid white;
+  width: 75%;
+  height: auto;
+}
+
+
+/* Login */
+// MAIN.login ARTICLE {}
+
+/* Track List */
+MAIN.track_list ARTICLE {
+  .search {
+    margin-top: 1em;
+  }
+  DIV.active_filter_list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0.5em 0;
+    .active_filter {
+      border: 1px solid var(--border);
+      border-radius: 1em;
+      padding: 0.5em;
+      margin-right: 0.5em;
+      margin-bottom: 0.5em;
+      max-width: 10em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      .remove {
+        margin-right: 0.3em;
+      }
+      // SPAN.name {}
+    }
+  }
+  UL {
+    .filter_list_group {
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-dark);
+      LI {
+        background: var(--bg-light);
+      }
+      UL {
+        margin: 0em 0em 0 1em;
+        border-radius: 0;
+        border-top: 0;
+        border-bottom: 0;
+        border-right: 0;
+        box-shadow: none;
+      }
+      LI.add_filter {
+        padding-left: 1em;
+      }
+    }
+
+    LI SPAN.track_info {
+      .info {
+        font-weight: normal;
+      }
+    }
+  }
+}
+
+/* Track Details */
+MAIN.track_details ARTICLE {
+  VIDEO {
+    margin-top: 5vw;
+    border: 1px solid var(--border);
+  }
+  .code {
+    margin-top: 0;
+    text-align: center;
+    SPAN {
+      font-weight: bold;
+    }
+  }
+  DIV.tags {
+    display: flex;
+    flex-wrap: wrap;
+    DIV.tag {
+      flex: 0 0 30%;
+      justify-content: space-between;
+      margin-bottom: 1em;
+      .tag_key {
+        font-size: 0.75em;
+        font-weight: bold;
+      }
+      .tag_value {
+        padding-left: 0.5em;
+      }
+    }
+  }
+  VIDEO {
+    width: 100%;
+  }
+}
+
+/* Queue */
+MAIN.queue ARTICLE {
+  .me {
+    background: var(--notification-warning);
+  }
+  UL LI {
+    &.drop_source {
+      display: none;
+    }
+    &.drop_target {
+      border-top: 5px solid var(--drop-target);
+    }
+    &.drop_last {
+      text-align: center;
+      padding: 1em;
+    }
+    SPAN.lyrics {
+      font-weight: normal;
+    }
+    SPAN.queue_info {
+      .performer {
+        font-weight: normal;
+      }
+    }
+  }
+
+  .coming_later {
+    text-align: center;
+    SPAN::after {content: ", ";}
+    SPAN:last-child::after {content: "";}
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+  }
+  MAIN {
+    position: relative;
+    HEADER {
+      display: none !important;
+    }
+    ARTICLE {
+      overflow: visible !important;
+      column-count: 4;
+      font-size: 0.75em;
+    }
+    FOOTER {
+      display: none !important;
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////
+// Don't put stuff in iPhone's weird rounded corners
+
+MAIN {
+  HEADER {
+    padding-top: env(safe-area-inset-top);
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+  }
+  ARTICLE {
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  FOOTER {
+    padding-left: Max(5%, env(safe-area-inset-left));
+    padding-right: Max(5%, env(safe-area-inset-right));
+    padding-bottom: Max(0.3em, env(safe-area-inset-bottom));
+  }
+}
