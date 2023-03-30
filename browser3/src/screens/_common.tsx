@@ -115,6 +115,7 @@ export function Thumb({
                 <img
                     alt=""
                     style={{ backgroundImage: `url(${placeholder})` }}
+                    draggable="false"
                 />
             </picture>
             {children}

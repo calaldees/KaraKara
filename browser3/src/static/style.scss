@@ -481,7 +481,7 @@ MAIN.queue ARTICLE {
   }
   UL LI {
     &.drop_source {
-      display: none;
+      opacity: 0.5;
     }
     &.drop_target {
       border-top: 5px solid var(--drop-target);
