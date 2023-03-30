@@ -54,7 +54,7 @@ class TestE2E(unittest.TestCase):
 
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "5/5abo9Y3WIES.webp"}],
+                    "image": [{"mime": "image/webp", "path": "e/E4bqIk_mqTN.webp"}],
                     "preview": [{"mime": "video/mp4", "path": "x/x9Yd879NxaT.mp4"}],
                     "subtitle": [{"mime": "text/vtt", "path": "8/8wBGB457jKT.vtt"}],
                     "video": [{"mime": "video/mp4", "path": "e/ehai5GSd39a.mp4"}],
