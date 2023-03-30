@@ -20,12 +20,13 @@ services:
             - mqtt
             - player2
             - browser2
+            - browser3
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
             - "traefik.http.routers.karakara.middlewares=kkredir"
             - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
-            - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser2/"
+            - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser3/"
 
     api_queue:
         build:
@@ -57,6 +58,10 @@ services:
     browser2:
         build:
             context: ./browser2
+
+    browser3:
+        build:
+            context: ./browser3
 
     processmedia2:
         profiles:

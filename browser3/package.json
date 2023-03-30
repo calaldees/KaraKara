@@ -1,0 +1,34 @@
+{
+  "name": "browser3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "serve": "vite --host 127.0.0.1 --port 1236",
+    "build": "tsc && vite build --base /browser3/",
+    "cypress": "npx cypress open",
+    "format": "prettier --write '{src,cypress}/**/*.ts{,x}' --tab-width 4 --trailing-comma all",
+    "preview": "npm run build && vite preview --host 127.0.0.1 --port 1236 --base /browser3/",
+    "test": "vitest",
+    "test-once": "vitest run"
+  },
+  "dependencies": {
+    "qrcode.react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.9.0",
+    "u8-mqtt": "^0.3.2-0",
+    "vite-plugin-svgr": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-react-swc": "^3.0.0",
+    "cypress": "^12.8.1",
+    "prettier": "^2.8.7",
+    "sass": "^1.60.0",
+    "typescript": "^4.9.3",
+    "vite": "^4.1.0",
+    "vitest": "^0.29.7"
+  }
+}

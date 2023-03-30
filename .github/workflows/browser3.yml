@@ -1,0 +1,18 @@
+name: Browser3
+
+on:
+  push:
+    paths:
+    - 'browser3/**'
+    - '.github/workflows/browser3.yml'
+
+jobs:
+  publish:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Build
+      run: docker build .
+      working-directory: browser3
