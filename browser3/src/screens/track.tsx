@@ -25,13 +25,14 @@ export function TrackDetails(): React.ReactElement {
         performerName,
         setPerformerName,
     } = useContext(ClientContext);
-    const { now, tracks } = useContext(ServerContext);
+    const { tracks } = useContext(ServerContext);
     const { queue } = useContext(RoomContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request } = useApi();
     const navigate = useNavigate();
     if (!trackId) throw Error("Can't get here?");
     const track = tracks[trackId];
+    if (!track) return <div>No track with ID {trackId}</div>;
 
     function enqueue(performer_name: string, track_id: string) {
         request({
