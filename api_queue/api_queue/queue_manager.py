@@ -7,6 +7,7 @@ from pathlib import Path
 import io
 import asyncio
 from collections import defaultdict
+import uuid
 
 from .settings_manager import SettingsManager
 from .queue_model import Queue, QueueItem
@@ -16,15 +17,20 @@ from .queue_model import Queue, QueueItem
 @dataclasses.dataclass
 class User:
     is_admin: bool
+    session_id: str
 
 class LoginManager:
     @staticmethod
-    def login(session_id: str, queue_id: str, username: Optional[str], password: str) -> User:
-        return User(is_admin = password==queue_id)
+    def login(room_name: str, username: Optional[str], password: str) -> User:
+        if password==room_name:
+            session_id = "admin"
+        else:
+            session_id = str(uuid.uuid4())
+        return User(is_admin = password==room_name, session_id=session_id)
 
     @staticmethod
     def from_session(session_id: str) -> User:
-        return User(is_admin = session_id=="admin")
+        return User(is_admin = session_id=="admin", session_id=session_id)
 
 
 class QueueManager():

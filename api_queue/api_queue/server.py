@@ -163,11 +163,8 @@ class LoginRequest:
     ],
 )
 async def login(request, room_name):
-    user = LoginManager.login(request.ctx.session_id, room_name, None, request.json["password"])
-    if user.is_admin:
-        request.ctx.session_id = "admin"
-    else:
-        request.ctx.session_id = str(uuid.uuid4())
+    user = LoginManager.login(room_name, None, request.json["password"])
+    request.ctx.session_id = user.session_id
     return sanic.response.json(user.__dict__)
 
 
