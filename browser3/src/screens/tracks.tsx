@@ -59,7 +59,7 @@ const FilterListGroupHeader = ({
     count: number;
     expanded: boolean;
     setExpanded: any;
-    children: any;
+    children: React.ReactNode;
 }): React.ReactElement => (
     <li
         className={"filter_list_group_header"}
