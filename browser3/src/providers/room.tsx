@@ -27,6 +27,7 @@ function InternalRoomProvider(props: any) {
     const { root, roomPassword } = useContext(ClientContext);
     const { now } = useContext(ServerContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    // FIXME: where does session ID get set?
     const [sessionId, setSessionId] = useState<string>("");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [queue, setQueue] = useState<QueueItem[]>([]);
