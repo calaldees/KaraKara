@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 
 function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
     const { tracks, now } = useContext(ServerContext);
+    const { setQueue } = useContext(RoomContext);
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     const { request } = useApi();
@@ -90,8 +91,8 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
             new_queue.splice(dst_pos, 0, src_ob);
         }
 
-        // FIXME: update our local queue, tell the server to update server queue,
-        // setQueue(new_queue);
+        // update our local queue, tell the server to update server queue,
+        setQueue(new_queue);
         setDropSource(null);
         setDropTarget(null);
         request({
@@ -106,8 +107,8 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                     target: "" + dst_id,
                 }),
             },
-            // FIXME: on network error, revert to original queue
-            // onException: () => setQueue(queue),
+            // on network error, revert to original queue
+            onException: () => setQueue(queue),
         });
     }
 
