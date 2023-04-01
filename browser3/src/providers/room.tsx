@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useApi } from "../hooks/api";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
+import { useLocalStorage } from "usehooks-ts";
 import { current_and_future, mqtt_url } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
@@ -27,8 +28,7 @@ function InternalRoomProvider(props: any) {
     const { root, roomPassword } = useContext(ClientContext);
     const { now } = useContext(ServerContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    // FIXME: where does session ID get set?
-    const [sessionId, setSessionId] = useState<string>("");
+    const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [queue, setQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
@@ -61,6 +61,7 @@ function InternalRoomProvider(props: any) {
             },
             onAction: (response) => {
                 setIsAdmin(response.is_admin);
+                setSessionId(response.session_id);
             },
         });
     }, [root, roomName, roomPassword]);

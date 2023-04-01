@@ -21,11 +21,11 @@ class User:
 
 class LoginManager:
     @staticmethod
-    def login(room_name: str, username: Optional[str], password: str) -> User:
+    def login(room_name: str, username: Optional[str], password: str, requested_session: Optional[str] = None) -> User:
         if password==room_name:
             session_id = "admin"
         else:
-            session_id = str(uuid.uuid4())
+            session_id = requested_session or str(uuid.uuid4())
         return User(is_admin = password==room_name, session_id=session_id)
 
     @staticmethod
