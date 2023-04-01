@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useApi } from "../hooks/api";
-import { useServerTime } from "../hooks/servertime";
+import { useServerTime } from "@shish2k/react-use-servertime";
 import { ClientContext } from "./client";
 
 export type ServerContextType = {

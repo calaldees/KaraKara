@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocalStorage } from "../hooks/localstorage";
+import { useLocalStorage } from "usehooks-ts";
 
 type Notification = {
     text: string;

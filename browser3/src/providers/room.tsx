@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useApi } from "../hooks/api";
-import { useMqtt, useMqttSubscription } from "../hooks/mqtt";
+import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { current_and_future, mqtt_url } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
@@ -18,11 +18,11 @@ export const RoomContext = React.createContext<RoomContextType>({
     isAdmin: false,
     sessionId: "",
     queue: [],
-    setQueue: () => {},
+    setQueue: () => { },
     settings: {},
 });
 
-export function RoomProvider(props: any) {
+function InternalRoomProvider(props: any) {
     const { roomName } = useParams();
     const { root, roomPassword } = useContext(ClientContext);
     const { now } = useContext(ServerContext);
@@ -33,12 +33,17 @@ export function RoomProvider(props: any) {
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
 
-    const { client } = useMqtt(mqtt_url(root));
-    useMqttSubscription(client, `room/${roomName}/queue`, (msg) => {
-        setFullQueue(msg);
+    useSubscription(`room/${roomName}/queue`, (pkt) => {
+        console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
+        console.log(pkt.json());
+        console.groupEnd();
+        setFullQueue(pkt.json());
     });
-    useMqttSubscription(client, `room/${roomName}/settings`, (msg) => {
-        setSettings(msg);
+    useSubscription(`room/${roomName}/settings`, (pkt) => {
+        console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
+        console.log(pkt.json());
+        console.groupEnd();
+        setSettings(pkt.json());
     });
 
     useEffect(() => {
@@ -75,4 +80,13 @@ export function RoomProvider(props: any) {
             {props.children}
         </RoomContext.Provider>
     );
+}
+
+export function RoomProvider(props: any) {
+    const { root } = useContext(ClientContext);
+    return <MqttProvider url={mqtt_url(root)}>
+        <InternalRoomProvider>
+            {props.children}
+        </InternalRoomProvider>
+    </MqttProvider>
 }
