@@ -21,12 +21,10 @@ FROM code as test
     COPY --from=python_dependencies_test /site-packages /site-packages
     CMD ["python", "-m", "api_queue.server"]
 
-    #COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
     COPY ./pytest.ini ./
     RUN python3 -m pytest -x
 
-    #COPY --from=python_dependencies_test /usr/local/bin/mypy /usr/local/bin/mypy
     COPY ./.mypy.ini ./
     RUN python3 -m mypy api_queue
 
