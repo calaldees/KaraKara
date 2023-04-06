@@ -1,8 +1,4 @@
-ARG PYTHON_IMAGE_VERSION=3.10
-FROM python:${PYTHON_IMAGE_VERSION}-slim as base
-    ARG PYTHON_IMAGE_VERSION
-    ENV PATH_SITE_PACKAGES=/usr/local/lib/python${PYTHON_IMAGE_VERSION}/site-packages/
-
+FROM python:slim as base
     WORKDIR /app/
     EXPOSE 8000
 
@@ -12,24 +8,28 @@ FROM python:${PYTHON_IMAGE_VERSION}-slim as base
 
 FROM base as python_dependencies
     COPY ./requirements.txt ./
-    RUN pip install --no-cache-dir -r requirements.txt
+    RUN pip install --no-cache-dir -r requirements.txt -t /site-packages
+    ENV PYTHONPATH=/site-packages
 FROM python_dependencies as python_dependencies_test
     COPY ./requirements.test.txt ./
-    RUN pip install --no-cache-dir -r requirements.test.txt
+    RUN pip install --no-cache-dir -r requirements.test.txt -t /site-packages
 
 FROM python_dependencies as code
     COPY ./api_queue ./api_queue
 
 FROM code as test
-    COPY --from=python_dependencies_test ${PATH_SITE_PACKAGES} ${PATH_SITE_PACKAGES}
-    COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
+    COPY --from=python_dependencies_test /site-packages /site-packages
+    CMD ["python", "-m", "api_queue.server"]
+
+    #COPY --from=python_dependencies_test /usr/local/bin/pytest /usr/local/bin/pytest
     COPY ./tests ./tests
     COPY ./pytest.ini ./
-    RUN pytest -x
-    COPY --from=python_dependencies_test /usr/local/bin/mypy /usr/local/bin/mypy
+    RUN python3 -m pytest -x
+
+    #COPY --from=python_dependencies_test /usr/local/bin/mypy /usr/local/bin/mypy
     COPY ./.mypy.ini ./
-    RUN mypy api_queue
-    CMD ["python", "-m", "api_queue.server"]
+    RUN python3 -m mypy api_queue
+
 
 FROM code as production
     CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
