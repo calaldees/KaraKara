@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState, useCallback } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -214,32 +214,38 @@ export function TrackList(): React.ReactElement {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const search: string = searchParams.get("search") ?? "";
-    const filters: string[] = searchParams.getAll("filters") ?? [];
-    function setSearch(s: string) {
+    const filters: string[] = searchParams.getAll("filters");
+    const setSearch = useCallback(function(s: string) {
         setSearchParams({ search: s, filters: filters }, { replace: inSearch });
         setInSearch(true);
-    }
-    function setFilters(fs: string[] | CallableFunction) {
+    }, []);
+    const setFilters = useCallback(function(fs: string[] | CallableFunction) {
         const f2 = Array.isArray(fs) ? fs : fs(filters);
         setSearchParams({ search: search, filters: f2 });
         setInSearch(false);
-    }
+    }, []);
 
-    let track_list = useMemo(
-        () =>
+    // find_tracks took 16ms, of which 15ms was spent sorting the
+    // results of the search -- if we sort once in advance, then
+    // every future search is 1ms
+    let allTrackList = useMemo(
+        () => Object.values(tracks).sort((a, b) => normalise_cmp(a.tags.title[0], b.tags.title[0])),
+        [tracks],
+    )
+    // memoise based on searchParams, not searchParams.getAll("filters"),
+    // because the latter returns a fresh new Array object every time
+    let sections = useMemo(
+        () => group_tracks(
+            searchParams.getAll("filters"),
             find_tracks(
-                tracks,
-                filters,
-                search,
+                allTrackList,
+                searchParams.getAll("filters"),
+                searchParams.get("search") ?? "",
                 settings["hidden_tags"] ?? [],
                 settings["forced_tags"] ?? [],
-            ),
-        [tracks, filters, search, settings],
-    );
-    // console.log("Found", tracks.length, "tracks matching", state.filters, state.search);
-    let sections = useMemo(
-        () => group_tracks(filters, track_list),
-        [filters, track_list],
+            )
+        ),
+        [allTrackList, searchParams, settings],
     );
 
     return (
