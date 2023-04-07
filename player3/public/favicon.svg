@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#68C4D6;}
+	.st1{fill:#1D1D1B;}
+	.st2{fill:none;stroke:#68C4D6;stroke-width:8;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#1D1D1B;stroke-width:16;stroke-miterlimit:10;}
+</style>
+<rect id="BG-Apple" class="st0" width="512" height="512"/>
+<g id="Foreground">
+	<g id="Mic">
+		<g id="Blackout">
+			<polygon class="st1" points="190.3,344.14 133.62,311.41 235.62,118.37 306.48,159.28 			"/>
+			<polygon class="st1" points="185.58,341.41 138.34,314.14 118.16,365.46 151.22,384.56 			"/>
+			
+				<rect x="107.42" y="371.36" transform="matrix(0.866 0.5 -0.5 0.866 215.5327 -7.12)" class="st1" width="27.27" height="54.55"/>
+			<circle class="st1" cx="284.69" cy="115.2" r="54.55"/>
+		</g>
+		<g id="Transparent">
+			<path class="st2" d="M219.29,64.85c-36.36,62.98,105.35,144.8,141.71,81.82"/>
+			<path class="st2" d="M118.38,239.63c-36.36,62.98,105.35,144.8,141.71,81.82"/>
+			<path class="st2" d="M91.1,286.86c-36.36,62.98,105.35,144.8,141.71,81.82"/>
+			<path class="st2" d="M227.47,50.67C209.29,82.17,351,163.98,369.18,132.49"/>
+		</g>
+	</g>
+	<path id="Cable" class="st3" d="M107.36,421.58L96.45,443.4c0,0-8.03,16.22,10.91,21.82c3.43,1.01,24.6,1.79,35.45-2.73
+		c32.73-13.64,47.03-35.09,79.09-43.64c40.91-10.91,35.45,38.18,87.27,35.45"/>
+	<g id="Note">
+		<circle class="st1" cx="80.09" cy="196" r="27.27"/>
+		<rect x="93.73" y="59.64" class="st1" width="13.64" height="136.36"/>
+		<polygon class="st1" points="148.27,86.91 93.73,73.27 93.73,46 148.27,59.64 		"/>
+	</g>
+	<g id="Note_1_">
+		<circle class="st1" cx="295.55" cy="384.18" r="27.27"/>
+		<rect x="309.18" y="247.82" class="st1" width="13.64" height="136.36"/>
+		<polygon class="st1" points="363.73,275.09 309.18,261.45 309.18,234.18 363.73,247.82 		"/>
+	</g>
+	<g id="Note_2_">
+		<circle class="st1" cx="391" cy="356.91" r="27.27"/>
+		<rect x="404.64" y="220.55" class="st1" width="13.64" height="136.36"/>
+		<polygon class="st1" points="459.18,247.82 404.64,234.18 404.64,206.91 459.18,220.55 		"/>
+	</g>
+</g>
+</svg>
