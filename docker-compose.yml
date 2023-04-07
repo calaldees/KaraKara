@@ -19,6 +19,7 @@ services:
             - api_queue
             - mqtt
             - player2
+            - player3
             - browser2
             - browser3
         labels:
@@ -54,6 +55,10 @@ services:
     player2:
         build:
             context: ./player2
+
+    player3:
+        build:
+            context: ./player3
 
     browser2:
         build:
