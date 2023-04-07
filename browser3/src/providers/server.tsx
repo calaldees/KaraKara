@@ -23,7 +23,7 @@ export function ServerProvider(props: any) {
     const [downloadSize, setDownloadSize] = useState<number | null>(null);
     const [downloadDone, setDownloadDone] = useState<number>(0);
     const { request } = useApi();
-    const { now } = useServerTime(`${root}/time.json`, 10000);
+    const { now } = useServerTime(`${root}/time.json`, 1000);
 
     useEffect(() => {
         request({
