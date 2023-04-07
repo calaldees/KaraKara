@@ -143,7 +143,7 @@ describe("find_tracks", () => {
         // none of them are narrowing down the list at all, we're still
         // doing ok
         let tracks = finder.find_tracks(
-            big_tracks,
+            Object.values(big_tracks),
             ["category:anime", "from:Macross"],
             "mac",
             ["todo", "delete", "broken"],

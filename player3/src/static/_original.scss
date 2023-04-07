@@ -1,0 +1,314 @@
+.theme-original {
+	font-size: 2.5vh;
+
+	/*---------------------------------------------------------------------------*/
+	/* Title Screen Animation */
+	/*---------------------------------------------------------------------------*/
+
+	.screen_title {
+		overflow: hidden;
+	}
+
+	.screen_title img {
+		position: absolute;
+		border: 1px solid black;
+	}
+
+	.screen_title .info {
+		position: fixed;
+		/*-webkit-transform: rotate(-0.2rad);*/
+		top: 20%;
+		left: 25%;
+		width: 50%;
+		z-index: 100;
+	}
+	.screen_title .info > div {
+		color: black;
+		background-color: white;
+		border-radius: 8px;
+		padding: 2em;
+		font-size: 150%;
+		opacity: 0.9;
+	}
+
+	.screen_title .info h1 {
+		opacity: 1.0;
+		text-align: center;
+	}
+
+	/*---------------------------------------------------------------------------*/
+	/* Playlist */
+	/*---------------------------------------------------------------------------*/
+
+	#playlist ol {
+		padding: 0;
+	}
+
+	#playlist li {
+		position: relative;
+		width: 50%;
+		height: 4em;
+		margin: 1em;
+		overflow: hidden;
+		border: 0.15em solid black;
+		border-radius: 1em;
+	}
+	#playlist li img {
+		position: absolute;
+		top:-4em;
+		left:0;
+		opacity: 0.3;
+		width: 100%;
+		z-index: -1;
+	}
+	#playlist li p {
+		position: absolute;
+		margin: 0;
+	}
+	#playlist li .performer {
+		font-size: 2rem;
+		top:0.4em;
+		left:0.5em;
+		width: 40%;
+		text-transform: capitalize;
+
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	#playlist li .time {
+		right: 0.5em;
+		top: 0.5em;
+		bottom: 0.5em;
+		border: 0.25em solid black;
+		background-color: white;
+		width: 3.5em;
+		text-align: center;
+		border-radius: 4em;
+	}
+	#playlist li .time span {
+		position: absolute;
+		width: 3.5em;
+		top: 50%;
+		margin-top: -0.6em;
+		height: 1em;
+		left: 0px;
+	}
+	#playlist li .title,
+	#playlist li .from {
+		left: 45%;
+		right: 4.5rem;
+		text-transform: capitalize;
+		font-size: 1.2rem;
+
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	#playlist li .title {top: 0.5em;}
+	#playlist li .from {bottom: 0.5em;}
+
+	#playlist li:nth-child(1) {
+		width: 58%;
+		height: 7em;
+		border-width: 3px;
+	}
+	#playlist li:nth-child(1) .time {
+		border-color: red;
+		font-weight: bold;
+	}
+	#playlist li:nth-child(1) .performer {font-size: 3rem;}
+	#playlist li:nth-child(1) .title {font-size: 2rem;} /* font-size: 1.4em; */
+	#playlist li:nth-child(1) .from  {font-size: 2rem;}
+
+
+	#playlist li:nth-child(2)  {
+		width: 54%;
+		height: 5em;
+		border-width: 2px;
+	}
+	#playlist li:nth-child(2) .performer {font-size: 2.5rem;}
+	#playlist li:nth-child(2) .title {font-size: 1.5rem;}
+	#playlist li:nth-child(2) .from  {font-size: 1.5rem;}
+
+
+
+	#playlist_obscured {
+		position: absolute;
+		overflow: auto;
+		width: 40%;
+		top: 50%;
+		bottom: 0;
+		right: 0;
+		overflow: wrap;
+	}
+	#playlist_obscured ul {
+
+	}
+	#playlist_obscured ul li {
+		display: inline-block;
+		list-style-type: none;
+		font-size: 1.4rem;
+		background-color: #cccccc;
+		border: 0.1em solid #888888;
+		padding: 0.25em;
+		margin: 0.25em;
+		border-radius: 0.5em;
+		text-transform: capitalize;
+	}
+
+	.screen_preview .preview_holder {
+		position: absolute;
+		right: 0;
+		width: 40%;
+		height: 40%;
+	}
+	.screen_preview video {
+		width: 100%;
+	}
+
+	#event_end {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+	}
+
+
+	/**
+
+    #middle {
+        height: 70%;
+    }
+
+    #playerHolder {
+        float: left;
+        width: 60%;
+    }
+
+    #playerHolder h2 {
+        color: #fff;
+        text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
+        position: relative;
+        top: -10px;
+        width: 78%;
+        text-align: center;
+    }
+
+    #videoPreviewHolder {
+        position: relative;
+        top: -65px;
+        z-index: -1;
+        background-color: #000;
+        border-radius: 8px;
+        padding: 10px;
+        width: 78%;
+    }
+
+
+    #playlist ol {
+        list-style-position: inside;
+        font-size: 18px;
+    }
+
+    #playlist ol li {
+        margin: 5px 5px 5px 5px;
+        padding: 5px 5px 5px 5px;
+        color: black;
+        background-color: #777;
+        border: 1px solid #777;
+        border-radius: 8px;
+
+    }
+
+    #playlist ol li p {
+        margin: -1%;
+    }
+
+    #playlist li:nth-child(1)  {
+        background-color: #ccc;
+        border: 1px solid #ccc;
+        -webkit-animation-name: pulse;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: ease-in-out;
+        -webkit-animation-direction: alternate;
+        -webkit-animation-duration: 0.75s;
+    }
+    #playlist li:nth-child(1):after {
+        font-weight: bold;
+        float: right;
+        position: relative;
+        top: -15px;
+        left: -5px;
+        color: #c12;
+        text-shadow: 0 0 4px #ff1, 0 0 30px #fe6;
+        content: "Ready to Start";
+    }
+
+
+    #playlist li:nth-child(2) {background-color: #777;}
+    #playlist li:nth-child(2):after {
+        font-weight: bold;
+        content: "Up Next";
+        float: right;
+        position: relative;
+        top: -15px;
+        left: -5px;
+        color: #6b3;
+    }
+
+    #playlist .title:before{content: "Title: "; font-weight: bold;}
+    #playlist .from:before{content: "From: "; font-weight: bold;}
+    #playlist .performer:before{content: "Performer Name: "; font-weight: bold;}
+    #playlist .time:before{content: "Time before song: "; font-weight: bold;}
+
+
+
+    #playlistHolder {
+        float: left;
+        width: 38%;
+        padding: 0px;
+        border: 1px solid #999;
+        border-radius: 8px;
+        margin-top: 5px;
+        background-color: #999;
+    }
+
+    #marqueeHolder {
+        height: 20%;
+        position: absolute;
+        bottom: -3%;
+
+    }
+
+    #marqueeHolder h2 {
+        margin-top: 1.75%;
+        margin-bottom: 0;
+        text-shadow: 0 0 2px #1ff, 0 0 15px #6ef;
+        color: #fff;
+        padding-left: 35%;
+        background-color: #000;
+        border-radius: 8px 8px 0px 0px;
+
+
+    }
+
+    #marqueeHolder ul {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    #marqueeHolder ul li {
+        float: left;
+        border: 1px solid black;
+        border-radius: 8px;
+        padding: 1px 5px 1px 5px;
+        margin: 1px 5px 1px 5px;
+    }
+
+    #playlist_obscured {
+        margin-top: 0.25%;
+        white-space: nowrap;
+        overflow-x: hidden;
+    }
+    */
+}

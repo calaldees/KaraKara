@@ -38,7 +38,7 @@ declare global {
     }
 }
 
-import React from "react";
+import React, { useState } from "react";
 import { ClientContext, ClientContextType } from "../../src/providers/client";
 import { RoomContext, RoomContextType } from "../../src/providers/room";
 import { ServerContext, ServerContextType } from "../../src/providers/server";
@@ -83,11 +83,12 @@ function TestHarness(props: TestProps) {
         now: 1234,
         ...props.server
     }
+    const [queue_, setQueue] = useState(queue as QueueItem[]);
     const rc = {
         isAdmin: true,
         sessionId: "admin",
-        queue: queue,
-        setQueue: () => {},
+        queue: queue_,
+        setQueue: setQueue,
         settings: settings,
         ...props.room
     }

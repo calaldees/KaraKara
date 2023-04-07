@@ -120,18 +120,16 @@ export function text_to_filters(
  * All the searching in one place, for benchmarking
  */
 export function find_tracks(
-    tracks_: Record<string, Track>,
+    tracks: Array<Track>,
     filters_: string[],
     search_: string,
     hidden_tags: string[],
     forced_tags: string[],
 ): Array<Track> {
     let [filters, search] = text_to_filters(filters_, search_);
-    let tracks = Object.values(tracks_);
     tracks = apply_hidden(tracks, hidden_tags);
     tracks = apply_tags(tracks, forced_tags);
     tracks = apply_tags(tracks, filters);
     tracks = apply_search(tracks, search);
-    tracks.sort((a, b) => normalise_cmp(a.tags.title[0], b.tags.title[0]));
     return tracks;
 }

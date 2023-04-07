@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useLocalStorage } from "../hooks/localstorage";
+import React, { useState } from "react";
+import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 
 type Notification = {
     text: string;
@@ -44,10 +44,6 @@ export const ClientContext = React.createContext<ClientContextType>({
     setNotification: (x) => null,
 });
 
-function isWidescreen(): boolean {
-    return window.innerWidth > 780 && window.innerWidth > window.innerHeight;
-}
-
 export function ClientProvider(props: any) {
     // If we're running stand-alone, then use the main karakara.uk
     // server; else we're probably running as part of the full-stack,
@@ -63,7 +59,7 @@ export function ClientProvider(props: any) {
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [booth, setBooth] = useLocalStorage<boolean>("booth", false);
-    const [widescreen, setWidescreen] = useState<boolean>(isWidescreen());
+    const widescreen = useMediaQuery('(min-width: 780px) and (min-aspect-ratio: 1/1)');
     const [bookmarks, setBookmarks] = useLocalStorage<string[]>(
         "bookmarks",
         [],
@@ -80,16 +76,6 @@ export function ClientProvider(props: any) {
     function removeBookmark(track_id: string): void {
         setBookmarks(bookmarks.filter((x) => x !== track_id));
     }
-
-    useEffect(() => {
-        function handler(event: UIEvent) {
-            setWidescreen(isWidescreen());
-        }
-        window.addEventListener("resize", handler);
-        return function () {
-            window.removeEventListener("resize", handler);
-        };
-    });
 
     return (
         <ClientContext.Provider

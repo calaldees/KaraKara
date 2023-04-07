@@ -88,7 +88,12 @@ function dnd(drag: string, drop: string) {
 }
 describe("drag & drop", () => {
     beforeEach(function () {
-        cy.intercept("PUT", "/room/test/queue.json", { body: {} }).as("move");
+        cy.intercept("PUT", "/room/test/queue.json", (req) => {
+            req.reply({
+                body: {},
+                //delay: 1000
+            })
+        }).as("move");
     });
     it("drag to top", () => {
         cy.mount(<Control />, {
@@ -115,10 +120,16 @@ describe("drag & drop", () => {
             expect(request.body.source).to.eq("2");
             expect(request.body.target).to.eq("-1");
         });
+        cy.contains("Shish").should('exist')
     });
 });
 
 describe("misc", () => {
+    beforeEach(function () {
+        cy.intercept("PUT", "/room/test/queue.json", (req) => {
+            req.reply({ body: {}, delay: 1000 })
+        }).as("move");
+    });
     it("playground", () => {
         cy.mount(<Control />, {
             client: {},
