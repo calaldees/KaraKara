@@ -26,7 +26,7 @@ export const router = createBrowserRouter(
             <Route path=":roomName" element={<RoomWrapper />} />
         </Route>
     ),
-    {basename: process.env.NODE_ENV === "development" ? "/" : "/browser3"}
+    {basename: process.env.NODE_ENV === "development" ? "/" : "/player3"}
 );
 
 function RoomWrapper() {
