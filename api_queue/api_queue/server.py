@@ -209,10 +209,16 @@ async def update_settings(request, room_name):
 
 @room_blueprint.get("/queue.csv")
 @openapi.definition(
-    response=openapi.definitions.Response({"text/csv": str}),
+    response=[
+        openapi.definitions.Response({"text/csv": str}),
+        openapi.definitions.Response('queue not found', status=400),
+    ]
 )
 async def queue_csv(request, room_name):
-    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(room_name))
+    path_csv = request.app.ctx.queue_manager.path_csv(room_name)
+    if not path_csv.is_file():
+        raise sanic.exceptions.NotFound()
+    return await sanic.response.file(path_csv)
 
 @room_blueprint.get("/queue.json")
 @openapi.definition(

@@ -62,6 +62,10 @@ class QueueModel():
         self.app.asgi_client.cookies.delete('session_id')
 
     @property
+    async def queue_csv(self):
+        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.csv")
+        return response.text
+    @property
     async def queue(self):
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
         return response.json

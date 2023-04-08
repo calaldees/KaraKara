@@ -18,6 +18,8 @@ async def test_queue_invalid_name(app):
     assert response.status == 404
     request, response = await app.asgi_client.get(f"/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
     assert response.status == 404
+    request, response = await app.asgi_client.get(f"/room/キ/queue.csv")
+    assert response.status == 404
 
 
 @pytest.mark.asyncio
@@ -89,6 +91,14 @@ async def test_queue_add(queue_model, mock_mqtt):
     assert {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}.items() <= queue[0].items()
     assert mock_mqtt.publish.await_args.args == ("room/test/queue", json.dumps(queue))
     assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
+
+
+@pytest.mark.asyncio
+async def test_queue_add_csv(queue_model):
+    await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test1')
+    csv = await queue_model.queue_csv
+    assert csv.count(',') > 10  # TODO: assert this is valid csv?
+    assert 'test1' in csv
 
 
 @pytest.mark.asyncio
