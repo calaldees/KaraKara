@@ -151,9 +151,14 @@ VIDEO {
 			text-align: center;
 			padding: 2vh 4vw;
 		}
+		H2 {
+			@include border;
+			@include radial;
+		}
 
 		#splash {
 			position: absolute;
+			inset: 0;
 			// avoid using any zero-values in transform, because scss will
 			// optimise that into matrix() which won't animate...
 			@keyframes raincw {
@@ -176,6 +181,15 @@ VIDEO {
 			}
 			IMG:nth-child(odd) {
 				animation: rainccw 10s linear infinite;
+			}
+			TABLE {
+				TH {
+					color: #FF7;
+					text-align: right;
+				}
+				TD {
+					padding-left: .25em;
+				}
 			}
 		}
 	}

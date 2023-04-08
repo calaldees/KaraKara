@@ -5,7 +5,28 @@ import { RoomContext } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 
-export function Splash() {
+function StatsTable() {
+    const { tracks } = useContext(ServerContext);
+    const ts = Object.values(tracks);
+    const stats = {
+        tracks: ts.length,
+        lines: ts.map(t => t.lyrics.length).reduce((sum, n) => sum + n, 0),
+        shows: new Set(ts.map(t => t.tags.from?.[0])).size,
+        hours: Math.floor(ts.map(t => t.duration).reduce((sum, n) => sum + n, 0) / 60 / 60),
+    }
+    return <h2>
+        <table>
+            <tbody>
+                {Object.entries(stats).map(([key, value]) =>
+                    <tr key={key}><th><strong>{value}</strong></th><td>{key}</td></tr>
+                )}
+            </tbody>
+        </table>
+    </h2>;
+}
+
+function Waterfall() {
+    const { settings } = useContext(RoomContext);
     const { root } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const items = useMemo(() => {
@@ -27,19 +48,22 @@ export function Splash() {
             ))
     }, [tracks])
     return (
-        <div id={"splash"}>
-            {items.map(({ src, style }, n) => <img key={n} src={src} style={style} />)}
-        </div>
+        <>
+            <div id={"splash"}>
+                {items.map(({ src, style }, n) => <img key={n} src={src} style={style} />)}
+            </div>
+            <h1>{settings["title"]}</h1>
+        </>
     );
 }
 
 export function TitleScreen() {
-    const { settings } = useContext(RoomContext);
+    let splash = null;
+    if (true) splash = <Waterfall />;
     return (
         <section key="title" className={"screen_title"}>
-            <Splash />
+            {splash}
             <JoinInfo />
-            <h1>{settings["title"]}</h1>
             <EventInfo />
         </section>
     );
