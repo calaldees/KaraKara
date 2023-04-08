@@ -17,7 +17,7 @@ class QueueItem():
     performer_name: str
     start_time: t.Optional[datetime.datetime] = None
     id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
-    added_time: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.now)
+    added_time: datetime.datetime = dataclasses.field(default_factory=lambda: datetime.datetime.now())
 
     def __post_init__(self):
         """

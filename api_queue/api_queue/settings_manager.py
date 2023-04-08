@@ -18,6 +18,7 @@ DEFAULT_QUEUE_SETTINGS = {
     "validation_duplicate_track_timedelta": None,
     "validation_performer_names": [],
     "validation": ['default'],
+    "coming_soon_track_count": 5,
 }
 def _parse_isodatetime(isoformatString):
     return datetime.datetime.fromisoformat(isoformatString) if isoformatString else None
