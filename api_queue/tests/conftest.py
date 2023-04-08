@@ -112,7 +112,7 @@ def qu():
         "validation_duplicate_performer_timedelta": '4min',
         "validation_duplicate_track_timedelta": '4min',
         "validation_performer_names": [],
-        "coming_soon_track_count": 5,
+        "coming_soon_track_count": 3,
     }
     qu = Queue([], settings=SettingsManager.get(mock_settings_manager, 'test'))
     qu._now = datetime.datetime(2022, 1, 1, 10, 0, 0)
