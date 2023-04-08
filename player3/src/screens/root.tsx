@@ -98,7 +98,7 @@ function Room() {
             onClick={(e) => setAudioAllowed(true)}
             onDoubleClick={(e) => setShowSettings(true)}
         >
-            <main className={"theme-" + settings["theme"]}>
+            <main className={"theme-" + (settings["theme"] ?? "metalghosts")}>
                 {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
                 {screen}
             </main>
