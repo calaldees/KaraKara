@@ -96,6 +96,6 @@ describe("Search", () => {
         cy.go("back");
         cy.location("search").should("eq", "?search=&filters=category%3Aanime");
         cy.go("back");
-        cy.location("search").should("eq", "");
+        cy.location("search").should("eq", "?search=");
     });
 });

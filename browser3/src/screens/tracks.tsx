@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState, useCallback } from "react";
+import { useContext, useMemo, useState, useEffect } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -213,17 +213,16 @@ export function TrackList(): React.ReactElement {
     const [inSearch, setInSearch] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const search: string = searchParams.get("search") ?? "";
-    const filters: string[] = searchParams.getAll("filters");
-    const setSearch = useCallback(function(s: string) {
-        setSearchParams({ search: s, filters: filters }, { replace: inSearch });
-        setInSearch(true);
-    }, []);
-    const setFilters = useCallback(function(fs: string[] | CallableFunction) {
-        const f2 = Array.isArray(fs) ? fs : fs(filters);
-        setSearchParams({ search: search, filters: f2 });
+    const [search, setSearch] = useState(searchParams.get("search") ?? "");
+    const [filters, setFilters] = useState<string[]>(searchParams.getAll("filters"));
+    useEffect(() => {
+        setSearchParams({ search, filters });
         setInSearch(false);
-    }, []);
+    }, [filters])
+    useEffect(() => {
+        setSearchParams({ search, filters }, { replace: inSearch });
+        setInSearch(true);
+    }, [search])
 
     // find_tracks took 16ms, of which 15ms was spent sorting the
     // results of the search -- if we sort once in advance, then
