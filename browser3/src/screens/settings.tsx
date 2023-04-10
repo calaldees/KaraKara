@@ -22,6 +22,7 @@ export function RoomSettings(): React.ReactElement {
 
     function saveSettings(event: any) {
         event.preventDefault();
+        setSaving(true);
         request({
             notify: "Saving settings...",
             notify_ok: "Settings saved!",
@@ -33,7 +34,7 @@ export function RoomSettings(): React.ReactElement {
                 },
                 body: JSON.stringify(roomSettingsEdit),
             },
-            // action: (state, response) => [{ ...state }],
+            onAction: () => setSaving(false),
         });
     }
 
