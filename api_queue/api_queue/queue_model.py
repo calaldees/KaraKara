@@ -11,13 +11,17 @@ from itertools import pairwise
 # have I missed the point here? this feels like verbose rubbish for such a simple class
 @dataclasses.dataclass
 class QueueItem():
+    @staticmethod
+    def _now():
+        return datetime.datetime.now()
+
     track_id: str
     track_duration: datetime.timedelta
     session_id: str
     performer_name: str
     start_time: t.Optional[datetime.datetime] = None
     id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
-    added_time: datetime.datetime = dataclasses.field(default_factory=lambda: datetime.datetime.now())
+    added_time: datetime.datetime = dataclasses.field(default_factory=_now)
 
     def __post_init__(self):
         """
@@ -77,6 +81,11 @@ class QueueItem():
         if self.start_time:
             return self.start_time + self.track_duration
         return None
+
+    @property
+    def time_since_queued(self) -> datetime.timedelta:
+        return self._now() - self.added_time
+
 
 
 class Queue():
