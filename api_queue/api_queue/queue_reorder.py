@@ -53,5 +53,5 @@ def reorder(queue: Queue):
     queue_item_current = queue.current
     if not queue_item_current:
         return
-    reorder_index = queue.items.index(queue_item_current)-1 + queue.settings["coming_soon_track_count"]
+    reorder_index = queue.items.index(queue_item_current) + queue.settings["coming_soon_track_count"]
     queue.items[reorder_index:] = sorted(queue.items[reorder_index:], key=partial(_rank, queue))

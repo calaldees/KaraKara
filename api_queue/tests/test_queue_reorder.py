@@ -43,13 +43,23 @@ def test_no_reorder(qu):
     assert [i.track_id for i in qu.future] == ['Track1','Track2','Track3','Track4','Track5','Track6']
 
 
+def test_no_reorder_protect_coming_soon_track_count(qu):
+    qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name1', added_time=_mins_ago(60), start_time=_mins_ago(10)))
+    qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name2', added_time=_mins_ago(50), start_time=_mins_ago( 5)))
+    qu.add(QueueItem('Track3', 60, 'TestSession3', 'test_name3', added_time=_mins_ago(40)))
+    qu.add(QueueItem('Track4', 60, 'TestSession1', 'test_name4', added_time=_mins_ago(30)))
+    qu.add(QueueItem('Track11', 60, 'TestSession1', 'test_name1', added_time=_mins_ago(20)))  # test_name1 has sung before and should be outranked by all the others ... BUT it is currently in the protected 'coming_soon_track_count'
+    qu.add(QueueItem('Track5', 60, 'TestSession3', 'test_name5', added_time=_mins_ago(10)))
+    reorder(qu)
+    assert [i.track_id for i in qu.future] == ['Track3','Track4','Track11','Track5']
+
 def test_reorder_1(qu):
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name1', added_time=_mins_ago(60), start_time=_mins_ago(10)))
     qu.add(QueueItem('Track2', 60, 'TestSession2', 'test_name2', added_time=_mins_ago(50), start_time=_mins_ago( 5)))
     qu.add(QueueItem('Track3', 60, 'TestSession3', 'test_name3', added_time=_mins_ago(40)))
     qu.add(QueueItem('Track4', 60, 'TestSession1', 'test_name4', added_time=_mins_ago(30)))
+    qu.add(QueueItem('Track5', 60, 'TestSession3', 'test_name5', added_time=_mins_ago(20)))
     qu.add(QueueItem('Track11', 60, 'TestSession1', 'test_name1', added_time=_mins_ago(20)))  # test_name1 has sung before and should be outranked by all the others
-    qu.add(QueueItem('Track5', 60, 'TestSession3', 'test_name5', added_time=_mins_ago(10)))
+    qu.add(QueueItem('Track6', 60, 'TestSession6', 'test_name6', added_time=_mins_ago(10)))
     reorder(qu)
-    assert [i.track_id for i in qu.future] == ['Track3','Track4','Track5','Track11']
-
+    assert [i.track_id for i in qu.future] == ['Track3','Track4','Track5','Track6','Track11']
