@@ -50,6 +50,7 @@ export function YoureNext({
     );
 }
 
+// eslint-disable-next-line
 const EmptyHeaderLink = (): React.ReactElement => <a href="#" />;
 
 export function Screen({

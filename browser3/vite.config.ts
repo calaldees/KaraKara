@@ -2,12 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import svgr from 'vite-plugin-svgr'
 import { VitePWA } from 'vite-plugin-pwa'
+import eslint from 'vite-plugin-eslint';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     svgr(),
+    eslint(),
     VitePWA({
       injectRegister: null, manifest: {
         name: 'KaraKara',
