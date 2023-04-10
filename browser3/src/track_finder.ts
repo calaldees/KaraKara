@@ -1,5 +1,3 @@
-import { normalise_cmp } from "./utils";
-
 /**
  * If track has a 'hidden' tag, then skip it, UNLESS it also has
  * other non-hidden tags with the same parent. Consider top-level
@@ -123,12 +121,8 @@ export function find_tracks(
     tracks: Array<Track>,
     filters_: string[],
     search_: string,
-    hidden_tags: string[],
-    forced_tags: string[],
 ): Array<Track> {
     let [filters, search] = text_to_filters(filters_, search_);
-    tracks = apply_hidden(tracks, hidden_tags);
-    tracks = apply_tags(tracks, forced_tags);
     tracks = apply_tags(tracks, filters);
     tracks = apply_search(tracks, search);
     return tracks;

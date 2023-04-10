@@ -5,9 +5,9 @@ import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 
 type VideoProps = {
-    track: Track,
-    lowres: boolean,
-    [Key: string]: any,
+    track: Track;
+    lowres: boolean;
+    [Key: string]: any;
 };
 export function Video({ track, lowres, ...kwargs }: VideoProps) {
     const { root } = useContext(ClientContext);
@@ -22,8 +22,12 @@ export function Video({ track, lowres, ...kwargs }: VideoProps) {
         >
             {(lowres ? track.attachments.preview : track.attachments.video).map(
                 (a: Attachment) => (
-                    <source key={a.path} src={attachment_path(root, a)} type={a.mime} />
-                )
+                    <source
+                        key={a.path}
+                        src={attachment_path(root, a)}
+                        type={a.mime}
+                    />
+                ),
             )}
             {track.attachments.subtitle?.map((a: Attachment) => (
                 <track
@@ -32,7 +36,8 @@ export function Video({ track, lowres, ...kwargs }: VideoProps) {
                     src={attachment_path(root, a)}
                     default={true}
                     label="English"
-                    srcLang="en" />
+                    srcLang="en"
+                />
             ))}
         </video>
     );
@@ -43,8 +48,8 @@ export function JoinInfo() {
     const { root } = useContext(ClientContext);
     return (
         <div id="join_info">
-            Join at <strong>{root.replace("https://", "")}</strong> - Room
-            Name is <strong>{roomName}</strong>
+            Join at <strong>{root.replace("https://", "")}</strong> - Room Name
+            is <strong>{roomName}</strong>
         </div>
     );
 }
@@ -57,9 +62,7 @@ export function EventInfo() {
                 <span>
                     Event ends at{" "}
                     <strong>
-                        {short_date(
-                            settings["validation_event_end_datetime"]
-                        )}
+                        {short_date(settings["validation_event_end_datetime"])}
                     </strong>
                 </span>
             )}
@@ -69,16 +72,18 @@ export function EventInfo() {
             {settings["admin_list"]?.length > 0 && (
                 <span>
                     Admins are{" "}
-                    {settings["admin_list"].map((a: string, n: number, as: string[]) => (
-                        <span>
-                            <strong>{a}</strong>
-                            {n == as.length - 1
-                                ? ""
-                                : n == as.length - 2
+                    {settings["admin_list"].map(
+                        (a: string, n: number, as: string[]) => (
+                            <span>
+                                <strong>{a}</strong>
+                                {n === as.length - 1
+                                    ? ""
+                                    : n === as.length - 2
                                     ? " and "
                                     : ", "}
-                        </span>
-                    ))}
+                            </span>
+                        ),
+                    )}
                 </span>
             )}
         </div>

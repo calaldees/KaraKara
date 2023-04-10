@@ -7,21 +7,20 @@ import { current_and_future, mqtt_url } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 
-
 export type RoomContextType = {
     isAdmin: boolean;
     sessionId: string;
     queue: QueueItem[];
-    setQueue: (q: QueueItem[]) => void,
+    setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
-    connected: boolean,
+    connected: boolean;
 };
 
 export const RoomContext = React.createContext<RoomContextType>({
     isAdmin: false,
     sessionId: "",
     queue: [],
-    setQueue: () => { },
+    setQueue: () => {},
     settings: {},
     connected: false,
 });
@@ -67,10 +66,10 @@ function InternalRoomProvider(props: any) {
                 setSessionId(response.session_id);
             },
         });
-    }, [root, roomName, roomPassword]);
+    }, [root, roomName, roomPassword, request]);
     useEffect(() => {
-        setQueue(current_and_future(now, fullQueue))
-    }, [fullQueue, now])
+        setQueue(current_and_future(now, fullQueue));
+    }, [fullQueue, now]);
 
     return (
         <RoomContext.Provider
@@ -90,9 +89,9 @@ function InternalRoomProvider(props: any) {
 
 export function RoomProvider(props: any) {
     const { root } = useContext(ClientContext);
-    return <MqttProvider url={mqtt_url(root)}>
-        <InternalRoomProvider>
-            {props.children}
-        </InternalRoomProvider>
-    </MqttProvider>
+    return (
+        <MqttProvider url={mqtt_url(root)}>
+            <InternalRoomProvider>{props.children}</InternalRoomProvider>
+        </MqttProvider>
+    );
 }

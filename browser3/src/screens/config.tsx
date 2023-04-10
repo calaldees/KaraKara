@@ -21,7 +21,7 @@ export function ConfigMenu(): React.ReactElement {
     function onSubmit(e: FormEvent) {
         e.preventDefault();
         setRoot(rootEdit);
-        if (roomNameEdit != roomName) {
+        if (roomNameEdit !== roomName) {
             navigate("/" + roomNameEdit);
         }
         setRoomPassword(roomPasswordEdit);

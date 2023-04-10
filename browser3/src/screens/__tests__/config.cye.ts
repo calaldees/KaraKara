@@ -5,7 +5,9 @@ export {};
 describe("Admin Login", () => {
     beforeEach(function () {
         cy.intercept("GET", "/time.json", { body: 1234 });
-        cy.intercept("GET", "/files/tracks.json", { fixture: "small_tracks.json" });
+        cy.intercept("GET", "/files/tracks.json", {
+            fixture: "small_tracks.json",
+        });
         cy.visit("/");
         cy.get("h1").dblclick();
         cy.viewport(1000, 600);

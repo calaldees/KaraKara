@@ -66,14 +66,16 @@ export function ClientProvider(props: any) {
         onRelease: () => setWakeLock("Released"),
     });
     useEffect(() => {
-        if(isSupported) {
+        if (isSupported) {
             request().then(() => {
-                setWakeLock("Acquired")
+                setWakeLock("Acquired");
             });
         }
-    }, [isSupported])
+    }, [isSupported, request]);
 
-    function setNotification(n: any) { console.log(n); }
+    function setNotification(n: any) {
+        console.log(n);
+    }
 
     return (
         <ClientContext.Provider

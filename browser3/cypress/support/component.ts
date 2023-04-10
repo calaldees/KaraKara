@@ -14,13 +14,13 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from 'cypress/react18'
-import { MountOptions, MountReturn } from 'cypress/react'
+import { mount } from "cypress/react18";
+import { MountOptions, MountReturn } from "cypress/react";
 // Cypress.Commands.add('mount', mount)
 
 // Augment the Cypress namespace to include type definitions for
@@ -32,8 +32,8 @@ declare global {
         interface Chainable<Subject> {
             mount(
                 component: React.ReactNode,
-                options?: MountOptions | TestProps
-            ): Cypress.Chainable<MountReturn>
+                options?: MountOptions | TestProps,
+            ): Cypress.Chainable<MountReturn>;
         }
     }
 }
@@ -49,40 +49,39 @@ import tracks from "../../cypress/fixtures/small_tracks.json";
 import queue from "../../cypress/fixtures/small_queue.json";
 import settings from "../../cypress/fixtures/small_settings.json";
 
-
 type TestProps = {
-    client: Partial<ClientContextType>,
-    server: Partial<ServerContextType>,
-    room: Partial<RoomContextType>,
-    children?: any,
+    client: Partial<ClientContextType>;
+    server: Partial<ServerContextType>;
+    room: Partial<RoomContextType>;
+    children?: any;
 };
 function TestHarness(props: TestProps) {
     const cc = {
         root: "https://karakara.uk",
-        setRoot: () => { },
+        setRoot: () => {},
         roomPassword: "",
-        setRoomPassword: () => { },
+        setRoomPassword: () => {},
         showSettings: false,
-        setShowSettings: () => { },
+        setShowSettings: () => {},
         booth: false,
-        setBooth: () => { },
+        setBooth: () => {},
         widescreen: false,
         performerName: "",
-        setPerformerName: () => { },
+        setPerformerName: () => {},
         bookmarks: [],
-        addBookmark: () => { },
-        removeBookmark: () => { },
+        addBookmark: () => {},
+        removeBookmark: () => {},
         notification: null,
-        setNotification: () => { },
-        ...props.client
+        setNotification: () => {},
+        ...props.client,
     };
     const sc = {
         tracks: tracks,
         downloadSize: 100,
         downloadDone: 100,
         now: 1234,
-        ...props.server
-    }
+        ...props.server,
+    };
     const [queue_, setQueue] = useState(queue as QueueItem[]);
     const rc = {
         isAdmin: true,
@@ -90,27 +89,41 @@ function TestHarness(props: TestProps) {
         queue: queue_,
         setQueue: setQueue,
         settings: settings,
-        ...props.room
-    }
+        ...props.room,
+    };
 
-    const router = createMemoryRouter([
-        {
-            path: "/:roomName",
-            element: React.createElement(RoomContext.Provider, { value: rc, children: props.children }),
-        },
-    ], {initialEntries: [`/test`]});
-    const router_provider = React.createElement(RouterProvider, { router: router });
-    const server_provider = React.createElement(ServerContext.Provider, { value: sc, children: router_provider });
-    const client_provider = React.createElement(ClientContext.Provider, { value: cc, children: server_provider });
+    const router = createMemoryRouter(
+        [
+            {
+                path: "/:roomName",
+                element: React.createElement(RoomContext.Provider, {
+                    value: rc,
+                    children: props.children,
+                }),
+            },
+        ],
+        { initialEntries: [`/test`] },
+    );
+    const router_provider = React.createElement(RouterProvider, {
+        router: router,
+    });
+    const server_provider = React.createElement(ServerContext.Provider, {
+        value: sc,
+        children: router_provider,
+    });
+    const client_provider = React.createElement(ClientContext.Provider, {
+        value: cc,
+        children: server_provider,
+    });
     return client_provider;
 }
 
-Cypress.Commands.add('mount', (component, options: any = {}) => {
+Cypress.Commands.add("mount", (component, options: any = {}) => {
     const provider = React.createElement(TestHarness, {
         client: options.client ?? {},
         server: options.server ?? {},
         room: options.room ?? {},
-        children: component
+        children: component,
     });
     return mount(provider, options);
-})
+});

@@ -81,14 +81,16 @@ export function summarise_tags(
     tracks: Array<Pick<Track, "tags">>,
 ): Record<string, Record<string, number>> {
     let tags: Record<string, Record<string, number>> = {};
-    tracks.forEach(track => {
-        Object.entries(track.tags).filter(([tag, values]) => tag !== "title").forEach(([tag, values]) => {
-            values?.forEach(value => {
-                if (tags[tag] === undefined) tags[tag] = {};
-                if (tags[tag][value] === undefined) tags[tag][value] = 0;
-                tags[tag][value]++;
-            })
-        });
+    tracks.forEach((track) => {
+        Object.entries(track.tags)
+            .filter(([tag, values]) => tag !== "title")
+            .forEach(([tag, values]) => {
+                values?.forEach((value) => {
+                    if (tags[tag] === undefined) tags[tag] = {};
+                    if (tags[tag][value] === undefined) tags[tag][value] = 0;
+                    tags[tag][value]++;
+                });
+            });
     });
     return tags;
 }

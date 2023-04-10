@@ -146,8 +146,6 @@ describe("find_tracks", () => {
             Object.values(big_tracks),
             ["category:anime", "from:Macross"],
             "mac",
-            ["todo", "delete", "broken"],
-            ["retro"],
         );
         expect(tracks.length).toEqual(10000);
     });

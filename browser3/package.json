@@ -9,6 +9,7 @@
     "cypress": "npx cypress open",
     "format": "prettier --write '{src,cypress}/**/*.ts{,x}' --tab-width 4 --trailing-comma all",
     "preview": "npm run build && vite preview --host 127.0.0.1 --port 1236 --base /browser3/",
+    "lint": "eslint --format unix src",
     "test": "vitest",
     "test-once": "vitest run"
   },

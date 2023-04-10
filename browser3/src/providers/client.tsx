@@ -59,7 +59,9 @@ export function ClientProvider(props: any) {
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [booth, setBooth] = useLocalStorage<boolean>("booth", false);
-    const widescreen = useMediaQuery('(min-width: 780px) and (min-aspect-ratio: 1/1)');
+    const widescreen = useMediaQuery(
+        "(min-width: 780px) and (min-aspect-ratio: 1/1)",
+    );
     const [bookmarks, setBookmarks] = useLocalStorage<string[]>(
         "bookmarks",
         [],

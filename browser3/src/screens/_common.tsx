@@ -42,8 +42,8 @@ export function YoureNext({
             )) ||
                 (is_my_song(sessionId, performerName, queue[1]) && (
                     <h2 className="main-only upnext">
-                        Your song "{tracks[queue[1].track_id]?.tags.title[0]}" is
-                        up next!
+                        Your song "{tracks[queue[1].track_id]?.tags.title[0]}"
+                        is up next!
                     </h2>
                 ))}
         </>

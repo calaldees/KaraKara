@@ -15,8 +15,8 @@ describe("no tracks", () => {
                 queue: [],
             },
         });
-        cy.contains("Queue Empty").should("exist")
-        cy.contains("Coming Soon").should("not.exist")
+        cy.contains("Queue Empty").should("exist");
+        cy.contains("Coming Soon").should("not.exist");
     });
 });
 
@@ -31,13 +31,13 @@ describe("now playing", () => {
                 queue: [
                     {
                         ...queue[1],
-                        start_time: null
-                    }
+                        start_time: null,
+                    },
                 ],
             },
         });
-        cy.get("span.count").should('not.exist')
-        cy.contains("Coming Soon").should("not.exist")
+        cy.get("span.count").should("not.exist");
+        cy.contains("Coming Soon").should("not.exist");
     });
     it("in the future", () => {
         cy.mount(<Queue />, {
@@ -49,13 +49,13 @@ describe("now playing", () => {
                 queue: [
                     {
                         ...queue[1],
-                        start_time: 1120
-                    }
+                        start_time: 1120,
+                    },
                 ],
             },
         });
-        cy.get("span.count").contains('In 2 mins').should('exist')
-        cy.contains("Coming Soon").should("not.exist")
+        cy.get("span.count").contains("In 2 mins").should("exist");
+        cy.contains("Coming Soon").should("not.exist");
     });
     it("playing now", () => {
         cy.mount(<Queue />, {
@@ -69,12 +69,12 @@ describe("now playing", () => {
                         ...queue[1],
                         start_time: 990,
                         track_duration: 60,
-                    }
+                    },
                 ],
             },
         });
-        cy.get("span.count").contains('Now').should('exist')
-        cy.contains("Coming Soon").should("not.exist")
+        cy.get("span.count").contains("Now").should("exist");
+        cy.contains("Coming Soon").should("not.exist");
     });
     it("with lyrics", () => {
         let track_2_with_lyrics: Track = {
@@ -87,16 +87,14 @@ describe("now playing", () => {
                 now: 1000,
                 tracks: {
                     ...tracks,
-                    track_id_2: track_2_with_lyrics
-                }
+                    track_id_2: track_2_with_lyrics,
+                },
             },
             room: {
-                queue: [
-                    queue[1],
-                ],
+                queue: [queue[1]],
             },
         });
-        cy.contains("baz").should("exist")
+        cy.contains("baz").should("exist");
     });
 });
 
@@ -107,12 +105,12 @@ describe("coming soon", () => {
             server: {},
             room: {
                 settings: {
-                    ...settings, 
+                    ...settings,
                     coming_soon_track_count: 0,
-                }
+                },
             },
         });
-        cy.contains("Coming Soon").should("not.exist")
+        cy.contains("Coming Soon").should("not.exist");
     });
 });
 
@@ -124,7 +122,7 @@ describe("coming later", () => {
             server: {},
             room: {},
         });
-        cy.contains("Coming Later").should("exist")
+        cy.contains("Coming Later").should("exist");
     });
 });
 
@@ -135,15 +133,15 @@ describe("my entries", () => {
             server: {},
             room: {},
         });
-        cy.contains("My Entries").should("exist")
+        cy.contains("My Entries").should("exist");
     });
     it("without entries", () => {
         cy.mount(<Queue />, {
-            client: {performerName: "Zazzy"},
+            client: { performerName: "Zazzy" },
             server: {},
-            room: {sessionId: "nobody"},
+            room: { sessionId: "nobody" },
         });
-        cy.contains("My Entries").should("not.exist")
+        cy.contains("My Entries").should("not.exist");
     });
 });
 

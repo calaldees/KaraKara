@@ -31,9 +31,9 @@ export const router = createBrowserRouter(
                 <Route path="settings" element={<RoomSettings />} />
                 <Route path="printable" element={<Printable />} />
             </Route>
-        </Route>
+        </Route>,
     ),
-    {basename: process.env.NODE_ENV === "development" ? "/" : "/browser3"}
+    { basename: process.env.NODE_ENV === "development" ? "/" : "/browser3" },
 );
 
 function Page() {

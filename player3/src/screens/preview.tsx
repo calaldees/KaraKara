@@ -11,7 +11,8 @@ const show_tracks = 5;
 // Views
 
 export function PreviewScreen({
-    queue, track,
+    queue,
+    track,
 }: {
     queue: Array<QueueItem>;
     track: Track;
@@ -25,9 +26,12 @@ export function PreviewScreen({
             <JoinInfo />
             <Video
                 track={track}
-                onLoadStart={(e: any) => {e.target.volume = settings["preview_volume"]}}
+                onLoadStart={(e: any) => {
+                    e.target.volume = settings["preview_volume"];
+                }}
                 lowres={false}
-                loop={true} />
+                loop={true}
+            />
             {queue
                 .slice(0, show_tracks)
                 .map((item) => ({
@@ -37,10 +41,12 @@ export function PreviewScreen({
                 .map(({ item, track }, idx) => (
                     <div className={"item n" + (idx + 1)} key={item.id}>
                         <img
+                            alt=""
                             src={attachment_path(
                                 root,
-                                track.attachments.image[0]
-                            )} />
+                                track.attachments.image[0],
+                            )}
+                        />
                         <p className="title">{track.tags.title[0]}</p>
                         <p className="from">
                             {track.tags.from?.[0] ||
@@ -48,13 +54,14 @@ export function PreviewScreen({
                                 ""}
                         </p>
                         <p className="performer">
-                            <span className="n">{idx + 1}</span> {item.performer_name}
+                            <span className="n">{idx + 1}</span>{" "}
+                            {item.performer_name}
                         </p>
                         <p className="time">
                             <span>
                                 {time_until(now, item.start_time) ||
-                                    (idx == 0 && "You're up!") ||
-                                    (idx == 1 && "Nearly there!")}
+                                    (idx === 0 && "You're up!") ||
+                                    (idx === 1 && "Nearly there!")}
                             </span>
                         </p>
                     </div>

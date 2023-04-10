@@ -5,7 +5,9 @@ export {};
 describe("Portrait vs Landscape", () => {
     beforeEach(function () {
         cy.intercept("GET", "/time.json", '"1234"');
-        cy.intercept("GET", "/files/tracks.json", { fixture: "small_tracks.json" });
+        cy.intercept("GET", "/files/tracks.json", {
+            fixture: "small_tracks.json",
+        });
     });
     it("Portrait", () => {
         cy.viewport(600, 1000);

@@ -1,11 +1,6 @@
 import { useContext } from "react";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import {
-    shuffle,
-    is_my_song,
-    time_until,
-    dict2css,
-} from "../utils";
+import { shuffle, is_my_song, time_until, dict2css } from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
@@ -103,7 +98,9 @@ export function Queue(): React.ReactElement {
                             <li>
                                 <span className={"lyrics"}>
                                     {tracks[queue[0].track_id].lyrics.map(
-                                        (line, n) => <div key={n}>{line}</div>
+                                        (line, n) => (
+                                            <div key={n}>{line}</div>
+                                        ),
                                     )}
                                 </span>
                             </li>
