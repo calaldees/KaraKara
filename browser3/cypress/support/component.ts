@@ -89,6 +89,7 @@ function TestHarness(props: TestProps) {
         queue: queue_,
         setQueue: setQueue,
         settings: settings,
+        trackList: Object.values(tracks),
         ...props.room,
     };
 
