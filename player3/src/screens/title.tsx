@@ -5,6 +5,7 @@ import { RoomContext } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 
+// eslint-disable-next-line
 function StatsTable() {
     const { tracks } = useContext(ServerContext);
     const ts = Object.values(tracks);

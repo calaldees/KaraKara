@@ -325,11 +325,11 @@ export function TrackList(): React.ReactElement {
     useEffect(() => {
         setSearchParams({ search, filters });
         setInSearch(false);
-    }, [filters]);
+    }, [filters]); // eslint-disable-line
     useEffect(() => {
         setSearchParams({ search, filters }, { replace: inSearch });
         setInSearch(true);
-    }, [search]);
+    }, [search]); // eslint-disable-line
 
     return (
         <Screen

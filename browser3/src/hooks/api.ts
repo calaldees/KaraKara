@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 
@@ -7,7 +7,7 @@ export function useApi() {
     const { root, setNotification } = useContext(ClientContext);
     const [loading, setLoading] = useState(false);
 
-    function request(props_: {
+    const request = useCallback(function(props_: {
         function: string;
         url?: string;
         options?: Record<string, any>;
@@ -110,14 +110,14 @@ export function useApi() {
                     props.onException();
                 }
             });
-    }
+    }, [roomName, root, setNotification]);
 
-    function sendCommand(command: string) {
+    const sendCommand = useCallback(function(command: string) {
         return request({
             function: `command/${command}`,
             options: {},
         });
-    }
+    }, [request]);
 
     return { request, sendCommand, loading };
 }

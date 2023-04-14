@@ -38,7 +38,7 @@ export function ServerProvider(props: any) {
                 setDownloadSize(size);
             },
         });
-    }, [root]);
+    }, [root, request]);
 
     return (
         <ServerContext.Provider

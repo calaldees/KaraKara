@@ -83,7 +83,7 @@ function InternalRoomProvider(props: any) {
                 setSessionId(response.session_id);
             },
         });
-    }, [root, roomName, roomPassword]);
+    }, [root, roomName, roomPassword, request, setSessionId]);
     useEffect(() => {
         setQueue(current_and_future(now, fullQueue));
     }, [fullQueue, now]);
