@@ -42,6 +42,7 @@ class Encoder:
     category: str
     ext: str
     mime: str
+    priority: int = 1
     conf_audio: List[str] = []
     conf_video: List[str] = []
     conf_container: List[str] = []
@@ -268,6 +269,7 @@ class _BaseImageToImage(Encoder):
     category = "image"
     conf_video = ["-thumbnail", f"{IMAGE_WIDTH}x{IMAGE_WIDTH}"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
+    priority = 2
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         # fmt: off
@@ -316,6 +318,7 @@ class VoidToVTT(Encoder):
     ext = "vtt"
     category = "subtitle"
     mime = "text/vtt"
+    priority = 0
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         with open(target.as_posix(), "w") as vtt:
@@ -333,12 +336,16 @@ def find_appropriate_encoder(
             [s for c in cls.__subclasses__() for s in all_subclasses(c)]
         )
 
-    # Sort encoders by how many sources they take, so "combine multiple
-    # media" will take priority over "use a single media" which will take
-    # priority over "generate a stub file from nothing"
+    # Sort encoders by priority, highest first. Priority is manually specified
+    # so that:
+    # - encoders who generate empty stubs are low-priority
+    # - most encoders are mid-priority
+    # - image-to-image is high priority (so that if we have a choice of
+    #   "generate thumbnail from video" or "generate thumbnail from image",
+    #   we assume that a human chose the image sensibly)
     encoders = all_subclasses(Encoder)
     encoders = [e for e in encoders if e.__name__[0] != "_"]
-    encoders = sorted(encoders, key=lambda x: len(x.sources), reverse=True)
+    encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
 
     for encoder in encoders:
         if encoder.target == type and encoder.sources.issubset(
