@@ -8,12 +8,13 @@ import tempfile
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Callable, Dict, List, Set, Tuple, TypeVar
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
 
 log = logging.getLogger()
+T = TypeVar("T")
 
 
 class SourceType(Enum):
@@ -56,13 +57,13 @@ class Source:
             raise Exception(f"Can't tell what type of source {self.friendly} is")
 
     @staticmethod
-    def _cache(func):
+    def _cache(func: Callable[["Source"], T]) -> Callable[["Source"], T]:
         """
         if `self.cache[self.file.name self.file.mtime func.name]` is set,
         return that, else call func() and add the value to the cache
         """
 
-        def inner(self: "Source"):
+        def inner(self: "Source") -> T:
             mtime = self.path.stat().st_mtime
             key = (
                 f"{str(self.path.relative_to(self.source_dir))}-{mtime}-{func.__name__}"
