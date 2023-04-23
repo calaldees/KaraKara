@@ -1,5 +1,6 @@
 /.env
 /.venv
+/venv
 **/.DS_Store
 
 **/*.py[oc]
