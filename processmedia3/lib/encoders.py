@@ -376,7 +376,7 @@ def select_best_image(paths: List[Path]) -> Path:
             score = 0
         else:
             score = (sum(h[:128]) * sum(h[128:])) / sum(h)
-        print(p, score)
+        # print(p, score)
         return score
 
     if len(paths) == 0:
@@ -384,9 +384,8 @@ def select_best_image(paths: List[Path]) -> Path:
     scored_paths = [(score(p), p) for p in sorted(paths)]
     ok_paths = [(score, p) for (score, p) in scored_paths if score > 0]
     if ok_paths:
-        return sorted(ok_paths, reverse=True)[0][0]
-    else:
-        return sorted(scored_paths, reverse=True)[0][0]
+        scored_paths = ok_paths
+    return sorted(scored_paths, reverse=True)[0][1]
 
 
 if __name__ == "__main__":
