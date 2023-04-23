@@ -97,7 +97,7 @@ export function Thumb({
     children,
     ...kwargs
 }: {
-    track: Track|undefined;
+    track: Track | undefined;
     children?: any;
     [Key: string]: any;
 }): React.ReactElement {
