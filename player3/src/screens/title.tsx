@@ -4,11 +4,11 @@ import { EventInfo, JoinInfo } from "./_common";
 import { RoomContext } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
-import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { Html, useVideoTexture, useTexture } from '@react-three/drei'
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Html, useVideoTexture, useTexture } from "@react-three/drei";
 import { Group, TextureLoader } from "three";
 import * as THREE from "three";
-import world from '../static/world.svg';
+import world from "../static/world.svg";
 import { useMediaQuery } from "usehooks-ts";
 
 ///////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@ import { useMediaQuery } from "usehooks-ts";
 export function TitleScreen() {
     const { settings } = useContext(RoomContext);
     let splash = null;
-    switch (settings['splash']) {
+    switch (settings["splash"]) {
         case "globe":
         default:
             splash = <Globe />;
@@ -119,31 +119,37 @@ function Waterfall() {
 // Globe
 
 function VideoMaterial({ url }: { url: string }) {
-    const texture = useVideoTexture(url)
-    return <meshBasicMaterial map={texture} toneMapped={false} />
+    const texture = useVideoTexture(url);
+    return <meshBasicMaterial map={texture} toneMapped={false} />;
 }
 
 function FallbackMaterial({ url }: { url: string }) {
-    const texture = useTexture(url)
-    return <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
+    const texture = useTexture(url);
+    return (
+        <meshBasicMaterial
+            map={texture}
+            toneMapped={false}
+            side={THREE.DoubleSide}
+        />
+    );
 }
 
-function PlaneMaterial({ thumb, vid }: { thumb: string, vid: string }) {
+function PlaneMaterial({ thumb, vid }: { thumb: string; vid: string }) {
     const videos = false;
-    return videos ?
+    return videos ? (
         <Suspense fallback={<FallbackMaterial url={thumb} />}>
             <VideoMaterial url={vid} />
-        </Suspense> :
-        <FallbackMaterial url={thumb} />;
+        </Suspense>
+    ) : (
+        <FallbackMaterial url={thumb} />
+    );
 }
 
 function MyScene() {
     const { root } = useContext(ClientContext);
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
-    const widescreen = useMediaQuery(
-        "(min-aspect-ratio: 16/10)",
-    );
+    const widescreen = useMediaQuery("(min-aspect-ratio: 16/10)");
 
     const globe = useRef<Group>(null);
     const text1 = useRef<Group>(null);
@@ -153,61 +159,71 @@ function MyScene() {
     const thumbs = useMemo(() => {
         return getNiceTracks(tracks, 20).map((track) => [
             attachment_path(root, track.attachments.image[1]),
-            attachment_path(root, track.attachments.preview[0])
+            attachment_path(root, track.attachments.preview[0]),
         ]);
-    }, [tracks])
+    }, [tracks]);
 
     useFrame(({ camera, clock }) => {
         (camera as THREE.PerspectiveCamera).fov = widescreen ? 50 : 65;
-        const t = clock.getElapsedTime()
-        globe.current && (globe.current.rotation.y = t / 8)
-        text1.current && text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));
-        text2.current && text2.current.lookAt(0, -Math.sin(1.5 * t), Math.sin(t));
+        const t = clock.getElapsedTime();
+        globe.current && (globe.current.rotation.y = t / 8);
+        text1.current &&
+            text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));
+        text2.current &&
+            text2.current.lookAt(0, -Math.sin(1.5 * t), Math.sin(t));
         //console.log(a) // the value will be 0 at scene initialization and grow each frame
-    })
+    });
 
-    return <>
-        <ambientLight intensity={0.1} />
-        <directionalLight color="#29EDF2" position={[-4, 2, 5]} />
-        <group position={[3, -0.25, 0]} rotation={[0, 0, -0.15]}>
-            <group ref={globe}>
-                <mesh>
-                    <sphereGeometry args={[2.99, 20, 20]} />
-                    <meshStandardMaterial
-                        args={[{ flatShading: false }]}
-                        color={"#074D5E"}
-                        metalness={.5}
-                        roughness={.5}
-                    />
-                </mesh>
-                <mesh>
-                    <sphereGeometry args={[3, 20, 20]} />
-                    <meshStandardMaterial
-                        args={[{ flatShading: false }]}
-                        map={colorMap}
-                        color={"#29EDF2"}
-                        transparent={true}
-                    />
-                </mesh>
-                {thumbs.map(([thumb, vid], n) =>
-                    <group key={n} rotation={[0, -0.314 * n, 0]}>
-                        <mesh position={[0, 0, 3.5]}>
-                            <planeGeometry args={[1, 0.75]} />
-                            <PlaneMaterial thumb={thumb} vid={vid} />
-                        </mesh>
-                    </group>
-                )}
+    return (
+        <>
+            <ambientLight intensity={0.1} />
+            <directionalLight color="#29EDF2" position={[-4, 2, 5]} />
+            <group position={[3, -0.25, 0]} rotation={[0, 0, -0.15]}>
+                <group ref={globe}>
+                    <mesh>
+                        <sphereGeometry args={[2.99, 20, 20]} />
+                        <meshStandardMaterial
+                            args={[{ flatShading: false }]}
+                            color={"#074D5E"}
+                            metalness={0.5}
+                            roughness={0.5}
+                        />
+                    </mesh>
+                    <mesh>
+                        <sphereGeometry args={[3, 20, 20]} />
+                        <meshStandardMaterial
+                            args={[{ flatShading: false }]}
+                            map={colorMap}
+                            color={"#29EDF2"}
+                            transparent={true}
+                        />
+                    </mesh>
+                    {thumbs.map(([thumb, vid], n) => (
+                        <group key={n} rotation={[0, -0.314 * n, 0]}>
+                            <mesh position={[0, 0, 3.5]}>
+                                <planeGeometry args={[1, 0.75]} />
+                                <PlaneMaterial thumb={thumb} vid={vid} />
+                            </mesh>
+                        </group>
+                    ))}
+                </group>
             </group>
-        </group>
-        <group ref={text1} position={[-4, 2.5, -5]} onUpdate={self => self.lookAt(0, 0, 0)}>
-            <Html transform>
-                <h1>{settings["title"]}</h1>
-            </Html>
-        </group>
-        <group ref={text2} position={[-4, -1.5, -5]}>
-            <Html transform><StatsTable tracks={tracks} /></Html>
-        </group>
-    </>
+            <group
+                ref={text1}
+                position={[-4, 2.5, -5]}
+                onUpdate={(self) => self.lookAt(0, 0, 0)}
+            >
+                <Html transform>
+                    <h1>{settings["title"]}</h1>
+                </Html>
+            </group>
+            <group ref={text2} position={[-4, -1.5, -5]}>
+                <Html transform>
+                    <StatsTable tracks={tracks} />
+                </Html>
+            </group>
+        </>
+    );
 }
 
 function Globe() {
