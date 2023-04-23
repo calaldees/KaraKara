@@ -226,26 +226,29 @@ class _BaseVideoToImage(Encoder):
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
-        # imagemagick supports more formats, so first we get
-        # ffmpeg to pick a frame, then convert to compress
-        temp_target = target.with_suffix(".bmp")
-        # fmt: off
-        self._run(
-            "ffmpeg",
-            "-i", list(sources)[0].path.as_posix(),
-            *self.conf_video,
-            "-vframes", "1",
-            "-an",
-            temp_target.as_posix(),
-        )
-        self._run(
-            "convert",
-            temp_target.as_posix(),
-            *self.conf_vcodec,
-            target.as_posix(),
-        )
-        # fmt: on
-        temp_target.unlink()
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            tmpdir = Path(td)
+
+            # imagemagick supports more formats, so first we get
+            # ffmpeg to pick a frame, then convert to compress
+            # fmt: off
+            self._run(
+                "ffmpeg",
+                "-i", list(sources)[0].path.as_posix(),
+                *self.conf_video,
+                "-vframes", "1",
+                "-an",
+                tmpdir / "out%03d.bmp",
+            )
+            best = select_best_image(tmpdir.glob("*.bmp"))
+            self._run(
+                "convert",
+                best.as_posix(),
+                *self.conf_vcodec,
+                target.as_posix(),
+            )
+            # fmt: on
 
 
 class VideoToWebp(_BaseVideoToImage):
@@ -357,3 +360,35 @@ def find_appropriate_encoder(
         raise Exception(
             f"Couldn't find an encoder to make {type} out of:\n{source_list}"
         )
+
+
+def select_best_image(paths: List[Path]) -> Path:
+    def score(p: Path) -> float:
+        from PIL import Image
+        img = Image.open(p.as_posix()).convert("L")
+        # r, g, b = img.split()
+        h = img.histogram()
+        px_cnt = sum(h) # total number of pixels in the image
+
+        # if blacks make up most of the image, or if whites make up most of the image
+        thresh = 0.5
+        if sum(h[:32]) > px_cnt * thresh or sum(h[-32:]) > px_cnt * thresh:
+            score = 0
+        else:
+            score = (sum(h[:128]) * sum(h[128:])) / sum(h)
+        print(p, score)
+        return score
+
+    if len(paths) == 0:
+        raise Exception("Can't select best of zero thumbs")
+    scored_paths = [(score(p), p) for p in sorted(paths)]
+    ok_paths = [p for (score, p) in scored_paths if score > 0]
+    if ok_paths:
+        return sorted(ok_paths, reverse=True)[0]
+    else:
+        return sorted(scored_paths, reverse=True)[0]
+
+
+if __name__ == "__main__":
+    import sys
+    print(select_best_image(list(Path(sys.argv[1]).glob("*.bmp"))))
