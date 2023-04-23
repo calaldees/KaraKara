@@ -9,6 +9,7 @@ from collections import defaultdict
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Set, Tuple, TypeVar
+from fractions import Fraction
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
@@ -99,6 +100,32 @@ class Source:
         seconds = float(raw_duration.group(3))
         return hours + minutes + seconds
 
+    @_cache
+    def aspectratio(self) -> str:
+        log.info(f"Parsing aspectratio from {self.friendly}")
+        probe_proc = subprocess.run(
+            # fmt: off
+            [
+                "ffprobe",
+                "-v", "error",
+                "-select_streams", "v:0",
+                "-show_entries", "stream=width,height,display_aspect_ratio",
+                "-of", "csv=s=,:p=0",
+                self.path.as_posix(),
+            ],
+            # fmt: on
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            errors="ignore",  # some files contain non-utf8 metadata
+            check=True,
+        )
+        w, h, dar = probe_proc.stdout.strip().split(",")
+        if dar != "N/A":
+            return dar
+        f = Fraction(int(w), int(h))
+        return f"{f.numerator}:{f.denominator}"
+
     def lyrics(self) -> List[str]:
         return [l.text for l in self.subtitles()]
 
@@ -108,7 +135,7 @@ class Source:
         return parse_subtitles(self.path.read_text())
 
     @_cache
-    def tags(self) -> Dict[str, Tuple[str]]:
+    def tags(self) -> Dict[str, List[str]]:
         log.info(f"Parsing tags from {self.friendly}")
         return parse_tags(self.path.read_text())
 
@@ -197,8 +224,23 @@ class Track:
         lyrics = sub_files[0].lyrics() if sub_files else []
 
         tag_files = self._sources_by_type({SourceType.TAGS})
-        tags = tag_files[0].tags()
+        tags = dict(tag_files[0].tags())  # copy tags, don't modify the existing one
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
+
+        autotags = []
+        if self._sources_by_type({SourceType.SUBTITLES}):
+            autotags.append("subs-soft")
+        else:
+            autotags.append("subs-hard")
+        if self._sources_by_type({SourceType.IMAGE}):
+            autotags.append("src-image")
+        if self._sources_by_type({SourceType.VIDEO}):
+            autotags.append("src-video")
+        pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
+        autotags.append("ar-" + pxsrc.aspectratio().replace(":", "-"))
+        if "" not in tags:
+            tags[""] = []
+        tags[""] += sorted(autotags)
 
         return {
             "id": self.id,
