@@ -222,14 +222,13 @@ class ImageToH264Preview(_Preview, ImageToH264):
 class _BaseVideoToImage(Encoder):
     sources = {SourceType.VIDEO}
     category = "image"
-    conf_video = ["-ss", "3", "-vf", f"scale={IMAGE_WIDTH}:-1,thumbnail=n=30,select=gt(scene\,0.4)", "-vsync", "vfr"]
+    conf_video = ["-vf", f"scale={IMAGE_WIDTH}:-1,thumbnail", "-vsync", "vfr"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         import tempfile
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
-
             # imagemagick supports more formats, so first we get
             # ffmpeg to pick a frame, then convert to compress
             # fmt: off
@@ -237,11 +236,11 @@ class _BaseVideoToImage(Encoder):
                 "ffmpeg",
                 "-i", list(sources)[0].path.as_posix(),
                 *self.conf_video,
-                "-vframes", "1",
                 "-an",
                 (tmpdir / "out%03d.bmp").as_posix(),
             )
-            best = select_best_image(list(tmpdir.glob("*.bmp")))
+            thumbs = list(tmpdir.glob("*.bmp"))
+            best = select_best_image(thumbs)
             self._run(
                 "convert",
                 best.as_posix(),
