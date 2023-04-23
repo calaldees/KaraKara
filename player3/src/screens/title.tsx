@@ -5,14 +5,13 @@ import { RoomContext } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
-import { OrbitControls, Html, useVideoTexture, useTexture } from '@react-three/drei'
-import { Group, Object3D, TextureLoader } from "three";
+import { Html, useVideoTexture, useTexture } from '@react-three/drei'
+import { Group, TextureLoader } from "three";
 import * as THREE from "three";
 import world from '../static/world.svg';
+import { useMediaQuery } from "usehooks-ts";
 
-// eslint-disable-next-line
-function StatsTable() {
-    const { tracks } = useContext(ServerContext);
+function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     const ts = Object.values(tracks);
     const stats = {
         tracks: ts.length,
@@ -63,27 +62,6 @@ export function TitleScreen() {
             <EventInfo />
         </section>
     );
-}
-
-function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
-    const stats = useMemo(() => {
-        const ts = Object.values(tracks);
-        return {
-            tracks: ts.length,
-            lines: ts.map(t => t.lyrics.length).reduce((sum, n) => sum + n, 0),
-            shows: new Set(ts.map(t => t.tags.from?.[0])).size,
-            hours: Math.floor(ts.map(t => t.duration).reduce((sum, n) => sum + n, 0) / 60 / 60),
-        }
-    }, [tracks]);
-    return <h2>
-        <table>
-            <tbody>
-                {Object.entries(stats).map(([key, value]) =>
-                    <tr key={key}><th><strong>{value}</strong></th><td>{key}</td></tr>
-                )}
-            </tbody>
-        </table>
-    </h2>;
 }
 
 function getNiceTracks(tracks: Record<string, Track>, n: number) {
@@ -151,11 +129,14 @@ function MyScene() {
     const { root } = useContext(ClientContext);
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
+    const widescreen = useMediaQuery(
+        "(min-aspect-ratio: 16/10)",
+    );
 
     const globe = useRef<Group>(null);
     const text1 = useRef<Group>(null);
     const text2 = useRef<Group>(null);
-    const colorMap = useLoader(TextureLoader, world);
+    const colorMap = useLoader(TextureLoader, world) as THREE.Texture;
     const videos = false;
 
     const thumbs = useMemo(() => {
@@ -165,7 +146,8 @@ function MyScene() {
         ]);
     }, [tracks])
 
-    useFrame(({ clock }) => {
+    useFrame(({ camera, clock }) => {
+        (camera as THREE.PerspectiveCamera).fov = widescreen ? 50 : 65;
         const t = clock.getElapsedTime()
         globe.current && (globe.current.rotation.y = t / 8)
         text1.current && text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));
