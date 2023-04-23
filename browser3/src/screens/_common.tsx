@@ -97,7 +97,7 @@ export function Thumb({
     children,
     ...kwargs
 }: {
-    track: Track;
+    track: Track|undefined;
     children?: any;
     [Key: string]: any;
 }): React.ReactElement {
@@ -106,7 +106,7 @@ export function Thumb({
     return (
         <div className={"thumb"} {...kwargs}>
             <picture>
-                {track.attachments.image.map((a) => (
+                {track?.attachments.image.map((a) => (
                     <source
                         key={a.path}
                         srcSet={attachment_path(root, a)}

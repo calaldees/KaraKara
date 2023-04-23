@@ -4,7 +4,7 @@ export {};
 
 describe("Queue Screen", () => {
     beforeEach(function () {
-        cy.intercept("GET", "/time.json", { body: 1234 });
+        cy.intercept("GET", "/time.json", { body: 1234 }).as("time");
         cy.intercept("GET", "/files/tracks.json", {
             fixture: "tracks.json",
         }).as("tracks");
