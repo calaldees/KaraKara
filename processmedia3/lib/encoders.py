@@ -239,9 +239,9 @@ class _BaseVideoToImage(Encoder):
                 *self.conf_video,
                 "-vframes", "1",
                 "-an",
-                tmpdir / "out%03d.bmp",
+                (tmpdir / "out%03d.bmp").as_posix(),
             )
-            best = select_best_image(tmpdir.glob("*.bmp"))
+            best = select_best_image(list(tmpdir.glob("*.bmp")))
             self._run(
                 "convert",
                 best.as_posix(),
@@ -382,11 +382,11 @@ def select_best_image(paths: List[Path]) -> Path:
     if len(paths) == 0:
         raise Exception("Can't select best of zero thumbs")
     scored_paths = [(score(p), p) for p in sorted(paths)]
-    ok_paths = [p for (score, p) in scored_paths if score > 0]
+    ok_paths = [(score, p) for (score, p) in scored_paths if score > 0]
     if ok_paths:
-        return sorted(ok_paths, reverse=True)[0]
+        return sorted(ok_paths, reverse=True)[0][0]
     else:
-        return sorted(scored_paths, reverse=True)[0]
+        return sorted(scored_paths, reverse=True)[0][0]
 
 
 if __name__ == "__main__":
