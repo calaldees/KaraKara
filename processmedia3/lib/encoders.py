@@ -222,7 +222,7 @@ class ImageToH264Preview(_Preview, ImageToH264):
 class _BaseVideoToImage(Encoder):
     sources = {SourceType.VIDEO}
     category = "image"
-    conf_video = ["-ss", "3", "-vf", f"thumbnail,scale={IMAGE_WIDTH}:-1"]
+    conf_video = ["-ss", "3", "-vf", f"scale={IMAGE_WIDTH}:-1,thumbnail=n=30,select=gt(scene\,0.4)", "-vsync", "vfr"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     def encode(self, target: Path, sources: Set[Source]) -> None:

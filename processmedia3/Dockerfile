@@ -7,7 +7,7 @@ FROM python:3.11 as test
     RUN apt install -y imagemagick
     COPY --from=ffmpeg /ffmpeg /usr/local/bin/
     COPY --from=ffmpeg /ffprobe /usr/local/bin/
-    RUN pip install tqdm mypy
+    RUN pip install tqdm mypy pillow
     COPY main.py .mypy.ini /app/
     COPY lib /app/lib/
     COPY tests /app/tests/
@@ -24,7 +24,7 @@ FROM python:3.11-alpine as production
     COPY --from=ffmpeg /ffmpeg /usr/local/bin/
     COPY --from=ffmpeg /ffprobe /usr/local/bin/
 
-    RUN pip install tqdm
+    RUN pip install tqdm pillow
     COPY main.py /app/
     COPY lib /app/lib/
 
