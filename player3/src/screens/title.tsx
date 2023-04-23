@@ -11,6 +11,31 @@ import * as THREE from "three";
 import world from '../static/world.svg';
 import { useMediaQuery } from "usehooks-ts";
 
+///////////////////////////////////////////////////////////////////////
+// Common
+
+export function TitleScreen() {
+    const { settings } = useContext(RoomContext);
+    let splash = null;
+    switch (settings['splash']) {
+        case "globe":
+        default:
+            splash = <Globe />;
+            break;
+        case "waterfall":
+            splash = <Waterfall />;
+            break;
+    }
+
+    return (
+        <section key="title" className={"screen_title"}>
+            {splash}
+            <JoinInfo />
+            <EventInfo />
+        </section>
+    );
+}
+
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     const ts = Object.values(tracks);
     const stats = {
@@ -39,39 +64,17 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     );
 }
 
-///////////////////////////////////////////////////////////////////////
-// Common
-
-export function TitleScreen() {
-    const { settings } = useContext(RoomContext);
-    let splash = null;
-    switch (settings['splash']) {
-        case "globe":
-        default:
-            splash = <Globe />;
-            break;
-        case "waterfall":
-            splash = <Waterfall />;
-            break;
-    }
-
-    return (
-        <section key="title" className={"screen_title"}>
-            {splash}
-            <JoinInfo />
-            <EventInfo />
-        </section>
-    );
-}
-
 function getNiceTracks(tracks: Record<string, Track>, n: number) {
     const good_tracks = [
+        "AKB0048_ED2_Niji_no_Ressha",
         "07_Ghost_OP1_Aka_no_Kakera",
-        "Air_OP_Tori_no_Uta",
         "Ah_My_Goddess_TV_ED1_Negai",
         "Jojo_s_Bizarre_Adventure_Stone_Ocean_OP_Stone_Ocean",
         "Gekiganger_3_OP_Seigi_no_Robot_Gekiganger_3",
-        "Naruto_OP4_Go",
+        "Secret_Madonna_Japanese_version_",
+        "Haikyuu_Second_Season_OP1_I_m_a_Believer",
+        "Working_OP2_Coolish_Walk",
+        "Sailor_Moon_ED2_Princess_Moon",
     ]
         .map((t) => tracks[t])
         .filter((t) => t);
@@ -125,6 +128,15 @@ function FallbackMaterial({ url }: { url: string }) {
     return <meshBasicMaterial map={texture} toneMapped={false} side={THREE.DoubleSide} />
 }
 
+function PlaneMaterial({ thumb, vid }: { thumb: string, vid: string }) {
+    const videos = false;
+    return videos ?
+        <Suspense fallback={<FallbackMaterial url={thumb} />}>
+            <VideoMaterial url={vid} />
+        </Suspense> :
+        <FallbackMaterial url={thumb} />;
+}
+
 function MyScene() {
     const { root } = useContext(ClientContext);
     const { settings } = useContext(RoomContext);
@@ -137,7 +149,6 @@ function MyScene() {
     const text1 = useRef<Group>(null);
     const text2 = useRef<Group>(null);
     const colorMap = useLoader(TextureLoader, world) as THREE.Texture;
-    const videos = false;
 
     const thumbs = useMemo(() => {
         return getNiceTracks(tracks, 20).map((track) => [
@@ -179,15 +190,10 @@ function MyScene() {
                     />
                 </mesh>
                 {thumbs.map(([thumb, vid], n) =>
-                    <group key={n} rotation={[0, 0.314 * n, 0]}>
+                    <group key={n} rotation={[0, -0.314 * n, 0]}>
                         <mesh position={[0, 0, 3.5]}>
                             <planeGeometry args={[1, 0.75]} />
-                            {videos ?
-                                <Suspense fallback={<FallbackMaterial url={thumb} />}>
-                                    <VideoMaterial url={vid} />
-                                </Suspense> :
-                                <FallbackMaterial url={thumb} />
-                            }
+                            <PlaneMaterial thumb={thumb} vid={vid} />
                         </mesh>
                     </group>
                 )}
