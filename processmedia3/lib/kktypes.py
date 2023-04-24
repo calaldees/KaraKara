@@ -120,7 +120,7 @@ class Source:
             errors="ignore",  # some files contain non-utf8 metadata
             check=True,
         )
-        w, h, dar = probe_proc.stdout.strip().split(",")
+        w, h, dar = probe_proc.stdout.strip().split(",")[:3]
         if dar != "N/A":
             return dar
         f = Fraction(int(w), int(h))
