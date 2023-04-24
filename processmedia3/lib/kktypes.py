@@ -224,7 +224,7 @@ class Track:
         lyrics = sub_files[0].lyrics() if sub_files else []
 
         tag_files = self._sources_by_type({SourceType.TAGS})
-        tags = dict(tag_files[0].tags())  # copy tags, don't modify the existing one
+        tags = tag_files[0].tags()
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
 
         autotags = []
@@ -240,7 +240,7 @@ class Track:
         autotags.append("ar-" + pxsrc.aspectratio().replace(":", "-"))
         if "" not in tags:
             tags[""] = []
-        tags[""] += sorted(autotags)
+        tags[""] = sorted(set(tags[""]) | set(autotags))
 
         return {
             "id": self.id,
