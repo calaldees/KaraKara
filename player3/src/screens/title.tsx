@@ -65,25 +65,11 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
 }
 
 function getNiceTracks(tracks: Record<string, Track>, n: number) {
-    const good_tracks = [
-        "AKB0048_ED2_Niji_no_Ressha",
-        "07_Ghost_OP1_Aka_no_Kakera",
-        "Ah_My_Goddess_TV_ED1_Negai",
-        "Jojo_s_Bizarre_Adventure_Stone_Ocean_OP_Stone_Ocean",
-        "Gekiganger_3_OP_Seigi_no_Robot_Gekiganger_3",
-        "Secret_Madonna_Japanese_version_",
-        "Haikyuu_Second_Season_OP1_I_m_a_Believer",
-        "Working_OP2_Coolish_Walk",
-        "Sailor_Moon_ED2_Princess_Moon",
-    ]
-        .map((t) => tracks[t])
-        .filter((t) => t);
-    const first_tracks = Object.values(tracks)
-        // ignore instrumental tracks, because instrumentals
-        // tend to have hard-subs, which makes ugly thumbnails
-        .filter((track) => track.tags.vocaltrack?.[0] !== "off")
+    return Object.values(tracks)
+        .filter((track) => track.tags[""]?.includes("subs-soft"))
+        .filter((track) => track.tags[""]?.includes("ar-16-9"))
+        .filter((track) => track.tags[""]?.includes("src-image"))
         .slice(0, n);
-    return [...good_tracks, ...first_tracks].slice(0, n);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -171,7 +157,6 @@ function MyScene() {
             text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));
         text2.current &&
             text2.current.lookAt(0, -Math.sin(1.5 * t), Math.sin(t));
-        //console.log(a) // the value will be 0 at scene initialization and grow each frame
     });
 
     return (
@@ -201,7 +186,7 @@ function MyScene() {
                     {thumbs.map(([thumb, vid], n) => (
                         <group key={n} rotation={[0, -0.314 * n, 0]}>
                             <mesh position={[0, 0, 3.5]}>
-                                <planeGeometry args={[1, 0.75]} />
+                                <planeGeometry args={[1, 9/16]} />
                                 <PlaneMaterial thumb={thumb} vid={vid} />
                             </mesh>
                         </group>
