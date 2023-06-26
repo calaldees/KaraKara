@@ -70,11 +70,9 @@ function QueueItemRender({
 }
 
 export function Queue(): React.ReactElement {
-    const { widescreen } = useContext(ClientContext);
-    const { queue } = useContext(RoomContext);
-    const { performerName } = useContext(ClientContext);
+    const { performerName, widescreen } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
-    const { settings, sessionId } = useContext(RoomContext);
+    const { queue, settings, sessionId } = useContext(RoomContext);
 
     return (
         <Screen
