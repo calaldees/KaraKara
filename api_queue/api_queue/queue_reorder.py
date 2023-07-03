@@ -1,6 +1,7 @@
 from functools import partial
 import datetime
 from numbers import Number
+import typing as t
 
 from .queue_model import Queue, QueueItem
 
@@ -18,7 +19,7 @@ def _rank(queue: Queue, queue_item: QueueItem) -> Number:
         return t.total_seconds()/60 if t else None
     def _minuets_ago(d: datetime.datetime):
         return _minuets(queue.now - d) if d else None
-    def _hours_ago(d: datetime.datetime):
+    def _hours_ago(d: t.Optional[datetime.datetime]):
         return _minuets_ago(d)/60 if d else None
 
     added_minuets_ago = _minuets_ago(queue_item.added_time)
@@ -54,4 +55,4 @@ def reorder(queue: Queue):
     if not queue_item_current:
         return
     reorder_index = queue.items.index(queue_item_current) + queue.settings["coming_soon_track_count"]
-    queue.items[reorder_index:] = sorted(queue.items[reorder_index:], key=partial(_rank, queue))
+    queue.items[reorder_index:] = sorted(queue.items[reorder_index:], key=partial(_rank, queue)) # type: ignore[arg-type]
