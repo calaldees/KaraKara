@@ -29,6 +29,17 @@ app.ext.openapi.describe(
 )
 
 
+# Model ------------------------------------------------------------------------
+
+from .queue_model import QueueItem
+
+from .queue_validation import default as queue_validation_default
+from .queue_reorder import reorder as queue_reorder
+queue_post_processing_functions = {
+    "validation_default": queue_validation_default,
+    "reorder": queue_reorder,
+}
+
 # Startup ----------------------------------------------------------------------
 
 from .track_manager import TrackManager
@@ -37,10 +48,8 @@ async def tracks_load(_app: sanic.Sanic, _loop):
     _app.ctx.track_manager = TrackManager(Path(str(_app.config.get('PATH_TRACKS'))))
 
 
-from .queue_model import QueueItem
 from .settings_manager import SettingsManager
 from .queue_manager import QueueManagerCSVAsync
-from . import queue_validation
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     path_queue = Path(str(_app.config.get('PATH_QUEUE')))
@@ -259,17 +268,17 @@ async def add_queue_item(request, room_name):
                 performer_name=performer_name,
             )
             queue.add(queue_item)
-            # Validate queue state - validation functions are configurable per queue
+            # Post process queue state - functions are configurable per queue
             if not request.ctx.user.is_admin:
-                for validation_scheme in queue.settings.get("validation", []):
-                    validation_error = getattr(queue_validation, validation_scheme)(queue)
-                    if validation_error:
-                        log.info(f"add failed validation {validation_error=}")
+                for function_name in queue.settings.get("queue_post_processing_function_names", []):
+                    _error = queue_post_processing_functions[function_name](queue)
+                    if _error:
+                        log.info(f"add failed {_error=}")
                         # NOTE: the client has special behaviour for the specific
                         # hard-coded string "queue validation failed". In the long
                         # term we should add a more structured error format, but
                         # for now, we require this exact string.
-                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
+                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=_error)
             return sanic.response.json(queue_item.asdict())
 
 
