@@ -372,7 +372,7 @@ def select_best_image(paths: List[Path]) -> Path:
         # if blacks make up most of the image, or if whites make up most of the image
         thresh = 0.5
         if sum(h[:32]) > px_cnt * thresh or sum(h[-32:]) > px_cnt * thresh:
-            score = 0
+            score = 0.0
         else:
             score = (sum(h[:128]) * sum(h[128:])) / sum(h)
         # print(p, score)

@@ -1,6 +1,6 @@
 from functools import reduce
 from itertools import pairwise
-from typing import Dict, List
+from typing import Dict, List, Set
 
 
 def parse_tags(data: str) -> Dict[str, List[str]]:
@@ -30,6 +30,5 @@ def parse_tags(data: str) -> Dict[str, List[str]]:
                 accumulator.setdefault(parent, set()).add(tag)
         return accumulator
 
-    return dict(
-        (k, sorted(v)) for k, v in reduce(_reduce, data.split("\n"), {}).items()
-    )
+    tags_values: Dict[str, Set[str]] = reduce(_reduce, data.split("\n"), {})
+    return dict((k, sorted(v)) for k, v in tags_values.items())
