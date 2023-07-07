@@ -208,23 +208,31 @@ def export(
     # Export in alphabetic order
     json_dict = dict(sorted((t["id"], t) for t in json_list if t))
 
+    try:
+        old_tracklist = json.loads((processed_dir / "tracks.json").read_text())
+    except Exception:
+        old_tracklist = {}
+
     # If we've only scanned & encoded a few files, then add
     # those entries onto the end of the current tracks, don't
     # replace the whole database.
     if update:
-        json_dict = json.loads((processed_dir / "tracks.json").read_text()) | json_dict
+        json_dict = old_tracklist | json_dict
 
-    # Write to temp file then rename, so if the disk fills up then
-    # we don't end up with a half-written tracks.json
-    data = json.dumps(json_dict, default=tuple).encode("utf8")
+    # Only write if changed - turns a tiny-but-24/7 amount of
+    # disk I/O into zero disk I/O
+    if old_tracklist != json_dict:
+        # Write to temp file then rename, so if the disk fills up then
+        # we don't end up with a half-written tracks.json
+        data = json.dumps(json_dict, default=tuple).encode("utf8")
 
-    path = processed_dir / "tracks.json"
-    path.with_suffix(".tmp").write_bytes(data)
-    path.with_suffix(".tmp").rename(path)
+        path = processed_dir / "tracks.json"
+        path.with_suffix(".tmp").write_bytes(data)
+        path.with_suffix(".tmp").rename(path)
 
-    path = processed_dir / "tracks.json.gz"
-    path.with_suffix(".tmp").write_bytes(gzip.compress(data))
-    path.with_suffix(".tmp").rename(path)
+        path = processed_dir / "tracks.json.gz"
+        path.with_suffix(".tmp").write_bytes(gzip.compress(data))
+        path.with_suffix(".tmp").rename(path)
 
 
 def cleanup(
