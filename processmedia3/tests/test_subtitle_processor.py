@@ -8,7 +8,7 @@ from lib.subtitle_processor import (
     create_vtt,
     Subtitle,
     _remove_duplicate_lines,
-    parse_subtitles
+    parse_subtitles,
 )
 from pathlib import Path
 
