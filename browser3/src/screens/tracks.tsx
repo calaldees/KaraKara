@@ -315,21 +315,26 @@ export function TrackList(): React.ReactElement {
     const { isAdmin } = useContext(RoomContext);
     const { booth, widescreen } = useContext(ClientContext);
 
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [search, setSearch] = useState(searchParams.get("search") ?? "");
-    const [filters, setFilters] = useState<string[]>(
-        searchParams.getAll("filters"),
-    );
     const [expanded, setExpanded] = useState<string | null>(null);
     const [inSearch, setInSearch] = useState(false);
-    useEffect(() => {
-        setSearchParams({ search, filters });
-        setInSearch(false);
-    }, [filters]); // eslint-disable-line
-    useEffect(() => {
-        setSearchParams({ search, filters }, { replace: inSearch });
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.get("search") ?? "";
+    const filters = searchParams.getAll("filters");
+    function setSearch(new_search: string|((search: string) => string)) {
+        if (typeof new_search === "function") {
+            new_search = new_search(search);
+        }
+        setSearchParams({ search: new_search, filters }, { replace: inSearch });
         setInSearch(true);
-    }, [search]); // eslint-disable-line
+    }
+    function setFilters(new_filters: string[]|((filters: string[]) => string[])) {
+        if (typeof new_filters === "function") {
+            new_filters = new_filters(filters);
+        }
+        setSearchParams({ search, filters: new_filters });
+        setInSearch(false);
+    }
 
     return (
         <Screen

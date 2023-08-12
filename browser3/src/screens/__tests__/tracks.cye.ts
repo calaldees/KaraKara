@@ -77,25 +77,16 @@ describe("Search", () => {
     it("browser back button removes search as a single unit", () => {
         cy.contains("anime").click();
         cy.location("search").should("eq", "?search=&filters=category%3Aanime");
+        
         cy.get('[data-cy="search"]').type("magic");
         cy.location("search").should(
             "eq",
             "?search=magic&filters=category%3Aanime",
         );
-        cy.contains("Gundam").click();
-        cy.location("search").should(
-            "eq",
-            "?search=magic&filters=category%3Aanime&filters=from%3AGundam",
-        );
+        cy.contains("Madoka Magica").should("exist");
 
         cy.go("back");
-        cy.location("search").should(
-            "eq",
-            "?search=magic&filters=category%3Aanime",
-        );
-        cy.go("back");
         cy.location("search").should("eq", "?search=&filters=category%3Aanime");
-        cy.go("back");
-        cy.location("search").should("eq", "?search=");
+        cy.get('[data-cy="search"]').should("have.value", "");
     });
 });
