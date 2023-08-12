@@ -21,6 +21,18 @@ import "./commands";
 
 import { mount } from "cypress/react18";
 import { MountOptions, MountReturn } from "cypress/react";
+
+import React, { useState } from "react";
+import { ClientContext, ClientContextType } from "../../src/providers/client";
+import { RoomContext, RoomContextType } from "../../src/providers/room";
+import { ServerContext, ServerContextType } from "../../src/providers/server";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
+
+import "../../src/static/style.scss";
+import tracks from "../../cypress/fixtures/small_tracks.json";
+import queue from "../../cypress/fixtures/small_queue.json";
+import settings from "../../cypress/fixtures/small_settings.json";
+
 // Cypress.Commands.add('mount', mount)
 
 // Augment the Cypress namespace to include type definitions for
@@ -37,17 +49,6 @@ declare global {
         }
     }
 }
-
-import React, { useState } from "react";
-import { ClientContext, ClientContextType } from "../../src/providers/client";
-import { RoomContext, RoomContextType } from "../../src/providers/room";
-import { ServerContext, ServerContextType } from "../../src/providers/server";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
-
-import "../../src/static/style.scss";
-import tracks from "../../cypress/fixtures/small_tracks.json";
-import queue from "../../cypress/fixtures/small_queue.json";
-import settings from "../../cypress/fixtures/small_settings.json";
 
 type TestProps = {
     client: Partial<ClientContextType>;
