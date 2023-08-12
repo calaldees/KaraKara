@@ -7,6 +7,7 @@ import uuid
 import ujson as json
 import sanic
 from sanic_ext import openapi
+from sanic_ext.extensions.http.cors import add_cors
 from sanic.log import logger as log
 
 
@@ -27,6 +28,19 @@ app.ext.openapi.describe(
     description=dedent("""
     """),  # TODO: Markdown
 )
+
+# Allow dev-mode clients to connect to prod server.
+# When allowing connections with credentials, allowed
+# headers MUST be explicitly listed.
+app.config.CORS_SUPPORTS_CREDENTIALS = True
+app.config.CORS_ALLOW_HEADERS = ["Content-Type"]
+app.config.CORS_ORIGINS = [
+    "http://127.0.0.1:1234",  # browser2
+    "http://127.0.0.1:1235",  # player2
+    "http://127.0.0.1:1236",  # browser3
+    "http://127.0.0.1:1237",  # player3
+]
+add_cors(app)
 
 
 # Model ------------------------------------------------------------------------
