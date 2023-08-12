@@ -41,6 +41,7 @@ export function ConfigMenu(): React.ReactElement {
                                     <input
                                         value={rootEdit}
                                         type={"text"}
+                                        data-cy="server-input"
                                         onChange={(e) =>
                                             setRootEdit(e.target.value)
                                         }
@@ -53,6 +54,7 @@ export function ConfigMenu(): React.ReactElement {
                                     <input
                                         value={roomNameEdit}
                                         type={"text"}
+                                        data-cy="room-input"
                                         onChange={(e) =>
                                             setRoomNameEdit(e.target.value)
                                         }
@@ -65,6 +67,7 @@ export function ConfigMenu(): React.ReactElement {
                                     <input
                                         value={roomPasswordEdit}
                                         type={"password"}
+                                        data-cy="password-input"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(e.target.value)
                                         }
@@ -77,13 +80,14 @@ export function ConfigMenu(): React.ReactElement {
                                     <input
                                         checked={booth}
                                         type={"checkbox"}
+                                        data-cy="booth-input"
                                         onChange={(e) => setBooth(!booth)}
                                     />
                                 </td>
                             </tr>
                             <tr>
                                 <td colSpan={2}>
-                                    <button>Close</button>
+                                    <button data-cy="save-button">Close</button>
                                 </td>
                             </tr>
                         </tbody>
