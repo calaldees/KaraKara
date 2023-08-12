@@ -13,4 +13,5 @@ RUN npm run build
 
 # Copy built app to httpd container
 FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /app
+RUN echo "server { root /app; try_files \$uri /index.html; }" > /etc/nginx/conf.d/default.conf
