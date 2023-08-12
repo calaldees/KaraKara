@@ -34,8 +34,10 @@ export function Printable(): React.ReactElement {
             //navRight={}
             footer={<PrintButtons />}
         >
-            <p>To get an interactive track list on your phone, scan this QR code or
-            visit {root} and use room name "{roomName}".</p>
+            <p>
+                To get an interactive track list on your phone, scan this QR
+                code or visit {root} and use room name "{roomName}".
+            </p>
             <div className={"qr_container"}>
                 <QRCodeSVG
                     value={`${root}/browser3/${roomName}`}

@@ -42,7 +42,11 @@ export function RoomSettings(): React.ReactElement {
     const buttons = (
         <footer>
             <div className={"buttons"}>
-                <button onClick={saveSettings} data-cy="save-settings-button" disabled={saving}>
+                <button
+                    onClick={saveSettings}
+                    data-cy="save-settings-button"
+                    disabled={saving}
+                >
                     Save
                 </button>
             </div>

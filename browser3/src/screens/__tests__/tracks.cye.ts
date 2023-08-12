@@ -77,7 +77,7 @@ describe("Search", () => {
     it("browser back button removes search as a single unit", () => {
         cy.contains("anime").click();
         cy.location("search").should("eq", "?search=&filters=category%3Aanime");
-        
+
         cy.get('[data-cy="search"]').type("magic");
         cy.location("search").should(
             "eq",

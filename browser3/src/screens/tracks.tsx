@@ -321,14 +321,16 @@ export function TrackList(): React.ReactElement {
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get("search") ?? "";
     const filters = searchParams.getAll("filters");
-    function setSearch(new_search: string|((search: string) => string)) {
+    function setSearch(new_search: string | ((search: string) => string)) {
         if (typeof new_search === "function") {
             new_search = new_search(search);
         }
         setSearchParams({ search: new_search, filters }, { replace: inSearch });
         setInSearch(true);
     }
-    function setFilters(new_filters: string[]|((filters: string[]) => string[])) {
+    function setFilters(
+        new_filters: string[] | ((filters: string[]) => string[]),
+    ) {
         if (typeof new_filters === "function") {
             new_filters = new_filters(filters);
         }
