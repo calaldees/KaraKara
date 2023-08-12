@@ -35,13 +35,14 @@ export function RoomSettings(): React.ReactElement {
                 body: JSON.stringify(roomSettingsEdit),
             },
             onAction: () => setSaving(false),
+            onException: () => setSaving(false),
         });
     }
 
     const buttons = (
         <footer>
             <div className={"buttons"}>
-                <button onClick={saveSettings} disabled={saving}>
+                <button onClick={saveSettings} data-cy="save-settings-button" disabled={saving}>
                     Save
                 </button>
             </div>
@@ -64,6 +65,7 @@ export function RoomSettings(): React.ReactElement {
                         <input
                             type={"text"}
                             name={key}
+                            data-setting={key}
                             value={value ?? ""}
                             onChange={(e) => update(key, e.target.value)}
                         />
