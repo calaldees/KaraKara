@@ -63,8 +63,8 @@ async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
     mqtt = _app.config.get('MQTT')
     if isinstance(mqtt, str):
         log.info("[mqtt] connecting")
-        from asyncio_mqtt import Client as MqttClient, MqttError
-        _app.ctx.mqtt = MqttClient(mqtt)
+        import aiomqtt
+        _app.ctx.mqtt = aiomqtt.Client(mqtt)
         await _app.ctx.mqtt.connect()
     elif mqtt:  # normally pass-through for mock mqtt object
         log.info("[mqtt] bypassed")
