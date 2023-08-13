@@ -20,11 +20,14 @@ import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { Loading } from "./loading";
 
+// the null loader here is just to ensure that useNavigation() has
+// a "loading" phase, so that we can react to the navigation before
+// it happens (ie, saving scroll position)
 export const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Page />}>
+        <Route path="/" element={<Page />} loader={() => null}>
             <Route index element={<Login />} />
-            <Route path=":roomName" element={<Room />} loader={() => null}>
+            <Route path=":roomName" element={<Room />}>
                 <Route index element={<TrackList />} />
                 <Route path="tracks/:trackId" element={<TrackDetails />} />
                 <Route path="queue" element={<TracksOrQueueOrControl />} />
