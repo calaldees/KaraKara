@@ -1,11 +1,12 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigation } from "react-router-dom";
 import { attachment_path, is_my_song } from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import placeholder from "../static/placeholder.svg";
+import { useScrollRestoration } from "../hooks/scrollrestoration";
 
 export function Notification() {
     const { notification, setNotification } = useContext(ClientContext);
@@ -70,6 +71,8 @@ export function Screen({
 }): React.ReactElement {
     const { setShowSettings } = useContext(ClientContext);
     const { queue } = useContext(RoomContext);
+    const scroller = useRef(null);
+    useScrollRestoration(scroller);
 
     return (
         <main className={className}>
@@ -80,7 +83,7 @@ export function Screen({
             </header>
             <Notification />
             <YoureNext queue={queue} />
-            <article>{children}</article>
+            <article ref={scroller}>{children}</article>
             {footer}
         </main>
     );

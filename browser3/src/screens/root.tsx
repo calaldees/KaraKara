@@ -24,7 +24,7 @@ export const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Page />}>
             <Route index element={<Login />} />
-            <Route path=":roomName" element={<Room />}>
+            <Route path=":roomName" element={<Room />} loader={() => null}>
                 <Route index element={<TrackList />} />
                 <Route path="tracks/:trackId" element={<TrackDetails />} />
                 <Route path="queue" element={<TracksOrQueueOrControl />} />
