@@ -23,7 +23,6 @@ export function useScrollRestoration(container: React.RefObject<HTMLElement>) {
   const key = `scroll-position-${useLocation().key}`
   const { state } = useNavigation()
   useEffect(() => {
-    console.log('useScrollRestoration', state, key, container.current?.scrollTop)
     if (state === 'loading') {
       setScrollPosition(key, container.current?.scrollTop ?? 0)
     } else if (state === 'idle') {
