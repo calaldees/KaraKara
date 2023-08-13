@@ -35,7 +35,10 @@ svg:not(.qr_code) {
 svg.x2 {
   font-size: 2em;
 }
-BUTTON svg, SPAN svg {
+P>svg, LI>svg {
+  vertical-align: middle;
+}
+BUTTON>svg, SPAN>svg {
   top: .125em;
   position: relative;
 }
