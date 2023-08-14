@@ -98,7 +98,11 @@ async def aio_mqtt_close(_app, _loop):
 # https://sanic.dev/en/guide/best-practices/exceptions.html#custom-error-handling
 def exception_to_dict(exception):
     import traceback
-    return {'exception': "".join(traceback.TracebackException.from_exception(exception).format())}
+    return {
+        'status': 500,
+        'message': 'Internal Server Error',
+        'exception': "".join(traceback.TracebackException.from_exception(exception).format())
+    }
 class CustomErrorHandler(sanic.handlers.ErrorHandler):
     def default(self, request, exception):
         if isinstance(exception, sanic.exceptions.SanicException):
