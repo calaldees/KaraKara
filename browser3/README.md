@@ -84,6 +84,9 @@ tl;dr: Safari on iOS 11+ or Chrome on Android 8+
     * only used for React-Router `Loader`s, and we only use one null-Loader to trigger saving the scroll position. So on iOS-12, we don't set the null-loader.
 * ios11
   * `AbortController` is missing
+    * polyfill added
+* ios10
+  * mostly works, except for clicking on categories, which is pretty major o_O
 
 * android 8
   * worked out of the box (after all the stuff for iOS-11 was put in place, so perhaps polyfills are needed but we already have them?)
