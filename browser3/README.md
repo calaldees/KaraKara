@@ -77,6 +77,7 @@ tl;dr: Safari on iOS 11+ or Chrome on Android 8+
 * ios13
   * `user-select: none` is an invalid value?
     * but after setting target to ios11, text-selection is still fixed despite not affecting this??
+  * thumbnail images not showing up
 * ios12
   * `globalThis` is missing
     * polyfill added
