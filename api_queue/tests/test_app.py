@@ -218,3 +218,18 @@ async def test_queue_validation(queue_model):
     response = await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test_name')
     assert response.status == 400
     assert 'test_name' in response.json['context']
+
+
+@pytest.mark.skip("In progress fix - end time with timezone creates error")
+@pytest.mark.asyncio
+async def test_queue_validation__end_datetime(queue_model):
+    _original_session_id = queue_model.session_id
+    queue_model.session_id = 'admin'
+    response = await queue_model.settings_put(payload={
+        "validation_event_end_datetime": '2022-01-01T10:10:00.000000+01:00',
+    })
+    assert response.status == 200
+    queue_model.session_id = _original_session_id
+
+    response = await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test_name')
+    assert response.status == 200
