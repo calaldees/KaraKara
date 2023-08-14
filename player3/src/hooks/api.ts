@@ -43,7 +43,7 @@ export function useApi() {
                     if (response.status >= 500) {
                         throw {message: response.statusText};
                     }
-                    if (!response.body) return;
+                    if (!response.body) throw {message: "No response body"};
                     const reader = response.body.getReader();
                     let download_done = 0;
                     // Content-Length shows us the compressed size, we can only
