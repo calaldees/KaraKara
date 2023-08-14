@@ -147,7 +147,8 @@ VIDEO {
 			@include border;
 			@include radial;
 			z-index: 100;
-			font-size: 10vh;
+			font-size: 3em;
+			max-width: 10em;
 			text-align: center;
 			padding: 2vh 4vw;
 		}

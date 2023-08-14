@@ -147,7 +147,7 @@ function MyScene() {
             attachment_path(root, track.attachments.image[1]),
             attachment_path(root, track.attachments.preview[0]),
         ]);
-    }, [tracks]);
+    }, [tracks, root]);
 
     useFrame(({ camera, clock }) => {
         (camera as THREE.PerspectiveCamera).fov = widescreen ? 50 : 65;
