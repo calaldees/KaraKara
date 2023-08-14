@@ -67,15 +67,6 @@ export function mqtt_url(root: string): string {
     );
 }
 
-/**
- * Turn an ISO8601 date into a nicer time
- *
- * eg "2021-01-03T14:00:00" -> "14:00"
- */
-export function short_date(long_date: string): string {
-    return long_date.replace(" ", "T").split("T")[1].substring(0, 5);
-}
-
 export function is_my_song(
     session_id: string,
     performer_name: string,
