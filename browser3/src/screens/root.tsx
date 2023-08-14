@@ -22,10 +22,12 @@ import { Loading } from "./loading";
 
 // the null loader here is just to ensure that useNavigation() has
 // a "loading" phase, so that we can react to the navigation before
-// it happens (ie, saving scroll position)
+// it happens (ie, saving scroll position). Buuuut, using loaders
+// triggers a code-path that uses signals, which aren't supported
+// in iOS 12. So if we don't have signals, give up on scrolling...
 export const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Page />} loader={() => null}>
+        <Route path="/" element={<Page />} loader={(new Request("")).signal ? () => null : undefined}>
             <Route index element={<Login />} />
             <Route path=":roomName" element={<Room />}>
                 <Route index element={<TrackList />} />
