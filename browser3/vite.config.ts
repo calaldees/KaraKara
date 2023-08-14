@@ -7,7 +7,7 @@ import eslint from 'vite-plugin-eslint';
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
-    target: 'es2015',
+    target: ['es2015', 'ios11'],
   },
   plugins: [
     react(),
