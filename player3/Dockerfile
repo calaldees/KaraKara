@@ -8,7 +8,7 @@ RUN npm install
 
 # Build app
 COPY . /app
-#RUN npm run test-once
+RUN npm run test-once
 RUN npm run build
 
 # Copy built app to httpd container
