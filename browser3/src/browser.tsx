@@ -1,5 +1,6 @@
 /// <reference path='./browser.d.ts'/>
 
+import '@ungap/global-this';
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./static/style.scss";
