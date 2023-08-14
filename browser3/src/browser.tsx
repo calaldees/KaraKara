@@ -1,6 +1,9 @@
 /// <reference path='./browser.d.ts'/>
 
-import '@ungap/global-this';
+// polyfills
+import '@ungap/global-this'; // iOS up to 14
+import 'abortcontroller-polyfill/dist/polyfill-patch-fetch'; // iOS up to 12
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./static/style.scss";
