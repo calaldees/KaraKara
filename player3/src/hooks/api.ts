@@ -40,6 +40,9 @@ export function useApi() {
 
             fetch(props.url, props.options)
                 .then((response) => {
+                    if (response.status >= 500) {
+                        throw {message: response.statusText};
+                    }
                     if (!response.body) return;
                     const reader = response.body.getReader();
                     let download_done = 0;
