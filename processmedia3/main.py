@@ -20,7 +20,6 @@ from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lib.kktypes import Source, SourceType, TargetType, Track, Target
-from lib.subtitle_processor import Subtitle
 
 log = logging.getLogger()
 
