@@ -262,6 +262,12 @@ class VideoToAvif(_BaseVideoToImage):
     mime = "image/avif"
 
 
+class VideoToJpeg(_BaseVideoToImage):
+    target = TargetType.IMAGE_JPEG
+    ext = "jpeg"
+    mime = "image/jpeg"
+
+
 #######################################################################
 # Image to Image
 
@@ -295,6 +301,12 @@ class ImageToAvif(_BaseImageToImage):
     target = TargetType.IMAGE_AVIF
     ext = "avif"
     mime = "image/avif"
+
+
+class ImageToJpeg(_BaseImageToImage):
+    target = TargetType.IMAGE_JPEG
+    ext = "jpeg"
+    mime = "image/jpeg"
 
 
 #######################################################################

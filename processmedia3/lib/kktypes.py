@@ -35,6 +35,7 @@ class TargetType(Enum):
     PREVIEW_H265 = 22
     IMAGE_WEBP = 30
     IMAGE_AVIF = 31
+    IMAGE_JPEG = 32
     SUBTITLES_VTT = 40
 
 
