@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState, useEffect } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -323,10 +323,8 @@ export function TrackList(): React.ReactElement {
     // getAll returns a new Array object every time, so we need to compare the
     // string representation of the lists to see if they're the same, otherwise
     // React will think the list has changed and re-render.
-    const filters = useMemo(
-        () => searchParams.getAll("filters"),
-        [searchParams.getAll("filters").join(",")]
-    );
+    const filterString = JSON.stringify(searchParams.getAll("filters"));
+    const filters = useMemo(() => JSON.parse(filterString), [filterString]);
     function setSearch(new_search: string | ((search: string) => string)) {
         if (typeof new_search === "function") {
             new_search = new_search(search);

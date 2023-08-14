@@ -1,5 +1,5 @@
-import { useContext, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigation } from "react-router-dom";
+import { useContext, useRef } from "react";
+import { Link } from "react-router-dom";
 import { attachment_path, is_my_song } from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
