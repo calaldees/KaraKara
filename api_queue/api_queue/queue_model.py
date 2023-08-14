@@ -13,7 +13,7 @@ from itertools import pairwise
 class QueueItem():
     @staticmethod
     def _now():
-        return datetime.datetime.now()
+        return datetime.datetime.now(tz=datetime.timezone.utc)
 
     track_id: str
     track_duration: datetime.timedelta
@@ -52,13 +52,13 @@ class QueueItem():
             self.start_time = None
         if isinstance(self.start_time, str):
             self.start_time = float(self.start_time)
-        self.start_time = datetime.datetime.fromtimestamp(self.start_time) if isinstance(self.start_time, numbers.Number) else self.start_time
+        self.start_time = datetime.datetime.fromtimestamp(self.start_time, tz=datetime.timezone.utc) if isinstance(self.start_time, numbers.Number) else self.start_time
         self.id = int(self.id)
         if not self.added_time:
             self.added_time = None
         if isinstance(self.added_time, str):
             self.added_time = float(self.added_time)
-        self.added_time = datetime.datetime.fromtimestamp(self.added_time) if isinstance(self.added_time, numbers.Number) else self.added_time
+        self.added_time = datetime.datetime.fromtimestamp(self.added_time, tz=datetime.timezone.utc) if isinstance(self.added_time, numbers.Number) else self.added_time
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
     @staticmethod
@@ -100,7 +100,7 @@ class Queue():
         return self.settings["track_space"]
     @property
     def now(self) -> datetime.datetime:
-        return self._now or datetime.datetime.now()
+        return self._now or datetime.datetime.now(tz=datetime.timezone.utc)
     @property
     def past(self) -> t.Iterable[QueueItem]:
         now = self.now

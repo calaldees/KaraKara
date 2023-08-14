@@ -21,7 +21,12 @@ DEFAULT_QUEUE_SETTINGS = {
     "coming_soon_track_count": 5,
 }
 def _parse_isodatetime(isoformatString):
-    return datetime.datetime.fromisoformat(isoformatString) if isoformatString else None
+    if not isoformatString:
+        return None
+    dt = datetime.datetime.fromisoformat(isoformatString)
+    if not dt.tzinfo:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt
 def _parse_timedelta(durationString):
     return datetime.timedelta(seconds=timeparse(durationString)) if durationString else None
 QUEUE_SETTING_TYPES = {
