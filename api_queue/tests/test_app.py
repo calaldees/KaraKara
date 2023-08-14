@@ -220,7 +220,6 @@ async def test_queue_validation(queue_model):
     assert 'test_name' in response.json['context']
 
 
-@pytest.mark.skip("In progress fix - end time with timezone creates error")
 @pytest.mark.asyncio
 async def test_queue_validation__end_datetime(queue_model):
     _original_session_id = queue_model.session_id
