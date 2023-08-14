@@ -1,5 +1,6 @@
 import pytest
 import collections.abc
+import datetime
 
 import ujson as json
 
@@ -225,7 +226,7 @@ async def test_queue_validation__end_datetime(queue_model):
     _original_session_id = queue_model.session_id
     queue_model.session_id = 'admin'
     response = await queue_model.settings_put(payload={
-        "validation_event_end_datetime": '2022-01-01T10:10:00.000000+01:00',
+        "validation_event_end_datetime": (datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=1), name='bst'))+datetime.timedelta(minutes=10)).isoformat(),  # set end_datetime to be now as bst and add a 10 mins so the track can be queued (if the event ends at this current millisecond, no tracks can be added)
     })
     assert response.status == 200
     queue_model.session_id = _original_session_id

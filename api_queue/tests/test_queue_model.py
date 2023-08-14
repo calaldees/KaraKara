@@ -9,7 +9,7 @@ from api_queue.queue_model import Queue, QueueItem
 @pytest.fixture
 def qu():
     qu = Queue([], settings={"track_space": datetime.timedelta(seconds=10)})
-    qu._now = datetime.datetime(2022, 1, 1, tz=datetime.timezone.utc)
+    qu._now = datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc)
     return qu
 
 def test_queue_empty(qu):

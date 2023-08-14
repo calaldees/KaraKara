@@ -6,13 +6,13 @@ from api_queue.queue_model import QueueItem
 from api_queue.queue_reorder import reorder, _rank
 
 
-def _QueueItem(*args, added_time=datetime.datetime(2022, 1, 1, 10, 0, 0), **kwargs):
+def _QueueItem(*args, added_time=datetime.datetime(2022, 1, 1, 10, 0, 0, tzinfo=datetime.timezone.utc), **kwargs):
     with patch('api_queue.queue_model.datetime') as mock_datetime:
         mock_datetime.datetime.now.return_value = added_time
         return QueueItem(*args, **kwargs)
 
 def _mins_ago(minutes):
-    return datetime.datetime.now() - datetime.timedelta(minutes=minutes)
+    return datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(minutes=minutes)
 
 
 @pytest.fixture

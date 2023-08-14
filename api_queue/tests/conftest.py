@@ -115,5 +115,5 @@ def qu():
         "coming_soon_track_count": 3,
     }
     qu = Queue([], settings=SettingsManager.get(mock_settings_manager, 'test'))
-    qu._now = datetime.datetime(2022, 1, 1, 10, 0, 0)
+    qu._now = datetime.datetime(2022, 1, 1, 10, 0, 0, tzinfo=datetime.timezone.utc)
     return qu
