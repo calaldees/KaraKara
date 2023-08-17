@@ -29,6 +29,8 @@ app.ext.openapi.describe(
     """),  # TODO: Markdown
 )
 
+app.config.FALLBACK_ERROR_FORMAT = "json"
+
 # Allow dev-mode clients to connect to prod server.
 # When allowing connections with credentials, allowed
 # headers MUST be explicitly listed.
@@ -117,11 +119,11 @@ app.error_handler = CustomErrorHandler()
 
 from .queue_manager import LoginManager, User
 @app.middleware("request")
-async def attach_session_id_request(request):
+async def attach_session_id_request(request: sanic.Request):
     request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
     request.ctx.user = LoginManager.from_session(request.ctx.session_id)
 @app.middleware("response")
-async def attach_session_id(request, response):
+async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse):
     if request.cookies.get("session_id") != request.ctx.session_id:
         response.cookies["session_id"] = request.ctx.session_id
 
