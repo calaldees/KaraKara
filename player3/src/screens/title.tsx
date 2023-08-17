@@ -195,14 +195,14 @@ function MyScene() {
             </group>
             <group
                 ref={text1}
-                position={[-4, 2.5, -5]}
+                position={[-3, 2.5, -5]}
                 onUpdate={(self) => self.lookAt(0, 0, 0)}
             >
                 <Html transform>
                     <h1>{settings["title"]}</h1>
                 </Html>
             </group>
-            <group ref={text2} position={[-4, -1.5, -5]}>
+            <group ref={text2} position={[-3, -1.5, -5]}>
                 <Html transform>
                     <StatsTable tracks={tracks} />
                 </Html>
