@@ -41,9 +41,9 @@ export function useApi() {
             fetch(props.url, props.options)
                 .then((response) => {
                     if (response.status >= 500) {
-                        throw {message: response.statusText};
+                        throw new Error(response.statusText);
                     }
-                    if (!response.body) throw {message: "No response body"};
+                    if (!response.body) throw new Error("No response body");
                     const reader = response.body.getReader();
                     let download_done = 0;
                     // Content-Length shows us the compressed size, we can only
