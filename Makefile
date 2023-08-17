@@ -23,6 +23,9 @@ get_example_media:  ##
 up: .env  ##
 	docker-compose up --build
 
+deploy:
+	git pull && docker compose down && docker compose up --build --detach
+
 test_cypress_run:  ## cypress browser tests
 	${_DOCKER_COMPOSE} --file docker-compose.test.yml run --rm test_cypress
 #test_cypress_cmd:
