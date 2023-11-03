@@ -79,12 +79,13 @@ const QueueItem = data => h("tr", {}, [
 	h("td", {}, text(data.track_duration)),
 	h("td", {}, text(data.performer_name)),
 	h("td", {}, text((new Date(data.start_time*1000)).toLocaleDateString("en-GB", DATE_OPTIONS))),
+	h("td", {}, text((new Date(data.added_time*1000)).toLocaleDateString("en-GB", DATE_OPTIONS))),
 ])
 
 
 const viewRoot = (state) => {
 	return h("table", {}, [
-		h("tr", {}, ['Image', 'Title','Duration','Performer','Start'].map(heading => h("th", {}, text(heading)))),
+		h("tr", {}, ['Image', 'Title','Duration','Performer','Start','Added'].map(heading => h("th", {}, text(heading)))),
 		...state.queue.map((queue_item) => QueueItem({...queue_item, ...state.tracks[queue_item.track_id]}))
 	])
 }
