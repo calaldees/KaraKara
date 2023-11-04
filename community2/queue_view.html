@@ -82,7 +82,9 @@ function formatDuration(milliseconds) {
 
 const QueueItem = data => h("tr", {}, [
 	h("td", {}, [
-		h("img", {src: `${URL}/files/${data?.attachments?.image[0].path}`}),
+		h("a", {href: `${URL}/files/${data?.attachments?.video[0].path}`, target: "_blank"}, [
+			h("img", {src: `${URL}/files/${data?.attachments?.image[0].path}`}),
+		]),
 		// deprecated - only two images avif and webp
 		//h("img", {src: `${URL}/files/${data?.attachments?.image[1].path}`}),
 		//h("img", {src: `${URL}/files/${data?.attachments?.image[2].path}`}),
