@@ -13,6 +13,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
+    - name: Test
+      run: docker build --target test .
+      working-directory: processmedia3
     - name: Build
-      run: docker build .
+      run: docker build --target production .
       working-directory: processmedia3
