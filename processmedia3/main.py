@@ -42,6 +42,7 @@ SCAN_IGNORE = [
     ".stignore",
     ".stglobalignore",
     ".tmp",
+    ".gitignore",
     "cache.db",
     "tracks.json",
     "tracks.json.gz",

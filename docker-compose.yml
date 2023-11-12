@@ -1,5 +1,5 @@
 volumes:
-    processmedia2_data:
+    #processmedia2_data:
     logs:
     mqtt_data:
     queue_data:
@@ -19,9 +19,9 @@ services:
         links:
             - api_queue
             - mqtt
-            - player2
+            #- player2
             - player3
-            - browser2
+            #- browser2
             - browser3
         labels:
             - "traefik.enable=true"
@@ -55,43 +55,43 @@ services:
             - mqtt_data:/mosquitto/data
             - ${PWD}/mqtt/:/mosquitto/config/:ro
 
-    player2:
-        build:
-            context: ./player2
-        mem_limit: 1g
+    # player2:
+    #     build:
+    #         context: ./player2
+    #     mem_limit: 1g
 
     player3:
         build:
             context: ./player3
         mem_limit: 1g
 
-    browser2:
-        build:
-            context: ./browser2
-        mem_limit: 1g
+    # browser2:
+    #     build:
+    #         context: ./browser2
+    #     mem_limit: 1g
 
     browser3:
         build:
             context: ./browser3
         mem_limit: 1g
 
-    processmedia2:
-        profiles:
-            - processmedia
-        build:
-            context: ./processmedia2
-        mem_limit: 1g
-        environment:
-            - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
-            # TODO "path_static_track_list" from env to link with `api_queue` location and maybe even `nginx`?
-        env_file:
-            - .env
-        volumes:
-            - logs:/logs
-            - processmedia2_data:/data:rw   # does this prevent multiple encoding containers from running because of the `.lock`?
-            - ${PATH_HOST_source}:/media/source:ro
-            - ${PATH_HOST_meta}:/media/meta:rw
-            - ${PATH_HOST_processed}:/media/processed:rw
+    # processmedia2:
+    #     profiles:
+    #         - processmedia
+    #     build:
+    #         context: ./processmedia2
+    #     mem_limit: 1g
+    #     environment:
+    #         - KARAKARA_PROCESSMEDIA2_CONFIG=config.docker.json
+    #         # TODO "path_static_track_list" from env to link with `api_queue` location and maybe even `nginx`?
+    #     env_file:
+    #         - .env
+    #     volumes:
+    #         - logs:/logs
+    #         - processmedia2_data:/data:rw   # does this prevent multiple encoding containers from running because of the `.lock`?
+    #         - ${PATH_HOST_source}:/media/source:ro
+    #         - ${PATH_HOST_meta}:/media/meta:rw
+    #         - ${PATH_HOST_processed}:/media/processed:rw
 
     processmedia3:
         profiles:
