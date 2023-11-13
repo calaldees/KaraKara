@@ -83,6 +83,8 @@ These questions are designed for a group exercise in dissecting this codebase as
             * Find out about this test framework - how is it different to jest?
     * what is `player3/src/player.d.ts` - why is this file important?
     * permalink to a line that defines a clients state object
+    * Look at `Dockerfile`
+        * See the pattern of building, copying and serving with nginx. How big is the image that is created?
 * Look at contributions over time https://github.com/calaldees/KaraKara/graphs/contributors
     * Who is the biggest contributor?
     * Look at https://github.com/calaldees/KaraKara/blame/master/browser3/package-lock.json
