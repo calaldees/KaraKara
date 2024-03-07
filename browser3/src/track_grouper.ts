@@ -132,7 +132,7 @@ export function group_tracks(
         // for "from:Macross" then the resulting list of tracks will be
         // grouped by "Macross:*".
         let most_recent_tag = filters[filters.length - 1]?.split(":")[1];
-        if(most_recent_tag && all_tags[most_recent_tag]) {
+        if (most_recent_tag && all_tags[most_recent_tag]) {
             let found_track_ids: Array<string> = [];
 
             let tag_key = most_recent_tag;
@@ -176,8 +176,10 @@ export function group_tracks(
         if (next_filters.length === 0) {
             next_filters = Object.keys(all_tags);
             // Avoid repeating filter categories
-            let filter_categories = filters.map(f => f.split(":")[0])
-            next_filters = next_filters.filter((tag_key) => !(filter_categories.includes(tag_key)));
+            let filter_categories = filters.map((f) => f.split(":")[0]);
+            next_filters = next_filters.filter(
+                (tag_key) => !filter_categories.includes(tag_key),
+            );
             // Remove tags with null parent (system tags like
             // "source-video" or "hard-subs")
             next_filters = next_filters.filter((tag_key) => tag_key);
@@ -224,10 +226,7 @@ export function group_tracks(
             // If a tag has a few children (eg vocaltrack=on/off),
             // then show all the children
             else {
-                sections.push([
-                    tag_key,
-                    { filters: all_tags[tag_key] },
-                ]);
+                sections.push([tag_key, { filters: all_tags[tag_key] }]);
             }
             // Remove all tracks which would be discovered by this sub-query
             leftover_tracks = leftover_tracks.filter(

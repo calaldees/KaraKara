@@ -27,7 +27,11 @@ import { Loading } from "./loading";
 // in iOS 12. So if we don't have signals, give up on scrolling...
 export const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route path="/" element={<Page />} loader={(new Request("")).signal ? () => null : undefined}>
+        <Route
+            path="/"
+            element={<Page />}
+            loader={new Request("").signal ? () => null : undefined}
+        >
             <Route index element={<Login />} />
             <Route path=":roomName" element={<Room />}>
                 <Route index element={<TrackList />} />
