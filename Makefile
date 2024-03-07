@@ -21,7 +21,7 @@ get_example_media:  ##
 	python3 media/get_example_media.py
 
 up: .env  ##
-	docker-compose up --build
+	docker compose up --build
 
 deploy:
 	git pull && docker compose down && docker compose up --build --detach
