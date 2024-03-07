@@ -122,7 +122,7 @@ from .queue_manager import LoginManager, User
 async def attach_session_id_request(request: sanic.Request):
     request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
     request.ctx.user = LoginManager.from_session(request.ctx.session_id)
-@app.middleware("response")
+@app.middleware("response")  # type: ignore
 async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse):
     if request.cookies.get("session_id") != request.ctx.session_id:
         response.cookies["session_id"] = request.ctx.session_id

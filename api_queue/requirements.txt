@@ -2,5 +2,7 @@ sanic
 sanic-ext
 sanic-openapi
 ujson
-aiomqtt
+# aiomqtt is now on version 2.x.x `.connect()` is no longer a method - breaking changes need to be investigated
+# We can also bump python to 3.12 in Dockerfile with this update
+aiomqtt==1.2.1
 pytimeparse
