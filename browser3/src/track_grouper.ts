@@ -177,16 +177,19 @@ export function group_tracks(
         // sensible filters, then desperately try using any and every
         // available tag as a filter, because we really don't want to
         // be listing 50+ tracks with no filters at all.
-        if (next_filters.length === 0) next_filters = Object.keys(all_tags);
+        if (next_filters.length === 0) {
+            next_filters = Object.keys(all_tags);
+            // Avoid repeating filter categories
+            let filter_categories = filters.map(f => f.split(":")[0])
+            next_filters = next_filters.filter((tag_key) => !(filter_categories.includes(tag_key)));
+            // Remove tags with null parent (system tags like
+            // "source-video" or "hard-subs")
+            next_filters = next_filters.filter((tag_key) => tag_key);
+        }
         // Remove any suggestions which would give 0 results
-        let tag_keys = next_filters.filter((tag_key) => tag_key in all_tags);
+        next_filters = next_filters.filter((tag_key) => tag_key in all_tags);
         // For each section, either add a filter list, or a grouped filter list
-        tag_keys.forEach(function (tag_key) {
-            // If we've fallen back to using "all tags" as sections,
-            // then "all tags" includes top-level tags (with null as a
-            // parent) - let's turn null into something visible so that
-            // top-level tags will be grouped under this.
-            let tag_key_visible = tag_key || "*";
+        next_filters.forEach(function (tag_key) {
             // Look at our all_tags table to see what children we have
             let tag_children = Object.keys(all_tags[tag_key]).sort(
                 normalise_cmp,
@@ -220,13 +223,13 @@ export function group_tracks(
                             all_tags[tag_key][tag_child];
                     }
                 });
-                sections.push([tag_key_visible, { groups: grouped_groups }]);
+                sections.push([tag_key, { groups: grouped_groups }]);
             }
             // If a tag has a few children (eg vocaltrack=on/off),
             // then show all the children
             else {
                 sections.push([
-                    tag_key_visible,
+                    tag_key,
                     { filters: all_tags[tag_key] },
                 ]);
             }
