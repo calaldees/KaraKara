@@ -84,7 +84,7 @@ Core components
 ```mermaid
 graph TD
     internet{{internet}}
-    internet -- http 443 ---> violet --http 80--> nginx
+    internet -- http 443 ---> public-server --http 80--> nginx
     
     subgraph docker-compose [docker-compose]
         nginx
@@ -124,17 +124,17 @@ graph TD
   * Users can add tracks for themselves
   * Tracks will be validated to make sure one user isn't filling the whole queue, and nobody can add tracks past the end of the event time limit
   * Admins can re-order and delete tracks
-* [processmedia2](processmedia2/README.md) ![ProcessMedia2](https://github.com/calaldees/KaraKara/workflows/ProcessMedia2/badge.svg)
+* [processmedia3](processmedia2/README.md) ![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)
   * Takes folders of source data (video, image+audio, subtitles)
   * Create high-bitrate video for the player interface.
   * Create low-bitrate previews for mobile devices
   * Create thumbnail images for the track browser
   * Convert subtitles into a format that web browsers understand
   * Export an index of all the created files and metadata into `tracks.json`
-* [browser2](browser2/README.md) ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser2/badge.svg)
+* [browser3](browser3/README.md) ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser3/badge.svg)
   * Mobile webapp interface to search / preview / queue tracks
   * Gets data from `tracks.json`
-* [player2](player2/README.md) ![Player2](https://github.com/calaldees/KaraKara/workflows/Player2/badge.svg)
+* [player3](player3/README.md) ![Player2](https://github.com/calaldees/KaraKara/workflows/Player3/badge.svg)
   * Displays the current queue for use on a projector
   * Gets data from website / `queue` api
   * Streams final video from `nginx` in fullscreen mode.
