@@ -127,24 +127,15 @@ export function group_tracks(
 
     // If we have a few tracks, just list them all
     else if (tracks.length < 15) {
-        let found_track_ids: Array<string> = [];
-        // If we are searching for something, use suggest_next_filters
-        // to figure out some headings, eg if we are currently searching
-        // for "from:Macross" then it will suggest filtering by "Macross:*".
-        // If we have no filters, then the default suggested filters
-        // aren't hugely helpful here, so better to just have a list.
-        let next_filters =
-            filters.length > 0 ? suggest_next_filters(filters, all_tags) : [];
-        // If suggest_next_filters can't come up with any suggestions,
-        // or all of the suggestions are bad (eg it suggests a tag
-        // which would have 0 results due to the "if user searches for
-        // X then suggest Y next" feature) then we'll end up not having
-        // any sections, and everything will end up in leftover_tracks,
-        // which is fine.
-        let tag_keys = next_filters.filter((tag_key) => tag_key in all_tags);
-        // tag_keys lists all of the top-level suggested filters, eg
-        // in this example we would just have ["Macross"]
-        tag_keys.forEach(function (tag_key) {
+        // If we are searching for some tags, see if our most recently
+        // searched tag has any children, eg if we are currently searching
+        // for "from:Macross" then the resulting list of tracks will be
+        // grouped by "Macross:*".
+        let most_recent_tag = filters[filters.length - 1]?.split(":")[1];
+        if(most_recent_tag && all_tags[most_recent_tag]) {
+            let found_track_ids: Array<string> = [];
+
+            let tag_key = most_recent_tag;
             // Look at our all_tags table to see what children we have
             let tag_children = Object.keys(all_tags[tag_key]).sort(
                 normalise_cmp,
@@ -162,10 +153,15 @@ export function group_tracks(
                     tracks_in_this_section.map((t) => t.id),
                 );
             });
-        });
-        leftover_tracks = leftover_tracks.filter(
-            (t) => !found_track_ids.includes(t.id),
-        );
+
+            leftover_tracks = leftover_tracks.filter(
+                (t) => !found_track_ids.includes(t.id),
+            );
+        }
+
+        // if we're unable to figure out any groups, then all the
+        // tracks will end up in leftover_tracks, which will be
+        // handled below
     }
 
     // If we have many tracks, prompt for more filters
