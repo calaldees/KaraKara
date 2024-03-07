@@ -348,10 +348,11 @@ def _pickled_var(path: Path, default: Any):
 
 def main(argv: List[str]) -> int:
     args = parse_args(argv)
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format="%(asctime)s %(message)s",
-    )
+
+    with Path('logging.config.json').open() as f:
+        logging_config = json.load(f)
+        logging_config["root"]["level"] = logging.DEBUG if args.debug else logging.INFO
+        logging.config.dictConfig(logging_config)
 
     while True:
         with _pickled_var(args.cache, {}) as cache, logging_redirect_tqdm():
