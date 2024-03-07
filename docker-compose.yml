@@ -8,6 +8,7 @@ services:
 
     nginx:
         image: nginx:alpine
+        restart: unless-stopped
         mem_limit: 1g
         ports:
             - "127.0.0.1:${PORT_NGINX}:80"
@@ -33,6 +34,7 @@ services:
     api_queue:
         build:
             context: ./api_queue
+        restart: unless-stopped
         mem_limit: 1g
         environment:
             SANIC_MQTT: mqtt
@@ -50,6 +52,7 @@ services:
 
     mqtt:
         image: eclipse-mosquitto
+        restart: unless-stopped
         mem_limit: 1g
         volumes:
             - mqtt_data:/mosquitto/data
@@ -63,6 +66,7 @@ services:
     player3:
         build:
             context: ./player3
+        restart: unless-stopped
         mem_limit: 1g
 
     # browser2:
@@ -73,6 +77,7 @@ services:
     browser3:
         build:
             context: ./browser3
+        restart: unless-stopped
         mem_limit: 1g
 
     # processmedia2:
@@ -98,7 +103,8 @@ services:
             - processmedia3
         build:
             context: ./processmedia3
-        mem_limit: 1g
+        restart: unless-stopped
+        mem_limit: 8g
         volumes:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro
