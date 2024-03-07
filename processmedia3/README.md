@@ -5,20 +5,22 @@ Encode media (videos + images) for use with KaraKara.
 
 Efficiently monitor and detect changes to source videos, create processed media and create track datafile.
 
-Example input
+Example input:
+```
+source/My Video.mp4
+source/My Video.srt
+source/My Video.txt
+```
 
-    source/My Video.mp4
-    source/My Video.srt
-    source/My Video.txt
-
-Example Output
-
-    processed/z/zrYVkuc0Sn1.webm
-    processed/g/gESd0tcze9O.mp4
-    processed/x/xP_WJ0_44mv.avif
-    processed/x/xP_WJ0_44mv.webp
-    processed/track.json
-
+Example output:
+```
+processed/z/zrYVkuc0Sn1.webm
+processed/g/gESd0tcze9O.mp4
+processed/x/xP_WJ0_44mv.avif
+processed/x/xP_WJ0_44mv.webp
+processed/tracks.json
+processed/tracks.json.gz
+```
 
 Use
 ---
