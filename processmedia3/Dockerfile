@@ -19,6 +19,9 @@ FROM dependencies as dependencies_test
 FROM dependencies as code
     COPY main.py .
     COPY lib ./lib
+    VOLUME /logs
+    VOLUME /media/source
+    VOLUME /media/processed
 
 FROM code as test
     COPY --from=dependencies_test /site-packages /site-packages
@@ -28,9 +31,5 @@ FROM code as test
     RUN python3 -m tests.test_main
 
 FROM code as production
-    VOLUME /logs
-    VOLUME /media/source
-    VOLUME /media/processed
-
     ENTRYPOINT ["python3", "/app/main.py", "--source", "/media/source", "--cache", "/media/processed/cache.db", "--processed", "/media/processed"]
     CMD ["all", "--loop", "600"]
