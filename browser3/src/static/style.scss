@@ -530,6 +530,9 @@ MAIN.track_details ARTICLE {
   VIDEO {
     width: 100%;
   }
+  DIV.lyrics {
+    user-select: text;
+  }
 }
 
 /* Queue */
