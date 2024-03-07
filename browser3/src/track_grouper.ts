@@ -126,7 +126,7 @@ export function group_tracks(
     }
 
     // If we have a few tracks, just list them all
-    else if (tracks.length < 15) {
+    else if (tracks.length < 25) {
         // If we are searching for some tags, see if our most recently
         // searched tag has any children, eg if we are currently searching
         // for "from:Macross" then the resulting list of tracks will be
