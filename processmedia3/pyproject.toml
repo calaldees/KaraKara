@@ -1,0 +1,24 @@
+[project]
+name = "processmedia3"
+version = "0.0.0"
+readme = "README.md"
+dependencies = [
+	"tqdm",
+	"pillow",
+]
+
+[project.optional-dependencies]
+test = [
+	"mypy",
+	"pytest",
+	"types-tqdm",
+	"types-Pillow",
+]
+
+[tool.mypy]
+[[tool.mypy.overrides]]
+module = "mypy-tqdm.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
