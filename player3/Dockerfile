@@ -8,14 +8,10 @@ RUN npm install
 
 # Build app
 COPY . /app
-#RUN npm run test-once
+RUN npm run test-once
 RUN npm run build
 
-# Copy built app to minimal-httpd container
-FROM alpine:3.7
-EXPOSE 80
-HEALTHCHECK --interval=1m --timeout=3s CMD wget -q http://127.0.0.1/ -O /dev/null
-RUN apk add --no-cache thttpd
-COPY --from=build /app/dist /www
-RUN mkdir /www/errors && cd /www/errors && ln -s ../index.html err404.html
-CMD thttpd -D -d /www
+# Copy built app to httpd container
+FROM nginx:alpine
+COPY --from=build /app/dist /app
+RUN echo "server { root /app; try_files \$uri /index.html; }" > /etc/nginx/conf.d/default.conf

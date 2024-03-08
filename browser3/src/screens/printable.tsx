@@ -1,8 +1,6 @@
 import { useContext } from "react";
 import { BackToExplore, Screen } from "./_common";
-import { shortest_tag, last_tag } from "../utils";
 import { useParams } from "react-router-dom";
-import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -36,11 +34,15 @@ export function Printable(): React.ReactElement {
             //navRight={}
             footer={<PrintButtons />}
         >
-            To get an interactive track list on your phone, scan this
-            QR code or visit {root} and use room name "{roomName}".
-            <br />
+            <p>
+                To get an interactive track list on your phone, scan this QR
+                code or visit {root} and use room name "{roomName}".
+            </p>
             <div className={"qr_container"}>
-                <QRCodeSVG value={`${root}/browser3/${roomName}`} className={"qr_code"} />
+                <QRCodeSVG
+                    value={`${root}/browser3/${roomName}`}
+                    className={"qr_code"}
+                />
             </div>
         </Screen>
     );

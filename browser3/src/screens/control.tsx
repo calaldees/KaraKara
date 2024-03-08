@@ -155,7 +155,8 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                         </Thumb>
                         <span className={"text queue_info"}>
                             <span className={"title"}>
-                                {tracks[item.track_id].tags.title[0]}
+                                {tracks[item.track_id]?.tags.title[0] ??
+                                    `<${item.track_id} not found>`}
                             </span>
                             <br />
                             <span className={"performer"}>

@@ -17,10 +17,16 @@ DEFAULT_QUEUE_SETTINGS = {
     "validation_duplicate_performer_timedelta": None,
     "validation_duplicate_track_timedelta": None,
     "validation_performer_names": [],
-    "validation": ['default'],
+    "queue_post_processing_function_names": ["validation_default",],
+    "coming_soon_track_count": 5,
 }
 def _parse_isodatetime(isoformatString):
-    return datetime.datetime.fromisoformat(isoformatString) if isoformatString else None
+    if not isoformatString:
+        return None
+    dt = datetime.datetime.fromisoformat(isoformatString)
+    if not dt.tzinfo:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt
 def _parse_timedelta(durationString):
     return datetime.timedelta(seconds=timeparse(durationString)) if durationString else None
 QUEUE_SETTING_TYPES = {
@@ -35,7 +41,12 @@ def parse_settings_dict(settings_dict: dict) -> dict:
         k: QUEUE_SETTING_TYPES.get(k, lambda x: x)(v)
         for k, v in settings_dict.items()
     }
-
+def validate_settings_dict(settings_dict: dict):
+    # throw exception if parsed dict (with python types) is not valid
+    # settings_dict could be a subset of possible settings_dict fields
+    # TODO - Implement Me!
+    return
+    # Idea?: would it be better to perform the validation on a complete dict before saving?
 
 class SettingsManager():
     def __init__(self, path: Path = Path('.')):
@@ -53,7 +64,7 @@ class SettingsManager():
 
     def set_json(self, name: str, settings: dict) -> None:
         path = self.path.joinpath(f'{name}_settings.json')
-        parse_settings_dict(settings)  # new settings should parse without exception
+        validate_settings_dict(parse_settings_dict(settings))  # new settings should parse without exception
         old_settings = self.get_json(name)
         with path.open('w') as filehandle:
             json.dump({**old_settings, **settings}, filehandle)

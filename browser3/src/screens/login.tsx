@@ -9,7 +9,7 @@ export function Login(): React.ReactElement {
 
     function onSubmit(e: FormEvent) {
         e.preventDefault();
-        navigate(roomNameEdit);
+        navigate(roomNameEdit.toLowerCase());
     }
 
     return (

@@ -28,7 +28,7 @@ export function ConfigMenu() {
     function onSubmit(e: FormEvent) {
         e.preventDefault();
         setRoot(rootEdit);
-        if (roomNameEdit != roomName) {
+        if (roomNameEdit !== roomName) {
             navigate("/" + roomNameEdit);
         }
         setRoomPassword(roomPasswordEdit);
@@ -88,16 +88,20 @@ export function ConfigMenu() {
                                     />
                                 </td>
                             </tr>
-                            {podium && <tr>
-                                <td>Blank Podium</td>
-                                <td>
-                                    <input
-                                        checked={blankPodium}
-                                        type={"checkbox"}
-                                        onChange={(e) => setBlankPodium(!blankPodium)}
-                                    />
-                                </td>
-                            </tr>}
+                            {podium && (
+                                <tr>
+                                    <td>Blank Podium</td>
+                                    <td>
+                                        <input
+                                            checked={blankPodium}
+                                            type={"checkbox"}
+                                            onChange={(e) =>
+                                                setBlankPodium(!blankPodium)
+                                            }
+                                        />
+                                    </td>
+                                </tr>
+                            )}
                             {document.body.requestFullscreen && (
                                 <tr>
                                     <td>Fullscreen</td>
@@ -142,10 +146,7 @@ export function ConfigMenu() {
                             <tr>
                                 <td>WakeLock</td>
                                 <td>
-                                    <input
-                                        disabled={true}
-                                        value={wakeLock}
-                                    />
+                                    <input disabled={true} value={wakeLock} />
                                 </td>
                             </tr>
                             <tr>

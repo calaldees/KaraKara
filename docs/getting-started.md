@@ -8,7 +8,7 @@ karakara.uk Tour
 
 * https://karakara.uk/
     Room: test
-* https://karakara.uk/player2/
+* https://karakara.uk/player3/
 * double click title banner
     * username: test, password: test
 * Developers
@@ -19,10 +19,9 @@ karakara.uk Tour
 Run it locally or the cloud
 --------------
 
-### Checkout
-
-#### GitPod (Cloud)
-https://gitpod.io#https://github.com/calaldees/KaraKara
+#### Cloud
+* https://codespaces.new/calaldees/KaraKara?quickstart=1
+* https://gitpod.io/#https://github.com/calaldees/KaraKara
 
 #### Local
 ```bash
@@ -33,17 +32,17 @@ cd KaraKara
 ### Run
 ```bash
 python3 media/get_example_media.py
-docker-compose up --build
+cp .env.example .env
+docker compose up --build
+# see encoding progress in docker terminal
+# wait for example media to encode
 
-# see encoding progress
-docker-compose exec processmedia2 /bin/bash
-    python3 metaviewer.py
-    top
-    # KAT-TUN took 8min, Captain America took 25min (cpu is throttled after light use)
-
-# api_queue -> track_id invalid
 # when encoding complete - api_queue must be restarted to load new `tracks.json`
-docker-compose restart api_queue
+docker compose restart api_queue
+
+# open `/` forwards to `/docs`
+# open `/browser3`
+# open `/player3` (chrome only for subtitle styling)
 ```
 
 
@@ -56,17 +55,10 @@ These questions are designed for a group exercise in dissecting this codebase as
     * How many containers are needed to run the system?
         * what do they each do?
             * What is mqtt? why is it an important design pattern
-* look at `nginx/ngonx.conf`
+* look at `nginx/nginx.conf`
     * What is nginx?
     * what is the purpose of this container?
-* karakara does not use a database - but still stores data
-    * what data storage does the system use?
-        * for tracks?
-        * for queue/room?
-    * where on the file system is the data stored?
-        * permalink to the line that persists the queue data
-    * would using a database be better? why? why not?
-* Server API (api_queue)
+* Server API (`/api_queue`)
     * What framework is used for the server-state/restAPI?
         * What are some of benefits/features of this framework?
     * Find where some middleware is created - what is this middleware doing?
@@ -74,45 +66,59 @@ These questions are designed for a group exercise in dissecting this codebase as
         * give a permalink to a line number that contributes any information to the openapi spec
         * What language feature has been used to register these extra details with the openapi spec?
         * the framework does not provide this `/docs/` automatically, it's a plugin. Find the url to documentation for this extension/plugin/feature
-* Clients (player2 and browser2)
+* Clients (`/player3` and `/browser3`)
     * what framework is used in the clients?
     * what language is used in the clients?
     * look at `index.html` as a file - now look at the source of one of the clients in a browser (with ctrl+u). Which of the packages below is transforming this?
     * looking in `package.json`
+        * what is `vite` and why is it used?
         * what is `prettier` and why is it used?
-        * what is `parcel` and why is it used?
-        * what is `hyperapp-jsx-pragma` and why is it used?
-    * What testing framework is used in browser2
-    * what is `player.d.ts` - why is this file important?
+        * what is `@shish2k/react-mqtt` and why is it used?
+            * https://www.npmjs.com/package/@shish2k/react-mqtt
+    * `npm install`
+        * `npm run serve`
+            * Load the site - look at the network requests - see the number of ts files - why is this interesting?
+        * What testing framework is used in browser3
+            * `npm run test`
+            * Find out about this test framework - how is it different to jest?
+    * what is `player3/src/player.d.ts` - why is this file important?
     * permalink to a line that defines a clients state object
+    * Look at `Dockerfile`
+        * See the pattern of building, copying and serving with nginx. How big is the image that is created?
 * Look at contributions over time https://github.com/calaldees/KaraKara/graphs/contributors
-    * https://github.com/calaldees/KaraKara/blame/master/browser2/package-lock.json
-    * Question: are these "lines of code?"
-    * Should these lines be counted as contributions? why? why not?
+    * Who is the biggest contributor?
+    * Look at https://github.com/calaldees/KaraKara/blame/master/browser3/package-lock.json
+        * Look how many lies this file is?
+        * Question: are these "lines of code?"
+        * Should these lines be counted as contributions? why? why not?
 * https://github.com/calaldees/KaraKara/commit/e6b91a17e4f292f3851c7aac9d2a10e8a13b4e3d
     * What is happening in this commit? is this good or bad? why?
-* With gitpod/local
-    * looking in `media` 
+* With Code IDE
+    * looking in `/media` 
         * how many source files are needed for each track? what is in the source files?
-        * ```bash
-            # in new terminal while containers are running
-            docker-compose exec processmedia2 /bin/bash
-            python3 metaviewer.py
-            ```
         * Why are the processed files named they way they are?
-        * what is `vtt`? what is `webm`?
-    * using  `cloc --vcs=git xxx` `processmedia2/browser2/player2/api_queue`
-        * which is the biggest component in lines of code?
+        * what is `.vtt`?
+        * what is `.webm`?
+    * using  `cloc --vcs=git xxx` (where `xxx` could be `processmedia3`/`browser3`/`player3`/`api_queue`)
+        * (install with `sudo apt-get update && sudo apt-get install -y cloc`)
+        * which is the biggest component in lines of code? (ignoring datafiles)
         * compare `cloc --vcs=git api_queue/api_queue/` and `cloc --vcs=git api_queue/tests/` what is the app-to-test ratio? is this good?
 * with `karakara.uk`
-    * with browser2 - look at network transfer of `tracks.json` - how big is the file? how much data was transferred? Why is there a difference?
+    * with browser3 - look at network transfer of `tracks.json` - how big is the file? how much data was transferred? Why is there a difference?
     * What format are the image files in?
         * Why is this interesting? find out more about the format
 * with your gitpod/local server or `karakara.uk`
     * Add a track to the playlist using a curl statement (look in the documentation for api_queue)
-        * `curl https://karakara.uk/files/tracks.json | jq '.[] | { d:.duration|tostring, i:.id } | [.d, .i] | join(": ")' | sed 's/"//' | sort -nr`
-    * Play and then stop a video using a curl statement
-    * use curl to get the queue as a `csv`. What is csv?
+        * List duration:track_id `curl https://karakara.uk/files/tracks.json | jq '.[] | { d:.duration|tostring, i:.id } | [.d, .i] | join(": ")' | sed 's/"//' | sort -nr`
+    * Play and then stop a video using a `curl` statement
+    * use `curl` to get the queue as a `csv`. What is csv?
+* karakara does not use a database - but still stores data
+    * What data storage does the system use?
+        * for tracks?
+        * for queue/room?
+    * Where on the file system is the data stored?
+        * permalink to the line that persists/writes some data/state
+    * Would using a database be better? why? why not?
 * Integration Tests?
     * There are _some_ cypress tests. What site do they test? Is this good/bad? What are your recommendations for what should be tested in future?
 * Overall

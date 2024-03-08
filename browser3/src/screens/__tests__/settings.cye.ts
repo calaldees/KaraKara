@@ -10,12 +10,20 @@ describe("Room Settings Screen", () => {
         }).as("tracks");
     });
     it("Should show some settings", () => {
-        cy.visit("/demo/settings");
+        cy.login();
+        cy.contains("Room Settings").click();
         cy.contains("Room Settings").should("exist");
-        // FIXME: make sure there are some settings
+        cy.contains("title:").should("exist");
     });
     it.skip("Save settings", () => {
-        // FIXME: test saving
+        cy.login();
+        cy.contains("Room Settings").click();
+        cy.contains("Room Settings").should("exist");
+        cy.contains("title:").should("exist");
+        cy.get("[name=title]").should("exist");
+        cy.get("[name=title]").clear().type("test title");
+        cy.get("[data-cy=save-settings-button]").click();
+        cy.contains("Settings saved").should("exist");
     });
     it.skip("Reject invalid settings", () => {
         // FIXME: test saving

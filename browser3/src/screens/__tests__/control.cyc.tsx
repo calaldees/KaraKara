@@ -2,9 +2,9 @@
 /// <reference path="../../../cypress/support/component.ts" />
 
 import { Control } from "../control";
-import tracks from "../../../cypress/fixtures/small_tracks.json";
+//import tracks from "../../../cypress/fixtures/small_tracks.json";
 import queue from "../../../cypress/fixtures/small_queue.json";
-import settings from "../../../cypress/fixtures/small_settings.json";
+//import settings from "../../../cypress/fixtures/small_settings.json";
 
 describe("no tracks", () => {
     it("no tracks", () => {
@@ -15,10 +15,9 @@ describe("no tracks", () => {
                 queue: [],
             },
         });
-        cy.contains("READ ME :)").should("exist")
+        cy.contains("READ ME :)").should("exist");
     });
 });
-
 
 describe("now playing", () => {
     it("no time", () => {
@@ -31,12 +30,12 @@ describe("now playing", () => {
                 queue: [
                     {
                         ...queue[1],
-                        start_time: null
-                    }
+                        start_time: null,
+                    },
                 ],
             },
         });
-        cy.get("span.count").should('not.exist')
+        cy.get("span.count").should("not.exist");
     });
     it("in the future", () => {
         cy.mount(<Control />, {
@@ -48,12 +47,12 @@ describe("now playing", () => {
                 queue: [
                     {
                         ...queue[1],
-                        start_time: 1120
-                    }
+                        start_time: 1120,
+                    },
                 ],
             },
         });
-        cy.get("span.count").contains('In 2 mins').should('exist')
+        cy.get("span.count").contains("In 2 mins").should("exist");
     });
     it("playing now", () => {
         cy.mount(<Control />, {
@@ -67,23 +66,23 @@ describe("now playing", () => {
                         ...queue[1],
                         start_time: 990,
                         track_duration: 60,
-                    }
+                    },
                 ],
             },
         });
-        cy.get("span.count").contains('Now').should('exist')
+        cy.get("span.count").contains("Now").should("exist");
     });
 });
 
 function dnd(drag: string, drop: string) {
     const dataTransfer = new DataTransfer();
 
-    cy.get(drag).trigger('dragstart', {
-        dataTransfer
+    cy.get(drag).trigger("dragstart", {
+        dataTransfer,
     });
 
-    cy.get(drop).trigger('drop', {
-        dataTransfer
+    cy.get(drop).trigger("drop", {
+        dataTransfer,
     });
 }
 describe("drag & drop", () => {
@@ -92,7 +91,7 @@ describe("drag & drop", () => {
             req.reply({
                 body: {},
                 //delay: 1000
-            })
+            });
         }).as("move");
     });
     it("drag to top", () => {
@@ -101,8 +100,8 @@ describe("drag & drop", () => {
             server: {},
             room: {},
         });
-        dnd('[data-item-id="2"]', '[data-item-id="1"]')
-        cy.wait('@move').then(({ request, response }) => {
+        dnd('[data-item-id="2"]', '[data-item-id="1"]');
+        cy.wait("@move").then(({ request, response }) => {
             expect(response?.statusCode).to.eq(200);
             expect(request.body.source).to.eq("2");
             expect(request.body.target).to.eq("1");
@@ -114,20 +113,20 @@ describe("drag & drop", () => {
             server: {},
             room: {},
         });
-        dnd('[data-item-id="2"]', '[data-cy="end-marker"]')
-        cy.wait('@move').then(({ request, response }) => {
+        dnd('[data-item-id="2"]', '[data-cy="end-marker"]');
+        cy.wait("@move").then(({ request, response }) => {
             expect(response?.statusCode).to.eq(200);
             expect(request.body.source).to.eq("2");
             expect(request.body.target).to.eq("-1");
         });
-        cy.contains("Shish").should('exist')
+        cy.contains("Shish").should("exist");
     });
 });
 
 describe("misc", () => {
     beforeEach(function () {
         cy.intercept("PUT", "/room/test/queue.json", (req) => {
-            req.reply({ body: {}, delay: 1000 })
+            req.reply({ body: {}, delay: 1000 });
         }).as("move");
     });
     it("playground", () => {
@@ -136,6 +135,6 @@ describe("misc", () => {
             server: {},
             room: {},
         });
-        cy.contains("READ ME :)").should("not.exist")
+        cy.contains("READ ME :)").should("not.exist");
     });
 });

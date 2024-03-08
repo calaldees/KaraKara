@@ -42,6 +42,7 @@ class Encoder:
     category: str
     ext: str
     mime: str
+    priority: int = 1
     conf_audio: List[str] = []
     conf_video: List[str] = []
     conf_container: List[str] = []
@@ -221,30 +222,32 @@ class ImageToH264Preview(_Preview, ImageToH264):
 class _BaseVideoToImage(Encoder):
     sources = {SourceType.VIDEO}
     category = "image"
-    conf_video = ["-ss", "3", "-vf", f"thumbnail,scale={IMAGE_WIDTH}:-1"]
+    conf_video = ["-vf", f"scale={IMAGE_WIDTH}:-1,thumbnail", "-vsync", "vfr"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
-        # imagemagick supports more formats, so first we get
-        # ffmpeg to pick a frame, then convert to compress
-        temp_target = target.with_suffix(".bmp")
-        # fmt: off
-        self._run(
-            "ffmpeg",
-            "-i", list(sources)[0].path.as_posix(),
-            *self.conf_video,
-            "-vframes", "1",
-            "-an",
-            temp_target.as_posix(),
-        )
-        self._run(
-            "convert",
-            temp_target.as_posix(),
-            *self.conf_vcodec,
-            target.as_posix(),
-        )
-        # fmt: on
-        temp_target.unlink()
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            tmpdir = Path(td)
+            # imagemagick supports more formats, so first we get
+            # ffmpeg to pick a frame, then convert to compress
+            # fmt: off
+            self._run(
+                "ffmpeg",
+                "-i", list(sources)[0].path.as_posix(),
+                *self.conf_video,
+                "-an",
+                (tmpdir / "out%03d.bmp").as_posix(),
+            )
+            thumbs = list(tmpdir.glob("*.bmp"))
+            best = select_best_image(thumbs)
+            self._run(
+                "convert",
+                best.as_posix(),
+                *self.conf_vcodec,
+                target.as_posix(),
+            )
+            # fmt: on
 
 
 class VideoToWebp(_BaseVideoToImage):
@@ -259,6 +262,12 @@ class VideoToAvif(_BaseVideoToImage):
     mime = "image/avif"
 
 
+class VideoToJpeg(_BaseVideoToImage):
+    target = TargetType.IMAGE_JPEG
+    ext = "jpeg"
+    mime = "image/jpeg"
+
+
 #######################################################################
 # Image to Image
 
@@ -268,6 +277,7 @@ class _BaseImageToImage(Encoder):
     category = "image"
     conf_video = ["-thumbnail", f"{IMAGE_WIDTH}x{IMAGE_WIDTH}"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
+    priority = 2
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         # fmt: off
@@ -293,6 +303,12 @@ class ImageToAvif(_BaseImageToImage):
     mime = "image/avif"
 
 
+class ImageToJpeg(_BaseImageToImage):
+    target = TargetType.IMAGE_JPEG
+    ext = "jpeg"
+    mime = "image/jpeg"
+
+
 #######################################################################
 # Subtitles
 
@@ -316,6 +332,7 @@ class VoidToVTT(Encoder):
     ext = "vtt"
     category = "subtitle"
     mime = "text/vtt"
+    priority = 0
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         with open(target.as_posix(), "w") as vtt:
@@ -333,12 +350,16 @@ def find_appropriate_encoder(
             [s for c in cls.__subclasses__() for s in all_subclasses(c)]
         )
 
-    # Sort encoders by how many sources they take, so "combine multiple
-    # media" will take priority over "use a single media" which will take
-    # priority over "generate a stub file from nothing"
+    # Sort encoders by priority, highest first. Priority is manually specified
+    # so that:
+    # - encoders who generate empty stubs are low-priority
+    # - most encoders are mid-priority
+    # - image-to-image is high priority (so that if we have a choice of
+    #   "generate thumbnail from video" or "generate thumbnail from image",
+    #   we assume that a human chose the image sensibly)
     encoders = all_subclasses(Encoder)
     encoders = [e for e in encoders if e.__name__[0] != "_"]
-    encoders = sorted(encoders, key=lambda x: len(x.sources), reverse=True)
+    encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
 
     for encoder in encoders:
         if encoder.target == type and encoder.sources.issubset(
@@ -350,3 +371,34 @@ def find_appropriate_encoder(
         raise Exception(
             f"Couldn't find an encoder to make {type} out of:\n{source_list}"
         )
+
+
+def select_best_image(paths: List[Path]) -> Path:
+    def score(p: Path) -> float:
+        from PIL import Image
+        img = Image.open(p.as_posix()).convert("L")
+        # r, g, b = img.split()
+        h = img.histogram()
+        px_cnt = sum(h) # total number of pixels in the image
+
+        # if blacks make up most of the image, or if whites make up most of the image
+        thresh = 0.5
+        if sum(h[:32]) > px_cnt * thresh or sum(h[-32:]) > px_cnt * thresh:
+            score = 0.0
+        else:
+            score = (sum(h[:128]) * sum(h[128:])) / sum(h)
+        # print(p, score)
+        return score
+
+    if len(paths) == 0:
+        raise Exception("Can't select best of zero thumbs")
+    scored_paths = [(score(p), p) for p in sorted(paths)]
+    ok_paths = [(score, p) for (score, p) in scored_paths if score > 0]
+    if ok_paths:
+        scored_paths = ok_paths
+    return sorted(scored_paths, reverse=True)[0][1]
+
+
+if __name__ == "__main__":
+    import sys
+    print(select_best_image(list(Path(sys.argv[1]).glob("*.bmp"))))

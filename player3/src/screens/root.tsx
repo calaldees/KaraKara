@@ -18,24 +18,34 @@ import { PodiumScreen } from "./podium";
 import { PreviewScreen } from "./preview";
 import { percent } from "../utils";
 
-
 export const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/">
             <Route index element={<RoomWrapper />} />
             <Route path=":roomName" element={<RoomWrapper />} />
-        </Route>
+        </Route>,
     ),
-    {basename: process.env.NODE_ENV === "development" ? "/" : "/browser3"}
+    { basename: process.env.NODE_ENV === "development" ? "/" : "/player3" },
 );
 
 function RoomWrapper() {
-    return <RoomProvider><Room /></RoomProvider>
+    return (
+        <RoomProvider>
+            <Room />
+        </RoomProvider>
+    );
 }
 function Room() {
     const { roomName } = useParams();
-    const { podium, audioAllowed, setAudioAllowed, showSettings, setShowSettings } = useContext(ClientContext);
-    const { now, tracks, downloadSize, downloadDone } = useContext(ServerContext);
+    const {
+        podium,
+        audioAllowed,
+        setAudioAllowed,
+        showSettings,
+        setShowSettings,
+    } = useContext(ClientContext);
+    const { now, tracks, downloadSize, downloadDone } =
+        useContext(ServerContext);
     const { connected, queue, isAdmin, settings } = useContext(RoomContext);
 
     let screen = <section>Unknown state :(</section>;
@@ -43,9 +53,7 @@ function Room() {
     if (Object.keys(tracks).length === 0)
         screen = (
             <section key="title" className={"screen_title"}>
-                <h1>
-                    Loading {percent(downloadDone, downloadSize ?? 1)}
-                </h1>
+                <h1>Loading {percent(downloadDone, downloadSize ?? 1)}</h1>
             </section>
         );
     else if (!audioAllowed && !podium)
@@ -69,15 +77,9 @@ function Room() {
                 queue_item={queue[0]}
             />
         );
-    else if (
-        queue[0].start_time == null ||
-        queue[0].start_time > now
-    )
+    else if (queue[0].start_time == null || queue[0].start_time > now)
         screen = (
-            <PreviewScreen
-                track={tracks[queue[0].track_id]}
-                queue={queue}
-            />
+            <PreviewScreen track={tracks[queue[0].track_id]} queue={queue} />
         );
     else
         screen = (
@@ -91,14 +93,14 @@ function Room() {
     if (!roomName) errors.push("No Room Set");
     if (!connected) errors.push("Not Connected");
     if (!isAdmin) errors.push("Not Admin");
-    if (Object.keys(tracks).length == 0) errors.push("No Tracks");
+    if (Object.keys(tracks).length === 0) errors.push("No Tracks");
 
     return (
         <div
             onClick={(e) => setAudioAllowed(true)}
             onDoubleClick={(e) => setShowSettings(true)}
         >
-            <main className={"theme-" + settings["theme"]}>
+            <main className={"theme-" + (settings["theme"] ?? "metalghosts")}>
                 {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
                 {screen}
             </main>

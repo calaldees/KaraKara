@@ -1,8 +1,9 @@
 from functools import reduce
 from itertools import pairwise
+from typing import Dict, List, Set
 
 
-def parse_tags(data):
+def parse_tags(data: str) -> Dict[str, List[str]]:
     r"""
     >>> data = '''
     ... \ufeff
@@ -13,13 +14,10 @@ def parse_tags(data):
     ... title:Dynamite Explosion
     ... artist:Fire Bomber
     ... artist:Yoshiki Fukuyama
-    ... vocaltrack:on
-    ... length:short
-    ... vocalstyle:male
-    ... lang:jp
     ... retro
     ... \ufeff'''
-    >>> assert parse_tags(data) == {'category': {'anime'}, 'from': {'Macross'}, 'Macross': {'Macross Dynamite 7'}, 'use': {'opening'}, 'title': {'Dynamite Explosion'}, 'artist': {'Yoshiki Fukuyama', 'Fire Bomber'}, 'vocaltrack': {'on'}, 'length': {'short'}, 'vocalstyle': {'male'}, 'lang': {'jp'}, '': {'retro'}}
+    >>> parse_tags(data)
+    {'category': ['anime'], 'from': ['Macross'], 'Macross': ['Macross Dynamite 7'], 'use': ['opening'], 'title': ['Dynamite Explosion'], 'artist': ['Fire Bomber', 'Yoshiki Fukuyama'], '': ['retro']}
     """
     data = data.strip().strip("\ufeff").strip()
 
@@ -32,6 +30,5 @@ def parse_tags(data):
                 accumulator.setdefault(parent, set()).add(tag)
         return accumulator
 
-    return dict(
-        (k, sorted(v)) for k, v in reduce(_reduce, data.split("\n"), {}).items()
-    )
+    tags_values: Dict[str, Set[str]] = reduce(_reduce, data.split("\n"), {})
+    return dict((k, sorted(v)) for k, v in tags_values.items())

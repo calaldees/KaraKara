@@ -1,8 +1,7 @@
-shell:
-	docker-compose build api_queue
-	docker-compose run --rm --service-ports api_queue
-
-# /bin/bash
+run_with_mqtt:
+	docker compose build api_queue
+	docker compose run --rm --service-ports api_queue
+#/bin/bash
 
 
 # Standalone api_queue container -----------------------------------------------

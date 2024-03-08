@@ -10,11 +10,13 @@ describe("Printable Screen", () => {
         }).as("tracks");
     });
     it("mention the room name", () => {
-        cy.visit("/testroom/printable");
-        cy.contains('room name "testroom"').should("exist");
+        cy.login();
+        cy.contains("Printable Tracklist").click();
+        cy.contains('room name "test"').should("exist");
     });
-    it.skip("show a QR code", () => {
-        cy.visit("/testroom/printable");
-        // FIXME: test that the QR code exists - and is valid?
+    it("show a QR code", () => {
+        cy.login();
+        cy.contains("Printable Tracklist").click();
+        cy.get("svg").should("exist");
     });
 });

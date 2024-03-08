@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import { attachment_path, is_my_song } from "../utils";
 import * as icons from "../static/icons";
@@ -6,6 +6,7 @@ import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import placeholder from "../static/placeholder.svg";
+import { useScrollRestoration } from "../hooks/scrollrestoration";
 
 export function Notification() {
     const { notification, setNotification } = useContext(ClientContext);
@@ -42,14 +43,15 @@ export function YoureNext({
             )) ||
                 (is_my_song(sessionId, performerName, queue[1]) && (
                     <h2 className="main-only upnext">
-                        Your song "{tracks[queue[1].track_id]?.tags.title[0]}" is
-                        up next!
+                        Your song "{tracks[queue[1].track_id]?.tags.title[0]}"
+                        is up next!
                     </h2>
                 ))}
         </>
     );
 }
 
+// eslint-disable-next-line
 const EmptyHeaderLink = (): React.ReactElement => <a href="#" />;
 
 export function Screen({
@@ -69,6 +71,8 @@ export function Screen({
 }): React.ReactElement {
     const { setShowSettings } = useContext(ClientContext);
     const { queue } = useContext(RoomContext);
+    const scroller = useRef(null);
+    useScrollRestoration(scroller);
 
     return (
         <main className={className}>
@@ -79,7 +83,7 @@ export function Screen({
             </header>
             <Notification />
             <YoureNext queue={queue} />
-            <article>{children}</article>
+            <article ref={scroller}>{children}</article>
             {footer}
         </main>
     );
@@ -96,7 +100,7 @@ export function Thumb({
     children,
     ...kwargs
 }: {
-    track: Track;
+    track: Track | undefined;
     children?: any;
     [Key: string]: any;
 }): React.ReactElement {
@@ -105,7 +109,7 @@ export function Thumb({
     return (
         <div className={"thumb"} {...kwargs}>
             <picture>
-                {track.attachments.image.map((a) => (
+                {track?.attachments.image.map((a) => (
                     <source
                         key={a.path}
                         srcSet={attachment_path(root, a)}

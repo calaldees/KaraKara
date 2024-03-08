@@ -43,12 +43,6 @@ describe("mqtt_url", () => {
     });
 });
 
-describe("short_date", () => {
-    test("should basically work", () => {
-        expect(utils.short_date("2021-01-03T14:00:00")).toEqual("14:00");
-    });
-});
-
 describe("time_until", () => {
     test("should basically work", () => {
         expect(utils.time_until(0, 125)).toEqual("In 2 mins");

@@ -5,6 +5,7 @@ import contextlib
 import gzip
 import json
 import logging
+import logging.config
 import math
 import os
 import pickle
@@ -20,7 +21,6 @@ from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lib.kktypes import Source, SourceType, TargetType, Track, Target
-from lib.subtitle_processor import Subtitle
 
 log = logging.getLogger()
 
@@ -43,6 +43,7 @@ SCAN_IGNORE = [
     ".stignore",
     ".stglobalignore",
     ".tmp",
+    ".gitignore",
     "cache.db",
     "tracks.json",
     "tracks.json.gz",
@@ -208,23 +209,31 @@ def export(
     # Export in alphabetic order
     json_dict = dict(sorted((t["id"], t) for t in json_list if t))
 
+    try:
+        old_tracklist = json.loads((processed_dir / "tracks.json").read_text())
+    except Exception:
+        old_tracklist = {}
+
     # If we've only scanned & encoded a few files, then add
     # those entries onto the end of the current tracks, don't
     # replace the whole database.
     if update:
-        json_dict = json.loads((processed_dir / "tracks.json").read_text()) | json_dict
+        json_dict = old_tracklist | json_dict
 
-    # Write to temp file then rename, so if the disk fills up then
-    # we don't end up with a half-written tracks.json
-    data = json.dumps(json_dict, default=tuple).encode("utf8")
+    # Only write if changed - turns a tiny-but-24/7 amount of
+    # disk I/O into zero disk I/O
+    if old_tracklist != json_dict:
+        # Write to temp file then rename, so if the disk fills up then
+        # we don't end up with a half-written tracks.json
+        data = json.dumps(json_dict, default=tuple).encode("utf8")
 
-    path = processed_dir / "tracks.json"
-    path.with_suffix(".tmp").write_bytes(data)
-    path.with_suffix(".tmp").rename(path)
+        path = processed_dir / "tracks.json"
+        path.with_suffix(".tmp").write_bytes(data)
+        path.with_suffix(".tmp").rename(path)
 
-    path = processed_dir / "tracks.json.gz"
-    path.with_suffix(".tmp").write_bytes(gzip.compress(data))
-    path.with_suffix(".tmp").rename(path)
+        path = processed_dir / "tracks.json.gz"
+        path.with_suffix(".tmp").write_bytes(gzip.compress(data))
+        path.with_suffix(".tmp").rename(path)
 
 
 def cleanup(
@@ -340,10 +349,11 @@ def _pickled_var(path: Path, default: Any):
 
 def main(argv: List[str]) -> int:
     args = parse_args(argv)
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format="%(asctime)s %(message)s",
-    )
+
+    with Path('logging.config.json').open() as f:
+        logging_config = json.load(f)
+        logging_config["root"]["level"] = logging.DEBUG if args.debug else logging.INFO
+        logging.config.dictConfig(logging_config)
 
     while True:
         with _pickled_var(args.cache, {}) as cache, logging_redirect_tqdm():

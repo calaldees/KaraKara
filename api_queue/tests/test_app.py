@@ -1,5 +1,6 @@
 import pytest
 import collections.abc
+import datetime
 
 import ujson as json
 
@@ -17,6 +18,8 @@ async def test_queue_invalid_name(app):
     request, response = await app.asgi_client.get(f"/room/ /queue.json")
     assert response.status == 404
     request, response = await app.asgi_client.get(f"/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
+    assert response.status == 404
+    request, response = await app.asgi_client.get(f"/room/キ/queue.csv")
     assert response.status == 404
 
 
@@ -89,6 +92,14 @@ async def test_queue_add(queue_model, mock_mqtt):
     assert {'track_id': 'KAT_TUN_Your_side_Instrumental_', 'performer_name':'test'}.items() <= queue[0].items()
     assert mock_mqtt.publish.await_args.args == ("room/test/queue", json.dumps(queue))
     assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
+
+
+@pytest.mark.asyncio
+async def test_queue_add_csv(queue_model):
+    await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test1')
+    csv = await queue_model.queue_csv
+    assert csv.count(',') > 10  # TODO: assert this is valid csv?
+    assert 'test1' in csv
 
 
 @pytest.mark.asyncio
@@ -208,3 +219,17 @@ async def test_queue_validation(queue_model):
     response = await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test_name')
     assert response.status == 400
     assert 'test_name' in response.json['context']
+
+
+@pytest.mark.asyncio
+async def test_queue_validation__end_datetime(queue_model):
+    _original_session_id = queue_model.session_id
+    queue_model.session_id = 'admin'
+    response = await queue_model.settings_put(payload={
+        "validation_event_end_datetime": (datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=1), name='bst'))+datetime.timedelta(minutes=10)).isoformat(),  # set end_datetime to be now as bst and add a 10 mins so the track can be queued (if the event ends at this current millisecond, no tracks can be added)
+    })
+    assert response.status == 200
+    queue_model.session_id = _original_session_id
+
+    response = await queue_model.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test_name')
+    assert response.status == 200

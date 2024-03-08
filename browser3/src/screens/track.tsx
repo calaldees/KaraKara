@@ -56,9 +56,7 @@ export function TrackDetails(): React.ReactElement {
     let buttons = null;
     if (action === TrackAction.NONE) {
         let is_queued =
-            queue.find(
-                (i) => i.track_id === track.id,
-            ) !== undefined;
+            queue.find((i) => i.track_id === track.id) !== undefined;
 
         buttons = (
             <footer>

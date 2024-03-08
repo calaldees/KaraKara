@@ -7,7 +7,8 @@ import { ServerContext } from "../providers/server";
 // Views
 
 export function VideoScreen({
-    track, queue_item,
+    track,
+    queue_item,
 }: {
     track: Track;
     queue_item: QueueItem;
@@ -24,9 +25,10 @@ export function VideoScreen({
                 style={{
                     left: percent(
                         now - (queue_item.start_time ?? now),
-                        track.duration
+                        track.duration,
                     ),
-                }} />
+                }}
+            />
             <div id="pimpkk" className="pimp">
                 KaraKara
             </div>

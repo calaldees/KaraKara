@@ -10,7 +10,7 @@ from lib.kktypes import SourceType, TargetType
 from tqdm import tqdm
 
 # disable progress bars in unit tests
-tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)  # type: ignore
 
 
 class TestE2E(unittest.TestCase):
@@ -54,7 +54,7 @@ class TestE2E(unittest.TestCase):
 
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "e/E4bqIk_mqTN.webp"}],
+                    "image": [{"mime": "image/webp", "path": "x/xgkyBqtLHXj.webp"}],
                     "preview": [{"mime": "video/mp4", "path": "x/x9Yd879NxaT.mp4"}],
                     "subtitle": [{"mime": "text/vtt", "path": "8/8wBGB457jKT.vtt"}],
                     "video": [{"mime": "video/mp4", "path": "e/ehai5GSd39a.mp4"}],
@@ -63,6 +63,7 @@ class TestE2E(unittest.TestCase):
                 "id": "test1",
                 "lyrics": ["Red", "Green", "Blue"],
                 "tags": {
+                    "": ["ar-4-3", "src-video", "subs-soft"],
                     "artist": ["Artipie"],
                     "category": ["anime"],
                     "contributor": ["ここにいくつかのテキストです。"],
@@ -82,6 +83,7 @@ class TestE2E(unittest.TestCase):
                 "id": "test2",
                 "lyrics": ["AA", "EE"],
                 "tags": {
+                    "": ["ar-8-5", "src-image", "subs-soft"],
                     "artist": ["Mr Monkey"],
                     "category": ["anime"],
                     "contributor": ["contributor", "ここにいくつかのテキストです。"],

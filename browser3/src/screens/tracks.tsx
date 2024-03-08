@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState, useCallback } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -9,8 +9,23 @@ import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 
-///////////////////////////////////////////////////////////////////////
-// Views
+type ExploreContextType = {
+    search: string;
+    setSearch: (f: string) => void;
+    filters: string[];
+    setFilters: (f: any) => void;
+    expanded: string | null;
+    setExpanded: (x: string | null) => void;
+};
+
+const ExploreContext = React.createContext<ExploreContextType>({
+    search: "",
+    setSearch: (s) => null,
+    filters: [],
+    setFilters: (fs) => null,
+    expanded: null,
+    setExpanded: (x) => null,
+});
 
 /*
  * List individual tracks
@@ -48,79 +63,75 @@ function TrackItem({
 /*
  * List groups of tracks
  */
-const FilterListGroupHeader = ({
+function FilterListGroupHeader({
     filter,
     count,
     expanded,
-    setExpanded,
     children,
 }: {
     filter: string;
     count: number;
     expanded: boolean;
-    setExpanded: any;
     children: React.ReactNode;
-}): React.ReactElement => (
-    <li
-        className={"filter_list_group_header"}
-        onClick={(e) => setExpanded(expanded ? null : filter)}
-    >
-        <span className={"text"}>{children}</span>
-        <span className={"count"}>{count}</span>
-        <span className={"go_arrow"}>
-            {expanded ? <icons.CircleMinus /> : <icons.CirclePlus />}
-        </span>
-    </li>
-);
+}): React.ReactElement {
+    const { setExpanded } = useContext(ExploreContext);
 
-const GroupedFilterList = ({
+    return (
+        <li
+            className={"filter_list_group_header"}
+            onClick={(e) => setExpanded(expanded ? null : filter)}
+        >
+            <span className={"text"}>{children}</span>
+            <span className={"count"}>{count}</span>
+            <span className={"go_arrow"}>
+                {expanded ? <icons.CircleMinus /> : <icons.CirclePlus />}
+            </span>
+        </li>
+    );
+}
+
+function GroupedFilterList({
     heading,
     filters,
-    expanded,
-    setExpanded,
-    setFilters,
 }: {
     heading: string;
     filters: Record<string, Record<string, number>>;
-    expanded: string | null;
-    setExpanded: any;
-    setFilters: any;
-}): React.ReactElement => (
-    <ul>
-        {Object.keys(filters)
-            .sort(normalise_cmp)
-            .map((group) =>
-                group === expanded ? (
-                    <div key={group} className={"filter_list_group"}>
+}): React.ReactElement {
+    const { expanded } = useContext(ExploreContext);
+
+    return (
+        <ul>
+            {Object.keys(filters)
+                .sort(normalise_cmp)
+                .map((group) =>
+                    group === expanded ? (
+                        <div key={group} className={"filter_list_group"}>
+                            <FilterListGroupHeader
+                                filter={group}
+                                count={Object.keys(filters[group]).length}
+                                expanded={true}
+                            >
+                                {group}
+                            </FilterListGroupHeader>
+                            <FilterList
+                                heading={heading}
+                                filters={filters[group]}
+                            />
+                        </div>
+                    ) : (
                         <FilterListGroupHeader
+                            key={group}
                             filter={group}
                             count={Object.keys(filters[group]).length}
-                            expanded={true}
-                            setExpanded={setExpanded}
+                            expanded={false}
                         >
                             {group}
                         </FilterListGroupHeader>
-                        <FilterList
-                            heading={heading}
-                            filters={filters[group]}
-                            setExpanded={setExpanded}
-                            setFilters={setFilters}
-                        />
-                    </div>
-                ) : (
-                    <FilterListGroupHeader
-                        key={group}
-                        filter={group}
-                        count={Object.keys(filters[group]).length}
-                        expanded={false}
-                        setExpanded={setExpanded}
-                    >
-                        {group}
-                    </FilterListGroupHeader>
-                ),
-            )}
-    </ul>
-);
+                    ),
+                )}
+        </ul>
+    );
+}
 
 function unThe(filter: string): string {
     if (filter.toLowerCase().endsWith(", the")) {
@@ -133,57 +144,57 @@ function unThe(filter: string): string {
     return filter;
 }
 
-const FilterList = ({
+function FilterList({
     heading,
     filters,
-    setExpanded,
-    setFilters,
 }: {
     heading: string;
     filters: Record<string, number>;
-    setExpanded: any;
-    setFilters: any;
-}): React.ReactElement => (
-    <ul>
-        {Object.keys(filters)
-            .sort(normalise_cmp)
-            .map((child) => (
-                <li
-                    key={child}
-                    className={"add_filter"}
-                    onClick={(e) => {
-                        setExpanded(null);
-                        setFilters((filters: string[]) => [
-                            ...filters,
-                            heading + ":" + unThe(child),
-                        ]);
-                    }}
-                >
-                    <span className={"text"}>{child}</span>
-                    <span className={"count"}>{filters[child]}</span>
-                    <span className={"go_arrow"}>
-                        <icons.CircleChevronRight />
-                    </span>
-                </li>
-            ))}
-    </ul>
-);
+}): React.ReactElement {
+    const { setFilters, setExpanded } = useContext(ExploreContext);
+
+    return (
+        <ul>
+            {Object.keys(filters)
+                .sort(normalise_cmp)
+                .map((child) => (
+                    <li
+                        key={child}
+                        className={"add_filter"}
+                        onClick={(e) => {
+                            setExpanded(null);
+                            setFilters((fs: string[]) => [
+                                ...fs,
+                                heading + ":" + unThe(child),
+                            ]);
+                        }}
+                    >
+                        <span className={"text"}>{child}</span>
+                        <span className={"count"}>{filters[child]}</span>
+                        <span className={"go_arrow"}>
+                            <icons.CircleChevronRight />
+                        </span>
+                    </li>
+                ))}
+        </ul>
+    );
+}
 
 function Bookmarks({
     bookmarks,
-    track_list,
+    tracks,
 }: {
     bookmarks: string[];
-    track_list: Record<string, Track>;
+    tracks: Record<string, Track>;
 }) {
     return (
         <div>
             <h2>Bookmarks</h2>
             <ul>
                 {bookmarks
-                    .filter((bm) => bm in track_list)
+                    .filter((bm) => bm in tracks)
                     .map((bm) => (
-                        <TrackItem key={bm} track={track_list[bm]} filters={[]} />
+                        <TrackItem key={bm} track={tracks[bm]} filters={[]} />
                     ))}
             </ul>
         </div>
@@ -205,72 +216,20 @@ function AdminButtons(): React.ReactElement {
     );
 }
 
-export function TrackList(): React.ReactElement {
+function Explorer(): React.ReactElement {
     const { tracks } = useContext(ServerContext);
-    const { isAdmin, settings } = useContext(RoomContext);
-    const { booth, bookmarks, widescreen } = useContext(ClientContext);
-    const [expanded, setExpanded] = useState<string | null>(null);
-    const [inSearch, setInSearch] = useState(false);
+    const { trackList } = useContext(RoomContext);
+    const { bookmarks } = useContext(ClientContext);
+    const { search, setSearch, filters, setFilters, setExpanded } =
+        useContext(ExploreContext);
 
-    const [searchParams, setSearchParams] = useSearchParams();
-    const search: string = searchParams.get("search") ?? "";
-    const filters: string[] = searchParams.getAll("filters");
-    const setSearch = useCallback(function(s: string) {
-        setSearchParams({ search: s, filters: filters }, { replace: inSearch });
-        setInSearch(true);
-    }, []);
-    const setFilters = useCallback(function(fs: string[] | CallableFunction) {
-        const f2 = Array.isArray(fs) ? fs : fs(filters);
-        setSearchParams({ search: search, filters: f2 });
-        setInSearch(false);
-    }, []);
-
-    // find_tracks took 16ms, of which 15ms was spent sorting the
-    // results of the search -- if we sort once in advance, then
-    // every future search is 1ms
-    let allTrackList = useMemo(
-        () => Object.values(tracks).sort((a, b) => normalise_cmp(a.tags.title[0], b.tags.title[0])),
-        [tracks],
-    )
-    // memoise based on searchParams, not searchParams.getAll("filters"),
-    // because the latter returns a fresh new Array object every time
     let sections = useMemo(
-        () => group_tracks(
-            searchParams.getAll("filters"),
-            find_tracks(
-                allTrackList,
-                searchParams.getAll("filters"),
-                searchParams.get("search") ?? "",
-                settings["hidden_tags"] ?? [],
-                settings["forced_tags"] ?? [],
-            )
-        ),
-        [allTrackList, searchParams, settings],
+        () => group_tracks(filters, find_tracks(trackList, filters, search)),
+        [trackList, search, filters],
     );
 
     return (
-        <Screen
-            className={"track_list"}
-            navLeft={
-                filters.length > 0 && (
-                    <div
-                        onClick={(e) => setFilters(filters.slice(0, -1))}
-                        data-cy="back"
-                    >
-                        <icons.CircleChevronLeft className="x2" />
-                    </div>
-                )
-            }
-            title={"Explore Tracks"}
-            navRight={
-                !widescreen && (
-                    <Link to="queue" data-cy="queue">
-                        <icons.ListOl className="x2" />
-                    </Link>
-                )
-            }
-            footer={isAdmin && !booth && <AdminButtons />}
-        >
+        <>
             {/* Full-text search */}
             <input
                 className={"search"}
@@ -311,9 +270,6 @@ export function TrackList(): React.ReactElement {
                             key={heading}
                             heading={heading}
                             filters={section.groups}
-                            expanded={expanded}
-                            setExpanded={setExpanded}
-                            setFilters={setFilters}
                         />
                     );
                 }
@@ -323,8 +279,6 @@ export function TrackList(): React.ReactElement {
                             key={heading}
                             heading={heading}
                             filters={section.filters}
-                            setExpanded={setExpanded}
-                            setFilters={setFilters}
                         />
                     );
                 }
@@ -351,8 +305,78 @@ export function TrackList(): React.ReactElement {
 
             {/* If no filters, show bookmarks */}
             {bookmarks.length > 0 && filters.length === 0 && search === "" && (
-                <Bookmarks bookmarks={bookmarks} track_list={tracks} />
+                <Bookmarks bookmarks={bookmarks} tracks={tracks} />
             )}
+        </>
+    );
+}
+
+export function TrackList(): React.ReactElement {
+    const { isAdmin } = useContext(RoomContext);
+    const { booth, widescreen } = useContext(ClientContext);
+
+    const [expanded, setExpanded] = useState<string | null>(null);
+    const [inSearch, setInSearch] = useState(false);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.get("search") ?? "";
+    // getAll returns a new Array object every time, so we need to compare the
+    // string representation of the lists to see if they're the same, otherwise
+    // React will think the list has changed and re-render.
+    const filterString = JSON.stringify(searchParams.getAll("filters"));
+    const filters = useMemo(() => JSON.parse(filterString), [filterString]);
+    function setSearch(new_search: string | ((search: string) => string)) {
+        if (typeof new_search === "function") {
+            new_search = new_search(search);
+        }
+        setSearchParams({ search: new_search, filters }, { replace: inSearch });
+        setInSearch(true);
+    }
+    function setFilters(
+        new_filters: string[] | ((filters: string[]) => string[]),
+    ) {
+        if (typeof new_filters === "function") {
+            new_filters = new_filters(filters);
+        }
+        setSearchParams({ search, filters: new_filters });
+        setInSearch(false);
+    }
+
+    return (
+        <Screen
+            className={"track_list"}
+            navLeft={
+                filters.length > 0 && (
+                    <div
+                        onClick={(e) => setFilters(filters.slice(0, -1))}
+                        data-cy="back"
+                    >
+                        <icons.CircleChevronLeft className="x2" />
+                    </div>
+                )
+            }
+            title={"Explore Tracks"}
+            navRight={
+                !widescreen && (
+                    <Link to="queue" data-cy="queue">
+                        <icons.ListOl className="x2" />
+                    </Link>
+                )
+            }
+            footer={isAdmin && !booth && <AdminButtons />}
+        >
+            <ExploreContext.Provider
+                value={{
+                    search,
+                    setSearch,
+                    filters,
+                    setFilters,
+                    expanded,
+                    setExpanded,
+                }}
+            >
+                <Explorer />
+            </ExploreContext.Provider>
         </Screen>
     );
 }

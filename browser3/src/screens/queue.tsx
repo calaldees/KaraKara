@@ -1,11 +1,6 @@
 import { useContext } from "react";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import {
-    shuffle,
-    is_my_song,
-    time_until,
-    dict2css,
-} from "../utils";
+import { shuffle, is_my_song, time_until, dict2css } from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
@@ -75,11 +70,9 @@ function QueueItemRender({
 }
 
 export function Queue(): React.ReactElement {
-    const { widescreen } = useContext(ClientContext);
-    const { queue } = useContext(RoomContext);
-    const { performerName } = useContext(ClientContext);
+    const { performerName, widescreen } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
-    const { settings, sessionId } = useContext(RoomContext);
+    const { queue, settings, sessionId } = useContext(RoomContext);
 
     return (
         <Screen
@@ -103,7 +96,9 @@ export function Queue(): React.ReactElement {
                             <li>
                                 <span className={"lyrics"}>
                                     {tracks[queue[0].track_id].lyrics.map(
-                                        (line, n) => <div key={n}>{line}</div>
+                                        (line, n) => (
+                                            <div key={n}>{line}</div>
+                                        ),
                                     )}
                                 </span>
                             </li>

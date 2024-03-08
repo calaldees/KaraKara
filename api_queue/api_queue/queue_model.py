@@ -11,21 +11,37 @@ from itertools import pairwise
 # have I missed the point here? this feels like verbose rubbish for such a simple class
 @dataclasses.dataclass
 class QueueItem():
+    @staticmethod
+    def _now():
+        return datetime.datetime.now(tz=datetime.timezone.utc)
+
     track_id: str
     track_duration: datetime.timedelta
     session_id: str
     performer_name: str
     start_time: t.Optional[datetime.datetime] = None
     id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
+    added_time: datetime.datetime = dataclasses.field(default_factory=_now)
+    debug_str: t.Optional[str] = None
 
     def __post_init__(self):
         """
-        >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789)
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789)
-        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '123456789.123456789', '123456789')
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789)
-        >>> QueueItem('', '', '', '', '', 123456789)
-        QueueItem(track_id='', track_duration=datetime.timedelta(0), session_id='', performer_name='', start_time=None, id=123456789)
+        >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789, 111111111.111111111)
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None)
+
+        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '123456789.123456789', '123456789', '111111111.111111111')
+        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None)
+
+        >>> queue_item = QueueItem('', '', '', '', '')
+        >>> type(queue_item.track_duration)
+        <class 'datetime.timedelta'>
+        >>> type(queue_item.id)
+        <class 'int'>
+        >>> type(queue_item.added_time)
+        <class 'datetime.datetime'>
+        >>> queue_item.added_time.year >= 2023
+        True
+
         """
         if not self.track_duration:
             self.track_duration = 0.0
@@ -36,16 +52,21 @@ class QueueItem():
             self.start_time = None
         if isinstance(self.start_time, str):
             self.start_time = float(self.start_time)
-        self.start_time = datetime.datetime.fromtimestamp(self.start_time) if isinstance(self.start_time, numbers.Number) else self.start_time
+        self.start_time = datetime.datetime.fromtimestamp(self.start_time, tz=datetime.timezone.utc) if isinstance(self.start_time, numbers.Number) else self.start_time
         self.id = int(self.id)
+        if not self.added_time:
+            self.added_time = None
+        if isinstance(self.added_time, str):
+            self.added_time = float(self.added_time)
+        self.added_time = datetime.datetime.fromtimestamp(self.added_time, tz=datetime.timezone.utc) if isinstance(self.added_time, numbers.Number) else self.added_time
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
     @staticmethod
     def dict_factory(key_values):
         """
-        >>> i = QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789)
+        >>> i = QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789, 111111111.111111111)
         >>> i.asdict()
-        {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789}
+        {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None}
         """
         def _parse(dd):
             k, v = dd
@@ -62,6 +83,11 @@ class QueueItem():
             return self.start_time + self.track_duration
         return None
 
+    @property
+    def time_since_queued(self) -> datetime.timedelta:
+        return self._now() - self.added_time
+
+
 
 class Queue():
     def __init__(self, items: list[QueueItem], settings: dict):
@@ -74,7 +100,7 @@ class Queue():
         return self.settings["track_space"]
     @property
     def now(self) -> datetime.datetime:
-        return self._now or datetime.datetime.now()
+        return self._now or datetime.datetime.now(tz=datetime.timezone.utc)
     @property
     def past(self) -> t.Iterable[QueueItem]:
         now = self.now

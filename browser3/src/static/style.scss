@@ -1,27 +1,78 @@
 :root {
-  --fg: #000;
-  --border: #DDD;
-  --bg-dark: #E9E9E9;
-  --bg-dark-active: #D0D0D0;
-  --bg-dark-border: #838383;
-  --bg-light: #F9F9F9;
+  --page-fg: #000;
+  --page-bg: #F9F9F9;
+
+  --header-bg: #E9E9E9;
+  --header-border: #DDD;
+
   --input-fg: #000;
+  --input-fg-disabled: #AAA;
   --input-bg: #FFF;
-  --input-border: #999;
-  --disabled: grey;
+  --input-light: #EEE;
+  --input-shade: #999;
+
+  --button-fb: #000;
+  --button-bg: #E9E9E9;
+  --button-bg-active: #D0D0D0;
+
+  --list-bg: #F9F9F9;
+  --list-border: #DDD;
+  --list-shadow: #E9E9E9;
+
   --drag-handle-bg: #F9F9F9A0;
 
   --notification-ok: #AFA;
-  --notification-ok-border: #0A0;
+  --notification-ok-border: #0D0;
   --notification-warning: #FFA;
-  --notification-warning-border: #AA0;
+  --notification-warning-border: #DD0;
   --notification-error: #FAA;
-  --notification-error-border: #A00;
+  --notification-error-border: #D00;
 
-  --drop-target: red;
+  --settings-bg: #FFF;
+  --settings-border: #000;
+  --settings-color: #000;
+
+  --drop-target: #F00;
 }
 
-// @media (prefers-color-scheme: dark) {}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-fg: #FFF;
+    --page-bg: #111;
+
+    --header-bg: #333;
+    --header-border: #222;
+
+    --input-fg: #000;
+    --input-fg-disabled: #888;
+    --input-bg: #DDD;
+    --input-light: #555;
+    --input-shade: #222;
+
+    --button-fg: #DDD;
+    --button-bg: #444;
+    --button-bg-active: #333;
+
+    --list-bg: #333;
+    --list-border: #222;
+    --list-shadow: #222;
+
+    --drag-handle-bg: #444;
+
+    --notification-ok: #060;
+    --notification-ok-border: #020;
+    --notification-warning: #762;
+    --notification-warning-border: #220;
+    --notification-error: #600;
+    --notification-error-border: #200;
+
+    --settings-bg: #222;
+    --settings-border: #444;
+    --settings-color: #FFF;
+
+    --drop-target: #600;
+  }
+}
 
 
 /* svg wibbling */
@@ -35,12 +86,15 @@ svg:not(.qr_code) {
 svg.x2 {
   font-size: 2em;
 }
-BUTTON svg, SPAN svg {
+P>svg, LI>svg {
+  vertical-align: middle;
+}
+BUTTON>svg, SPAN>svg {
   top: .125em;
   position: relative;
 }
 A svg {
-  color: var(--fg);
+  color: var(--page-fg);
 }
 
 /* subtitle wibbling */
@@ -63,7 +117,7 @@ A svg {
 /* Overall Layout */
 * {box-sizing: border-box;}
 BODY {
-  color: var(--fg);
+  color: var(--page-fg);
   margin: 0;
   padding: 0;
   font-family: arial, sans-serif;
@@ -104,14 +158,14 @@ MAIN {
   flex-flow: column;
   justify-content: flex-start;
 
-  background: var(--bg-light);
+  background: var(--page-bg);
 
   HEADER {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
-    background-color: var(--bg-dark);
-    border-bottom: 1px solid var(--border);
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--header-border);
     padding: 0 5%;
     &>A, &>DIV {
       display: block;
@@ -132,9 +186,9 @@ MAIN {
   }
   .upnext {
     background: var(--notification-warning);
+    border-bottom: 1px solid var(--notification-warning-border);
     padding: 1em;
     margin: 0;
-    border-bottom: 1px solid var(--border);
   }
   .notification {
     position: absolute;
@@ -180,8 +234,8 @@ MAIN {
     flex: 0 0 auto;
     display: flex;
     flex-flow: column;
-    border-top: 1px solid var(--border);
-    background-color: var(--bg-dark);
+    border-top: 1px solid var(--header-border);
+    background-color: var(--header-bg);
     padding: 0.3em 5%;
 
     .already_queued {
@@ -220,10 +274,11 @@ MAIN {
     flex: 0 0 auto;
     text-align: center;
     z-index: 9999;
-    background: white;
-    border: 2px solid black;
+    color: var(--settings-color);
+    background: var(--settings-bg);
+    border: 2px solid var(--settings-border);
     border-radius: 1em;
-    box-shadow: #000 0 0 1em;
+    box-shadow: var(--settings-border) 0 0 1em;
     padding: 1em;
     H2 {
       margin: 0;
@@ -258,15 +313,16 @@ H2 {
   font-size: 1.2em;
 }
 UL {
-  border: 1px solid var(--border);
+  border: 1px solid var(--list-border);
+  background-color: var(--list-bg);
   margin: 0.5em 0;
   border-radius: .5em;
   overflow: hidden;
-  box-shadow: var(--bg-dark) 2px 2px 4px;
+  box-shadow: var(--list-shadow) 2px 2px 4px;
   padding: 0;
   LI {
     display: flex;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--list-border);
     padding: 0.75em;
     font-weight: bold;
     align-items: center;
@@ -277,7 +333,7 @@ UL {
       margin-right: 0.75em;
       background-size: cover;
       background-position: center;
-      border-right: 1px solid var(--border);
+      border-right: 1px solid var(--list-border);
       flex: 0 0 auto;
       position: relative;
       IMG {
@@ -294,7 +350,7 @@ UL {
         left: 0;
         bottom: 1em;
         background: var(--drag-handle-bg);
-        border: 1px solid var(--border);
+        border: 1px solid var(--list-border);
         border-radius: 0 .5em .5em 0;
         padding: .4em .4em .5em .2em;
       }
@@ -309,8 +365,8 @@ UL {
     SPAN.count {
       flex: 0 0 auto;
       margin-right: 0.5em;
-      border: 1px solid var(--border);
-      background: var(--bg-light);
+      border: 1px solid var(--list-border);
+      background: var(--page-bg);
       font-size: 0.75em;
       padding: 0.2em 0.4em;
       border-radius: 0.2em;
@@ -336,7 +392,6 @@ BUTTON, .button {
 }
 A.button {
   text-align: center;
-  color: var(--fg);
   text-decoration: none;
   font-weight: bold;
 }
@@ -348,22 +403,24 @@ INPUT[type="password"] {
   color: var(--input-fg);
   font-weight: bold;
   background: var(--input-bg);
-  box-shadow: var(--input-border) 0px 1px 3px 0px inset;
+  box-shadow: var(--input-shade) 0px 1px 3px 0px inset;
   border: 1px solid;
-  border-color: var(--input-border) #fff #fff var(--input-border);
+  border-color: var(--input-shade) var(--input-light) var(--input-light) var(--input-shade);
 }
 BUTTON, .button {
-  color: var(--fg);
+  color: var(--button-fg);
   font-weight: bold;
-  background: var(--bg-dark);
+  background: var(--button-bg);
   border: 1px solid;
-  border-color: #fff var(--bg-dark-border) var(--bg-dark-border) #fff;
-}
-BUTTON:active {
-  background: var(--bg-dark-active);
-}
-BUTTON:disabled {
-  color: var(--disabled);
+  border-color: var(--input-light) var(--input-shade) var(--input-shade) var(--input-light);
+
+  &:active {
+    background: var(--button-bg-active);
+    border-color: var(--input-shade) var(--input-light) var(--input-light) var(--input-shade);
+  }
+  &:disabled {
+    color: var(--input-fg-disabled);
+  }
 }
 .loading {
   animation: spin 1s linear infinite;
@@ -397,7 +454,8 @@ MAIN.track_list ARTICLE {
     flex-wrap: wrap;
     margin: 0.5em 0;
     .active_filter {
-      border: 1px solid var(--border);
+      border: 1px solid var(--list-border);
+      background-color: var(--list-bg);
       border-radius: 1em;
       padding: 0.5em;
       margin-right: 0.5em;
@@ -414,10 +472,10 @@ MAIN.track_list ARTICLE {
   }
   UL {
     .filter_list_group {
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-dark);
+      border-bottom: 1px solid var(--list-border);
+      background: var(--list-shadow);
       LI {
-        background: var(--bg-light);
+        background: var(--list-bg);
       }
       UL {
         margin: 0em 0em 0 1em;
@@ -444,7 +502,7 @@ MAIN.track_list ARTICLE {
 MAIN.track_details ARTICLE {
   VIDEO {
     margin-top: 5vw;
-    border: 1px solid var(--border);
+    border: 1px solid var(--list-border);
   }
   .code {
     margin-top: 0;
@@ -471,6 +529,9 @@ MAIN.track_details ARTICLE {
   }
   VIDEO {
     width: 100%;
+  }
+  DIV.lyrics {
+    user-select: text;
   }
 }
 

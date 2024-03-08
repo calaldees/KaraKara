@@ -7,6 +7,7 @@ import uuid
 import ujson as json
 import sanic
 from sanic_ext import openapi
+from sanic_ext.extensions.http.cors import add_cors
 from sanic.log import logger as log
 
 
@@ -28,6 +29,32 @@ app.ext.openapi.describe(
     """),  # TODO: Markdown
 )
 
+app.config.FALLBACK_ERROR_FORMAT = "json"
+
+# Allow dev-mode clients to connect to prod server.
+# When allowing connections with credentials, allowed
+# headers MUST be explicitly listed.
+app.config.CORS_SUPPORTS_CREDENTIALS = True
+app.config.CORS_ALLOW_HEADERS = ["Content-Type"]
+app.config.CORS_ORIGINS = [
+    "http://127.0.0.1:1234",  # browser2
+    "http://127.0.0.1:1235",  # player2
+    "http://127.0.0.1:1236",  # browser3
+    "http://127.0.0.1:1237",  # player3
+]
+add_cors(app)
+
+
+# Model ------------------------------------------------------------------------
+
+from .queue_model import QueueItem
+
+from .queue_validation import default as queue_validation_default
+from .queue_reorder import reorder as queue_reorder
+queue_post_processing_functions = {
+    "validation_default": queue_validation_default,
+    "reorder": queue_reorder,
+}
 
 # Startup ----------------------------------------------------------------------
 
@@ -37,10 +64,8 @@ async def tracks_load(_app: sanic.Sanic, _loop):
     _app.ctx.track_manager = TrackManager(Path(str(_app.config.get('PATH_TRACKS'))))
 
 
-from .queue_model import QueueItem
 from .settings_manager import SettingsManager
 from .queue_manager import QueueManagerCSVAsync
-from . import queue_validation
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     path_queue = Path(str(_app.config.get('PATH_QUEUE')))
@@ -54,8 +79,8 @@ async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
     mqtt = _app.config.get('MQTT')
     if isinstance(mqtt, str):
         log.info("[mqtt] connecting")
-        from asyncio_mqtt import Client as MqttClient, MqttError
-        _app.ctx.mqtt = MqttClient(mqtt)
+        import aiomqtt
+        _app.ctx.mqtt = aiomqtt.Client(mqtt)
         await _app.ctx.mqtt.connect()
     elif mqtt:  # normally pass-through for mock mqtt object
         log.info("[mqtt] bypassed")
@@ -75,7 +100,11 @@ async def aio_mqtt_close(_app, _loop):
 # https://sanic.dev/en/guide/best-practices/exceptions.html#custom-error-handling
 def exception_to_dict(exception):
     import traceback
-    return {'exception': "".join(traceback.TracebackException.from_exception(exception).format())}
+    return {
+        'status': 500,
+        'message': 'Internal Server Error',
+        'exception': "".join(traceback.TracebackException.from_exception(exception).format())
+    }
 class CustomErrorHandler(sanic.handlers.ErrorHandler):
     def default(self, request, exception):
         if isinstance(exception, sanic.exceptions.SanicException):
@@ -89,14 +118,14 @@ app.error_handler = CustomErrorHandler()
 
 
 from .queue_manager import LoginManager, User
-@app.middleware("request")
-async def attach_session_id_request(request):
+@app.on_request
+async def attach_session_id_request(request: sanic.Request):
     request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
     request.ctx.user = LoginManager.from_session(request.ctx.session_id)
-@app.middleware("response")
-async def attach_session_id(request, response):
+@app.on_response
+async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse):
     if request.cookies.get("session_id") != request.ctx.session_id:
-        response.cookies["session_id"] = request.ctx.session_id
+        response.cookies.add_cookie("session_id", request.ctx.session_id)
 
 
 
@@ -209,10 +238,16 @@ async def update_settings(request, room_name):
 
 @room_blueprint.get("/queue.csv")
 @openapi.definition(
-    response=openapi.definitions.Response({"text/csv": str}),
+    response=[
+        openapi.definitions.Response({"text/csv": str}),
+        openapi.definitions.Response('queue not found', status=400),
+    ]
 )
 async def queue_csv(request, room_name):
-    return await sanic.response.file(request.app.ctx.queue_manager.path_csv(room_name))
+    path_csv = request.app.ctx.queue_manager.path_csv(room_name)
+    if not path_csv.is_file():
+        raise sanic.exceptions.NotFound()
+    return await sanic.response.file(path_csv)
 
 @room_blueprint.get("/queue.json")
 @openapi.definition(
@@ -253,17 +288,17 @@ async def add_queue_item(request, room_name):
                 performer_name=performer_name,
             )
             queue.add(queue_item)
-            # Validate queue state - validation functions are configurable per queue
+            # Post process queue state - functions are configurable per queue
             if not request.ctx.user.is_admin:
-                for validation_scheme in queue.settings.get("validation", []):
-                    validation_error = getattr(queue_validation, validation_scheme)(queue)
-                    if validation_error:
-                        log.info(f"add failed validation {validation_error=}")
+                for function_name in queue.settings.get("queue_post_processing_function_names", []):
+                    _error = queue_post_processing_functions[function_name](queue)
+                    if _error:
+                        log.info(f"add failed {_error=}")
                         # NOTE: the client has special behaviour for the specific
                         # hard-coded string "queue validation failed". In the long
                         # term we should add a more structured error format, but
                         # for now, we require this exact string.
-                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=validation_error)
+                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=_error)
             return sanic.response.json(queue_item.asdict())
 
 

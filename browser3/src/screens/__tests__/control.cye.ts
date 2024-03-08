@@ -8,11 +8,7 @@ describe("Control Screen", () => {
         cy.intercept("GET", "/files/tracks.json", {
             fixture: "small_tracks.json",
         }).as("tracks");
-        cy.visit("/");
-        cy.get("h1").dblclick();
-        cy.get("input").eq(2).type("test");
-        cy.get("input").eq(3).type("test");
-        cy.contains("Close").click();
+        cy.login();
     });
     it("Should show instructions when empty", () => {
         cy.visit("/test/queue");

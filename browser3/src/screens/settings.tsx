@@ -22,6 +22,7 @@ export function RoomSettings(): React.ReactElement {
 
     function saveSettings(event: any) {
         event.preventDefault();
+        setSaving(true);
         request({
             notify: "Saving settings...",
             notify_ok: "Settings saved!",
@@ -33,14 +34,19 @@ export function RoomSettings(): React.ReactElement {
                 },
                 body: JSON.stringify(roomSettingsEdit),
             },
-            // action: (state, response) => [{ ...state }],
+            onAction: () => setSaving(false),
+            onException: () => setSaving(false),
         });
     }
 
     const buttons = (
         <footer>
             <div className={"buttons"}>
-                <button onClick={saveSettings} disabled={saving}>
+                <button
+                    onClick={saveSettings}
+                    data-cy="save-settings-button"
+                    disabled={saving}
+                >
                     Save
                 </button>
             </div>
@@ -63,6 +69,7 @@ export function RoomSettings(): React.ReactElement {
                         <input
                             type={"text"}
                             name={key}
+                            data-setting={key}
                             value={value ?? ""}
                             onChange={(e) => update(key, e.target.value)}
                         />
