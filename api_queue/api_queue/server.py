@@ -118,14 +118,14 @@ app.error_handler = CustomErrorHandler()
 
 
 from .queue_manager import LoginManager, User
-@app.middleware("request")
+@app.on_request
 async def attach_session_id_request(request: sanic.Request):
     request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
     request.ctx.user = LoginManager.from_session(request.ctx.session_id)
-@app.middleware("response")  # type: ignore
+@app.on_response
 async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse):
     if request.cookies.get("session_id") != request.ctx.session_id:
-        response.cookies["session_id"] = request.ctx.session_id
+        response.cookies.add_cookie("session_id", request.ctx.session_id, secure=False, samesite=None)
 
 
 
