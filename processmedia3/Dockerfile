@@ -36,7 +36,7 @@ FROM code as test
     COPY .mypy.ini .
     COPY tests ./tests
     RUN python3 -m mypy .
-    RUN python3 -m tests.test_main
+    RUN python3 -m pytest --doctest-modules
 
 FROM code as production
     ENTRYPOINT ["python3", "main.py", "--source", "/media/source", "--cache", "/media/processed/cache.db", "--processed", "/media/processed"]
