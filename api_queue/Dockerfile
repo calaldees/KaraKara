@@ -5,12 +5,11 @@ FROM python:3.11-alpine as base
         bash
 
 FROM base as python_dependencies
-    COPY ./requirements.txt ./
-    RUN pip install --no-cache-dir -r requirements.txt -t /site-packages
+    COPY ./pyproject.toml ./
+    RUN pip install --no-cache-dir -e . -t /site-packages
     ENV PYTHONPATH=/site-packages
 FROM python_dependencies as python_dependencies_test
-    COPY ./requirements.test.txt ./
-    RUN pip install --no-cache-dir -r requirements.test.txt -t /site-packages
+    RUN pip install --no-cache-dir -e '.[test]' -t /site-packages
 
 FROM python_dependencies as code
     COPY ./api_queue ./api_queue
@@ -20,12 +19,8 @@ FROM code as test
     CMD ["python", "-m", "api_queue.server"]
 
     COPY ./tests ./tests
-    COPY ./pytest.ini ./
     RUN python3 -m pytest -x
-
-    COPY ./.mypy.ini ./
     RUN python3 -m mypy api_queue
-
 
 FROM code as production
     EXPOSE 8000
