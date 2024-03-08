@@ -10,7 +10,7 @@ from lib.kktypes import SourceType, TargetType
 from tqdm import tqdm
 
 # disable progress bars in unit tests
-tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)  # type: ignore
 
 
 class TestE2E(unittest.TestCase):
