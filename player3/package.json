@@ -15,7 +15,7 @@
   "dependencies": {
     "@react-three/fiber": "^8.12.0",
     "@shish2k/react-mqtt": "^0.0.2",
-    "@shish2k/react-use-servertime": "^0.0.1",
+    "@shish2k/react-use-servertime": "^0.0.2",
     "@types/three": "^0.150.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

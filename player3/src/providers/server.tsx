@@ -8,6 +8,7 @@ export type ServerContextType = {
     downloadSize: number | null;
     downloadDone: number;
     now: number;
+    offset: number;
 };
 
 export const ServerContext = React.createContext<ServerContextType>({
@@ -15,6 +16,7 @@ export const ServerContext = React.createContext<ServerContextType>({
     downloadSize: null,
     downloadDone: 0,
     now: 0,
+    offset: 0,
 });
 
 export function ServerProvider(props: any) {
@@ -23,7 +25,7 @@ export function ServerProvider(props: any) {
     const [downloadSize, setDownloadSize] = useState<number | null>(null);
     const [downloadDone, setDownloadDone] = useState<number>(0);
     const { request } = useApi();
-    const { now } = useServerTime({ url: `${root}/time.json` });
+    const { now, offset } = useServerTime({ url: `${root}/time.json` });
 
     useEffect(() => {
         request({
@@ -42,7 +44,7 @@ export function ServerProvider(props: any) {
 
     return (
         <ServerContext.Provider
-            value={{ tracks, downloadSize, downloadDone, now }}
+            value={{ tracks, downloadSize, downloadDone, now, offset }}
         >
             {props.children}
         </ServerContext.Provider>
