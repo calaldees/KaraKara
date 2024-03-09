@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useApi } from "../hooks/api";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
@@ -36,6 +36,7 @@ function InternalRoomProvider(props: any) {
     const [queue, setQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
+    const navigate = useNavigate();
 
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -76,14 +77,20 @@ function InternalRoomProvider(props: any) {
                 },
                 body: JSON.stringify({
                     password: roomPassword,
+                    create: roomPassword !== "",
                 }),
             },
             onAction: (response) => {
                 setIsAdmin(response.is_admin);
                 setSessionId(response.session_id);
             },
+            onException: () => {
+                // request() function will already have shown an error,
+                // so we just need to redirect to root
+                navigate("/");
+            },
         });
-    }, [root, roomName, roomPassword, request, setSessionId]);
+    }, [root, roomName, roomPassword, request, setSessionId, navigate]);
     useEffect(() => {
         setQueue(current_and_future(now, fullQueue));
     }, [fullQueue, now]);
