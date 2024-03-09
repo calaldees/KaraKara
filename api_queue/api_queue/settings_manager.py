@@ -55,6 +55,9 @@ class SettingsManager():
         assert path.is_dir()
         self.path = path
 
+    def room_exists(self, name: str) -> bool:
+        return self.path.joinpath(f'{name}_settings.json').is_file()
+
     def get_json(self, name: str) -> dict:
         path = self.path.joinpath(f'{name}_settings.json')
         if not path.is_file():
