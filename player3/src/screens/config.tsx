@@ -139,7 +139,7 @@ export function ConfigMenu() {
                                 <td>
                                     <input
                                         disabled={true}
-                                        value={offset.toFixed(3)}
+                                        value={`${now.toFixed(3)} (${offset.toFixed(3)})`}
                                     />
                                 </td>
                             </tr>
