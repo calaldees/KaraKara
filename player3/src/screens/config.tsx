@@ -19,7 +19,7 @@ export function ConfigMenu() {
         setFullscreen,
         wakeLock,
     } = useContext(ClientContext);
-    const { now } = useContext(ServerContext);
+    const { now, offset } = useContext(ServerContext);
     const [rootEdit, setRootEdit] = useState(root);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
@@ -139,7 +139,7 @@ export function ConfigMenu() {
                                 <td>
                                     <input
                                         disabled={true}
-                                        value={Date.now() / 1000 - now}
+                                        value={offset.toFixed(3)}
                                     />
                                 </td>
                             </tr>
