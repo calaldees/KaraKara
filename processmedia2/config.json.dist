@@ -1,9 +1,0 @@
-{
-    "loggingconf": "data/logging.json",
-    "lockfile": "data/.lock",
-    "mtime_store_path": "data/mtimes.json",
-
-    "path_source": "../mediaserver/www/files/",
-    "path_meta": "../mediaserver/www/meta/",
-    "path_processed": "../mediaserver/www/processed/"
-}
