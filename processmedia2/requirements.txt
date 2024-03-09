@@ -1,7 +1,0 @@
-pyyaml
-dateutils
-clint
-chardet
-humanize
-
-git+https://github.com/calaldees/libs.git@d3bc10d#egg=calaldees
