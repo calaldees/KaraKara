@@ -209,7 +209,7 @@ function AdminButtons(): React.ReactElement {
                     Room Settings
                 </Link>
                 <Link to="printable" className="button">
-                    Printable Tracklist
+                    Printable QR Code
                 </Link>
             </div>
         </footer>
