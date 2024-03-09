@@ -192,6 +192,10 @@ class LoginRequest:
     ],
 )
 async def login(request, room_name):
+    if not request.app.ctx.settings_manager.room_exists(room_name):
+        if not request.json.get("create"):
+            raise sanic.exceptions.NotFound(message=f"Room '{room_name}' not found")
+        request.app.ctx.settings_manager.set_json(room_name, {})
     user = LoginManager.login(room_name, None, request.json["password"], request.ctx.session_id)
     request.ctx.session_id = user.session_id
     return sanic.response.json(user.__dict__)
