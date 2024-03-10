@@ -183,16 +183,23 @@ function FilterList({
 function Bookmarks({
     bookmarks,
     tracks,
+    trackList,
 }: {
     bookmarks: string[];
     tracks: Record<string, Track>;
+    trackList: Track[];
 }) {
+    const visibleTrackIDs = useMemo(
+        () => trackList.map((track) => track.id),
+        [trackList]
+    );
     return (
         <div>
             <h2>Bookmarks</h2>
             <ul>
                 {bookmarks
                     .filter((bm) => bm in tracks)
+                    .filter((bm) => visibleTrackIDs.includes(bm))
                     .map((bm) => (
                         <TrackItem key={bm} track={tracks[bm]} filters={[]} />
                     ))}
@@ -305,7 +312,7 @@ function Explorer(): React.ReactElement {
 
             {/* If no filters, show bookmarks */}
             {bookmarks.length > 0 && filters.length === 0 && search === "" && (
-                <Bookmarks bookmarks={bookmarks} tracks={tracks} />
+                <Bookmarks bookmarks={bookmarks} tracks={tracks} trackList={trackList} />
             )}
         </>
     );
