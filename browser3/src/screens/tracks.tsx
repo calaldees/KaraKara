@@ -235,7 +235,7 @@ function Explorer(): React.ReactElement {
                 className={"search"}
                 type={"text"}
                 placeholder={"Add search keywords"}
-                value={search}
+                defaultValue={search}
                 data-cy="search"
                 onChange={(e) => setSearch(e.target.value)}
             />
