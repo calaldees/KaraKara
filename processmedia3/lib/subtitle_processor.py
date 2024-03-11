@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## -*- coding: utf-8 -*-
 
 import re
@@ -570,3 +571,23 @@ def create_vtt(subtitles):
             ))
 
     return "WEBVTT - KaraKara Subtitle\n\n" + "".join(blocks)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Convert between subtitle formats')
+    parser.add_argument('input', type=str, help='input subtitle file')
+    parser.add_argument('output', type=str, help='output subtitle file')
+    args = parser.parse_args()
+    with open(args.input, "r") as f:
+        subs = parse_subtitles(f.read())
+    if args.output.endswith(".vtt"):
+        output = create_vtt(subs)
+    elif args.output.endswith(".srt"):
+        output = create_srt(subs)
+    elif args.output.endswith(".ssa"):
+        output = create_ssa()
+    else:
+        raise Exception("Unknown output format")
+    with open(args.output, "w") as f:
+        f.write(output)
