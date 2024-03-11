@@ -1,0 +1,33 @@
+[project]
+name = "api_queue"
+version = "0.0.0"
+readme = "README.md"
+dependencies = [
+	"sanic ~= 23.12",
+	"sanic-ext ~= 23.12",
+	"sanic-openapi ~= 21.12",
+	"ujson ~= 5.9",
+	# aiomqtt is now on version 2.x.x `.connect()` is no longer a method
+	# breaking changes need to be investigated
+	# We can also bump python to 3.12 in Dockerfile with this update
+	"aiomqtt ~= 1.2",
+	"pytimeparse ~= 1.1",
+]
+
+[project.optional-dependencies]
+test = [
+	"pytest ~= 8.0",
+	"pytest-asyncio ~= 0.23",
+	"sanic-testing ~= 23.12",
+	"mypy ~= 1.8",
+	"types-ujson ~= 5.9",
+]
+
+[tool.mypy]
+[[tool.mypy.overrides]]
+module = "mypy-sanic_ext.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--doctest-modules -p no:cacheprovider"
