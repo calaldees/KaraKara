@@ -1,5 +1,0 @@
-pytest
-pytest-asyncio
-sanic-testing
-mypy
-types-ujson
