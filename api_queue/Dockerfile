@@ -1,5 +1,4 @@
-# Temp using `3.11-alpine` as `3.12`+ currently has install errors https://github.com/Azure-Samples/azure-search-openai-demo/issues/752
-FROM python:3.11-alpine as base
+FROM python:3.12-alpine as base
     WORKDIR /app/
     RUN apk add --no-cache \
         bash
