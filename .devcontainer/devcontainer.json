@@ -1,23 +1,40 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
-	//"name": "Debian",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	//"image": "mcr.microsoft.com/devcontainers/universal:2-linux",
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [80],
+	"name": "KaraKara",
+	"build": {
+		"context": ".",
+		"dockerfile": "./Dockerfile"
+	},
+	"forwardPorts": [
+		80,
+		1236,
+		1237
+	],
 	"portsAttributes": {
 		"80": {
-			"label": "nginx"
-		}
+			"label": "nginx",
+			"onAutoForward": "openPreview"
+		},
+		"1236": {
+			"label": "browser3",
+			"onAutoForward": "openPreview"
+		},
+		"1237": {
+			"label": "player3",
+			"onAutoForward": "openPreview"
+		},
 	},
-
-
-	// Configure tool-specific properties.
+	"otherPortsAttributes": {
+		"onAutoForward": "silent"
+	},
+	"mounts": [
+		"source=${localWorkspaceFolderBasename}-venv,target=${containerWorkspaceFolder}/venv,type=volume",
+		"source=${localWorkspaceFolderBasename}-api_queue-venv,target=${containerWorkspaceFolder}/api_queue/venv,type=volume",
+		"source=${localWorkspaceFolderBasename}-browser3-node_modules,target=${containerWorkspaceFolder}/browser3/node_modules,type=volume",
+		"source=${localWorkspaceFolderBasename}-player3-node_modules,target=${containerWorkspaceFolder}/player3/node_modules,type=volume",
+		"source=${localWorkspaceFolderBasename}-processmedia3-venv,target=${containerWorkspaceFolder}/processmedia3/venv,type=volume",
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -27,7 +44,5 @@
 				"ms-vscode.makefile-tools"
 			]
 		}
-
 	}
-
 }
