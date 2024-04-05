@@ -39,7 +39,6 @@
 		"vscode": {
 			"extensions": [
 				"ms-azuretools.vscode-docker",
-				"streetsidesoftware.code-spell-checker",
 				"ms-python.python",
 				"ms-vscode.makefile-tools"
 			]
