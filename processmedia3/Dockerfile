@@ -35,5 +35,5 @@ FROM code as test
     RUN python3 -m pytest
 
 FROM code as production
-    ENTRYPOINT ["python3", "main.py", "--source", "/media/source", "--cache", "/media/processed/cache.db", "--processed", "/media/processed"]
+    ENTRYPOINT ["python3", "main.py", "--source", "/media/source", "--processed", "/media/processed"]
     CMD ["all", "--loop", "600"]

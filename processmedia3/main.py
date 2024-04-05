@@ -270,13 +270,6 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         help="Where to find source files (Default: %(default)s)",
     )
     parser.add_argument(
-        "--cache",
-        type=Path,
-        default=Path("/media/processed/cache.db"),
-        metavar="FILE",
-        help="Where to store source metadata (Default: %(default)s)",
-    )
-    parser.add_argument(
         "--processed",
         type=Path,
         default=Path("/media/processed"),
@@ -356,7 +349,7 @@ def main(argv: List[str]) -> int:
         logging.config.dictConfig(logging_config)
 
     while True:
-        with _pickled_var(args.cache, {}) as cache, logging_redirect_tqdm():
+        with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
             tracks = scan(args.source, args.processed, args.match, cache, args.threads)
 
             # If no specific command is specified, then encode,
