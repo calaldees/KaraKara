@@ -73,6 +73,7 @@ function getNiceTracks(tracks: Record<string, Track>, n: number) {
         .filter((track) => track.tags[""]?.includes("subs-soft"))
         .filter((track) => track.tags[""]?.includes("ar-16-9"))
         .filter((track) => track.tags[""]?.includes("src-image"))
+        .filter((track) => track.tags["vocaltrack"]?.includes("on"))
         .slice(0, n);
 }
 
