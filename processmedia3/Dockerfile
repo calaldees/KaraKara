@@ -1,4 +1,4 @@
-ARG FFMPEG_VERSION=6.1
+ARG FFMPEG_VERSION=7.0
 ARG PYTHON_VERSION=3.12
 
 # Can't use ARG variables in `COPY --from`, but can use them in `FROM`...

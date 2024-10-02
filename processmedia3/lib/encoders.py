@@ -31,7 +31,7 @@ VCODEC_H265 = ["-vcodec", "libx265", "-tag:v", "hvc1"]
 VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p"]
 
 ACODEC_OPUS = ["-acodec", "libopus"]
-ACODEC_AAC = ["-acodec", "libfdk_aac"]
+ACODEC_AAC = ["-acodec", "aac"]
 ACODEC_MP3 = ["-acodec", "mp3"]
 # fmt: on
 
