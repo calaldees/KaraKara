@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 /// <reference path="../../../cypress/support/component.ts" />
 
 import { Queue } from "../queue";

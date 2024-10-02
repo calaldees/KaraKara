@@ -12,10 +12,10 @@ on: [workflow_dispatch]
 jobs:
 
   cypress-run:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - run: make test_cypress_run
 
@@ -27,11 +27,11 @@ jobs:
             path: test_cypress/reports/
 
   # cypress-run:
-  #   runs-on: ubuntu-latest
+  #   runs-on: ubuntu-24.04
   #   container: cypress/included:9.4.1
   #   steps:
   #     - name: Checkout
-  #       uses: actions/checkout@v2
+  #       uses: actions/checkout@v4
   #     - run: cypress run
   #       env:
   #         CYPRESS_BASE_URL: 'http://localhost:8000/'

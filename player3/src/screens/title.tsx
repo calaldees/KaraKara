@@ -4,7 +4,7 @@ import { EventInfo, JoinInfo } from "./_common";
 import { RoomContext } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Html, useVideoTexture, useTexture } from "@react-three/drei";
 import { Group, TextureLoader } from "three";
 import * as THREE from "three";
@@ -37,15 +37,19 @@ export function TitleScreen() {
 }
 
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
-    const ts = Object.values(tracks);
-    const stats = {
-        tracks: ts.length,
-        lines: ts.map((t) => t.lyrics.length).reduce((sum, n) => sum + n, 0),
-        shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
-        hours: Math.floor(
-            ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) / 60 / 60,
-        ),
-    };
+    // computing stats only takes ~10ms, but we don't want that to happen
+    // in the middle of rendering the globe
+    const stats = useMemo(() => {
+        const ts = Object.values(tracks);
+        return {
+            tracks: ts.length,
+            lines: ts.map((t) => t.lyrics.length).reduce((sum, n) => sum + n, 0),
+            shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
+            hours: Math.floor(
+                ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) / 60 / 60,
+            ),
+        };
+    }, [tracks]);
     return (
         <h2>
             <table>
@@ -149,9 +153,16 @@ function MyScene() {
         ]);
     }, [tracks, root]);
 
-    useFrame(({ camera, clock }) => {
-        (camera as THREE.PerspectiveCamera).fov = widescreen ? 50 : 65;
-        const t = clock.getElapsedTime();
+    useThree((state) => {
+        // these debug functions can randomly take ~100ms
+        // on raspberry pi (less on more powerful machines),
+        // which causes a noticeable stutter in the animation
+        state.gl.getContext().getProgramInfoLog = () => "";
+        state.gl.getContext().getShaderInfoLog = () => "";
+    });
+    useFrame((state, delta) => {
+        (state.camera as THREE.PerspectiveCamera).fov = widescreen ? 50 : 65;
+        const t = state.clock.getElapsedTime();
         globe.current && (globe.current.rotation.y = t / 8);
         text1.current &&
             text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));

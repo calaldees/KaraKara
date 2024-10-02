@@ -137,7 +137,7 @@ class VideoToH264(_BaseVideoToVideo):
     target = TargetType.VIDEO_H264
     ext = "mp4"
     mime = "video/mp4"
-    conf_vcodec = VCODEC_H265
+    conf_vcodec = VCODEC_H264
     conf_acodec = ACODEC_MP3
 
 
