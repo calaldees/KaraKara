@@ -110,3 +110,13 @@ Debugging Tools
     * `./lib/subtitle_processor.py input.srt output.vtt`
 
 Commands: scan, view, encode, export, cleanup
+
+
+Dev Setup
+---------
+```
+python3 -m venv venv
+source venv/bin/activate
+pip install -e .
+./main.py --help
+```
