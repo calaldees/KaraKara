@@ -19,7 +19,7 @@ T = TypeVar("T")
 
 
 class SourceType(Enum):
-    VIDEO = {".mp4", ".mkv", ".avi", ".mpg"}
+    VIDEO = {".mp4", ".mkv", ".avi", ".mpg", ".webm"}
     AUDIO = {".mp3", ".flac", ".ogg"}
     IMAGE = {".jpg", ".png"}
     TAGS = {".txt"}
