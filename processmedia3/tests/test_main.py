@@ -37,7 +37,7 @@ class TestE2E(unittest.TestCase):
                 {s.type for s in tracks[0].sources},
             )
             self.assertEqual(TargetType.VIDEO_H264, tracks[0].targets[0].type)
-            self.assertEqual("ehai5GSd39a", tracks[0].targets[0].path.stem)
+            self.assertEqual("DrH2SWWHaOW", tracks[0].targets[0].path.stem)
             self.assertEqual("test2", tracks[1].id)
 
             # Encode should generate output video
@@ -55,9 +55,9 @@ class TestE2E(unittest.TestCase):
             for k, v in {
                 "attachments": {
                     "image": [{"mime": "image/webp", "path": "x/xgkyBqtLHXj.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "x/x9Yd879NxaT.mp4"}],
+                    "preview": [{"mime": "video/mp4", "path": "7/7px2MuJ4wc8.mp4"}],
                     "subtitle": [{"mime": "text/vtt", "path": "8/8wBGB457jKT.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "e/ehai5GSd39a.mp4"}],
+                    "video": [{"mime": "video/mp4", "path": "d/DrH2SWWHaOW.mp4"}],
                 },
                 "duration": 30.0,
                 "id": "test1",
