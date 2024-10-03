@@ -318,7 +318,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         "cmd",
         default="all",
         nargs="?",
-        help="Sub-process to run (view, encode, export, lint, cleanup)",
+        help="Sub-process to run (view, encode, test-encode, export, lint, cleanup)",
     )
     parser.add_argument(
         "match", nargs="?", help="Only act upon files matching this pattern"
@@ -358,6 +358,25 @@ def main(argv: List[str]) -> int:
             args.log_file, maxBytes=65535, backupCount=3
         )
         logging.getLogger().addHandler(handler)
+
+    if args.cmd == "test-encode":
+        with logging_redirect_tqdm():
+            cache = {}
+            original = Path(args.match)
+            tracks = [Track(
+                original.parent,
+                original.stem,
+                [
+                    Source(original.parent, original, cache)
+                ],
+                [
+                    TargetType.VIDEO_H264,
+                    TargetType.VIDEO_AV1,
+                    TargetType.VIDEO_H265,
+                ]
+            )]
+            encode(tracks, args.reencode, args.threads)
+            return 0
 
     while True:
         with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
