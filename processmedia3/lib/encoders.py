@@ -3,7 +3,9 @@ import logging
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple, Optional
+import tqdm
+import re
 
 from .kktypes import Source, SourceType, TargetType
 from .subtitle_processor import create_vtt, parse_subtitles
@@ -58,22 +60,33 @@ class Encoder:
     def encode(self, target: Path, sources: Set[Source]) -> None:
         ...
 
-    def _run(self, *args: str):
+    def _run(self, *args: str, title: Optional[str] = None, duration: Optional[float]=None) -> None:
+        output = []
         try:
-            log.debug(f"Calling external command: {shlex.join(args)}")
-            subprocess.run(
-                ["nice"] + list(args),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                errors="ignore",  # some files contain non-utf8 metadata
-                check=True,
-            )
+            with tqdm.tqdm(total=int(duration), unit="s", disable=duration is None, leave=False) as pbar:
+                pbar.set_description(title)
+
+                log.debug(f"Calling external command: {shlex.join(args)}")
+                proc = subprocess.Popen(
+                    ["nice"] + list(args),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    errors="ignore",  # some files contain non-utf8 metadata
+                )
+
+                assert proc.stdout is not None
+                while line := proc.stdout.readline():
+                    output.append(line)
+                    if match := re.search(r"time=(\d+):(\d+):(\d+.\d+)", line):
+                        hours, minutes, seconds = match.groups()
+                        current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
+                        pbar.update(current_s - pbar.n)
         except subprocess.CalledProcessError as e:
+            outstr = "".join(output)
             raise Exception(
                 f"Command failed ({e.returncode}): {shlex.join(args)}\n"
-                f"{e.stdout}\n"
-                f"{e.stderr}"
+                f"{outstr}\n"
             )
         except Exception as e:
             raise Exception(f"Command failed {args}\n{e}")
@@ -105,6 +118,8 @@ class _BaseVideoToVideo(Encoder):
             *self.conf_vcodec,
             *self.conf_acodec,
             target.as_posix(),
+            title=f"{self.__class__.__name__}({list(sources)[0].path.stem})",
+            duration=list(sources)[0].duration(),
         )
         # fmt: on
 
