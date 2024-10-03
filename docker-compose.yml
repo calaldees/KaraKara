@@ -80,6 +80,8 @@ services:
             - ${PATH_HOST_processed}:/media/processed:rw
 
     syncthing:
+        profiles:
+            - syncthing
         image: syncthing/syncthing
         restart: unless-stopped
         mem_limit: 1g

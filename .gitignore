@@ -2,6 +2,7 @@
 /.venv
 /venv
 **/.DS_Store
+/media
 
 **/*.py[oc]
 **/__pycache__
