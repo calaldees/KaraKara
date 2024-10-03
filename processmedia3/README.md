@@ -108,6 +108,8 @@ Debugging Tools
     * Docker automatically sets the `--source` / `--processed` flags based on `.env`
 * Testing subtitle encoding
     * `./lib/subtitle_processor.py input.srt output.vtt`
+* Encoding a single file into various formats to test with
+    * `./main.py test-encode --reencode ~/Videos/kk-stress-test/demo.webm`
 
 Commands: scan, view, encode, export, cleanup
 
