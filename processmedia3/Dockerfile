@@ -35,5 +35,10 @@ FROM code as test
     RUN python3 -m pytest
 
 FROM code as production
-    ENTRYPOINT ["python3", "main.py", "--source", "/media/source", "--processed", "/media/processed"]
+    ENTRYPOINT [ \
+        "python3", "main.py", \
+        "--source", "/media/source", \
+        "--processed", "/media/processed" \
+        "--log-file", "/logs/processmedia3.log" \
+    ]
     CMD ["all", "--loop", "600"]

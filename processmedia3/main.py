@@ -6,6 +6,7 @@ import gzip
 import json
 import logging
 import logging.config
+import logging.handlers
 import math
 import os
 import pickle
@@ -309,6 +310,11 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         help="Super-extra verbose logging",
     )
     parser.add_argument(
+        "--log-file",
+        type=Path,
+        help="Where to write logs to",
+    )
+    parser.add_argument(
         "cmd",
         default="all",
         nargs="?",
@@ -343,10 +349,15 @@ def _pickled_var(path: Path, default: Any):
 def main(argv: List[str]) -> int:
     args = parse_args(argv)
 
-    with Path('logging.config.json').open() as f:
-        logging_config = json.load(f)
-        logging_config["root"]["level"] = logging.DEBUG if args.debug else logging.INFO
-        logging.config.dictConfig(logging_config)
+    logging.basicConfig(
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)s %(message)s",
+    )
+    if args.log_file:
+        handler = logging.handlers.RotatingFileHandler(
+            args.log_file, maxBytes=65535, backupCount=3
+        )
+        logging.getLogger().addHandler(handler)
 
     while True:
         with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
