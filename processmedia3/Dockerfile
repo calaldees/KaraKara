@@ -26,7 +26,6 @@ FROM dependencies as dependencies_test
 FROM dependencies as code
     COPY main.py .
     COPY lib ./lib
-    COPY logging.config.json .
 
 FROM code as test
     COPY --from=dependencies_test /site-packages /site-packages
@@ -35,5 +34,10 @@ FROM code as test
     RUN python3 -m pytest
 
 FROM code as production
-    ENTRYPOINT ["python3", "main.py", "--source", "/media/source", "--processed", "/media/processed"]
+    ENTRYPOINT [ \
+        "python3", "main.py", \
+        "--source", "/media/source", \
+        "--processed", "/media/processed" \
+        "--log-file", "/logs/processmedia3.log" \
+    ]
     CMD ["all", "--loop", "600"]
