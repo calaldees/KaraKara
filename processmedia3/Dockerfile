@@ -2,9 +2,9 @@ ARG FFMPEG_VERSION=7.0
 ARG PYTHON_VERSION=3.12
 
 # Can't use ARG variables in `COPY --from`, but can use them in `FROM`...
-FROM mwader/static-ffmpeg:${FFMPEG_VERSION} as ffmpeg
+FROM mwader/static-ffmpeg:${FFMPEG_VERSION} AS ffmpeg
 
-FROM python:${PYTHON_VERSION}-alpine as dependencies
+FROM python:${PYTHON_VERSION}-alpine AS dependencies
     WORKDIR /app/
     VOLUME /logs
     VOLUME /media/source
@@ -20,24 +20,19 @@ FROM python:${PYTHON_VERSION}-alpine as dependencies
     COPY --from=ffmpeg /ffmpeg /usr/local/bin/
     COPY --from=ffmpeg /ffprobe /usr/local/bin/
 
-FROM dependencies as dependencies_test
+FROM dependencies AS dependencies_test
     RUN pip install --no-cache-dir -e '.[test]' -t /site-packages
 
-FROM dependencies as code
+FROM dependencies AS code
     COPY main.py .
     COPY lib ./lib
 
-FROM code as test
+FROM code AS test
     COPY --from=dependencies_test /site-packages /site-packages
     COPY tests ./tests
     RUN python3 -m mypy .
     RUN python3 -m pytest
 
-FROM code as production
-    ENTRYPOINT [ \
-        "python3", "main.py", \
-        "--source", "/media/source", \
-        "--processed", "/media/processed" \
-        "--log-file", "/logs/processmedia3.log" \
-    ]
+FROM code AS production
+    ENTRYPOINT [ "python3", "main.py", "--source", "/media/source", "--processed", "/media/processed", "--log-file", "/logs/processmedia3.log" ]
     CMD ["all", "--loop", "600"]
