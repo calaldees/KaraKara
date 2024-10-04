@@ -11,7 +11,7 @@ FROM python:${PYTHON_VERSION}-alpine AS dependencies
     VOLUME /media/processed
 
     RUN apk add --no-cache \
-        imagemagick
+        imagemagick imagemagick-jpeg imagemagick-webp
 
     COPY ./pyproject.toml ./
     RUN pip install --no-cache-dir -e . -t /site-packages

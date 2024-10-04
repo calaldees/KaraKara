@@ -179,6 +179,9 @@ class Target:
         with tempfile.TemporaryDirectory() as tempdir:
             temppath = Path(tempdir) / ("out." + self.encoder.ext)
             self.encoder.encode(temppath, self.sources)
+            if not temppath.exists():
+                log.error(f"Encoder failed to create {temppath}")
+                return
             self.path.parent.mkdir(exist_ok=True)
             log.debug(f"Moving {temppath} to {self.path}")
             shutil.move(temppath.as_posix(), self.path.as_posix())
