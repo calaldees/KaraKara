@@ -94,7 +94,7 @@ services:
         volumes:
             - ${PWD}/media:/var/syncthing
         ports:
-            - 127.0.0.1:8085:8384 # Web UI
-            - 22085:22000/tcp # TCP file transfers
-            - 22085:22000/udp # QUIC file transfers
-            - 21085:21027/udp # Receive local discovery broadcasts
+            - 127.0.0.1:8384:8384 # Web UI
+            - 22000:22000/tcp # TCP file transfers
+            - 22000:22000/udp # QUIC file transfers
+            - 21027:21027/udp # Receive local discovery broadcasts
