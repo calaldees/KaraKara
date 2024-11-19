@@ -245,7 +245,7 @@ class Track:
         tags["aspect_ratio"] = [pxsrc.aspectratio()]
 
         if tags.get("date"):
-            tags["year"] = [datetime.fromisoformat(tags["date"][0]).strftime("%Y")]
+            tags["year"] = [d.split("-")[0] for d in tags["date"]]
 
         return {
             "id": self.id,
