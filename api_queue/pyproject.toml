@@ -9,6 +9,7 @@ dependencies = [
 	"ujson ~= 5.9",
 	"aiomqtt ~= 2.0",
 	"pytimeparse ~= 1.1",
+	"setuptools ~= 75.5",
 ]
 
 [project.optional-dependencies]
