@@ -246,8 +246,8 @@ class Track:
 
         updated_ts = max([s.path.stat().st_mtime for s in self.sources])
         tags["updated"] = [datetime.fromtimestamp(updated_ts).strftime("%Y-%m-%d")]
-        if updated_ts > (datetime.now() - timedelta(days=365)).timestamp():
-            tags["category"].append("new")
+        #if updated_ts > (datetime.now() - timedelta(days=365)).timestamp():
+        #    tags["category"].append("new")
 
         return {
             "id": self.id,
