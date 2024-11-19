@@ -10,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Set, Tuple, TypeVar
 from fractions import Fraction
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
@@ -231,6 +231,7 @@ class Track:
         tag_files = self._sources_by_type({SourceType.TAGS})
         tags = tag_files[0].tags()
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
+        assert tags.get("category") is not None, f"{self.id} is missing tags.category"
 
         if self._sources_by_type({SourceType.SUBTITLES}):
             tags["subs"] = ["soft"]
@@ -245,6 +246,8 @@ class Track:
 
         updated_ts = max([s.path.stat().st_mtime for s in self.sources])
         tags["updated"] = [datetime.fromtimestamp(updated_ts).strftime("%Y-%m-%d")]
+        if updated_ts > (datetime.now() - timedelta(days=365)).timestamp():
+            tags["category"].append("new")
 
         return {
             "id": self.id,
