@@ -4,6 +4,7 @@ import tempfile
 from functools import partialmethod
 from pathlib import Path
 import unittest
+from datetime import datetime
 
 import main
 from lib.kktypes import SourceType, TargetType
@@ -69,6 +70,7 @@ class TestE2E(unittest.TestCase):
                     "contributor": ["ここにいくつかのテキストです。"],
                     "from": ["test series T"],
                     "title": ["Test1"],
+                    "updated": [datetime.now().strftime("%Y-%m-%d")],
                 },
             }.items():
                 self.assertEqual(v, tracks_json["test1"][k])
@@ -90,6 +92,7 @@ class TestE2E(unittest.TestCase):
                     "from": ["gundam"],
                     "gundam": ["gundam seed"],
                     "title": ["Test2"],
+                    "updated": [datetime.fromtimestamp(time()).strftime("%Y-%m-%d")],
                 },
             }.items():
                 self.assertEqual(v, tracks_json["test2"][k])
