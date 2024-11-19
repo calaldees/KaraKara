@@ -63,7 +63,9 @@ class TestE2E(unittest.TestCase):
                 "id": "test1",
                 "lyrics": ["Red", "Green", "Blue"],
                 "tags": {
-                    "": ["ar-4-3", "src-video", "subs-soft"],
+                    "aspect_ratio": ["4:3"],
+                    "source_type": ["video"],
+                    "subs": ["soft"],
                     "artist": ["Artipie"],
                     "category": ["anime"],
                     "contributor": ["ここにいくつかのテキストです。"],
@@ -83,7 +85,9 @@ class TestE2E(unittest.TestCase):
                 "id": "test2",
                 "lyrics": ["AA", "EE"],
                 "tags": {
-                    "": ["ar-8-5", "src-image", "subs-soft"],
+                    "aspect_ratio": ["8:5"],
+                    "source_type": ["image"],
+                    "subs": ["soft"],
                     "artist": ["Mr Monkey"],
                     "category": ["anime"],
                     "contributor": ["contributor", "ここにいくつかのテキストです。"],

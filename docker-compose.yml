@@ -78,3 +78,23 @@ services:
             - logs:/logs
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_processed}:/media/processed:rw
+
+    syncthing:
+        profiles:
+            - syncthing
+        image: syncthing/syncthing
+        restart: unless-stopped
+        mem_limit: 1g
+        cpu_count: 1
+        hostname: karakara
+        environment:
+            PUID: 1002
+            PGID: 1003
+            UMASK: 002
+        volumes:
+            - ${PWD}/media:/var/syncthing
+        ports:
+            - 127.0.0.1:8384:8384 # Web UI
+            - 22000:22000/tcp # TCP file transfers
+            - 22000:22000/udp # QUIC file transfers
+            - 21027:21027/udp # Receive local discovery broadcasts

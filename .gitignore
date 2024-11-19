@@ -1,13 +1,15 @@
-/.env
-/.venv
-/venv
+**/.env
+**/.venv
+**/venv
+**/_env
+
 **/.DS_Store
+/media
 
 **/*.py[oc]
 **/__pycache__
 **/.pytest_cache
 **/*.egg-info
-**/_env
 
 **/coverage
 
