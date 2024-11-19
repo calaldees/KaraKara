@@ -246,6 +246,9 @@ class Track:
         updated_ts = max([s.path.stat().st_mtime for s in self.sources])
         tags["updated"] = [datetime.fromtimestamp(updated_ts).strftime("%Y-%m-%d")]
 
+        updated_ts = max([s.path.stat().st_mtime for s in self.sources])
+        tags["updated"] = [datetime.fromtimestamp(updated_ts).strftime("%Y-%m-%d")]
+
         return {
             "id": self.id,
             "duration": round(duration, 1),  # for more consistent unit tests
