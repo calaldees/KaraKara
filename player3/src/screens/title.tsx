@@ -70,9 +70,9 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
 
 function getNiceTracks(tracks: Record<string, Track>, n: number) {
     return Object.values(tracks)
-        .filter((track) => track.tags[""]?.includes("subs-soft"))
-        .filter((track) => track.tags[""]?.includes("ar-16-9"))
-        .filter((track) => track.tags[""]?.includes("src-image"))
+        .filter((track) => track.tags["subs"]?.includes("soft"))
+        .filter((track) => track.tags["aspect_ratio"]?.includes("16:9"))
+        .filter((track) => track.tags["source_type"]?.includes("image"))
         .filter((track) => track.tags["vocaltrack"]?.includes("on"))
         .slice(0, n);
 }

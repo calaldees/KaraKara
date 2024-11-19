@@ -231,20 +231,16 @@ class Track:
         tags = tag_files[0].tags()
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
 
-        autotags = []
         if self._sources_by_type({SourceType.SUBTITLES}):
-            autotags.append("subs-soft")
+            tags["subs"] = ["soft"]
         else:
-            autotags.append("subs-hard")
+            tags["subs"] = ["hard"]
         if self._sources_by_type({SourceType.IMAGE}):
-            autotags.append("src-image")
+            tags["source_type"] = ["image"]
         if self._sources_by_type({SourceType.VIDEO}):
-            autotags.append("src-video")
+            tags["source_type"] = ["video"]
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
-        autotags.append("ar-" + pxsrc.aspectratio().replace(":", "-"))
-        if "" not in tags:
-            tags[""] = []
-        tags[""] = sorted(set(tags[""]) | set(autotags))
+        tags["aspect_ratio"] = [pxsrc.aspectratio()]
 
         return {
             "id": self.id,
