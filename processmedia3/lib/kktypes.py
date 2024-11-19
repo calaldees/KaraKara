@@ -10,6 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Set, Tuple, TypeVar
 from fractions import Fraction
+from datetime import datetime
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
@@ -241,6 +242,9 @@ class Track:
             tags["source_type"] = ["video"]
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
         tags["aspect_ratio"] = [pxsrc.aspectratio()]
+
+        updated_ts = max([s.path.stat().st_mtime for s in self.sources])
+        tags["updated"] = [datetime.fromtimestamp(updated_ts).strftime("%Y-%m-%d")]
 
         return {
             "id": self.id,
