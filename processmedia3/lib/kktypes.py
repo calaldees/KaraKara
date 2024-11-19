@@ -244,7 +244,7 @@ class Track:
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
         tags["aspect_ratio"] = [pxsrc.aspectratio()]
 
-        if tags["date"]:
+        if tags.get("date"):
             tags["year"] = [datetime.fromisoformat(tags["date"][0]).strftime("%Y")]
 
         return {
