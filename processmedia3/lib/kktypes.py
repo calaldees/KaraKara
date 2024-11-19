@@ -244,11 +244,6 @@ class Track:
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
         tags["aspect_ratio"] = [pxsrc.aspectratio()]
 
-        updated_ts = max([s.path.stat().st_mtime for s in self.sources])
-        tags["updated"] = [datetime.fromtimestamp(updated_ts).strftime("%Y-%m-%d")]
-        #if updated_ts > (datetime.now() - timedelta(days=365)).timestamp():
-        #    tags["category"].append("new")
-
         return {
             "id": self.id,
             "duration": round(duration, 1),  # for more consistent unit tests
