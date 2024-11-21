@@ -237,10 +237,11 @@ class Track:
             tags["subs"] = ["soft"]
         else:
             tags["subs"] = ["hard"]
+        tags["source_type"] = []
         if self._sources_by_type({SourceType.IMAGE}):
-            tags["source_type"] = ["image"]
+            tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
-            tags["source_type"] = ["video"]
+            tags["source_type"].append("video")
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
         tags["aspect_ratio"] = [pxsrc.aspectratio()]
 
