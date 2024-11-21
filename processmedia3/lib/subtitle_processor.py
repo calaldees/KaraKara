@@ -513,22 +513,34 @@ def create_vtt(subtitles):
         #   active: ...
         #   next: verse 2
         if gap > BIG_GAP:
-            padded_lines.append(
-                Subtitle(
-                    start=last_end,
-                    end=line.start - BIG_GAP_PREVIEW,
-                    text="[...]",
-                    top=line.top,
+            # big gap at the start
+            if last_end == timedelta(0):
+                padded_lines.append(
+                    Subtitle(
+                        start=line.start - BIG_GAP_PREVIEW,
+                        end=line.start,
+                        text="",
+                        top=line.top,
+                    )
                 )
-            )
-            padded_lines.append(
-                Subtitle(
-                    start=line.start - BIG_GAP_PREVIEW,
-                    end=line.start,
-                    text="[...]",
-                    top=line.top,
+            # big gap in the middle
+            else:
+                padded_lines.append(
+                    Subtitle(
+                        start=last_end,
+                        end=line.start - BIG_GAP_PREVIEW,
+                        text="[...]",
+                        top=line.top,
+                    )
                 )
-            )
+                padded_lines.append(
+                    Subtitle(
+                        start=line.start - BIG_GAP_PREVIEW,
+                        end=line.start,
+                        text="[...]",
+                        top=line.top,
+                    )
+                )
 
         # If there is a short gap between line 1 and 2, add a
         # zero-length subtitle 1.1 showing the line 2's text, so
