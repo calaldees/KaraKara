@@ -525,22 +525,27 @@ def create_vtt(subtitles):
                 )
             # big gap in the middle
             else:
-                padded_lines.append(
-                    Subtitle(
-                        start=last_end,
-                        end=line.start - BIG_GAP_PREVIEW,
-                        text="[...]",
-                        top=line.top,
+                parts = 50
+                for n in range(0, parts):
+                    g1 = "&nbsp;" * n
+                    g2 = "&nbsp;" * (parts - n)
+                    padded_lines.append(
+                        Subtitle(
+                            start=last_end + (gap/parts) * n,
+                            end=last_end + (gap/parts) * (n+1),
+                            text=f"[ {g1}♫{g2} ]",
+                            top=line.top,
+                        )
                     )
-                )
-                padded_lines.append(
-                    Subtitle(
-                        start=line.start - BIG_GAP_PREVIEW,
-                        end=line.start,
-                        text="[...]",
-                        top=line.top,
-                    )
-                )
+                    if n < parts:
+                        padded_lines.append(
+                            Subtitle(
+                                start=last_end + (gap/parts) * (n+1),
+                                end=last_end + (gap/parts) * (n+1),
+                                text=line.text,
+                                top=line.top,
+                            )
+                        )
 
         # If there is a short gap between line 1 and 2, add a
         # zero-length subtitle 1.1 showing the line 2's text, so
