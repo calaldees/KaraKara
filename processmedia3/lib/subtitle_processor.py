@@ -500,20 +500,15 @@ def create_vtt(subtitles):
 
     last_end = timedelta(0)
     padded_lines = []
+    # Turn each line of source text into one or more lines of output text
+    # by inserting blank lines or progress bars as needed
     for line in subtitles:
         gap = line.start - last_end
-        # if there is a big gap, then insert an explicit blank
-        # subtitle entry, so that the end of verse 1 shows
-        #
-        #   active: final line of verse 1
-        #   next: ...
-        #
-        # and then shortly before verse 2 begins we show
-        #
-        #   active: ...
-        #   next: verse 2
         if gap > BIG_GAP:
-            # big gap at the start
+            # If there is a big gap at the start of the track, show nothing
+            # until {first line time - $PREVIEW} seconds. At that point, show
+            # a blank string as "active" (which causes the first line of the
+            # lyrics to be shown as "next")
             if last_end == timedelta(0):
                 padded_lines.append(
                     Subtitle(
@@ -523,7 +518,21 @@ def create_vtt(subtitles):
                         top=line.top,
                     )
                 )
-            # big gap in the middle
+            # If there is a big gap in the middle of the track, show a
+            # progress bar. Progress bars are made out of pairs of
+            #
+            #   [   ♫      ]
+            #   {first line of next verse}
+            #   [     ♫    ]
+            #   {first line of next verse}
+            #   [       ♫  ]
+            #   {first line of next verse}
+            #
+            # where the "first line of next verse" is set to be zero-length,
+            # so that what actually appears on screen is:
+            #
+            #   active: [   ♫      ]               <-- animated
+            #   next: {first line of next verse}   <-- never actually shown as "active"
             else:
                 parts = 50
                 for n in range(0, parts):
@@ -537,28 +546,37 @@ def create_vtt(subtitles):
                             top=line.top,
                         )
                     )
-                    if n < parts:
-                        padded_lines.append(
-                            Subtitle(
-                                start=last_end + (gap/parts) * (n+1),
-                                end=last_end + (gap/parts) * (n+1),
-                                text=line.text,
-                                top=line.top,
-                            )
+                    padded_lines.append(
+                        Subtitle(
+                            start=last_end + (gap/parts) * (n+1),
+                            end=last_end + (gap/parts) * (n+1),
+                            text=line.text,
+                            top=line.top,
                         )
+                    )
 
-        # If there is a short gap between line 1 and 2, add a
-        # zero-length subtitle 1.1 showing the line 2's text, so
-        # that line 1 shows "next: line 2", and then insert a
-        # gap-length subtitle 1.2 with empty text so that during
-        # the gap we see "active: blank / next: line 2", ie the
-        # end result being:
+        # If there is a short gap between line 1 and 2, eg:
+        #
+        #     1.0: 00:00 -> 00:02 line 1
+        #     2.0: 00:04 -> 00:06 line 2
+        #
+        # we output:
+        #
+        #     1.0: 00:00 -> 00:02 line 1
+        #     1.1: 00:02 -> 00:02 line 2
+        #     1.2: 00:02 -> 00:04
+        #     2.0: 00:04 -> 00:06 line 2
+        #
+        # the end result being:
         #
         #   active: line 1
-        #   next: line 2
+        #   next: line 2       <-- the zero-length line2 shows as "next",
+        #                          even though what's actually next is a
+        #                          blank space
         #
-        #   active:
-        #   next: line 2
+        #   active:            <-- the gap-length blank line shows as "active"
+        #   next: line 2           so that line2 is shown as "next", as opposed
+        #                          to showing nothing when there is a gap
         #
         #   active: line 2
         #   next: line 3
@@ -581,23 +599,38 @@ def create_vtt(subtitles):
             )
         padded_lines.append(line)
         last_end = line.end
+
+    # Add one final blank line because we render in (active line, next line)
+    # pairs, and the final line of the lyrics needs to have a "next line" in
+    # order to render properly
     padded_lines.append(Subtitle(start=last_end, end=last_end, text=""))
 
-    # strip out all the zero-length subtitle blocks we inserted earlier
-    index = 0
-    blocks = []
-    for (subtitle1, subtitle2) in zip(padded_lines[:-1], padded_lines[1:]):
-        if(subtitle1.start != subtitle1.end):
-            index += 1
-            blocks.append(VTT_FORMAT.format(
-                index=index,
-                start=_vtt_time(subtitle1.start),
-                end=_vtt_time(subtitle1.end),
-                format=" line:1" if subtitle1.top else "",
-                active=subtitle1.text,
-                next=subtitle2.text,
-            ))
+    # Turn the list of lines into a list of (active line, next line) pairs
+    #
+    # Skip the zero-length "active" lines - these placeholders are only added
+    # so that the "next" text will show something useful (the next line of the
+    # lyrics) as opposed to showing what is literally next (a blank space or
+    # a progress bar)
+    pairs = [
+        (active, next)
+        for (active, next)
+        in zip(padded_lines[:-1], padded_lines[1:])
+        if active.start != active.end
+    ]
 
+    # Turn the list of (active line, next line) pairs into VTT-formated strings
+    blocks = [
+        VTT_FORMAT.format(
+            index=index,
+            start=_vtt_time(active.start),
+            end=_vtt_time(active.end),
+            format=" line:1" if active.top else "",
+            active=active.text,
+            next=next.text,
+        )
+        for index, (active, next)
+        in enumerate(pairs, start=1)
+    ]
     return "WEBVTT - KaraKara Subtitle\n\n" + "".join(blocks)
 
 
