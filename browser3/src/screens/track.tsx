@@ -8,7 +8,17 @@ import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 
-const BLOCKED_KEYS = [null, "null", "", "title", "from", "source_type", "subs", "aspect_ratio", "date"];
+const BLOCKED_KEYS = [
+    null,
+    "null",
+    "",
+    "title",
+    "from",
+    "source_type",
+    "subs",
+    "aspect_ratio",
+    "date",
+];
 enum TrackAction {
     NONE = 0,
     ENQUEUE = 1,
