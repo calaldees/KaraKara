@@ -191,7 +191,7 @@ function Bookmarks({
 }) {
     const visibleTrackIDs = useMemo(
         () => trackList.map((track) => track.id),
-        [trackList]
+        [trackList],
     );
     return (
         <div>
@@ -312,7 +312,11 @@ function Explorer(): React.ReactElement {
 
             {/* If no filters, show bookmarks */}
             {bookmarks.length > 0 && filters.length === 0 && search === "" && (
-                <Bookmarks bookmarks={bookmarks} tracks={tracks} trackList={trackList} />
+                <Bookmarks
+                    bookmarks={bookmarks}
+                    tracks={tracks}
+                    trackList={trackList}
+                />
             )}
         </>
     );
