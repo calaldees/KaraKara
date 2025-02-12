@@ -38,7 +38,7 @@
     "typescript": "^5.5.4",
     "vite": "^4.5.9",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-pwa": "^0.14.7",
+    "vite-plugin-pwa": "^0.21.1",
     "vitest": "^0.29.7"
   }
 }
