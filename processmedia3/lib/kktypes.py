@@ -198,11 +198,11 @@ class Track:
     def __init__(
         self,
         processed_dir: Path,
-        basename: str,
+        id: str,
         sources: List[Source],
         target_types: List[TargetType],
     ) -> None:
-        self.id = re.sub("[^0-9a-zA-Z]+", "_", basename)
+        self.id = id
         self.sources = sources
         self.targets = [Target(processed_dir, type, sources) for type in target_types]
 

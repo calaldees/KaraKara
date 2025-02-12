@@ -10,6 +10,7 @@ import logging.handlers
 import math
 import os
 import pickle
+import re
 import sys
 import time
 import csv
@@ -69,9 +70,9 @@ def scan(
       - eg "x/x53t4dg.webm", "6/6sbh34s.mp4"
     """
 
-    # Get a list of source files grouped by basename, eg
+    # Get a list of source files grouped by Track ID, eg
     # {
-    #   "My Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
+    #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
     #   ...
     # }
     grouped = defaultdict(list)
@@ -80,23 +81,23 @@ def scan(
         if any((i in posix) for i in SCAN_IGNORE):
             continue
         if path.is_file() and (match is None or match in path.stem):
-            grouped[path.stem].append(path)
+            grouped[re.sub("[^0-9a-zA-Z]+", "_", path.stem.title())].append(path)
     groups = sorted(grouped.items())
 
     # Turn all the (basename, list of filenames) tuples into a
     # list of Tracks (log en error and return None if we can't
     # figure out how to turn these files into a valid Track)
     def _load_track(group: Tuple[str, List[Path]]) -> Optional[Track]:
-        (basename, paths) = group
+        (track_id, paths) = group
         try:
             sources = []
             for path in paths:
                 source = Source(source_dir, path, cache)
                 source.hash()  # force hashing now
                 sources.append(source)
-            return Track(processed_dir, basename, sources, TARGET_TYPES)
+            return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
-            log.exception(f"Error calculating track {basename}")
+            log.exception(f"Error calculating track {track_id}")
             return None
 
     maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")

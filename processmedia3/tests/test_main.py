@@ -32,14 +32,14 @@ class TestE2E(unittest.TestCase):
             # Scan should detect source files for two tracks
             tracks = main.scan(Path("./tests/source"), processed, None, {})
 
-            self.assertEqual("test1", tracks[0].id)
+            self.assertEqual("Test1", tracks[0].id)
             self.assertEqual(
                 {SourceType.TAGS, SourceType.VIDEO, SourceType.SUBTITLES},
                 {s.type for s in tracks[0].sources},
             )
             self.assertEqual(TargetType.VIDEO_H264, tracks[0].targets[0].type)
             self.assertEqual("DrH2SWWHaOW", tracks[0].targets[0].path.stem)
-            self.assertEqual("test2", tracks[1].id)
+            self.assertEqual("Test2", tracks[1].id)
 
             # Encode should generate output video
             main.encode(tracks)
@@ -61,7 +61,7 @@ class TestE2E(unittest.TestCase):
                     "video": [{"mime": "video/mp4", "path": "d/DrH2SWWHaOW.mp4"}],
                 },
                 "duration": 30.0,
-                "id": "test1",
+                "id": "Test1",
                 "lyrics": ["Red", "Green", "Blue"],
                 "tags": {
                     "aspect_ratio": ["4:3"],
@@ -74,7 +74,7 @@ class TestE2E(unittest.TestCase):
                     "title": ["Test1"],
                 },
             }.items():
-                self.assertEqual(v, tracks_json["test1"][k])
+                self.assertEqual(v, tracks_json["Test1"][k])
             for k, v in {
                 "attachments": {
                     "image": [{"mime": "image/webp", "path": "r/Rck_Khyvlnb.webp"}],
@@ -83,7 +83,7 @@ class TestE2E(unittest.TestCase):
                     "video": [{"mime": "video/mp4", "path": "v/vgO9puzSJ60.mp4"}],
                 },
                 "duration": 15.0,
-                "id": "test2",
+                "id": "Test2",
                 "lyrics": ["AA", "EE"],
                 "tags": {
                     "aspect_ratio": ["8:5"],
@@ -97,7 +97,7 @@ class TestE2E(unittest.TestCase):
                     "title": ["Test2"],
                 },
             }.items():
-                self.assertEqual(v, tracks_json["test2"][k])
+                self.assertEqual(v, tracks_json["Test2"][k])
 
             # Cleanup should leave expected tracks alone
             main.cleanup(processed, tracks, True)
