@@ -30,7 +30,7 @@ Login
      |   \- Queue (if user) / Control (if admin)
      |- Queue (if user) / Control (if admin)
      |- Settings (admin only)
-     \- Tracklist (admin only)
+     \- QR Code (admin only)
 
 ```
 
@@ -39,7 +39,7 @@ Login
 Depending on whether you prefer Docker or Node:
 ```
 docker build -t kk-browser3 .
-docker run --rm -p 1234:80 -ti kk-browser3
+docker run --rm -p 1236:80 -ti kk-browser3
 ```
 or
 ```
@@ -47,13 +47,10 @@ npm install
 npm run serve
 ```
 
-And then visit the browser at `http://localhost:1234/`
+And then visit the browser at `http://localhost:1236/`
 
 With `npm run serve`, files will automatically get rebuilt and
 hot-reloaded, no need to even hit refresh in the browser :)
-
-After double-clicking any title to get to the app settings, click on
-"Settings" to write out the current state to the debug console.
 
 Unit tests for the more processing-heavy parts of the code can
 be run with:
