@@ -143,6 +143,8 @@ def lint(tracks: List[Track]) -> None:
                 print(f"{t.friendly} missing (Sources: {[s.friendly for s in t.sources]!r})")
         for s in track.sources:
             if s.type == SourceType.SUBTITLES:
+                ls = s.subtitles()
+
                 # Check for weird stuff at the file level
                 if len(ls) == 0:
                     writer.writerow([s.friendly, 0, "no subtitles", 0, ""])
@@ -158,7 +160,6 @@ def lint(tracks: List[Track]) -> None:
                 # separate out the top and bottom lines because they may have
                 # different timing and we only care about timing glitches
                 # within the same area of the screen
-                ls = s.subtitles()
                 toplines = [l for l in ls if l.top]
                 botlines = [l for l in ls if not l.top]
                 for ls in [toplines, botlines]:
