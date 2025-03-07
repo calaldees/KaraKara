@@ -59,7 +59,7 @@ export function ClientProvider(props: any) {
     );
     const [underscan, setUnderscan] = useLocalStorage<string>(
         "underscan",
-        "0em",
+        "0em 0em",
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [podium, setPodium] = useState<boolean>(false);

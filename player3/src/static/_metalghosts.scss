@@ -112,7 +112,9 @@ VIDEO {
 		display: grid;
 		gap: 2vh;
 		overflow: hidden;
-		border: var(--underscan) solid black;
+		border-width: var(--underscan);
+		border-style: solid;
+		border-color: black;
 
 		#join_info, #event_info {
 			@include radial;
