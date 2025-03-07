@@ -19,6 +19,8 @@ export type ClientContextType = {
     setFullscreen: (b: boolean) => void;
     setNotification: (n: any) => void;
     wakeLock: string;
+    underscan: string;
+    setUnderscan: (n: string) => void;
 };
 
 export const ClientContext = React.createContext<ClientContextType>({
@@ -38,6 +40,8 @@ export const ClientContext = React.createContext<ClientContextType>({
     setFullscreen: (x) => null,
     setNotification: (x) => null,
     wakeLock: "",
+    underscan: "0em",
+    setUnderscan: (x) => null,
 });
 
 export function ClientProvider(props: any) {
@@ -52,6 +56,10 @@ export function ClientProvider(props: any) {
     const [roomPassword, setRoomPassword] = useLocalStorage<string>(
         "room_password",
         "",
+    );
+    const [underscan, setUnderscan] = useLocalStorage<string>(
+        "underscan",
+        "0em",
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [podium, setPodium] = useState<boolean>(false);
@@ -96,6 +104,8 @@ export function ClientProvider(props: any) {
                 setFullscreen,
                 setNotification,
                 wakeLock,
+                underscan,
+                setUnderscan,
             }}
         >
             {props.children}

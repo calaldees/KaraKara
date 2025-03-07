@@ -112,6 +112,7 @@ VIDEO {
 		display: grid;
 		gap: 2vh;
 		overflow: hidden;
+		border: var(--underscan) solid black;
 
 		#join_info, #event_info {
 			@include radial;
@@ -309,7 +310,7 @@ VIDEO {
 				align-self: center;
 				SPAN {
 					color: #aa0;
-				}	
+				}
 			}
 		}
 
@@ -322,7 +323,7 @@ VIDEO {
 			width: 100%;
 			height: 100%;
 		}
-	
+
 		/*---------------------------------------------------------------------------*/
 		/* 4:3 tweaks */
 		/* Draw a line between 16/10 (widescreen) and 16/12 (4:3) - by default we */
@@ -351,7 +352,7 @@ VIDEO {
 		VIDEO {
 			grid-area: video;
 			width: 100%;
-			height: 100vh;
+			height: 100%;
 		}
 
 		.pimp {
@@ -409,7 +410,8 @@ VIDEO {
 				top: 15vh;
 			}
 			VIDEO {
-				height: 76vh;
+			    width: 100%;
+				height: 100%;
 			}
 			@keyframes fadeout {
 				0% {opacity: 1.0;}

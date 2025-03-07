@@ -83,7 +83,10 @@ export function mqtt_url(root: string): string {
  */
 export function short_date(long_date: string): string {
     const date = new Date(long_date);
-    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
 }
 
 export function is_my_song(
