@@ -51,8 +51,10 @@ export function JoinInfo() {
     const { root } = useContext(ClientContext);
     return (
         <div id="join_info">
-            Join at <strong>{root.replace("https://", "")}</strong> - Room Name
-            is <strong>{roomName}</strong>
+            <span>
+                Join at <strong>{root.replace("https://", "")}</strong> -
+                Room Name is <strong>{roomName}</strong>
+            </span>
         </div>
     );
 }
