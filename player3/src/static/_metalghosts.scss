@@ -314,14 +314,22 @@ VIDEO {
 			}
 		}
 
-		VIDEO {
+		.videoScaler {
 			grid-area: video;
-			@include border;
 			animation-name: slideleft;
 			animation-duration: 1s;
 			animation-delay: 0.0s;
 			width: 100%;
 			height: 100%;
+			position: relative;
+			VIDEO {
+				@include border;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
 		}
 
 		/*---------------------------------------------------------------------------*/
@@ -349,11 +357,16 @@ VIDEO {
 		#join_info, #event_info {
 			display: none;
 		}
-		VIDEO {
-			grid-area: video;
-			width: 100%;
-			height: 100%;
-			max-height: calc(100vh - 2 * var(--underscan));
+		.videoScaler {
+		    grid-area: video;
+    		width: 100%;
+    		height: 100%;
+            position: relative;
+    		VIDEO {
+       			position: absolute;
+                width: 100%;
+                height: 100%;
+    		}
 		}
 
 		.pimp {
@@ -409,9 +422,6 @@ VIDEO {
 			}
 			#pimpsong {
 				top: 15vh;
-			}
-			VIDEO {
-				max-height: calc(76vh - 2 * var(--underscan));
 			}
 			@keyframes fadeout {
 				0% {opacity: 1.0;}
