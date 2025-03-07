@@ -353,6 +353,7 @@ VIDEO {
 			grid-area: video;
 			width: 100%;
 			height: 100%;
+			max-height: calc(100vh - 2 * var(--underscan));
 		}
 
 		.pimp {
@@ -410,8 +411,7 @@ VIDEO {
 				top: 15vh;
 			}
 			VIDEO {
-			    width: 100%;
-				height: 100%;
+				max-height: calc(76vh - 2 * var(--underscan));
 			}
 			@keyframes fadeout {
 				0% {opacity: 1.0;}
