@@ -211,7 +211,7 @@ function MyScene() {
             </group>
             <group
                 ref={text1}
-                position={[-3, 2.5, -5]}
+                position={[-3, 2, -5]}
                 onUpdate={(self) => self.lookAt(0, 0, 0)}
             >
                 <Html transform>
