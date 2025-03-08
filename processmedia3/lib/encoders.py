@@ -3,7 +3,7 @@ import logging
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Optional
+from typing import List, Set, Tuple, Optional
 import tqdm
 import re
 
@@ -26,11 +26,11 @@ NORMALIZE_AUDIO = ["-af", "loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1", "-ac", "2
 
 CONTINER_MP4 = ["-movflags", "faststart"]
 
-VCODEC_AV1 = ["-vcodec", "libsvtav1", "-pix_fmt", "yuv420p10le"]
+VCODEC_AV1 = ["-vcodec", "libsvtav1", "-pix_fmt", "yuv420p10le", "-fpsmax", "30"]
 # tag hvc1 needed for apple software to understand it
-VCODEC_H265 = ["-vcodec", "libx265", "-tag:v", "hvc1"]
+VCODEC_H265 = ["-vcodec", "libx265", "-tag:v", "hvc1", "-fpsmax", "30"]
 # yuv420p needed for apple software to understand it
-VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p"]
+VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p", "-fpsmax", "30"]
 
 ACODEC_OPUS = ["-acodec", "libopus"]
 ACODEC_AAC = ["-acodec", "aac"]
