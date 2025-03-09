@@ -571,6 +571,9 @@ MAIN.queue ARTICLE {
       text-align: center;
       padding: 1em;
     }
+    &.public {
+      background: var(--notification-warning);
+    }
     SPAN.lyrics {
       font-weight: normal;
     }

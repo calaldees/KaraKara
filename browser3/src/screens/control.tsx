@@ -145,7 +145,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
     return (
         <section>
             <ul onDragLeave={(e) => onDragLeave(e)}>
-                {queue.map((item) => (
+                {queue.map((item, n) => (
                     <li
                         data-item-id={item.id}
                         key={item.id}
@@ -153,6 +153,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                             queue_item: true,
                             drop_source: dropSource === item.id,
                             drop_target: dropTarget === item.id,
+                            public: !booth && n <= 5
                         })}
                         draggable={true}
                         onDragStart={(e) => onDragStart(e, item.id)}
