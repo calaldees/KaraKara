@@ -245,6 +245,10 @@ class Track:
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
         tags["aspect_ratio"] = [pxsrc.aspectratio()]
 
+        ausrc = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})[0]
+        d = int(ausrc.duration())
+        tags["duration"] = [f"{d//60}m{d%60:02}s"]
+
         if tags.get("date"):
             tags["year"] = [d.split("-")[0] for d in tags["date"]]
 
