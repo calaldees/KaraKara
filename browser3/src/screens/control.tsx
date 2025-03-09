@@ -236,17 +236,17 @@ function ProgressBar({ queue, startDateTime, endDateTime }: { queue: QueueItem[]
         <div className="progress_bar">
             <div
                 className="played"
-                style={{ width: `${Math.floor(current / end * 100)}%` }}
+                style={{ width: `${current / end * 100}%` }}
                 title={`Played until ${new Date(start + current).toLocaleString()}`}
             />
             <div
                 className="queued"
-                style={{ width: `${Math.floor((queue_end - current) / end * 100)}%` }}
+                style={{ width: `${(queue_end - current) / end * 100}%` }}
                 title={`Queued until ${new Date(start + queue_end).toLocaleString()}`}
             />
             <div
                 className="space"
-                style={{ width: `${Math.floor((end - queue_end) / end * 100)}%` }}
+                style={{ width: `${(end - queue_end) / end * 100}%` }}
                 title={`Remaining time ${Math.floor((end - queue_end) / 60000)} minutes`}
             />
         </div>
