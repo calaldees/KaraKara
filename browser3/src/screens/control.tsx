@@ -10,7 +10,8 @@ import { useParams } from "react-router-dom";
 
 function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
     const { tracks, now } = useContext(ServerContext);
-    const { setQueue } = useContext(RoomContext);
+    const { fullQueue, setQueue } = useContext(RoomContext);
+    const { booth } = useContext(ClientContext);
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     const { request } = useApi();
@@ -123,6 +124,24 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
         });
     }
 
+    function airtime_text(performer_name: string, queue_item_id: number) {
+        let n = 0;
+        let airtime = 0;
+        for (let i = 0; i < fullQueue.length; i++) {
+            if (fullQueue[i].performer_name === performer_name) {
+                n++;
+                airtime += fullQueue[i].track_duration;
+            }
+            if (fullQueue[i].id === queue_item_id) {
+                break;
+            }
+        }
+        let nth = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
+        let airtime_mins = Math.floor(airtime / 60);
+        let text = n + nth + " track" + (airtime > 0 ? ", " + airtime_mins + " mins total" : "");
+        return text;
+    }
+
     return (
         <section>
             <ul onDragLeave={(e) => onDragLeave(e)}>
@@ -161,6 +180,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                             <br />
                             <span className={"performer"}>
                                 {item.performer_name}
+                                {!booth && <> ({airtime_text(item.performer_name, item.id)})</>}
                             </span>
                         </span>
                         {item.start_time && (
