@@ -224,10 +224,39 @@ function ControlButtons(): React.ReactElement {
     );
 }
 
+function ProgressBar({ queue, startDateTime, endDateTime }: { queue: QueueItem[]; startDateTime: string; endDateTime: string }) {
+    if (!queue.length) return null;
+    let queue_last = queue[queue.length - 1];
+    if (!queue_last.start_time) return null;
+    let start = Date.parse(startDateTime);
+    let current = Date.now() - start;
+    let queue_end = (queue_last.start_time + queue_last.track_duration) * 1000 - start;
+    let end = Date.parse(endDateTime) - start;
+    return (
+        <div className="progress_bar">
+            <div
+                className="played"
+                style={{ width: `${current / end * 100}%` }}
+                title={`Played until ${new Date(start + current).toLocaleString()}`}
+            />
+            <div
+                className="queued"
+                style={{ width: `${(queue_end - current) / end * 100}%` }}
+                title={`Queued until ${new Date(start + queue_end).toLocaleString()}`}
+            />
+            <div
+                className="space"
+                style={{ width: `${(end - queue_end) / end * 100}%` }}
+                title={`Remaining time ${Math.floor((end - queue_end) / 60000)} minutes`}
+            />
+        </div>
+    );
+}
+
 export function Control(): React.ReactElement {
     const { roomName } = useParams();
     const { root, widescreen } = useContext(ClientContext);
-    const { queue } = useContext(RoomContext);
+    const { queue, fullQueue, settings } = useContext(RoomContext);
 
     return (
         <Screen
@@ -261,7 +290,18 @@ export function Control(): React.ReactElement {
                     </ol>
                 </div>
             ) : (
-                <Playlist queue={queue} />
+                <>
+                    {fullQueue.length > 0
+                        && settings['validation_event_start_datetime']
+                        && settings['validation_event_end_datetime']
+                        && <ProgressBar
+                            queue={fullQueue}
+                            startDateTime={settings['validation_event_start_datetime']}
+                            endDateTime={settings['validation_event_end_datetime']}
+                        />
+                    }
+                    <Playlist queue={queue} />
+                </>
             )}
         </Screen>
     );

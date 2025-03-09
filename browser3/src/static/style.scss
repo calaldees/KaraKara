@@ -145,7 +145,7 @@ BODY {
     flex: 0 0 50%;
     max-width: 50%;
     border-left: 2px solid black;
-  }  
+  }
 }
 MAIN {
   position: fixed;
@@ -537,6 +537,24 @@ MAIN.track_details ARTICLE {
 
 /* Queue */
 MAIN.queue ARTICLE {
+  .progress_bar {
+      margin: 1em 0em 1em 0em;
+      height: 1em;
+      border: 1px solid #444;
+      DIV {
+        display: inline-block;
+        height: 100%;
+      }
+      .played {
+        background: var(--notification-error);
+      }
+      .queued {
+        background: var(--notification-warning);
+      }
+      .space {
+        background: var(--notification-ok);
+      }
+  }
   .me {
     background: var(--notification-warning);
   }
