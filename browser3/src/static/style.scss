@@ -542,6 +542,7 @@ MAIN.queue ARTICLE {
       height: 1em;
       border: 1px solid #444;
       overflow: hidden;
+      white-space: nowrap;
       DIV {
         display: inline-block;
         height: 100%;
