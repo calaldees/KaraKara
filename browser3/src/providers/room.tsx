@@ -13,6 +13,7 @@ export type RoomContextType = {
     isAdmin: boolean;
     sessionId: string;
     queue: QueueItem[];
+    fullQueue: QueueItem[];
     setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
 };
@@ -22,6 +23,7 @@ export const RoomContext = React.createContext<RoomContextType>({
     isAdmin: false,
     sessionId: "",
     queue: [],
+    fullQueue: [],
     setQueue: () => {},
     settings: {},
 });
@@ -102,6 +104,7 @@ function InternalRoomProvider(props: any) {
                 isAdmin,
                 sessionId,
                 queue,
+                fullQueue,
                 setQueue,
                 settings,
             }}
