@@ -88,6 +88,7 @@ function TestHarness(props: TestProps) {
         isAdmin: true,
         sessionId: "admin",
         queue: queue_,
+        fullQueue: queue_,
         setQueue: setQueue,
         settings: settings,
         trackList: Object.values(tracks),

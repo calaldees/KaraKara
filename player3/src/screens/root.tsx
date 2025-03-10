@@ -43,6 +43,7 @@ function Room() {
         setAudioAllowed,
         showSettings,
         setShowSettings,
+        underscan,
     } = useContext(ClientContext);
     const { now, tracks, downloadSize, downloadDone } =
         useContext(ServerContext);
@@ -95,11 +96,13 @@ function Room() {
     if (!isAdmin) errors.push("Not Admin");
     if (Object.keys(tracks).length === 0) errors.push("No Tracks");
 
+    let css = ":root {--underscan: " + underscan + ";}";
     return (
         <div
             onClick={(e) => setAudioAllowed(true)}
             onDoubleClick={(e) => setShowSettings(true)}
         >
+            <style>{css}</style>
             <main className={"theme-" + (settings["theme"] ?? "metalghosts")}>
                 {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
                 {screen}

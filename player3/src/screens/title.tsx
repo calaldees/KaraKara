@@ -43,10 +43,14 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
         const ts = Object.values(tracks);
         return {
             tracks: ts.length,
-            lines: ts.map((t) => t.lyrics.length).reduce((sum, n) => sum + n, 0),
+            lines: ts
+                .map((t) => t.lyrics.length)
+                .reduce((sum, n) => sum + n, 0),
             shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
             hours: Math.floor(
-                ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) / 60 / 60,
+                ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) /
+                    60 /
+                    60,
             ),
         };
     }, [tracks]);
@@ -198,7 +202,7 @@ function MyScene() {
                     {thumbs.map(([thumb, vid], n) => (
                         <group key={n} rotation={[0, -0.314 * n, 0]}>
                             <mesh position={[0, 0, 3.5]}>
-                                <planeGeometry args={[1, 9/16]} />
+                                <planeGeometry args={[1, 9 / 16]} />
                                 <PlaneMaterial thumb={thumb} vid={vid} />
                             </mesh>
                         </group>
@@ -207,7 +211,7 @@ function MyScene() {
             </group>
             <group
                 ref={text1}
-                position={[-3, 2.5, -5]}
+                position={[-3, 2, -5]}
                 onUpdate={(self) => self.lookAt(0, 0, 0)}
             >
                 <Html transform>

@@ -10,7 +10,8 @@ import { useParams } from "react-router-dom";
 
 function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
     const { tracks, now } = useContext(ServerContext);
-    const { setQueue } = useContext(RoomContext);
+    const { fullQueue, setQueue } = useContext(RoomContext);
+    const { booth } = useContext(ClientContext);
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     const { request } = useApi();
@@ -123,10 +124,28 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
         });
     }
 
+    function airtime_text(performer_name: string, queue_item_id: number) {
+        let n = 0;
+        let airtime = 0;
+        for (let i = 0; i < fullQueue.length; i++) {
+            if (fullQueue[i].performer_name === performer_name) {
+                n++;
+                airtime += fullQueue[i].track_duration;
+            }
+            if (fullQueue[i].id === queue_item_id) {
+                break;
+            }
+        }
+        let nth = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
+        let airtime_mins = Math.floor(airtime / 60);
+        let text = n + nth + " track, " + airtime_mins + " mins total";
+        return text;
+    }
+
     return (
         <section>
             <ul onDragLeave={(e) => onDragLeave(e)}>
-                {queue.map((item) => (
+                {queue.map((item, n) => (
                     <li
                         data-item-id={item.id}
                         key={item.id}
@@ -134,6 +153,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                             queue_item: true,
                             drop_source: dropSource === item.id,
                             drop_target: dropTarget === item.id,
+                            public: !booth && n <= 5
                         })}
                         draggable={true}
                         onDragStart={(e) => onDragStart(e, item.id)}
@@ -161,6 +181,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                             <br />
                             <span className={"performer"}>
                                 {item.performer_name}
+                                {!booth && <> ({airtime_text(item.performer_name, item.id)})</>}
                             </span>
                         </span>
                         {item.start_time && (
@@ -198,6 +219,8 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
 
 function ControlButtons(): React.ReactElement {
     const { sendCommand, loading } = useApi();
+    const { booth } = useContext(ClientContext);
+    const { queue } = useContext(RoomContext);
 
     const buttons = {
         seek_backwards: <icons.Backward />,
@@ -215,6 +238,14 @@ function ControlButtons(): React.ReactElement {
                         key={command}
                         onClick={(e) => sendCommand(command)}
                         disabled={loading}
+                        className={dict2css({
+                            blinking: (
+                                booth
+                                && command === "play"
+                                && queue.length > 0
+                                && queue[0].start_time === null
+                            ),
+                        })}
                     >
                         {icon}
                     </button>
@@ -224,10 +255,39 @@ function ControlButtons(): React.ReactElement {
     );
 }
 
+function ProgressBar({ queue, startDateTime, endDateTime }: { queue: QueueItem[]; startDateTime: string; endDateTime: string }) {
+    if (!queue.length) return null;
+    let queue_last = queue[queue.length - 1];
+    if (!queue_last.start_time) return null;
+    let start = Date.parse(startDateTime);
+    let current = Date.now() - start;
+    let queue_end = (queue_last.start_time + queue_last.track_duration) * 1000 - start;
+    let end = Date.parse(endDateTime) - start;
+    return (
+        <div className="progress_bar">
+            <div
+                className="played"
+                style={{ width: `${current / end * 100}%` }}
+                title={`Played until ${new Date(start + current).toLocaleString()}`}
+            />
+            <div
+                className="queued"
+                style={{ width: `${(queue_end - current) / end * 100}%` }}
+                title={`Queued until ${new Date(start + queue_end).toLocaleString()}`}
+            />
+            <div
+                className="space"
+                style={{ width: `${(end - queue_end) / end * 100}%` }}
+                title={`Remaining time ${Math.floor((end - queue_end) / 60000)} minutes`}
+            />
+        </div>
+    );
+}
+
 export function Control(): React.ReactElement {
     const { roomName } = useParams();
     const { root, widescreen } = useContext(ClientContext);
-    const { queue } = useContext(RoomContext);
+    const { queue, fullQueue, settings } = useContext(RoomContext);
 
     return (
         <Screen
@@ -261,7 +321,18 @@ export function Control(): React.ReactElement {
                     </ol>
                 </div>
             ) : (
-                <Playlist queue={queue} />
+                <>
+                    {fullQueue.length > 0
+                        && settings['validation_event_start_datetime']
+                        && settings['validation_event_end_datetime']
+                        && <ProgressBar
+                            queue={fullQueue}
+                            startDateTime={settings['validation_event_start_datetime']}
+                            endDateTime={settings['validation_event_end_datetime']}
+                        />
+                    }
+                    <Playlist queue={queue} />
+                </>
             )}
         </Screen>
     );

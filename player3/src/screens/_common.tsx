@@ -12,34 +12,37 @@ type VideoProps = {
 export function Video({ track, lowres, ...kwargs }: VideoProps) {
     const { root } = useContext(ClientContext);
     return (
-        <video
-            autoPlay={true}
-            poster={attachment_path(root, track.attachments.image[0])}
-            // ensure the video element gets re-created when <source> changes
-            key={track.id}
-            crossOrigin="anonymous"
-            {...kwargs}
-        >
-            {(lowres ? track.attachments.preview : track.attachments.video).map(
-                (a: Attachment) => (
+        <div className="videoScaler">
+            <video
+                autoPlay={true}
+                poster={attachment_path(root, track.attachments.image[0])}
+                // ensure the video element gets re-created when <source> changes
+                key={track.id}
+                crossOrigin="anonymous"
+                {...kwargs}
+            >
+                {(lowres
+                    ? track.attachments.preview
+                    : track.attachments.video
+                ).map((a: Attachment) => (
                     <source
                         key={a.path}
                         src={attachment_path(root, a)}
                         type={a.mime}
                     />
-                ),
-            )}
-            {track.attachments.subtitle?.map((a: Attachment) => (
-                <track
-                    key={a.path}
-                    kind="subtitles"
-                    src={attachment_path(root, a)}
-                    default={true}
-                    label="English"
-                    srcLang="en"
-                />
-            ))}
-        </video>
+                ))}
+                {track.attachments.subtitle?.map((a: Attachment) => (
+                    <track
+                        key={a.path}
+                        kind="subtitles"
+                        src={attachment_path(root, a)}
+                        default={true}
+                        label="English"
+                        srcLang="en"
+                    />
+                ))}
+            </video>
+        </div>
     );
 }
 
@@ -48,8 +51,10 @@ export function JoinInfo() {
     const { root } = useContext(ClientContext);
     return (
         <div id="join_info">
-            Join at <strong>{root.replace("https://", "")}</strong> - Room Name
-            is <strong>{roomName}</strong>
+            <span>
+                Join at <strong>{root.replace("https://", "")}</strong> -
+                Room Name is <strong>{roomName}</strong>
+            </span>
         </div>
     );
 }

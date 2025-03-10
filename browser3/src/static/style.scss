@@ -145,7 +145,7 @@ BODY {
     flex: 0 0 50%;
     max-width: 50%;
     border-left: 2px solid black;
-  }  
+  }
 }
 MAIN {
   position: fixed;
@@ -255,6 +255,14 @@ MAIN {
         }
         &:last-child {
           margin-right: 0;
+        }
+        @keyframes blink {
+		  0% {background-color: var(--button-bg);}
+		  50% {background-color: var(--notification-ok);}
+		  100% {background-color: var(--button-bg);}
+        }
+        &.blinking {
+          animation: blink 1s infinite;
         }
       }
     }
@@ -537,6 +545,26 @@ MAIN.track_details ARTICLE {
 
 /* Queue */
 MAIN.queue ARTICLE {
+  .progress_bar {
+      margin: 1em 0em 1em 0em;
+      height: 1em;
+      border: 1px solid #444;
+      overflow: hidden;
+      white-space: nowrap;
+      DIV {
+        display: inline-block;
+        height: 100%;
+      }
+      .played {
+        background: var(--notification-error);
+      }
+      .queued {
+        background: var(--notification-warning);
+      }
+      .space {
+        background: var(--notification-ok);
+      }
+  }
   .me {
     background: var(--notification-warning);
   }
@@ -550,6 +578,9 @@ MAIN.queue ARTICLE {
     &.drop_last {
       text-align: center;
       padding: 1em;
+    }
+    &.public {
+      background: var(--notification-warning);
     }
     SPAN.lyrics {
       font-weight: normal;

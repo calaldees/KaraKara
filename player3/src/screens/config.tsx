@@ -18,6 +18,8 @@ export function ConfigMenu() {
         fullscreen,
         setFullscreen,
         wakeLock,
+        underscan,
+        setUnderscan,
     } = useContext(ClientContext);
     const { now, offset } = useContext(ServerContext);
     const [rootEdit, setRootEdit] = useState(root);
@@ -139,7 +141,9 @@ export function ConfigMenu() {
                                 <td>
                                     <input
                                         disabled={true}
-                                        value={`${now.toFixed(3)} (${offset.toFixed(3)})`}
+                                        value={`${now.toFixed(
+                                            3,
+                                        )} (${offset.toFixed(3)})`}
                                     />
                                 </td>
                             </tr>
@@ -147,6 +151,17 @@ export function ConfigMenu() {
                                 <td>WakeLock</td>
                                 <td>
                                     <input disabled={true} value={wakeLock} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Underscan</td>
+                                <td>
+                                    <input
+                                        value={underscan}
+                                        onChange={(e) =>
+                                            setUnderscan(e.target.value)
+                                        }
+                                    />
                                 </td>
                             </tr>
                             <tr>

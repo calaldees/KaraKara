@@ -72,7 +72,7 @@ class TestCreateSrt(unittest.TestCase):
     def test_create_srt(self) -> None:
         srt = create_srt(
             (
-                Subtitle(timedelta(minutes=0), timedelta(minutes=1), "first"),
+                Subtitle(timedelta(minutes=0), timedelta(minutes=1), "first\nfirst2"),
                 Subtitle(
                     timedelta(minutes=2),
                     timedelta(minutes=3, microseconds=510000),
@@ -86,6 +86,7 @@ class TestCreateSrt(unittest.TestCase):
             """1
 00:00:00,000 --> 00:01:00,000
 first
+first2
 
 2
 00:02:00,000 --> 00:03:00,510
@@ -99,7 +100,7 @@ second
                 Subtitle(
                     start=timedelta(0),
                     end=timedelta(seconds=60),
-                    text="first",
+                    text="first\nfirst2",
                     top=False,
                 ),
                 Subtitle(

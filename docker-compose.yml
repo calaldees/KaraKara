@@ -3,6 +3,11 @@ volumes:
     mqtt_data:
     queue_data:
 
+networks:
+    default:
+        name: karakara_default
+        external: ${EXTERNAL_NETWORK}
+
 services:
 
     nginx:

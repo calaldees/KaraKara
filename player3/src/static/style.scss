@@ -1,4 +1,14 @@
-* {box-sizing: border-box;}
+// This file should have generally sensible things that apply to all themes
+// (eg the root of the page should)
+
+* {
+    box-sizing: border-box;
+   	// before animation, be at 0%, after
+	// animation, be at 100%
+	animation-fill-mode: both;
+}
+// root elements should be full-screen, no overflow,
+// no scrolling, no cursor
 HTML, BODY {
   margin: 0;
   padding: 0;
@@ -10,6 +20,8 @@ HTML, BODY {
   left: 0;
   right: 0;
   bottom: 0;
+  background: black;
+  font-family: sans-serif;
 }
 MAIN {
   position: fixed;
@@ -18,8 +30,12 @@ MAIN {
   right: 0;
   bottom: 0;
   cursor: none;
+  container: main / size;
+  margin: var(--underscan);
 }
 
+// Settings menu should consistently pop up in the center of the screen,
+// this is an admin-only feature, it shouldn't be customised by themes
 .settings {
   position: absolute;
   display: flex;
@@ -59,6 +75,29 @@ MAIN {
   transition: left 1s linear;
 }
 
+// Video scaling is glitchy and unreliable and works differently
+// across browsers... but div scaling works fine, and you can tell
+// the video to mimic the size of the div
+.videoScaler {
+    background: black;
+    container: video / size;
+    VIDEO {
+        top: 0;
+        left: 0;
+        width: 100cqw;
+        height: 100cqh;
+    }
+}
+
+// Subtitles should be yellow or white, with a black border
+::cue {
+	text-shadow:
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
+	font-size: 5cqh;
+}
 ::cue(v[voice='active']) {
   color: yellow;
 }
@@ -66,7 +105,19 @@ MAIN {
   color: white;
 }
 .screen_podium ::cue {
-	font-size: 3em;
+	font-size: 10cqh;
+}
+
+#error {
+	color: red;
+	z-index: 9999;
+	position: absolute;
+	text-align: center;
+	background: black;
+	border-radius: .5em;
+	left: 1vw;
+	right: 1vw;
+	top: 1vh;
 }
 
 @import 'metalghosts';
