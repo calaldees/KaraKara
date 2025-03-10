@@ -138,7 +138,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
         }
         let nth = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
         let airtime_mins = Math.floor(airtime / 60);
-        let text = n + nth + " track" + (airtime > 0 ? ", " + airtime_mins + " mins total" : "");
+        let text = n + nth + " track, " + airtime_mins + " mins total";
         return text;
     }
 
