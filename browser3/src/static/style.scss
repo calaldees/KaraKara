@@ -256,6 +256,14 @@ MAIN {
         &:last-child {
           margin-right: 0;
         }
+        @keyframes blink {
+		  0% {background-color: var(--button-bg);}
+		  50% {background-color: var(--notification-ok);}
+		  100% {background-color: var(--button-bg);}
+        }
+        &.blinking {
+          animation: blink 1s infinite;
+        }
       }
     }
   }
