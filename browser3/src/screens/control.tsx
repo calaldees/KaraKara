@@ -219,6 +219,8 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
 
 function ControlButtons(): React.ReactElement {
     const { sendCommand, loading } = useApi();
+    const { booth } = useContext(ClientContext);
+    const { queue } = useContext(RoomContext);
 
     const buttons = {
         seek_backwards: <icons.Backward />,
@@ -236,6 +238,14 @@ function ControlButtons(): React.ReactElement {
                         key={command}
                         onClick={(e) => sendCommand(command)}
                         disabled={loading}
+                        className={dict2css({
+                            blinking: (
+                                booth
+                                && command === "play"
+                                && queue.length > 0
+                                && queue[0].start_time === null
+                            ),
+                        })}
                     >
                         {icon}
                     </button>
