@@ -11,9 +11,9 @@ export function apply_hidden(
     //   hidden=category:anime,category:retro,broken
     // into
     //   {"category": ["anime", "retro"], "broken": []}
-    let hidden: Record<string, string[]> = {};
+    const hidden: Record<string, string[]> = {};
     hidden_tags.forEach((x) => {
-        let [k, v] = x.split(":");
+        const [k, v] = x.split(":");
         if (!hidden[k]) hidden[k] = [];
         if (v) hidden[k].push(v);
     });
@@ -26,7 +26,7 @@ export function apply_hidden(
             //   tags["category"].length == 0 ||
             //   tags["category"] - {"anime", "cartoon"} != set()
             if (hidden_values.length > 0) {
-                let values = track.tags[hidden_key];
+                const values = track.tags[hidden_key];
                 // track["category"] needs to be both defined *and*
                 // empty-after-removing-hidden-subtags. If it's not
                 // defined, we don't care.
@@ -56,7 +56,7 @@ export function apply_tags(
     tags: Array<string>,
 ): Array<Track> {
     // convert "retro" to ["", "retro"] and "from:Macross" to ["from", "Macross"]
-    let tag_pairs = tags.map((x) => (x.includes(":") ? x : ":" + x).split(":"));
+    const tag_pairs = tags.map((x) => (x.includes(":") ? x : ":" + x).split(":"));
 
     // keep tracks where ...
     return tracks.filter(
@@ -104,10 +104,10 @@ export function text_to_filters(
     filters: string[],
     search: string,
 ): [string[], string] {
-    let ret_filters = filters.map((x) => x);
-    let ret_search: string[] = [];
+    const ret_filters = filters.map((x) => x);
+    const ret_search: string[] = [];
     search.split(" ").forEach((word) => {
-        let m = word.match("([a-z]+):(.*)");
+        const m = word.match("([a-z]+):(.*)");
         if (m) ret_filters.push(word);
         else ret_search.push(word);
     });
@@ -122,7 +122,7 @@ export function find_tracks(
     filters_: string[],
     search_: string,
 ): Array<Track> {
-    let [filters, search] = text_to_filters(filters_, search_);
+    const [filters, search] = text_to_filters(filters_, search_);
     tracks = apply_tags(tracks, filters);
     tracks = apply_search(tracks, search);
     return tracks;

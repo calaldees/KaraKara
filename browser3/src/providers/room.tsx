@@ -89,7 +89,7 @@ function InternalRoomProvider(props: any) {
             onException: () => {
                 // request() function will already have shown an error,
                 // so we just need to redirect to root
-                navigate("/");
+                void navigate("/");
             },
         });
     }, [root, roomName, roomPassword, request, setSessionId, navigate]);

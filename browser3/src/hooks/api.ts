@@ -24,7 +24,7 @@ export function useApi() {
             onAction?: (result: any) => void;
             onException?: () => void;
         }) {
-            let props = {
+            const props = {
                 response: "json",
                 url: `${root}/room/${roomName}/${props_.function}.json`,
                 options: {},
@@ -48,28 +48,35 @@ export function useApi() {
                     let download_done = 0;
                     // Content-Length shows us the compressed size, we can only
                     // guess the real size :(
-                    let download_size = 5 * 1024 * 1024;
+                    const download_size = 5 * 1024 * 1024;
 
                     return new ReadableStream({
                         start(controller) {
                             function push() {
-                                reader.read().then(({ done, value }) => {
-                                    if (done) {
-                                        controller.close();
-                                        return;
-                                    }
-                                    if (value) {
-                                        download_done += value.byteLength;
-                                        if (props.onProgress) {
-                                            props.onProgress({
-                                                done: download_done,
-                                                size: download_size,
-                                            });
+                                reader
+                                    .read()
+                                    .then(({ done, value }) => {
+                                        if (done) {
+                                            controller.close();
+                                            return;
                                         }
-                                    }
-                                    controller.enqueue(value);
-                                    push();
-                                });
+                                        if (value) {
+                                            download_done += value.byteLength;
+                                            if (props.onProgress) {
+                                                props.onProgress({
+                                                    done: download_done,
+                                                    size: download_size,
+                                                });
+                                            }
+                                        }
+                                        controller.enqueue(value);
+                                        push();
+                                    })
+                                    .catch(() => {
+                                        controller.error(
+                                            new Error("Failed to read"),
+                                        );
+                                    });
                             }
                             push();
                         },

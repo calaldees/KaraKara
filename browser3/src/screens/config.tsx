@@ -22,7 +22,7 @@ export function ConfigMenu(): React.ReactElement {
         e.preventDefault();
         setRoot(rootEdit);
         if (roomNameEdit !== roomName) {
-            navigate("/" + roomNameEdit);
+            void navigate("/" + roomNameEdit);
         }
         setRoomPassword(roomPasswordEdit);
         setShowSettings(false);
@@ -81,7 +81,7 @@ export function ConfigMenu(): React.ReactElement {
                                         checked={booth}
                                         type={"checkbox"}
                                         data-cy="booth-input"
-                                        onChange={(e) => setBooth(!booth)}
+                                        onChange={(_) => setBooth(!booth)}
                                     />
                                 </td>
                             </tr>

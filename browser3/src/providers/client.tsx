@@ -8,40 +8,40 @@ type Notification = {
 
 export type ClientContextType = {
     root: string;
-    setRoot: (n: string) => void;
+    setRoot: (_: string) => void;
     roomPassword: string;
-    setRoomPassword: (n: string) => void;
+    setRoomPassword: (_: string) => void;
     showSettings: boolean;
-    setShowSettings: (n: boolean) => void;
+    setShowSettings: (_: boolean) => void;
     booth: boolean;
-    setBooth: (b: boolean) => void;
+    setBooth: (_: boolean) => void;
     widescreen: boolean;
     performerName: string;
-    setPerformerName: (n: string) => void;
+    setPerformerName: (_: string) => void;
     bookmarks: string[];
-    addBookmark: (s: string) => void;
-    removeBookmark: (s: string) => void;
+    addBookmark: (_: string) => void;
+    removeBookmark: (_: string) => void;
     notification: Notification;
-    setNotification: (n: Notification) => void;
+    setNotification: (_: Notification) => void;
 };
 
 export const ClientContext = React.createContext<ClientContextType>({
     root: "",
-    setRoot: (x) => null,
+    setRoot: (_) => null,
     roomPassword: "",
-    setRoomPassword: (x) => null,
+    setRoomPassword: (_) => null,
     showSettings: false,
-    setShowSettings: (x) => null,
+    setShowSettings: (_) => null,
     booth: false,
-    setBooth: (x) => null,
+    setBooth: (_) => null,
     widescreen: false,
     performerName: "",
-    setPerformerName: (x) => null,
+    setPerformerName: (_) => null,
     bookmarks: [],
-    addBookmark: (x) => null,
-    removeBookmark: (x) => null,
+    addBookmark: (_) => null,
+    removeBookmark: (_) => null,
     notification: null,
-    setNotification: (x) => null,
+    setNotification: (_) => null,
 });
 
 export function ClientProvider(props: any) {
