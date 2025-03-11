@@ -1,9 +1,6 @@
 {
     "track_space": 30,
-    "hidden_tags": [
-        "category:cartoon",
-        "red:duplicate"
-    ],
+    "hidden_tags": ["category:cartoon", "red:duplicate"],
     "forced_tags": [],
     "title": "KaraKara",
     "theme": "metalghosts",
@@ -13,8 +10,6 @@
     "validation_duplicate_performer_timedelta": null,
     "validation_duplicate_track_timedelta": null,
     "validation_performer_names": [],
-    "validation": [
-        "default"
-    ],
+    "validation": ["default"],
     "coming_soon_track_count": 3
 }
