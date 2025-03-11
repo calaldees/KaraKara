@@ -5,6 +5,7 @@ import { Queue } from "../queue";
 import tracks from "../../../cypress/fixtures/small_tracks.json";
 import queue from "../../../cypress/fixtures/small_queue.json";
 import settings from "../../../cypress/fixtures/small_settings.json";
+import type { Track } from "../../types";
 
 describe("no tracks", () => {
     it("no tracks", () => {

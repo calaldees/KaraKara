@@ -1,3 +1,5 @@
+import type { Track } from "./types";
+
 /**
  * If track has a 'hidden' tag, then skip it, UNLESS it also has
  * other non-hidden tags with the same parent. Consider top-level

@@ -8,6 +8,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
+import type { Track } from "../types";
 
 type ExploreContextType = {
     search: string;

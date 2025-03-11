@@ -1,4 +1,11 @@
 import { normalise_cmp, normalise_name } from "./utils";
+import type { Track } from "./types";
+
+type TrackListSection = {
+    tracks?: Array<Track>;
+    groups?: any;
+    filters?: any;
+};
 
 /**
  * Given a selection of tracks and some search terms, figure out

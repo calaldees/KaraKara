@@ -32,6 +32,7 @@ import "../../src/static/style.scss";
 import tracks from "../../cypress/fixtures/small_tracks.json";
 import queue from "../../cypress/fixtures/small_queue.json";
 import settings from "../../cypress/fixtures/small_settings.json";
+import type { QueueItem } from "../../src/types";
 
 // Cypress.Commands.add('mount', mount)
 
