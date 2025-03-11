@@ -3,6 +3,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./static/style.scss";
+import "./static/metalghosts.scss";
 import { ClientProvider } from "./providers/client";
 import { ServerProvider } from "./providers/server";
 import { Root } from "./screens/root";
