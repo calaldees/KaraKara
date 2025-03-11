@@ -15,7 +15,7 @@ export function Notification() {
         notification && (
             <div
                 className={"main-only notification " + notification.style}
-                onClick={(e) => setNotification(null)}
+                onClick={(_) => setNotification(null)}
             >
                 <span>{notification.text}</span>
                 <icons.CircleXmark />
@@ -78,7 +78,7 @@ export function Screen({
         <main className={className}>
             <header>
                 {navLeft || <EmptyHeaderLink />}
-                <h1 onDoubleClick={(e) => setShowSettings(true)}>{title}</h1>
+                <h1 onDoubleClick={(_) => setShowSettings(true)}>{title}</h1>
                 {navRight || <EmptyHeaderLink />}
             </header>
             <Notification />

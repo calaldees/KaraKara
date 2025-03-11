@@ -77,26 +77,26 @@ describe("suggest_next_filters", () => {
 
 describe("group_tracks", () => {
     describe("with no tracks", () => {
-        let tracks: Track[] = [];
+        const tracks: Track[] = [];
 
         test("show 'No Results'", () => {
-            let results = grouper.group_tracks([], tracks);
+            const results = grouper.group_tracks([], tracks);
             expect(results.length).toEqual(1);
             expect(results[0][0]).toEqual("No Results");
         });
     });
 
     describe("with a few tracks", () => {
-        let tracks = [track_dict["track_id_1"], track_dict["track_id_2"]];
+        const tracks = [track_dict["track_id_1"], track_dict["track_id_2"]];
 
         test("with no filters, just list them", () => {
-            let results = grouper.group_tracks([], tracks);
+            const results = grouper.group_tracks([], tracks);
             expect(results.length).toEqual(1);
             expect(results[0][0]).toEqual("");
             expect(results[0][1].tracks).toBeDefined();
         });
         test("use filters to figure out relevant subheadings", () => {
-            let results = grouper.group_tracks(["from:Macross"], tracks);
+            const results = grouper.group_tracks(["from:Macross"], tracks);
             expect(results.length).toEqual(2);
             expect(results[0][0]).toEqual("Do You Remember Love?");
             expect(results[0][1].tracks).toBeDefined();
@@ -104,7 +104,7 @@ describe("group_tracks", () => {
             expect(results[1][1].tracks).toBeDefined();
         });
         test("if there are no relevant headings, show leftovers under a blank heading", () => {
-            let results = grouper.group_tracks(["from:Gundam"], tracks);
+            const results = grouper.group_tracks(["from:Gundam"], tracks);
             expect(results.length).toEqual(1);
             expect(results[0][0]).toEqual("");
             expect(results[0][1].tracks).toBeDefined();
@@ -121,10 +121,10 @@ describe("group_tracks", () => {
         // of them containing a "T", "W", or "Z" (because we want to manually
         // insert data which uses those letters)
         function random_title(length: number): string {
-            var result = "";
-            var characters = "ABCDEFGHIJKLMNOPQRSUVXYabcdefghijklmnopqrsuvxy";
-            var charactersLength = characters.length;
-            for (var i = 0; i < length; i++) {
+            let result = "";
+            const characters = "ABCDEFGHIJKLMNOPQRSUVXYabcdefghijklmnopqrsuvxy";
+            const charactersLength = characters.length;
+            for (let i = 0; i < length; i++) {
                 result += characters.charAt(
                     Math.floor(Math.random() * charactersLength),
                 );
@@ -139,7 +139,7 @@ describe("group_tracks", () => {
         many_tracks[1].tags.from = ["[Z][e][b][r][a]"];
 
         test("with no filters, prompt for default filters", () => {
-            let results = grouper.group_tracks([], many_tracks);
+            const results = grouper.group_tracks([], many_tracks);
             expect(results.length).toBeGreaterThanOrEqual(1);
             expect(results[0][0]).toEqual("category");
             expect(results[0][1].filters).toBeDefined();
@@ -147,7 +147,10 @@ describe("group_tracks", () => {
         test("with a filter, prompt for relevant sub-filters", () => {
             // When searching for category:jpop, it's hard-coded that the next prompt
             // should be "artist", and we have few artists, so they should be displayed
-            let results = grouper.group_tracks(["category:jpop"], many_tracks);
+            const results = grouper.group_tracks(
+                ["category:jpop"],
+                many_tracks,
+            );
             expect(results.length).toBeGreaterThanOrEqual(1);
             expect(results[0][0]).toEqual("artist");
             expect(results[0][1].filters).toBeDefined();
@@ -155,7 +158,10 @@ describe("group_tracks", () => {
         describe("when searching for a tag with a ton of children", () => {
             // When searching for category:anime, it's hard-coded that the next prompt
             // should be "from", and we have many froms, so they should be grouped
-            let results = grouper.group_tracks(["category:anime"], many_tracks);
+            const results = grouper.group_tracks(
+                ["category:anime"],
+                many_tracks,
+            );
             test("show grouped filters", () => {
                 expect(results.length).toEqual(1);
                 expect(results[0][0]).toEqual("from");
@@ -174,7 +180,7 @@ describe("group_tracks", () => {
             });
         });
         test("show leftovers under 'Tracks' at the end", () => {
-            let results = grouper.group_tracks(["from:Macross"], many_tracks);
+            const results = grouper.group_tracks(["from:Macross"], many_tracks);
             expect(results.length).toEqual(2);
             expect(results[0][0]).toEqual("Macross");
             expect(results[0][1].filters).toBeDefined();

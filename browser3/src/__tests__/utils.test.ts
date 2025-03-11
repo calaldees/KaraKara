@@ -214,7 +214,7 @@ describe("copy_type", () => {
 });
 
 describe("current_and_future", () => {
-    var item: QueueItem = {
+    const item: QueueItem = {
         id: 4567,
         performer_name: "test",
         session_id: "test",

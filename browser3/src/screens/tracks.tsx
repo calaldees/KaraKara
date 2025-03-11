@@ -11,20 +11,20 @@ import { RoomContext } from "../providers/room";
 
 type ExploreContextType = {
     search: string;
-    setSearch: (f: string) => void;
+    setSearch: (_: string) => void;
     filters: string[];
-    setFilters: (f: any) => void;
+    setFilters: (_: any) => void;
     expanded: string | null;
-    setExpanded: (x: string | null) => void;
+    setExpanded: (_: string | null) => void;
 };
 
 const ExploreContext = React.createContext<ExploreContextType>({
     search: "",
-    setSearch: (s) => null,
+    setSearch: (_: string) => null,
     filters: [],
-    setFilters: (fs) => null,
+    setFilters: (_: any) => null,
     expanded: null,
-    setExpanded: (x) => null,
+    setExpanded: (_: string | null) => null,
 });
 
 /*
@@ -42,7 +42,7 @@ function TrackItem({
     return (
         <li
             className={"track_item"}
-            onClick={(e) => navigate(`tracks/${track.id}`)}
+            onClick={(_) => void navigate(`tracks/${track.id}`)}
         >
             <Thumb track={track} />
             <span className={"text track_info"}>
@@ -79,7 +79,7 @@ function FilterListGroupHeader({
     return (
         <li
             className={"filter_list_group_header"}
-            onClick={(e) => setExpanded(expanded ? null : filter)}
+            onClick={(_) => setExpanded(expanded ? null : filter)}
         >
             <span className={"text"}>{children}</span>
             <span className={"count"}>{count}</span>
@@ -161,7 +161,7 @@ function FilterList({
                     <li
                         key={child}
                         className={"add_filter"}
-                        onClick={(e) => {
+                        onClick={(_) => {
                             setExpanded(null);
                             setFilters((fs: string[]) => [
                                 ...fs,
@@ -230,7 +230,7 @@ function Explorer(): React.ReactElement {
     const { search, setSearch, filters, setFilters, setExpanded } =
         useContext(ExploreContext);
 
-    let sections = useMemo(
+    const sections = useMemo(
         () => group_tracks(filters, find_tracks(trackList, filters, search)),
         [trackList, search, filters],
     );
@@ -253,7 +253,7 @@ function Explorer(): React.ReactElement {
                     <div
                         key={filter}
                         className={"active_filter"}
-                        onClick={(e) => {
+                        onClick={(_) => {
                             setExpanded(null);
                             setFilters(filters.filter((v) => v !== filter));
                         }}
@@ -359,7 +359,7 @@ export function TrackList(): React.ReactElement {
             navLeft={
                 filters.length > 0 && (
                     <div
-                        onClick={(e) => setFilters(filters.slice(0, -1))}
+                        onClick={(_) => setFilters(filters.slice(0, -1))}
                         data-cy="back"
                     >
                         <icons.CircleChevronLeft className="x2" />
