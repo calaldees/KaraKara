@@ -1,7 +1,7 @@
 export function dict2css(d: Record<string, any>) {
     return Object.entries(d)
-        .filter(([k, v]) => v)
-        .map(([k, v]) => k)
+        .filter(([_, v]) => v)
+        .map(([k, _]) => k)
         .join(" ");
 }
 
@@ -112,7 +112,7 @@ export function last_tag(
  * Figure out what extra info is relevant for a given track, given what the
  * user is currently searching for
  */
-let title_tags_for_category: Record<string, string[]> = {
+const title_tags_for_category: Record<string, string[]> = {
     DEFAULT: ["from", "use", "length"],
     vocaloid: ["artist"],
     jpop: ["artist"],
@@ -122,25 +122,25 @@ export function track_info(
     filters: Array<string>,
     track: Pick<Track, "tags">,
 ): string {
-    let info_tags =
+    const info_tags =
         title_tags_for_category[track.tags.category?.[0] || "DEFAULT"] ||
         title_tags_for_category["DEFAULT"];
     // look at series that are in the search box
-    let search_from = filters
+    const search_from = filters
         .filter((x) => x.startsWith("from:"))
         .map((x) => x.replace("from:", ""));
     // we manually check that all our keys exist
-    let track_tags = track.tags as Record<string, string[]>;
-    let info_data = info_tags
+    const track_tags = track.tags as Record<string, string[]>;
+    const info_data = info_tags
         // Ignore undefined tags
-        .filter((x) => track_tags.hasOwnProperty(x))
+        .filter((x) => Object.prototype.hasOwnProperty.call(track_tags, x))
         // We always display track title, so ignore any tags which duplicate that
         .filter((x) => track_tags[x][0] !== track.tags.title[0])
         // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
         .filter((x) => x !== "from" || !search_from.includes(track_tags[x][0]))
         // Format a list of tags
         .map((x) => track_tags[x].join(", "));
-    let info = info_data.join(" - ");
+    const info = info_data.join(" - ");
     return info;
 }
 

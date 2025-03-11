@@ -46,11 +46,11 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
         while (ul && ul.tagName !== "UL") ul = ul.parentElement;
         if (!ul) return;
 
-        let x = e.touches[0].clientX,
+        const x = e.touches[0].clientX,
             y = e.touches[0].clientY;
         let tgt_id = null;
         ul.querySelectorAll("LI").forEach(function (el, key) {
-            let r = el.getBoundingClientRect();
+            const r = el.getBoundingClientRect();
             if (x > r.left && x < r.right && y > r.top && y < r.bottom) {
                 tgt_id = queue[key].id;
             }
@@ -76,19 +76,19 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
         }
 
         // find the dragged item by ID number, remove it from the list
-        let src_ob = queue.find((x) => x.id === src_id);
+        const src_ob = queue.find((x) => x.id === src_id);
         if (!src_ob) {
             setDropSource(null);
             setDropTarget(null);
             return;
         }
-        let new_queue = queue.filter((x) => x.id !== src_id);
+        const new_queue = queue.filter((x) => x.id !== src_id);
 
         // insert the dragged item above the drop target
         if (dst_id === -1) {
             new_queue.push(src_ob);
         } else {
-            let dst_pos = new_queue.findIndex((x) => x.id === dst_id);
+            const dst_pos = new_queue.findIndex((x) => x.id === dst_id);
             new_queue.splice(dst_pos, 0, src_ob);
         }
 
@@ -136,9 +136,9 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                 break;
             }
         }
-        let nth = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
-        let airtime_mins = Math.floor(airtime / 60);
-        let text = n + nth + " track, " + airtime_mins + " mins total";
+        const nth = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
+        const airtime_mins = Math.floor(airtime / 60);
+        const text = n + nth + " track, " + airtime_mins + " mins total";
         return text;
     }
 
@@ -153,7 +153,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                             queue_item: true,
                             drop_source: dropSource === item.id,
                             drop_target: dropTarget === item.id,
-                            public: !booth && n <= 5
+                            public: !booth && n <= 5,
                         })}
                         draggable={true}
                         onDragStart={(e) => onDragStart(e, item.id)}
@@ -181,7 +181,17 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
                             <br />
                             <span className={"performer"}>
                                 {item.performer_name}
-                                {!booth && <> ({airtime_text(item.performer_name, item.id)})</>}
+                                {!booth && (
+                                    <>
+                                        {" "}
+                                        (
+                                        {airtime_text(
+                                            item.performer_name,
+                                            item.id,
+                                        )}
+                                        )
+                                    </>
+                                )}
                             </span>
                         </span>
                         {item.start_time && (
@@ -192,7 +202,7 @@ function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
 
                         <span
                             className={"go_arrow"}
-                            onClick={(e) => removeTrack(item.id)}
+                            onClick={(_) => removeTrack(item.id)}
                         >
                             <icons.CircleXmark />
                         </span>
@@ -234,7 +244,7 @@ function ControlButtons(): React.ReactElement {
                 {Object.entries(buttons).map(([command, icon]) => (
                     <button
                         key={command}
-                        onClick={(e) => sendCommand(command)}
+                        onClick={(_) => sendCommand(command)}
                         disabled={loading}
                     >
                         {icon}
@@ -245,30 +255,45 @@ function ControlButtons(): React.ReactElement {
     );
 }
 
-function ProgressBar({ queue, startDateTime, endDateTime }: { queue: QueueItem[]; startDateTime: string; endDateTime: string }) {
+function ProgressBar({
+    queue,
+    startDateTime,
+    endDateTime,
+}: {
+    queue: QueueItem[];
+    startDateTime: string;
+    endDateTime: string;
+}) {
     if (!queue.length) return null;
-    let queue_last = queue[queue.length - 1];
+    const queue_last = queue[queue.length - 1];
     if (!queue_last.start_time) return null;
-    let start = Date.parse(startDateTime);
-    let current = Date.now() - start;
-    let queue_end = (queue_last.start_time + queue_last.track_duration) * 1000 - start;
-    let end = Date.parse(endDateTime) - start;
+    const start = Date.parse(startDateTime);
+    const current = Date.now() - start;
+    const queue_end =
+        (queue_last.start_time + queue_last.track_duration) * 1000 - start;
+    const end = Date.parse(endDateTime) - start;
     return (
         <div className="progress_bar">
             <div
                 className="played"
-                style={{ width: `${current / end * 100}%` }}
-                title={`Played until ${new Date(start + current).toLocaleString()}`}
+                style={{ width: `${(current / end) * 100}%` }}
+                title={`Played until ${new Date(
+                    start + current,
+                ).toLocaleString()}`}
             />
             <div
                 className="queued"
-                style={{ width: `${(queue_end - current) / end * 100}%` }}
-                title={`Queued until ${new Date(start + queue_end).toLocaleString()}`}
+                style={{ width: `${((queue_end - current) / end) * 100}%` }}
+                title={`Queued until ${new Date(
+                    start + queue_end,
+                ).toLocaleString()}`}
             />
             <div
                 className="space"
-                style={{ width: `${(end - queue_end) / end * 100}%` }}
-                title={`Remaining time ${Math.floor((end - queue_end) / 60000)} minutes`}
+                style={{ width: `${((end - queue_end) / end) * 100}%` }}
+                title={`Remaining time ${Math.floor(
+                    (end - queue_end) / 60000,
+                )} minutes`}
             />
         </div>
     );
@@ -312,15 +337,19 @@ export function Control(): React.ReactElement {
                 </div>
             ) : (
                 <>
-                    {fullQueue.length > 0
-                        && settings['validation_event_start_datetime']
-                        && settings['validation_event_end_datetime']
-                        && <ProgressBar
-                            queue={fullQueue}
-                            startDateTime={settings['validation_event_start_datetime']}
-                            endDateTime={settings['validation_event_end_datetime']}
-                        />
-                    }
+                    {fullQueue.length > 0 &&
+                        settings["validation_event_start_datetime"] &&
+                        settings["validation_event_end_datetime"] && (
+                            <ProgressBar
+                                queue={fullQueue}
+                                startDateTime={
+                                    settings["validation_event_start_datetime"]
+                                }
+                                endDateTime={
+                                    settings["validation_event_end_datetime"]
+                                }
+                            />
+                        )}
                     <Playlist queue={queue} />
                 </>
             )}

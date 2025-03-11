@@ -77,7 +77,7 @@ describe("now playing", () => {
         cy.contains("Coming Soon").should("not.exist");
     });
     it("with lyrics", () => {
-        let track_2_with_lyrics: Track = {
+        const track_2_with_lyrics: Track = {
             ...tracks["track_id_2"],
             lyrics: ["foo", "bar", "baz"],
         };

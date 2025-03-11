@@ -118,7 +118,7 @@ describe("text_to_filters", () => {
 describe("find_tracks", () => {
     // generate a large dataset, but do it outside of the test
     // so that it doesn't contribute to the test's performance
-    let big_tracks: Record<string, Track> = {};
+    const big_tracks: Record<string, Track> = {};
     for (let i = 0; i < 10000; i++) {
         big_tracks["track_id_" + i] = {
             id: "track_id_" + i,
@@ -142,7 +142,7 @@ describe("find_tracks", () => {
         // check that even though we have all the types of filters, and
         // none of them are narrowing down the list at all, we're still
         // doing ok
-        let tracks = finder.find_tracks(
+        const tracks = finder.find_tracks(
             Object.values(big_tracks),
             ["category:anime", "from:Macross"],
             "mac",

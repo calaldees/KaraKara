@@ -65,7 +65,7 @@ export function TrackDetails(): React.ReactElement {
 
     let buttons = null;
     if (action === TrackAction.NONE) {
-        let is_queued =
+        const is_queued =
             queue.find((i) => i.track_id === track.id) !== undefined;
 
         buttons = (
@@ -77,17 +77,17 @@ export function TrackDetails(): React.ReactElement {
                 )}
                 <div className={"buttons"}>
                     <button
-                        onClick={(e) => setAction(TrackAction.ENQUEUE)}
+                        onClick={(_) => setAction(TrackAction.ENQUEUE)}
                         disabled={is_queued}
                     >
                         Enqueue
                     </button>
                     {bookmarks.includes(track.id) ? (
-                        <button onClick={(e) => removeBookmark(track.id)}>
+                        <button onClick={(_) => removeBookmark(track.id)}>
                             Un-Bookmark
                         </button>
                     ) : (
-                        <button onClick={(e) => addBookmark(track.id)}>
+                        <button onClick={(_) => addBookmark(track.id)}>
                             Bookmark
                         </button>
                     )}
@@ -107,10 +107,10 @@ export function TrackDetails(): React.ReactElement {
                     onChange={(e) => setPerformerName(e.target.value)}
                 />
                 <div className={"buttons"}>
-                    <button onClick={(e) => setAction(TrackAction.NONE)}>
+                    <button onClick={(_) => setAction(TrackAction.NONE)}>
                         Cancel
                     </button>
-                    <button onClick={(e) => enqueue(performerName, track.id)}>
+                    <button onClick={(_) => enqueue(performerName, track.id)}>
                         Confirm
                     </button>
                 </div>
@@ -122,7 +122,7 @@ export function TrackDetails(): React.ReactElement {
         <Screen
             className={"track_details"}
             navLeft={
-                <div onClick={() => navigate(-1)} data-cy="back">
+                <div onClick={() => void navigate(-1)} data-cy="back">
                     <icons.CircleChevronLeft className="x2" />
                 </div>
             }

@@ -15,7 +15,7 @@ export function RoomSettings(): React.ReactElement {
     }, [roomSettings]);
 
     function update(key: string, value: string) {
-        let newSettings = { ...roomSettingsEdit };
+        const newSettings = { ...roomSettingsEdit };
         newSettings[key] = copy_type(roomSettings[key], value);
         setRoomSettingsEdit(newSettings);
     }

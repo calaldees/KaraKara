@@ -60,7 +60,7 @@ function QueueItemRender({
                 <span
                     data-cy="remove"
                     className={"go_arrow"}
-                    onClick={(e) => removeTrack(item.id)}
+                    onClick={(_) => removeTrack(item.id)}
                 >
                     <icons.CircleXmark />
                 </span>

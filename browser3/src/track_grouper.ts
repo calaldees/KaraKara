@@ -16,7 +16,7 @@ export function suggest_next_filters(
     filters: Array<string>,
     groups: Record<string, Record<string, number>>,
 ): Array<string> {
-    let last_filter = filters[filters.length - 1];
+    const last_filter = filters[filters.length - 1];
 
     // if no search, show a sensible selection
     if (last_filter === undefined) {
@@ -80,10 +80,10 @@ export function suggest_next_filters(
 export function summarise_tags(
     tracks: Array<Pick<Track, "tags">>,
 ): Record<string, Record<string, number>> {
-    let tags: Record<string, Record<string, number>> = {};
+    const tags: Record<string, Record<string, number>> = {};
     tracks.forEach((track) => {
         Object.entries(track.tags)
-            .filter(([tag, values]) => tag !== "title")
+            .filter(([tag, _values]) => tag !== "title")
             .forEach(([tag, values]) => {
                 values?.forEach((value) => {
                     if (tags[tag] === undefined) tags[tag] = {};
@@ -116,9 +116,9 @@ export function group_tracks(
     filters: Array<string>,
     tracks: Array<Track>,
 ): Array<[string, TrackListSection]> {
-    let sections: Array<[string, TrackListSection]> = [];
+    const sections: Array<[string, TrackListSection]> = [];
     let leftover_tracks: Array<Track> = tracks;
-    let all_tags = summarise_tags(tracks);
+    const all_tags = summarise_tags(tracks);
 
     // If there are no tracks, show a friendly error
     if (tracks.length === 0) {
@@ -131,13 +131,13 @@ export function group_tracks(
         // searched tag has any children, eg if we are currently searching
         // for "from:Macross" then the resulting list of tracks will be
         // grouped by "Macross:*".
-        let most_recent_tag = filters[filters.length - 1]?.split(":")[1];
+        const most_recent_tag = filters[filters.length - 1]?.split(":")[1];
         if (most_recent_tag && all_tags[most_recent_tag]) {
             let found_track_ids: Array<string> = [];
 
-            let tag_key = most_recent_tag;
+            const tag_key = most_recent_tag;
             // Look at our all_tags table to see what children we have
-            let tag_children = Object.keys(all_tags[tag_key]).sort(
+            const tag_children = Object.keys(all_tags[tag_key]).sort(
                 normalise_cmp,
             );
             // tag_children then lists the children of this tag
@@ -145,7 +145,7 @@ export function group_tracks(
             // add one [section title, track list] pair into the
             // sections list for each of those.
             tag_children.forEach(function (tag_child) {
-                let tracks_in_this_section = tracks.filter((t) =>
+                const tracks_in_this_section = tracks.filter((t) =>
                     t.tags[tag_key]?.includes(tag_child),
                 );
                 sections.push([tag_child, { tracks: tracks_in_this_section }]);
@@ -176,7 +176,7 @@ export function group_tracks(
         if (next_filters.length === 0) {
             next_filters = Object.keys(all_tags);
             // Avoid repeating filter categories
-            let filter_categories = filters.map((f) => f.split(":")[0]);
+            const filter_categories = filters.map((f) => f.split(":")[0]);
             next_filters = next_filters.filter(
                 (tag_key) => !filter_categories.includes(tag_key),
             );
@@ -189,16 +189,19 @@ export function group_tracks(
         // For each section, either add a filter list, or a grouped filter list
         next_filters.forEach(function (tag_key) {
             // Look at our all_tags table to see what children we have
-            let tag_children = Object.keys(all_tags[tag_key]).sort(
+            const tag_children = Object.keys(all_tags[tag_key]).sort(
                 normalise_cmp,
             );
             // If a tag has a lot of children (eg artist=...) then show
             // children grouped alphabetically
             if (tag_children.length > 50) {
-                let grouped_groups: Record<string, Record<string, number>> = {};
+                const grouped_groups: Record<
+                    string,
+                    Record<string, number>
+                > = {};
                 tag_children.forEach(function (tag_child) {
                     // Group by first alphabetic character
-                    var initial = normalise_name(tag_child)[0];
+                    let initial = normalise_name(tag_child)[0];
                     if (grouped_groups[initial] === undefined)
                         grouped_groups[initial] = {};
                     grouped_groups[initial][tag_child] =
@@ -210,7 +213,7 @@ export function group_tracks(
                         tag_child.toLowerCase().startsWith("the ") &&
                         tag_child.length > 4
                     ) {
-                        var x2 =
+                        const x2 =
                             tag_child.substring(4) +
                             ", " +
                             tag_child.substring(0, 3);
@@ -241,7 +244,7 @@ export function group_tracks(
     // If we didn't come up with any sections, then include the
     // leftovers in an untitled section.
     if (leftover_tracks.length > 0) {
-        let leftover_title = sections.length > 0 ? "Tracks" : "";
+        const leftover_title = sections.length > 0 ? "Tracks" : "";
         sections.push([leftover_title, { tracks: leftover_tracks }]);
     }
 
