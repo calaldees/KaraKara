@@ -1,445 +1,513 @@
-$DARK: #020F1F;
-$MID: #074D5E;
-$LIGHT: #29EDF2;
+$DARK: #020f1f;
+$MID: #074d5e;
+$LIGHT: #29edf2;
 
 @font-face {
-	font-family: metalghosts;
-	src: url('metalghosts/Xolonium-Regular.ttf');
-	font-weight: 400;
-	font-display: swap;
+    font-family: metalghosts;
+    src: url("metalghosts/Xolonium-Regular.ttf");
+    font-weight: 400;
+    font-display: swap;
 }
 @mixin radial {
-	background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
+    background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
 }
 @mixin border {
-	padding: 2cqh 2cqw;
-	border: var(--border-width) solid $LIGHT;
-	border-radius: 2cqh;
+    padding: 2cqh 2cqw;
+    border: var(--border-width) solid $LIGHT;
+    border-radius: 2cqh;
 }
 
 .theme-metalghosts {
     --border-width: 1px;
 
-	/*---------------------------------------------------------------------------*/
-	/* Common */
-	/*---------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------*/
+    /* Common */
+    /*---------------------------------------------------------------------------*/
 
-	@keyframes glow_y {
-		0% {opacity: 0.5;}
-		100% {opacity: 1.0;}
-	}
+    @keyframes glow_y {
+        0% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
 
-	// Things common to all screens
-	SECTION {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		display: grid;
-		gap: 2vh;
-		overflow: hidden;
-		border-style: solid;
-		border-color: black;
-		color: white;
+    // Things common to all screens
+    SECTION {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: grid;
+        gap: 2vh;
+        overflow: hidden;
+        border-style: solid;
+        border-color: black;
+        color: white;
 
-		color: white;
+        color: white;
         font-family: metalghosts, sans-serif;
-        text-shadow:
-        -1px -1px 0 #000,
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+            1px 1px 0 #000;
 
-		background:
-			url('metalghosts/background.png'),
-			url('metalghosts/perlin.jpg');
-		background-size: 25cqh, 100% 200%;
+        background: url("metalghosts/background.png"),
+            url("metalghosts/perlin.jpg");
+        background-size: 25cqh, 100% 200%;
 
-		H1, H2, OL, UL, P {
-			margin: 0;
-			padding: 0;
-		}
+        H1,
+        H2,
+        OL,
+        UL,
+        P {
+            margin: 0;
+            padding: 0;
+        }
 
-		STRONG {
-			color: #FF7;
-			font-weight: normal;
-		}
+        STRONG {
+            color: #ff7;
+            font-weight: normal;
+        }
 
-		#join_info, #event_info {
-			@include radial;
-			text-align: center;
-			color: #BBB;
-			container-type: size;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			SPAN {
-				font-size: 4cqw;
-			}
-			z-index: 100;
-			height: 8cqw;
-		}
-		#join_info {
-    		grid-area: header;
-    		border-bottom: var(--border-width) solid $LIGHT;
-		}
-		#event_info {
-    		grid-area: footer;
-    		border-top: var(--border-width) solid $LIGHT;
-		}
-	}
+        #join_info,
+        #event_info {
+            @include radial;
+            text-align: center;
+            color: #bbb;
+            container-type: size;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            SPAN {
+                font-size: 4cqw;
+            }
+            z-index: 100;
+            height: 8cqw;
+        }
+        #join_info {
+            grid-area: header;
+            border-bottom: var(--border-width) solid $LIGHT;
+        }
+        #event_info {
+            grid-area: footer;
+            border-top: var(--border-width) solid $LIGHT;
+        }
+    }
 
-	/*---------------------------------------------------------------------------*/
-	/* Title Screen Animation */
-	/*---------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------*/
+    /* Title Screen Animation */
+    /*---------------------------------------------------------------------------*/
 
-	.screen_title {
-		grid-template:
-		  "header" min-content
-		  "title " 1fr
-		  "footer" min-content
-		  / 1fr;
+    .screen_title {
+        grid-template:
+            "header" min-content
+            "title " 1fr
+            "footer" min-content
+            / 1fr;
 
-		H1 {
-			grid-area: title;
-			justify-self: center;
-			align-self: center;
-			@include border;
-			@include radial;
-			z-index: 100;
-			font-size: 7cqh;
-			text-align: center;
-			padding: 2cqh 4cqw;
-		}
-		H2 {
-			@include border;
-			@include radial;
-		}
+        H1 {
+            grid-area: title;
+            justify-self: center;
+            align-self: center;
+            @include border;
+            @include radial;
+            z-index: 100;
+            font-size: 7cqh;
+            text-align: center;
+            padding: 2cqh 4cqw;
+        }
+        H2 {
+            @include border;
+            @include radial;
+        }
 
-		#splash {
-			position: absolute;
-			inset: 0;
-			// avoid using any zero-values in transform, because scss will
-			// optimise that into matrix() which won't animate...
-			@keyframes raincw {
-				0% {transform: translateY(-1cqh) rotate(-180deg);}
-				100% {transform: translateY(120cqh) rotate(180deg);}
-			}
-			@keyframes rainccw {
-				0% {transform: translateY(-1cqh) rotate(180deg);}
-				100% {transform: translateY(120cqh) rotate(-180deg);}
-			}
-			IMG {
-				position: absolute;
-				border: 1px solid black;
-				top: -20cqh;
-				max-width: 20cqw;
-				max-height: 20cqh;
-				height: auto;
-				width: auto;
-				animation: raincw 10s linear infinite;
-			}
-			IMG:nth-child(odd) {
-				animation: rainccw 10s linear infinite;
-			}
-			TABLE {
-				TH {
-					color: #FF7;
-					text-align: right;
-				}
-				TD {
-					padding-left: .25em;
-				}
-			}
-		}
-	}
+        #splash {
+            position: absolute;
+            inset: 0;
+            // avoid using any zero-values in transform, because scss will
+            // optimise that into matrix() which won't animate...
+            @keyframes raincw {
+                0% {
+                    transform: translateY(-1cqh) rotate(-180deg);
+                }
+                100% {
+                    transform: translateY(120cqh) rotate(180deg);
+                }
+            }
+            @keyframes rainccw {
+                0% {
+                    transform: translateY(-1cqh) rotate(180deg);
+                }
+                100% {
+                    transform: translateY(120cqh) rotate(-180deg);
+                }
+            }
+            IMG {
+                position: absolute;
+                border: 1px solid black;
+                top: -20cqh;
+                max-width: 20cqw;
+                max-height: 20cqh;
+                height: auto;
+                width: auto;
+                animation: raincw 10s linear infinite;
+            }
+            IMG:nth-child(odd) {
+                animation: rainccw 10s linear infinite;
+            }
+            TABLE {
+                TH {
+                    color: #ff7;
+                    text-align: right;
+                }
+                TD {
+                    padding-left: 0.25em;
+                }
+            }
+        }
+    }
 
-	/*---------------------------------------------------------------------------*/
-	/* Playlist */
-	/*---------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------*/
+    /* Playlist */
+    /*---------------------------------------------------------------------------*/
 
-	.screen_preview {
-		grid-template:
-		  "header header header header" min-content
-		  "   .     n1     n1     .   " 1fr
-		  "   .     n1     n1     .   " 1fr
-		  "   .     n2   video    .   " 1fr
-		  "   .     n3   video    .   " 1fr
-		  "   .     n4   video    .   " 1fr
-		  "   .     n5   n_more   .   " 1fr
-		  "footer footer footer footer" min-content
-		  / 1cqw   6fr     4fr   1cqw;
+    .screen_preview {
+        grid-template:
+            "header header header header" min-content
+            "   .     n1     n1     .   " 1fr
+            "   .     n1     n1     .   " 1fr
+            "   .     n2   video    .   " 1fr
+            "   .     n3   video    .   " 1fr
+            "   .     n4   video    .   " 1fr
+            "   .     n5   n_more   .   " 1fr
+            "footer footer footer footer" min-content
+            / 1cqw 6fr 4fr 1cqw;
 
-		/* main blocks */
-		@keyframes slideright {
-			0% {transform: translateX(-200cqw);}
-			100% {transform: translateX(0cqw);}
-		}
-		/* playlist detail */
-		.item {
-			@include border;
-			@include radial;
-			display: grid;
-			grid-template:
-			  "performer title" 2fr
-			  "time      from " 1fr
-			  / 1fr      2fr;
-			animation-name: slideright;
-			animation-duration: 1s;
-			padding: 1cqh 1.5cqw;
-			container-type: size;
+        /* main blocks */
+        @keyframes slideright {
+            0% {
+                transform: translateX(-200cqw);
+            }
+            100% {
+                transform: translateX(0cqw);
+            }
+        }
+        /* playlist detail */
+        .item {
+            @include border;
+            @include radial;
+            display: grid;
+            grid-template:
+                "performer title" 2fr
+                "time      from " 1fr
+                / 1fr 2fr;
+            animation-name: slideright;
+            animation-duration: 1s;
+            padding: 1cqh 1.5cqw;
+            container-type: size;
 
-			img {
-				grid-area: thumb;
-				display: none;
-			}
-			p {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
- 			.performer {
-				grid-area: performer;
-				align-self: end;
-				font-size: 60cqh;
-				.n {display: none;}
- 			}
+            img {
+                grid-area: thumb;
+                display: none;
+            }
+            p {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .performer {
+                grid-area: performer;
+                align-self: end;
+                font-size: 60cqh;
+                .n {
+                    display: none;
+                }
+            }
             .time {
-				grid-area: time;
-				align-self: start;
-				color: #777;
-				font-size: 30cqh;
- 			}
- 			.title {
-				grid-area: title;
-				align-self: end;
-				font-size: 60cqh;
- 			}
- 			.from {
-				grid-area: from;
-				align-self: start;
-				color: #aaa;
-				font-size: 30cqh;
- 			}
-		}
-		.n1 {animation-delay: 0.0s; grid-area: n1;}
-		.n2 {animation-delay: 0.2s; grid-area: n2;}
-		.n3 {animation-delay: 0.3s; grid-area: n3;}
-		.n4 {animation-delay: 0.4s; grid-area: n4;}
-		.n5 {animation-delay: 0.5s; grid-area: n5;}
-		.n6 {animation-delay: 0.6s; grid-area: n6;}
-		.n7 {animation-delay: 0.7s; grid-area: n7;}
-		.n8 {animation-delay: 0.8s; grid-area: n8;}
-		.n9 {animation-delay: 0.9s; grid-area: n9;}
+                grid-area: time;
+                align-self: start;
+                color: #777;
+                font-size: 30cqh;
+            }
+            .title {
+                grid-area: title;
+                align-self: end;
+                font-size: 60cqh;
+            }
+            .from {
+                grid-area: from;
+                align-self: start;
+                color: #aaa;
+                font-size: 30cqh;
+            }
+        }
+        .n1 {
+            animation-delay: 0s;
+            grid-area: n1;
+        }
+        .n2 {
+            animation-delay: 0.2s;
+            grid-area: n2;
+        }
+        .n3 {
+            animation-delay: 0.3s;
+            grid-area: n3;
+        }
+        .n4 {
+            animation-delay: 0.4s;
+            grid-area: n4;
+        }
+        .n5 {
+            animation-delay: 0.5s;
+            grid-area: n5;
+        }
+        .n6 {
+            animation-delay: 0.6s;
+            grid-area: n6;
+        }
+        .n7 {
+            animation-delay: 0.7s;
+            grid-area: n7;
+        }
+        .n8 {
+            animation-delay: 0.8s;
+            grid-area: n8;
+        }
+        .n9 {
+            animation-delay: 0.9s;
+            grid-area: n9;
+        }
 
-		.n1 .time {
-			color: #ff0;
-			animation-name: glow_y;
-			animation-duration: 1s;
-			animation-iteration-count: infinite;
-			animation-direction: alternate;
-		}
-		.n2 .time {
-			color: #aa0;
-		}
+        .n1 .time {
+            color: #ff0;
+            animation-name: glow_y;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+        }
+        .n2 .time {
+            color: #aa0;
+        }
 
-		@keyframes slideleft {
-			0% {transform: translateX(200cqw);}
-			100% {transform: translateX(0cqw);}
-		}
-		#playlist_obscured {
-			display: none;
-		}
+        @keyframes slideleft {
+            0% {
+                transform: translateX(200cqw);
+            }
+            100% {
+                transform: translateX(0cqw);
+            }
+        }
+        #playlist_obscured {
+            display: none;
+        }
 
-		#n_more {
-			@include border;
-			@include radial;
-			grid-area: n_more;
-			display: grid;
-			animation-name: slideleft;
-			animation-duration: 1s;
-			animation-delay: 0.6s;
-			color: #777;
-			container-type: size;
+        #n_more {
+            @include border;
+            @include radial;
+            grid-area: n_more;
+            display: grid;
+            animation-name: slideleft;
+            animation-duration: 1s;
+            animation-delay: 0.6s;
+            color: #777;
+            container-type: size;
 
-			DIV {
-				justify-self: center;
-				align-self: center;
-				font-size: 60cqh;
-				SPAN {
-					color: #aa0;
-				}
-			}
-		}
+            DIV {
+                justify-self: center;
+                align-self: center;
+                font-size: 60cqh;
+                SPAN {
+                    color: #aa0;
+                }
+            }
+        }
 
-		.videoScaler {
-			grid-area: video;
-			animation-name: slideleft;
-			animation-duration: 1s;
-			animation-delay: 0.0s;
-			width: 100%;
-			height: 100%;
-			@include border;
-		}
+        .videoScaler {
+            grid-area: video;
+            animation-name: slideleft;
+            animation-duration: 1s;
+            animation-delay: 0s;
+            width: 100%;
+            height: 100%;
+            @include border;
+        }
 
-		/*---------------------------------------------------------------------------*/
-		/* 4:3 tweaks */
-		/* Draw a line between 16/10 (widescreen) and 16/12 (4:3) - by default we */
-		/* use the default layout, for display areas closer to 4:3 we override bits */
-		/*---------------------------------------------------------------------------*/
+        /*---------------------------------------------------------------------------*/
+        /* 4:3 tweaks */
+        /* Draw a line between 16/10 (widescreen) and 16/12 (4:3) - by default we */
+        /* use the default layout, for display areas closer to 4:3 we override bits */
+        /*---------------------------------------------------------------------------*/
 
-		@media (max-aspect-ratio: 16/11) {
-			// FIXME: tweak grid sizes
-		}
-	}
+        @media (max-aspect-ratio: 16/11) {
+            // FIXME: tweak grid sizes
+        }
+    }
 
-	/*---------------------------------------------------------------------------*/
-	/* Video */
-	/*---------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------*/
+    /* Video */
+    /*---------------------------------------------------------------------------*/
 
-	.screen_video {
-		grid-template:
-		  "video " 1fr
-		  / 1fr;
+    .screen_video {
+        grid-template:
+            "video " 1fr
+            / 1fr;
 
-		background: black;
+        background: black;
 
-		#join_info, #event_info {
-			display: none;
-		}
-		.videoScaler {
-		    grid-area: video;
-		}
+        #join_info,
+        #event_info {
+            display: none;
+        }
+        .videoScaler {
+            grid-area: video;
+        }
 
-		.pimp {
-			max-width: 50%;
-			position: absolute;
-			animation-iteration-count: 2;
-			animation-direction: alternate;
-			animation-duration: 5s;
-			text-shadow:
-				-1px -1px 0 #000,
-				1px -1px 0 #000,
-				-1px 1px 0 #000,
-				1px 1px 0 #000,
-				0 0 5vh #000;
-		}
-		@keyframes popright {
-			0% {transform: translate(200cqw);}
-			20% {transform: translate(200cqw);}
-			40% {transform: translate(0cqw);}
-			100% {transform: translate(0cqw);}
-		}
-		#pimpkk {
-			font-size: 10vh;
-			top: 5vh;
-			right: 5vw;
-			animation-name: popright;
-		}
-		#pimpcontributor {
-			display: none;
-		}
+        .pimp {
+            max-width: 50%;
+            position: absolute;
+            animation-iteration-count: 2;
+            animation-direction: alternate;
+            animation-duration: 5s;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+                1px 1px 0 #000, 0 0 5vh #000;
+        }
+        @keyframes popright {
+            0% {
+                transform: translate(200cqw);
+            }
+            20% {
+                transform: translate(200cqw);
+            }
+            40% {
+                transform: translate(0cqw);
+            }
+            100% {
+                transform: translate(0cqw);
+            }
+        }
+        #pimpkk {
+            font-size: 10vh;
+            top: 5vh;
+            right: 5vw;
+            animation-name: popright;
+        }
+        #pimpcontributor {
+            display: none;
+        }
 
-		@keyframes popleft {
-			0% {transform: translate(-200vw);}
-			20% {transform: translate(-200vw);}
-			40% {transform: translate(0vw);}
-			100% {transform: translate(0vw);}
-		}
-		#pimpsong {
-			font-size: 5vh;
-			top: 5vh;
-			left: 5vw;
-			animation-name: popleft;
-		}
+        @keyframes popleft {
+            0% {
+                transform: translate(-200vw);
+            }
+            20% {
+                transform: translate(-200vw);
+            }
+            40% {
+                transform: translate(0vw);
+            }
+            100% {
+                transform: translate(0vw);
+            }
+        }
+        #pimpsong {
+            font-size: 5vh;
+            top: 5vh;
+            left: 5vw;
+            animation-name: popleft;
+        }
 
-		@media (max-aspect-ratio: 16/11) {
-			grid-template:
-				"header" min-content
-				"video " 1fr
-				"footer" min-content
-				/ 1fr;
-			#pimpkk {
-				top: 15vh;
-			}
-			#pimpsong {
-				top: 15vh;
-			}
-			@keyframes fadeout {
-				0% {opacity: 1.0;}
-				100% {opacity: 0.25;}
-			}
-			#join_info, #event_info {
-				display: flex;
-				animation-name: fadeout;
-				animation-duration: 5s;
-			}
-		}
-	}
+        @media (max-aspect-ratio: 16/11) {
+            grid-template:
+                "header" min-content
+                "video " 1fr
+                "footer" min-content
+                / 1fr;
+            #pimpkk {
+                top: 15vh;
+            }
+            #pimpsong {
+                top: 15vh;
+            }
+            @keyframes fadeout {
+                0% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0.25;
+                }
+            }
+            #join_info,
+            #event_info {
+                display: flex;
+                animation-name: fadeout;
+                animation-duration: 5s;
+            }
+        }
+    }
 
-	/*---------------------------------------------------------------------------*/
-	/* Podium Mode */
-	/*---------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------*/
+    /* Podium Mode */
+    /*---------------------------------------------------------------------------*/
 
-	.screen_podium {
-		grid-template:
-		  "header header header" min-content
-		  "  .    video    .   " 1fr
-		  "footer footer footer" min-content
-		  / 1cqw   1fr      1cqw;
+    .screen_podium {
+        grid-template:
+            "header header header" min-content
+            "  .    video    .   " 1fr
+            "footer footer footer" min-content
+            / 1cqw 1fr 1cqw;
 
-		text-align: center;
+        text-align: center;
 
-		H1 {
-    		grid-area: header;
-    		border-bottom: var(--border-width) solid $LIGHT;
-			@include radial;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-			overflow: hidden;
-			font-size: 5cqh;
-			padding: 1cqh;
-		}
+        H1 {
+            grid-area: header;
+            border-bottom: var(--border-width) solid $LIGHT;
+            @include radial;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: 5cqh;
+            padding: 1cqh;
+        }
 
-		.videoScaler {
-			grid-area: video;
-			@include border;
-			height: 100%;
-			width: 100%;
-		}
+        .videoScaler {
+            grid-area: video;
+            @include border;
+            height: 100%;
+            width: 100%;
+        }
 
-		DIV.startButton,
-		DIV.progressBar {
-    		grid-area: footer;
-    		border-top: var(--border-width) solid $LIGHT;
-			@include radial;
-			background: linear-gradient(
-				90deg,
-				rgba($DARK, 0.5) 0,
-				$LIGHT 50%,
-				rgba($DARK, 0.5) 50%
-			);
-			background-size: 200% 100%;
-			// NOTE: keep the time here in sync with the frequency of state updates
-			transition: background-position 1s linear;
-			font-size: 5cqh;
-			padding: 2cqh;
-			SMALL {
-				font-size: 2cqh;
-				display: block;
-			}
-		}
-		DIV.startButton {
-			SPAN {
-				color: #ff0;
-				animation-name: glow_y;
-				animation-duration: 1s;
-				animation-iteration-count: infinite;
-				animation-direction: alternate;
-				animation-timing-function: linear;
-			}
-		}
-	}
+        DIV.startButton,
+        DIV.progressBar {
+            grid-area: footer;
+            border-top: var(--border-width) solid $LIGHT;
+            @include radial;
+            background: linear-gradient(
+                90deg,
+                rgba($DARK, 0.5) 0,
+                $LIGHT 50%,
+                rgba($DARK, 0.5) 50%
+            );
+            background-size: 200% 100%;
+            // NOTE: keep the time here in sync with the frequency of state updates
+            transition: background-position 1s linear;
+            font-size: 5cqh;
+            padding: 2cqh;
+            SMALL {
+                font-size: 2cqh;
+                display: block;
+            }
+        }
+        DIV.startButton {
+            SPAN {
+                color: #ff0;
+                animation-name: glow_y;
+                animation-duration: 1s;
+                animation-iteration-count: infinite;
+                animation-direction: alternate;
+                animation-timing-function: linear;
+            }
+        }
+    }
 }
