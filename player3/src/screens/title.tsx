@@ -165,14 +165,12 @@ function MyScene() {
         state.gl.getContext().getProgramInfoLog = () => "";
         state.gl.getContext().getShaderInfoLog = () => "";
     });
-    useFrame((state, delta) => {
+    useFrame((state, _delta) => {
         (state.camera as THREE.PerspectiveCamera).fov = widescreen ? 50 : 65;
         const t = state.clock.getElapsedTime();
-        globe.current && (globe.current.rotation.y = t / 8);
-        text1.current &&
-            text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));
-        text2.current &&
-            text2.current.lookAt(0, -Math.sin(1.5 * t), Math.sin(t));
+        if(globe.current) globe.current.rotation.y = t / 8;
+        if(text1.current) text1.current.lookAt(0, Math.sin(1.5 * t), Math.sin(t));
+        if(text2.current) text2.current.lookAt(0, -Math.sin(1.5 * t), Math.sin(t));
     });
 
     return (

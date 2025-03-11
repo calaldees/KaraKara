@@ -25,23 +25,23 @@ export type ClientContextType = {
 
 export const ClientContext = React.createContext<ClientContextType>({
     root: "",
-    setRoot: (x) => null,
+    setRoot: (_) => null,
     roomPassword: "",
-    setRoomPassword: (x) => null,
+    setRoomPassword: (_) => null,
     showSettings: false,
-    setShowSettings: (x) => null,
+    setShowSettings: (_) => null,
     podium: false,
-    setPodium: (x) => null,
+    setPodium: (_) => null,
     blankPodium: false,
-    setBlankPodium: (x) => null,
+    setBlankPodium: (_) => null,
     audioAllowed: false,
-    setAudioAllowed: (x) => null,
+    setAudioAllowed: (_) => null,
     fullscreen: false,
-    setFullscreen: (x) => null,
-    setNotification: (x) => null,
+    setFullscreen: (_) => null,
+    setNotification: (_) => null,
     wakeLock: "",
     underscan: "0em",
-    setUnderscan: (x) => null,
+    setUnderscan: (_) => null,
 });
 
 export function ClientProvider(props: any) {
