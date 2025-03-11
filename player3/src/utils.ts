@@ -1,3 +1,5 @@
+import type { Track, QueueItem, Attachment } from "./types";
+
 export function dict2css(d: Record<string, any>) {
     return Object.entries(d)
         .filter(([_, v]) => v)

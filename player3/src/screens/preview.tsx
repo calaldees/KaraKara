@@ -4,6 +4,7 @@ import { JoinInfo, Video, EventInfo } from "./_common";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
+import type { Track, QueueItem } from "../types";
 
 const show_tracks = 5;
 

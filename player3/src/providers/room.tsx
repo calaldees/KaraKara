@@ -6,6 +6,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { current_and_future, mqtt_url } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
+import type { QueueItem } from "../types";
 
 export type RoomContextType = {
     isAdmin: boolean;
