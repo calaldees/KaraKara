@@ -7,6 +7,7 @@ import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import placeholder from "../static/placeholder.svg";
 import { useScrollRestoration } from "../hooks/scrollrestoration";
+import type { Track, QueueItem } from "../types";
 
 export function Notification() {
     const { notification, setNotification } = useContext(ClientContext);

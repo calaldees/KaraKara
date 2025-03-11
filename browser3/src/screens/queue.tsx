@@ -6,6 +6,7 @@ import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
+import type { Track, QueueItem } from "../types";
 
 function QueueItemRender({
     item,
