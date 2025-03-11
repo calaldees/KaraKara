@@ -18,7 +18,7 @@ import { PodiumScreen } from "./podium";
 import { PreviewScreen } from "./preview";
 import { percent } from "../utils";
 
-export const router = createBrowserRouter(
+const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/">
             <Route index element={<RoomWrapper />} />
@@ -90,17 +90,17 @@ function Room() {
             />
         );
 
-    let errors: Array<string> = [];
+    const errors: Array<string> = [];
     if (!roomName) errors.push("No Room Set");
     if (!connected) errors.push("Not Connected");
     if (!isAdmin) errors.push("Not Admin");
     if (Object.keys(tracks).length === 0) errors.push("No Tracks");
 
-    let css = ":root {--underscan: " + underscan + ";}";
+    const css = ":root {--underscan: " + underscan + ";}";
     return (
         <div
-            onClick={(e) => setAudioAllowed(true)}
-            onDoubleClick={(e) => setShowSettings(true)}
+            onClick={(_) => setAudioAllowed(true)}
+            onDoubleClick={(_) => setShowSettings(true)}
         >
             <style>{css}</style>
             <main className={"theme-" + (settings["theme"] ?? "metalghosts")}>

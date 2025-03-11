@@ -88,7 +88,7 @@ export function PodiumScreen({
                 ) : (
                     <div
                         className={"startButton"}
-                        onClick={(e) => start()}
+                        onClick={(_) => start()}
                         style={{
                             backgroundPosition: percent(
                                 queue_item.start_time - now,
@@ -106,7 +106,7 @@ export function PodiumScreen({
                     </div>
                 )
             ) : (
-                <div className={"startButton"} onClick={(e) => start()}>
+                <div className={"startButton"} onClick={(_) => start()}>
                     <span>
                         Tap Here to Start
                         <small>Autoplay Disabled</small>
