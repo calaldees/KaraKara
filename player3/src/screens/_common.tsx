@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useContext } from "react";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
+import type { Track, Attachment } from "../types";
 
 type VideoProps = {
     track: Track;
@@ -52,8 +53,8 @@ export function JoinInfo() {
     return (
         <div id="join_info">
             <span>
-                Join at <strong>{root.replace("https://", "")}</strong> -
-                Room Name is <strong>{roomName}</strong>
+                Join at <strong>{root.replace("https://", "")}</strong> - Room
+                Name is <strong>{roomName}</strong>
             </span>
         </div>
     );

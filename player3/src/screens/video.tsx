@@ -2,9 +2,7 @@ import { useContext } from "react";
 import { percent } from "../utils";
 import { EventInfo, JoinInfo, Video } from "./_common";
 import { ServerContext } from "../providers/server";
-
-///////////////////////////////////////////////////////////////////////
-// Views
+import type { Track, QueueItem } from "../types";
 
 export function VideoScreen({
     track,
