@@ -1,11 +1,11 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
-import eslint from 'vite-plugin-eslint';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import eslint from "vite-plugin-eslint";
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    eslint(),
-  ],
-})
+    build: {
+        target: ["es2015", "ios11"],
+    },
+    plugins: [react(), eslint()],
+});
