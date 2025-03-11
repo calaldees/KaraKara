@@ -20,11 +20,14 @@ Global state (eg track list, queue, server time) is set in `src/providers/`
 ## Dev Setup
 
 Depending on whether you prefer Docker or Node:
+
 ```
 docker build -t kk-player3 .
 docker run --rm -p 1237:80 -ti kk-player3
 ```
+
 or
+
 ```
 npm install
 npm run serve

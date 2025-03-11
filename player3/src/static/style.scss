@@ -3,76 +3,78 @@
 
 * {
     box-sizing: border-box;
-   	// before animation, be at 0%, after
-	// animation, be at 100%
-	animation-fill-mode: both;
+    // before animation, be at 0%, after
+    // animation, be at 100%
+    animation-fill-mode: both;
 }
 // root elements should be full-screen, no overflow,
 // no scrolling, no cursor
-HTML, BODY {
-  margin: 0;
-  padding: 0;
-  user-select: none;
-  // to prevent scrolling on iOS
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: black;
-  font-family: sans-serif;
+HTML,
+BODY {
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    // to prevent scrolling on iOS
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: black;
+    font-family: sans-serif;
 }
 MAIN {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  cursor: none;
-  container: main / size;
-  margin: var(--underscan);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    cursor: none;
+    container: main / size;
+    margin: var(--underscan);
 }
 
 // Settings menu should consistently pop up in the center of the screen,
 // this is an admin-only feature, it shouldn't be customised by themes
 .settings {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  DIV {
-    flex: 0 0 auto;
-    text-align: center;
-    z-index: 9999;
-    background: white;
-    border: 2px solid black;
-    border-radius: 1em;
-    box-shadow: #000 0 0 1em;
-    padding: 1em;
-    H2 {
-      margin: 0;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    DIV {
+        flex: 0 0 auto;
+        text-align: center;
+        z-index: 9999;
+        background: white;
+        border: 2px solid black;
+        border-radius: 1em;
+        box-shadow: #000 0 0 1em;
+        padding: 1em;
+        H2 {
+            margin: 0;
+        }
+        INPUT[type="text"],
+        BUTTON {
+            width: 100%;
+        }
     }
-    INPUT[type="text"], BUTTON {
-      width: 100%;
-    }
-  }
 }
 
 #seekbar {
-  position: absolute;
-  top: 0;
-  height: 2vh;
-  background: yellow;
-  border: 1px solid black;
-  border-bottom: 0;
-  width: 4px;
-  // NOTE: keep the time here in sync with the frequency of state updates
-  transition: left 1s linear;
+    position: absolute;
+    top: 0;
+    height: 2vh;
+    background: yellow;
+    border: 1px solid black;
+    border-bottom: 0;
+    width: 4px;
+    // NOTE: keep the time here in sync with the frequency of state updates
+    transition: left 1s linear;
 }
 
 // Video scaling is glitchy and unreliable and works differently
@@ -91,33 +93,30 @@ MAIN {
 
 // Subtitles should be yellow or white, with a black border
 ::cue {
-	text-shadow:
-		-1px -1px 0 #000,
-		1px -1px 0 #000,
-		-1px 1px 0 #000,
-		1px 1px 0 #000;
-	font-size: 5cqh;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+        1px 1px 0 #000;
+    font-size: 5cqh;
 }
-::cue(v[voice='active']) {
-  color: yellow;
+::cue(v[voice="active"]) {
+    color: yellow;
 }
-::cue(v[voice='next']) {
-  color: white;
+::cue(v[voice="next"]) {
+    color: white;
 }
 .screen_podium ::cue {
-	font-size: 10cqh;
+    font-size: 10cqh;
 }
 
 #error {
-	color: red;
-	z-index: 9999;
-	position: absolute;
-	text-align: center;
-	background: black;
-	border-radius: .5em;
-	left: 1vw;
-	right: 1vw;
-	top: 1vh;
+    color: red;
+    z-index: 9999;
+    position: absolute;
+    text-align: center;
+    background: black;
+    border-radius: 0.5em;
+    left: 1vw;
+    right: 1vw;
+    top: 1vh;
 }
 
 @import 'metalghosts';
