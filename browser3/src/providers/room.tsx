@@ -7,6 +7,7 @@ import { current_and_future, mqtt_url, normalise_cmp } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 import { apply_hidden, apply_tags } from "../track_finder";
+import type { Track, QueueItem } from "../types";
 
 export type RoomContextType = {
     trackList: Track[];
