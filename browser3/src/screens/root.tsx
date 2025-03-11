@@ -25,7 +25,7 @@ import { Loading } from "./loading";
 // it happens (ie, saving scroll position). Buuuut, using loaders
 // triggers a code-path that uses signals, which aren't supported
 // in iOS 12. So if we don't have signals, give up on scrolling...
-export const router = createBrowserRouter(
+const router = createBrowserRouter(
     createRoutesFromElements(
         <Route
             path="/"

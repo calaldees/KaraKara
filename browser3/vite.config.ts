@@ -4,7 +4,7 @@ import svgr from "vite-plugin-svgr";
 import { VitePWA } from "vite-plugin-pwa";
 import eslint from "vite-plugin-eslint";
 
-// https://vitejs.dev/config/
+// https://vite.dev/config/
 export default defineConfig({
     build: {
         target: ["es2015", "ios11"],
