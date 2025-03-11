@@ -31,7 +31,7 @@ export function ConfigMenu() {
         e.preventDefault();
         setRoot(rootEdit);
         if (roomNameEdit !== roomName) {
-            navigate("/" + roomNameEdit);
+            void navigate("/" + roomNameEdit);
         }
         setRoomPassword(roomPasswordEdit);
         setShowSettings(false);
@@ -86,7 +86,7 @@ export function ConfigMenu() {
                                     <input
                                         checked={podium}
                                         type={"checkbox"}
-                                        onChange={(e) => setPodium(!podium)}
+                                        onChange={(_) => setPodium(!podium)}
                                     />
                                 </td>
                             </tr>
@@ -97,7 +97,7 @@ export function ConfigMenu() {
                                         <input
                                             checked={blankPodium}
                                             type={"checkbox"}
-                                            onChange={(e) =>
+                                            onChange={(_) =>
                                                 setBlankPodium(!blankPodium)
                                             }
                                         />
@@ -111,11 +111,11 @@ export function ConfigMenu() {
                                         <input
                                             checked={fullscreen}
                                             type={"checkbox"}
-                                            onChange={(e) => {
+                                            onChange={(_) => {
                                                 if (fullscreen) {
-                                                    document.exitFullscreen();
+                                                    void document.exitFullscreen();
                                                 } else {
-                                                    document.body.requestFullscreen();
+                                                    void document.body.requestFullscreen();
                                                 }
                                                 setFullscreen(!fullscreen);
                                             }}

@@ -56,7 +56,7 @@ export function TrackDetails(): React.ReactElement {
                 },
                 body: JSON.stringify({
                     track_id: track_id || "error",
-                    performer_name: performer_name,
+                    performer_name: performer_name.trim(),
                 }),
             },
             onAction: () => setAction(TrackAction.NONE),
