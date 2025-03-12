@@ -14,7 +14,7 @@
         "test-once": "vitest run"
     },
     "dependencies": {
-        "@shish2k/react-mqtt": "^0.0.0",
+        "@shish2k/react-mqtt": "^0.0.2",
         "@shish2k/react-use-servertime": "^0.0.3",
         "@ungap/global-this": "^0.4.4",
         "abortcontroller-polyfill": "^1.7.5",
