@@ -5,11 +5,11 @@
     "type": "module",
     "scripts": {
         "serve": "vite --host 127.0.0.1 --port 1236",
-        "build": "tsc && vite build --base /browser3/",
+        "build": "tsc -b && vite build --base /browser3/",
         "cypress": "npx cypress open",
         "format": "prettier --write .",
         "preview": "npm run build && vite preview --host 127.0.0.1 --port 1236 --base /browser3/",
-        "lint": "eslint --format unix src",
+        "lint": "eslint src",
         "test": "vitest",
         "test-once": "vitest run"
     },
@@ -29,7 +29,7 @@
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.11",
         "@vitejs/plugin-react-swc": "^3.0.0",
-        "cypress": "^13.14.1",
+        "cypress": "^14.1.0",
         "eslint": "^8.38.0",
         "eslint-config-react-app": "^7.0.1",
         "prettier": "^3.5.3",
@@ -38,7 +38,7 @@
         "vite": "^4.5.9",
         "vite-plugin-eslint": "^1.8.1",
         "vite-plugin-pwa": "^0.21.1",
-        "vitest": "^0.29.7"
+        "vitest": "^3.0.8"
     },
     "prettier": {
         "tabWidth": 4,

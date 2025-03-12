@@ -5,14 +5,16 @@
     "type": "module",
     "scripts": {
         "serve": "vite --host 127.0.0.1 --port 1237",
-        "build": "tsc && vite build --base /player3/",
+        "build": "tsc -b && vite build --base /player3/",
+        "cypress": "npx cypress open",
         "format": "prettier --write .",
         "preview": "npm run build && vite preview --host 127.0.0.1 --port 1237 --base /player3/",
-        "lint": "eslint --format unix src",
+        "lint": "eslint src",
         "test": "vitest",
         "test-once": "vitest run"
     },
     "dependencies": {
+        "@react-three/drei": "^9.64.0",
         "@react-three/fiber": "^8.12.0",
         "@shish2k/react-mqtt": "^0.0.2",
         "@shish2k/react-use-servertime": "^0.0.4",
@@ -25,10 +27,10 @@
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
-        "@react-three/drei": "^9.64.0",
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.11",
         "@vitejs/plugin-react-swc": "^3.0.0",
+        "cypress": "^14.1.0",
         "eslint": "^8.38.0",
         "eslint-config-react-app": "^7.0.1",
         "prettier": "^3.5.3",
@@ -37,7 +39,7 @@
         "typescript": "^5.5.4",
         "vite": "^4.5.9",
         "vite-plugin-eslint": "^1.8.1",
-        "vitest": "^0.29.7"
+        "vitest": "^3.0.8"
     },
     "prettier": {
         "tabWidth": 4,
