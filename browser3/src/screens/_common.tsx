@@ -72,7 +72,7 @@ export function Screen({
 }): React.ReactElement {
     const { setShowSettings } = useContext(ClientContext);
     const { queue } = useContext(RoomContext);
-    const scroller = useRef(null);
+    const scroller = useRef<HTMLElement|null>(null);
     useScrollRestoration(scroller);
 
     return (
