@@ -17,6 +17,7 @@ export type RoomContextType = {
     fullQueue: QueueItem[];
     setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
+    connected: boolean;
 };
 
 export const RoomContext = React.createContext<RoomContextType>({
@@ -27,6 +28,7 @@ export const RoomContext = React.createContext<RoomContextType>({
     fullQueue: [],
     setQueue: () => {},
     settings: {},
+    connected: false,
 });
 
 function InternalRoomProvider(props: any) {
@@ -41,7 +43,14 @@ function InternalRoomProvider(props: any) {
     const { request } = useApi();
     const navigate = useNavigate();
 
-    useSubscription(`room/${roomName}/queue`, (pkt) => {
+    // reset to default when room changes
+    useEffect(() => {
+        setFullQueue([]);
+        setQueue([]);
+        setSettings({});
+    }, [roomName]);
+
+    const { connected } = useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
         console.log(pkt.json());
         console.groupEnd();
@@ -108,6 +117,7 @@ function InternalRoomProvider(props: any) {
                 fullQueue,
                 setQueue,
                 settings,
+                connected,
             }}
         >
             {props.children}
