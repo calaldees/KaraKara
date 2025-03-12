@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "serve": "vite --host 127.0.0.1 --port 1237",
-        "build": "tsc -b && vite build --base /player3/",
+        "build": "tsc && vite build --base /player3/",
         "cypress": "npx cypress open",
         "format": "prettier --write .",
         "preview": "npm run build && vite preview --host 127.0.0.1 --port 1237 --base /player3/",
