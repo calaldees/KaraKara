@@ -22,8 +22,7 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-router-dom": "^6.9.0",
-        "usehooks-ts": "^3.1.1",
-        "vite-plugin-svgr": "^2.4.0"
+        "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
         "@types/react": "^18.0.28",
@@ -38,6 +37,7 @@
         "vite": "^4.5.9",
         "vite-plugin-eslint": "^1.8.1",
         "vite-plugin-pwa": "^0.21.1",
+        "vite-plugin-svgr": "^4.3.0",
         "vitest": "^3.0.8"
     },
     "prettier": {
