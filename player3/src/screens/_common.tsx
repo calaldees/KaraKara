@@ -85,8 +85,8 @@ export function EventInfo() {
                                 {n === as.length - 1
                                     ? ""
                                     : n === as.length - 2
-                                    ? " and "
-                                    : ", "}
+                                      ? " and "
+                                      : ", "}
                             </span>
                         ),
                     )}

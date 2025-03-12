@@ -93,7 +93,10 @@ MAIN {
 
 // Subtitles should be yellow or white, with a black border
 ::cue {
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
         1px 1px 0 #000;
     font-size: 5cqh;
 }

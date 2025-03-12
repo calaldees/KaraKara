@@ -49,12 +49,17 @@ $LIGHT: #29edf2;
 
         color: white;
         font-family: metalghosts, sans-serif;
-        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+        text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
             1px 1px 0 #000;
 
-        background: url("metalghosts/background.png"),
-            url("metalghosts/perlin.jpg");
-        background-size: 25cqh, 100% 200%;
+        background:
+            url("metalghosts/background.png"), url("metalghosts/perlin.jpg");
+        background-size:
+            25cqh,
+            100% 200%;
 
         H1,
         H2,
@@ -370,8 +375,12 @@ $LIGHT: #29edf2;
             animation-iteration-count: 2;
             animation-direction: alternate;
             animation-duration: 5s;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
-                1px 1px 0 #000, 0 0 5vh #000;
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000,
+                0 0 5vh #000;
         }
         @keyframes popright {
             0% {
