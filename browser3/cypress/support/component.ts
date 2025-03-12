@@ -93,6 +93,7 @@ function TestHarness(props: TestProps) {
         setQueue: setQueue,
         settings: settings,
         trackList: Object.values(tracks),
+        connected: true,
         ...props.room,
     };
 

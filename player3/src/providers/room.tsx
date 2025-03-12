@@ -37,6 +37,13 @@ function InternalRoomProvider(props: any) {
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
 
+    // reset to default when room changes
+    useEffect(() => {
+        setFullQueue([]);
+        setQueue([]);
+        setSettings({});
+    }, [roomName]);
+
     const { connected } = useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
         console.log(pkt.json());
