@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "serve": "vite --host 127.0.0.1 --port 1237",
-        "build": "tsc && vite build --base /player3/",
+        "build": "tsc -b && vite build --base /player3/",
         "cypress": "npx cypress open",
         "format": "prettier --write .",
         "preview": "npm run build && vite preview --host 127.0.0.1 --port 1237 --base /player3/",
@@ -14,21 +14,21 @@
         "test-once": "vitest run"
     },
     "dependencies": {
-        "@react-three/drei": "^9.64.0",
-        "@react-three/fiber": "^8.12.0",
-        "@shish2k/react-mqtt": "^0.0.2",
+        "@react-three/drei": "^10.0.4",
+        "@react-three/fiber": "^9.1.0",
+        "@shish2k/react-mqtt": "^0.0.5",
         "@shish2k/react-use-servertime": "^0.0.4",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-router-dom": "^6.9.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+        "react-router-dom": "^7.3.0",
         "react-screen-wake-lock": "^3.0.4",
         "three": "^0.174",
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
-        "@types/react": "^18.0.28",
-        "@types/react-dom": "^18.0.11",
         "@types/node": "^22.13.10",
+        "@types/react": "^19.0.10",
+        "@types/react-dom": "^19.0.4",
         "@types/three": "^0.174",
         "@vitejs/plugin-react-swc": "^3.8.0",
         "eslint": "^9.21.0",
