@@ -1,4 +1,4 @@
-/// <reference path='./browser.d.ts'/>
+/// <reference types='./browser.d.ts'/>
 
 // polyfills
 import "@ungap/global-this"; // iOS up to 14

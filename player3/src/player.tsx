@@ -1,4 +1,4 @@
-/// <reference path='./player.d.ts'/>
+/// <reference types='./player.d.ts'/>
 
 import React from "react";
 import ReactDOM from "react-dom/client";
