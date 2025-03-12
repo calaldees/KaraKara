@@ -75,7 +75,7 @@ export function ClientProvider(props: any) {
     });
     useEffect(() => {
         if (isSupported) {
-            request().then(() => {
+            void request().then(() => {
                 setWakeLock("Acquired");
             });
         }
