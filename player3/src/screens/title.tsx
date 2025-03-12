@@ -178,8 +178,8 @@ function MyScene() {
 
     return (
         <>
-            <ambientLight intensity={0.1} />
-            <directionalLight color="#29EDF2" position={[-4, 2, 5]} />
+            <ambientLight intensity={0.3} />
+            <directionalLight color="#29EDF2" position={[-4, 2, 5]} intensity={3} />
             <group position={[3, -0.25, 0]} rotation={[0, 0, -0.15]}>
                 <group ref={globe}>
                     <mesh>
