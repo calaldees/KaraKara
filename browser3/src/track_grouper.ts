@@ -1,11 +1,11 @@
 import { normalise_cmp, normalise_name } from "./utils";
 import type { Track } from "./types";
 
-type TrackListSection = {
-    tracks?: Array<Track>;
+interface TrackListSection {
+    tracks?: Track[];
     groups?: any;
     filters?: any;
-};
+}
 
 /**
  * Given a selection of tracks and some search terms, figure out
@@ -20,9 +20,9 @@ type TrackListSection = {
  *   from:gundam    -> gundam (wing, waltz, unicorn)
  */
 export function suggest_next_filters(
-    filters: Array<string>,
+    filters: string[],
     groups: Record<string, Record<string, number>>,
-): Array<string> {
+): string[] {
     const last_filter = filters[filters.length - 1];
 
     // if no search, show a sensible selection
@@ -85,7 +85,7 @@ export function suggest_next_filters(
  *  }
  */
 export function summarise_tags(
-    tracks: Array<Pick<Track, "tags">>,
+    tracks: Pick<Track, "tags">[],
 ): Record<string, Record<string, number>> {
     const tags: Record<string, Record<string, number>> = {};
     tracks.forEach((track) => {
@@ -120,11 +120,11 @@ export function summarise_tags(
  * - tag_child, eg "on", "Gundam"
  */
 export function group_tracks(
-    filters: Array<string>,
-    tracks: Array<Track>,
-): Array<[string, TrackListSection]> {
-    const sections: Array<[string, TrackListSection]> = [];
-    let leftover_tracks: Array<Track> = tracks;
+    filters: string[],
+    tracks: Track[],
+): [string, TrackListSection][] {
+    const sections: [string, TrackListSection][] = [];
+    let leftover_tracks: Track[] = tracks;
     const all_tags = summarise_tags(tracks);
 
     // If there are no tracks, show a friendly error
@@ -140,7 +140,7 @@ export function group_tracks(
         // grouped by "Macross:*".
         const most_recent_tag = filters[filters.length - 1]?.split(":")[1];
         if (most_recent_tag && all_tags[most_recent_tag]) {
-            let found_track_ids: Array<string> = [];
+            let found_track_ids: string[] = [];
 
             const tag_key = most_recent_tag;
             // Look at our all_tags table to see what children we have

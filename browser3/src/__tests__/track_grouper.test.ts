@@ -113,7 +113,7 @@ describe("group_tracks", () => {
     });
 
     describe("with many tracks", () => {
-        let many_tracks: Array<Track> = [];
+        let many_tracks: Track[] = [];
         for (let i = 0; i < 1000; i++) {
             many_tracks.push(track_dict["track_id_1"]);
         }

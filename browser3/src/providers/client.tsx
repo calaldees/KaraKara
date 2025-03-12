@@ -6,7 +6,7 @@ type Notification = {
     style: string;
 } | null;
 
-export type ClientContextType = {
+export interface ClientContextType {
     root: string;
     setRoot: (_: string) => void;
     roomPassword: string;

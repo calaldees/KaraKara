@@ -41,7 +41,7 @@ export function time_until(now: number, time: number | null): string {
  * Generic function to shuffle an array, modifying it in-place
  * and also returning it
  */
-export function shuffle<T>(array: Array<T>): Array<T> {
+export function shuffle<T>(array: T[]): T[] {
     let currentIndex = array.length;
     let temporaryValue, randomIndex;
 
@@ -84,7 +84,7 @@ export function percent(a: number, b: number): string {
     return Math.round((a / b) * 100) + "%";
 }
 
-export function shortest_tag(n: Array<string> | undefined): string {
+export function shortest_tag(n: string[] | undefined): string {
     if (n === undefined) {
         return "";
     }
@@ -121,11 +121,11 @@ const title_tags_for_category: Record<string, string[]> = {
     meme: ["from"],
 };
 export function track_info(
-    filters: Array<string>,
+    filters: string[],
     track: Pick<Track, "tags">,
 ): string {
     const info_tags =
-        title_tags_for_category[track.tags.category?.[0] || "DEFAULT"] ||
+        title_tags_for_category[track.tags.category?.[0] ?? "DEFAULT"] ||
         title_tags_for_category["DEFAULT"];
     // look at series that are in the search box
     const search_from = filters
@@ -166,8 +166,8 @@ export function copy_type(original: any, value: any) {
  */
 export function current_and_future(
     now: number,
-    tracks: Array<QueueItem>,
-): Array<QueueItem> {
+    tracks: QueueItem[],
+): QueueItem[] {
     return tracks.filter(
         (t) => t.start_time == null || t.start_time + t.track_duration > now,
     );

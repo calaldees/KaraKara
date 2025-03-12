@@ -90,7 +90,7 @@ function Room() {
             />
         );
 
-    const errors: Array<string> = [];
+    const errors: string[] = [];
     if (!roomName) errors.push("No Room Set");
     if (!connected) errors.push("Not Connected");
     if (!isAdmin) errors.push("Not Admin");

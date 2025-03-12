@@ -167,7 +167,7 @@ export function TrackDetails(): React.ReactElement {
             <h2>Tags</h2>
             <div className={"tags"}>
                 {Object.keys(track.tags)
-                    .filter((key) => BLOCKED_KEYS.indexOf(key) === -1)
+                    .filter((key) => BLOCKED_KEYS.includes(key))
                     .map((key) => (
                         <div key={key} className={"tag"}>
                             <div className={"tag_key"}>{key}</div>

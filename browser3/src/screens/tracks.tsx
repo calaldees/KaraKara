@@ -10,7 +10,7 @@ import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import type { Track } from "../types";
 
-type ExploreContextType = {
+interface ExploreContextType {
     search: string;
     setSearch: (_: string) => void;
     filters: string[];

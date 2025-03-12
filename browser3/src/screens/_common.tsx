@@ -28,7 +28,7 @@ export function Notification() {
 export function YoureNext({
     queue,
 }: {
-    queue: Array<QueueItem>;
+    queue: QueueItem[];
 }): React.ReactElement {
     const { performerName } = useContext(ClientContext);
     const { sessionId } = useContext(RoomContext);
@@ -77,9 +77,9 @@ export function Screen({
     return (
         <main className={className}>
             <header>
-                {navLeft || <EmptyHeaderLink />}
+                {navLeft ?? <EmptyHeaderLink />}
                 <h1 onDoubleClick={(_) => setShowSettings(true)}>{title}</h1>
-                {navRight || <EmptyHeaderLink />}
+                {navRight ?? <EmptyHeaderLink />}
             </header>
             <Notification />
             <YoureNext queue={queue} />

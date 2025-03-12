@@ -4,7 +4,7 @@ import { useServerTime } from "@shish2k/react-use-servertime";
 import { ClientContext } from "./client";
 import type { Track } from "../types";
 
-export type ServerContextType = {
+export interface ServerContextType {
     tracks: Record<string, Track>;
     downloadSize: number | null;
     downloadDone: number;

@@ -5,10 +5,7 @@ import type { Track } from "./types";
  * other non-hidden tags with the same parent. Consider top-level
  * tags to have different parents.
  */
-export function apply_hidden(
-    tracks: Array<Track>,
-    hidden_tags: Array<string>,
-): Array<Track> {
+export function apply_hidden(tracks: Track[], hidden_tags: string[]): Track[] {
     // Translate
     //   hidden=category:anime,category:retro,broken
     // into
@@ -53,10 +50,7 @@ export function apply_hidden(
  * If user filters for from:macross, then check
  *   track.tags["from"].includes("macross")
  */
-export function apply_tags(
-    tracks: Array<Track>,
-    tags: Array<string>,
-): Array<Track> {
+export function apply_tags(tracks: Track[], tags: string[]): Track[] {
     // convert "retro" to ["", "retro"] and "from:Macross" to ["from", "Macross"]
     const tag_pairs = tags.map((x) =>
         (x.includes(":") ? x : ":" + x).split(":"),
@@ -78,10 +72,7 @@ export function apply_tags(
  * If the user uses free-text search, then check all tag values
  * for matching text, and skip if we have no matches
  */
-export function apply_search(
-    tracks: Array<Track>,
-    search: string,
-): Array<Track> {
+export function apply_search(tracks: Track[], search: string): Track[] {
     search = search.trim();
     if (search === "") return tracks;
     search = search.toLowerCase();
@@ -92,9 +83,9 @@ export function apply_search(
         return Object.values(track.tags).some(
             // ... has any value ...
             (tag_values) =>
-                (tag_values as Array<string>).some(
+                tag_values!.some(
                     // ... which contains the text we're looking for
-                    (value) => value.toLowerCase().indexOf(search) >= 0,
+                    (value) => value.toLowerCase().includes(search),
                 ),
         );
     });
@@ -122,10 +113,10 @@ export function text_to_filters(
  * All the searching in one place, for benchmarking
  */
 export function find_tracks(
-    tracks: Array<Track>,
+    tracks: Track[],
     filters_: string[],
     search_: string,
-): Array<Track> {
+): Track[] {
     const [filters, search] = text_to_filters(filters_, search_);
     tracks = apply_tags(tracks, filters);
     tracks = apply_search(tracks, search);

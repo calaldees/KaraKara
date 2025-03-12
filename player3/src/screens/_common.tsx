@@ -5,7 +5,7 @@ import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import type { Track, Attachment } from "../types";
 
-type VideoProps = {
+interface VideoProps {
     track: Track;
     lowres: boolean;
     [Key: string]: any;

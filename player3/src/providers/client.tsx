@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
 
-export type ClientContextType = {
+export interface ClientContextType {
     root: string;
     setRoot: (n: string) => void;
     roomPassword: string;

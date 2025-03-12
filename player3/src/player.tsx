@@ -8,9 +8,7 @@ import { ClientProvider } from "./providers/client";
 import { ServerProvider } from "./providers/server";
 import { Root } from "./screens/root";
 
-const root = ReactDOM.createRoot(
-    document.getElementById("root") as HTMLElement,
-);
+const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
     <React.StrictMode>
         <ClientProvider>

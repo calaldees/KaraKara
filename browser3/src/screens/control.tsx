@@ -9,7 +9,7 @@ import { useApi } from "../hooks/api";
 import { useParams } from "react-router-dom";
 import type { QueueItem } from "../types";
 
-function Playlist({ queue }: { queue: Array<QueueItem> }): React.ReactElement {
+function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks, now } = useContext(ServerContext);
     const { fullQueue, setQueue } = useContext(RoomContext);
     const { booth } = useContext(ClientContext);

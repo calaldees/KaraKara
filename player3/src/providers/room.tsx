@@ -8,7 +8,7 @@ import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 import type { QueueItem } from "../types";
 
-export type RoomContextType = {
+export interface RoomContextType {
     isAdmin: boolean;
     sessionId: string;
     queue: QueueItem[];
