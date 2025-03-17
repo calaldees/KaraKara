@@ -1,7 +1,8 @@
-FROM python:3.12-alpine as base
+FROM python:3.13-alpine as base
     WORKDIR /app/
     RUN apk add --no-cache \
-        bash
+        bash \
+    && true
 
 FROM base as python_dependencies
     COPY ./pyproject.toml ./

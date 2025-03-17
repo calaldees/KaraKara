@@ -3,22 +3,23 @@ name = "api_queue"
 version = "0.0.0"
 readme = "README.md"
 dependencies = [
-	"sanic ~= 23.12",
-	"sanic-ext ~= 23.12",
-	"sanic-openapi ~= 21.12",
-	"ujson ~= 5.9",
-	"aiomqtt ~= 2.0",
-	"pytimeparse ~= 1.1",
-	"setuptools ~= 75.5",
+	"sanic",  # ~= 23.12
+	"sanic-ext",  # ~= 23.12
+	"sanic-openapi",  # ~= 21.12
+	"ujson",  # ~= 5.9
+	"aiomqtt",  #  ~= 2.0
+	"pytimeparse",  # ~= 1.1
+	"pydantic",
+	"setuptools",  # ~= 75.5
 ]
 
 [project.optional-dependencies]
 test = [
-	"pytest ~= 8.0",
-	"pytest-asyncio ~= 0.23",
-	"sanic-testing ~= 23.12",
-	"mypy ~= 1.8",
-	"types-ujson ~= 5.9",
+	"pytest",  # ~= 8.0
+	"pytest-asyncio",  #  ~= 0.23
+	"sanic-testing",  #  ~= 23.12
+	"mypy",  # ~= 1.8
+	"types-ujson", #  ~= 5.9
 ]
 
 [tool.mypy]
