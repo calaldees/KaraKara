@@ -1,4 +1,6 @@
+import sanic
 import pytest
+import typing as t
 from unittest.mock import patch, AsyncMock, MagicMock
 
 from api_queue.settings_manager import SettingsManager
@@ -24,7 +26,7 @@ def mock_mqtt():
 
 
 @pytest.fixture
-async def app(tmp_path, mock_mqtt):  #mock_redis
+async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[sanic.Sanic]:
     # get the single registered app - is this needed? can we just import app from server?
     #from sanic import Sanic
     #app = Sanic.get_app()
@@ -44,66 +46,9 @@ async def app(tmp_path, mock_mqtt):  #mock_redis
     )
     yield app
 
-class QueueModel():
-    def __init__(self, app, queue):
-        self.app = app
-        self._queue = queue
-        del self.session_id
-
-    @property
-    def session_id(self):
-        return self.app.asgi_client.cookies.get('session_id')
-    @session_id.setter
-    def session_id(self, value):
-        self.app.asgi_client.cookies.delete('session_id')
-        self.app.asgi_client.cookies.set('session_id', value)
-    @session_id.deleter
-    def session_id(self):
-        self.app.asgi_client.cookies.delete('session_id')
-
-    @property
-    async def queue_csv(self):
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.csv")
-        return response.text
-    @property
-    async def queue(self):
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
-        return response.json
-    @property
-    async def tracks(self):
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/tracks.json")
-        return response.json
-    @property
-    async def settings(self):
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
-        return response.json
-
-    async def settings_put(self, payload):
-        request, response = await self.app.asgi_client.put(f"/room/{self._queue}/settings.json", data=json.dumps(payload))
-        return response
-    async def post(self, **kwargs):
-        request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
-        return response
-    async def delete(self, queue_item_id):
-        request, response = await self.app.asgi_client.delete(f"/room/{self._queue}/queue/{queue_item_id}.json")
-        return response
-    async def put(self, **kwargs):
-        request, response = await self.app.asgi_client.put(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
-        return response
-
-    async def command(self, command):
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/command/{command}.json")
-        return response
-
-
 
 @pytest.fixture
-def queue_model(app):
-    return QueueModel(app, 'test')
-
-
-@pytest.fixture
-def qu():
+def qu() -> Queue:
     mock_settings_manager = MagicMock()
     mock_settings_manager.get_json.return_value = {
         "track_space": 10.0,
