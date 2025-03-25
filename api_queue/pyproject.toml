@@ -8,18 +8,21 @@ dependencies = [
 	"sanic-openapi",  # ~= 21.12
 	"ujson",  # ~= 5.9
 	"aiomqtt",  #  ~= 2.0
-	"pytimeparse",  # ~= 1.1
-	"pydantic",
+	"pytimeparse2",  # ~= 1.1
+	"dateparser",
 	"setuptools",  # ~= 75.5
+	"pydantic",  # To be replaced with msgspec?
 ]
 
 [project.optional-dependencies]
 test = [
+	"mypy",  # ~= 1.8
 	"pytest",  # ~= 8.0
 	"pytest-asyncio",  #  ~= 0.23
+	"pytest-mypy",
 	"sanic-testing",  #  ~= 23.12
-	"mypy",  # ~= 1.8
 	"types-ujson", #  ~= 5.9
+	"types-dateparser",
 ]
 
 [tool.mypy]
@@ -29,4 +32,4 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--doctest-modules -p no:cacheprovider"
+addopts = "--mypy --doctest-modules -p no:cacheprovider"

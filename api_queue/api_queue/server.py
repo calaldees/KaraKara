@@ -294,7 +294,7 @@ async def add_queue_item(request, room_name):
             queue.add(queue_item)
             # Post process queue state - functions are configurable per queue
             if not request.ctx.user.is_admin:
-                for function_name in queue.settings.get("queue_post_processing_function_names", []):
+                for function_name in queue.settings.queue_post_processing_function_names:
                     _error = queue_post_processing_functions[function_name](queue)
                     if _error:
                         log.info(f"add failed {_error=}")

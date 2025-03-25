@@ -10,11 +10,11 @@ def default(queue: Queue):
     Check performer name in performer name list
     """
 
-    _start = queue.settings["validation_event_start_datetime"]
+    _start = queue.settings.validation_event_start_datetime
     if _start and queue.now < _start:
         return f"Event starts at {_start}"
 
-    _end = queue.settings["validation_event_end_datetime"]
+    _end = queue.settings.validation_event_end_datetime
     if _end and queue.end_time > _end:
         return f"Queue is full all the way until {_end}"
 
@@ -22,12 +22,12 @@ def default(queue: Queue):
     if not queue_last:
         return  # No tracks to validate
 
-    _valid_performer_names = queue.settings["validation_performer_names"]
+    _valid_performer_names = queue.settings.validation_performer_names
     if _valid_performer_names:
         if queue_last.performer_name not in _valid_performer_names:
             return f"{queue_last.performer_name} is not a valid performer_name for this event"
 
-    _performer_timedelta = queue.settings["validation_duplicate_performer_timedelta"]
+    _performer_timedelta = queue.settings.validation_duplicate_performer_timedelta
     if _performer_timedelta:
         raise NotImplementedError('TODO: finish this feature')
         epoch = queue.now - _performer_timedelta
@@ -41,7 +41,7 @@ def default(queue: Queue):
         if tuple(filter(_filter, queue.items)):
             return f"Duplicated performer {queue_last.performer_name} within {_performer_timedelta}"
 
-    _track_timedelta = queue.settings["validation_duplicate_track_timedelta"]
+    _track_timedelta = queue.settings.validation_duplicate_track_timedelta
     if _track_timedelta:
         raise NotImplementedError('TODO: finish this feature')
         epoch = queue.now - _track_timedelta

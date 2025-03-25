@@ -6,6 +6,8 @@ import numbers
 from functools import reduce
 from itertools import pairwise
 
+from .settings_manager import QueueSettings
+
 
 # dataclasses are ment to be this cool hip new happening pattern in python
 # have I missed the point here? this feels like verbose rubbish for such a simple class
@@ -90,14 +92,14 @@ class QueueItem():
 
 
 class Queue():
-    def __init__(self, items: list[QueueItem], settings: dict):
+    def __init__(self, items: list[QueueItem], settings: QueueSettings):
         self.items = items
         self.settings = settings
         self.modified = False
         self._now: t.Optional[datetime.datetime] = None
     @property
-    def track_space(self):
-        return self.settings["track_space"]
+    def track_space(self) -> datetime.timedelta:
+        return self.settings.track_space
     @property
     def now(self) -> datetime.datetime:
         return self._now or datetime.datetime.now(tz=datetime.timezone.utc)
@@ -134,7 +136,7 @@ class Queue():
     def end_time(self) -> datetime.datetime:
         if self.last and self.last.end_time:
             return self.last.end_time
-        def track_duration_reducer(end_time, i):
+        def track_duration_reducer(end_time: datetime.datetime, i: QueueItem) -> datetime.datetime:
             end_time += i.track_duration + self.track_space
             return end_time
         return reduce(track_duration_reducer, self.future, self.now)
@@ -214,5 +216,5 @@ class Queue():
             self.delete(self.current.id)
     def _recalculate_start_times(self) -> None:
         for i_prev, i_next in pairwise(self.current_future):
-            i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None
+            i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None   # type: ignore
         self.modified = True

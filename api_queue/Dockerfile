@@ -16,11 +16,10 @@ FROM python_dependencies as code
 
 FROM code as test
     COPY --from=python_dependencies_test /site-packages /site-packages
-    CMD ["python", "-m", "api_queue.server"]
-
     COPY ./tests ./tests
     RUN python3 -m pytest -x
-    RUN python3 -m mypy api_queue
+    #RUN python3 -m mypy api_queue
+    CMD ["python", "-m", "api_queue.server"]
 
 FROM code as production
     EXPOSE 8000

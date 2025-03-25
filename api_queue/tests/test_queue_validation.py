@@ -15,15 +15,15 @@ def test_single_item(qu):
     assert default_validation(qu) is None
 
 def test_start_time(qu):
-    qu.settings["validation_event_start_datetime"] += datetime.timedelta(hours=1)
+    qu.settings.validation_event_start_datetime += datetime.timedelta(hours=1)
     assert 'starts' in default_validation(qu)
 
 def test_end_time(qu):
-    qu.settings["validation_event_end_datetime"] += datetime.timedelta(hours=-1)
+    qu.settings.validation_event_end_datetime += datetime.timedelta(hours=-1)
     assert 'is full' in default_validation(qu)
 
 def test_performer_names(qu):
-    qu.settings["validation_performer_names"] = ['TTT']
+    qu.settings.validation_performer_names = ['TTT']
     qu.add(QueueItem('Track1', 60, 'TestSession1', 'test_name'))
     assert 'test_name' in default_validation(qu)
 

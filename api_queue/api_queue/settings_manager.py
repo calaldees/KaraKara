@@ -1,76 +1,92 @@
 import datetime
+import enum
+import typing as t
 from pathlib import Path
 
+import pydantic
 import ujson as json
-from pytimeparse.timeparse import timeparse  # type: ignore
+import pytimeparse2  # type: ignore
+import dateparser
+
+type Tag = str
 
 
-DEFAULT_QUEUE_SETTINGS = {
-    "track_space": 15.0,
-    "hidden_tags": ["red:duplicate"],
-    "forced_tags": [],
-    "title": "KaraKara",
-    "theme": "metalghosts",
-    "preview_volume": 0.2,
-    "validation_event_start_datetime": None,
-    "validation_event_end_datetime": None,
-    "validation_duplicate_performer_timedelta": None,
-    "validation_duplicate_track_timedelta": None,
-    "validation_performer_names": [],
-    "queue_post_processing_function_names": ["validation_default",],
-    "coming_soon_track_count": 5,
-}
-def _parse_isodatetime(isoformatString):
-    if not isoformatString:
+class Theme(enum.StrEnum):
+    METALGHOSTS = enum.auto()
+
+
+def _parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optional[datetime.timedelta]:
+    if not duration:
         return None
-    dt = datetime.datetime.fromisoformat(isoformatString)
+    if isinstance(duration, datetime.timedelta):
+        return duration
+    seconds = pytimeparse2.parse(duration) if isinstance(duration, str) else duration
+    return datetime.timedelta(seconds=seconds)
+
+Timedelta = t.Annotated[
+    datetime.timedelta,
+    pydantic.PlainValidator(_parse_timedelta, json_schema_input_type=int|float|str),
+    pydantic.PlainSerializer(lambda td: td.total_seconds() if td else None, return_type=int),
+]
+
+def _parse_datetime(value: str | int) -> t.Optional[datetime.datetime]:
+    #dt = datetime.datetime.fromisoformat(isoformatString)
+    dt: t.Optional[datetime.datetime] = None
+    if isinstance(value, int):
+        dt = datetime.datetime.fromtimestamp(value, tz=datetime.timezone.utc)
+    if isinstance(value, str):
+        dt = dateparser.parse(value)
+        if not dt:
+            raise ValueError(f'unable to parse datetime {value}')
+    if not dt:
+        return None
     if not dt.tzinfo:
         dt = dt.replace(tzinfo=datetime.timezone.utc)
     return dt
-def _parse_timedelta(durationString):
-    return datetime.timedelta(seconds=timeparse(durationString)) if durationString else None
-QUEUE_SETTING_TYPES = {
-    "track_space": lambda x: datetime.timedelta(seconds=x),
-    "validation_event_start_datetime": _parse_isodatetime,
-    "validation_event_end_datetime": _parse_isodatetime,
-    "validation_duplicate_performer_timedelta": _parse_timedelta,
-    "validation_duplicate_track_timedelta": _parse_timedelta,
-}
-def parse_settings_dict(settings_dict: dict) -> dict:
-    return {
-        k: QUEUE_SETTING_TYPES.get(k, lambda x: x)(v)
-        for k, v in settings_dict.items()
-    }
-def validate_settings_dict(settings_dict: dict):
-    # throw exception if parsed dict (with python types) is not valid
-    # settings_dict could be a subset of possible settings_dict fields
-    # TODO - Implement Me!
-    return
-    # Idea?: would it be better to perform the validation on a complete dict before saving?
 
-class SettingsManager():
-    def __init__(self, path: Path = Path('.')):
+OptionalDatetime = t.Annotated[
+    t.Optional[datetime.datetime],
+    pydantic.PlainValidator(_parse_datetime, json_schema_input_type=str),
+    #pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
+]
+#OptionalDatetime = t.Optional[datetime.datetime]
+
+
+class QueueSettings(pydantic.BaseModel):
+    track_space: Timedelta = datetime.timedelta(seconds=15)
+    hidden_tags: t.Sequence[Tag] = ("red:duplicate",)
+    forced_tags: t.Sequence[Tag] = ()
+    title: str = "KaraKara"
+    theme: Theme = Theme.METALGHOSTS
+    preview_volume: float = 0.1
+    coming_soon_track_count: int = 5
+    validation_event_start_datetime: OptionalDatetime = None
+    validation_event_end_datetime: OptionalDatetime = None
+    validation_duplicate_performer_timedelta: t.Optional[Timedelta] = None
+    validation_duplicate_track_timedelta: t.Optional[Timedelta] = None
+    validation_performer_names: t.Sequence[str] = ()
+    queue_post_processing_function_names: t.Sequence[str] = ("validation_default", )
+
+
+class SettingsManager:
+    def __init__(self, path: Path = Path(".")):
         path = path if isinstance(path, Path) else Path(path)
         path.mkdir(parents=True, exist_ok=True)  # is this safe?
         assert path.is_dir()
         self.path = path
 
     def room_exists(self, name: str) -> bool:
-        return self.path.joinpath(f'{name}_settings.json').is_file()
+        return self.path.joinpath(f"{name}_settings.json").is_file()
 
     def get_json(self, name: str) -> dict:
-        path = self.path.joinpath(f'{name}_settings.json')
-        if not path.is_file():
-            return DEFAULT_QUEUE_SETTINGS
-        with path.open('r') as filehandle:
-            return {**DEFAULT_QUEUE_SETTINGS, **json.load(filehandle)}
+        path = self.path.joinpath(f"{name}_settings.json")
+        json_str = path.read_text() if path.is_file() else QueueSettings().model_dump_json()
+        return json.loads(json_str)
 
     def set_json(self, name: str, settings: dict) -> None:
-        path = self.path.joinpath(f'{name}_settings.json')
-        validate_settings_dict(parse_settings_dict(settings))  # new settings should parse without exception
-        old_settings = self.get_json(name)
-        with path.open('w') as filehandle:
-            json.dump({**old_settings, **settings}, filehandle)
+        path = self.path.joinpath(f"{name}_settings.json")
+        json_str = QueueSettings(**{**self.get_json(name), **settings}).model_dump_json()
+        path.write_text(json_str)
 
-    def get(self, name: str) -> dict:
-        return parse_settings_dict(self.get_json(name))
+    def get(self, name: str) -> QueueSettings:
+        return QueueSettings(**self.get_json(name))

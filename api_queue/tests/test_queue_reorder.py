@@ -18,7 +18,7 @@ def _mins_ago(minutes):
 @pytest.fixture
 def qu(qu):
     qu._now = None
-    qu.settings["coming_soon_track_count"] = 3
+    qu.settings.coming_soon_track_count = 3
     return qu
 
 
