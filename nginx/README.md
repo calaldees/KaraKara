@@ -24,3 +24,11 @@ server {
 	}
 }
 ```
+
+References
+----------
+
+* [Rotating nginx logs using Docker Compose and logrotate](https://alexanderzeitler.com/articles/rotating-nginx-logs-with-docker-compose/)
+	* this is `logrotate` on the host
+* [StackOverflow: Logrotate - nginx logs not rotating inside docker container](https://stackoverflow.com/a/46365627/3356840)
+	* run CMD to run `cron`->`logrotate` inside `nginx` container
