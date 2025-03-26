@@ -64,7 +64,7 @@ async def tracks_load(_app: sanic.Sanic, _loop):
     _app.ctx.track_manager = TrackManager(Path(str(_app.config.get('PATH_TRACKS'))))
 
 
-from .settings_manager import SettingsManager
+from .settings_manager import SettingsManager, QueueSettings
 from .queue_manager import QueueManagerCSVAsync
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
@@ -98,7 +98,7 @@ async def aio_mqtt_close(_app, _loop):
 
 # pytest debugging - This is needed to see exceptions on failed tests. DEBUG=True wont give me json exceptions. SO CLUMSY!
 # https://sanic.dev/en/guide/best-practices/exceptions.html#custom-error-handling
-def exception_to_dict(exception):
+def exception_to_dict(exception: Exception) -> dict[str, str|int]:
     import traceback
     return {
         'status': 500,
@@ -172,6 +172,7 @@ app.blueprint(room_blueprint)
 class NullObjectJson:
     pass
 class QueueItemJson:
+    # We cant use QueueItem(dataclass) directly as the types are not the same as it's `.to_dict()`
     track_id: str
     track_duration: float
     session_id: str
@@ -215,14 +216,14 @@ async def tracks(request, room_name):
 
 @room_blueprint.get("/settings.json")
 @openapi.definition(
-    response=openapi.definitions.Response({"application/json": NullObjectJson}),
+    response=openapi.definitions.Response({"application/json": QueueSettings}),
 )
 async def get_settings(request, room_name):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(room_name))
 
 @room_blueprint.put("/settings.json")
 @openapi.definition(
-    body={"application/json": {}},
+    body={"application/json": QueueSettings},
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
 async def update_settings(request, room_name):

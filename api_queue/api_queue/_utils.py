@@ -1,7 +1,8 @@
 from types import MappingProxyType
-from typing import Mapping, Iterable
+import typing as t
 
-def harden(data):
+
+def harden(data: t.Mapping | t.Iterable | t.Any) -> t.Mapping | t.Iterable | t.Any:
     """
     >>> harden({"a": [1,2,3]})
     mappingproxy({'a': (1, 2, 3)})
@@ -12,9 +13,9 @@ def harden(data):
     >>> harden([1, {"c": True, "d": 3.14, "e": {"no", "no"}}])
     (1, mappingproxy({'c': True, 'd': 3.14, 'e': ('no',)}))
     """
-    if isinstance(data, Mapping):
+    if isinstance(data, t.Mapping):
         return MappingProxyType({k: harden(v) for k, v in data.items()})
-    if isinstance(data, Iterable) and not isinstance(data, str):
+    if isinstance(data, t.Iterable) and not isinstance(data, str):
         return tuple((harden(i) for i in data))
     return data
 
