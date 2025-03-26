@@ -3,8 +3,8 @@ Getting Started with KaraKara
 
 unfinished...
 
-karakara.uk Tour
------------
+`karakara.uk` Tour
+-------------
 
 * https://karakara.uk/
     Room: test
@@ -12,8 +12,8 @@ karakara.uk Tour
 * double click title banner
     * username: test, password: test
 * Developers
-    * https://karakara.uk/docs
-    * https://karakara.uk/community2/queue_view.html#test
+    * https://karakara.uk/tools
+        * Links to tools + datafiles
 
 
 Run it locally or the cloud
@@ -38,11 +38,12 @@ docker compose up --build
 # wait for example media to encode
 
 # when encoding complete - api_queue must be restarted to load new `tracks.json`
+  # TODO: this may have been solved by mtime check of TrackManager - investigate
 docker compose restart api_queue
 
-# open `/` forwards to `/docs`
-# open `/browser3`
-# open `/player3` (chrome only for subtitle styling)
+# open 2 web-browser tabs/windows
+#   `/browser3`
+#   `/player3` (chrome only for subtitle styling)
 ```
 
 
@@ -94,7 +95,7 @@ These questions are designed for a group exercise in dissecting this codebase as
 * https://github.com/calaldees/KaraKara/commit/e6b91a17e4f292f3851c7aac9d2a10e8a13b4e3d
     * What is happening in this commit? is this good or bad? why?
 * With Code IDE
-    * looking in `/media` 
+    * looking in `/media`
         * how many source files are needed for each track? what is in the source files?
         * Why are the processed files named they way they are?
         * what is `.vtt`?
