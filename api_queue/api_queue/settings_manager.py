@@ -17,8 +17,30 @@ class Theme(enum.StrEnum):
 
 
 def _parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optional[datetime.timedelta]:
-    if not duration:
-        None
+    """
+    >>> _parse_timedelta(None)
+    >>> _parse_timedelta(0)
+    datetime.timedelta(0)
+    >>> _parse_timedelta(datetime.timedelta(seconds=1))
+    datetime.timedelta(seconds=1)
+    >>> _parse_timedelta(2.0)
+    datetime.timedelta(seconds=2)
+    >>> _parse_timedelta('3')
+    datetime.timedelta(seconds=3)
+    >>> _parse_timedelta('4 seconds')
+    datetime.timedelta(seconds=4)
+    >>> _parse_timedelta('NOT REAL')
+    Traceback (most recent call last):
+    ValueError: ...
+    >>> _parse_timedelta(-1)
+    Traceback (most recent call last):
+    ValueError: ...
+    >>> _parse_timedelta('5 seconds ago')
+    Traceback (most recent call last):
+    ValueError: ...
+    """
+    if duration is None:
+        return None
     if isinstance(duration, datetime.timedelta):
         return duration
     if isinstance(duration, float):
@@ -37,6 +59,20 @@ Timedelta = t.Annotated[
 ]
 
 def _parse_datetime(value: str | int) -> t.Optional[datetime.datetime]:
+    """
+    >>> _parse_datetime(None)
+    >>> _parse_datetime(0)
+    datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
+    >>> _parse_datetime('2022-01-01T09:50:00.000000')
+    datetime.datetime(2022, 1, 1, 9, 50, tzinfo=datetime.timezone.utc)
+    >>> _parse_datetime('1st January 2000')
+    datetime.datetime(2000, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
+    >>> _parse_datetime('tomorrow midnight')
+    datetime.datetime(...
+    >>> _parse_datetime('NOT REAL')
+    Traceback (most recent call last):
+    ValueError: ...
+    """
     #dt = datetime.datetime.fromisoformat(isoformatString)
     dt: t.Optional[datetime.datetime] = None
     if isinstance(value, int):
