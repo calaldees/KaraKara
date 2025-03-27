@@ -17,7 +17,7 @@ class TrackManager:
         self.mtime: float = 0
         self._tracks: Tracks = {}
         if not path.is_file():
-            log.error('No tracks.json file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. processmedia2 should output this file when encoding is complete')
+            log.error('No tracks.json file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. `processmedia` should output this file when encoding is complete')
 
     @property
     def tracks(self) -> Tracks:

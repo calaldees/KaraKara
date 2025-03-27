@@ -9,6 +9,7 @@ import sanic
 from sanic_ext import openapi
 from sanic_ext.extensions.http.cors import add_cors
 from sanic.log import logger as log
+import pydantic
 
 
 app = sanic.Sanic("karakara_queue")
@@ -233,9 +234,9 @@ async def update_settings(request, room_name):
         try:
             request.app.ctx.settings_manager.set_json(room_name, request.json)
             log.info(f"Updated settings for {room_name} with {request.json}")
-        except Exception as ex:
+        except pydantic.ValidationError as ex:
             log.warning(f"Rejected settings for {room_name} with {request.json}")
-            raise sanic.exceptions.InvalidUsage(message="invalid settings", context=exception_to_dict(ex))
+            raise sanic.exceptions.InvalidUsage(message="invalid settings", context=json.loads(ex.json()))
         return sanic.response.json({})
 
 
@@ -275,7 +276,7 @@ class QueueItemAdd:
     ],
 )
 async def add_queue_item(request, room_name):
-    tracks = request.app.ctx.track_manager.tracks
+    tracks = request.app.ctx.track_manager.tracks  # Performance note: This fetches the mtime of the tracks file each time
     # Validation
     if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
         raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
@@ -304,6 +305,7 @@ async def add_queue_item(request, room_name):
                         # term we should add a more structured error format, but
                         # for now, we require this exact string.
                         raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=_error)
+                        # TODO: validation error properly!
             return sanic.response.json(queue_item.asdict())
 
 

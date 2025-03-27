@@ -3,6 +3,7 @@ import enum
 import typing as t
 from pathlib import Path
 
+import annotated_types
 import pydantic
 import ujson as json
 import pytimeparse2  # type: ignore
@@ -17,10 +18,16 @@ class Theme(enum.StrEnum):
 
 def _parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optional[datetime.timedelta]:
     if not duration:
-        return None
+        None
     if isinstance(duration, datetime.timedelta):
         return duration
+    if isinstance(duration, float):
+        duration = int(duration)
     seconds = pytimeparse2.parse(duration) if isinstance(duration, str) else duration
+    if not isinstance(seconds, int):
+        raise ValueError(f'unable to parse seconds from {duration}')
+    if seconds < 0:
+        raise ValueError('must be positive')
     return datetime.timedelta(seconds=seconds)
 
 Timedelta = t.Annotated[
@@ -42,11 +49,14 @@ def _parse_datetime(value: str | int) -> t.Optional[datetime.datetime]:
         return None
     if not dt.tzinfo:
         dt = dt.replace(tzinfo=datetime.timezone.utc)
+    #if dt < (datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1)):
+    #    raise ValueError(f'dates in the past are probably not what you want {dt}')
     return dt
 
 OptionalDatetime = t.Annotated[
     t.Optional[datetime.datetime],
     pydantic.PlainValidator(_parse_datetime, json_schema_input_type=str),
+    annotated_types.Timezone(datetime.timezone.utc)
     #pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
 ]
 #OptionalDatetime = t.Optional[datetime.datetime]
@@ -58,8 +68,8 @@ class QueueSettings(pydantic.BaseModel):
     forced_tags: t.Sequence[Tag] = ()
     title: str = "KaraKara"
     theme: Theme = Theme.METALGHOSTS
-    preview_volume: float = 0.1
-    coming_soon_track_count: int = 5
+    preview_volume: t.Annotated[float, annotated_types.Ge(0), annotated_types.Le(1)] = 0.1
+    coming_soon_track_count: t.Annotated[int, annotated_types.Gt(0), annotated_types.Lt(10)] = 5
     validation_event_start_datetime: OptionalDatetime = None
     validation_event_end_datetime: OptionalDatetime = None
     validation_duplicate_performer_timedelta: t.Optional[Timedelta] = None

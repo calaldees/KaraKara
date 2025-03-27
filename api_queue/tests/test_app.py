@@ -29,7 +29,7 @@ class APIQueue():
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.csv")
         return response.text
     @property
-    async def queue(self) -> t.Sequence[dict]:
+    async def queue(self) -> t.Sequence[t.Mapping]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
         return response.json
     @property
@@ -37,11 +37,11 @@ class APIQueue():
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/tracks.json")
         return response.json
     @property
-    async def settings(self) -> dict[str, t.Any]:
+    async def settings(self) -> t.Mapping[str, t.Any]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
         return response.json
 
-    async def settings_put(self, payload: dict[str, t.Any]):
+    async def settings_put(self, payload: t.Mapping[str, t.Any]):
         request, response = await self.app.asgi_client.put(f"/room/{self._queue}/settings.json", data=json.dumps(payload))
         return response
     async def post(self, **kwargs):
@@ -129,6 +129,24 @@ async def test_queue_settings_change_invalid(api_queue: APIQueue, mock_mqtt):
     response = await api_queue.settings_put(payload={"validation_event_end_datetime": "Some nonsense that is not a datetime"})
     assert response.status == 400
     mock_mqtt.publish.assert_not_awaited()
+
+
+
+@pytest.mark.parametrize('settings_fieldname', (
+    "track_space",
+    "validation_event_end_datetime",
+    "theme",
+    "preview_volume",
+    "coming_soon_track_count",
+    "validation_performer_names",
+))
+async def test_queue_settings_validation_invalid(api_queue: APIQueue, settings_fieldname: str):
+    api_queue.session_id = 'admin'
+    response = await api_queue.settings_put(payload={settings_fieldname: "NOT VALID"})
+    assert response.status == 400
+    error = response.json['context'][0]
+    assert error['input'] == "NOT VALID"
+    assert error['loc'][0] == settings_fieldname
 
 
 @pytest.mark.asyncio
