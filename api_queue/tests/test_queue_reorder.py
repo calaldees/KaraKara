@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 import datetime
 
 from api_queue.queue_model import QueueItem

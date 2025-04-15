@@ -291,13 +291,13 @@ async def add_queue_item(request, room_name):
                 performer_name=performer_name,
             )
             queue.add(queue_item)
-            # Post process queue state - functions are configurable per queue
+
             if not request.ctx.user.is_admin:
                 try:
                     validate_queue(queue)
                 except QueueValidationError as ex:
                     log.info(f"add failed {ex=}")
-                    # NOTE: the client has special behaviour for the specific
+                    # NOTE: the client has special behavior for the specific
                     # hard-coded string "queue validation failed". In the long
                     # term we should add a more structured error format, but
                     # for now, we require this exact string.

@@ -1,7 +1,5 @@
 from functools import partial
 import datetime
-from numbers import Number
-import typing as t
 
 from .queue_model import Queue, QueueItem
 
@@ -65,7 +63,7 @@ def validate_queue(queue: Queue):
         reorder(queue)
 
 
-def _rank(queue: Queue, queue_item: QueueItem) -> Number:
+def _rank(queue: Queue, queue_item: QueueItem) -> float:
     """
     negative == sooner
     positive == later
@@ -74,12 +72,12 @@ def _rank(queue: Queue, queue_item: QueueItem) -> Number:
     Time since last song
     Duration of sung songs (decayed with time ago)
     """
-    def _minuets(t: datetime.timedelta):
-        return t.total_seconds()/60 if t else None
-    def _minuets_ago(d: datetime.datetime):
-        return _minuets(queue.now - d) if d else None
-    def _hours_ago(d: t.Optional[datetime.datetime]):
-        return _minuets_ago(d)/60 if d else None
+    def _minuets(t: datetime.timedelta) -> float:
+        return t.total_seconds()/60
+    def _minuets_ago(d: datetime.datetime) -> float:
+        return _minuets(queue.now - d)
+    def _hours_ago(d: datetime.datetime) -> float:
+        return _minuets_ago(d)/60
 
     added_minuets_ago = _minuets_ago(queue_item.added_time)
 
@@ -96,9 +94,9 @@ def _rank(queue: Queue, queue_item: QueueItem) -> Number:
     ))
 
     def _sang_ago_score(i: QueueItem):
-        sang_hours_ago = _hours_ago(i.start_time)  # the start_time could be hypothetical (e.g: it has not been sung, but is scheduled/estimated to be start_time)
-        if sang_hours_ago:
-            # if you sang a single 4 miuet song 1 hour ago
+        if i.start_time:
+            sang_hours_ago = _hours_ago(i.start_time)  # the start_time could be hypothetical (e.g: it has not been sung, but is scheduled/estimated to be start_time)
+            # if you sang a single 4 minuet song 1 hour ago
             # added_minuets_ago will rise linearly with time while this rank decays with time
             # for a 20min since the last sang track = ((1/0.35) * 4min * 5) = 57 is equivalent to 60min in the queue
             return (1/sang_hours_ago) * _minuets(i.track_duration) * 5
@@ -110,8 +108,7 @@ def _rank(queue: Queue, queue_item: QueueItem) -> Number:
 
 
 def reorder(queue: Queue):
-    queue_item_current = queue.current
-    if not queue_item_current:
+    if not (queue_item_current := queue.current):
         return
-    reorder_index = queue.items.index(queue_item_current) + queue.settings.coming_soon_track_count
-    queue.items[reorder_index:] = sorted(queue.items[reorder_index:], key=partial(_rank, queue)) # type: ignore[arg-type]
+    reorder_from_index = queue.items.index(queue_item_current) + queue.settings.coming_soon_track_count
+    queue.items[reorder_from_index:] = sorted(queue.items[reorder_from_index:], key=partial(_rank, queue))

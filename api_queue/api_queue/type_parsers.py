@@ -1,6 +1,5 @@
 import datetime
 import typing as t
-import numbers
 
 import dateparser
 import pytimeparse2  # type: ignore
@@ -37,11 +36,11 @@ def parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optio
     if isinstance(duration, datetime.timedelta):
         return duration
     seconds = duration
-    if isinstance(duration, numbers.Number):
+    if isinstance(duration, (int, float)):
         seconds = duration
     if isinstance(duration, str):
         seconds = pytimeparse2.parse(duration)
-    if not isinstance(seconds, numbers.Number):
+    if not isinstance(seconds, (int, float)):
         raise ValueError(f'unable to parse seconds from {duration}')
     if seconds < 0:
         raise ValueError('must be positive')
@@ -74,7 +73,7 @@ def parse_datetime(value: str | int | float | None | datetime.datetime) -> t.Opt
     dt: t.Optional[datetime.datetime] = None
     if isinstance(value, datetime.datetime):
         dt = value
-    if isinstance(value, numbers.Number):
+    if isinstance(value, (int, float)):
         dt = datetime.datetime.fromtimestamp(value, tz=datetime.timezone.utc)
     if isinstance(value, str):
         dt = dateparser.parse(value)
