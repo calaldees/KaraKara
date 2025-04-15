@@ -3,6 +3,8 @@ import contextlib
 from textwrap import dedent
 from pathlib import Path
 import uuid
+from types import MappingProxyType
+import typing as t
 
 import ujson as json
 import sanic
@@ -48,14 +50,9 @@ add_cors(app)
 
 # Model ------------------------------------------------------------------------
 
-from .queue_model import QueueItem
+from .queue_model import Queue, QueueItem
+from .queue_validation import validate_queue, QueueValidationError
 
-from .queue_validation import default as queue_validation_default
-from .queue_reorder import reorder as queue_reorder
-queue_post_processing_functions = {
-    "validation_default": queue_validation_default,
-    "reorder": queue_reorder,
-}
 
 # Startup ----------------------------------------------------------------------
 
@@ -296,16 +293,16 @@ async def add_queue_item(request, room_name):
             queue.add(queue_item)
             # Post process queue state - functions are configurable per queue
             if not request.ctx.user.is_admin:
-                for function_name in queue.settings.queue_post_processing_function_names:
-                    _error = queue_post_processing_functions[function_name](queue)
-                    if _error:
-                        log.info(f"add failed {_error=}")
-                        # NOTE: the client has special behaviour for the specific
-                        # hard-coded string "queue validation failed". In the long
-                        # term we should add a more structured error format, but
-                        # for now, we require this exact string.
-                        raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=_error)
-                        # TODO: validation error properly!
+                try:
+                    validate_queue(queue)
+                except QueueValidationError as ex:
+                    log.info(f"add failed {ex=}")
+                    # NOTE: the client has special behaviour for the specific
+                    # hard-coded string "queue validation failed". In the long
+                    # term we should add a more structured error format, but
+                    # for now, we require this exact string.
+                    raise sanic.exceptions.InvalidUsage(message="queue validation failed", context=str(ex))
+                    # TODO: validation error properly!
             return sanic.response.json(queue_item.asdict())
 
 

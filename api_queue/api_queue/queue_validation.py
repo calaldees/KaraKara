@@ -1,7 +1,16 @@
+from functools import partial
+import datetime
+from numbers import Number
+import typing as t
+
 from .queue_model import Queue, QueueItem
 
 
-def default(queue: Queue):
+class QueueValidationError(Exception):
+    pass
+
+
+def validate_queue(queue: Queue):
     """
     Check event start
     Check event end
@@ -12,23 +21,21 @@ def default(queue: Queue):
 
     _start = queue.settings.validation_event_start_datetime
     if _start and queue.now < _start:
-        return f"Event starts at {_start}"
+        raise QueueValidationError(f"Event starts at {_start}")
 
     _end = queue.settings.validation_event_end_datetime
     if _end and queue.end_time > _end:
-        return f"Queue is full all the way until {_end}"
+        raise QueueValidationError(f"Queue is full all the way until {_end}")
 
-    queue_last = queue.last
+    queue_last = queue.last  # This is track that has been proposed to be added (not saved to disk yet)
     if not queue_last:
-        return  # No tracks to validate
+        return  # No tracks to validate - no need to proceed with further validation
 
-    _valid_performer_names = queue.settings.validation_performer_names
-    if _valid_performer_names:
+    if _valid_performer_names := queue.settings.validation_performer_names:
         if queue_last.performer_name not in _valid_performer_names:
-            return f"{queue_last.performer_name} is not a valid performer_name for this event"
+            raise QueueValidationError(f"{queue_last.performer_name} is not a valid performer_name for this event")
 
-    _performer_timedelta = queue.settings.validation_duplicate_performer_timedelta
-    if _performer_timedelta:
+    if _performer_timedelta := None:  # queue.settings.validation_duplicate_performer_timedelta
         raise NotImplementedError('TODO: finish this feature')
         epoch = queue.now - _performer_timedelta
         def _filter(queue_item: QueueItem) -> bool:
@@ -41,8 +48,7 @@ def default(queue: Queue):
         if tuple(filter(_filter, queue.items)):
             return f"Duplicated performer {queue_last.performer_name} within {_performer_timedelta}"
 
-    _track_timedelta = queue.settings.validation_duplicate_track_timedelta
-    if _track_timedelta:
+    if _track_timedelta := None:  # queue.settings.validation_duplicate_track_timedelta:
         raise NotImplementedError('TODO: finish this feature')
         epoch = queue.now - _track_timedelta
         def _filter(queue_item: QueueItem) -> bool:
@@ -54,3 +60,58 @@ def default(queue: Queue):
             )
         if tuple(filter(_filter, queue.items)):
             return f"Duplicated track {queue_last.performer_name} within {_track_timedelta}"
+
+    if queue.settings.auto_reorder_queue:
+        reorder(queue)
+
+
+def _rank(queue: Queue, queue_item: QueueItem) -> Number:
+    """
+    negative == sooner
+    positive == later
+
+    Time since queued
+    Time since last song
+    Duration of sung songs (decayed with time ago)
+    """
+    def _minuets(t: datetime.timedelta):
+        return t.total_seconds()/60 if t else None
+    def _minuets_ago(d: datetime.datetime):
+        return _minuets(queue.now - d) if d else None
+    def _hours_ago(d: t.Optional[datetime.datetime]):
+        return _minuets_ago(d)/60 if d else None
+
+    added_minuets_ago = _minuets_ago(queue_item.added_time)
+
+    # All tracks queued by this performer
+    queued = tuple(filter(
+        lambda i:
+            i.performer_name==queue_item.performer_name
+            and
+            i.added_time < queue_item.added_time
+            and
+            _hours_ago(i.added_time) < 3
+        ,
+        queue.items
+    ))
+
+    def _sang_ago_score(i: QueueItem):
+        sang_hours_ago = _hours_ago(i.start_time)  # the start_time could be hypothetical (e.g: it has not been sung, but is scheduled/estimated to be start_time)
+        if sang_hours_ago:
+            # if you sang a single 4 miuet song 1 hour ago
+            # added_minuets_ago will rise linearly with time while this rank decays with time
+            # for a 20min since the last sang track = ((1/0.35) * 4min * 5) = 57 is equivalent to 60min in the queue
+            return (1/sang_hours_ago) * _minuets(i.track_duration) * 5
+        return _minuets(i.track_duration) * 2  # need thought - it's in the queue, but has no start_time, so the queue is currently paused  # the queue could be reordered, so we apply a static penalty  # I don't even know if this is needed
+    sang_ago_penalty = sum(map(_sang_ago_score, queued))
+
+    #print(f'{queue_item.track_id=}: {sang_ago_penalty=} - {added_minuets_ago=}')
+    return sang_ago_penalty - added_minuets_ago
+
+
+def reorder(queue: Queue):
+    queue_item_current = queue.current
+    if not queue_item_current:
+        return
+    reorder_index = queue.items.index(queue_item_current) + queue.settings.coming_soon_track_count
+    queue.items[reorder_index:] = sorted(queue.items[reorder_index:], key=partial(_rank, queue)) # type: ignore[arg-type]

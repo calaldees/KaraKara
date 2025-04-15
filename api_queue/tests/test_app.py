@@ -139,6 +139,7 @@ async def test_queue_settings_change_invalid(api_queue: APIQueue, mock_mqtt):
     "preview_volume",
     "coming_soon_track_count",
     "validation_performer_names",
+    "auto_reorder_queue",
 ))
 async def test_queue_settings_validation_invalid(api_queue: APIQueue, settings_fieldname: str):
     api_queue.session_id = 'admin'
@@ -295,9 +296,9 @@ async def test_queue_validation(api_queue: APIQueue):
     settings = await api_queue.settings
     assert settings["validation_performer_names"] == ['valid_name1','valid_name2']
 
-    response = await api_queue.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='test_name')
+    response = await api_queue.post(track_id='KAT_TUN_Your_side_Instrumental_', performer_name='invalid_name')
     assert response.status == 400
-    assert 'test_name' in response.json['context']
+    assert 'invalid_name' in response.json['context']
 
 
 @pytest.mark.asyncio

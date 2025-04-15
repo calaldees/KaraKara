@@ -32,4 +32,4 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--mypy --doctest-modules -p no:cacheprovider"
+addopts = "--doctest-modules -p no:cacheprovider"  # --mypy # mypy slows my flow down

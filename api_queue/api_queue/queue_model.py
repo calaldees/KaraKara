@@ -2,11 +2,11 @@ import dataclasses
 import datetime
 import typing as t
 import random
-import numbers
 from functools import reduce
 from itertools import pairwise
 
 from .settings_manager import QueueSettings
+from .type_parsers import parse_datetime, parse_timedelta
 
 
 # dataclasses are ment to be this cool hip new happening pattern in python
@@ -31,7 +31,7 @@ class QueueItem():
         >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789, 111111111.111111111)
         QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None)
 
-        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '123456789.123456789', '123456789', '111111111.111111111')
+        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '1973-11-29 21:33:09.123457', '123456789', 111111111.111111111)
         QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None)
 
         >>> queue_item = QueueItem('', '', '', '', '')
@@ -45,22 +45,10 @@ class QueueItem():
         True
 
         """
-        if not self.track_duration:
-            self.track_duration = 0.0
-        if isinstance(self.track_duration, str):
-            self.track_duration = float(self.track_duration)
-        self.track_duration = datetime.timedelta(seconds=self.track_duration) if isinstance(self.track_duration, numbers.Number) else self.track_duration
-        if not self.start_time:
-            self.start_time = None
-        if isinstance(self.start_time, str):
-            self.start_time = float(self.start_time)
-        self.start_time = datetime.datetime.fromtimestamp(self.start_time, tz=datetime.timezone.utc) if isinstance(self.start_time, numbers.Number) else self.start_time
         self.id = int(self.id)
-        if not self.added_time:
-            self.added_time = None
-        if isinstance(self.added_time, str):
-            self.added_time = float(self.added_time)
-        self.added_time = datetime.datetime.fromtimestamp(self.added_time, tz=datetime.timezone.utc) if isinstance(self.added_time, numbers.Number) else self.added_time
+        self.track_duration = parse_timedelta(self.track_duration) or datetime.timedelta(0)
+        self.start_time = parse_datetime(self.start_time)
+        self.added_time = parse_datetime(self.added_time) or self._now()
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
     @staticmethod
@@ -70,14 +58,14 @@ class QueueItem():
         >>> i.asdict()
         {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None}
         """
-        def _parse(dd):
+        def _to_base_types(dd):
             k, v = dd
             if isinstance(v, datetime.timedelta):
                 v = v.total_seconds()
             elif isinstance(v, datetime.datetime):
                 v = v.timestamp()
             return (k, v)
-        return dict(map(_parse, key_values))
+        return dict(map(_to_base_types, key_values))
 
     @property
     def end_time(self) -> t.Optional[datetime.datetime]:
@@ -168,7 +156,7 @@ class Queue():
         queue_item.start_time = None
         self.items.insert(index2, queue_item)
         self._recalculate_start_times()
-    def get(self, id: int) -> t.Union[t.Tuple[int, QueueItem], t.Tuple[None, None]]:
+    def get(self, id: int) -> tuple[int, QueueItem] | tuple[None, None]:
         return next(((index, queue_item) for index, queue_item in enumerate(self.items) if queue_item.id==id), (None, None))
     def delete(self, id: int) -> None:
         now = self.now
