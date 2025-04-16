@@ -284,7 +284,7 @@ async def test_queue_command(api_queue: APIQueue, mock_mqtt):
 
 
 @pytest.mark.asyncio
-async def test_queue_validation(api_queue: APIQueue):
+async def test_queue_updated_actions(api_queue: APIQueue):
     _original_session_id = api_queue.session_id
     api_queue.session_id = 'admin'
     response = await api_queue.settings_put(payload={
@@ -302,7 +302,7 @@ async def test_queue_validation(api_queue: APIQueue):
 
 
 @pytest.mark.asyncio
-async def test_queue_validation__end_datetime(api_queue: APIQueue):
+async def test_queue_updated_actions__end_datetime(api_queue: APIQueue):
     _original_session_id = api_queue.session_id
     api_queue.session_id = 'admin'
     response = await api_queue.settings_put(payload={

@@ -2,7 +2,7 @@ import pytest
 import datetime
 
 from api_queue.queue_model import QueueItem
-from api_queue.queue_validation import reorder
+from api_queue.queue_updated_actions import reorder
 
 ONE_MINUTE = datetime.timedelta(seconds=60)
 

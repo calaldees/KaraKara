@@ -8,6 +8,12 @@ class QueueValidationError(Exception):
     pass
 
 
+def queue_updated_actions(queue: Queue):
+    validate_queue(queue)
+    if queue.settings.auto_reorder_queue:
+        reorder(queue)
+
+
 def validate_queue(queue: Queue):
     """
     Check event start
@@ -59,8 +65,6 @@ def validate_queue(queue: Queue):
         if tuple(filter(_filter, queue.items)):
             return f"Duplicated track {queue_last.performer_name} within {_track_timedelta}"
 
-    if queue.settings.auto_reorder_queue:
-        reorder(queue)
 
 
 def _rank(queue: Queue, queue_item: QueueItem) -> float:

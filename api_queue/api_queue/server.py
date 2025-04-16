@@ -51,7 +51,7 @@ add_cors(app)
 # Model ------------------------------------------------------------------------
 
 from .queue_model import Queue, QueueItem
-from .queue_validation import validate_queue, QueueValidationError
+from .queue_updated_actions import queue_updated_actions, QueueValidationError
 
 
 # Startup ----------------------------------------------------------------------
@@ -294,7 +294,7 @@ async def add_queue_item(request, room_name):
 
             if not request.ctx.user.is_admin:
                 try:
-                    validate_queue(queue)
+                    queue_updated_actions(queue)
                 except QueueValidationError as ex:
                     log.info(f"add failed {ex=}")
                     # NOTE: the client has special behavior for the specific
