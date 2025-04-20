@@ -147,6 +147,20 @@ export function track_info(
 }
 
 /*
+ * Given a string value from the settings form, check what data
+ * type the setting is now, and try to keep that type
+ */
+export function copy_type(original: any, value: any) {
+    if (Array.isArray(original)) {
+        return value.split(",").filter((x: any) => x);
+    } else if (typeof original == "number") {
+        return parseFloat(value);
+    } else {
+        return value;
+    }
+}
+
+/*
  * Given a list of all tracks in the queue, find which ones are in-progress
  * now or queued for the future
  */

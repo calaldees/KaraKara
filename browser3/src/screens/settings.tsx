@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { BackToExplore, Screen } from "./_common";
+import { copy_type } from "../utils";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 
@@ -15,7 +16,7 @@ export function RoomSettings(): React.ReactElement {
 
     function update(key: string, value: string) {
         const newSettings = { ...roomSettingsEdit };
-        newSettings[key] = value;
+        newSettings[key] = copy_type(roomSettings[key], value);
         setRoomSettingsEdit(newSettings);
     }
 
