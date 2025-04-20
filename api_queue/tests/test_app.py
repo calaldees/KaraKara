@@ -74,13 +74,13 @@ async def test_root(app: sanic.Sanic):  # mock_redis,
 
 @pytest.mark.asyncio
 async def test_queue_invalid_name(app: sanic.Sanic):
-    request, response = await app.asgi_client.get(f"/room/キ/queue.json")
+    request, response = await app.asgi_client.get("/room/キ/queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get(f"/room/ /queue.json")
+    request, response = await app.asgi_client.get("/room/ /queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get(f"/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
+    request, response = await app.asgi_client.get("/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get(f"/room/キ/queue.csv")
+    request, response = await app.asgi_client.get("/room/キ/queue.csv")
     assert response.status == 404
 
 
@@ -208,12 +208,12 @@ async def test_queue_delete(api_queue: APIQueue, mock_mqtt):
     # session_id owner reject
     api_queue.session_id = 'not_real'
     response = await api_queue.delete(queue_item_id=queue[0]['id'])
-    response.status == 403
+    assert response.status == 403
 
     # session_id admin can delete
     api_queue.session_id = 'admin'
     response = await api_queue.delete(queue_item_id=queue[0]['id'])
-    response.status == 200
+    assert response.status == 200
     queue = await api_queue.queue
     assert len(queue) == 0
 
@@ -305,8 +305,10 @@ async def test_queue_updated_actions(api_queue: APIQueue):
 async def test_queue_updated_actions__end_datetime(api_queue: APIQueue):
     _original_session_id = api_queue.session_id
     api_queue.session_id = 'admin'
+    # set end_datetime to be now as bst and add a 10 mins so the track can be queued (if the event ends at this current millisecond, no tracks can be added)
+    end_datetime = (datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=1), name='bst'))+datetime.timedelta(minutes=10)).isoformat()
     response = await api_queue.settings_put(payload={
-        "validation_event_end_datetime": (datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=1), name='bst'))+datetime.timedelta(minutes=10)).isoformat(),  # set end_datetime to be now as bst and add a 10 mins so the track can be queued (if the event ends at this current millisecond, no tracks can be added)
+        "validation_event_end_datetime": end_datetime,
     })
     assert response.status == 200
     api_queue.session_id = _original_session_id
