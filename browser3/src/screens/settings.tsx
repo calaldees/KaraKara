@@ -6,23 +6,33 @@ import { useApi } from "../hooks/api";
 
 export function RoomSettings(): React.ReactElement {
     const { settings: roomSettings } = useContext(RoomContext);
-    const [roomSettingsEdit, setRoomSettingsEdit] = useState(roomSettings);
-    const [saving, setSaving] = useState(false);
-    const { request } = useApi();
+    const [roomSettingsEdit, setRoomSettingsEdit] = useState<Record<string, string>>({});
+    const { request, loading } = useApi();
 
+    // on first loading this screen, and whenever server-side settings change,
+    // convert the string:any settings into string:string
     useEffect(() => {
-        setRoomSettingsEdit(roomSettings);
+        const roomSettingsUntyped: Record<string, string> = {};
+        for(const key of Object.keys(roomSettings)) {
+            roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
+        }
+        setRoomSettingsEdit(roomSettingsUntyped);
     }, [roomSettings]);
 
+    // when user types in a textbox, update the string:string
     function update(key: string, value: string) {
         const newSettings = { ...roomSettingsEdit };
-        newSettings[key] = copy_type(roomSettings[key], value);
+        newSettings[key] = value;
         setRoomSettingsEdit(newSettings);
     }
 
+    // when saving settings, convert the string:string into string:any
     function saveSettings(event: any) {
         event.preventDefault();
-        setSaving(true);
+        const roomSettingsTyped: Record<string, any> = {};
+        for(const key of Object.keys(roomSettings)) {
+            roomSettingsTyped[key] = copy_type(roomSettings[key], roomSettingsEdit[key]);
+        }
         request({
             notify: "Saving settings...",
             notify_ok: "Settings saved!",
@@ -32,10 +42,8 @@ export function RoomSettings(): React.ReactElement {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(roomSettingsEdit),
+                body: JSON.stringify(roomSettingsTyped),
             },
-            onAction: () => setSaving(false),
-            onException: () => setSaving(false),
         });
     }
 
@@ -45,7 +53,7 @@ export function RoomSettings(): React.ReactElement {
                 <button
                     onClick={saveSettings}
                     data-cy="save-settings-button"
-                    disabled={saving}
+                    disabled={loading}
                 >
                     Save
                 </button>
