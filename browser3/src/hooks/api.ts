@@ -72,10 +72,8 @@ export function useApi() {
                                         controller.enqueue(value);
                                         push();
                                     })
-                                    .catch(() => {
-                                        controller.error(
-                                            new Error("Failed to read"),
-                                        );
+                                    .catch((error) => {
+                                        controller.error(error);
                                     });
                             }
                             push();
@@ -120,11 +118,13 @@ export function useApi() {
                     setLoading(false);
                     setNotification({
                         text:
-                            error.message === "queue validation failed"  // TODO: convert this to new exception schema from client
+                            error.message === "queue validation failed" // TODO: convert this to new exception schema from client
                                 ? error.context
                                 : "Internal Error: " +
                                   (error.message ?? "unknown") +
-                                  (error.context ? ": " + error.context : ""),
+                                  (error.context
+                                      ? ": " + JSON.stringify(error.context)
+                                      : ""),
                         style: "error",
                     });
 

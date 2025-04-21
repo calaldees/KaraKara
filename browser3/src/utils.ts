@@ -8,6 +8,15 @@ export function dict2css(d: Record<string, any>) {
 }
 
 /**
+ * turn seconds into {MM}:{SS}
+ */
+export function s_to_mns(t: number): string {
+    return (
+        Math.floor(t / 60) + ":" + (Math.floor(t % 60) + "").padStart(2, "0")
+    );
+}
+
+/**
  * Looking at an Attachment, get the full URL
  *
  * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
@@ -67,6 +76,19 @@ export function mqtt_url(root: string): string {
     return (
         root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt"
     );
+}
+
+/**
+ * Turn an ISO8601 UTC datetime into the user's local time
+ *
+ * eg "2021-01-03T14:00:00" -> "14:00"
+ */
+export function short_date(long_date: string): string {
+    const date = new Date(long_date);
+    return date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
 }
 
 export function is_my_song(
