@@ -5,6 +5,7 @@ from pathlib import Path
 import uuid
 from types import MappingProxyType
 import typing as t
+import asyncio
 
 import ujson as json
 import sanic
@@ -273,12 +274,12 @@ class QueueItemAdd:
     ],
 )
 async def add_queue_item(request, room_name):
-    tracks = request.app.ctx.track_manager.tracks  # Performance note: This fetches the mtime of the tracks file each time
+    track_durations = request.app.ctx.track_manager.track_durations
     # Validation
     if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
         raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
     track_id = request.json['track_id']
-    if track_id not in tracks:
+    if track_id not in track_durations:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
     performer_name = request.json['performer_name']
     # Queue update
@@ -286,7 +287,7 @@ async def add_queue_item(request, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
                 track_id=track_id,
-                track_duration=tracks[track_id]["duration"],
+                track_duration=track_durations[track_id],
                 session_id=request.ctx.session_id,
                 performer_name=performer_name,
             )
@@ -349,6 +350,7 @@ async def move_queue_item(request, room_name):
 
 class CommandReturn():
     is_playing: bool
+
 @room_blueprint.get("/command/<command:([a-z_]+).json>")
 @openapi.definition(
     response=[
@@ -368,8 +370,34 @@ async def queue_command(request, room_name, command):
             return sanic.response.json({'is_playing': bool(queue.is_playing)})
 
 
-# end Queue --------------------------------------------------------------------
+# Background tasks -------------------------------------------------------------
 
+tracks_update_semaphore = asyncio.Semaphore(1)
+async def background_tracks_update_event(_app: sanic.Sanic) -> None:
+    # A background task is created for each worker - Only allow one background process by aborting if another task has the semaphore
+    if tracks_update_semaphore.locked():
+        log.debug('`tracks.json` background_tracks_update_event already active - cancel task')
+        return
+    async with tracks_update_semaphore:
+        log.info('`tracks.json` background_tracks_update_event started')
+        while True:
+            track_manager = _app.ctx.track_manager
+            log.debug('`tracks.json` check mtime')
+            if track_manager.has_tracks_updated:
+                log.debug('`tracks.json` reload')
+                track_manager.reload_tracks()
+                # Use PUT `/settings.json` to update settings -> mqtt settings event will be sent to all clients
+                # Clients check `tracks_last_updated_mtime` and fetch/reload `tracks.json` if value has changed
+                await _app.test_client.put(
+                    _app.url_for('update_settings'),
+                    json={'tracks_last_updated_mtime': track_manager.mtime},
+                    headers={'admin': True}
+                )
+            await asyncio.sleep(60)
+#app.add_task(background_tracks_update_event(app))  # TODO: enable endpoint after testing
+
+
+# Main -------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, workers=4, dev=True, access_log=True, auto_reload=True)
