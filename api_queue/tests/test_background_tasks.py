@@ -1,4 +1,6 @@
+import re
 import os
+import json
 from unittest.mock import AsyncMock
 from pathlib import Path
 
@@ -24,7 +26,8 @@ async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: Async
     # Wind the clock back on `tracks.json` mtime to trigger file reload in background task
     tracks_json: Path = app.ctx.track_manager.path
     tracks_json_mtime: float = tracks_json.stat().st_mtime
-    os.utime(tracks_json, times=(tracks_json_mtime-1,tracks_json_mtime-1))
+    tracks_json_mtime += -1
+    os.utime(tracks_json, times=(tracks_json_mtime,tracks_json_mtime))
 
     # Create a few rooms + settings files that count as `active_room_names` by jibbling mtimes of files
     path_queue.joinpath('fake_room_for_background_task_test.csv').write_text('')
@@ -43,7 +46,10 @@ async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: Async
     assert mock_mqtt.publish.await_count == 2
 
     for call in mock_mqtt.publish.await_args_list:
-        queue_name, settings = call.args
-        #assert room_name in EXPECTED_ROOM_NAMES
-    #assert mock_mqtt.publish.await_args.args == ("room/test/settings", {})
-    # TODO: Test not finished!!!!
+        queue_path, settings = call.args
+
+        queue_name = re.match('.+/(.+)/.+', queue_path).group(1)  # type: ignore[union-attr]
+        assert queue_name in EXPECTED_ROOM_NAMES
+
+        settings = json.loads(settings)
+        assert settings['tracks_json_mtime'] == tracks_json_mtime
