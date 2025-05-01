@@ -4,7 +4,7 @@ import datetime
 from collections.abc import MutableMapping
 from functools import reduce
 from pathlib import Path
-from collections.abc import Sequence
+from collections.abc import Collection
 from typing import Callable
 
 import sanic
@@ -43,7 +43,7 @@ async def _background_tracks_update_event(
         if mtime > acc.get(name, TIMESTAMP_ACTIVE_THRESHOLD):
             acc[name] = mtime
         return acc
-    active_room_names: Sequence[str] = reduce(
+    active_room_names: Collection[str] = reduce(
         _reducer,
         app.ctx.path_queue.iterdir(),
         {},  # MutableMapping[str, float]:

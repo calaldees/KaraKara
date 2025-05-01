@@ -57,7 +57,7 @@ class QueueManagerCSV(QueueManager):
     def for_json(self, name) -> t.Sequence[t.Mapping[str, t.Any]]:
         file_context = self.path_csv(name).open('r', encoding='utf8') if self.path_csv(name).is_file() else io.StringIO('')
         with file_context as filehandle:
-            return tuple(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))
+            return tuple(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))  # type: ignore[arg-type]  # dataclass.__post_init__ takes care of the types in `**row`
 
     @contextlib.contextmanager
     def queue_modify_context(self, name):

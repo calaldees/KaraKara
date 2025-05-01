@@ -3,6 +3,8 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
+from collections.abc import AsyncIterator, AsyncGenerator
+from typing import NoReturn
 
 import pydantic
 import sanic
@@ -127,18 +129,18 @@ async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse
 
 
 @contextlib.asynccontextmanager
-async def push_queue_to_mqtt(app: sanic.Sanic, room_name: str):
+async def push_queue_to_mqtt(app: sanic.Sanic, room_name: str) -> AsyncGenerator[None]:  # contextlib.AbstractAsyncContextManager[None]
     yield
     if hasattr(app.ctx, 'mqtt'):
         log.info(f"push_queue_to_mqtt {room_name}")
         await app.ctx.mqtt.publish(f"room/{room_name}/queue", json.dumps(app.ctx.queue_manager.for_json(room_name)), retain=True)
 
 @contextlib.asynccontextmanager
-async def push_settings_to_mqtt(app: sanic.Sanic, room_name: str) -> contextlib.AbstractAsyncContextManager[None]:
+async def push_settings_to_mqtt(app: sanic.Sanic, room_name: str) -> AsyncGenerator[None]:  # contextlib.AbstractAsyncContextManager[None]
     yield
     if hasattr(app.ctx, 'mqtt'):
         log.info(f"push_settings_to_mqtt {room_name}")
-        await app.ctx.mqtt.publish(f"room/{room_name}/settings", json.dumps(app.ctx.queue_manager.settings.get_json(room_name)), retain=True)
+        await app.ctx.mqtt.publish(f"room/{room_name}/settings", app.ctx.queue_manager.settings.get(room_name).model_dump_json(), retain=True)
 
 
 # Routes -----------------------------------------------------------------------
@@ -217,7 +219,7 @@ async def tracks(request, room_name):
     # TODO: description='not normally used by production clients' see queue instead
 )
 async def get_settings(request, room_name):
-    return sanic.response.json(request.app.ctx.settings_manager.get_json(room_name))
+    return sanic.response.raw(request.app.ctx.settings_manager.get(room_name).model_dump_json(), headers={'content-type': 'application/json'})
 
 @room_blueprint.put("/settings.json")
 @openapi.definition(
