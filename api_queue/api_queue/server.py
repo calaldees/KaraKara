@@ -3,8 +3,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from collections.abc import AsyncIterator, AsyncGenerator
-from typing import NoReturn
+from collections.abc import AsyncGenerator
 
 import pydantic
 import sanic
@@ -21,7 +20,7 @@ app.config.update({
         #'MQTT': 'mqtt',  #:1883
         'PATH_TRACKS': 'tracks.json',
         'PATH_QUEUE': '_data',
-        'BACKGROUND_TASK_TRACK_UPDATE_ENABLED': False,   # Disable until feature is complete
+        'BACKGROUND_TASK_TRACK_UPDATE_ENABLED': True,
     }.items()
     if k not in app.config.keys()
 })

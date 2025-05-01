@@ -23,4 +23,5 @@ FROM code AS test
 
 FROM code AS production
     EXPOSE 8000
-    CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+    CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--single-process"]
+    # "--workers", "4"  # workers are python.multithreading rather than async. For now, we can just stick with single process
