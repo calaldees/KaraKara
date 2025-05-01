@@ -33,11 +33,11 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 addopts = "--doctest-modules -p no:cacheprovider"  # --mypy # mypy slows my flow down
-filterwarnings = [  # TODO: how does warning filtering work?
-  #"PydanticDeprecatedSince20",
-  #"PydanticSerializationUnexpectedValue",
-  #"websockets.legacy",
-  #"tracerite/html.py",
-  #"Use 'content=<...>' to upload raw bytes/text content",
-  #"dateparser/utils/strptime.py",
+filterwarnings = [
+	"ignore:The `schema` method is deprecated.*",
+	"ignore:Pydantic serializer warnings",
+	"ignore:Parsing dates involving a day of month without a year specified is ambiguious",
+	"ignore:websockets.legacy is deprecated",
+	"ignore:pkg_resources is deprecated as an API",
+	"ignore:Use 'content=<...>' to upload raw bytes/text content",
 ]

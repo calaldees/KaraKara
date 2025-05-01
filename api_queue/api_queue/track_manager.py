@@ -22,9 +22,12 @@ class TrackManager:
 
     @property
     def has_tracks_updated(self) -> bool:
-        return self.mtime != self.path.stat().st_mtime
+        return self.path.is_file() and self.mtime != self.path.stat().st_mtime
 
     def reload_tracks(self) -> None:
+        if not self.path.is_file():
+            log.error('`tracks.json` does not exist - unable to reload_tracks')
+            return
         with self.path.open() as filehandle:
             self.track_durations = MappingProxyType({
                 track_id: track_payload['duration']
