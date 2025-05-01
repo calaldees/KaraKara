@@ -31,7 +31,10 @@ OptionalDatetime = t.Annotated[
 #OptionalDatetime = t.Optional[datetime.datetime]
 
 
-class QueueSettings(pydantic.BaseModel):
+class GlobalSettings(pydantic.BaseModel):
+    tracks_json_mtime: float = 0
+
+class PersistedQueueSettings(pydantic.BaseModel):
     track_space: Timedelta = datetime.timedelta(seconds=15)
     hidden_tags: t.Sequence[Tag] = ("red:duplicate",)
     forced_tags: t.Sequence[Tag] = ()
@@ -46,6 +49,11 @@ class QueueSettings(pydantic.BaseModel):
     validation_performer_names: t.Sequence[str] = ()
     auto_reorder_queue: bool = False
 
+class QueueSettings(PersistedQueueSettings, GlobalSettings):
+    """
+    Unsure if this merges the two Settings class's correctly ... testing required
+    """
+    ...
 
 class SettingsManager:
     def __init__(self, path: Path = Path(".")):
@@ -53,19 +61,20 @@ class SettingsManager:
         path.mkdir(parents=True, exist_ok=True)  # is this safe?
         assert path.is_dir()
         self.path = path
+        self.global_settings = GlobalSettings()
 
     def room_exists(self, name: str) -> bool:
         return self.path.joinpath(f"{name}_settings.json").is_file()
 
     def get_json(self, name: str) -> dict:
         path = self.path.joinpath(f"{name}_settings.json")
-        json_str = path.read_text() if path.is_file() else QueueSettings().model_dump_json()
+        json_str = path.read_text() if path.is_file() else PersistedQueueSettings().model_dump_json()
         return json.loads(json_str)
 
     def set_json(self, name: str, settings: dict) -> None:
         path = self.path.joinpath(f"{name}_settings.json")
-        json_str = QueueSettings(**{**self.get_json(name), **settings}).model_dump_json()
+        json_str = PersistedQueueSettings(**{**self.get_json(name), **settings}).model_dump_json()
         path.write_text(json_str)
 
     def get(self, name: str) -> QueueSettings:
-        return QueueSettings(**self.get_json(name))
+        return QueueSettings(**self.get_json(name), **self.global_settings.model_dump())

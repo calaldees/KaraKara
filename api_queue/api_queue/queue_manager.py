@@ -1,36 +1,15 @@
 import contextlib
 import dataclasses
-
-from typing import Iterator, Optional
+from abc import abstractmethod
 import csv
 from pathlib import Path
 import io
 import asyncio
 from collections import defaultdict
-import uuid
+import typing as t
 
 from .settings_manager import SettingsManager
 from .queue_model import Queue, QueueItem
-
-
-
-@dataclasses.dataclass
-class User:
-    is_admin: bool
-    session_id: str
-
-class LoginManager:
-    @staticmethod
-    def login(room_name: str, username: Optional[str], password: str, requested_session: Optional[str] = None) -> User:
-        if password==room_name:
-            session_id = "admin"
-        else:
-            session_id = requested_session or str(uuid.uuid4())
-        return User(is_admin = password==room_name, session_id=session_id)
-
-    @staticmethod
-    def from_session(session_id: str) -> User:
-        return User(is_admin = session_id=="admin", session_id=session_id)
 
 
 class QueueManager():
@@ -52,6 +31,10 @@ class QueueManager():
             for i in queue.items:
                 writer.writerow(i.asdict())
 
+    #@abstractmethod
+    #def queue_names(self, newer_than_timestamp:float = 0) -> t.Sequence[str]:
+    #    ...
+
 class QueryManagerAsyncLockMixin():
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,10 +51,10 @@ class QueueManagerCSV(QueueManager):
         assert path.is_dir()
         self.path = path
 
-    def path_csv(self, name):
+    def path_csv(self, name) -> Path:
         return self.path.joinpath(f'{name}.csv')
 
-    def for_json(self, name):
+    def for_json(self, name) -> t.Sequence[t.Mapping[str, t.Any]]:
         file_context = self.path_csv(name).open('r', encoding='utf8') if self.path_csv(name).is_file() else io.StringIO('')
         with file_context as filehandle:
             return tuple(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))
@@ -83,6 +66,7 @@ class QueueManagerCSV(QueueManager):
         with path_csv.open('r+', encoding='utf8') as filehandle:
             with self._queue_modify_context(name, filehandle) as queue:
                 yield queue
+
 
 class QueueManagerCSVAsync(QueueManagerCSV, QueryManagerAsyncLockMixin):
     @contextlib.asynccontextmanager

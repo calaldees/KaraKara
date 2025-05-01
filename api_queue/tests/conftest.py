@@ -42,6 +42,7 @@ async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[sanic.Sanic]:
             'PATH_TRACKS': temp_path_tracks,
             'PATH_QUEUE': tmp_path,
             'MQTT': mock_mqtt,
+            'BACKGROUND_TASK_TRACK_UPDATE_ENABLED': False,
         }
     )
     yield app

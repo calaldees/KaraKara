@@ -1,19 +1,15 @@
-from datetime import datetime
 import contextlib
-from textwrap import dedent
-from pathlib import Path
 import uuid
-from types import MappingProxyType
-import typing as t
-import asyncio
+from datetime import datetime
+from pathlib import Path
+from textwrap import dedent
 
-import ujson as json
+import pydantic
 import sanic
+import ujson as json
+from sanic.log import logger as log
 from sanic_ext import openapi
 from sanic_ext.extensions.http.cors import add_cors
-from sanic.log import logger as log
-import pydantic
-
 
 app = sanic.Sanic("karakara_queue")
 app.config.update({
@@ -23,6 +19,7 @@ app.config.update({
         #'MQTT': 'mqtt',  #:1883
         'PATH_TRACKS': 'tracks.json',
         'PATH_QUEUE': '_data',
+        'BACKGROUND_TASK_TRACK_UPDATE_ENABLED': False,   # Disable until feature is complete
     }.items()
     if k not in app.config.keys()
 })
@@ -52,23 +49,26 @@ add_cors(app)
 # Model ------------------------------------------------------------------------
 
 from .queue_model import Queue, QueueItem
-from .queue_updated_actions import queue_updated_actions, QueueValidationError
-
+from .queue_updated_actions import QueueValidationError, queue_updated_actions
 
 # Startup ----------------------------------------------------------------------
-
 from .track_manager import TrackManager
+
+
 @app.listener('before_server_start')
 async def tracks_load(_app: sanic.Sanic, _loop):
     _app.ctx.track_manager = TrackManager(Path(str(_app.config.get('PATH_TRACKS'))))
 
 
-from .settings_manager import SettingsManager, QueueSettings
 from .queue_manager import QueueManagerCSVAsync
+from .settings_manager import QueueSettings, SettingsManager
+
+
 @app.listener('before_server_start')
 async def queue_manager(_app: sanic.Sanic, _loop):
     path_queue = Path(str(_app.config.get('PATH_QUEUE')))
     log.info(f"[queue_manager] - {path_queue=}")
+    _app.ctx.path_queue = path_queue
     _app.ctx.settings_manager = SettingsManager(path=path_queue)
     _app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=_app.ctx.settings_manager)
 
@@ -115,8 +115,7 @@ class CustomErrorHandler(sanic.handlers.ErrorHandler):
 app.error_handler = CustomErrorHandler()
 
 
-
-from .queue_manager import LoginManager, User
+from .login_manager import LoginManager, User
 @app.on_request
 async def attach_session_id_request(request: sanic.Request):
     request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
@@ -127,21 +126,19 @@ async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse
         response.cookies.add_cookie("session_id", request.ctx.session_id, secure=False, samesite=None)
 
 
-
-
 @contextlib.asynccontextmanager
-async def push_queue_to_mqtt(request, room_name):
+async def push_queue_to_mqtt(app: sanic.Sanic, room_name: str):
     yield
-    if hasattr(request.app.ctx, 'mqtt'):
+    if hasattr(app.ctx, 'mqtt'):
         log.info(f"push_queue_to_mqtt {room_name}")
-        await request.app.ctx.mqtt.publish(f"room/{room_name}/queue", json.dumps(request.app.ctx.queue_manager.for_json(room_name)), retain=True)
+        await app.ctx.mqtt.publish(f"room/{room_name}/queue", json.dumps(app.ctx.queue_manager.for_json(room_name)), retain=True)
 
 @contextlib.asynccontextmanager
-async def push_settings_to_mqtt(request, room_name):
+async def push_settings_to_mqtt(app: sanic.Sanic, room_name: str) -> contextlib.AbstractAsyncContextManager[None]:
     yield
-    if hasattr(request.app.ctx, 'mqtt'):
+    if hasattr(app.ctx, 'mqtt'):
         log.info(f"push_settings_to_mqtt {room_name}")
-        await request.app.ctx.mqtt.publish(f"room/{room_name}/settings", json.dumps(request.app.ctx.queue_manager.settings.get_json(room_name)), retain=True)
+        await app.ctx.mqtt.publish(f"room/{room_name}/settings", json.dumps(app.ctx.queue_manager.settings.get_json(room_name)), retain=True)
 
 
 # Routes -----------------------------------------------------------------------
@@ -206,6 +203,7 @@ async def login(request, room_name):
 @room_blueprint.get("/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
+    # TODO: description='not normally used by production clients' see queue instead
 )
 async def tracks(request, room_name):
     return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
@@ -216,6 +214,7 @@ async def tracks(request, room_name):
 @room_blueprint.get("/settings.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueSettings}),
+    # TODO: description='not normally used by production clients' see queue instead
 )
 async def get_settings(request, room_name):
     return sanic.response.json(request.app.ctx.settings_manager.get_json(room_name))
@@ -228,7 +227,7 @@ async def get_settings(request, room_name):
 async def update_settings(request, room_name):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
-    async with push_settings_to_mqtt(request, room_name):
+    async with push_settings_to_mqtt(request.app, room_name):
         try:
             request.app.ctx.settings_manager.set_json(room_name, request.json)
             log.info(f"Updated settings for {room_name} with {request.json}")
@@ -283,7 +282,7 @@ async def add_queue_item(request, room_name):
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
     performer_name = request.json['performer_name']
     # Queue update
-    async with push_queue_to_mqtt(request, room_name):
+    async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
                 track_id=track_id,
@@ -313,7 +312,7 @@ async def add_queue_item(request, room_name):
 )
 async def delete_queue_item(request, room_name, queue_item_id):
     queue_item_id = int(queue_item_id)
-    async with push_queue_to_mqtt(request, room_name):
+    async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             _, queue_item = queue.get(queue_item_id)
             if not queue_item:
@@ -340,7 +339,7 @@ async def move_queue_item(request, room_name):
         raise sanic.exceptions.InvalidUsage(message="source and target args required", context=request.json)
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
-    async with push_queue_to_mqtt(request, room_name):
+    async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue.move(source, target)
             return sanic.response.json({}, status=201)
@@ -364,37 +363,16 @@ async def queue_command(request, room_name, command):
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
     if command not in {'play', 'stop', 'seek_forwards', 'seek_backwards', 'skip'}:
         raise sanic.exceptions.NotFound(message='invalid command')
-    async with push_queue_to_mqtt(request, room_name):
+    async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             getattr(queue, command)()
             return sanic.response.json({'is_playing': bool(queue.is_playing)})
 
 
-# Background tasks -------------------------------------------------------------
+# Background Tasks -------------------------------------------------------------
 
-tracks_update_semaphore = asyncio.Semaphore(1)
-async def background_tracks_update_event(_app: sanic.Sanic) -> None:
-    # A background task is created for each worker - Only allow one background process by aborting if another task has the semaphore
-    if tracks_update_semaphore.locked():
-        log.debug('`tracks.json` background_tracks_update_event already active - cancel task')
-        return
-    async with tracks_update_semaphore:
-        log.info('`tracks.json` background_tracks_update_event started')
-        while True:
-            track_manager = _app.ctx.track_manager
-            log.debug('`tracks.json` check mtime')
-            if track_manager.has_tracks_updated:
-                log.debug('`tracks.json` reload')
-                track_manager.reload_tracks()
-                # Use PUT `/settings.json` to update settings -> mqtt settings event will be sent to all clients
-                # Clients check `tracks_last_updated_mtime` and fetch/reload `tracks.json` if value has changed
-                await _app.test_client.put(
-                    _app.url_for('update_settings'),
-                    json={'tracks_last_updated_mtime': track_manager.mtime},
-                    headers={'admin': True}
-                )
-            await asyncio.sleep(60)
-#app.add_task(background_tracks_update_event(app))  # TODO: enable endpoint after testing
+from .background_tasks import background_tracks_update_event
+app.add_task(background_tracks_update_event(app, push_settings_to_mqtt))
 
 
 # Main -------------------------------------------------------------------------
