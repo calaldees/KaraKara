@@ -139,8 +139,8 @@ class Queue():
                 self.current.start_time = self.now + datetime.timedelta(seconds=1)
             self._recalculate_start_times()
     def stop(self) -> None:
-        if self.current:
-            self.current.start_time = None
+        if current := self.current:
+            current.start_time = None
             self._recalculate_start_times()
     def add(self, queue_item: QueueItem) -> None:
         self.items.append(queue_item)
@@ -159,6 +159,10 @@ class Queue():
     def get(self, id: int) -> tuple[int, QueueItem] | tuple[None, None]:
         return next(((index, queue_item) for index, queue_item in enumerate(self.items) if queue_item.id==id), (None, None))
     def delete(self, id: int) -> None:
+        if current := self.current:
+            # If deleting current item and current item is queued for future playback
+            if current.id == id and current.start_time:
+                self.stop()
         now = self.now
         self.items[:] = [i for i in self.items if (i.start_time and i.start_time < now) or i.id != id]
         self._recalculate_start_times()

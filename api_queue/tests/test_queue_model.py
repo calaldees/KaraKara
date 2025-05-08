@@ -86,6 +86,32 @@ def test_queue_append(qu: Queue):
     assert qu.current
     assert qu.current.track_id == 'Track4'
 
+def test_queue_delete_playing_item_stops_playback(qu: Queue):
+    assert qu._now
+    qu.add(QueueItem('Track1', ONE_MINUTE, 'TestSession1', 'test_name'))
+    qu.add(QueueItem('Track2', ONE_MINUTE, 'TestSession2', 'test_name'))
+    qu.add(QueueItem('Track3', ONE_MINUTE, 'TestSession2', 'test_name'))
+    qu.play(immediate=True)
+    assert qu.playing
+    assert qu.last
+    qu.delete(qu.last.id)
+    assert qu.playing, 'deleting future items should not stop playback'
+    qu.delete(qu.playing.id)
+    assert not qu.playing, 'deleting the current playing item should stop playback'
+    assert qu.current and qu.current.track_id == 'Track2'
+
+def test_queue_delete_scheduled_playing_item_stops_playback(qu: Queue):
+    assert qu._now
+    qu.add(QueueItem('Track1', ONE_MINUTE, 'TestSession1', 'test_name'))
+    qu.add(QueueItem('Track2', ONE_MINUTE, 'TestSession2', 'test_name'))
+    qu.add(QueueItem('Track3', ONE_MINUTE, 'TestSession2', 'test_name'))
+    qu.play(immediate=False)  # queue to start playing in 1 second time
+    assert not qu.playing
+    assert qu.items[0].start_time, 'all items should have start_time'
+    assert qu.items[1].start_time, 'all items should have start_time'
+    qu.delete(qu.items[0].id)
+    assert qu.current and not qu.current.start_time, 'playback should have stopped'
+
 def test_queue_append_while_playing_populates_start_time(qu: Queue):
     assert qu._now
     qu.add(QueueItem('Track4', ONE_MINUTE, 'TestSession4', 'test_name'))
