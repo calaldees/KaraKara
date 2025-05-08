@@ -1,3 +1,4 @@
+import enum
 import contextlib
 import uuid
 from datetime import datetime
@@ -348,11 +349,22 @@ async def move_queue_item(request, room_name):
 
 # Queue / Commands ------------------------------------------------------------
 
+class Commands(enum.StrEnum):
+    PLAY = enum.auto()
+    PLAY_ONE = enum.auto()
+    STOP = enum.auto()
+    SEEK_FORWARDS = enum.auto()
+    SEEK_BACKWARDS = enum.auto()
+    SKIP = enum.auto()
+
 class CommandReturn():
     is_playing: bool
 
 @room_blueprint.get("/command/<command:([a-z_]+).json>")
 @openapi.definition(
+    description=dedent(f"""
+        Valid commands {', '.join(map(str, Commands))}
+    """),
     response=[
         openapi.definitions.Response({"application/json": CommandReturn}, status=200),
         openapi.definitions.Response('invalid command', status=400),
@@ -362,7 +374,7 @@ class CommandReturn():
 async def queue_command(request, room_name, command):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
-    if command not in {'play', 'stop', 'seek_forwards', 'seek_backwards', 'skip'}:
+    if command not in Commands:
         raise sanic.exceptions.NotFound(message='invalid command')
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:

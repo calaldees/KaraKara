@@ -34,7 +34,7 @@ def test_queue_time_moves_forwards(qu: Queue):
     qu.add(QueueItem('Track2', ONE_MINUTE, 'TestSession2', 'test_name'))
 
     # Playing state when moving time forward
-    qu.play()  # play queues a track to start in 1s
+    qu.play(immediate=False)  # play queues a track to start in 1s
     assert qu.playing is None
     qu._now += datetime.timedelta(seconds=1)
     assert qu.playing
@@ -86,8 +86,14 @@ def test_queue_append(qu: Queue):
     assert qu.current
     assert qu.current.track_id == 'Track4'
 
+def test_queue_play_one(qu: Queue):
+    qu.add(QueueItem('Track1', ONE_MINUTE, 'TestSession1', 'test_name'))
+    qu.add(QueueItem('Track2', ONE_MINUTE, 'TestSession2', 'test_name'))
+    qu.play_one(immediate=True)
+    assert qu.items[0].start_time
+    assert not qu.items[1].start_time
+
 def test_queue_delete_playing_item_stops_playback(qu: Queue):
-    assert qu._now
     qu.add(QueueItem('Track1', ONE_MINUTE, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', ONE_MINUTE, 'TestSession2', 'test_name'))
     qu.add(QueueItem('Track3', ONE_MINUTE, 'TestSession2', 'test_name'))
@@ -101,7 +107,6 @@ def test_queue_delete_playing_item_stops_playback(qu: Queue):
     assert qu.current and qu.current.track_id == 'Track2'
 
 def test_queue_delete_scheduled_playing_item_stops_playback(qu: Queue):
-    assert qu._now
     qu.add(QueueItem('Track1', ONE_MINUTE, 'TestSession1', 'test_name'))
     qu.add(QueueItem('Track2', ONE_MINUTE, 'TestSession2', 'test_name'))
     qu.add(QueueItem('Track3', ONE_MINUTE, 'TestSession2', 'test_name'))
