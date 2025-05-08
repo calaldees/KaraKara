@@ -101,10 +101,13 @@ graph TD
         processmedia ..-> logs
         api_queue ..-> logs
 
+        /data/queue/[(/data/queue/)]
+
         nginx -- http 80 --> browser
         nginx -- http 80 --> player
         nginx -- http 8000 --> api_queue
         api_queue --mqtt 1887--> mqtt
+        api_queue <--> /data/queue/
         mqtt -- websocket 9001 --> nginx
     end
 
