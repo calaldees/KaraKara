@@ -205,7 +205,11 @@ async def login(request, room_name):
 @room_blueprint.get("/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
-    # TODO: description='not normally used by production clients' see queue instead
+    description=dedent("""
+        Dev convenience.
+        Not used by production clients.
+        Nginx serves this static content.
+    """),
 )
 async def tracks(request, room_name):
     return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
@@ -216,7 +220,11 @@ async def tracks(request, room_name):
 @room_blueprint.get("/settings.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueSettings}),
-    # TODO: description='not normally used by production clients' see queue instead
+    description=dedent("""
+        Dev convenience.
+        Not used by production clients.
+        settings received by mqtt event
+    """),
 )
 async def get_settings(request, room_name):
     return sanic.response.raw(request.app.ctx.settings_manager.get(room_name).model_dump_json(), headers={'content-type': 'application/json'})
@@ -246,7 +254,13 @@ async def update_settings(request, room_name):
     response=[
         openapi.definitions.Response({"text/csv": str}),
         openapi.definitions.Response('queue not found', status=400),
-    ]
+    ],
+    description=dedent("""
+        Dev convenience.
+        Not used by production clients.
+        queue received by mqtt event.
+        Useful for debugging to see raw datastore on disk.
+    """),
 )
 async def queue_csv(request, room_name):
     path_csv = request.app.ctx.queue_manager.path_csv(room_name)
@@ -257,6 +271,11 @@ async def queue_csv(request, room_name):
 @room_blueprint.get("/queue.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
+    description=dedent("""
+        Dev convenience.
+        Not used by production clients.
+        queue received by mqtt event
+    """),
 )
 async def queue_json(request, room_name):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(room_name))
@@ -391,4 +410,4 @@ app.add_task(background_tracks_update_event(app, push_settings_to_mqtt))
 # Main -------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, workers=4, dev=True, access_log=True, auto_reload=True)
+    app.run(host='0.0.0.0', port=8000, dev=True, access_log=True, auto_reload=True)
