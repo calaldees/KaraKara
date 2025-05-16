@@ -17,24 +17,26 @@ import csv
 from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Tuple
+from collections.abc import Sequence, MutableMapping
 
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from lib.kktypes import Source, SourceType, TargetType, Track, Target
+from lib.kktypes import Source, SourceType, TargetType, Track, Target, TrackDict
+
 
 log = logging.getLogger()
 
 TARGET_TYPES = [
     # TargetType.VIDEO_H264,
     TargetType.VIDEO_AV1,
-    # TargetType.VIDEO_H265,
-    TargetType.PREVIEW_AV1,
-    TargetType.PREVIEW_H265,
+    TargetType.VIDEO_H265,
+    #TargetType.PREVIEW_AV1,
+    #TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,
     TargetType.IMAGE_AVIF,
-    TargetType.IMAGE_WEBP,
+    #TargetType.IMAGE_WEBP,
     TargetType.SUBTITLES_VTT,
 ]
 SCAN_IGNORE = [
@@ -56,9 +58,9 @@ def scan(
     source_dir: Path,
     processed_dir: Path,
     match: str,
-    cache: Dict[str, Any],
+    cache: MutableMapping[str, Any],
     threads: int = 1,
-) -> List[Track]:
+) -> Sequence[Track]:
     """
     Look at the source directory and return a list of Track objects,
     where each track has:
@@ -85,16 +87,14 @@ def scan(
     groups = sorted(grouped.items())
 
     # Turn all the (basename, list of filenames) tuples into a
-    # list of Tracks (log en error and return None if we can't
+    # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
-    def _load_track(group: Tuple[str, List[Path]]) -> Optional[Track]:
+    def _load_track(group: Tuple[str, Sequence[Path]]) -> Track | None:
         (track_id, paths) = group
         try:
-            sources = []
-            for path in paths:
-                source = Source(source_dir, path, cache)
+            sources = tuple(Source(source_dir, path, cache) for path in paths)
+            for source in sources:
                 source.hash()  # force hashing now
-                sources.append(source)
             return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
             log.exception(f"Error calculating track {track_id}")
@@ -105,7 +105,7 @@ def scan(
     return [t for t in maybe_tracks if t]
 
 
-def view(tracks: List[Track]) -> None:
+def view(tracks: Sequence[Track]) -> None:
     """
     Print out a list of Tracks, marking whether or not each Target (ie, each
     file in the "processsed" directory) exists
@@ -131,7 +131,7 @@ def view(tracks: List[Track]) -> None:
             )
 
 
-def lint(tracks: List[Track]) -> None:
+def lint(tracks: Sequence[Track]) -> None:
     """
     Scan through all the data, looking for things which seem suspicious
     and probably want a human to investigate
@@ -178,16 +178,17 @@ def lint(tracks: List[Track]) -> None:
                                 writer.writerow([s.friendly, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
 
 
-def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> None:
+def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) -> None:
     """
     Take a list of Track objects, and make sure that every Target exists
     """
 
     # Come up with a single list of every Target object that we can imagine
-    targets = []
-    for tr in tracks:
-        for t in tr.targets:
-            targets.append(t)
+    targets = tuple(
+        target
+        for tr in tracks
+        for target in tr.targets
+    )
 
     # Only check if the file exists at the last minute, not at the start,
     # because somebody else might have finished this encode while we still
@@ -204,7 +205,7 @@ def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> Non
 
 def export(
     processed_dir: Path,
-    tracks: List[Track],
+    tracks: Sequence[Track],
     update: bool = False,
     threads: int = 1,
 ) -> None:
@@ -215,7 +216,7 @@ def export(
     # Exporting a Track to json can take some time, since we also need
     # to read the tags and the subtitle files in order to include those
     # in the index; so do it multi-threaded.
-    def _export(track: Track) -> Optional[Dict[str, Any]]:
+    def _export(track: Track) -> TrackDict | None:
         try:
             return track.to_json()
         except Exception:
@@ -255,7 +256,7 @@ def export(
 
 
 def cleanup(
-    processed_dir: Path, tracks: List[Track], delete: bool, threads: int = 1
+    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
 ) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
@@ -278,7 +279,7 @@ def cleanup(
     thread_map(_cleanup, files, max_workers=threads, desc="cleanup", unit="file")
 
 
-def parse_args(argv: List[str]) -> argparse.Namespace:
+def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--source",
@@ -363,7 +364,7 @@ def _pickled_var(path: Path, default: Any):
         log.debug(f"Error saving cache: {e}")
 
 
-def main(argv: List[str]) -> int:
+def main(argv: Sequence[str]) -> int:
     args = parse_args(argv)
 
     logging.basicConfig(
@@ -378,7 +379,7 @@ def main(argv: List[str]) -> int:
 
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
-            cache: Dict[str, Any] = {}
+            cache: MutableMapping[str, Any] = {}
             original = Path(args.match)
             tracks = [Track(
                 original.parent,
@@ -398,6 +399,7 @@ def main(argv: List[str]) -> int:
     while True:
         with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
             tracks = scan(args.source, args.processed, args.match, cache, args.threads)
+            tracks = tuple(track for track in tracks if track.has_tags)  # only encode tracks that have a tag.txt file
 
             # If no specific command is specified, then encode,
             # export, and cleanup with the default settings

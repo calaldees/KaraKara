@@ -5,29 +5,31 @@ import re
 import shutil
 import subprocess
 import tempfile
+import zlib
 from collections import defaultdict
-from enum import Enum
+import enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Set, Tuple, TypeVar
+import typing as t
+from collections.abc import Sequence, Mapping, MutableMapping, Set
 from fractions import Fraction
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
 
 log = logging.getLogger()
-T = TypeVar("T")
+T = t.TypeVar("T")
 
 
-class SourceType(Enum):
-    VIDEO = {".mp4", ".mkv", ".avi", ".mpg", ".webm"}
-    AUDIO = {".mp3", ".flac", ".ogg"}
-    IMAGE = {".jpg", ".png"}
-    TAGS = {".txt"}
-    SUBTITLES = {".srt", ".ssa"}
+class SourceType(enum.Enum):
+    VIDEO = frozenset({".mp4", ".mkv", ".avi", ".mpg", ".webm"})
+    AUDIO = frozenset({".mp3", ".flac", ".ogg"})
+    IMAGE = frozenset({".jpg", ".png", ".webp", ".avif"})
+    TAGS = frozenset({".txt"})
+    SUBTITLES = frozenset({".srt", ".ssa"})
 
 
-class TargetType(Enum):
+class TargetType(enum.Enum):
     VIDEO_H264 = 10
     VIDEO_AV1 = 11
     VIDEO_H265 = 12
@@ -40,13 +42,126 @@ class TargetType(Enum):
     SUBTITLES_VTT = 40
 
 
+class MediaType(enum.StrEnum):
+    VIDEO = enum.auto()
+    PREVIEW = enum.auto()
+    SUBTITLE = enum.auto()
+    IMAGE = enum.auto()
+
+
+def hash_file(path: Path) -> str:
+    # New way - get first and last 64k and 32bit-int hash - fast
+    # Could try and 64bit int hash?
+    # May not be enough to avoid collisions - will check
+    # Future: Could be abstracted with http-range request for cloud store
+    block_size = pow(2, 16)
+    st_size = path.stat().st_size
+    with path.open('rb') as f:
+        fist_bytes = f.read(block_size)
+        f.seek(max(0, st_size-block_size))
+        last_bytes = f.read(block_size)
+        return base64.b64encode(zlib.adler32(fist_bytes + last_bytes + st_size.to_bytes(4)).to_bytes(4)).decode('utf8').rstrip('=')
+
+
+class MediaMeta(t.NamedTuple):
+    fps: float = 0.0
+    width: int = 0
+    height: int = 0
+    duration: timedelta = timedelta(seconds=0)
+    aspect_ratio: Fraction = Fraction(1, 1)
+
+    @property
+    def aspect_ratio_str(self) -> str:
+        return ':'.join(map(str,self.aspect_ratio.as_integer_ratio()))
+
+    @classmethod
+    def from_width_height(cls, width, height):
+        return cls(width=width, height=height, aspect_ratio=Fraction(width, height))
+
+    @classmethod
+    def from_path(cls, path: Path, _subprocess_run: t.Callable[...,subprocess.CompletedProcess]=subprocess.run) -> t.Self:
+        r"""
+        >>> from textwrap import dedent
+
+        >>> from unittest.mock import Mock
+        >>> def from_path(fake_ffprobe_stderr):
+        ...     mock_subprocess_run = Mock()
+        ...     mock_completed_process = Mock()
+        ...     mock_subprocess_run.return_value = mock_completed_process
+        ...     mock_completed_process.returncode = 0
+        ...     mock_completed_process.stdout.decode.return_value = fake_ffprobe_stderr
+        ...     return MediaMeta.from_path(Path(), _subprocess_run=mock_subprocess_run)
+
+        >>> fake_ffprobe_stderr_video = dedent('''
+        ...     Input #0, matroska,webm, from 'Macross Dynamite7 - OP - Dynamite Explosion.mkv':
+        ...     Metadata:
+        ...         title           : [ET] マクロスダイナマイト7 - NC OP Ver.01
+        ...         encoder         : libebml v1.3.0 + libmatroska v1.4.0
+        ...         creation_time   : 2013-08-24T18:45:46.000000Z
+        ...     Duration: 00:02:08.13, start: 0.000000, bitrate: 8747 kb/s
+        ...     Stream #0:0(jpn): Video: h264 (High 10), yuv420p10le(tv, bt709/unknown/unknown, progressive), 960x720, SAR 1:1 DAR 4:3, 23.98 fps, 23.98 tbr, 1k tbn (default)
+        ...     Stream #0:1(jpn): Audio: flac, 48000 Hz, stereo, s16 (default)
+        ... ''')
+        >>> from_path(fake_ffprobe_stderr_video)
+        MediaMeta(fps=23.98, width=960, height=720, duration=datetime.timedelta(seconds=128, microseconds=130000), aspect_ratio=Fraction(4, 3))
+
+        >>> fake_ffprobe_stderr_image = dedent('''
+        ...     Input #0, png_pipe, from 'Screenshot 2025-02-14 at 15.58.24.png':
+        ...     Duration: N/A, bitrate: N/A
+        ...     Stream #0:0: Video: png, rgba(pc, gbr/unknown/unknown), 3024x1646 [SAR 5669:5669 DAR 1512:823], 25 fps, 25 tbr, 25 tbn
+        ... ''')
+        >>> from_path(fake_ffprobe_stderr_image)
+        MediaMeta(fps=25.0, width=3024, height=1646, duration=datetime.timedelta(0), aspect_ratio=Fraction(1512, 823))
+
+
+        >>> fake_ffprobe_stderr_audio = dedent('''
+        ...   Duration: 00:03:32.48, start: 0.025056, bitrate: 322 kb/s
+        ...     Stream #0:0: Audio: mp3 (mp3float), 44100 Hz, stereo, fltp, 320 kb/s
+        ...     Metadata:
+        ...     encoder         : LAME3.97
+        ...     Stream #0:1: Video: mjpeg (Baseline), yuvj420p(pc, bt470bg/unknown/unknown), 534x599 [SAR 72:72 DAR 534:599], 90k tbr, 90k tbn (attached pic)
+        ... ''')
+        >>> from_path(fake_ffprobe_stderr_audio)
+        MediaMeta()
+        """
+        # Can `ffprobe` output json?
+        completed_process = _subprocess_run(("ffprobe", path.as_posix()), capture_output=True)
+        if completed_process.returncode:
+            log.debug(f'Unable to ffprobe {path}')
+            return cls()
+        ffprobe_output = completed_process.stderr.decode('utf8')
+
+        fps = 0.0
+        if match := re.search(r'(\d{1,3}(\.\d+)?) fps', ffprobe_output):
+            fps = float(match.group(1))
+
+        width = 0
+        height = 0
+        if match := re.search(r'((\d{3,4})x(\d{3,4}))', ffprobe_output):
+            width, height = int(match.group(2)), int(match.group(3))
+
+        duration = timedelta(seconds=0)
+        if match := re.search(r'Duration: (\d{2}):(\d{2}):(\d{2}\.\d{2})', ffprobe_output):
+            duration = timedelta(
+                hours=int(match.group(1)),
+                minutes=int(match.group(2)),
+                seconds=float(match.group(3)),
+            )
+
+        aspect_ratio = Fraction(width or 1, height or 1)
+        if match := re.search(r'DAR (\d{1,4}):(\d{1,4})', ffprobe_output):
+            aspect_ratio = Fraction(int(match.group(1)), int(match.group(2)))
+
+        return cls(fps, width, height, duration, aspect_ratio)
+
+
 class Source:
     """
     A file in the "source" directory, with some convenience methods
     to parse data out of the file (hash, duration, etc) efficiently
     """
 
-    def __init__(self, source_dir: Path, path: Path, cache: Dict[str, Any]):
+    def __init__(self, source_dir: Path, path: Path, cache: MutableMapping[str, t.Any]):
         self.source_dir = source_dir
         self.path = path
         self.cache = cache
@@ -60,7 +175,7 @@ class Source:
             raise Exception(f"Can't tell what type of source {self.friendly} is")
 
     @staticmethod
-    def _cache(func: Callable[["Source"], T]) -> Callable[["Source"], T]:
+    def _cache(func: t.Callable[["Source"], T]) -> t.Callable[["Source"], T]:
         """
         if `self.cache[self.file.name self.file.mtime func.name]` is set,
         return that, else call func() and add the value to the cache
@@ -82,62 +197,27 @@ class Source:
     @_cache
     def hash(self) -> str:
         log.info(f"Hashing {self.friendly}")
+        # Old way - sha256 the whole file - slow
         return hashlib.sha256(self.path.read_bytes()).hexdigest()
+        return hash_file(self.path)
+
+
+    @property
+    @_cache
+    def meta(self) -> MediaMeta:
+        log.info(f"Parsing meta from {self.friendly}")
+        return MediaMeta.from_path(self.path)
 
     @_cache
-    def duration(self) -> float:
-        log.info(f"Parsing duration from {self.friendly}")
-        probe_proc = subprocess.run(
-            ["ffprobe", self.path.as_posix()],
-            stderr=subprocess.PIPE,
-            text=True,
-            errors="ignore",  # some files contain non-utf8 metadata
-            check=True,
-        )
-        raw_duration = re.search(r"Duration: (\d+):(\d+):(\d+.\d+)", probe_proc.stderr)
-        if not raw_duration:
-            raise Exception(f"Failed to find duration in probe:\n{probe_proc.stderr}")
-        hours = float(raw_duration.group(1)) * 60.0 * 60.0
-        minutes = float(raw_duration.group(2)) * 60.0
-        seconds = float(raw_duration.group(3))
-        return hours + minutes + seconds
-
-    @_cache
-    def aspectratio(self) -> str:
-        log.info(f"Parsing aspectratio from {self.friendly}")
-        probe_proc = subprocess.run(
-            # fmt: off
-            [
-                "ffprobe",
-                "-v", "error",
-                "-select_streams", "v:0",
-                "-show_entries", "stream=width,height,display_aspect_ratio",
-                "-of", "csv=s=,:p=0",
-                self.path.as_posix(),
-            ],
-            # fmt: on
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            errors="ignore",  # some files contain non-utf8 metadata
-            check=True,
-        )
-        w, h, dar = probe_proc.stdout.strip().split(",")[:3]
-        if dar != "N/A":
-            return dar
-        f = Fraction(int(w), int(h))
-        return f"{f.numerator}:{f.denominator}"
-
-    def lyrics(self) -> List[str]:
-        return [l.text for l in self.subtitles()]
-
-    @_cache
-    def subtitles(self) -> List[Subtitle]:
+    def subtitles(self) -> Sequence[Subtitle]:
         log.info(f"Parsing subtitles from {self.friendly}")
         return parse_subtitles(self.path.read_text())
 
+    def lyrics(self) -> Sequence[str]:
+        return [l.text for l in self.subtitles()]
+
     @_cache
-    def tags(self) -> Dict[str, List[str]]:
+    def tags(self) -> Mapping[str, Sequence[str]]:
         log.info(f"Parsing tags from {self.friendly}")
         return parse_tags(self.path.read_text())
 
@@ -150,7 +230,7 @@ class Target:
     """
 
     def __init__(
-        self, processed_dir: Path, type: TargetType, sources: List[Source]
+        self, processed_dir: Path, type: TargetType, sources: Sequence[Source]
     ) -> None:
         from .encoders import find_appropriate_encoder  # circular import :(
 
@@ -188,6 +268,17 @@ class Target:
             shutil.move(temppath.as_posix(), self.path.as_posix())
 
 
+class TrackAttachment(t.TypedDict):
+    mime: str
+    path: str
+class TrackDict(t.TypedDict):
+    id: str
+    duration: float
+    attachments: Mapping[MediaType, Sequence[TrackAttachment]]
+    lyrics: Sequence[str]
+    tags: Mapping[str, Sequence[str]]
+
+
 class Track:
     """
     An entry in tracks.json, keeping track of which source files are
@@ -199,30 +290,34 @@ class Track:
         self,
         processed_dir: Path,
         id: str,
-        sources: List[Source],
-        target_types: List[TargetType],
+        sources: Sequence[Source],
+        target_types: Sequence[TargetType],
     ) -> None:
         self.id = id
         self.sources = sources
         self.targets = [Target(processed_dir, type, sources) for type in target_types]
 
-    def _sources_by_type(self, types: Set[SourceType]) -> List[Source]:
+    def _sources_by_type(self, types: Set[SourceType]) -> Sequence[Source]:
         return [s for s in self.sources if s.type in types]
 
-    def to_json(self) -> Dict[str, Any]:
+    @property
+    def has_tags(self) -> bool:
+        return bool(self._sources_by_type({SourceType.TAGS}))
+
+    def to_json(self) -> TrackDict:  # Mapping[str, t.Any]
         media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-        duration = media_files[0].duration()
+        duration = media_files[0].meta.duration.total_seconds()
 
         attachments = defaultdict(list)
         for t in self.targets:
             attachments[t.encoder.category].append(
-                {
+                TrackAttachment({
                     "mime": t.encoder.mime,
                     "path": str(t.path.relative_to(t.processed_dir)),
-                }
+                })
             )
         assert attachments.get("video"), f"{self.id} is missing attachments.video"
-        assert attachments.get("preview"), f"{self.id} is missing attachments.preview"
+        #assert attachments.get("preview"), f"{self.id} is missing attachments.preview"
         assert attachments.get("image"), f"{self.id} is missing attachments.image"
 
         sub_files = self._sources_by_type({SourceType.SUBTITLES})
@@ -243,19 +338,19 @@ class Track:
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
         pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
-        tags["aspect_ratio"] = [pxsrc.aspectratio()]
+        tags["aspect_ratio"] = [pxsrc.meta.aspect_ratio_str]
 
         ausrc = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})[0]
-        d = int(ausrc.duration())
+        d = ausrc.meta.duration.total_seconds()
         tags["duration"] = [f"{d//60}m{d%60:02}s"]
 
         if tags.get("date"):
             tags["year"] = [d.split("-")[0] for d in tags["date"]]
 
-        return {
-            "id": self.id,
-            "duration": round(duration, 1),  # for more consistent unit tests
-            "attachments": attachments,
-            "lyrics": lyrics,
-            "tags": tags,
-        }
+        return TrackDict(
+            id=self.id,
+            duration=round(duration, 1),  # for more consistent unit tests
+            attachments=attachments,
+            lyrics=lyrics,
+            tags=tags,
+        )
