@@ -6,11 +6,12 @@ import shutil
 import subprocess
 import tempfile
 import zlib
+import copy
 from collections import defaultdict
 import enum
 from pathlib import Path
 import typing as t
-from collections.abc import Sequence, Mapping, MutableMapping, Set
+from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set
 from fractions import Fraction
 from datetime import timedelta
 
@@ -89,7 +90,7 @@ class MediaMeta(t.NamedTuple):
         ...     mock_completed_process = Mock()
         ...     mock_subprocess_run.return_value = mock_completed_process
         ...     mock_completed_process.returncode = 0
-        ...     mock_completed_process.stdout.decode.return_value = fake_ffprobe_stderr
+        ...     mock_completed_process.stderr.decode.return_value = fake_ffprobe_stderr
         ...     return MediaMeta.from_path(Path(), _subprocess_run=mock_subprocess_run)
 
         >>> fake_ffprobe_stderr_video = dedent('''
@@ -122,7 +123,7 @@ class MediaMeta(t.NamedTuple):
         ...     Stream #0:1: Video: mjpeg (Baseline), yuvj420p(pc, bt470bg/unknown/unknown), 534x599 [SAR 72:72 DAR 534:599], 90k tbr, 90k tbn (attached pic)
         ... ''')
         >>> from_path(fake_ffprobe_stderr_audio)
-        MediaMeta()
+        MediaMeta(fps=0.0, width=534, height=599, duration=datetime.timedelta(seconds=212, microseconds=480000), aspect_ratio=Fraction(534, 599))
         """
         # Can `ffprobe` output json?
         completed_process = _subprocess_run(("ffprobe", path.as_posix()), capture_output=True)
@@ -308,23 +309,23 @@ class Track:
         media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         duration = media_files[0].meta.duration.total_seconds()
 
-        attachments = defaultdict(list)
-        for t in self.targets:
-            attachments[t.encoder.category].append(
+        attachments: MutableMapping[MediaType, MutableSequence[TrackAttachment]] = defaultdict(list)
+        for target in self.targets:
+            attachments[target.encoder.category].append(
                 TrackAttachment({
-                    "mime": t.encoder.mime,
-                    "path": str(t.path.relative_to(t.processed_dir)),
+                    "mime": target.encoder.mime,
+                    "path": str(target.path.relative_to(target.processed_dir)),
                 })
             )
-        assert attachments.get("video"), f"{self.id} is missing attachments.video"
-        #assert attachments.get("preview"), f"{self.id} is missing attachments.preview"
-        assert attachments.get("image"), f"{self.id} is missing attachments.image"
+        assert attachments.get(MediaType.VIDEO), f"{self.id} is missing attachments.video"
+        #assert attachments.get(MediaType.PREVIEW), f"{self.id} is missing attachments.preview"
+        assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
 
         sub_files = self._sources_by_type({SourceType.SUBTITLES})
         lyrics = sub_files[0].lyrics() if sub_files else []
 
         tag_files = self._sources_by_type({SourceType.TAGS})
-        tags = tag_files[0].tags()
+        tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags())  # type: ignore[arg-type]
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
         assert tags.get("category") is not None, f"{self.id} is missing tags.category"
 
@@ -341,7 +342,7 @@ class Track:
         tags["aspect_ratio"] = [pxsrc.meta.aspect_ratio_str]
 
         ausrc = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})[0]
-        d = ausrc.meta.duration.total_seconds()
+        d = int(ausrc.meta.duration.total_seconds())
         tags["duration"] = [f"{d//60}m{d%60:02}s"]
 
         if tags.get("date"):

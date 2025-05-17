@@ -381,7 +381,7 @@ def main(argv: Sequence[str]) -> int:
         with logging_redirect_tqdm():
             cache: MutableMapping[str, Any] = {}
             original = Path(args.match)
-            tracks = [Track(
+            tracks: Sequence[Track] = [Track(
                 original.parent,
                 original.stem,
                 [
