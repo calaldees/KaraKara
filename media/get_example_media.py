@@ -4,7 +4,7 @@ from urllib.parse import unquote_plus
 import pathlib
 
 URL = "https://calaldees.dreamhosters.com/karakara_media/"
-RE_LINKS = re.compile(r'a.+?href="(.*?\..{3})"')
+RE_LINKS = re.compile(r'a.+?href="(.*?\..{3,4})"')
 PATH = pathlib.Path(__file__).parent.resolve().joinpath('source')
 
 def get_url(url):

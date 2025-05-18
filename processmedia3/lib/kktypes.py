@@ -50,20 +50,6 @@ class MediaType(enum.StrEnum):
     IMAGE = enum.auto()
 
 
-def hash_file(path: Path) -> str:
-    # New way - get first and last 64k and 32bit-int hash - fast
-    # Could try and 64bit int hash?
-    # May not be enough to avoid collisions - will check
-    # Future: Could be abstracted with http-range request for cloud store
-    block_size = pow(2, 16)
-    st_size = path.stat().st_size
-    with path.open('rb') as f:
-        fist_bytes = f.read(block_size)
-        f.seek(max(0, st_size-block_size))
-        last_bytes = f.read(block_size)
-        return base64.b64encode(zlib.adler32(fist_bytes + last_bytes + st_size.to_bytes(4)).to_bytes(4)).decode('utf8').rstrip('=')
-
-
 class MediaMeta(t.NamedTuple):
     fps: float = 0.0
     width: int = 0
