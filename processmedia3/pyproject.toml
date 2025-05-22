@@ -5,6 +5,7 @@ readme = "README.md"
 dependencies = [
 	"tqdm ~= 4.66",
 	"pillow ~= 10.2",
+	"dateparser",
 ]
 
 [project.optional-dependencies]
