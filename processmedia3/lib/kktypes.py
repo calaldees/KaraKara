@@ -149,10 +149,9 @@ class Source:
     """
 
     def __init__(self, source_dir: Path, path: Path, cache: MutableMapping[str, t.Any]):
-        self.source_dir = source_dir
         self.path = path
         self.cache = cache
-        self.friendly = str(path.relative_to(source_dir))
+        self.friendly = str(path.relative_to(source_dir))  # TODO: rename 'relative'?
         self.path.stat
         for type in SourceType:
             if self.path.suffix in type.value:
@@ -170,9 +169,7 @@ class Source:
 
         def inner(self: "Source") -> T:
             mtime = self.path.stat().st_mtime
-            key = (
-                f"{str(self.path.relative_to(self.source_dir))}-{mtime}-{func.__name__}"
-            )
+            key = f"{self.friendly}-{mtime}-{func.__name__}"
             cached = self.cache.get(key)
             if not cached:
                 cached = func(self)
@@ -186,8 +183,6 @@ class Source:
         log.info(f"Hashing {self.friendly}")
         # Old way - sha256 the whole file - slow
         return hashlib.sha256(self.path.read_bytes()).hexdigest()
-        return hash_file(self.path)
-
 
     @property
     @_cache

@@ -18,7 +18,7 @@ from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Tuple
-from collections.abc import Sequence, MutableMapping
+from collections.abc import Mapping, Sequence, MutableMapping, MutableSequence
 
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
@@ -77,14 +77,14 @@ def scan(
     #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
     #   ...
     # }
-    grouped = defaultdict(list)
+    grouped: Mapping[str, MutableSequence[Path]] = defaultdict(list)
     for path in source_dir.glob("**/*"):
         posix = path.as_posix()
         if any((i in posix) for i in SCAN_IGNORE):
             continue
         if path.is_file() and (match is None or match in path.stem):
             grouped[re.sub("[^0-9a-zA-Z]+", "_", path.stem.title())].append(path)
-    groups = sorted(grouped.items())
+    groups: Sequence[Tuple[str, Sequence[Path]]] = sorted(grouped.items())
 
     # Turn all the (basename, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
