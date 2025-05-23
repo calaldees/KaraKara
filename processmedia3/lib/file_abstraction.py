@@ -4,16 +4,18 @@ from pathlib import Path
 from typing import override, Self, TypedDict, NamedTuple
 from functools import cached_property
 from abc import abstractmethod
-from collections.abc import Mapping, Generator, Sequence, MutableSet
+from collections.abc import Mapping, Generator, Sequence, MutableSet, Set
 from os import stat_result
-#from zlib import adler32
-from hashlib import sha256
 from io import BytesIO
 import urllib.response
 
 import dateparser
 
 
+# Hash -------------------------------------------------------------------------
+
+#from zlib import adler32
+from hashlib import sha256
 def hash_bytes(data) -> bytes:
     #return adler32(data).to_bytes(4)
     return sha256(data).digest()
@@ -26,13 +28,19 @@ class AbstractFile():
 
     @property
     @abstractmethod
-    def name(self) -> str: ...
+    def absolute(self) -> str: ...
 
-    @cached_property
+    @property
     @abstractmethod
-    def head_tail(self) -> bytes: ...
-        # Get the head self.block_size and tail self.block_size
-        # if less then self.block_size total, just return the whole head
+    def relative(self) -> str: ...
+
+    @property
+    @abstractmethod
+    def stem(self) -> str: ...
+
+    @property
+    @abstractmethod
+    def suffix(self) -> str: ...
 
     @property
     @abstractmethod
@@ -41,6 +49,16 @@ class AbstractFile():
     @property
     @abstractmethod
     def mtime(self) -> int: ...
+
+    @property
+    @abstractmethod
+    def text(self) -> str: ...
+
+    @cached_property
+    @abstractmethod
+    def head_tail(self) -> bytes: ...
+        # Get the head self.block_size and tail self.block_size
+        # if less then self.block_size total, just return the whole head
 
     @cached_property
     def hash(self) -> str:
@@ -57,25 +75,31 @@ class AbstractFolder():
 # Path/Local -------------------------------------------------------------------
 
 class LocalFile(AbstractFile):
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, root: Path):
+        if (not path.is_file):
+            raise FileNotFoundError(path)
         self.path = path
+        self.root = root or path.parent
 
     @property
     @override
-    def name(self) -> str:
+    def absolute(self) -> str:
         return self.path.as_posix()
 
-    @cached_property
+    @property
     @override
-    def head_tail(self) -> bytes:
-        with self.path.open('rb') as f:
-            if self.size < self.block_size*2:
-                return f.read()
-            bytes_io = BytesIO()
-            bytes_io.write(f.read(self.block_size))
-            f.seek(self.size - self.block_size)
-            bytes_io.write(f.read(self.block_size))
-            return bytes_io.getvalue()
+    def relative(self) -> str:
+        return str(self.path.relative_to(self.root))
+
+    @property
+    @override
+    def stem(self) -> str:
+        return self.path.stem
+
+    @property
+    @override
+    def suffix(self) -> str:
+        return self.path.suffix
 
     @cached_property
     def stat(self) -> stat_result:
@@ -91,16 +115,36 @@ class LocalFile(AbstractFile):
     def mtime(self) -> int:
         return int(self.stat.st_mtime)
 
+    @cached_property
+    @override
+    def text(self) -> str:
+        return self.path.read_text()
+
+    @cached_property
+    @override
+    def head_tail(self) -> bytes:
+        with self.path.open('rb') as f:
+            if self.size < self.block_size*2:
+                return f.read()
+            bytes_io = BytesIO()
+            bytes_io.write(f.read(self.block_size))
+            f.seek(self.size - self.block_size)
+            bytes_io.write(f.read(self.block_size))
+            return bytes_io.getvalue()
+
 
 class LocalPath(AbstractFolder):
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, root: Path):
+        if (not root.is_dir):
+            raise NotADirectoryError(root)
+        self.root = root
 
     @property
     @override
     def files(self) -> Generator[AbstractFile]:
-        for path in self.path.glob("**/*"):
-            yield LocalFile(path)
+        for path in self.root.glob("**/*"):
+            #path.stat  # ? Investigate - this was part of `Source()` is this needed?
+            yield LocalFile(path, root=self.root)
 
 
 
@@ -109,10 +153,15 @@ class LocalPath(AbstractFolder):
 import re
 import json
 import urllib.request  # TODO: use http2 client. (http1 involves LOTS of https handshaking)
+from urllib.parse import urlparse, unquote
 #from http.client import HTTPResponse, HTTPMessage
+
 class HTTPResponse(NamedTuple):
     body: bytes
     headers: Mapping[str, str]
+    def has_headers(self, expected_headers: Set[str]) -> bool:
+        return set(key.lower() for key in self.headers.keys()) >= expected_headers
+
 def _http(url, headers={}, method='GET', timeout=5) -> HTTPResponse:
     request = urllib.request.Request(url, headers=headers, method=method)
     with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -120,17 +169,58 @@ def _http(url, headers={}, method='GET', timeout=5) -> HTTPResponse:
 
 
 class HttpFile(AbstractFile):
+    """
+    >>> file = HttpFile(
+    ...     url='https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).mp4',
+    ...     url_root='https://calaldees.dreamhosters.com/karakara_media/',
+    ...     mtime_str=', 2022-11-13 08:02   ',
+    ...     size_str='8.1M'
+    ... )
+    >>> file.absolute
+    'https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).mp4'
+    >>> file.relative
+    'Captain%20America%20(1966).mp4'
+    >>> file.stem
+    'Captain America (1966)'
+    >>> file.suffix
+    '.mp4'
+    >>> file.mtime
+    1668326520
+    """
     HEADERS_REQUIRED = frozenset({'accept-ranges', 'last-modified', 'content-length'})
     HEADER_DATETIME_STRPTIME = r'%a, %d %b %Y %H:%M:%S %Z'
 
-    def __init__(self, url: str, mtime_str: str = '', size_str: str = ''):
+    def __init__(self, url: str, url_root: str, mtime_str: str = '', size_str: str = ''):
         self.url = url
+        self.url_root = url_root
         self._size = size_str
         self._mtime = mtime_str
+        assert self.url.startswith(self.url_root)
 
     @property
-    def name(self) -> str:
+    def absolute(self) -> str:
         return self.url
+
+    @property
+    @override
+    def relative(self) -> str:
+        # Less than ideal, nieave implementation
+        return self.url.replace(self.url_root, '')
+
+    @property
+    def _path(self) -> Path:
+        # Not to be used in local filesystem, but does have useful functions for parts
+        return Path(unquote(urlparse(self.url).path))
+
+    @property
+    @override
+    def stem(self) -> str:
+        return self._path.stem
+
+    @property
+    @override
+    def suffix(self) -> str:
+        return self._path.suffix
 
     @cached_property
     @override
@@ -144,6 +234,8 @@ class HttpFile(AbstractFile):
         """
         # TODO: Bug? Will this request fail of the ranges overlap? test filesize between 8k to 16k (suggest 10k?)
         response = _http(self.url, headers={'Range': f'bytes=0-{self.block_size-1},-{self.block_size}'})
+        if not response.has_headers(self.HEADERS_REQUIRED):
+            raise Exception(f'http server does support required headers: {self.HEADERS_REQUIRED}')
         self._mtime = response.headers.get('Last-Modified', '')
         multipart_boundary = re.match(r'multipart/byteranges; boundary=(.+)', response.headers.get('content-type',''))
         if not multipart_boundary:
@@ -161,20 +253,12 @@ class HttpFile(AbstractFile):
             bytes_io.write(body)
         return bytes_io.getvalue()
 
-        # Old way with multiple requests
-        if self.size > self.block_size*2:
-            return (
-                _http(self.url, headers={'Range': f'bytes=0-{self.block_size-1}'}).body +
-                _http(self.url, headers={'Range': f'bytes=-{self.block_size}'}).body
-            )
-        return _http(self.url).body
-
     @cached_property
     def headers(self) -> Mapping[str, str]:
         response = _http(self.url, method='HEAD')
-        if set(key.lower() for key in response.headers.keys()) >= self.HEADERS_REQUIRED:
-            return response.headers
-        raise Exception(f'http server does support required headers: {self.HEADERS_REQUIRED}')
+        if not response.has_headers(self.HEADERS_REQUIRED):
+            raise Exception(f'http server does support required headers: {self.HEADERS_REQUIRED}')
+        return response.headers
 
     @property
     @override
@@ -188,7 +272,7 @@ class HttpFile(AbstractFile):
         mtime = self._mtime or self.headers['last-modified']
         #dt = datetime.strptime(mtime, self.HEADER_DATETIME_STRPTIME)
         dt = dateparser.parse(mtime)
-        return int(dt.timestamp())
+        return int(dt.timestamp() if dt else 0)
 
 
 class HttpFolder(AbstractFolder):
@@ -212,6 +296,7 @@ class HttpFolder(AbstractFolder):
         while folders_to_visit:
             url = folders_to_visit.pop()
             response = _http(url, headers={'Accept': 'application/json, text/html'})
+            # TODO: enforce has required headers?
             body = response.body.decode('utf8')
             folders_visited.add(url)
             content_type = response.headers.get('content-type', '')
@@ -230,6 +315,7 @@ class HttpFolder(AbstractFolder):
             for file_dict in file_dicts:
                 yield HttpFile(
                     url = f'{url}{file_dict['name']}',
+                    url_root = self.url,
                     mtime_str = dateparser.parse(file_dict['mtime']).strftime(HttpFile.HEADER_DATETIME_STRPTIME),
                     size_str = file_dict['size']
                 )
@@ -238,9 +324,9 @@ class HttpFolder(AbstractFolder):
 # Example ----------------------------------------------------------------------
 
 # python3 hash_file.py
-aa = HttpFile('https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).mp4')
-bb = LocalFile(Path('../media/source/Captain America (1966).mp4'))
-cc = HttpFile('https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).srt')
+aa = HttpFile('https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).mp4', url_root='https://calaldees.dreamhosters.com/karakara_media/')
+bb = LocalFile(Path('../media/source/Captain America (1966).mp4'), Path('../media/source/'))
+cc = HttpFile('https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).srt', url_root='https://calaldees.dreamhosters.com/karakara_media/')
 #breakpoint()
 #cc.head_tail
 #aa.head_tail

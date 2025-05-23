@@ -5,7 +5,6 @@ import re
 import shutil
 import subprocess
 import tempfile
-import zlib
 import copy
 from collections import defaultdict
 import enum
@@ -17,6 +16,7 @@ from datetime import timedelta
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
+from .file_abstraction import AbstractFile
 
 log = logging.getLogger()
 T = t.TypeVar("T")
@@ -66,18 +66,18 @@ class MediaMeta(t.NamedTuple):
         return cls(width=width, height=height, aspect_ratio=Fraction(width, height))
 
     @classmethod
-    def from_path(cls, path: Path, _subprocess_run: t.Callable[...,subprocess.CompletedProcess]=subprocess.run) -> t.Self:
+    def from_uri(cls, uri, _subprocess_run: t.Callable[...,subprocess.CompletedProcess]=subprocess.run) -> t.Self:
         r"""
         >>> from textwrap import dedent
 
         >>> from unittest.mock import Mock
-        >>> def from_path(fake_ffprobe_stderr):
+        >>> def from_uri(fake_ffprobe_stderr):
         ...     mock_subprocess_run = Mock()
         ...     mock_completed_process = Mock()
         ...     mock_subprocess_run.return_value = mock_completed_process
         ...     mock_completed_process.returncode = 0
         ...     mock_completed_process.stderr.decode.return_value = fake_ffprobe_stderr
-        ...     return MediaMeta.from_path(Path(), _subprocess_run=mock_subprocess_run)
+        ...     return MediaMeta.from_uri(Path(), _subprocess_run=mock_subprocess_run)
 
         >>> fake_ffprobe_stderr_video = dedent('''
         ...     Input #0, matroska,webm, from 'Macross Dynamite7 - OP - Dynamite Explosion.mkv':
@@ -89,7 +89,7 @@ class MediaMeta(t.NamedTuple):
         ...     Stream #0:0(jpn): Video: h264 (High 10), yuv420p10le(tv, bt709/unknown/unknown, progressive), 960x720, SAR 1:1 DAR 4:3, 23.98 fps, 23.98 tbr, 1k tbn (default)
         ...     Stream #0:1(jpn): Audio: flac, 48000 Hz, stereo, s16 (default)
         ... ''')
-        >>> from_path(fake_ffprobe_stderr_video)
+        >>> from_uri(fake_ffprobe_stderr_video)
         MediaMeta(fps=23.98, width=960, height=720, duration=datetime.timedelta(seconds=128, microseconds=130000), aspect_ratio=Fraction(4, 3))
 
         >>> fake_ffprobe_stderr_image = dedent('''
@@ -97,7 +97,7 @@ class MediaMeta(t.NamedTuple):
         ...     Duration: N/A, bitrate: N/A
         ...     Stream #0:0: Video: png, rgba(pc, gbr/unknown/unknown), 3024x1646 [SAR 5669:5669 DAR 1512:823], 25 fps, 25 tbr, 25 tbn
         ... ''')
-        >>> from_path(fake_ffprobe_stderr_image)
+        >>> from_uri(fake_ffprobe_stderr_image)
         MediaMeta(fps=25.0, width=3024, height=1646, duration=datetime.timedelta(0), aspect_ratio=Fraction(1512, 823))
 
 
@@ -108,13 +108,13 @@ class MediaMeta(t.NamedTuple):
         ...     encoder         : LAME3.97
         ...     Stream #0:1: Video: mjpeg (Baseline), yuvj420p(pc, bt470bg/unknown/unknown), 534x599 [SAR 72:72 DAR 534:599], 90k tbr, 90k tbn (attached pic)
         ... ''')
-        >>> from_path(fake_ffprobe_stderr_audio)
+        >>> from_uri(fake_ffprobe_stderr_audio)
         MediaMeta(fps=0.0, width=534, height=599, duration=datetime.timedelta(seconds=212, microseconds=480000), aspect_ratio=Fraction(534, 599))
         """
         # Can `ffprobe` output json?
-        completed_process = _subprocess_run(("ffprobe", path.as_posix()), capture_output=True)
+        completed_process = _subprocess_run(("ffprobe", uri), capture_output=True)
         if completed_process.returncode:
-            log.debug(f'Unable to ffprobe {path}')
+            log.debug(f'Unable to ffprobe {uri}')
             return cls()
         ffprobe_output = completed_process.stderr.decode('utf8')
 
@@ -148,17 +148,12 @@ class Source:
     to parse data out of the file (hash, duration, etc) efficiently
     """
 
-    def __init__(self, source_dir: Path, path: Path, cache: MutableMapping[str, t.Any]):
-        self.path = path
+    def __init__(self, file: AbstractFile, cache: MutableMapping[str, t.Any]):
+        self.file = file
         self.cache = cache
-        self.friendly = str(path.relative_to(source_dir))  # TODO: rename 'relative'?
-        self.path.stat
-        for type in SourceType:
-            if self.path.suffix in type.value:
-                self.type = type
-                break
-        else:
-            raise Exception(f"Can't tell what type of source {self.friendly} is")
+        self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
+        if not self.type:
+            raise Exception(f"Can't tell what type of source {self.file.relative} is")
 
     @staticmethod
     def _cache(func: t.Callable[["Source"], T]) -> t.Callable[["Source"], T]:
@@ -168,8 +163,9 @@ class Source:
         """
 
         def inner(self: "Source") -> T:
-            mtime = self.path.stat().st_mtime
-            key = f"{self.friendly}-{mtime}-{func.__name__}"
+            mtime = self.file.mtime
+            # TODO: consider normalising to 1min - this will have transposeability between http and local?
+            key = f"{self.file.relative}-{mtime}-{func.__name__}"
             cached = self.cache.get(key)
             if not cached:
                 cached = func(self)
@@ -178,30 +174,33 @@ class Source:
 
         return inner
 
+    @property
     @_cache
     def hash(self) -> str:
-        log.info(f"Hashing {self.friendly}")
-        # Old way - sha256 the whole file - slow
-        return hashlib.sha256(self.path.read_bytes()).hexdigest()
+        log.info(f"Hashing {self.file.relative}")
+        return self.file.hash
 
     @property
     @_cache
     def meta(self) -> MediaMeta:
-        log.info(f"Parsing meta from {self.friendly}")
-        return MediaMeta.from_path(self.path)
+        log.info(f"Parsing meta from {self.file.relative}")
+        return MediaMeta.from_uri(self.file.absolute)
 
+    @property
     @_cache
     def subtitles(self) -> Sequence[Subtitle]:
-        log.info(f"Parsing subtitles from {self.friendly}")
-        return parse_subtitles(self.path.read_text())
+        log.info(f"Parsing subtitles from {self.file.relative}")
+        return parse_subtitles(self.file.text)
 
+    @property
     def lyrics(self) -> Sequence[str]:
-        return [l.text for l in self.subtitles()]
+        return [l.text for l in self.subtitles]
 
+    @property
     @_cache
     def tags(self) -> Mapping[str, Sequence[str]]:
-        log.info(f"Parsing tags from {self.friendly}")
-        return parse_tags(self.path.read_text())
+        log.info(f"Parsing tags from {self.file.relative}")
+        return parse_tags(self.file.text)
 
 
 class Target:
@@ -220,7 +219,7 @@ class Target:
         self.type = type
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
-        parts = [self.encoder.salt()] + [s.hash() for s in self.sources]
+        parts = [self.encoder.salt()] + [s.hash for s in self.sources]
         hasher = hashlib.sha256()
         hasher.update("".join(sorted(parts)).encode("utf-8"))
         hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("utf8"))
@@ -236,7 +235,7 @@ class Target:
         log.info(
             f"{self.encoder.__class__.__name__}("
             f"{self.friendly!r}, "
-            f"{[s.friendly for s in self.sources]})"
+            f"{[s.file.relative for s in self.sources]})"
         )
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -303,10 +302,10 @@ class Track:
         assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
 
         sub_files = self._sources_by_type({SourceType.SUBTITLES})
-        lyrics = sub_files[0].lyrics() if sub_files else []
+        lyrics = sub_files[0].lyrics if sub_files else []
 
         tag_files = self._sources_by_type({SourceType.TAGS})
-        tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags())  # type: ignore[arg-type]
+        tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags)  # type: ignore[arg-type]
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
         assert tags.get("category") is not None, f"{self.id} is missing tags.category"
 

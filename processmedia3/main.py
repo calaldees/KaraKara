@@ -24,6 +24,7 @@ from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lib.kktypes import Source, SourceType, TargetType, Track, Target, TrackDict
+from lib.file_abstraction import AbstractFolder, LocalPath, AbstractFile
 
 
 log = logging.getLogger()
@@ -71,38 +72,40 @@ def scan(
     - A list of targets to write to the "processed" directory
       - eg "x/x53t4dg.webm", "6/6sbh34s.mp4"
     """
+    source_folder: AbstractFolder = LocalPath(source_dir)
 
     # Get a list of source files grouped by Track ID, eg
     # {
     #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
     #   ...
     # }
-    grouped: Mapping[str, MutableSequence[Path]] = defaultdict(list)
-    for path in source_dir.glob("**/*"):
-        posix = path.as_posix()
-        if any((i in posix) for i in SCAN_IGNORE):
+    grouped: Mapping[str, MutableSequence[AbstractFile]] = defaultdict(list)
+    for file in source_folder.files:
+    #for path in source_dir.glob("**/*"):
+        #posix = path.as_posix()
+        if any((i in file.absolute) for i in SCAN_IGNORE):
             continue
-        if path.is_file() and (match is None or match in path.stem):
-            grouped[re.sub("[^0-9a-zA-Z]+", "_", path.stem.title())].append(path)
-    groups: Sequence[Tuple[str, Sequence[Path]]] = sorted(grouped.items())
+        if match is None or match in file.stem:  # path.is_file() and ( path.stem
+            grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].append(file)
+    groups: Sequence[Tuple[str, Sequence[AbstractFile]]] = sorted(grouped.items())
 
     # Turn all the (basename, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
-    def _load_track(group: Tuple[str, Sequence[Path]]) -> Track | None:
-        (track_id, paths) = group
+    def _load_track(group: Tuple[str, Sequence[AbstractFile]]) -> Track | None:
+        (track_id, files) = group
         try:
-            sources = tuple(Source(source_dir, path, cache) for path in paths)
+            sources = tuple(Source(file, cache) for file in files)
             for source in sources:
-                source.hash()  # force hashing now
+                source.hash  # force hashing now (if not already in cache)
             return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
             log.exception(f"Error calculating track {track_id}")
             return None
 
-    maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
-
-    return [t for t in maybe_tracks if t]
+    return tuple(filter(None,
+        thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
+    ))
 
 
 def view(tracks: Sequence[Track]) -> None:
@@ -186,8 +189,8 @@ def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) ->
     # Come up with a single list of every Target object that we can imagine
     targets = tuple(
         target
-        for tr in tracks
-        for target in tr.targets
+        for track in tracks
+        for target in track.targets
     )
 
     # Only check if the file exists at the last minute, not at the start,
