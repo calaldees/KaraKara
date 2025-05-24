@@ -20,7 +20,7 @@
         "@shish2k/react-use-servertime": "^0.0.4",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "react-router-dom": "^7.3.0",
+        "react-router-dom": "^7.6.0",
         "react-screen-wake-lock": "^3.0.4",
         "three": "^0.174",
         "usehooks-ts": "^3.1.1"
