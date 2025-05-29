@@ -129,7 +129,7 @@ class _BaseVideoToVideo(Encoder):
         source = list(sources)[0]
         self._run(
             "ffmpeg",
-            "-i", source.path.as_posix(),
+            "-i", source.file.absolute,
             *self.conf_audio,
             *self.conf_video,
             # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
@@ -139,7 +139,7 @@ class _BaseVideoToVideo(Encoder):
             *self.additional_vcodec_arguments(source.meta),
             *self.conf_acodec,
             target.as_posix(),
-            title=f"{self.__class__.__name__}({source.path.stem})",
+            title=f"{self.__class__.__name__}({source.file.stem})",
             duration=source.meta.duration.total_seconds(),
         )
         # fmt: on
@@ -236,8 +236,8 @@ class _BaseImageToVideo(Encoder):
         self._run(
             "ffmpeg",
             "-loop", "1",
-            "-i", source_by_type(SourceType.IMAGE).path.as_posix(),
-            "-i", source_by_type(SourceType.AUDIO).path.as_posix(),
+            "-i", source_by_type(SourceType.IMAGE).file.absolute,
+            "-i", source_by_type(SourceType.AUDIO).file.absolute,
             "-t", str(source_by_type(SourceType.AUDIO).meta.duration.total_seconds()),
             "-r", "1",  # 1 fps
             *self.conf_audio,
@@ -307,7 +307,7 @@ class _BaseVideoToImage(Encoder):
             # fmt: off
             self._run(
                 "ffmpeg",
-                "-i", list(sources)[0].path.as_posix(),
+                "-i", list(sources)[0].file.absolute,
                 *self.conf_video,
                 "-an",
                 (tmpdir / "out%03d.bmp").as_posix(),
@@ -356,7 +356,7 @@ class _BaseImageToImage(Encoder):
         # fmt: off
         self._run(
             "convert",
-            list(sources)[0].path.as_posix(),
+            list(sources)[0].file.absolute,  # TODO: double check `convert` can take url as input
             *self.conf_video,
             *self.conf_vcodec,
             target.as_posix(),
@@ -394,9 +394,9 @@ class SubtitleToVTT(Encoder):
     mime = "text/vtt"
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
-        with open(list(sources)[0].path.as_posix()) as srt:
-            with open(target.as_posix(), "w") as vtt:
-                vtt.write(create_vtt(parse_subtitles(srt.read())))
+        srt = list(sources)[0].file.text
+        with open(target.as_posix(), "w") as vtt:
+            vtt.write(create_vtt(parse_subtitles(srt)))
 
 
 class VoidToVTT(Encoder):
@@ -415,7 +415,7 @@ class VoidToVTT(Encoder):
 #######################################################################
 
 
-def find_appropriate_encoder(type: TargetType, sources: Sequence[Source]) -> t.Tuple[Encoder, Set[Source]]:
+def find_appropriate_encoder(type: TargetType, sources: Set[Source]) -> t.Tuple[Encoder, Set[Source]]:
     def all_subclasses(cls):
         return set(cls.__subclasses__()).union(
             [s for c in cls.__subclasses__() for s in all_subclasses(c)]
@@ -438,7 +438,7 @@ def find_appropriate_encoder(type: TargetType, sources: Sequence[Source]) -> t.T
         ):
             return encoder(), {s for s in sources if s.type in encoder.sources}
     else:
-        source_list = "\n".join(f"  - {s.type}: {s.friendly}" for s in sources)
+        source_list = "\n".join(f"  - {s.type}: {s.file.relative}" for s in sources)
         raise Exception(
             f"Couldn't find an encoder to make {type} out of:\n{source_list}"
         )

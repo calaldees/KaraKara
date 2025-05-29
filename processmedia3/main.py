@@ -24,7 +24,7 @@ from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lib.kktypes import Source, SourceType, TargetType, Track, Target, TrackDict
-from lib.file_abstraction import AbstractFolder, LocalPath, AbstractFile
+from lib.file_abstraction import AbstractFolder, LocalPath, AbstractFile, LocalFile
 
 
 log = logging.getLogger()
@@ -122,7 +122,7 @@ def view(tracks: Sequence[Track]) -> None:
     for track in tracks:
         print(track.id)
         for t in track.targets:
-            source_list = [s.friendly for s in t.sources]
+            source_list = [s.file.relative for s in t.sources]
             if t.path.exists():
                 stats = f"{OK} ({int(t.path.stat().st_size/1024):,} KB)"
             else:
@@ -143,21 +143,21 @@ def lint(tracks: Sequence[Track]) -> None:
     for track in tracks:
         for t in track.targets:
             if not t.path.exists():
-                print(f"{t.friendly} missing (Sources: {[s.friendly for s in t.sources]!r})")
+                print(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
         for s in track.sources:
             if s.type == SourceType.SUBTITLES:
                 ls = s.subtitles()
 
                 # Check for weird stuff at the file level
                 if len(ls) == 0:
-                    writer.writerow([s.friendly, 0, "no subtitles", 0, ""])
+                    writer.writerow([s.file.relative, 0, "no subtitles", 0, ""])
                 if len(ls) == 1:
-                    writer.writerow([s.friendly, 0, "only one subtitle", 0, ls[0].text])
+                    writer.writerow([s.file.relative, 0, "only one subtitle", 0, ls[0].text])
 
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
-                        writer.writerow([s.friendly, index+1, "line contains newline", 0, l.text])
+                        writer.writerow([s.file.relative, index+1, "line contains newline", 0, l.text])
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
@@ -169,16 +169,16 @@ def lint(tracks: Sequence[Track]) -> None:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
                         gap = l1.end - l2.start
                         if l1.end == l2.start and (l1.text == l2.text == l3.text):
-                            writer.writerow([s.friendly, index+1, "no gap between 3+ repeats", 0, l1.text])
+                            writer.writerow([s.file.relative, index+1, "no gap between 3+ repeats", 0, l1.text])
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
                             if gap < timedelta(microseconds=500_000) and not (l1.text == l2.text):
-                                writer.writerow([s.friendly, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                                writer.writerow([s.file.relative, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
                         elif l2.start < l1.end:
                             gap = l1.end - l2.start
                             if gap < timedelta(microseconds=1_000_000):
-                                writer.writerow([s.friendly, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                                writer.writerow([s.file.relative, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
 
 
 def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) -> None:
@@ -383,12 +383,12 @@ def main(argv: Sequence[str]) -> int:
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
             cache: MutableMapping[str, Any] = {}
-            original = Path(args.match)
+            original = LocalFile(Path(args.match))
             tracks: Sequence[Track] = [Track(
                 original.parent,
                 original.stem,
                 [
-                    Source(original.parent, original, cache)
+                    Source(original, cache)
                 ],
                 [
                     TargetType.VIDEO_H264,

@@ -163,8 +163,9 @@ class Source:
         """
 
         def inner(self: "Source") -> T:
-            mtime = self.file.mtime
-            # TODO: consider normalising to 1min - this will have transposeability between http and local?
+            # Normalise mtime to accuracy of 1min. This enables remote and local timestamps to match
+            # Technically there is a possibility of an update that is missed, but it's pretty edge case for our usecase
+            mtime = int(self.file.mtime.replace(second=0, microsecond=0).timestamp())
             key = f"{self.file.relative}-{mtime}-{func.__name__}"
             cached = self.cache.get(key)
             if not cached:

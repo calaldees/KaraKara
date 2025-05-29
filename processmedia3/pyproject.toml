@@ -14,6 +14,7 @@ test = [
 	"pytest ~= 8.1",
 	"types-tqdm ~= 4.66",
 	"types-Pillow ~= 10.2",
+	"types-dateparser",
 ]
 
 [tool.mypy]
