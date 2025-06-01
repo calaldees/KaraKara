@@ -10,7 +10,7 @@ from collections import defaultdict
 import enum
 from pathlib import Path
 import typing as t
-from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set
+from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set, Collection
 from fractions import Fraction
 from datetime import timedelta
 
@@ -212,7 +212,7 @@ class Target:
     """
 
     def __init__(
-        self, processed_dir: Path, type: TargetType, sources: Sequence[Source]
+        self, processed_dir: Path, type: TargetType, sources: Set[Source]
     ) -> None:
         from .encoders import find_appropriate_encoder  # circular import :(
 
@@ -272,7 +272,7 @@ class Track:
         self,
         processed_dir: Path,
         id: str,
-        sources: Sequence[Source],
+        sources: Set[Source],
         target_types: Sequence[TargetType],
     ) -> None:
         self.id = id

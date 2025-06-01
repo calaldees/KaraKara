@@ -18,7 +18,7 @@ from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Tuple
-from collections.abc import Mapping, Sequence, MutableMapping, MutableSequence
+from collections.abc import Mapping, Sequence, MutableMapping, MutableSet, Set
 
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
@@ -79,25 +79,25 @@ def scan(
     #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
     #   ...
     # }
-    grouped: Mapping[str, MutableSequence[AbstractFile]] = defaultdict(list)
+    grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
     for file in source_folder.files:
     #for path in source_dir.glob("**/*"):
         #posix = path.as_posix()
         if any((i in file.absolute) for i in SCAN_IGNORE):
             continue
         if match is None or match in file.stem:  # path.is_file() and ( path.stem
-            grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].append(file)
-    groups: Sequence[Tuple[str, Sequence[AbstractFile]]] = sorted(grouped.items())
+            grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].add(file)
+    groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
 
     # Turn all the (basename, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
-    def _load_track(group: Tuple[str, Sequence[AbstractFile]]) -> Track | None:
+    def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
         (track_id, files) = group
         try:
-            sources = tuple(Source(file, cache) for file in files)
+            sources = frozenset(Source(file, cache) for file in files)
             for source in sources:
-                source.hash  # force hashing now (if not already in cache)
+                source.hash  # force hashing now (if not already in `cache`)
             return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
             log.exception(f"Error calculating track {track_id}")
@@ -146,7 +146,7 @@ def lint(tracks: Sequence[Track]) -> None:
                 print(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
         for s in track.sources:
             if s.type == SourceType.SUBTITLES:
-                ls = s.subtitles()
+                ls = s.subtitles
 
                 # Check for weird stuff at the file level
                 if len(ls) == 0:
@@ -383,13 +383,14 @@ def main(argv: Sequence[str]) -> int:
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
             cache: MutableMapping[str, Any] = {}
-            original = LocalFile(Path(args.match))
+            path = Path(args.match)
+            local_file = LocalFile(path, path.parent)
             tracks: Sequence[Track] = [Track(
-                original.parent,
-                original.stem,
-                [
-                    Source(original, cache)
-                ],
+                local_file.root,
+                local_file.stem,
+                {
+                    Source(local_file, cache)
+                },
                 [
                     TargetType.VIDEO_H264,
                     TargetType.VIDEO_AV1,
