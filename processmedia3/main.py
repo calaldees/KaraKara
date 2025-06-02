@@ -24,7 +24,7 @@ from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lib.kktypes import Source, SourceType, TargetType, Track, Target, TrackDict
-from lib.file_abstraction import AbstractFolder, LocalPath, AbstractFile, LocalFile
+from lib.file_abstraction import AbstractFolder, AbstractFile, AbstractFolder_from_str, LocalFile
 
 
 log = logging.getLogger()
@@ -56,7 +56,7 @@ SCAN_IGNORE = [
 
 
 def scan(
-    source_dir: Path,
+    source_folder: AbstractFolder,
     processed_dir: Path,
     match: str,
     cache: MutableMapping[str, Any],
@@ -72,8 +72,6 @@ def scan(
     - A list of targets to write to the "processed" directory
       - eg "x/x53t4dg.webm", "6/6sbh34s.mp4"
     """
-    source_folder: AbstractFolder = LocalPath(source_dir)
-
     # Get a list of source files grouped by Track ID, eg
     # {
     #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
@@ -286,14 +284,14 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--source",
-        type=Path,
-        default=Path("/media/source"),
-        metavar="DIR",
-        help="Where to find source files (Default: %(default)s)",
+        type=AbstractFolder_from_str,
+        default=AbstractFolder_from_str("/media/source"),
+        metavar="DIR/URL",
+        help="Where to find source files (Default: %(default)s) (can be local path or http path)",
     )
     parser.add_argument(
         "--processed",
-        type=Path,
+        type=Path,  # TODO: AbstractFolder?
         default=Path("/media/processed"),
         metavar="DIR",
         help="Where to place output files (Default: %(default)s)",
@@ -310,7 +308,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         type=int,
         default=None,
         metavar="SECONDS",
-        help="Run forever, polling for changes in the source directory this often",
+        help="Run forever, polling for changes in the source directory this often (in seconds)",
     )
     parser.add_argument(
         "--delete",

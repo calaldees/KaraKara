@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import override, TypedDict, NamedTuple
 from functools import cached_property
 from abc import abstractmethod
-from collections.abc import Mapping, Generator, Sequence, MutableSet, Set, Iterable
+from typing import Self
+from collections.abc import Mapping, Generator, MutableSet, Set, Iterable
 from os import stat_result
 from io import BytesIO
 import gzip
@@ -69,6 +70,9 @@ class AbstractFolder():
     @property
     @abstractmethod
     def files(self) -> Generator[AbstractFile]: ...
+
+    @classmethod
+    def from_str(cls, s: str) -> Self | None: ...
 
 
 
@@ -152,6 +156,13 @@ class LocalPath(AbstractFolder):
         if (not root.is_dir()):
             raise NotADirectoryError(root)
         self.root = root
+
+    @override
+    @classmethod
+    def from_str(cls, s: str) -> Self | None:
+        if (path := Path(s)).is_dir():
+            return cls(path)
+        return None
 
     @property
     @override
@@ -346,6 +357,14 @@ class HttpFolder(AbstractFolder):
         self.url = url
         assert self.url.endswith('/'), 'url should end in `/` because it should be a folder'
 
+    @override
+    @classmethod
+    def from_str(cls, s: str) -> Self | None:
+        url = urlparse(s)
+        if 'http' in url.scheme and url.path.endswith('/'):
+            return cls(s)
+        return None
+
     class FileItem(TypedDict):
         name: str
         type: str
@@ -395,8 +414,6 @@ class HttpFolder(AbstractFolder):
         while folders_to_visit:
             url = folders_to_visit.pop()
             response = _http(url, headers={'Accept': 'application/json, text/html'})
-            if not response.has_headers({'accept-ranges'}):
-                raise Exception('remote must support accept-ranges header')
             body = response.body.decode('utf8')
             folders_visited.add(url)
             content_type = response.headers.get('content-type', '')
@@ -421,6 +438,16 @@ class HttpFolder(AbstractFolder):
                     mtime_str = (dateparser.parse(file_dict['mtime']) or datetime.fromtimestamp(0)).strftime(HttpFile.HEADER_DATETIME_STRPTIME),
                     size_str = file_dict['size']
                 )
+
+
+# Factory ----------------------------------------------------------------------
+
+FolderTypes = (HttpFolder, LocalPath)
+def AbstractFolder_from_str(s: str) -> AbstractFolder:
+    for cls in FolderTypes:
+        if folder := cls.from_str(s):
+            return folder
+    raise ValueError(f'unable to identify folder type from {s}')
 
 
 # Example ----------------------------------------------------------------------

@@ -8,6 +8,7 @@ from datetime import datetime
 
 import main
 from lib.kktypes import SourceType, TargetType
+from lib.file_abstraction import AbstractFolder_from_str
 from tqdm import tqdm
 
 # disable progress bars in unit tests
@@ -30,7 +31,7 @@ class TestE2E(unittest.TestCase):
             processed = Path(processed_str)
 
             # Scan should detect source files for two tracks
-            tracks = main.scan(Path("./tests/source"), processed, None, {})
+            tracks = main.scan(AbstractFolder_from_str("./tests/source"), processed, '', {})
 
             self.assertEqual("Test1", tracks[0].id)
             self.assertEqual(

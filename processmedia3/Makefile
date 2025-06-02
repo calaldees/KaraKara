@@ -16,8 +16,8 @@ shell: logs
 	docker run ${DOCKER_RUN_ARGS} -it ${DOCKER_IMAGE} /bin/sh
 logs:
 	mkdir logs
-run_local:
-	python3 main.py --source ../media/source --processed ../media/processed --log-file logs/processmedia3.log --debug
+run_in_container:
+	python3 main.py --source /media/source --processed /media/processed --log-file /logs/processmedia3.log --debug
 
 .PHONY: cloc
 cloc:

@@ -159,6 +159,23 @@ class VideoToAV1(_BaseVideoToVideo):
     @classmethod
     def additional_vcodec_arguments(cls, meta: MediaMeta) -> Sequence[str]:
         """
+        Goals
+        1. per track (per minuet) roughly the same size
+        2. per track (per minuet) roughly the same encoding time
+
+        Bigger res == more time to encode + higher filesize
+        Correct for resolution
+        Preset (encode time) + crf (perceived quality)
+
+        Test videos:
+         Prince Valiant    :  480*360 172k 1min  1.6 crf 45 preset 3  0.90 encodefps
+         Dynamite Explosion:  960*720 691k 2min  6mb crf 55 preset 4  0.47 encodefps
+         FF Endwalker      : 1280*720 921k 4min 15mb crf 60 preset 6  0.55 encodefps
+
+        I think the real solution to this is `total_pixels` -> video `bitrate` == consistent-ish number of bytes per pixel. Out 320x240 videos don't need ultra bitrates, but 1280 should not have turd bitrate.
+        The heuristic I've created visibly feels ballpark even if it's unscientific and weird.
+        Happy for this to be revisited.
+
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1280, 720))
         ['-crf', '60', '-preset', '6']
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(960, 720))
