@@ -5,6 +5,7 @@ readme = "README.md"
 dependencies = [
 	"tqdm ~= 4.66",
 	"pillow ~= 10.2",
+	"dateparser",
 ]
 
 [project.optional-dependencies]
@@ -13,6 +14,7 @@ test = [
 	"pytest ~= 8.1",
 	"types-tqdm ~= 4.66",
 	"types-Pillow ~= 10.2",
+	"types-dateparser",
 ]
 
 [tool.mypy]

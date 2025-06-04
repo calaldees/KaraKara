@@ -17,24 +17,27 @@ import csv
 from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Tuple
+from collections.abc import Mapping, Sequence, MutableMapping, MutableSet, Set
 
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from lib.kktypes import Source, SourceType, TargetType, Track, Target
+from lib.kktypes import Source, SourceType, TargetType, Track, Target, TrackDict
+from lib.file_abstraction import AbstractFolder, AbstractFile, AbstractFolder_from_str, LocalFile
+
 
 log = logging.getLogger()
 
 TARGET_TYPES = [
     # TargetType.VIDEO_H264,
     TargetType.VIDEO_AV1,
-    # TargetType.VIDEO_H265,
-    TargetType.PREVIEW_AV1,
-    TargetType.PREVIEW_H265,
+    TargetType.VIDEO_H265,
+    #TargetType.PREVIEW_AV1,
+    #TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,
     TargetType.IMAGE_AVIF,
-    TargetType.IMAGE_WEBP,
+    #TargetType.IMAGE_WEBP,
     TargetType.SUBTITLES_VTT,
 ]
 SCAN_IGNORE = [
@@ -53,12 +56,12 @@ SCAN_IGNORE = [
 
 
 def scan(
-    source_dir: Path,
+    source_folder: AbstractFolder,
     processed_dir: Path,
     match: str,
-    cache: Dict[str, Any],
+    cache: MutableMapping[str, Any],
     threads: int = 1,
-) -> List[Track]:
+) -> Sequence[Track]:
     """
     Look at the source directory and return a list of Track objects,
     where each track has:
@@ -69,43 +72,41 @@ def scan(
     - A list of targets to write to the "processed" directory
       - eg "x/x53t4dg.webm", "6/6sbh34s.mp4"
     """
-
     # Get a list of source files grouped by Track ID, eg
     # {
     #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
     #   ...
     # }
-    grouped = defaultdict(list)
-    for path in source_dir.glob("**/*"):
-        posix = path.as_posix()
-        if any((i in posix) for i in SCAN_IGNORE):
+    grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
+    for file in source_folder.files:
+    #for path in source_dir.glob("**/*"):
+        #posix = path.as_posix()
+        if any((i in file.absolute) for i in SCAN_IGNORE):
             continue
-        if path.is_file() and (match is None or match in path.stem):
-            grouped[re.sub("[^0-9a-zA-Z]+", "_", path.stem.title())].append(path)
-    groups = sorted(grouped.items())
+        if match is None or match in file.stem:  # path.is_file() and ( path.stem
+            grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].add(file)
+    groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
 
     # Turn all the (basename, list of filenames) tuples into a
-    # list of Tracks (log en error and return None if we can't
+    # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
-    def _load_track(group: Tuple[str, List[Path]]) -> Optional[Track]:
-        (track_id, paths) = group
+    def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
+        (track_id, files) = group
         try:
-            sources = []
-            for path in paths:
-                source = Source(source_dir, path, cache)
-                source.hash()  # force hashing now
-                sources.append(source)
+            sources = frozenset(Source(file, cache) for file in files)
+            for source in sources:
+                source.hash  # force hashing now (if not already in `cache`)
             return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
             log.exception(f"Error calculating track {track_id}")
             return None
 
-    maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
+    return tuple(filter(None,
+        thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
+    ))
 
-    return [t for t in maybe_tracks if t]
 
-
-def view(tracks: List[Track]) -> None:
+def view(tracks: Sequence[Track]) -> None:
     """
     Print out a list of Tracks, marking whether or not each Target (ie, each
     file in the "processsed" directory) exists
@@ -119,7 +120,7 @@ def view(tracks: List[Track]) -> None:
     for track in tracks:
         print(track.id)
         for t in track.targets:
-            source_list = [s.friendly for s in t.sources]
+            source_list = [s.file.relative for s in t.sources]
             if t.path.exists():
                 stats = f"{OK} ({int(t.path.stat().st_size/1024):,} KB)"
             else:
@@ -131,7 +132,7 @@ def view(tracks: List[Track]) -> None:
             )
 
 
-def lint(tracks: List[Track]) -> None:
+def lint(tracks: Sequence[Track]) -> None:
     """
     Scan through all the data, looking for things which seem suspicious
     and probably want a human to investigate
@@ -140,21 +141,21 @@ def lint(tracks: List[Track]) -> None:
     for track in tracks:
         for t in track.targets:
             if not t.path.exists():
-                print(f"{t.friendly} missing (Sources: {[s.friendly for s in t.sources]!r})")
+                print(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
         for s in track.sources:
             if s.type == SourceType.SUBTITLES:
-                ls = s.subtitles()
+                ls = s.subtitles
 
                 # Check for weird stuff at the file level
                 if len(ls) == 0:
-                    writer.writerow([s.friendly, 0, "no subtitles", 0, ""])
+                    writer.writerow([s.file.relative, 0, "no subtitles", 0, ""])
                 if len(ls) == 1:
-                    writer.writerow([s.friendly, 0, "only one subtitle", 0, ls[0].text])
+                    writer.writerow([s.file.relative, 0, "only one subtitle", 0, ls[0].text])
 
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
-                        writer.writerow([s.friendly, index+1, "line contains newline", 0, l.text])
+                        writer.writerow([s.file.relative, index+1, "line contains newline", 0, l.text])
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
@@ -166,28 +167,29 @@ def lint(tracks: List[Track]) -> None:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
                         gap = l1.end - l2.start
                         if l1.end == l2.start and (l1.text == l2.text == l3.text):
-                            writer.writerow([s.friendly, index+1, "no gap between 3+ repeats", 0, l1.text])
+                            writer.writerow([s.file.relative, index+1, "no gap between 3+ repeats", 0, l1.text])
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
                             if gap < timedelta(microseconds=500_000) and not (l1.text == l2.text):
-                                writer.writerow([s.friendly, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                                writer.writerow([s.file.relative, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
                         elif l2.start < l1.end:
                             gap = l1.end - l2.start
                             if gap < timedelta(microseconds=1_000_000):
-                                writer.writerow([s.friendly, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                                writer.writerow([s.file.relative, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
 
 
-def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> None:
+def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) -> None:
     """
     Take a list of Track objects, and make sure that every Target exists
     """
 
     # Come up with a single list of every Target object that we can imagine
-    targets = []
-    for tr in tracks:
-        for t in tr.targets:
-            targets.append(t)
+    targets = tuple(
+        target
+        for track in tracks
+        for target in track.targets
+    )
 
     # Only check if the file exists at the last minute, not at the start,
     # because somebody else might have finished this encode while we still
@@ -204,7 +206,7 @@ def encode(tracks: List[Track], reencode: bool = False, threads: int = 1) -> Non
 
 def export(
     processed_dir: Path,
-    tracks: List[Track],
+    tracks: Sequence[Track],
     update: bool = False,
     threads: int = 1,
 ) -> None:
@@ -215,7 +217,7 @@ def export(
     # Exporting a Track to json can take some time, since we also need
     # to read the tags and the subtitle files in order to include those
     # in the index; so do it multi-threaded.
-    def _export(track: Track) -> Optional[Dict[str, Any]]:
+    def _export(track: Track) -> TrackDict | None:
         try:
             return track.to_json()
         except Exception:
@@ -255,7 +257,7 @@ def export(
 
 
 def cleanup(
-    processed_dir: Path, tracks: List[Track], delete: bool, threads: int = 1
+    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
 ) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
@@ -278,18 +280,18 @@ def cleanup(
     thread_map(_cleanup, files, max_workers=threads, desc="cleanup", unit="file")
 
 
-def parse_args(argv: List[str]) -> argparse.Namespace:
+def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--source",
-        type=Path,
-        default=Path("/media/source"),
-        metavar="DIR",
-        help="Where to find source files (Default: %(default)s)",
+        type=AbstractFolder_from_str,
+        default=AbstractFolder_from_str("/media/source"),
+        metavar="DIR/URL",
+        help="Where to find source files (Default: %(default)s) (can be local path or http path)",
     )
     parser.add_argument(
         "--processed",
-        type=Path,
+        type=Path,  # TODO: AbstractFolder?
         default=Path("/media/processed"),
         metavar="DIR",
         help="Where to place output files (Default: %(default)s)",
@@ -306,7 +308,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
         type=int,
         default=None,
         metavar="SECONDS",
-        help="Run forever, polling for changes in the source directory this often",
+        help="Run forever, polling for changes in the source directory this often (in seconds)",
     )
     parser.add_argument(
         "--delete",
@@ -363,7 +365,7 @@ def _pickled_var(path: Path, default: Any):
         log.debug(f"Error saving cache: {e}")
 
 
-def main(argv: List[str]) -> int:
+def main(argv: Sequence[str]) -> int:
     args = parse_args(argv)
 
     logging.basicConfig(
@@ -378,14 +380,15 @@ def main(argv: List[str]) -> int:
 
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
-            cache: Dict[str, Any] = {}
-            original = Path(args.match)
-            tracks = [Track(
-                original.parent,
-                original.stem,
-                [
-                    Source(original.parent, original, cache)
-                ],
+            cache: MutableMapping[str, Any] = {}
+            path = Path(args.match)
+            local_file = LocalFile(path, path.parent)
+            tracks: Sequence[Track] = [Track(
+                local_file.root,
+                local_file.stem,
+                {
+                    Source(local_file, cache)
+                },
                 [
                     TargetType.VIDEO_H264,
                     TargetType.VIDEO_AV1,
@@ -398,6 +401,7 @@ def main(argv: List[str]) -> int:
     while True:
         with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
             tracks = scan(args.source, args.processed, args.match, cache, args.threads)
+            tracks = tuple(track for track in tracks if track.has_tags)  # only encode tracks that have a tag.txt file
 
             # If no specific command is specified, then encode,
             # export, and cleanup with the default settings

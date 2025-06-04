@@ -3,11 +3,14 @@ import logging
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Optional
-import tqdm
+import typing as t
+from collections.abc import Sequence, Set
 import re
+import math
 
-from .kktypes import Source, SourceType, TargetType
+import tqdm
+
+from .kktypes import Source, SourceType, TargetType, MediaMeta, MediaType
 from .subtitle_processor import create_vtt, parse_subtitles
 
 log = logging.getLogger()
@@ -26,9 +29,19 @@ NORMALIZE_AUDIO = ["-af", "loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1", "-ac", "2
 
 CONTINER_MP4 = ["-movflags", "faststart"]
 
-VCODEC_AV1 = ["-vcodec", "libsvtav1", "-pix_fmt", "yuv420p10le"]
-# tag hvc1 needed for apple software to understand it
-VCODEC_H265 = ["-vcodec", "libx265", "-tag:v", "hvc1"]
+VCODEC_AV1 = [
+    # https://trac.ffmpeg.org/wiki/Encode/AV1
+    #"-c:v", "av1", "-strict", "experimental"  # auto select highest priority AV1 encoder
+    "-vcodec", "libsvtav1",     # STV-AV1 software (there are 3 software encoders, but the others are early reference implementations)
+    "-pix_fmt", "yuv420p10le",  # 10bit
+]
+VCODEC_H265 = [
+    # https://trac.ffmpeg.org/wiki/Encode/H.265
+    "-vcodec", "libx265",
+    "-tag:v", "hvc1",  # tag hvc1 needed for apple software to understand it
+    "-crf", "40",   # av1 needs a function to derive crf, h265 seems to do this as expected for the resolution and does not need changing for different resolutions
+    #"-preset", "medium",
+]
 # yuv420p needed for apple software to understand it
 VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p"]
 
@@ -41,15 +54,15 @@ ACODEC_MP3 = ["-acodec", "mp3"]
 class Encoder:
     target: TargetType
     sources: Set[SourceType]
-    category: str
+    category: MediaType
     ext: str
     mime: str
     priority: int = 1
-    conf_audio: List[str] = []
-    conf_video: List[str] = []
-    conf_container: List[str] = []
-    conf_acodec: List[str] = []
-    conf_vcodec: List[str] = []
+    conf_audio: Sequence[str] = []
+    conf_video: Sequence[str] = []
+    conf_container: Sequence[str] = []
+    conf_acodec: Sequence[str] = []
+    conf_vcodec: Sequence[str] = []
 
     def salt(self) -> str:
         # sort, concatenate, and flatten all of the conf_* arrays
@@ -60,7 +73,7 @@ class Encoder:
     def encode(self, target: Path, sources: Set[Source]) -> None:
         ...
 
-    def _run(self, *args: str, title: Optional[str] = None, duration: Optional[float]=None) -> None:
+    def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> None:
         output = []
         try:
             with tqdm.tqdm(
@@ -100,33 +113,39 @@ class Encoder:
 #######################################################################
 # Video to Video
 
-
 class _Preview(Encoder):
-    category = "preview"
+    category = MediaType.PREVIEW
     conf_video = SCALE_PREVIEW
 
 
 class _BaseVideoToVideo(Encoder):
     sources = {SourceType.VIDEO}
-    category = "video"
+    category = MediaType.VIDEO
     conf_audio = NORMALIZE_AUDIO
     conf_video = SCALE_VIDEO
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
         # fmt: off
+        source = list(sources)[0]
         self._run(
             "ffmpeg",
-            "-i", list(sources)[0].path.as_posix(),
+            "-i", source.file.absolute,
             *self.conf_audio,
             *self.conf_video,
+            # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
+            "-filter:v", f"framestep={int(1 + math.floor(source.meta.fps / 30))}",
             *self.conf_container,
             *self.conf_vcodec,
+            *self.additional_vcodec_arguments(source.meta),
             *self.conf_acodec,
             target.as_posix(),
-            title=f"{self.__class__.__name__}({list(sources)[0].path.stem})",
-            duration=list(sources)[0].duration(),
+            title=f"{self.__class__.__name__}({source.file.stem})",
+            duration=source.meta.duration.total_seconds(),
         )
         # fmt: on
+
+    def additional_vcodec_arguments(self, video_meta: MediaMeta) -> Sequence[str]:
+        return []
 
 
 class VideoToAV1(_BaseVideoToVideo):
@@ -135,6 +154,57 @@ class VideoToAV1(_BaseVideoToVideo):
     mime = "video/webm; codecs=av01.0.05M.08,opus"
     conf_vcodec = VCODEC_AV1
     conf_acodec = ACODEC_OPUS
+
+    @t.override
+    @classmethod
+    def additional_vcodec_arguments(cls, meta: MediaMeta) -> Sequence[str]:
+        """
+        Goals
+        1. per track (per minuet) roughly the same size
+        2. per track (per minuet) roughly the same encoding time
+
+        Bigger res == more time to encode + higher filesize
+        Correct for resolution
+        Preset (encode time) + crf (perceived quality)
+
+        Test videos:
+         Prince Valiant    :  480*360 172k 1min  1.6 crf 45 preset 3  0.90 encodefps
+         Dynamite Explosion:  960*720 691k 2min  6mb crf 55 preset 4  0.47 encodefps
+         FF Endwalker      : 1280*720 921k 4min 15mb crf 60 preset 6  0.55 encodefps
+
+        I think the real solution to this is `total_pixels` -> video `bitrate` == consistent-ish number of bytes per pixel. Out 320x240 videos don't need ultra bitrates, but 1280 should not have turd bitrate.
+        The heuristic I've created visibly feels ballpark even if it's unscientific and weird.
+        Happy for this to be revisited.
+
+        >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1280, 720))
+        ['-crf', '60', '-preset', '6']
+        >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(960, 720))
+        ['-crf', '55', '-preset', '4']
+        >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(480, 360))
+        ['-crf', '45', '-preset', '4']
+        >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(720, 520))
+        ['-crf', '48', '-preset', '4']
+        >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1920, 1080))
+        ['-crf', '60', '-preset', '6']
+        """
+        class AV1Args(t.NamedTuple):
+            total_pixels: int
+            crf: int
+            preset: int
+        _top = AV1Args(total_pixels=1280*720, crf=60, preset=6)
+        _bot = AV1Args(total_pixels=960*720, crf=55, preset=4)
+
+        def translate(input_top, input_bot, output_top, output_bot, input_value):
+            input_range = input_top - input_bot
+            output_range = output_top - output_bot
+            return output_bot + (((input_value-input_bot)/input_range)*output_range)
+
+        total_pixels = min(meta.width*meta.height, 1280*720)  # ffmpeg will max width to 1280. See SCALE_VIDEO
+        crf = int(translate(_top.total_pixels, _bot.total_pixels, _top.crf, _bot.crf, total_pixels))
+        crf = max(crf, 45)
+        preset = int(translate(_top.total_pixels, _bot.total_pixels, _top.preset, _bot.preset, total_pixels))
+        preset = max(preset, 4)
+        return ["-crf", str(crf), "-preset", str(preset)]
 
 
 class VideoToAV1Preview(_Preview, VideoToAV1):
@@ -171,7 +241,7 @@ class VideoToH264Preview(_Preview, VideoToH264):
 
 class _BaseImageToVideo(Encoder):
     sources = {SourceType.AUDIO, SourceType.IMAGE}
-    category = "video"
+    category = MediaType.VIDEO
     conf_audio = NORMALIZE_AUDIO
     conf_video = SCALE_VIDEO
 
@@ -183,9 +253,9 @@ class _BaseImageToVideo(Encoder):
         self._run(
             "ffmpeg",
             "-loop", "1",
-            "-i", source_by_type(SourceType.IMAGE).path.as_posix(),
-            "-i", source_by_type(SourceType.AUDIO).path.as_posix(),
-            "-t", str(source_by_type(SourceType.AUDIO).duration()),
+            "-i", source_by_type(SourceType.IMAGE).file.absolute,
+            "-i", source_by_type(SourceType.AUDIO).file.absolute,
+            "-t", str(source_by_type(SourceType.AUDIO).meta.duration.total_seconds()),
             "-r", "1",  # 1 fps
             *self.conf_audio,
             *self.conf_video,
@@ -241,7 +311,7 @@ class ImageToH264Preview(_Preview, ImageToH264):
 
 class _BaseVideoToImage(Encoder):
     sources = {SourceType.VIDEO}
-    category = "image"
+    category = MediaType.IMAGE
     conf_video = ["-vf", f"scale={IMAGE_WIDTH}:-1,thumbnail", "-vsync", "vfr"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
@@ -254,7 +324,7 @@ class _BaseVideoToImage(Encoder):
             # fmt: off
             self._run(
                 "ffmpeg",
-                "-i", list(sources)[0].path.as_posix(),
+                "-i", list(sources)[0].file.absolute,
                 *self.conf_video,
                 "-an",
                 (tmpdir / "out%03d.bmp").as_posix(),
@@ -294,7 +364,7 @@ class VideoToJpeg(_BaseVideoToImage):
 
 class _BaseImageToImage(Encoder):
     sources = {SourceType.IMAGE}
-    category = "image"
+    category = MediaType.IMAGE
     conf_video = ["-thumbnail", f"{IMAGE_WIDTH}x{IMAGE_WIDTH}"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
     priority = 2
@@ -303,7 +373,7 @@ class _BaseImageToImage(Encoder):
         # fmt: off
         self._run(
             "convert",
-            list(sources)[0].path.as_posix(),
+            list(sources)[0].file.absolute,  # TODO: double check `convert` can take url as input
             *self.conf_video,
             *self.conf_vcodec,
             target.as_posix(),
@@ -337,20 +407,20 @@ class SubtitleToVTT(Encoder):
     target = TargetType.SUBTITLES_VTT
     sources = {SourceType.SUBTITLES}
     ext = "vtt"
-    category = "subtitle"
+    category = MediaType.SUBTITLE
     mime = "text/vtt"
 
     def encode(self, target: Path, sources: Set[Source]) -> None:
-        with open(list(sources)[0].path.as_posix()) as srt:
-            with open(target.as_posix(), "w") as vtt:
-                vtt.write(create_vtt(parse_subtitles(srt.read())))
+        srt = list(sources)[0].file.text
+        with open(target.as_posix(), "w") as vtt:
+            vtt.write(create_vtt(parse_subtitles(srt)))
 
 
 class VoidToVTT(Encoder):
     target = TargetType.SUBTITLES_VTT
     sources: Set[SourceType] = set()
     ext = "vtt"
-    category = "subtitle"
+    category = MediaType.SUBTITLE
     mime = "text/vtt"
     priority = 0
 
@@ -362,9 +432,7 @@ class VoidToVTT(Encoder):
 #######################################################################
 
 
-def find_appropriate_encoder(
-    type: TargetType, sources: List[Source]
-) -> Tuple[Encoder, Set[Source]]:
+def find_appropriate_encoder(type: TargetType, sources: Set[Source]) -> t.Tuple[Encoder, Set[Source]]:
     def all_subclasses(cls):
         return set(cls.__subclasses__()).union(
             [s for c in cls.__subclasses__() for s in all_subclasses(c)]
@@ -387,13 +455,13 @@ def find_appropriate_encoder(
         ):
             return encoder(), {s for s in sources if s.type in encoder.sources}
     else:
-        source_list = "\n".join(f"  - {s.type}: {s.friendly}" for s in sources)
+        source_list = "\n".join(f"  - {s.type}: {s.file.relative}" for s in sources)
         raise Exception(
             f"Couldn't find an encoder to make {type} out of:\n{source_list}"
         )
 
 
-def select_best_image(paths: List[Path]) -> Path:
+def select_best_image(paths: Sequence[Path]) -> Path:
     def score(p: Path) -> float:
         from PIL import Image
         img = Image.open(p.as_posix()).convert("L")
