@@ -5,6 +5,7 @@
 
 **/.DS_Store
 /media
+/data
 
 **/*.py[oc]
 **/__pycache__
