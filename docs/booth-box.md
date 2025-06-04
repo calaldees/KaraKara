@@ -31,7 +31,7 @@ One-time steps:
 
 Each-time steps:
 
-* Open up [player2](https://karakara.uk/player2/) on the projector,
+* Open up [player](https://karakara.uk/player3/) on the projector,
   double-click title to set room / password / fullscreen
-* Open up [browser2](https://karakara.uk/browser2/) touchscreen,
+* Open up [browser](https://karakara.uk/browser3/) touchscreen,
   double-click title to set room / password / fullscreen

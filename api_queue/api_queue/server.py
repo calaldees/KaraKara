@@ -40,8 +40,6 @@ app.config.FALLBACK_ERROR_FORMAT = "json"
 app.config.CORS_SUPPORTS_CREDENTIALS = True
 app.config.CORS_ALLOW_HEADERS = ["Content-Type"]
 app.config.CORS_ORIGINS = [
-    "http://127.0.0.1:1234",  # browser2
-    "http://127.0.0.1:1235",  # player2
     "http://127.0.0.1:1236",  # browser3
     "http://127.0.0.1:1237",  # player3
 ]

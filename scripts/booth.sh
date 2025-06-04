@@ -7,10 +7,10 @@ xset -dpms
 xset s noblank
 
 # open two chrome windows, wait for them to load the right pages
-chromium-browser --new-window --kiosk https://karakara.uk/browser2/ 2>/dev/null &
+chromium-browser --new-window --kiosk https://karakara.uk/browser3/ 2>/dev/null &
 while ! wmctrl -l | grep -q 'KaraKara Browser' ; do sleep 1 ; done
 
-chromium-browser --new-window --kiosk https://karakara.uk/player2/ 2>/dev/null &
+chromium-browser --new-window --kiosk https://karakara.uk/player3/ 2>/dev/null &
 while ! wmctrl -l | grep -q 'KaraKara Player' ; do sleep 1 ; done
 
 # move Browser to touchscreen and Player to external screen
