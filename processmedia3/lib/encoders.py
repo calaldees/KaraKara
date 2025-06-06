@@ -103,7 +103,7 @@ class Encoder:
                         hours, minutes, seconds = match.groups()
                         current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
                         pbar.update(current_s - pbar.n)
-            return '\n'.join(output)
+            return ''.join(output)
         except subprocess.CalledProcessError as e:
             outstr = "".join(output)
             raise Exception(
