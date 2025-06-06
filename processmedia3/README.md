@@ -104,7 +104,7 @@ Debugging Tools
 
 * Raw python: `./main.py <command>`
     * You'll need to make sure the `--source` / `--processed` flags are set appropriately
-* In docker: `docker compose run -ti processmedia3 <command>`
+* In docker: `docker compose run --rm -ti processmedia3 <command>`
     * Docker automatically sets the `--source` / `--processed` flags based on `.env`
 * Testing subtitle encoding
     * `./lib/subtitle_processor.py input.srt output.vtt`
