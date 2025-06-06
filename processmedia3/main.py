@@ -32,7 +32,7 @@ log = logging.getLogger()
 TARGET_TYPES = [
     # TargetType.VIDEO_H264,
     TargetType.VIDEO_AV1,
-    TargetType.VIDEO_H265,
+    #TargetType.VIDEO_H265,
     #TargetType.PREVIEW_AV1,
     #TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,
@@ -196,7 +196,7 @@ def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) ->
     # had it in our own queue.
     def _encode(target: Target):
         try:
-            if reencode or not target.path.exists():
+            if reencode or not target.path.exists() or target.path.stat().st_size == 0:
                 target.encode()
         except Exception:
             log.exception(f"Error encoding {target.friendly}")

@@ -169,7 +169,8 @@ class LocalPath(AbstractFolder):
     def files(self) -> Generator[AbstractFile]:
         for path in self.root.glob("**/*"):
             #path.stat  # ? Investigate - this was part of `Source()` is this needed?
-            yield LocalFile(path, root=self.root)
+            if path.is_file():
+                yield LocalFile(path, root=self.root)
 
 
 

@@ -4,13 +4,14 @@ import shlex
 import subprocess
 from pathlib import Path
 import typing as t
+from abc import abstractmethod
 from collections.abc import Sequence, Set
 import re
 import math
 
 import tqdm
 
-from .kktypes import Source, SourceType, TargetType, MediaMeta, MediaType
+from .kktypes import Source, SourceType, TargetType, MediaType, MediaMeta
 from .subtitle_processor import create_vtt, parse_subtitles
 
 log = logging.getLogger()
@@ -34,13 +35,15 @@ VCODEC_AV1 = [
     #"-c:v", "av1", "-strict", "experimental"  # auto select highest priority AV1 encoder
     "-vcodec", "libsvtav1",     # STV-AV1 software (there are 3 software encoders, but the others are early reference implementations)
     "-pix_fmt", "yuv420p10le",  # 10bit
+    #"-b:v", "400k",  # "-bufsize", "4096k", "-maxrate", "1024k", "-minrate", "256k",
+    #"-preset", "4",
 ]
 VCODEC_H265 = [
     # https://trac.ffmpeg.org/wiki/Encode/H.265
     "-vcodec", "libx265",
     "-tag:v", "hvc1",  # tag hvc1 needed for apple software to understand it
-    "-crf", "40",   # av1 needs a function to derive crf, h265 seems to do this as expected for the resolution and does not need changing for different resolutions
-    #"-preset", "medium",
+    "-b:v", "400k", # "-maxrate", "1024k", "-minrate", "256k", "-bufsize", "4096k",
+    "-preset", "medium",
 ]
 # yuv420p needed for apple software to understand it
 VCODEC_H264 = ["-vcodec", "libx264", "-pix_fmt", "yuv420p"]
@@ -70,10 +73,10 @@ class Encoder:
         confs = list(itertools.chain.from_iterable(confs))
         return str(confs)
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
-        ...
+    @abstractmethod
+    def encode(self, target: Path, sources: Set[Source]) -> str: ...
 
-    def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> None:
+    def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> str:
         output = []
         try:
             with tqdm.tqdm(
@@ -100,6 +103,7 @@ class Encoder:
                         hours, minutes, seconds = match.groups()
                         current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
                         pbar.update(current_s - pbar.n)
+            return '\n'.join(output)
         except subprocess.CalledProcessError as e:
             outstr = "".join(output)
             raise Exception(
@@ -124,16 +128,17 @@ class _BaseVideoToVideo(Encoder):
     conf_audio = NORMALIZE_AUDIO
     conf_video = SCALE_VIDEO
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    @t.override
+    def encode(self, target: Path, sources: Set[Source]) -> str:
         # fmt: off
         source = list(sources)[0]
-        self._run(
+        # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
+        framestep = int(1 + math.floor(source.meta.fps / 30))
+        return self._run(
             "ffmpeg",
             "-i", source.file.absolute,
             *self.conf_audio,
-            *self.conf_video,
-            # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
-            "-filter:v", f"framestep={int(1 + math.floor(source.meta.fps / 30))}",
+            *self._append_ffmpeg_video_filter_string(self.conf_video, f'framestep={framestep}'),
             *self.conf_container,
             *self.conf_vcodec,
             *self.additional_vcodec_arguments(source.meta),
@@ -146,6 +151,20 @@ class _BaseVideoToVideo(Encoder):
 
     def additional_vcodec_arguments(self, video_meta: MediaMeta) -> Sequence[str]:
         return []
+
+    @staticmethod
+    def _append_ffmpeg_video_filter_string(args: Sequence[str], *filters: str) -> Sequence[str]:
+        """
+        >>> _BaseVideoToVideo._append_ffmpeg_video_filter_string(('unknown1', '-vf', 'SOME_FILTER', 'unknown2'))
+        ('unknown1', '-vf', 'SOME_FILTER', 'unknown2')
+        >>> _BaseVideoToVideo._append_ffmpeg_video_filter_string(('unknown1', '-vf', 'SOME_FILTER', 'unknown2'), 'ANOTHER_FILTER', 'MORE_FILTER')
+        ('unknown1', '-vf', 'SOME_FILTER,ANOTHER_FILTER,MORE_FILTER', 'unknown2')
+        """
+        for arg_a, arg_b in itertools.pairwise(args):
+            if arg_a in {'-vf', '-filter:v'}:
+                replace = arg_b
+                replacement = ','.join(itertools.chain((arg_b,), filters))
+        return tuple(arg if arg != replace else replacement for arg in args)
 
 
 class VideoToAV1(_BaseVideoToVideo):
@@ -177,22 +196,22 @@ class VideoToAV1(_BaseVideoToVideo):
         Happy for this to be revisited.
 
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1280, 720))
-        ['-crf', '60', '-preset', '6']
+        ['-crf', '56', '-preset', '6']
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(960, 720))
-        ['-crf', '55', '-preset', '4']
+        ['-crf', '55', '-preset', '5']
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(480, 360))
-        ['-crf', '45', '-preset', '4']
+        ['-crf', '52', '-preset', '4']
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(720, 520))
-        ['-crf', '48', '-preset', '4']
+        ['-crf', '53', '-preset', '4']
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1920, 1080))
-        ['-crf', '60', '-preset', '6']
+        ['-crf', '56', '-preset', '6']
         """
         class AV1Args(t.NamedTuple):
             total_pixels: int
             crf: int
             preset: int
-        _top = AV1Args(total_pixels=1280*720, crf=60, preset=6)
-        _bot = AV1Args(total_pixels=960*720, crf=55, preset=4)
+        _top = AV1Args(total_pixels=1280*720, crf=56, preset=6)
+        _bot = AV1Args(total_pixels=960*720, crf=55, preset=5)
 
         def translate(input_top, input_bot, output_top, output_bot, input_value):
             input_range = input_top - input_bot
@@ -245,12 +264,13 @@ class _BaseImageToVideo(Encoder):
     conf_audio = NORMALIZE_AUDIO
     conf_video = SCALE_VIDEO
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    @t.override
+    def encode(self, target: Path, sources: Set[Source]) -> str:
         def source_by_type(type: SourceType) -> Source:
             return [s for s in sources if s.type == type][0]
 
         # fmt: off
-        self._run(
+        return self._run(
             "ffmpeg",
             "-loop", "1",
             "-i", source_by_type(SourceType.IMAGE).file.absolute,
@@ -315,7 +335,8 @@ class _BaseVideoToImage(Encoder):
     conf_video = ["-vf", f"scale={IMAGE_WIDTH}:-1,thumbnail", "-vsync", "vfr"]
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    @t.override
+    def encode(self, target: Path, sources: Set[Source]) -> str:
         import tempfile
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
@@ -331,7 +352,7 @@ class _BaseVideoToImage(Encoder):
             )
             thumbs = list(tmpdir.glob("*.bmp"))
             best = select_best_image(thumbs)
-            self._run(
+            return self._run(
                 "convert",
                 best.as_posix(),
                 *self.conf_vcodec,
@@ -369,9 +390,10 @@ class _BaseImageToImage(Encoder):
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
     priority = 2
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    @t.override
+    def encode(self, target: Path, sources: Set[Source]) -> str:
         # fmt: off
-        self._run(
+        return self._run(
             "convert",
             list(sources)[0].file.absolute,  # TODO: double check `convert` can take url as input
             *self.conf_video,
@@ -410,10 +432,12 @@ class SubtitleToVTT(Encoder):
     category = MediaType.SUBTITLE
     mime = "text/vtt"
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    @t.override
+    def encode(self, target: Path, sources: Set[Source]) -> str:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt(parse_subtitles(srt)))
+        return ''
 
 
 class VoidToVTT(Encoder):
@@ -424,9 +448,11 @@ class VoidToVTT(Encoder):
     mime = "text/vtt"
     priority = 0
 
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    @t.override
+    def encode(self, target: Path, sources: Set[Source]) -> str:
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt([]))
+        return ''
 
 
 #######################################################################

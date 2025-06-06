@@ -238,12 +238,12 @@ class Target:
             f"{self.friendly!r}, "
             f"{[s.file.relative for s in self.sources]})"
         )
-
         with tempfile.TemporaryDirectory() as tempdir:
             temppath = Path(tempdir) / ("out." + self.encoder.ext)
-            self.encoder.encode(temppath, self.sources)
-            if not temppath.exists():
-                log.error(f"Encoder failed to create {temppath}")
+            output = self.encoder.encode(temppath, self.sources)
+            if not temppath.exists() or temppath.stat().st_size == 0:
+                log.error(f"Encoder failed to create {temppath=} with intention of creating {self.path=}")
+                log.debug(output)
                 return
             self.path.parent.mkdir(exist_ok=True)
             log.debug(f"Moving {temppath} to {self.path}")
