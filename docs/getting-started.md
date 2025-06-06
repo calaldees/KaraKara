@@ -52,7 +52,7 @@ Education: System Investigation
 
 These questions are designed for a group exercise in dissecting this codebase as part of a wider education exercise.
 
-* docker (see `docker-compose.yml`)
+* docker (see `compose.yml`)
     * How many containers are needed to run the system?
         * what do they each do?
             * What is mqtt? why is it an important design pattern

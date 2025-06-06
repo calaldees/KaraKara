@@ -15,7 +15,7 @@ help:	## display this help
 # Docker ----------------------------------------------------------------------
 
 _DOCKER_COMPOSE:=USER=$(shell id -u):$(shell id -g) docker-compose
-DOCKER_COMPOSE:=${_DOCKER_COMPOSE} --file docker-compose.yml
+DOCKER_COMPOSE:=${_DOCKER_COMPOSE}
 
 get_example_media:  ##
 	python3 media/get_example_media.py
@@ -27,7 +27,7 @@ deploy:
 	git pull && docker compose down && docker compose up --build --detach
 
 test_cypress_run:  ## cypress browser tests
-	${_DOCKER_COMPOSE} --file docker-compose.test.yml run --rm test_cypress
+	${_DOCKER_COMPOSE} run --rm test_cypress
 #test_cypress_cmd:
 #	${_DOCKER_COMPOSE} --file docker-compose.cypress.yml \
 #		run --rm client_test \
