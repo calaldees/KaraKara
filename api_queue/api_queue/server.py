@@ -402,7 +402,7 @@ async def queue_command(request, room_name, command):
 # Background Tasks -------------------------------------------------------------
 
 from .background_tasks import background_tracks_update_event
-app.add_task(background_tracks_update_event(app, push_settings_to_mqtt))
+app.add_task(background_tracks_update_event(app))
 
 
 # Main -------------------------------------------------------------------------
