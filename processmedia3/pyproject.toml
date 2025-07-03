@@ -6,6 +6,8 @@ dependencies = [
 	"tqdm ~= 4.66",
 	"pillow ~= 10.2",
 	"dateparser",
+	"modern-colorthief",
+	"annotated_types",
 ]
 
 [project.optional-dependencies]
