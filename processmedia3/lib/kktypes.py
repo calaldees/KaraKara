@@ -240,14 +240,17 @@ class Target:
         )
         with tempfile.TemporaryDirectory() as tempdir:
             temppath = Path(tempdir) / ("out." + self.encoder.ext)
-            output = self.encoder.encode(temppath, self.sources)
-            if not temppath.exists() or temppath.stat().st_size == 0:
-                log.error(f"Encoder failed to create {temppath=} with intention of creating {self.path=}")
-                log.debug(output)
-                return
-            self.path.parent.mkdir(exist_ok=True)
-            log.debug(f"Moving {temppath} to {self.path}")
-            shutil.move(temppath.as_posix(), self.path.as_posix())
+            try:
+                self.encoder.encode(temppath, self.sources)
+                if not temppath.exists():
+                    raise Exception("Encoder didn't return any error, but failed to create an output file")
+                if temppath.stat().st_size == 0:
+                    raise Exception("Encoder didn't return any error, but created an empty file")
+                self.path.parent.mkdir(exist_ok=True)
+                log.debug(f"Moving {temppath} to {self.path}")
+                shutil.move(temppath.as_posix(), self.path.as_posix())
+            except Exception as e:
+                log.error(f"Error while encoding {self.friendly!r}: {e}")
 
 
 class TrackAttachment(t.TypedDict):
