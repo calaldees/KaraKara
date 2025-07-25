@@ -136,6 +136,9 @@ class _BaseVideoToVideo(Encoder):
         framestep = int(1 + math.floor(source.meta.fps / 30))
         return self._run(
             "ffmpeg",
+            "-hide_banner",
+            "-loglevel", "quiet",
+            "-stats",
             "-i", source.file.absolute,
             *self.conf_audio,
             *self._append_ffmpeg_video_filter_string(self.conf_video, f'framestep={framestep}'),
