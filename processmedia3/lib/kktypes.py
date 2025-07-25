@@ -116,7 +116,7 @@ class MediaMeta(t.NamedTuple):
         if completed_process.returncode:
             log.debug(f'Unable to ffprobe {uri}')
             return cls()
-        ffprobe_output = completed_process.stderr.decode('utf8')
+        ffprobe_output = completed_process.stderr.decode('utf8', errors="ignore")
 
         fps = 0.0
         if match := re.search(r'(\d{1,3}(\.\d+)?) fps', ffprobe_output):
