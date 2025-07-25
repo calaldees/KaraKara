@@ -74,44 +74,43 @@ class Encoder:
         return str(confs)
 
     @abstractmethod
-    def encode(self, target: Path, sources: Set[Source]) -> str: ...
+    def encode(self, target: Path, sources: Set[Source]) -> None: ...
 
-    def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> str:
+    def _run(self,
+        *args: str,
+        title: str|None = None,
+        duration: float|None=None,
+        creates: Path|None=None,
+    ) -> None:
         output = []
-        try:
-            with tqdm.tqdm(
-                total=int(duration) if duration else None,
-                unit="s",
-                disable=duration is None,
-                leave=False
-            ) as pbar:
-                pbar.set_description(title)
+        with tqdm.tqdm(
+            total=int(duration) if duration else None,
+            unit="s",
+            disable=duration is None,
+            leave=False
+        ) as pbar:
+            pbar.set_description(title)
 
-                log.debug(f"Calling external command: {shlex.join(args)}")
-                proc = subprocess.Popen(
-                    ["nice"] + list(args),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    errors="ignore",  # some files contain non-utf8 metadata
-                )
-
-                assert proc.stdout is not None
-                while line := proc.stdout.readline():
-                    output.append(line)
-                    if match := re.search(r"time=(\d+):(\d+):(\d+.\d+)", line):
-                        hours, minutes, seconds = match.groups()
-                        current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
-                        pbar.update(current_s - pbar.n)
-            return ''.join(output)
-        except subprocess.CalledProcessError as e:
-            outstr = "".join(output)
-            raise Exception(
-                f"Command failed ({e.returncode}): {shlex.join(args)}\n"
-                f"{outstr}\n"
+            log.debug(f"Calling external command: {shlex.join(args)}")
+            proc = subprocess.Popen(
+                ["nice"] + list(args),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                errors="ignore",  # some files contain non-utf8 metadata
             )
-        except Exception as e:
-            raise Exception(f"Command failed {args}\n{e}")
+
+            assert proc.stdout is not None
+            while line := proc.stdout.readline():
+                output.append(line)
+                if match := re.search(r"time=(\d+):(\d+):(\d+.\d+)", line):
+                    hours, minutes, seconds = match.groups()
+                    current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
+                    pbar.update(current_s - pbar.n)
+
+        proc.wait()
+        if proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, shlex.join(args), "".join(output))
 
 
 #######################################################################
@@ -129,12 +128,12 @@ class _BaseVideoToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> str:
+    def encode(self, target: Path, sources: Set[Source]) -> None:
         # fmt: off
         source = list(sources)[0]
         # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
         framestep = int(1 + math.floor(source.meta.fps / 30))
-        return self._run(
+        self._run(
             "ffmpeg",
             "-hide_banner",
             "-loglevel", "quiet",
@@ -268,12 +267,12 @@ class _BaseImageToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> str:
+    def encode(self, target: Path, sources: Set[Source]) -> None:
         def source_by_type(type: SourceType) -> Source:
             return [s for s in sources if s.type == type][0]
 
         # fmt: off
-        return self._run(
+        self._run(
             "ffmpeg",
             "-loop", "1",
             "-i", source_by_type(SourceType.IMAGE).file.absolute,
@@ -339,7 +338,7 @@ class _BaseVideoToImage(Encoder):
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> str:
+    def encode(self, target: Path, sources: Set[Source]) -> None:
         import tempfile
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
@@ -355,7 +354,7 @@ class _BaseVideoToImage(Encoder):
             )
             thumbs = list(tmpdir.glob("*.bmp"))
             best = select_best_image(thumbs)
-            return self._run(
+            self._run(
                 "convert",
                 best.as_posix(),
                 *self.conf_vcodec,
@@ -394,9 +393,9 @@ class _BaseImageToImage(Encoder):
     priority = 2
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> str:
+    def encode(self, target: Path, sources: Set[Source]) -> None:
         # fmt: off
-        return self._run(
+        self._run(
             "convert",
             list(sources)[0].file.absolute,  # TODO: double check `convert` can take url as input
             *self.conf_video,
@@ -436,11 +435,10 @@ class SubtitleToVTT(Encoder):
     mime = "text/vtt"
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> str:
+    def encode(self, target: Path, sources: Set[Source]) -> None:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt(parse_subtitles(srt)))
-        return ''
 
 
 class VoidToVTT(Encoder):
@@ -452,10 +450,9 @@ class VoidToVTT(Encoder):
     priority = 0
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> str:
+    def encode(self, target: Path, sources: Set[Source]) -> None:
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt([]))
-        return ''
 
 
 #######################################################################
