@@ -7,10 +7,9 @@ import type { Track, Attachment } from "../types";
 
 interface VideoProps {
     track: Track;
-    lowres: boolean;
     [Key: string]: any;
 };
-export function Video({ track, lowres, ...kwargs }: VideoProps) {
+export function Video({ track, ...kwargs }: VideoProps) {
     const { root } = useContext(ClientContext);
     return (
         <div className="videoScaler">
@@ -22,10 +21,7 @@ export function Video({ track, lowres, ...kwargs }: VideoProps) {
                 crossOrigin="anonymous"
                 {...kwargs}
             >
-                {(lowres
-                    ? track.attachments.preview
-                    : track.attachments.video
-                ).map((a: Attachment) => (
+                {track.attachments.video.map((a: Attachment) => (
                     <source
                         key={a.path}
                         src={attachment_path(root, a)}
