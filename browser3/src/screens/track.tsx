@@ -147,7 +147,7 @@ export function TrackDetails(): React.ReactElement {
                 controls={true}
                 crossOrigin="anonymous"
             >
-                {track.attachments.preview.map((a) => (
+                {track.attachments.video.map((a) => (
                     <source
                         key={a.path}
                         src={attachment_path(root, a)}

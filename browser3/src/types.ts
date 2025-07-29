@@ -14,7 +14,6 @@ export interface Track {
     };
     attachments: {
         video: Attachment[];
-        preview: Attachment[];
         image: Attachment[];
         subtitle?: Attachment[];
     };

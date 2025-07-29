@@ -132,7 +132,6 @@ describe("find_tracks", () => {
             },
             attachments: {
                 video: [],
-                preview: [],
                 image: [],
                 subtitle: [],
             },
