@@ -154,8 +154,8 @@ function MyScene() {
 
     const thumbs = useMemo(() => {
         return getNiceTracks(tracks, 20).map((track) => [
-            attachment_path(root, track.attachments.image[1]),
-            attachment_path(root, track.attachments.preview[0]),
+            attachment_path(root, track.attachments.image[0]),
+            attachment_path(root, track.attachments.video[0]),
         ]);
     }, [tracks, root]);
 
