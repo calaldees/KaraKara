@@ -21,9 +21,8 @@ class TestE2E(unittest.TestCase):
         self.maxDiff = 2000
 
         main.TARGET_TYPES = [
-            TargetType.VIDEO_H264,
-            TargetType.PREVIEW_H264,
-            TargetType.IMAGE_WEBP,
+            TargetType.VIDEO_AV1,
+            TargetType.IMAGE_AVIF,
             TargetType.SUBTITLES_VTT,
         ]
 
@@ -38,8 +37,8 @@ class TestE2E(unittest.TestCase):
                 {SourceType.TAGS, SourceType.VIDEO, SourceType.SUBTITLES},
                 {s.type for s in tracks[0].sources},
             )
-            self.assertEqual(TargetType.VIDEO_H264, tracks[0].targets[0].type)
-            self.assertEqual('F2PBV8Klqic', tracks[0].targets[0].path.stem)
+            self.assertEqual(TargetType.VIDEO_AV1, tracks[0].targets[0].type)
+            self.assertEqual('QbcWNbOP07G', tracks[0].targets[0].path.stem)
             self.assertEqual("Test2", tracks[1].id)
 
             # Encode should generate output video
@@ -56,10 +55,9 @@ class TestE2E(unittest.TestCase):
 
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "r/RcRMUP_OaWJ.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "7/7l4MLpzS8Yk.mp4"}],
+                    "image": [{"mime": "image/avif", "path": "a/AFJz1z_uAoG.avif"}],
                     "subtitle": [{"mime": "text/vtt", "path": "g/gHe0erd2h5b.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "f/F2PBV8Klqic.mp4"}],
+                    'video': [{'mime': 'video/webm; codecs=av01.0.05M.08,opus', 'path': 'q/QbcWNbOP07G.webm'}]
                 },
                 "duration": 30.0,
                 "id": "Test1",
@@ -79,10 +77,9 @@ class TestE2E(unittest.TestCase):
                 self.assertEqual(v, tracks_json["Test1"][k])
             for k, v in {
                 "attachments": {
-                    "image": [{"mime": "image/webp", "path": "i/i1H329fzjEK.webp"}],
-                    "preview": [{"mime": "video/mp4", "path": "i/ihvVMUQpicM.mp4"}],
+                    "image": [{"mime": "image/avif", "path": "g/g0hYJlNw99D.avif"}],
                     "subtitle": [{"mime": "text/vtt", "path": "n/nm9fD7_qOn0.vtt"}],
-                    "video": [{"mime": "video/mp4", "path": "v/VmdVq_d7HXE.mp4"}],
+                    "video": [{'mime': 'video/webm; codecs=av01.0.05M.08,opus', 'path': 'k/kQiTVqqX7if.webm'}],
                 },
                 "duration": 15.0,
                 "id": "Test2",

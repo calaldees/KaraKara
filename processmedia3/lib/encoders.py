@@ -344,11 +344,13 @@ class _BaseVideoToImage(Encoder):
                 "ffmpeg",
                 "-i", list(sources)[0].file.absolute,
                 *self.conf_video,
+                # TODO: fps for images? possible every 20 seconds?
                 "-an",
                 (tmpdir / "out%03d.bmp").as_posix(),
             )
             thumbs = list(tmpdir.glob("*.bmp"))
             best = select_best_image(thumbs)
+            # TODO: handle/return error code
             self._run(
                 "magick",
                 best.as_posix(),
