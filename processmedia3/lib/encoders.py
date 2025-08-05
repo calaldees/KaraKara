@@ -17,7 +17,7 @@ from .subtitle_processor import create_vtt, parse_subtitles
 log = logging.getLogger()
 
 # fmt: off
-IMAGE_QUALITY = 75
+IMAGE_QUALITY = 50
 IMAGE_WIDTH = 256
 
 # Scale down if necessary to fit inside the given box,
@@ -350,7 +350,7 @@ class _BaseVideoToImage(Encoder):
             thumbs = list(tmpdir.glob("*.bmp"))
             best = select_best_image(thumbs)
             self._run(
-                "convert",
+                "magick",
                 best.as_posix(),
                 *self.conf_vcodec,
                 target.as_posix(),
