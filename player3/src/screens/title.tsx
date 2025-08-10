@@ -146,6 +146,7 @@ function MyScene() {
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
     const widescreen = useMediaQuery("(min-aspect-ratio: 16/10)");
+    const { splashScale }  = useContext(ClientContext);
 
     const globe = useRef<Group>(null);
     const text1 = useRef<Group>(null);
@@ -167,8 +168,8 @@ function MyScene() {
         state.gl.getContext().getShaderInfoLog = () => "";
     });
     useFrame((state, _delta) => {
-        const cam = state.camera as THREE.PerspectiveCamera;
-        cam.fov = widescreen ? 50 : 65;
+        const cam = (state.camera as THREE.PerspectiveCamera);
+        cam.fov = (widescreen ? 50 : 65) * (1/splashScale);
         cam.updateProjectionMatrix();
 
         const t = state.clock.getElapsedTime();
@@ -182,11 +183,7 @@ function MyScene() {
     return (
         <>
             <ambientLight intensity={0.3} />
-            <directionalLight
-                color="#29EDF2"
-                position={[-4, 2, 5]}
-                intensity={3}
-            />
+            <directionalLight color="#29EDF2" position={[-4, 2, 5]} intensity={3} />
             <group position={[3, -0.25, 0]} rotation={[0, 0, -0.15]}>
                 <group ref={globe}>
                     <mesh>

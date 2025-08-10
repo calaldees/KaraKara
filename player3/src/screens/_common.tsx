@@ -8,7 +8,7 @@ import type { Track, Attachment } from "../types";
 interface VideoProps {
     track: Track;
     [Key: string]: any;
-};
+}
 export function Video({ track, ...kwargs }: VideoProps) {
     const { root } = useContext(ClientContext);
     return (

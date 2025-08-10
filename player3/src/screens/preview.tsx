@@ -50,7 +50,9 @@ export function PreviewScreen({
                         />
                         <p className="title">{track.tags.title[0]}</p>
                         <p className="from">
-                            {track.tags.from?.[0] ?? track.tags.artist?.join(", ") ?? ""}
+                            {track.tags.from?.[0] ??
+                                track.tags.artist?.join(", ") ??
+                                ""}
                         </p>
                         <p className="performer">
                             <span className="n">{idx + 1}</span>{" "}

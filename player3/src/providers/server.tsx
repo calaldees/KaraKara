@@ -10,7 +10,7 @@ export interface ServerContextType {
     downloadDone: number;
     now: number;
     offset: number;
-};
+}
 
 export const ServerContext = React.createContext<ServerContextType>({
     tracks: {},

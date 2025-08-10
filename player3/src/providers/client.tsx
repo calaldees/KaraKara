@@ -21,7 +21,9 @@ export interface ClientContextType {
     wakeLock: string;
     underscan: string;
     setUnderscan: (n: string) => void;
-};
+    splashScale: number;
+    setSplashScale: (n: number) => void;
+}
 
 export const ClientContext = React.createContext<ClientContextType>({
     root: "",
@@ -42,6 +44,8 @@ export const ClientContext = React.createContext<ClientContextType>({
     wakeLock: "",
     underscan: "0em",
     setUnderscan: (_) => null,
+    splashScale: 1.0,
+    setSplashScale: (_) => null,
 });
 
 export function ClientProvider(props: any) {
@@ -67,6 +71,10 @@ export function ClientProvider(props: any) {
     const [audioAllowed, setAudioAllowed] = useState<boolean>(false);
     const [fullscreen, setFullscreen] = useState<boolean>(false);
     const [wakeLock, setWakeLock] = useState<string>("Not supported");
+    const [splashScale, setSplashScale] = useLocalStorage<number>(
+        "splash_scale",
+        1.0,
+    );
 
     const { isSupported, request } = useWakeLock({
         onRequest: () => setWakeLock("Requested"),
@@ -106,6 +114,8 @@ export function ClientProvider(props: any) {
                 wakeLock,
                 underscan,
                 setUnderscan,
+                splashScale,
+                setSplashScale,
             }}
         >
             {props.children}
