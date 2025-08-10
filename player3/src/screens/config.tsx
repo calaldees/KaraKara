@@ -20,6 +20,8 @@ export function ConfigMenu() {
         wakeLock,
         underscan,
         setUnderscan,
+        splashScale,
+        setSplashScale,
     } = useContext(ClientContext);
     const { now, offset } = useContext(ServerContext);
     const [rootEdit, setRootEdit] = useState(root);
@@ -161,6 +163,23 @@ export function ConfigMenu() {
                                         onChange={(e) =>
                                             setUnderscan(e.target.value)
                                         }
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Splash Scale</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        value={splashScale}
+                                        onChange={(e) =>
+                                            setSplashScale(
+                                                parseFloat(e.target.value),
+                                            )
+                                        }
+                                        step={0.1}
+                                        min={0.1}
+                                        max={2.0}
                                     />
                                 </td>
                             </tr>

@@ -15,7 +15,7 @@ export interface RoomContextType {
     setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
     connected: boolean;
-};
+}
 
 export const RoomContext = React.createContext<RoomContextType>({
     isAdmin: false,
