@@ -31,7 +31,7 @@ cd KaraKara
 
 ### Run
 ```bash
-python3 media/get_example_media.py
+python3 processmedia3/get_example_media.py
 cp .env.example .env
 docker compose up --build
 # see encoding progress in docker terminal

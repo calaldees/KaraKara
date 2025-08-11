@@ -45,7 +45,7 @@ test_cypress_run:  ## cypress browser tests
 # Example Data ----------------------------------------------------------------
 
 get_example_media:  ##
-	python3 media/get_example_media.py
+	python3 processmedia3/get_example_media.py
 
 
 # Cloc ------------------------------------------------------------------------
