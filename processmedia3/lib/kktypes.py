@@ -10,7 +10,7 @@ from collections import defaultdict
 import enum
 from pathlib import Path
 import typing as t
-from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set, Collection
+from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set
 from fractions import Fraction
 from datetime import timedelta
 
@@ -24,7 +24,7 @@ T = t.TypeVar("T")
 
 class SourceType(enum.Enum):
     VIDEO = frozenset({".mp4", ".mkv", ".avi", ".mpg", ".webm"})
-    AUDIO = frozenset({".mp3", ".flac", ".ogg"})
+    AUDIO = frozenset({".mp3", ".flac", ".ogg", ".aac"})
     IMAGE = frozenset({".jpg", ".png", ".webp", ".avif"})
     TAGS = frozenset({".txt"})
     SUBTITLES = frozenset({".srt", ".ssa"})
