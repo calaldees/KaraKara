@@ -134,7 +134,7 @@ def lint(tracks: Sequence[Track]) -> None:
     and probably want a human to investigate
     """
     writer = csv.writer(sys.stdout)
-    for track in tracks:
+    def _lint(track: Track) -> None:
         for t in track.targets:
             if not t.path.exists():
                 print(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
@@ -172,6 +172,7 @@ def lint(tracks: Sequence[Track]) -> None:
                             gap = l1.end - l2.start
                             if gap < timedelta(microseconds=1_000_000):
                                 writer.writerow([s.file.relative, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+    thread_map(_lint, tracks, max_workers=4, desc="lint   ", unit="track")
 
 
 def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) -> None:
