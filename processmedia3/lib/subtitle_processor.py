@@ -3,7 +3,7 @@
 
 import re
 from datetime import timedelta
-from itertools import zip_longest, tee, chain
+from itertools import zip_longest
 from typing import NamedTuple, List
 import logging
 
