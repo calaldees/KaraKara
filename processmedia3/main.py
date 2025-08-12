@@ -79,11 +79,9 @@ def scan(
     # }
     grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
     for file in source_folder.files:
-    #for path in source_dir.glob("**/*"):
-        #posix = path.as_posix()
         if any((i in file.absolute) for i in SCAN_IGNORE):
             continue
-        if match is None or match in file.stem:  # path.is_file() and ( path.stem
+        if match is None or match in file.stem:
             grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].add(file)
     groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
 
@@ -94,8 +92,6 @@ def scan(
         (track_id, files) = group
         try:
             sources = frozenset(Source(file, cache) for file in files)
-            for source in sources:
-                source.hash  # force hashing now (if not already in `cache`)
             return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
             log.exception(f"Error calculating track {track_id}")

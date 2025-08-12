@@ -222,8 +222,8 @@ class Target:
 
         parts = [self.encoder.salt()] + [s.hash for s in self.sources]
         hasher = hashlib.sha256()
-        hasher.update("".join(sorted(parts)).encode("utf-8"))
-        hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("utf8"))
+        hasher.update("".join(sorted(parts)).encode("ascii"))
+        hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("ascii"))
         self.friendly = hash[0].lower() + "/" + hash[:11] + "." + self.encoder.ext
         self.path = (
             processed_dir / hash[0].lower() / (hash[:11] + "." + self.encoder.ext)

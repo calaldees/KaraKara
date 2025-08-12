@@ -455,27 +455,30 @@ class VoidToVTT(Encoder):
 #######################################################################
 
 
+def all_subclasses(cls):
+    return set(cls.__subclasses__()).union(
+        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+    )
+
+
+# Sort encoders by priority, highest first. Priority is manually specified
+# so that:
+# - encoders who generate empty stubs are low-priority
+# - most encoders are mid-priority
+# - image-to-image is high priority (so that if we have a choice of
+#   "generate thumbnail from video" or "generate thumbnail from image",
+#   we assume that a human chose the image sensibly)
+encoders = all_subclasses(Encoder)
+encoders = [e for e in encoders if e.__name__[0] != "_"]
+encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
+encoders_for_type = {
+    t: [e for e in encoders if e.target == t] for t in TargetType
+}
+
+
 def find_appropriate_encoder(type: TargetType, sources: Set[Source]) -> t.Tuple[Encoder, Set[Source]]:
-    def all_subclasses(cls):
-        return set(cls.__subclasses__()).union(
-            [s for c in cls.__subclasses__() for s in all_subclasses(c)]
-        )
-
-    # Sort encoders by priority, highest first. Priority is manually specified
-    # so that:
-    # - encoders who generate empty stubs are low-priority
-    # - most encoders are mid-priority
-    # - image-to-image is high priority (so that if we have a choice of
-    #   "generate thumbnail from video" or "generate thumbnail from image",
-    #   we assume that a human chose the image sensibly)
-    encoders = all_subclasses(Encoder)
-    encoders = [e for e in encoders if e.__name__[0] != "_"]
-    encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
-
-    for encoder in encoders:
-        if encoder.target == type and encoder.sources.issubset(
-            {s.type for s in sources}
-        ):
+    for encoder in encoders_for_type[type]:
+        if encoder.sources.issubset({s.type for s in sources}):
             return encoder(), {s for s in sources if s.type in encoder.sources}
     else:
         source_list = "\n".join(f"  - {s.type}: {s.file.relative}" for s in sources)
