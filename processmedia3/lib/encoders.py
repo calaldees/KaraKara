@@ -67,11 +67,11 @@ class Encoder:
     conf_acodec: Sequence[str] = []
     conf_vcodec: Sequence[str] = []
 
-    def salt(self) -> str:
+    def __init__(self) -> None:
         # sort, concatenate, and flatten all of the conf_* arrays
         confs = [getattr(self, k) for k in sorted(dir(self)) if k.startswith("conf_")]
         confs = list(itertools.chain.from_iterable(confs))
-        return str(confs)
+        self.salt = str(confs)
 
     @abstractmethod
     def encode(self, target: Path, sources: Set[Source]) -> None: ...
@@ -146,7 +146,7 @@ class _BaseVideoToVideo(Encoder):
         )
         # fmt: on
 
-    def additional_vcodec_arguments(self, video_meta: MediaMeta) -> Sequence[str]:
+    def additional_vcodec_arguments(self, meta: MediaMeta) -> Sequence[str]:
         return []
 
     @staticmethod
@@ -176,8 +176,8 @@ class VideoToAV1(_BaseVideoToVideo):
     def additional_vcodec_arguments(cls, meta: MediaMeta) -> Sequence[str]:
         """
         Goals
-        1. per track (per minuet) roughly the same size
-        2. per track (per minuet) roughly the same encoding time
+        1. per track (per minute) roughly the same size
+        2. per track (per minute) roughly the same encoding time
 
         Bigger res == more time to encode + higher filesize
         Correct for resolution
@@ -472,14 +472,14 @@ encoders = all_subclasses(Encoder)
 encoders = [e for e in encoders if e.__name__[0] != "_"]
 encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
 encoders_for_type = {
-    t: [e for e in encoders if e.target == t] for t in TargetType
+    t: [e() for e in encoders if e.target == t] for t in TargetType
 }
 
 
 def find_appropriate_encoder(type: TargetType, sources: Set[Source]) -> t.Tuple[Encoder, Set[Source]]:
     for encoder in encoders_for_type[type]:
         if encoder.sources.issubset({s.type for s in sources}):
-            return encoder(), {s for s in sources if s.type in encoder.sources}
+            return encoder, {s for s in sources if s.type in encoder.sources}
     else:
         source_list = "\n".join(f"  - {s.type}: {s.file.relative}" for s in sources)
         raise Exception(

@@ -220,7 +220,7 @@ class Target:
         self.type = type
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
-        parts = [self.encoder.salt()] + [s.hash for s in self.sources]
+        parts = [self.encoder.salt] + [s.hash for s in self.sources]
         hasher = hashlib.sha256()
         hasher.update("".join(sorted(parts)).encode("ascii"))
         hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("ascii"))
