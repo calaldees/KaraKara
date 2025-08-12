@@ -165,8 +165,7 @@ def lint(tracks: Sequence[Track]) -> None:
                 botlines = [l for l in ls if not l.top]
                 for ls in [toplines, botlines]:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
-                        gap = l1.end - l2.start
-                        if l1.end == l2.start and (l1.text == l2.text == l3.text):
+                        if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
                             writer.writerow([s.file.relative, index+1, "no gap between 3+ repeats", 0, l1.text])
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
