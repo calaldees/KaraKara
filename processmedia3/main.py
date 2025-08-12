@@ -284,8 +284,8 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--source",
-        type=AbstractFolder_from_str,
-        default=AbstractFolder_from_str("/media/source"),
+        type=str,
+        default="/media/source",
         metavar="DIR/URL",
         help="Where to find source files (Default: %(default)s) (can be local path or http path)",
     )
@@ -343,7 +343,12 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "match", nargs="?", help="Only act upon files matching this pattern"
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    # we need to create AbstractFolder lazily, because
+    # `default=AbstractFolder("/blah")` crashes when `/blah`
+    # doesn't exist, even when we specify `--source ../media/source`
+    args.source = AbstractFolder_from_str(args.source)
+    return args
 
 
 @contextlib.contextmanager
