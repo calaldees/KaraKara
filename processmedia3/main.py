@@ -133,25 +133,45 @@ def lint(tracks: Sequence[Track]) -> None:
     Scan through all the data, looking for things which seem suspicious
     and probably want a human to investigate
     """
-    writer = csv.writer(sys.stdout)
     def _lint(track: Track) -> None:
-        for t in track.targets:
-            if not t.path.exists():
-                print(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
+        #for t in track.targets:
+        #    if not t.path.exists():
+        #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
         for s in track.sources:
+            if s.type == SourceType.TAGS:
+                for tag in ["title", "category", "vocaltrack", "lang"]:
+                    if not s.tags.get(tag):
+                        log.error(f"{s.file.relative} has no {tag} tag")
+
+                if s.tags.get("vocaltrack") == ["on"]:
+                    if not s.tags.get("vocalstyle"):
+                        log.error(f"{s.file.relative} has vocaltrack:on but no vocalstyle")
+
+                use = s.tags.get("use")
+                if use:
+                    use = [u.lower() for u in use]
+                    for n in range(0, 50):
+                        if f"op{n}" in use and "opening" not in use:
+                            log.error(f"{s.file.relative} has use:op{n} but no opening tag")
+                        if f"en{n}" in use and "ending" not in use:
+                            log.error(f"{s.file.relative} has use:ed{n} but no ending tag")
+
+                if "red" in s.tags:
+                    log.error(f"{s.file.relative} has red tag")
+
             if s.type == SourceType.SUBTITLES:
                 ls = s.subtitles
 
                 # Check for weird stuff at the file level
                 if len(ls) == 0:
-                    writer.writerow([s.file.relative, 0, "no subtitles", 0, ""])
+                    log.error(f"{s.file.relative} has no subtitles")
                 if len(ls) == 1:
-                    writer.writerow([s.file.relative, 0, "only one subtitle", 0, ls[0].text])
+                    log.error(f"{s.file.relative} has only one subtitle: {ls[0].text}")
 
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
-                        writer.writerow([s.file.relative, index+1, "line contains newline", 0, l.text])
+                        log.error(f"{s.file.relative}:{index+1} line contains newline: {l.text}")
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
@@ -162,16 +182,15 @@ def lint(tracks: Sequence[Track]) -> None:
                 for ls in [toplines, botlines]:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
                         if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
-                            writer.writerow([s.file.relative, index+1, "no gap between 3+ repeats", 0, l1.text])
+                            log.error(f"{s.file.relative}:{index+1} no gap between 3+ repeats: {l1.text}")
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
-                            if gap < timedelta(microseconds=500_000) and not (l1.text == l2.text):
-                                writer.writerow([s.file.relative, index+1, "blink between lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                            if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
+                                log.error(f"{s.file.relative}:{index+1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")
                         elif l2.start < l1.end:
                             gap = l1.end - l2.start
-                            if gap < timedelta(microseconds=1_000_000):
-                                writer.writerow([s.file.relative, index+1, "overlapping lines", int(gap.microseconds / 1000), f"{l1.text} / {l2.text}"])
+                            log.error(f"{s.file.relative}:{index+1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")
     thread_map(_lint, tracks, max_workers=4, desc="lint   ", unit="track")
 
 
