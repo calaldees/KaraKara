@@ -475,7 +475,7 @@ def create_srt(subtitles):
             index=index + 1,
             start=_srt_time(subtitle.start),
             end=_srt_time(subtitle.end),
-            text=subtitle.text,
+            text=("{\\a6}" if subtitle.top else "") + subtitle.text,
         )
         for index, subtitle in enumerate(subtitles)
         if subtitle.text
@@ -639,9 +639,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert between subtitle formats')
     parser.add_argument('input', type=str, help='input subtitle file')
     parser.add_argument('output', type=str, help='output subtitle file')
+    parser.add_argument('--unblink', action='store_true', help='remove blinking subtitles')
     args = parser.parse_args()
+
     with open(args.input, "r") as f:
         subs = parse_subtitles(f.read())
+
+    if args.unblink:
+        for i in range(len(subs) - 1):
+            if subs[i+1].start - subs[i].end < timedelta(seconds=0.1):
+                subs[i] = Subtitle(
+                    start=subs[i].start,
+                    end=subs[i+1].start,
+                    text=subs[i].text,
+                    top=subs[i].top
+                )
+
     if args.output.endswith(".vtt"):
         output = create_vtt(subs)
     elif args.output.endswith(".srt"):
@@ -650,5 +663,6 @@ if __name__ == "__main__":
         output = create_ssa(subs)
     else:
         raise Exception("Unknown output format")
+
     with open(args.output, "w") as f:
         f.write(output)
