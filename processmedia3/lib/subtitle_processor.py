@@ -6,6 +6,7 @@ from datetime import timedelta
 from itertools import zip_longest
 from typing import NamedTuple, List
 import logging
+import difflib
 
 log = logging.getLogger(__name__)
 
@@ -638,12 +639,15 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Convert between subtitle formats')
     parser.add_argument('input', type=str, help='input subtitle file')
-    parser.add_argument('output', type=str, help='output subtitle file')
+    parser.add_argument('output', type=str, help='output subtitle file', nargs="?")
     parser.add_argument('--unblink', action='store_true', help='remove blinking subtitles')
     args = parser.parse_args()
+    if args.output is None:
+        args.output = args.input
 
     with open(args.input, "r") as f:
-        subs = parse_subtitles(f.read())
+        indata = f.read()
+        subs = parse_subtitles(indata)
 
     if args.unblink:
         for i in range(len(subs) - 1):
@@ -656,13 +660,21 @@ if __name__ == "__main__":
                 )
 
     if args.output.endswith(".vtt"):
-        output = create_vtt(subs)
+        outdata = create_vtt(subs)
     elif args.output.endswith(".srt"):
-        output = create_srt(subs)
+        outdata = create_srt(subs)
     elif args.output.endswith(".ssa"):
-        output = create_ssa(subs)
+        outdata = create_ssa(subs)
     else:
         raise Exception("Unknown output format")
 
+    if args.input == args.output:
+        diff = difflib.unified_diff(
+            indata.splitlines(keepends=True),
+            outdata.splitlines(keepends=True),
+            fromfile=args.input,
+            tofile=args.output,
+        )
+        print("".join(diff))
     with open(args.output, "w") as f:
-        f.write(output)
+        f.write(outdata)
