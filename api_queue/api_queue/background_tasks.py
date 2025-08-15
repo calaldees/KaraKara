@@ -20,7 +20,7 @@ async def _background_tracks_update_event(app: sanic.Sanic) -> None:
 
     log.info("`tracks.json` mqtt event")
     await app.ctx.mqtt.publish(
-        '/global/tracks-updated',
+        'global/tracks-updated',
         json.dumps({'tracks_json_mtime': tracks_json_mtime}),
         retain=True,
     )

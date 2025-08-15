@@ -30,5 +30,5 @@ async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: Async
 
     channel, payload = mock_mqtt.publish.await_args.args
     payload = json.loads(payload)
-    assert channel == '/global/tracks-updated'
+    assert channel == 'global/tracks-updated'
     assert payload['tracks_json_mtime'] == tracks_json_mtime
