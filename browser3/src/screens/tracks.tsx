@@ -17,7 +17,7 @@ interface ExploreContextType {
     setFilters: (_: any) => void;
     expanded: string | null;
     setExpanded: (_: string | null) => void;
-};
+}
 
 const ExploreContext = React.createContext<ExploreContextType>({
     search: "",

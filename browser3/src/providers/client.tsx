@@ -23,26 +23,12 @@ export interface ClientContextType {
     removeBookmark: (_: string) => void;
     notification: Notification;
     setNotification: (_: Notification) => void;
-};
+}
 
-export const ClientContext = React.createContext<ClientContextType>({
-    root: "",
-    setRoot: (_) => null,
-    roomPassword: "",
-    setRoomPassword: (_) => null,
-    showSettings: false,
-    setShowSettings: (_) => null,
-    booth: false,
-    setBooth: (_) => null,
-    widescreen: false,
-    performerName: "",
-    setPerformerName: (_) => null,
-    bookmarks: [],
-    addBookmark: (_) => null,
-    removeBookmark: (_) => null,
-    notification: null,
-    setNotification: (_) => null,
-});
+/* eslint-disable react-refresh/only-export-components */
+export const ClientContext = React.createContext<ClientContextType>(
+    {} as ClientContextType,
+);
 
 export function ClientProvider(props: any) {
     // If we're running stand-alone, then use the main karakara.uk
@@ -80,7 +66,7 @@ export function ClientProvider(props: any) {
     }
 
     return (
-        <ClientContext.Provider
+        <ClientContext
             value={{
                 root,
                 setRoot,
@@ -101,6 +87,6 @@ export function ClientProvider(props: any) {
             }}
         >
             {props.children}
-        </ClientContext.Provider>
+        </ClientContext>
     );
 }

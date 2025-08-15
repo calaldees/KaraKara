@@ -18,18 +18,12 @@ export interface RoomContextType {
     setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
     connected: boolean;
-};
+}
 
-export const RoomContext = React.createContext<RoomContextType>({
-    trackList: [],
-    isAdmin: false,
-    sessionId: "",
-    queue: [],
-    fullQueue: [],
-    setQueue: () => {},
-    settings: {},
-    connected: false,
-});
+/* eslint-disable react-refresh/only-export-components */
+export const RoomContext = React.createContext<RoomContextType>(
+    {} as RoomContextType,
+);
 
 function InternalRoomProvider(props: any) {
     const { roomName } = useParams();
@@ -108,7 +102,7 @@ function InternalRoomProvider(props: any) {
     }, [fullQueue, now]);
 
     return (
-        <RoomContext.Provider
+        <RoomContext
             value={{
                 trackList,
                 isAdmin,
@@ -121,7 +115,7 @@ function InternalRoomProvider(props: any) {
             }}
         >
             {props.children}
-        </RoomContext.Provider>
+        </RoomContext>
     );
 }
 

@@ -9,14 +9,12 @@ export interface ServerContextType {
     downloadSize: number | null;
     downloadDone: number;
     now: number;
-};
+}
 
-export const ServerContext = React.createContext<ServerContextType>({
-    tracks: {},
-    downloadSize: null,
-    downloadDone: 0,
-    now: 0,
-});
+/* eslint-disable react-refresh/only-export-components */
+export const ServerContext = React.createContext<ServerContextType>(
+    {} as ServerContextType,
+);
 
 export function ServerProvider(props: any) {
     const { root } = useContext(ClientContext);
@@ -42,10 +40,8 @@ export function ServerProvider(props: any) {
     }, [root, request]);
 
     return (
-        <ServerContext.Provider
-            value={{ tracks, downloadSize, downloadDone, now }}
-        >
+        <ServerContext value={{ tracks, downloadSize, downloadDone, now }}>
             {props.children}
-        </ServerContext.Provider>
+        </ServerContext>
     );
 }

@@ -6,14 +6,16 @@ import { useApi } from "../hooks/api";
 
 export function RoomSettings(): React.ReactElement {
     const { settings: roomSettings } = useContext(RoomContext);
-    const [roomSettingsEdit, setRoomSettingsEdit] = useState<Record<string, string>>({});
+    const [roomSettingsEdit, setRoomSettingsEdit] = useState<
+        Record<string, string>
+    >({});
     const { request, loading } = useApi();
 
     // on first loading this screen, and whenever server-side settings change,
     // convert the string:any settings into string:string
     useEffect(() => {
         const roomSettingsUntyped: Record<string, string> = {};
-        for(const key of Object.keys(roomSettings)) {
+        for (const key of Object.keys(roomSettings)) {
             roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
         }
         setRoomSettingsEdit(roomSettingsUntyped);
@@ -30,8 +32,11 @@ export function RoomSettings(): React.ReactElement {
     function saveSettings(event: any) {
         event.preventDefault();
         const roomSettingsTyped: Record<string, any> = {};
-        for(const key of Object.keys(roomSettings)) {
-            roomSettingsTyped[key] = copy_type(roomSettings[key], roomSettingsEdit[key]);
+        for (const key of Object.keys(roomSettings)) {
+            roomSettingsTyped[key] = copy_type(
+                roomSettings[key],
+                roomSettingsEdit[key],
+            );
         }
         request({
             notify: "Saving settings...",

@@ -86,7 +86,6 @@ tl;dr: Safari on iOS 11+ or Chrome on Android 8+
     - `AbortController` is missing
         - polyfill added
 - ios10
-
     - mostly works, except for clicking on categories, which is pretty major o_O
 
 - android 8

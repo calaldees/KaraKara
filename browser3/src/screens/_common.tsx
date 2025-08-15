@@ -82,7 +82,7 @@ export function Screen({
                 {navRight || <EmptyHeaderLink />}
             </header>
             <Notification />
-            <YoureNext queue={queue} />
+            {queue && <YoureNext queue={queue} />}
             <article ref={scroller}>{children}</article>
             {footer}
         </main>
