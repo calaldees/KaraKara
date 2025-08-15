@@ -45,9 +45,9 @@ function Room() {
         setShowSettings,
         underscan,
     } = useContext(ClientContext);
-    const { now, tracks, downloadSize, downloadDone } =
+    const { now, tracks, downloadSize, downloadDone, connected } =
         useContext(ServerContext);
-    const { connected, queue, isAdmin, settings } = useContext(RoomContext);
+    const { queue, isAdmin, settings } = useContext(RoomContext);
 
     let screen = <section>Unknown state :(</section>;
 
