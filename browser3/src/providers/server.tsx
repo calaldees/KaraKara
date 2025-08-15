@@ -5,6 +5,7 @@ import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { ClientContext } from "./client";
 import { mqtt_url } from "../utils";
 import type { Track } from "../types";
+import { useLocalStorage } from "usehooks-ts";
 
 export interface ServerContextType {
     tracks: Record<string, Track>;
@@ -24,6 +25,7 @@ function InternalServerProvider(props: any) {
     const [tracks, setTracks] = useState<Record<string, Track>>({});
     const [downloadSize, setDownloadSize] = useState<number | null>(null);
     const [downloadDone, setDownloadDone] = useState<number>(0);
+    const [tracksUpdated, setTracksUpdated] = useLocalStorage<number>("tracksUpdated", 0);
     const { request } = useApi();
     const { now } = useServerTime({ url: `${root}/time.json` });
 
@@ -31,12 +33,12 @@ function InternalServerProvider(props: any) {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
         console.log(pkt.json());
         console.groupEnd();
-        // setTracksUpdated(pkt.json());
+        setTracksUpdated(pkt.json()["tracks_json_mtime"]);
     });
     useEffect(() => {
         request({
             function: "overridden by url",
-            url: `${root}/files/tracks.json`,
+            url: `${root}/files/tracks.json?ver=${tracksUpdated}`,
             options: {
                 credentials: "omit",
             },
@@ -46,7 +48,7 @@ function InternalServerProvider(props: any) {
                 setDownloadSize(size);
             },
         });
-    }, [root, request]);
+    }, [root, request, tracksUpdated]);
 
     return (
         <ServerContext value={{ tracks, downloadSize, downloadDone, now, connected }}>
