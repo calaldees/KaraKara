@@ -64,10 +64,10 @@ export function Screen({
 }: {
     title: string;
     className?: string | undefined;
-    footer?: any;
-    navLeft?: any;
-    navRight?: any;
-    children?: any;
+    footer?: React.ReactElement | null | false;
+    navLeft?: React.ReactElement | null | false;
+    navRight?: React.ReactElement | null | false;
+    children?: React.ReactNode;
 }): React.ReactElement {
     const { setShowSettings } = useContext(ClientContext);
     const { queue } = useContext(RoomContext);
@@ -77,9 +77,9 @@ export function Screen({
     return (
         <main className={className}>
             <header>
-                {navLeft ?? <EmptyHeaderLink />}
+                {navLeft || <EmptyHeaderLink />}
                 <h1 onDoubleClick={(_) => setShowSettings(true)}>{title}</h1>
-                {navRight ?? <EmptyHeaderLink />}
+                {navRight || <EmptyHeaderLink />}
             </header>
             <Notification />
             <YoureNext queue={queue} />
