@@ -82,6 +82,7 @@ function TestHarness(props: TestProps) {
         downloadSize: 100,
         downloadDone: 100,
         now: 1234,
+        connected: true,
         ...props.server,
     };
     const [queue_, setQueue] = useState(queue as QueueItem[]);
@@ -93,7 +94,6 @@ function TestHarness(props: TestProps) {
         setQueue: setQueue,
         settings: settings,
         trackList: Object.values(tracks),
-        connected: true,
         ...props.room,
     };
 
