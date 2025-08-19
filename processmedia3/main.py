@@ -54,6 +54,7 @@ SCAN_IGNORE = [
     "cache.db",
     "tracks.json",
     "tracks.json.gz",
+    "WorkInProgress",
 ]
 
 
