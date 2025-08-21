@@ -14,7 +14,7 @@ def parse_tags(data: str) -> Dict[str, List[str]]:
     ... use:opening
     ... title:Dynamite Explosion
     ... artist:Fire Bomber
-    ... artist:Yoshiki Fukuyama
+    ... artist:Yoshiki "Test" Fukuyama
     ... retro
     ... source:"https://www.youtube.com/watch?v=1b2a8d3e4f5"
     ... \ufeff'''
@@ -22,7 +22,7 @@ def parse_tags(data: str) -> Dict[str, List[str]]:
     >>> pprint(parse_tags(data))
     {'': ['retro'],
      'Macross': ['Macross Dynamite 7'],
-     'artist': ['Fire Bomber', 'Yoshiki Fukuyama'],
+     'artist': ['Fire Bomber', 'Yoshiki "Test" Fukuyama'],
      'category': ['anime'],
      'from': ['Macross'],
      'source': ['https://www.youtube.com/watch?v=1b2a8d3e4f5'],
