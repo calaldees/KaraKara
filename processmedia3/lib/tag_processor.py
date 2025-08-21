@@ -1,6 +1,8 @@
 from functools import reduce
 from itertools import pairwise
 from typing import Dict, List, Set
+from io import StringIO
+import csv
 
 
 def parse_tags(data: str) -> Dict[str, List[str]]:
@@ -8,27 +10,34 @@ def parse_tags(data: str) -> Dict[str, List[str]]:
     >>> data = '''
     ... \ufeff
     ... category:anime
-    ... from:Macross
     ... from:Macross:Macross Dynamite 7
     ... use:opening
     ... title:Dynamite Explosion
     ... artist:Fire Bomber
     ... artist:Yoshiki Fukuyama
     ... retro
+    ... source:"https://www.youtube.com/watch?v=1b2a8d3e4f5"
     ... \ufeff'''
-    >>> parse_tags(data)
-    {'category': ['anime'], 'from': ['Macross'], 'Macross': ['Macross Dynamite 7'], 'use': ['opening'], 'title': ['Dynamite Explosion'], 'artist': ['Fire Bomber', 'Yoshiki Fukuyama'], '': ['retro']}
+    >>> from pprint import pprint
+    >>> pprint(parse_tags(data))
+    {'': ['retro'],
+     'Macross': ['Macross Dynamite 7'],
+     'artist': ['Fire Bomber', 'Yoshiki Fukuyama'],
+     'category': ['anime'],
+     'from': ['Macross'],
+     'source': ['https://www.youtube.com/watch?v=1b2a8d3e4f5'],
+     'title': ['Dynamite Explosion'],
+     'use': ['opening']}
     """
     data = data.strip().strip("\ufeff").strip()
+    tags_values: Dict[str, List[str]] = {}
 
-    def _reduce(accumulator, item):
-        item = tuple(filter(None, (i.strip() for i in item.split(":"))))
-        if len(item) == 1:
-            accumulator.setdefault("", set()).add(item[0])
+    for row in csv.reader(StringIO(data), delimiter=":"):
+        row = tuple(filter(None, (i.strip() for i in row)))
+        if len(row) == 1:
+            tags_values.setdefault("", []).append(row[0])
         else:
-            for parent, tag in pairwise(item):
-                accumulator.setdefault(parent, set()).add(tag)
-        return accumulator
+            for parent, tag in pairwise(row):
+                tags_values.setdefault(parent, []).append(tag)
 
-    tags_values: Dict[str, Set[str]] = reduce(_reduce, data.split("\n"), {})
-    return dict((k, sorted(v)) for k, v in tags_values.items())
+    return dict((k, sorted(set(v))) for k, v in tags_values.items())
