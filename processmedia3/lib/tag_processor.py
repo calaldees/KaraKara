@@ -33,7 +33,7 @@ def parse_tags(data: str) -> Dict[str, List[str]]:
     tags_values: Dict[str, List[str]] = {}
 
     for row in csv.reader(StringIO(data), delimiter=":"):
-        row = tuple(filter(None, (i.strip() for i in row)))
+        row = list(filter(None, (i.strip() for i in row)))
         if len(row) == 1:
             tags_values.setdefault("", []).append(row[0])
         else:

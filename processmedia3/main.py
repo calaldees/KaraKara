@@ -159,6 +159,10 @@ def lint(tracks: Sequence[Track]) -> None:
                         if f"en{n}" in use and "ending" not in use:
                             log.error(f"{s.file.relative} has use:ed{n} but no ending tag")
 
+                if "source" in s.tags:
+                    if "http" in s.tags["source"] or "https" in s.tags["source"]:
+                        log.error(f"{s.file.relative} appears to have an unquoted URL in the source tag")
+
                 if "red" in s.tags:
                     log.error(f"{s.file.relative} has red tag")
 
