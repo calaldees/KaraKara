@@ -119,16 +119,11 @@ def view(tracks: Sequence[Track]) -> None:
     for track in tracks:
         print(track.id)
         for t in track.targets:
-            source_list = [s.file.relative for s in t.sources]
             if t.path.exists():
                 stats = f"{OK} ({int(t.path.stat().st_size/1024):,} KB)"
             else:
                 stats = FAIL
-            print(
-                f"  - {t.type.name}: {t.friendly!r} = "
-                + f"{t.encoder.__class__.__name__}({repr(source_list)}) "
-                + f"{stats}"
-            )
+            print(f"  - {t} {stats}")
 
 
 def lint(tracks: Sequence[Track]) -> None:

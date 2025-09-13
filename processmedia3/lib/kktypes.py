@@ -252,6 +252,9 @@ class Target:
             except Exception as e:
                 log.error(f"Error while encoding {self.friendly!r}: {e}")
 
+    def __str__(self):
+        source_list = [s.file.relative for s in self.sources]
+        return f"{self.type.name}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list!r})"
 
 class TrackAttachment(t.TypedDict):
     mime: str
