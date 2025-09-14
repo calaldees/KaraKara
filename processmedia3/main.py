@@ -5,7 +5,6 @@ import contextlib
 import gzip
 import json
 import logging
-import logging.config
 import logging.handlers
 import math
 import os
@@ -13,7 +12,6 @@ import pickle
 import re
 import sys
 import time
-import csv
 from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path

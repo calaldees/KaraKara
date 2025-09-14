@@ -292,7 +292,7 @@ class Track:
     def has_tags(self) -> bool:
         return bool(self._sources_by_type({SourceType.TAGS}))
 
-    def to_json(self) -> TrackDict:  # Mapping[str, t.Any]
+    def to_json(self) -> TrackDict:
         media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         duration = media_files[0].meta.duration.total_seconds()
 
