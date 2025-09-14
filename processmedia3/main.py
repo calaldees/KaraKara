@@ -75,7 +75,12 @@ def scan(
     """
     # Get a list of source files grouped by Track ID, eg
     # {
-    #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
+    #   "My_Track": [
+    #     "My Track [Vocal].mp4",
+    #     "My Track [Instrumental].ogg",
+    #     "My Track.srt",
+    #     "My Track.txt",
+    #   ],
     #   ...
     # }
     grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
@@ -83,10 +88,20 @@ def scan(
         if any((i in file.absolute) for i in SCAN_IGNORE):
             continue
         if match is None or match in file.stem:
-            grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].add(file)
+            # Match "My Track [Instrumental].mp4" into "base:My Track" and "variant:Instrumental"
+            matches = re.match(r"^(?P<base>.+?)( \[(?P<variant>.+?)\])?$", file.stem.title())
+            if not matches:
+                raise Exception(f"Can't figure out track ID for {file.relative}")
+            base = matches.group("base")
+            variant = matches.group("variant")
+            if variant and file.suffix.lower() == ".txt":
+                raise Exception(f"Can't have variants in tag files: {file.relative}")
+            # track id = base name with non-alphanumeric characters replaced by _
+            track_id = re.sub("[^0-9a-zA-Z]+", "_", base).strip("_")
+            grouped[track_id].add(file)
     groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
 
-    # Turn all the (basename, list of filenames) tuples into a
+    # Turn all the (track_id, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
     def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
