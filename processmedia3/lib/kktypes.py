@@ -152,6 +152,8 @@ class Source:
         self.file = file
         self.cache = cache
         self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
+        variant_match = re.search(r"\[(.+?)\]$", self.file.stem)
+        self.variant = str(variant_match.group(1)) if variant_match else None
         if not self.type:
             raise Exception(f"Can't tell what type of source {self.file.relative} is")
 
