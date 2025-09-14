@@ -214,12 +214,17 @@ class Target:
     """
 
     def __init__(
-        self, processed_dir: Path, type: TargetType, sources: Set[Source]
+        self,
+        processed_dir: Path,
+        type: TargetType,
+        sources: Set[Source],
+        variant: str | None = None,
     ) -> None:
         from .encoders import find_appropriate_encoder  # circular import :(
 
         self.processed_dir = processed_dir
         self.type = type
+        self.variant = variant
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
         parts = [self.encoder.salt] + [s.hash for s in self.sources]
@@ -256,7 +261,8 @@ class Target:
 
     def __str__(self):
         source_list = [s.file.relative for s in self.sources]
-        return f"{self.type.name}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list!r})"
+        var = f"[{self.variant}]" if self.variant else ""
+        return f"{self.type.name}{var}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list!r})"
 
 class TrackAttachment(t.TypedDict):
     mime: str
