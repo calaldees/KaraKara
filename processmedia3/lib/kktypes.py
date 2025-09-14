@@ -225,6 +225,8 @@ class Target:
         self.processed_dir = processed_dir
         self.type = type
         self.variant = variant
+        if variant:
+            sources = {s for s in sources if s.variant == variant}
         self.encoder, self.sources = find_appropriate_encoder(type, sources)
 
         parts = [self.encoder.salt] + [s.hash for s in self.sources]
@@ -265,6 +267,7 @@ class Target:
         return f"{self.type.name}{var}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list!r})"
 
 class TrackAttachment(t.TypedDict):
+    variant: str | None
     mime: str
     path: str
 class TrackDict(t.TypedDict):
@@ -291,7 +294,30 @@ class Track:
     ) -> None:
         self.id = id
         self.sources = sources
-        self.targets = [Target(processed_dir, type, sources) for type in target_types]
+        video_variants = self._variants_by_type({SourceType.VIDEO, SourceType.AUDIO})
+        video_target_types = {t for t in target_types if t.name.startswith("VIDEO_")}
+        preview_target_types = {t for t in target_types if t.name.startswith("PREVIEW_")}
+        subtitle_variants = self._variants_by_type({SourceType.SUBTITLES})
+        subtitle_target_types = {t for t in target_types if t.name.startswith("SUBTITLES_")}
+        image_target_types = {t for t in target_types if t.name.startswith("IMAGE_")}
+        targets = set()
+        import itertools
+        for variant, type in itertools.product(video_variants, video_target_types):
+            targets.add(Target(processed_dir, type, sources, variant))
+        for type in preview_target_types:
+            targets.add(Target(processed_dir, type, sources, None))
+        for variant, type in itertools.product(subtitle_variants, subtitle_target_types):
+            targets.add(Target(processed_dir, type, sources, variant))
+        for type in image_target_types:
+            targets.add(Target(processed_dir, type, sources, None))
+        self.targets = list(targets)
+
+    def _variants_by_type(self, types: Set[SourceType]) -> Set[str|None]:
+        variants = {s.variant for s in self.sources if s.type in types}
+        if None in variants:
+            if len(variants) > 1:
+                raise Exception(f"Mixing variant and non-variant sources of type {types} in track {self.id}")
+        return variants
 
     def _sources_by_type(self, types: Set[SourceType]) -> Sequence[Source]:
         return [s for s in self.sources if s.type in types]
@@ -308,6 +334,7 @@ class Track:
         for target in self.targets:
             attachments[target.encoder.category].append(
                 TrackAttachment({
+                    "variant": target.variant,
                     "mime": target.encoder.mime,
                     "path": str(target.path.relative_to(target.processed_dir)),
                 })
