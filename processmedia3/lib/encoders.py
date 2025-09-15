@@ -55,6 +55,10 @@ ACODEC_MP3 = ["-acodec", "mp3"]
 # fmt: on
 
 
+class EncoderException(Exception):
+    pass
+
+
 class Encoder:
     target: TargetType
     sources: Set[SourceType]
@@ -477,15 +481,23 @@ encoders_for_type = {
 }
 
 
+class NoAppropriateEncoderException(Exception):
+    pass
+
+
 def find_appropriate_encoder(type: TargetType, sources: Set[Source]) -> t.Tuple[Encoder, Set[Source]]:
     for encoder in encoders_for_type[type]:
         if encoder.sources.issubset({s.type for s in sources}):
             return encoder, {s for s in sources if s.type in encoder.sources}
     else:
         source_list = "\n".join(f"  - {s.type}: {s.file.relative}" for s in sources)
-        raise Exception(
+        raise NoAppropriateEncoderException(
             f"Couldn't find an encoder to make {type} out of:\n{source_list}"
         )
+
+
+class NoBestImageException(Exception):
+    pass
 
 
 def select_best_image(paths: Sequence[Path]) -> Path:
@@ -506,7 +518,7 @@ def select_best_image(paths: Sequence[Path]) -> Path:
         return score
 
     if len(paths) == 0:
-        raise Exception("Can't select best of zero thumbs")
+        raise NoBestImageException("Can't select best of zero thumbs")
     scored_paths = [(score(p), p) for p in sorted(paths)]
     ok_paths = [(score, p) for (score, p) in scored_paths if score > 0]
     if ok_paths:

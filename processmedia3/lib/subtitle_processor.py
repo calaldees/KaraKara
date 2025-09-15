@@ -27,6 +27,14 @@ re_ssa_line = re.compile(
 )
 
 
+class SubtitleParseException(Exception):
+    pass
+
+
+class SubtitleFormatException(Exception):
+    pass
+
+
 class Subtitle(NamedTuple):
     start: timedelta = timedelta()
     end: timedelta = timedelta()
@@ -116,7 +124,7 @@ def _parse_time(time_str: str) -> timedelta:
     """
     match = re_time.search(time_str)
     if not match:
-        raise Exception(f"Can't parse time: {time_str}")
+        raise SubtitleParseException(f"Can't parse time: {time_str}")
     time_dict = match.groupdict()
     return timedelta(
         hours=int(time_dict["hours"]),
@@ -666,7 +674,7 @@ if __name__ == "__main__":
     elif args.output.endswith(".ssa"):
         outdata = create_ssa(subs)
     else:
-        raise Exception("Unknown output format")
+        raise SubtitleFormatException("Unknown output format")
 
     if args.input == args.output:
         diff = difflib.unified_diff(

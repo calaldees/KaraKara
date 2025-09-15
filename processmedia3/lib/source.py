@@ -20,6 +20,10 @@ class SourceType(enum.Enum):
     SUBTITLES = frozenset({".srt", ".ssa"})
 
 
+class SourceTypeException(Exception):
+    pass
+
+
 class Source:
     """
     A file in the "source" directory, with some convenience methods
@@ -31,7 +35,7 @@ class Source:
         self.cache = cache
         self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
         if not self.type:
-            raise Exception(f"Can't tell what type of source {self.file.relative} is")
+            raise SourceTypeException(f"Can't tell what type of source {self.file.relative} is")
 
     @staticmethod
     def _cache(func: t.Callable[["Source"], T]) -> t.Callable[["Source"], T]:

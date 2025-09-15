@@ -75,6 +75,9 @@ class AbstractFolder():
     def from_str(cls, s: str) -> Self | None: ...
 
 
+class AbstractFileException(Exception):
+    pass
+
 
 # Path/Local -------------------------------------------------------------------
 
@@ -303,7 +306,7 @@ class HttpFile(AbstractFile):
         # TODO: Bug? Will this request fail of the ranges overlap? test filesize between 8k to 16k (suggest 10k?)
         response = _http(self.url, headers={'Range': f'bytes=0-{self.block_size-1},-{self.block_size}'})
         if not response.has_headers(self.HEADERS_REQUIRED):
-            raise Exception(f'http server does support required headers: {self.HEADERS_REQUIRED}')
+            raise AbstractFileException(f'http server does support required headers: {self.HEADERS_REQUIRED}')
         self._mtime = response.headers.get('last-modified', '')
         multipart_boundary = re.match(r'multipart/byteranges; boundary=(.+)', response.headers.get('content-type',''))
         body = gzip.decompress(response.body) if 'gzip' in response.headers.get('content-encoding', '') else response.body
@@ -327,7 +330,7 @@ class HttpFile(AbstractFile):
     def headers(self) -> Mapping[str, str]:
         response = _http(self.url, method='HEAD')
         if not response.has_headers(self.HEADERS_REQUIRED):
-            raise Exception(f'http server does support required headers: {self.HEADERS_REQUIRED}')
+            raise AbstractFileException(f'http server does support required headers: {self.HEADERS_REQUIRED}')
         return response.headers
 
     @property
@@ -387,13 +390,13 @@ class HttpFolder(AbstractFolder):
 
         >>> apache = '''<h1>Index of /karakara_media</h1>
         ... <pre>      <a href="?C=N;O=D">Name</a>                    <a href="?C=M;O=A">Last modified</a>      <a href="?C=S;O=A">Size</a>  <a href="?C=D;O=A">Description</a><hr>      <a href="/">Parent Directory</a>                             -
-        ... <a href="Captain%20America%20(1966).mp4">Captain America (196..&gt;</a> 2022-11-13 09:09  8.1M  
-        ... <a href="Captain%20America%20(1966).srt">Captain America (196..&gt;</a> 2022-11-13 09:09  426   
-        ... <a href="Captain%20America%20(1966).txt">Captain America (196..&gt;</a> 2022-11-13 09:09  174   
-        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.jpg">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02   43K  
-        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.mp3">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02  8.2M  
-        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.srt">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02  2.9K  
-        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.txt">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02  136   
+        ... <a href="Captain%20America%20(1966).mp4">Captain America (196..&gt;</a> 2022-11-13 09:09  8.1M
+        ... <a href="Captain%20America%20(1966).srt">Captain America (196..&gt;</a> 2022-11-13 09:09  426
+        ... <a href="Captain%20America%20(1966).txt">Captain America (196..&gt;</a> 2022-11-13 09:09  174
+        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.jpg">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02   43K
+        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.mp3">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02  8.2M
+        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.srt">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02  2.9K
+        ... <a href="KAT-TUN%20Your%20side%20%5bInstrumental%5d.txt">KAT-TUN Your side [I..&gt;</a> 2022-11-13 08:02  136
         ... <hr></pre>'''
         >>> HttpFolder_files(build_response(apache, 'text/html'))
         (HttpFile: http://fake_url/Captain%20America%20(1966).mp4, HttpFile: http://fake_url/Captain%20America%20(1966).srt, HttpFile: http://fake_url/Captain%20America%20(1966).txt, HttpFile: http://fake_url/KAT-TUN%20Your%20side%20%5bInstrumental%5d.jpg, HttpFile: http://fake_url/KAT-TUN%20Your%20side%20%5bInstrumental%5d.mp3, HttpFile: http://fake_url/KAT-TUN%20Your%20side%20%5bInstrumental%5d.srt, HttpFile: http://fake_url/KAT-TUN%20Your%20side%20%5bInstrumental%5d.txt)
@@ -430,7 +433,7 @@ class HttpFolder(AbstractFolder):
                     for folder_match in self.RE_FOLDER.finditer(body)
                 }
             else:
-                raise Exception(f'unknown {content_type}')
+                raise AbstractFileException(f'unknown {content_type}')
             folders_to_visit -= folders_visited
             for file_dict in file_dicts:
                 yield HttpFile(
