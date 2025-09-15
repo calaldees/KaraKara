@@ -11,7 +11,8 @@ import math
 
 import tqdm
 
-from .kktypes import Source, SourceType, TargetType, MediaType, MediaMeta
+from .source import Source, SourceType
+from .kktypes import TargetType, MediaType, MediaMeta
 from .subtitle_processor import create_vtt, parse_subtitles
 
 log = logging.getLogger()
