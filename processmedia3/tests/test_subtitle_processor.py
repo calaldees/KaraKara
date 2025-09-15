@@ -7,7 +7,6 @@ from lib.subtitle_processor import (
     create_ssa,
     create_vtt,
     Subtitle,
-    _remove_duplicate_lines,
     parse_subtitles,
 )
 from pathlib import Path
@@ -44,12 +43,12 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
         )
 
         self.assertEqual(
-            _remove_duplicate_lines(parse_subtitles(ssa)),
+            parse_subtitles(ssa),
             [
                 Subtitle(
                     start=timedelta(0),
                     end=timedelta(seconds=60),
-                    text="first",
+                    text="first\nsecond",
                     top=False,
                 ),
                 Subtitle(

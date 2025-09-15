@@ -78,7 +78,7 @@ class TestE2E(unittest.TestCase):
             for k, v in {
                 "attachments": {
                     "image": [{"mime": "image/avif", "path": "g/g0hYJlNw99D.avif"}],
-                    "subtitle": [{"mime": "text/vtt", "path": "n/nm9fD7_qOn0.vtt"}],
+                    "subtitle": [{"mime": "text/vtt", "path": "6/6u2Zuq6Cuho.vtt"}],
                     "video": [{'mime': 'video/webm; codecs=av01.0.05M.08,opus', 'path': 'k/kQiTVqqX7if.webm'}],
                 },
                 "duration": 15.0,

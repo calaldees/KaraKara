@@ -205,53 +205,6 @@ def _parse_ssa(source: str) -> List[Subtitle]:
     return [parse_line(line_dict) for line_dict in lines]
 
 
-def _remove_duplicate_lines(lines: List[Subtitle]) -> List[Subtitle]:
-    r"""
-    Overlap of subtitles should be removed
-
-    >>> lines = [
-    ...     Subtitle(start=timedelta(seconds=1), end=timedelta(seconds=2), text='Tooi hi no kioku wo\nKanashimi no iki no ne wo'),
-    ...     Subtitle(start=timedelta(seconds=3), end=timedelta(seconds=4), text='Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune'),
-    ... ]
-    >>> [l.text for l in _remove_duplicate_lines(lines)]
-    ['Tooi hi no kioku wo', 'Kanashimi no iki no ne wo tometekure yo\nSaa ai ni kogareta mune']
-
-    Small Overlap is rejected
-
-    >>> lines = [
-    ...     Subtitle(start=timedelta(seconds=1), end=timedelta(seconds=2), text=' ga takaraMON da\nase mamire wa'),
-    ...     Subtitle(start=timedelta(seconds=2), end=timedelta(seconds=3), text='ase mamire'),
-    ... ]
-    >>> [l.text for l in _remove_duplicate_lines(lines)]
-    ['ga takaraMON da\nase mamire wa', 'ase mamire']
-
-    """
-
-    def remove_duplicate_line(line_current, line_next):
-        if not line_next:
-            return line_current
-        _, overlap_text = commonOverlap(line_current.text, line_next.text)
-        if len(overlap_text) < int(len(line_next.text) * 0.3):
-            log.debug(
-                'Subtitle text overlap is suspiciously small, ignoring the overlap current:"{}" - next:"{}" - overlap:"{}"'.format(
-                    line_current.text, line_next.text, overlap_text
-                )
-            )
-            overlap_text = ""
-        return Subtitle(
-            line_current.start,
-            line_current.end,
-            line_current.text.replace(overlap_text, "").strip(),
-            line_current.top,
-        )
-
-    lines = [
-        remove_duplicate_line(line_current, line_next)
-        for line_current, line_next in zip_longest(lines, lines[1:])
-    ]
-    return [line for line in lines if line.text]
-
-
 def _strip_toptitles(lines: List[Subtitle]) -> List[Subtitle]:
     r"""
     If there are many subs on top, keep them (they're normally trying
@@ -305,7 +258,7 @@ def parse_subtitles(data: str) -> List[Subtitle]:
     assert isinstance(data, str), "Subtitle data should be a string"
     # Only two tracks actually have duplicate lines - the two .ssa ones.
     # Other tracks have intentionally repeated lyrics, don't mess with those.
-    lines = _parse_srt(data) or _remove_duplicate_lines(_parse_ssa(data))
+    lines = _parse_srt(data) or _parse_ssa(data)
     lines = _strip_toptitles(lines)
     return lines
 
