@@ -1,0 +1,98 @@
+import typing as t
+from collections import defaultdict
+import copy
+from pathlib import Path
+from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set
+from .kktypes import MediaType, TargetType
+from .source import Source, SourceType
+from .target import Target
+
+
+class TrackAttachment(t.TypedDict):
+    mime: str
+    path: str
+
+
+class TrackDict(t.TypedDict):
+    id: str
+    duration: float
+    attachments: Mapping[MediaType, Sequence[TrackAttachment]]
+    lyrics: Sequence[str]
+    tags: Mapping[str, Sequence[str]]
+
+
+class Track:
+    """
+    An entry in tracks.json, keeping track of which source files are
+    used to build the track, which target files should be generated,
+    and a method to dump all the metadata into a json dict.
+    """
+
+    def __init__(
+        self,
+        processed_dir: Path,
+        id: str,
+        sources: Set[Source],
+        target_types: Sequence[TargetType],
+    ) -> None:
+        self.id = id
+        self.sources = sources
+        self.targets = [Target(processed_dir, type, sources) for type in target_types]
+
+    def _sources_by_type(self, types: Set[SourceType]) -> Sequence[Source]:
+        return [s for s in self.sources if s.type in types]
+
+    @property
+    def has_tags(self) -> bool:
+        return bool(self._sources_by_type({SourceType.TAGS}))
+
+    def to_json(self) -> TrackDict:
+        media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
+        duration = media_files[0].meta.duration.total_seconds()
+
+        attachments: MutableMapping[MediaType, MutableSequence[TrackAttachment]] = defaultdict(list)
+        for target in self.targets:
+            attachments[target.encoder.category].append(
+                TrackAttachment({
+                    "mime": target.encoder.mime,
+                    "path": str(target.path.relative_to(target.processed_dir)),
+                })
+            )
+        assert attachments.get(MediaType.VIDEO), f"{self.id} is missing attachments.video"
+        #assert attachments.get(MediaType.PREVIEW), f"{self.id} is missing attachments.preview"
+        assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
+
+        sub_files = self._sources_by_type({SourceType.SUBTITLES})
+        lyrics = sub_files[0].lyrics if sub_files else []
+
+        tag_files = self._sources_by_type({SourceType.TAGS})
+        tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags)  # type: ignore[arg-type]
+        assert tags.get("title") is not None, f"{self.id} is missing tags.title"
+        assert tags.get("category") is not None, f"{self.id} is missing tags.category"
+
+        if self._sources_by_type({SourceType.SUBTITLES}):
+            tags["subs"] = ["soft"]
+        else:
+            tags["subs"] = ["hard"]
+        tags["source_type"] = []
+        if self._sources_by_type({SourceType.IMAGE}):
+            tags["source_type"].append("image")
+        if self._sources_by_type({SourceType.VIDEO}):
+            tags["source_type"].append("video")
+        pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
+        tags["aspect_ratio"] = [pxsrc.meta.aspect_ratio_str]
+
+        ausrc = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})[0]
+        d = int(ausrc.meta.duration.total_seconds())
+        tags["duration"] = [f"{d//60}m{d%60:02}s"]
+
+        if tags.get("date"):
+            tags["year"] = [d.split("-")[0] for d in tags["date"]]
+
+        return TrackDict(
+            id=self.id,
+            duration=round(duration, 1),  # for more consistent unit tests
+            attachments=attachments,
+            lyrics=lyrics,
+            tags=tags,
+        )
