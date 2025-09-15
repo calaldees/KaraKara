@@ -6,7 +6,7 @@ from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, 
 from .kktypes import MediaType, TargetType
 from .source import Source, SourceType
 from .target import Target
-from .encoders import find_appropriate_encoder
+from .encoders import find_appropriate_encoder, NoAppropriateEncoderException
 
 
 class TrackAttachment(t.TypedDict):
@@ -39,10 +39,26 @@ class Track:
     ) -> None:
         self.id = id
         self.sources = sources
+        all_variants = {s.variant for s in sources if s.variant} | {None}
         targets = []
         for target_type in target_types:
-            target_encoder, target_sources = find_appropriate_encoder(target_type, sources)
-            targets.append(Target(processed_dir, target_type, target_encoder, target_sources))
+            found_an_encoder = False
+            for variant in all_variants:
+                variant_sources = {s for s in sources if s.variant in {variant, None}}
+                try:
+                    target_encoder, target_sources = find_appropriate_encoder(target_type, variant_sources)
+                    if variant and variant not in {s.variant for s in target_sources}:
+                        # if the variant is specified, it must be used
+                        continue
+                    targets.append(Target(processed_dir, target_type, target_encoder, target_sources, variant))
+                    found_an_encoder = True
+                except NoAppropriateEncoderException:
+                    # it's ok if one variant doesn't have an encoder, as long as
+                    # another one does
+                    continue
+            if not found_an_encoder:
+                raise Exception(f"Can't find sources to create target type {target_type} for track {id}")
+
         self.targets = targets
 
     def _sources_by_type(self, types: Set[SourceType]) -> Sequence[Source]:
