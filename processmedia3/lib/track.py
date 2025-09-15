@@ -10,6 +10,7 @@ from .encoders import find_appropriate_encoder
 
 
 class TrackAttachment(t.TypedDict):
+    variant: str | None
     mime: str
     path: str
 
@@ -59,6 +60,7 @@ class Track:
         for target in self.targets:
             attachments[target.encoder.category].append(
                 TrackAttachment({
+                    "variant": target.variant,
                     "mime": target.encoder.mime,
                     "path": str(target.path.relative_to(target.processed_dir)),
                 })
