@@ -21,7 +21,10 @@ from collections.abc import Mapping, Sequence, MutableMapping, MutableSet, Set
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from lib.kktypes import Source, SourceType, TargetType, Track, Target, TrackDict
+from lib.source import Source, SourceType
+from lib.target import Target
+from lib.track import Track, TrackDict
+from lib.kktypes import TargetType
 from lib.file_abstraction import AbstractFolder, AbstractFile, AbstractFolder_from_str, LocalFile
 
 
