@@ -16,14 +16,14 @@ from pathlib import Path
 class TestCreateSsa(unittest.TestCase):
     def test_create_ssa(self) -> None:
         ssa = create_ssa(
-            (
+            [
                 Subtitle(timedelta(minutes=0), timedelta(minutes=1), "first"),
                 Subtitle(
                     timedelta(minutes=2),
                     timedelta(minutes=3, microseconds=510000),
                     "second",
                 ),
-            )
+            ]
         )
         self.assertEqual(
             ssa,
@@ -63,7 +63,7 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
 
     def test_newline(self) -> None:
         ssa = create_ssa(
-            (Subtitle(timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),)
+            [Subtitle(timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),]
         )
         self.assertIn("newline\\Ntest", ssa)
 
@@ -71,7 +71,7 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
 class TestCreateSrt(unittest.TestCase):
     def test_create_srt(self) -> None:
         srt = create_srt(
-            (
+            [
                 Subtitle(timedelta(minutes=0), timedelta(minutes=1), "first\nfirst2"),
                 Subtitle(
                     timedelta(minutes=2),
@@ -79,7 +79,7 @@ class TestCreateSrt(unittest.TestCase):
                     "second",
                 ),
                 Subtitle(timedelta(minutes=4), timedelta(minutes=5), ""),
-            )
+            ]
         )
         self.assertEqual(
             srt,

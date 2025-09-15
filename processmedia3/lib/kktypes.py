@@ -42,7 +42,7 @@ class MediaMeta(t.NamedTuple):
         return ':'.join(map(str,self.aspect_ratio.as_integer_ratio()))
 
     @classmethod
-    def from_width_height(cls, width, height):
+    def from_width_height(cls, width: int, height: int) -> "MediaMeta":
         return cls(width=width, height=height, aspect_ratio=Fraction(width, height))
 
     @classmethod

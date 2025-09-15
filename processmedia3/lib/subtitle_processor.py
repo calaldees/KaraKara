@@ -5,6 +5,7 @@ import re
 from datetime import timedelta
 from itertools import zip_longest
 from typing import NamedTuple, List
+import typing as t
 import logging
 import difflib
 
@@ -158,7 +159,7 @@ def _parse_srt(source: str) -> List[Subtitle]:
     [Subtitle(start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
     """
 
-    def parse_line(line):
+    def parse_line(line: t.Dict[str, str]) -> Subtitle:
         return Subtitle(
             _parse_time(line["start"]),
             _parse_time(line["end"]),
@@ -193,7 +194,7 @@ def _parse_ssa(source: str) -> List[Subtitle]:
     """
     lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
 
-    def parse_line(line):
+    def parse_line(line: t.Dict[str, str]) -> Subtitle:
         return Subtitle(
             _parse_time(line["start"]),
             _parse_time(line["end"]),
@@ -309,170 +310,36 @@ def parse_subtitles(data: str) -> List[Subtitle]:
     return lines
 
 
-class SSASection(NamedTuple):
-    name: str
-    line: int
-    format_order: tuple
+def create_ssa(subtitles: t.List[Subtitle]) -> str:
+    data = """[Script Info]
+Title: <untitled>
+Original Script: <unknown>
+ScriptType: v4.00
+
+[V4 Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+Style: Default,Arial,14,65535,16777215,16777215,0,-1,0,3,1,1,2,14,14,14,0,128
+
+[Events]
+Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+    for subtitle, subtitle_next in zip_longest(subtitles, subtitles[1:]):
+        text = (
+            "{}{}{}{}".format(
+                subtitle.text,
+                SSA_NEWLINE,
+                SSA_NEXT_COLOR,
+                subtitle_next.text,
+            )
+            if subtitle_next
+            else subtitle.text
+        ).replace("\n", SSA_NEWLINE)
+        data += f"Dialogue: Marked=0,{_ssa_time(subtitle.start)},{_ssa_time(subtitle.end)},*Default,NTP,0000,0000,0000,!Effect,{text}\n"
+    return data
 
 
-def create_ssa(
-    subtitles,
-    font_size=None,
-    width=None,
-    height=None,
-    margin_h_size_multiplyer=1,
-    margin_v_size_multiplyer=1,
-    font_ratio=SSA_HEIGHT_TO_FONT_SIZE_RATIO,
-):
-    if not font_size and height:
-        font_size = height / font_ratio
-    if not font_size:
-        font_size = font_ratio
-    header = dict(
-        (
-            ("Title", "<untitled>"),
-            ("Original Script", "<unknown>"),
-            ("ScriptType", "v4.00"),
-        )
-    )
-    if width:
-        header["PlayResX"] = width
-    if height:
-        header["PlayResY"] = height
-    ssa_template = dict(
-        (
-            ("Script Info", header),
-            (
-                SSASection(
-                    "V4 Styles",
-                    "Style",
-                    (
-                        "Name",
-                        "Fontname",
-                        "Fontsize",
-                        "PrimaryColour",
-                        "SecondaryColour",
-                        "TertiaryColour",
-                        "BackColour",
-                        "Bold",
-                        "Italic",
-                        "BorderStyle",
-                        "Outline",
-                        "Shadow",
-                        "Alignment",
-                        "MarginL",
-                        "MarginR",
-                        "MarginV",
-                        "AlphaLevel",
-                        "Encoding",
-                    ),
-                ),
-                (
-                    {
-                        "Name": "Default",
-                        "Fontname": "Arial",
-                        "Fontsize": int(font_size),
-                        "PrimaryColour": 65535,
-                        "SecondaryColour": 16777215,
-                        "TertiaryColour": 16777215,
-                        "BackColour": 0,
-                        "Bold": -1,
-                        "Italic": 0,
-                        "BorderStyle": 3,
-                        "Outline": 1,
-                        "Shadow": 1,
-                        "Alignment": 2,
-                        "MarginL": int(margin_h_size_multiplyer * font_size),
-                        "MarginR": int(margin_h_size_multiplyer * font_size),
-                        "MarginV": int(margin_v_size_multiplyer * font_size),
-                        "AlphaLevel": 0,
-                        "Encoding": 128,
-                    },
-                ),
-            ),
-            (
-                SSASection(
-                    "Events",
-                    "Dialogue",
-                    (
-                        "Marked",
-                        "Start",
-                        "End",
-                        "Style",
-                        "Name",
-                        "MarginL",
-                        "MarginR",
-                        "MarginV",
-                        "Effect",
-                        "Text",
-                    ),
-                ),
-                (
-                    {
-                        "Marked": "Marked=0",
-                        "Start": _ssa_time(subtitle.start),
-                        "End": _ssa_time(subtitle.end),
-                        "Style": "*Default",
-                        "Name": "NTP",
-                        "MarginL": "0000",
-                        "MarginR": "0000",
-                        "MarginV": "0000",
-                        "Effect": "!Effect",
-                        "Text": (
-                            "{}{}{}{}".format(
-                                subtitle.text,
-                                SSA_NEWLINE,
-                                SSA_NEXT_COLOR,
-                                subtitle_next.text,
-                            )
-                            if subtitle_next
-                            else subtitle.text
-                        ).replace("\n", SSA_NEWLINE),
-                    }
-                    for subtitle, subtitle_next in zip_longest(subtitles, subtitles[1:])
-                ),
-            ),
-        )
-    )
-
-    o = []
-    for key, section_data in ssa_template.items():
-        if isinstance(key, SSASection):
-            section_name = key.name
-            section_meta = key
-        else:
-            section_name = key
-            section_meta = None
-
-        # Section Header
-        o.append("[{0}]".format(section_name))
-
-        # No field list - just print the dict
-        if section_meta is None:
-            for key, value in section_data.items():
-                o.append("{0}: {1}".format(key, value))
-        # Specific field list required for this section
-        if isinstance(section_meta, SSASection):
-            # Section field description
-            o.append("Format: {0}".format(", ".join(section_meta.format_order)))
-            # Add each row
-            for item in section_data:
-                o.append(
-                    "{0}: {1}".format(
-                        section_meta.line,
-                        ",".join(
-                            str(item[col_name])
-                            for col_name in section_meta.format_order
-                        ),
-                    )
-                )
-
-        o.append("")
-
-    return "\n".join(o)
-
-
-def create_srt(subtitles):
+def create_srt(subtitles: t.List[Subtitle]) -> str:
     SRT_FORMAT = """\
 {index}
 {start} --> {end}
@@ -491,7 +358,7 @@ def create_srt(subtitles):
     )
 
 
-def create_vtt(subtitles):
+def create_vtt(subtitles: t.List[Subtitle]) -> str:
     r"""
     https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
     https://w3c.github.io/webvtt/

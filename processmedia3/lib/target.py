@@ -5,8 +5,7 @@ import logging
 import shutil
 import tempfile
 from pathlib import Path
-from collections.abc import Set
-
+import typing as t
 
 from .kktypes import TargetType
 from .source import Source
@@ -28,7 +27,7 @@ class Target:
         processed_dir: Path,
         type: TargetType,
         encoder: Encoder,
-        sources: Set[Source],
+        sources: t.Set[Source],
     ) -> None:
 
         self.processed_dir = processed_dir
@@ -68,6 +67,6 @@ class Target:
             except Exception as e:
                 log.error(f"Error while encoding {self.friendly!r}: {e}")
 
-    def __str__(self):
+    def __str__(self) -> str:
         source_list = [s.file.relative for s in self.sources]
         return f"{self.type.name}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list!r})"

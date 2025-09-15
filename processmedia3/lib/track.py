@@ -2,7 +2,7 @@ import typing as t
 from collections import defaultdict
 import copy
 from pathlib import Path
-from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, Set
+from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence
 from .kktypes import MediaType, TargetType
 from .source import Source, SourceType
 from .target import Target
@@ -33,7 +33,7 @@ class Track:
         self,
         processed_dir: Path,
         id: str,
-        sources: Set[Source],
+        sources: t.Set[Source],
         target_types: Sequence[TargetType],
     ) -> None:
         self.id = id
@@ -44,7 +44,7 @@ class Track:
             targets.append(Target(processed_dir, target_type, target_encoder, target_sources))
         self.targets = targets
 
-    def _sources_by_type(self, types: Set[SourceType]) -> Sequence[Source]:
+    def _sources_by_type(self, types: t.Set[SourceType]) -> Sequence[Source]:
         return [s for s in self.sources if s.type in types]
 
     @property

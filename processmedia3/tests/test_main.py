@@ -16,7 +16,7 @@ tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)  # type: ignore
 
 
 class TestE2E(unittest.TestCase):
-    def test_e2e(self):
+    def test_e2e(self) -> None:
         logging.basicConfig(level=logging.DEBUG)
         self.maxDiff = 2000
 

@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 import typing as t
 from abc import abstractmethod
-from collections.abc import Sequence, Set
+from collections.abc import Sequence
 import re
 import math
 
@@ -61,7 +61,7 @@ class EncoderException(Exception):
 
 class Encoder:
     target: TargetType
-    sources: Set[SourceType]
+    sources: t.Set[SourceType]
     category: MediaType
     ext: str
     mime: str
@@ -79,7 +79,7 @@ class Encoder:
         self.salt = str(confs)
 
     @abstractmethod
-    def encode(self, target: Path, sources: Set[Source]) -> None: ...
+    def encode(self, target: Path, sources: t.Set[Source]) -> None: ...
 
     def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> None:
         output = []
@@ -128,7 +128,7 @@ class _BaseVideoToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
         # fmt: off
         source = list(sources)[0]
         # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
@@ -267,7 +267,7 @@ class _BaseImageToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
         def source_by_type(type: SourceType) -> Source:
             return [s for s in sources if s.type == type][0]
 
@@ -338,7 +338,7 @@ class _BaseVideoToImage(Encoder):
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
         import tempfile
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
@@ -395,7 +395,7 @@ class _BaseImageToImage(Encoder):
     priority = 2
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
         # fmt: off
         self._run(
             "convert",
@@ -437,7 +437,7 @@ class SubtitleToVTT(Encoder):
     mime = "text/vtt"
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt(parse_subtitles(srt)))
@@ -445,14 +445,14 @@ class SubtitleToVTT(Encoder):
 
 class VoidToVTT(Encoder):
     target = TargetType.SUBTITLES_VTT
-    sources: Set[SourceType] = set()
+    sources: t.Set[SourceType] = set()
     ext = "vtt"
     category = MediaType.SUBTITLE
     mime = "text/vtt"
     priority = 0
 
     @t.override
-    def encode(self, target: Path, sources: Set[Source]) -> None:
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt([]))
 
@@ -460,24 +460,23 @@ class VoidToVTT(Encoder):
 #######################################################################
 
 
-def all_subclasses(cls):
+def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
     return set(cls.__subclasses__()).union(
-        [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+        s for c in cls.__subclasses__() for s in all_subclasses(c)
     )
 
 
 # Sort encoders by priority, highest first. Priority is manually specified
 # so that:
-# - encoders who generate empty stubs are low-priority
-# - most encoders are mid-priority
 # - image-to-image is high priority (so that if we have a choice of
 #   "generate thumbnail from video" or "generate thumbnail from image",
 #   we assume that a human chose the image sensibly)
-encoders = all_subclasses(Encoder)
-encoders = [e for e in encoders if e.__name__[0] != "_"]
-encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
+# - most encoders are mid-priority
+# - encoders who generate empty stubs are low-priority
+encoders = {e for e in all_subclasses(Encoder) if e.__name__[0] != "_"}
+sorted_encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
 encoders_for_type = {
-    t: [e() for e in encoders if e.target == t] for t in TargetType
+    t: [e() for e in sorted_encoders if e.target == t] for t in TargetType
 }
 
 
@@ -485,7 +484,7 @@ class NoAppropriateEncoderException(Exception):
     pass
 
 
-def find_appropriate_encoder(type: TargetType, sources: Set[Source]) -> t.Tuple[Encoder, Set[Source]]:
+def find_appropriate_encoder(type: TargetType, sources: t.Set[Source]) -> t.Tuple[Encoder, t.Set[Source]]:
     for encoder in encoders_for_type[type]:
         if encoder.sources.issubset({s.type for s in sources}):
             return encoder, {s for s in sources if s.type in encoder.sources}

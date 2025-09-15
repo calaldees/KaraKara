@@ -17,7 +17,7 @@ import dateparser
 
 #from zlib import adler32
 from hashlib import sha256
-def hash_bytes(data) -> bytes:
+def hash_bytes(data: bytes) -> bytes:
     #return adler32(data).to_bytes(4)
     return sha256(data).digest()
 
@@ -456,7 +456,7 @@ def AbstractFolder_from_str(s: str) -> AbstractFolder:
 
 # Example ----------------------------------------------------------------------
 
-def _examples():
+def _examples() -> None:
     aa = HttpFile('https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).mp4', url_root='https://calaldees.dreamhosters.com/karakara_media/')
     bb = LocalFile(Path('../media/source/Captain America (1966).mp4'), Path('../media/source/'))
     cc = HttpFile('https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).srt', url_root='https://calaldees.dreamhosters.com/karakara_media/')

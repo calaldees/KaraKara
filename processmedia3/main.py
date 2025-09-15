@@ -95,7 +95,7 @@ def scan(
     def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
         (track_id, files) = group
         try:
-            sources = frozenset(Source(file, cache) for file in files)
+            sources = {Source(file, cache) for file in files}
             return Track(processed_dir, track_id, sources, TARGET_TYPES)
         except Exception:
             log.exception(f"Error calculating track {track_id}")
@@ -212,7 +212,7 @@ def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) ->
     # Only check if the file exists at the last minute, not at the start,
     # because somebody else might have finished this encode while we still
     # had it in our own queue.
-    def _encode(target: Target):
+    def _encode(target: Target) -> None:
         try:
             if reencode or not target.path.exists() or target.path.stat().st_size == 0:
                 target.encode()
