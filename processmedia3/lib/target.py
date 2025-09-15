@@ -10,7 +10,7 @@ from collections.abc import Set
 
 from .kktypes import TargetType
 from .source import Source
-from .encoders import find_appropriate_encoder
+from .encoders import Encoder
 
 
 log = logging.getLogger()
@@ -24,12 +24,17 @@ class Target:
     """
 
     def __init__(
-        self, processed_dir: Path, type: TargetType, sources: Set[Source]
+        self,
+        processed_dir: Path,
+        type: TargetType,
+        encoder: Encoder,
+        sources: Set[Source],
     ) -> None:
 
         self.processed_dir = processed_dir
         self.type = type
-        self.encoder, self.sources = find_appropriate_encoder(type, sources)
+        self.encoder = encoder
+        self.sources = sources
 
         parts = [self.encoder.salt] + [s.hash for s in self.sources]
         hasher = hashlib.sha256()

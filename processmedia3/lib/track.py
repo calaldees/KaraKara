@@ -6,6 +6,7 @@ from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence, 
 from .kktypes import MediaType, TargetType
 from .source import Source, SourceType
 from .target import Target
+from .encoders import find_appropriate_encoder
 
 
 class TrackAttachment(t.TypedDict):
@@ -37,7 +38,11 @@ class Track:
     ) -> None:
         self.id = id
         self.sources = sources
-        self.targets = [Target(processed_dir, type, sources) for type in target_types]
+        targets = []
+        for target_type in target_types:
+            target_encoder, target_sources = find_appropriate_encoder(target_type, sources)
+            targets.append(Target(processed_dir, target_type, target_encoder, target_sources))
+        self.targets = targets
 
     def _sources_by_type(self, types: Set[SourceType]) -> Sequence[Source]:
         return [s for s in self.sources if s.type in types]
