@@ -49,6 +49,7 @@ class MediaMeta(t.NamedTuple):
     def from_uri(cls, uri, _subprocess_run: t.Callable[...,subprocess.CompletedProcess]=subprocess.run) -> t.Self:
         r"""
         >>> from textwrap import dedent
+        >>> from pathlib import Path
 
         >>> from unittest.mock import Mock
         >>> def from_uri(fake_ffprobe_stderr):
