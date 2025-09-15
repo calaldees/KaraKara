@@ -10,7 +10,7 @@ from collections.abc import Set
 
 from .kktypes import TargetType
 from .source import Source
-from .encoders import Encoder
+from .encoders import Encoder, EncoderException
 
 
 log = logging.getLogger()
@@ -59,9 +59,9 @@ class Target:
             try:
                 self.encoder.encode(temppath, self.sources)
                 if not temppath.exists():
-                    raise Exception("Encoder didn't return any error, but failed to create an output file")
+                    raise EncoderException("Encoder didn't return any error, but failed to create an output file")
                 if temppath.stat().st_size == 0:
-                    raise Exception("Encoder didn't return any error, but created an empty file")
+                    raise EncoderException("Encoder didn't return any error, but created an empty file")
                 self.path.parent.mkdir(exist_ok=True)
                 log.debug(f"Moving {temppath} to {self.path}")
                 shutil.move(temppath.as_posix(), self.path.as_posix())

@@ -444,7 +444,7 @@ def main(argv: Sequence[str]) -> int:
                 export(args.processed, tracks, update, args.threads)
             elif args.cmd == "cleanup":
                 if args.match:
-                    raise Exception("Can't use cleanup with --match")
+                    raise ValueError("Can't use cleanup with --match")
                 cleanup(args.processed, tracks, args.delete, args.threads)
 
         if args.loop:
