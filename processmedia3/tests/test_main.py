@@ -4,10 +4,10 @@ import tempfile
 from functools import partialmethod
 from pathlib import Path
 import unittest
-from datetime import datetime
 
 import main
-from lib.kktypes import SourceType, TargetType
+from lib.source import SourceType
+from lib.kktypes import TargetType
 from lib.file_abstraction import AbstractFolder_from_str
 from tqdm import tqdm
 
