@@ -40,8 +40,8 @@ class Track:
         self.sources = sources
         targets = []
         for target_type in target_types:
-            target_encoder, target_sources = find_appropriate_encoder(target_type, sources)
-            targets.append(Target(processed_dir, target_type, target_encoder, target_sources))
+            if enc := find_appropriate_encoder(target_type, sources):
+                targets.append(Target(processed_dir, target_type, enc[0], enc[1]))
         self.targets = targets
 
     def _sources_by_type(self, types: t.Set[SourceType]) -> Sequence[Source]:

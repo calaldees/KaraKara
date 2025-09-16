@@ -466,14 +466,10 @@ encoders_for_type = {
 }
 
 
-class NoAppropriateEncoderException(Exception):
-    pass
-
-
 def find_appropriate_encoder(
     type: TargetType,
     sources: t.Set[Source],
-) -> t.Tuple[Encoder, t.Set[Source]]:
+) -> t.Optional[t.Tuple[Encoder, t.Set[Source]]]:
     """
     Find the highest priority encoder that can create the given target
     from the given sources.
@@ -486,10 +482,7 @@ def find_appropriate_encoder(
         if encoder.sources.issubset({s.type for s in sources}):
             return encoder, {s for s in sources if s.type in encoder.sources}
     else:
-        source_list = "\n".join(f"  - {s.type}: {s.file.relative}" for s in sources)
-        raise NoAppropriateEncoderException(
-            f"Couldn't find an encoder to make {type} out of:\n{source_list}"
-        )
+        return None
 
 
 def select_best_image(paths: Sequence[Path]) -> Path:
