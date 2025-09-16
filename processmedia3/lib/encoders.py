@@ -443,20 +443,6 @@ class SubtitleToVTT(Encoder):
             vtt.write(create_vtt(parse_subtitles(srt)))
 
 
-class VoidToVTT(Encoder):
-    target = TargetType.SUBTITLES_VTT
-    sources: t.Set[SourceType] = set()
-    ext = "vtt"
-    category = MediaType.SUBTITLE
-    mime = "text/vtt"
-    priority = 0
-
-    @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
-        with open(target.as_posix(), "w") as vtt:
-            vtt.write(create_vtt([]))
-
-
 #######################################################################
 
 
@@ -495,11 +481,14 @@ def find_appropriate_encoder(type: TargetType, sources: t.Set[Source]) -> t.Tupl
         )
 
 
-class NoBestImageException(Exception):
-    pass
-
-
 def select_best_image(paths: Sequence[Path]) -> Path:
+    """
+    Given a selection of thumbnails, try to choose one which
+    isn't just a black or white frame.
+    """
+    if len(paths) == 0:
+        raise ValueError("Can't select best of zero thumbs")
+
     def score(p: Path) -> float:
         from PIL import Image
         img = Image.open(p.as_posix()).convert("L")
@@ -516,8 +505,6 @@ def select_best_image(paths: Sequence[Path]) -> Path:
         # print(p, score)
         return score
 
-    if len(paths) == 0:
-        raise NoBestImageException("Can't select best of zero thumbs")
     scored_paths = [(score(p), p) for p in sorted(paths)]
     ok_paths = [(score, p) for (score, p) in scored_paths if score > 0]
     if ok_paths:
