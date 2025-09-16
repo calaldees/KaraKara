@@ -1,11 +1,10 @@
-from functools import reduce
 from itertools import pairwise
-from typing import Dict, List, Set
+import typing as t
 from io import StringIO
 import csv
 
 
-def parse_tags(data: str) -> Dict[str, List[str]]:
+def parse_tags(data: str) -> t.Dict[str, t.List[str]]:
     r"""
     >>> data = '''
     ... \ufeff
@@ -30,7 +29,7 @@ def parse_tags(data: str) -> Dict[str, List[str]]:
      'use': ['opening']}
     """
     data = data.strip().strip("\ufeff").strip()
-    tags_values: Dict[str, List[str]] = {}
+    tags_values: t.Dict[str, t.List[str]] = {}
 
     for row in csv.reader(StringIO(data), delimiter=":"):
         row = list(filter(None, (i.strip() for i in row)))

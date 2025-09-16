@@ -1,6 +1,7 @@
 import enum
 import typing as t
 import logging
+import re
 from collections.abc import Sequence, Mapping, MutableMapping
 
 from .subtitle_processor import parse_subtitles, Subtitle
@@ -34,8 +35,14 @@ class Source:
         self.file = file
         self.cache = cache
         self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
+        variant_match = re.search(r"\[(.+?)\]$", self.file.stem)
+        self.variant = str(variant_match.group(1)) if variant_match else None
+
         if not self.type:
             raise SourceTypeException(f"Can't tell what type of source {self.file.relative} is")
+
+    def __str__(self) -> str:
+        return self.file.relative
 
     @staticmethod
     def _cache(func: t.Callable[["Source"], T]) -> t.Callable[["Source"], T]:

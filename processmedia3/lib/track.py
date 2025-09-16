@@ -10,6 +10,7 @@ from .encoders import find_appropriate_encoder
 
 
 class TrackAttachment(t.TypedDict):
+    variant: str | None
     mime: str
     path: str
 
@@ -38,10 +39,22 @@ class Track:
     ) -> None:
         self.id = id
         self.sources = sources
-        targets = []
+
+        # eg: sources = {"XX [Vocal].mp4", "XX [Instr].ogg", "XX [Instr].jpg", "XX.srt", "XX.txt"}
+        targets: t.List[Target] = []
         for target_type in target_types:
-            target_encoder, target_sources = find_appropriate_encoder(target_type, sources)
-            targets.append(Target(processed_dir, target_type, target_encoder, target_sources))
+            # eg: variants = {"Vocal", "Instr", None}
+            for variant in {s.variant for s in sources}:
+                # For each variant, we create a set of sources:
+                #   variant_sources = ["XX [Vocal].mp4"]
+                #   variant_sources = ["XX [Instr].ogg", "XX [Instr].jpg"]
+                #   variant_sources = ["XX.srt", "XX.txt"]
+                variant_sources = {s for s in sources if s.variant == variant}
+                # We then try to find an encoder that can create the target_type
+                # from those sources. If we find one, we create a Target for it.
+                if enc := find_appropriate_encoder(target_type, variant_sources):
+                    targets.append(Target(processed_dir, target_type, enc[0], enc[1], variant))
+
         self.targets = targets
 
     def _sources_by_type(self, types: t.Set[SourceType]) -> Sequence[Source]:
@@ -52,6 +65,11 @@ class Track:
         return bool(self._sources_by_type({SourceType.TAGS}))
 
     def to_json(self) -> TrackDict:
+        """
+        Most of ProcessMedia is fairly generic, creating any set of outputs
+        from any set of inputs; this method is where we enforce the specific
+        requirements of KaraKara (ie, the assumptions of Browser / Player).
+        """
         media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         duration = media_files[0].meta.duration.total_seconds()
 
@@ -59,12 +77,12 @@ class Track:
         for target in self.targets:
             attachments[target.encoder.category].append(
                 TrackAttachment({
+                    "variant": target.variant,
                     "mime": target.encoder.mime,
                     "path": str(target.path.relative_to(target.processed_dir)),
                 })
             )
         assert attachments.get(MediaType.VIDEO), f"{self.id} is missing attachments.video"
-        #assert attachments.get(MediaType.PREVIEW), f"{self.id} is missing attachments.preview"
         assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
 
         sub_files = self._sources_by_type({SourceType.SUBTITLES})
@@ -84,12 +102,19 @@ class Track:
             tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
-        pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
-        tags["aspect_ratio"] = [pxsrc.meta.aspect_ratio_str]
+        tags["aspect_ratio"] = list(set(
+            pxsrc.meta.aspect_ratio_str
+            for pxsrc
+            in self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
+        ))
 
-        ausrc = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})[0]
-        d = int(ausrc.meta.duration.total_seconds())
-        tags["duration"] = [f"{d//60}m{d%60:02}s"]
+        ds = list(set(
+            int(ausrc.meta.duration.total_seconds())
+            for ausrc
+            in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
+        ))
+        tags["duration"] = [f"{d//60}m{d%60:02}s" for d in ds]
+        assert len(ds) == 1, f"{self.id} has inconsistent durations: {ds}"
 
         if tags.get("date"):
             tags["year"] = [d.split("-")[0] for d in tags["date"]]
