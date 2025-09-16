@@ -88,12 +88,19 @@ class Track:
             tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
-        pxsrc = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})[0]
-        tags["aspect_ratio"] = [pxsrc.meta.aspect_ratio_str]
+        tags["aspect_ratio"] = list(set(
+            pxsrc.meta.aspect_ratio_str
+            for pxsrc
+            in self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
+        ))
 
-        ausrc = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})[0]
-        d = int(ausrc.meta.duration.total_seconds())
-        tags["duration"] = [f"{d//60}m{d%60:02}s"]
+        ds = list(set(
+            int(ausrc.meta.duration.total_seconds())
+            for ausrc
+            in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
+        ))
+        tags["duration"] = [f"{d//60}m{d%60:02}s" for d in ds]
+        assert len(ds) == 1, f"{self.id} has inconsistent durations: {ds}"
 
         if tags.get("date"):
             tags["year"] = [d.split("-")[0] for d in tags["date"]]
