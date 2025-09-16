@@ -10,6 +10,7 @@ from .encoders import find_appropriate_encoder
 
 
 class TrackAttachment(t.TypedDict):
+    variant: str | None
     mime: str
     path: str
 
@@ -38,10 +39,22 @@ class Track:
     ) -> None:
         self.id = id
         self.sources = sources
-        targets = []
+
+        # eg: sources = {"XX [Vocal].mp4", "XX [Instr].ogg", "XX [Instr].jpg", "XX.srt", "XX.txt"}
+        targets: t.List[Target] = []
         for target_type in target_types:
-            if enc := find_appropriate_encoder(target_type, sources):
-                targets.append(Target(processed_dir, target_type, enc[0], enc[1]))
+            # eg: variants = {"Vocal", "Instr", None}
+            for variant in {s.variant for s in sources}:
+                # For each variant, we create a set of sources:
+                #   variant_sources = ["XX [Vocal].mp4"]
+                #   variant_sources = ["XX [Instr].ogg", "XX [Instr].jpg"]
+                #   variant_sources = ["XX.srt", "XX.txt"]
+                variant_sources = {s for s in sources if s.variant == variant}
+                # We then try to find an encoder that can create the target_type
+                # from those sources. If we find one, we create a Target for it.
+                if enc := find_appropriate_encoder(target_type, variant_sources):
+                    targets.append(Target(processed_dir, target_type, enc[0], enc[1], variant))
+
         self.targets = targets
 
     def _sources_by_type(self, types: t.Set[SourceType]) -> Sequence[Source]:
@@ -64,6 +77,7 @@ class Track:
         for target in self.targets:
             attachments[target.encoder.category].append(
                 TrackAttachment({
+                    "variant": target.variant,
                     "mime": target.encoder.mime,
                     "path": str(target.path.relative_to(target.processed_dir)),
                 })
