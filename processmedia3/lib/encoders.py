@@ -342,8 +342,9 @@ class _BaseVideoToImage(Encoder):
         import tempfile
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
-            # imagemagick supports more formats, so first we get
-            # ffmpeg to pick a frame, then convert to compress
+            # - ffmpeg is best at extracting frames
+            # - custom code is best at picking a "good" frame
+            # - imagemagick is best at compressing to webp/avif/jpeg
             # fmt: off
             self._run(
                 "ffmpeg",
@@ -355,7 +356,6 @@ class _BaseVideoToImage(Encoder):
             )
             thumbs = list(tmpdir.glob("*.bmp"))
             best = select_best_image(thumbs)
-            # TODO: handle/return error code
             self._run(
                 "magick",
                 best.as_posix(),
@@ -470,7 +470,18 @@ class NoAppropriateEncoderException(Exception):
     pass
 
 
-def find_appropriate_encoder(type: TargetType, sources: t.Set[Source]) -> t.Tuple[Encoder, t.Set[Source]]:
+def find_appropriate_encoder(
+    type: TargetType,
+    sources: t.Set[Source],
+) -> t.Tuple[Encoder, t.Set[Source]]:
+    """
+    Find the highest priority encoder that can create the given target
+    from the given sources.
+
+    Returns both the Encoder and the subset of sources that it will use,
+    so we can know which Sources are used for which Targets, and only
+    re-encode the necessary Targets when a given Source changes.
+    """
     for encoder in encoders_for_type[type]:
         if encoder.sources.issubset({s.type for s in sources}):
             return encoder, {s for s in sources if s.type in encoder.sources}

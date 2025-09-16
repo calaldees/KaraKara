@@ -14,7 +14,6 @@ log = logging.getLogger(__name__)
 
 SSA_NEWLINE = "\\N"
 SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
-SSA_HEIGHT_TO_FONT_SIZE_RATIO = 14
 
 re_time = re.compile(
     r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)"
@@ -41,23 +40,6 @@ class Subtitle(NamedTuple):
     end: timedelta = timedelta()
     text: str = ""
     top: bool = False
-
-
-class TextOverlap(NamedTuple):
-    idx: int
-    text: str
-
-
-def commonOverlap(text1: str, text2: str) -> TextOverlap:
-    """
-    https://neil.fraser.name/news/2010/11/04/
-    """
-    index = min(len(text1), len(text2))
-    while index > 0:
-        if text1[-index:] == text2[:index]:
-            break
-        index -= 1
-    return TextOverlap(index, text2[:index])
 
 
 def _ssa_time(t: timedelta) -> str:

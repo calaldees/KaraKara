@@ -37,6 +37,9 @@ class Source:
         if not self.type:
             raise SourceTypeException(f"Can't tell what type of source {self.file.relative} is")
 
+    def __str__(self) -> str:
+        return self.file.relative
+
     @staticmethod
     def _cache(func: t.Callable[["Source"], T]) -> t.Callable[["Source"], T]:
         """

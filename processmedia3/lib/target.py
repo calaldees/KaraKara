@@ -68,5 +68,5 @@ class Target:
                 log.error(f"Error while encoding {self.friendly!r}: {e}")
 
     def __str__(self) -> str:
-        source_list = [s.file.relative for s in self.sources]
-        return f"{self.type.name}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list!r})"
+        source_list = [str(s) for s in self.sources]
+        return f"{self.type.name}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list})"

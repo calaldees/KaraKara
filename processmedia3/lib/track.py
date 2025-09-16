@@ -52,6 +52,11 @@ class Track:
         return bool(self._sources_by_type({SourceType.TAGS}))
 
     def to_json(self) -> TrackDict:
+        """
+        Most of ProcessMedia is fairly generic, creating any set of outputs
+        from any set of inputs; this method is where we enforce the specific
+        requirements of KaraKara (ie, the assumptions of Browser / Player).
+        """
         media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         duration = media_files[0].meta.duration.total_seconds()
 
@@ -64,7 +69,6 @@ class Track:
                 })
             )
         assert attachments.get(MediaType.VIDEO), f"{self.id} is missing attachments.video"
-        #assert attachments.get(MediaType.PREVIEW), f"{self.id} is missing attachments.preview"
         assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
 
         sub_files = self._sources_by_type({SourceType.SUBTITLES})
