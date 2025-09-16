@@ -443,20 +443,6 @@ class SubtitleToVTT(Encoder):
             vtt.write(create_vtt(parse_subtitles(srt)))
 
 
-class VoidToVTT(Encoder):
-    target = TargetType.SUBTITLES_VTT
-    sources: t.Set[SourceType] = set()
-    ext = "vtt"
-    category = MediaType.SUBTITLE
-    mime = "text/vtt"
-    priority = 0
-
-    @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
-        with open(target.as_posix(), "w") as vtt:
-            vtt.write(create_vtt([]))
-
-
 #######################################################################
 
 
