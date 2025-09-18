@@ -155,7 +155,7 @@ export function TrackDetails(): React.ReactElement {
                         type={a.mime}
                     />
                 ))}
-                {track.attachments.subtitle?.map((a) => (
+                {track.attachments.subtitle?.filter((a) => a.mime === "text/vtt").map((a) => (
                     <track
                         key={a.path}
                         src={attachment_path(root, a)}
