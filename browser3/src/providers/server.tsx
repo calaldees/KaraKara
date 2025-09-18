@@ -12,6 +12,7 @@ export interface ServerContextType {
     downloadSize: number | null;
     downloadDone: number;
     now: number;
+    offset: number;
     connected: boolean;
 }
 
@@ -25,9 +26,12 @@ function InternalServerProvider(props: any) {
     const [tracks, setTracks] = useState<Record<string, Track>>({});
     const [downloadSize, setDownloadSize] = useState<number | null>(null);
     const [downloadDone, setDownloadDone] = useState<number>(0);
-    const [tracksUpdated, setTracksUpdated] = useLocalStorage<number>("tracksUpdated", 0);
+    const [tracksUpdated, setTracksUpdated] = useLocalStorage<number>(
+        "tracksUpdated",
+        0,
+    );
     const { request } = useApi();
-    const { now } = useServerTime({ url: `${root}/time.json` });
+    const { now, offset } = useServerTime({ url: `${root}/time.json` });
 
     const { connected } = useSubscription(`global/tracks-updated`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -51,7 +55,16 @@ function InternalServerProvider(props: any) {
     }, [root, request, tracksUpdated]);
 
     return (
-        <ServerContext value={{ tracks, downloadSize, downloadDone, now, connected }}>
+        <ServerContext
+            value={{
+                tracks,
+                downloadSize,
+                downloadDone,
+                now,
+                offset,
+                connected,
+            }}
+        >
             {props.children}
         </ServerContext>
     );

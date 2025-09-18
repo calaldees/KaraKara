@@ -26,7 +26,10 @@ function InternalServerProvider(props: any) {
     const [tracks, setTracks] = useState<Record<string, Track>>({});
     const [downloadSize, setDownloadSize] = useState<number | null>(null);
     const [downloadDone, setDownloadDone] = useState<number>(0);
-    const [tracksUpdated, setTracksUpdated] = useLocalStorage<number>("tracksUpdated", 0);
+    const [tracksUpdated, setTracksUpdated] = useLocalStorage<number>(
+        "tracksUpdated",
+        0,
+    );
     const { request } = useApi();
     const { now, offset } = useServerTime({ url: `${root}/time.json` });
 
@@ -53,7 +56,14 @@ function InternalServerProvider(props: any) {
 
     return (
         <ServerContext
-            value={{ tracks, downloadSize, downloadDone, now, offset, connected }}
+            value={{
+                tracks,
+                downloadSize,
+                downloadDone,
+                now,
+                offset,
+                connected,
+            }}
         >
             {props.children}
         </ServerContext>

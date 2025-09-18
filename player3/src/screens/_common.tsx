@@ -28,7 +28,7 @@ export function Video({ track, ...kwargs }: VideoProps) {
                         type={a.mime}
                     />
                 ))}
-                {track.attachments.subtitle?.map((a: Attachment) => (
+                {track.attachments.subtitle?.filter((a) => a.mime === "text/vtt").map((a: Attachment) => (
                     <track
                         key={a.path}
                         kind="subtitles"
