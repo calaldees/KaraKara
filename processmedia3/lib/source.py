@@ -79,10 +79,6 @@ class Source:
         return parse_subtitles(self.file.text)
 
     @property
-    def lyrics(self) -> Sequence[str]:
-        return [l.text for l in self.subtitles]
-
-    @property
     @_cache
     def tags(self) -> Mapping[str, Sequence[str]]:
         log.info(f"Parsing tags from {self.file.relative}")
