@@ -13,7 +13,7 @@ import tqdm
 
 from .source import Source, SourceType
 from .kktypes import TargetType, MediaType, MediaMeta
-from .subtitle_processor import create_vtt, parse_subtitles
+from .subtitle_processor import create_vtt, create_json, parse_subtitles
 
 log = logging.getLogger()
 
@@ -441,6 +441,20 @@ class SubtitleToVTT(Encoder):
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt(parse_subtitles(srt)))
+
+
+class SubtitleToJSON(Encoder):
+    target = TargetType.SUBTITLES_JSON
+    sources = {SourceType.SUBTITLES}
+    ext = "json"
+    category = MediaType.SUBTITLE
+    mime = "application/json"
+
+    @t.override
+    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+        srt = list(sources)[0].file.text
+        with open(target.as_posix(), "w") as vtt:
+            vtt.write(create_json(parse_subtitles(srt)))
 
 
 #######################################################################
