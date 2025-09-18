@@ -40,6 +40,7 @@ TARGET_TYPES = [
     TargetType.IMAGE_AVIF,
     #TargetType.IMAGE_WEBP,
     TargetType.SUBTITLES_VTT,
+    TargetType.SUBTITLES_JSON,
 ]
 SCAN_IGNORE = [
     ".DS_Store",
