@@ -1,12 +1,12 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import { shuffle, is_my_song, time_until, dict2css } from "../utils";
+import { shuffle, is_my_song, time_until, dict2css, attachment_path } from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
-import type { Track, QueueItem } from "../types";
+import type { Track, QueueItem, Subtitle } from "../types";
 
 function QueueItemRender({
     item,
@@ -71,9 +71,31 @@ function QueueItemRender({
 }
 
 export function Queue(): React.ReactElement {
-    const { performerName, widescreen } = useContext(ClientContext);
+    const { root, performerName, widescreen } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const { queue, settings, sessionId } = useContext(RoomContext);
+    const { request } = useApi();
+
+    const [ lyrics, setLyrics ] = useState<Subtitle[]>([]);
+    const firstTrackId = queue[0]?.track_id;
+    useEffect(() => {
+        const subtitleAttachment = tracks[firstTrackId]?.attachments.subtitle?.find(
+            (a) => a.mime === "application/json"
+        );
+        if (!subtitleAttachment) {
+            setLyrics([]);
+            return;
+        }
+        request({
+            function: "overridden by url",
+            url: attachment_path(root, subtitleAttachment),
+            options: {
+                credentials: "omit",
+            },
+            onAction: (result) => setLyrics(result),
+            onException: () => setLyrics([]),
+        });
+    }, [request, root, tracks, firstTrackId]);
 
     return (
         <Screen
@@ -93,12 +115,12 @@ export function Queue(): React.ReactElement {
                             show_time={true}
                             track={tracks[queue[0].track_id]}
                         />
-                        {tracks[queue[0].track_id].lyrics.length > 0 && (
+                        {lyrics.length > 0 && (
                             <li>
                                 <span className={"lyrics"}>
-                                    {tracks[queue[0].track_id].lyrics.map(
+                                    {lyrics.map(
                                         (line, n) => (
-                                            <div key={n}>{line}</div>
+                                            <div key={n}>{line.text}</div>
                                         ),
                                     )}
                                 </span>

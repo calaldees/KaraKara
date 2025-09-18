@@ -135,7 +135,6 @@ describe("find_tracks", () => {
                 image: [],
                 subtitle: [],
             },
-            lyrics: [""],
         };
     }
     test("searching 10,000 tracks with every kind of filter performs ok", () => {
