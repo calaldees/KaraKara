@@ -95,7 +95,6 @@ class Track:
             for ausrc
             in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         ))
-        tags["duration"] = [f"{d//60}m{d%60:02}s" for d in ds]
         assert len(ds) == 1, f"{self.id} has inconsistent durations: {ds}"
 
         if tags.get("date"):
