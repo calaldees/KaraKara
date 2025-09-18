@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Screen } from "./_common";
 import { attachment_path } from "../utils";
 import * as icons from "../static/icons";
@@ -7,6 +7,7 @@ import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
+import { Subtitle } from "../types";
 
 const BLOCKED_KEYS = [
     null,
@@ -41,6 +42,26 @@ export function TrackDetails(): React.ReactElement {
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request } = useApi();
     const navigate = useNavigate();
+    const [ lyrics, setLyrics ] = useState<Subtitle[]>([]);
+    useEffect(() => {
+        if (!trackId) return;
+        const subtitleAttachment = tracks[trackId]?.attachments.subtitle?.find(
+            (a) => a.mime === "application/json"
+        );
+        if (!subtitleAttachment) {
+            setLyrics([]);
+            return;
+        }
+        request({
+            function: "overridden by url",
+            url: attachment_path(root, subtitleAttachment),
+            options: {
+                credentials: "omit",
+            },
+            onAction: (result) => setLyrics(result),
+            onException: () => setLyrics([]),
+        });
+    }, [request, root, tracks, trackId]);
     if (!trackId) throw Error("Can't get here?");
     const track = tracks[trackId];
     if (!track) return <div>No track with ID {trackId}</div>;
@@ -182,11 +203,11 @@ export function TrackDetails(): React.ReactElement {
             </div>
 
             {/* Lyrics */}
-            {track.lyrics.length > 0 && (
+            {lyrics.length > 0 && (
                 <div className={"lyrics"}>
                     <h2>Lyrics</h2>
-                    {track.lyrics.map((item, n) => (
-                        <div key={n}>{item}</div>
+                    {lyrics.map((item, n) => (
+                        <div key={n}>{item.text}</div>
                     ))}
                 </div>
             )}

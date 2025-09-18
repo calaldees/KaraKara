@@ -17,7 +17,6 @@ export interface Track {
         image: Attachment[];
         subtitle?: Attachment[];
     };
-    lyrics: string[];
 }
 
 export interface QueueItem {
