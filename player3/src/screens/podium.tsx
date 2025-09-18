@@ -51,15 +51,17 @@ export function PodiumScreen({
                     crossOrigin="anonymous"
                 >
                     <source src={blank.href} />
-                    {track.attachments.subtitle?.map((a) => (
-                        <track
-                            kind="subtitles"
-                            src={attachment_path(root, a)}
-                            default={true}
-                            label="English"
-                            srcLang="en"
-                        />
-                    ))}
+                    {track.attachments.subtitle
+                        ?.filter((a) => a.mime === "text/vtt")
+                        .map((a) => (
+                            <track
+                                kind="subtitles"
+                                src={attachment_path(root, a)}
+                                default={true}
+                                label="English"
+                                srcLang="en"
+                            />
+                        ))}
                 </video>
             ) : (
                 <Video track={track} lowres={true} loop={true} />
