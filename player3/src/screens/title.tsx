@@ -44,9 +44,7 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
         const ts = Object.values(tracks);
         return {
             tracks: ts.length,
-            lines: ts
-                .map((t) => t.lyrics.length)
-                .reduce((sum, n) => sum + n, 0),
+            artists: new Set(ts.map((t) => t.tags.artist?.[0])).size,
             shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
             hours: Math.floor(
                 ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) /
