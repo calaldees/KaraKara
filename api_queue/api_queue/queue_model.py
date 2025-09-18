@@ -34,7 +34,7 @@ class QueueItem():
         >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '1973-11-29 21:33:09.123457', '123456789', 111111111.111111111)
         QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None)
 
-        >>> queue_item = QueueItem('', '', '', 'Alice', '')
+        >>> queue_item = QueueItem('', '', '', '', '')
         >>> type(queue_item.track_duration)
         <class 'datetime.timedelta'>
         >>> type(queue_item.id)
@@ -43,18 +43,11 @@ class QueueItem():
         <class 'datetime.datetime'>
         >>> queue_item.added_time.year >= 2023
         True
-
-        >>> queue_item = QueueItem('', '', '', '', '')
-        Traceback (most recent call last):
-            ...
-        ValueError: Performer name cannot be empty
         """
         self.id = int(self.id)
         self.track_duration = parse_timedelta(self.track_duration) or datetime.timedelta(0)
         self.start_time = parse_datetime(self.start_time)
         self.added_time = parse_datetime(self.added_time) or self._now()
-        if self.performer_name.strip() == '':
-            raise ValueError('Performer name cannot be empty')
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
     @staticmethod
