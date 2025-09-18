@@ -28,16 +28,18 @@ export function Video({ track, ...kwargs }: VideoProps) {
                         type={a.mime}
                     />
                 ))}
-                {track.attachments.subtitle?.map((a: Attachment) => (
-                    <track
-                        key={a.path}
-                        kind="subtitles"
-                        src={attachment_path(root, a)}
-                        default={true}
-                        label="English"
-                        srcLang="en"
-                    />
-                ))}
+                {track.attachments.subtitle
+                    ?.filter((a) => a.mime === "text/vtt")
+                    .map((a: Attachment) => (
+                        <track
+                            key={a.path}
+                            kind="subtitles"
+                            src={attachment_path(root, a)}
+                            default={true}
+                            label="English"
+                            srcLang="en"
+                        />
+                    ))}
             </video>
         </div>
     );
