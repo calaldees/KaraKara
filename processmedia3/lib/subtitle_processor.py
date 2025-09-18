@@ -8,6 +8,7 @@ from typing import NamedTuple, List
 import typing as t
 import logging
 import difflib
+import json
 
 log = logging.getLogger(__name__)
 
@@ -293,6 +294,22 @@ def create_srt(subtitles: t.List[Subtitle]) -> str:
     )
 
 
+def create_json(subtitles: t.List[Subtitle]) -> str:
+    return json.dumps(
+        [
+            {
+                "start": subtitle.start.total_seconds(),
+                "end": subtitle.end.total_seconds(),
+                "text": subtitle.text,
+                "top": subtitle.top,
+            }
+            for subtitle in subtitles
+        ],
+        indent=2,
+        ensure_ascii=False,
+    ) + "\n"
+
+
 def create_vtt(subtitles: t.List[Subtitle]) -> str:
     r"""
     https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
@@ -475,6 +492,8 @@ if __name__ == "__main__":
         outdata = create_srt(subs)
     elif args.output.endswith(".ssa"):
         outdata = create_ssa(subs)
+    elif args.output.endswith(".json"):
+        outdata = create_json(subs)
     else:
         raise SubtitleFormatException("Unknown output format")
 

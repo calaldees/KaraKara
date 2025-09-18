@@ -21,6 +21,7 @@ class TargetType(enum.Enum):
     IMAGE_AVIF = 31
     IMAGE_JPEG = 32
     SUBTITLES_VTT = 40
+    SUBTITLES_JSON = 41
 
 
 class MediaType(enum.StrEnum):
