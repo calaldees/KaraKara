@@ -41,7 +41,6 @@ function InternalServerProvider(props: any) {
     });
     useEffect(() => {
         request({
-            function: "overridden by url",
             url: `${root}/files/tracks.json?ver=${tracksUpdated}`,
             options: {
                 credentials: "omit",
