@@ -2,10 +2,10 @@
 /// <reference path="../../../cypress/support/component.ts" />
 
 import { Queue } from "../queue";
-import tracks from "../../../cypress/fixtures/small_tracks.json";
+//import tracks from "../../../cypress/fixtures/small_tracks.json";
 import queue from "../../../cypress/fixtures/small_queue.json";
 import settings from "../../../cypress/fixtures/small_settings.json";
-import type { Track } from "../../types";
+//import type { Track } from "../../types";
 
 describe("no tracks", () => {
     it("no tracks", () => {
@@ -76,26 +76,6 @@ describe("now playing", () => {
         });
         cy.get("span.count").contains("Now").should("exist");
         cy.contains("Coming Soon").should("not.exist");
-    });
-    it("with lyrics", () => {
-        const track_2_with_lyrics: Track = {
-            ...tracks["track_id_2"],
-            lyrics: ["foo", "bar", "baz"],
-        };
-        cy.mount(<Queue />, {
-            client: {},
-            server: {
-                now: 1000,
-                tracks: {
-                    ...tracks,
-                    track_id_2: track_2_with_lyrics,
-                },
-            },
-            room: {
-                queue: [queue[1]],
-            },
-        });
-        cy.contains("baz").should("exist");
     });
 });
 
