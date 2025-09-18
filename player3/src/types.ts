@@ -3,6 +3,13 @@ export interface Attachment {
     path: string;
 }
 
+export interface Subtitle {
+    start: number;
+    end: number;
+    text: string;
+    top: boolean;
+}
+
 export interface Track {
     id: string;
     duration: number;
