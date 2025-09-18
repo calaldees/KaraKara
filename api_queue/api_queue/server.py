@@ -301,7 +301,7 @@ async def add_queue_item(request, room_name):
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
     performer_name = request.json['performer_name']
     if performer_name.strip() == "":
-        raise sanic.exceptions.InvalidUsage(message="Performer name cannot be empty", context=track_id)
+        raise sanic.exceptions.InvalidUsage(message="Performer name cannot be empty")
     # Queue update
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
