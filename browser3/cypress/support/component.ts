@@ -82,6 +82,7 @@ function TestHarness(props: TestProps) {
         downloadSize: 100,
         downloadDone: 100,
         now: 1234,
+        offset: 1.5,
         connected: true,
         ...props.server,
     };
