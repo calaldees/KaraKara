@@ -2,31 +2,36 @@ import { useCallback, useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 
+type CommonRequestProps = {
+    options?: Record<string, any>;
+    notify?: string;
+    notify_ok?: string;
+    onProgress?: ({ done, size }: { done: number; size: number }) => void;
+    onAction?: (result: any) => void;
+    onException?: () => void;
+};
+type FunctionRequestProps = CommonRequestProps & {
+    function: string;
+    url?: never;
+};
+type UrlRequestProps = CommonRequestProps & {
+    function?: never;
+    url: string;
+};
+type ApiRequestProps = FunctionRequestProps | UrlRequestProps;
+
 export function useApi() {
     const { roomName } = useParams();
     const { root, setNotification } = useContext(ClientContext);
     const [loading, setLoading] = useState(false);
 
     const request = useCallback(
-        function (props_: {
-            function: string;
-            url?: string;
-            options?: Record<string, any>;
-            notify?: string;
-            notify_ok?: string;
-            onProgress?: ({
-                done,
-                size,
-            }: {
-                done: number;
-                size: number;
-            }) => void;
-            onAction?: (result: any) => void;
-            onException?: () => void;
-        }) {
+        function (props_: ApiRequestProps) {
             const props = {
                 response: "json",
-                url: `${root}/room/${roomName}/${props_.function}.json`,
+                url:
+                    props_.url ??
+                    `${root}/room/${roomName}/${props_.function}.json`,
                 options: {},
                 ...props_,
             };

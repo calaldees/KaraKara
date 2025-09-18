@@ -87,7 +87,6 @@ export function Queue(): React.ReactElement {
             return;
         }
         request({
-            function: "overridden by url",
             url: attachment_path(root, subtitleAttachment),
             options: {
                 credentials: "omit",
