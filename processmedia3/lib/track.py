@@ -18,7 +18,6 @@ class TrackDict(t.TypedDict):
     id: str
     duration: float
     attachments: Mapping[MediaType, Sequence[TrackAttachment]]
-    lyrics: Sequence[str]
     tags: Mapping[str, Sequence[str]]
 
 
@@ -71,9 +70,6 @@ class Track:
         assert attachments.get(MediaType.VIDEO), f"{self.id} is missing attachments.video"
         assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
 
-        sub_files = self._sources_by_type({SourceType.SUBTITLES})
-        lyrics = sub_files[0].lyrics if sub_files else []
-
         tag_files = self._sources_by_type({SourceType.TAGS})
         tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags)  # type: ignore[arg-type]
         assert tags.get("title") is not None, f"{self.id} is missing tags.title"
@@ -109,6 +105,5 @@ class Track:
             id=self.id,
             duration=round(duration, 1),  # for more consistent unit tests
             attachments=attachments,
-            lyrics=lyrics,
             tags=tags,
         )

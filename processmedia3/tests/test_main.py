@@ -61,7 +61,6 @@ class TestE2E(unittest.TestCase):
                 },
                 "duration": 30.0,
                 "id": "Test1",
-                "lyrics": ["Red", "Green", "Blue"],
                 "tags": {
                     "aspect_ratio": ["4:3"],
                     "source_type": ["video"],
@@ -83,7 +82,6 @@ class TestE2E(unittest.TestCase):
                 },
                 "duration": 15.0,
                 "id": "Test2",
-                "lyrics": ["AA", "EE"],
                 "tags": {
                     "aspect_ratio": ["8:5"],
                     "source_type": ["image"],
