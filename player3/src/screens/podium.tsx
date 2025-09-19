@@ -1,11 +1,12 @@
-import { attachment_path, percent, s_to_mns } from "../utils";
-import { Video } from "./_common";
 import { useCallback, useContext, useState } from "react";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+
+import { Video } from "../components/video";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 import type { Track, QueueItem } from "../types";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { attachment_path, percent, s_to_mns } from "../utils";
 
 ///////////////////////////////////////////////////////////////////////
 // Views

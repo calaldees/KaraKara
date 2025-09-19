@@ -6,6 +6,7 @@ import {
     RouterProvider,
     useParams,
 } from "react-router-dom";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ClientContext } from "../providers/client";
@@ -17,7 +18,6 @@ import { VideoScreen } from "./video";
 import { PodiumScreen } from "./podium";
 import { PreviewScreen } from "./preview";
 import { percent } from "../utils";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 const router = createBrowserRouter(
     createRoutesFromElements(

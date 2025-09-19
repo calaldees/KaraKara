@@ -1,6 +1,8 @@
 import React from "react";
-import { ClientContext } from "../providers/client";
 import { ServerTimeProvider } from "@shish2k/react-use-servertime";
+
+import { ClientContext } from "../providers/client";
+
 
 export const TimeProvider = (props: any) => {
     const { root } = React.useContext(ClientContext);
