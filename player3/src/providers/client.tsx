@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -24,7 +24,7 @@ export interface ClientContextType {
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const ClientContext = React.createContext<ClientContextType>(
+export const ClientContext = createContext<ClientContextType>(
     {} as ClientContextType,
 );
 

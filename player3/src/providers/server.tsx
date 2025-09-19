@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -16,7 +16,7 @@ export interface ServerContextType {
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const ServerContext = React.createContext<ServerContextType>(
+export const ServerContext = createContext<ServerContextType>(
     {} as ServerContextType,
 );
 

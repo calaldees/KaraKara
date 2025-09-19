@@ -1,7 +1,7 @@
 /// <reference types='./player.d.ts'/>
 
-import React from "react";
-import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
 import { ClientProvider } from "./providers/client";
 import { TimeProvider } from "./providers/time";
@@ -12,9 +12,9 @@ import "./static/style.scss";
 import "./static/metalghosts.scss";
 
 
-const root = ReactDOM.createRoot(document.getElementById("root")!);
+const root = createRoot(document.getElementById("root")!);
 root.render(
-    <React.StrictMode>
+    <StrictMode>
         <ClientProvider>
             <TimeProvider>
                 <ServerProvider>
@@ -22,5 +22,5 @@ root.render(
                 </ServerProvider>
             </TimeProvider>
         </ClientProvider>
-    </React.StrictMode>,
+    </StrictMode>,
 );
