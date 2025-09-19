@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@shish2k/react-mqtt": "^0.0.5",
-        "@shish2k/react-use-servertime": "^0.0.4",
+        "@shish2k/react-use-servertime": "^0.0.6",
         "@ungap/global-this": "^0.4.4",
         "abortcontroller-polyfill": "^1.7.8",
         "qrcode.react": "^4.2.0",

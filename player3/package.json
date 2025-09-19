@@ -17,7 +17,7 @@
         "@react-three/drei": "^10.0.4",
         "@react-three/fiber": "^9.1.0",
         "@shish2k/react-mqtt": "^0.0.5",
-        "@shish2k/react-use-servertime": "^0.0.4",
+        "@shish2k/react-use-servertime": "^0.0.6",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-router-dom": "^7.6.0",
