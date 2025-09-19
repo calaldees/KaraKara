@@ -78,7 +78,7 @@ export function EventInfo() {
                     Admins are{" "}
                     {settings["admin_list"].map(
                         (a: string, n: number, as: string[]) => (
-                            <span>
+                            <span key={a}>
                                 <strong>{a}</strong>
                                 {n === as.length - 1
                                     ? ""

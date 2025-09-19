@@ -55,6 +55,7 @@ export function PodiumScreen({
                         ?.filter((a) => a.mime === "text/vtt")
                         .map((a) => (
                             <track
+                                key={a.path}
                                 kind="subtitles"
                                 src={attachment_path(root, a)}
                                 default={true}
