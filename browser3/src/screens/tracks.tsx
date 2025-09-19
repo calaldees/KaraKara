@@ -331,7 +331,10 @@ export function TrackList(): React.ReactElement {
     const [inSearch, setInSearch] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const search = searchParams.get("search") ?? "";
+    const search = useMemo(
+        () => searchParams.get("search") ?? "",
+        [searchParams],
+    );
     // getAll returns a new Array object every time, so we need to compare the
     // string representation of the lists to see if they're the same, otherwise
     // React will think the list has changed and re-render.

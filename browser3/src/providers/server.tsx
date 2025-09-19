@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useApi } from "../hooks/api";
-import { useServerTime } from "@shish2k/react-use-servertime";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { ClientContext } from "./client";
 import { mqtt_url } from "../utils";
@@ -11,8 +10,6 @@ export interface ServerContextType {
     tracks: Record<string, Track>;
     downloadSize: number | null;
     downloadDone: number;
-    now: number;
-    offset: number;
     connected: boolean;
 }
 
@@ -31,7 +28,6 @@ function InternalServerProvider(props: any) {
         0,
     );
     const { request } = useApi();
-    const { now, offset } = useServerTime({ url: `${root}/time.json` });
 
     const { connected } = useSubscription(`global/tracks-updated`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -59,8 +55,6 @@ function InternalServerProvider(props: any) {
                 tracks,
                 downloadSize,
                 downloadDone,
-                now,
-                offset,
                 connected,
             }}
         >

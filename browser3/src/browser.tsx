@@ -8,6 +8,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./static/style.scss";
 import { ClientProvider } from "./providers/client";
+import { TimeProvider } from "./providers/time";
 import { ServerProvider } from "./providers/server";
 import { Root } from "./screens/root";
 
@@ -15,9 +16,11 @@ const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
     <React.StrictMode>
         <ClientProvider>
-            <ServerProvider>
-                <Root />
-            </ServerProvider>
+            <TimeProvider>
+                <ServerProvider>
+                    <Root />
+                </ServerProvider>
+            </TimeProvider>
         </ClientProvider>
     </React.StrictMode>,
 );

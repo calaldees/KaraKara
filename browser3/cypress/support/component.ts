@@ -33,6 +33,7 @@ import tracks from "../../cypress/fixtures/small_tracks.json";
 import queue from "../../cypress/fixtures/small_queue.json";
 import settings from "../../cypress/fixtures/small_settings.json";
 import type { QueueItem } from "../../src/types";
+import { ServerTimeContextType } from "@shish2k/react-use-servertime";
 
 // Cypress.Commands.add('mount', mount)
 
@@ -54,6 +55,7 @@ declare global {
 type TestProps = {
     client: Partial<ClientContextType>;
     server: Partial<ServerContextType>;
+    serverTime: Partial<ServerTimeContextType>;
     room: Partial<RoomContextType>;
     children?: any;
 };
@@ -128,6 +130,7 @@ Cypress.Commands.add("mount", (component, options: any = {}) => {
     const provider = React.createElement(TestHarness, {
         client: options.client ?? {},
         server: options.server ?? {},
+        serverTime: options.serverTime ?? {},
         room: options.room ?? {},
         children: component,
     });

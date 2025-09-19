@@ -8,6 +8,7 @@ import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 import { apply_hidden, apply_tags } from "../track_finder";
 import type { Track, QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 export interface RoomContextType {
     trackList: Track[];
@@ -27,7 +28,8 @@ export const RoomContext = React.createContext<RoomContextType>(
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
     const { root, roomPassword } = useContext(ClientContext);
-    const { now, tracks } = useContext(ServerContext);
+    const { tracks } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
@@ -113,19 +115,20 @@ export function RoomProvider(props: any) {
         });
     }, [fullQueue, now]);
 
-    return (
-        <RoomContext
-            value={{
-                trackList,
-                isAdmin,
-                sessionId,
-                queue,
-                fullQueue,
-                setQueue,
-                settings,
-            }}
-        >
-            {props.children}
-        </RoomContext>
+    // This component re-renders every time "now" changes, but
+    // we don't want that to cause re-renders in the consumers
+    const memoContext = useMemo(
+        (): RoomContextType => ({
+            trackList,
+            isAdmin,
+            sessionId,
+            queue,
+            fullQueue,
+            setQueue,
+            settings,
+        }),
+        [trackList, isAdmin, sessionId, queue, fullQueue, setQueue, settings],
     );
+
+    return <RoomContext value={memoContext}>{props.children}</RoomContext>;
 }

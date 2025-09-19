@@ -8,9 +8,11 @@ import { ServerContext } from "../providers/server";
 import { useApi } from "../hooks/api";
 import { useParams } from "react-router-dom";
 import type { QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
-    const { tracks, now } = useContext(ServerContext);
+    const { tracks } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { fullQueue, setQueue } = useContext(RoomContext);
     const { booth } = useContext(ClientContext);
     const [dropSource, setDropSource] = useState<number | null>(null);

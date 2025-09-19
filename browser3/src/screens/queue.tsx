@@ -13,6 +13,7 @@ import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 import type { Track, QueueItem, Subtitle } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 function QueueItemRender({
     item,
@@ -25,7 +26,7 @@ function QueueItemRender({
 }): React.ReactElement {
     const { performerName } = useContext(ClientContext);
     const { sessionId } = useContext(RoomContext);
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { request } = useApi();
 
     function removeTrack(queue_item_id: number) {
