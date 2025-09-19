@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent, useCallback, useContext, useState } from "react";
 import { ServerContext } from "../providers/server";
 
 export function ConfigMenu() {
@@ -27,15 +27,27 @@ export function ConfigMenu() {
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
 
-    function onSubmit(e: FormEvent) {
-        e.preventDefault();
-        setRoot(rootEdit);
-        if (roomNameEdit !== roomName) {
-            void navigate("/" + roomNameEdit);
-        }
-        setRoomPassword(roomPasswordEdit);
-        setShowSettings(false);
-    }
+    const onSubmit = useCallback(
+        (e: FormEvent) => {
+            e.preventDefault();
+            setRoot(rootEdit);
+            if (roomNameEdit !== roomName) {
+                void navigate("/" + roomNameEdit);
+            }
+            setRoomPassword(roomPasswordEdit);
+            setShowSettings(false);
+        },
+        [
+            navigate,
+            roomName,
+            roomNameEdit,
+            roomPasswordEdit,
+            rootEdit,
+            setRoomPassword,
+            setRoot,
+            setShowSettings,
+        ],
+    );
 
     return (
         <div className={"settings"}>

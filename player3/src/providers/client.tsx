@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -65,9 +65,9 @@ export function ClientProvider(props: any) {
         }
     }, [isSupported, request]);
 
-    function setNotification(n: any) {
+    const setNotification = useCallback((n: any) => {
         console.log(n);
-    }
+    }, []);
 
     return (
         <ClientContext

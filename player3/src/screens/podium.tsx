@@ -1,6 +1,6 @@
 import { attachment_path, percent, s_to_mns } from "../utils";
 import { Video } from "./_common";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
@@ -25,11 +25,11 @@ export function PodiumScreen({
     const [starting, setStarting] = useState(false);
     const { request } = useApi();
 
-    function start() {
+    const start = useCallback(() => {
         setStarting(true);
         request({ function: "command/play" });
         setTimeout(() => setStarting(false), 2000);
-    }
+    }, [request]);
 
     return (
         <section key="podium" className={"screen_podium"}>
