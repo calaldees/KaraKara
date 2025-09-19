@@ -1,8 +1,7 @@
 import { useContext } from "react";
-import { attachment_path, time_until } from "../utils";
+import { time_until } from "../utils";
 import { JoinInfo, Video, EventInfo } from "./_common";
 import { ServerContext } from "../providers/server";
-import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import type { Track, QueueItem } from "../types";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
