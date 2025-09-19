@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useApi } from "../hooks/api";
 import { useSubscription } from "@shish2k/react-mqtt";
@@ -21,7 +21,7 @@ export interface RoomContextType {
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const RoomContext = React.createContext<RoomContextType>(
+export const RoomContext = createContext<RoomContextType>(
     {} as RoomContextType,
 );
 

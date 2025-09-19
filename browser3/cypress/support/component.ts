@@ -22,7 +22,7 @@ import "./commands";
 import { mount } from "cypress/react";
 import { MountOptions, MountReturn } from "cypress/react";
 
-import React, { useState } from "react";
+import { useState, createElement } from "react";
 import { ClientContext, ClientContextType } from "../../src/providers/client";
 import { RoomContext, RoomContextType } from "../../src/providers/room";
 import { ServerContext, ServerContextType } from "../../src/providers/server";
@@ -104,7 +104,7 @@ function TestHarness(props: TestProps) {
         [
             {
                 path: "/:roomName",
-                element: React.createElement(RoomContext.Provider, {
+                element: createElement(RoomContext.Provider, {
                     value: rc,
                     children: props.children,
                 }),
@@ -112,14 +112,14 @@ function TestHarness(props: TestProps) {
         ],
         { initialEntries: [`/test`] },
     );
-    const router_provider = React.createElement(RouterProvider, {
+    const router_provider = createElement(RouterProvider, {
         router: router,
     });
-    const server_provider = React.createElement(ServerContext.Provider, {
+    const server_provider = createElement(ServerContext.Provider, {
         value: sc,
         children: router_provider,
     });
-    const client_provider = React.createElement(ClientContext.Provider, {
+    const client_provider = createElement(ClientContext.Provider, {
         value: cc,
         children: server_provider,
     });
@@ -127,7 +127,7 @@ function TestHarness(props: TestProps) {
 }
 
 Cypress.Commands.add("mount", (component, options: any = {}) => {
-    const provider = React.createElement(TestHarness, {
+    const provider = createElement(TestHarness, {
         client: options.client ?? {},
         server: options.server ?? {},
         serverTime: options.serverTime ?? {},

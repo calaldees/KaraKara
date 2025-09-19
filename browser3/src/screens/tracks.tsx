@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, ReactElement } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -19,7 +19,7 @@ interface ExploreContextType {
     setExpanded: (_: string | null) => void;
 }
 
-const ExploreContext = React.createContext<ExploreContextType>({
+const ExploreContext = createContext<ExploreContextType>({
     search: "",
     setSearch: (_: string) => null,
     filters: [],
@@ -323,7 +323,7 @@ function Explorer(): React.ReactElement {
     );
 }
 
-export function TrackList(): React.ReactElement {
+export function TrackList(): ReactElement {
     const { isAdmin } = useContext(RoomContext);
     const { booth, widescreen } = useContext(ClientContext);
 

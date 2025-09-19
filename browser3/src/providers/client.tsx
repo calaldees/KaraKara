@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState, createContext } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 
 type Notification = {
@@ -26,7 +26,7 @@ export interface ClientContextType {
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const ClientContext = React.createContext<ClientContextType>(
+export const ClientContext = createContext<ClientContextType>(
     {} as ClientContextType,
 );
 
