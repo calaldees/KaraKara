@@ -1,6 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import { shuffle, is_my_song, time_until, dict2css, attachment_path } from "../utils";
+import {
+    shuffle,
+    is_my_song,
+    time_until,
+    dict2css,
+    attachment_path,
+} from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
@@ -76,11 +82,12 @@ export function Queue(): React.ReactElement {
     const { queue, settings, sessionId } = useContext(RoomContext);
     const { request } = useApi();
 
-    const [ lyrics, setLyrics ] = useState<Subtitle[]>([]);
+    const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const firstTrackId = queue[0]?.track_id;
     useEffect(() => {
-        const subtitleAttachment = tracks[firstTrackId]?.attachments.subtitle?.find(
-            (a) => a.mime === "application/json"
+        const track = tracks[firstTrackId];
+        const subtitleAttachment = track?.attachments.subtitle?.find(
+            (a) => a.mime === "application/json",
         );
         if (!subtitleAttachment) {
             setLyrics([]);
@@ -117,11 +124,9 @@ export function Queue(): React.ReactElement {
                         {lyrics.length > 0 && (
                             <li>
                                 <span className={"lyrics"}>
-                                    {lyrics.map(
-                                        (line, n) => (
-                                            <div key={n}>{line.text}</div>
-                                        ),
-                                    )}
+                                    {lyrics.map((line, n) => (
+                                        <div key={n}>{line.text}</div>
+                                    ))}
                                 </span>
                             </li>
                         )}

@@ -1,4 +1,4 @@
-import { FormEvent, useContext, useState } from "react";
+import { FormEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 
@@ -18,15 +18,27 @@ export function ConfigMenu(): React.ReactElement {
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
 
-    function onSubmit(e: FormEvent) {
-        e.preventDefault();
-        setRoot(rootEdit);
-        if (roomNameEdit !== roomName) {
-            void navigate("/" + roomNameEdit);
-        }
-        setRoomPassword(roomPasswordEdit);
-        setShowSettings(false);
-    }
+    const onSubmit = useCallback(
+        (e: FormEvent) => {
+            e.preventDefault();
+            setRoot(rootEdit);
+            if (roomNameEdit !== roomName) {
+                void navigate("/" + roomNameEdit);
+            }
+            setRoomPassword(roomPasswordEdit);
+            setShowSettings(false);
+        },
+        [
+            setRoot,
+            rootEdit,
+            roomNameEdit,
+            roomName,
+            navigate,
+            setRoomPassword,
+            roomPasswordEdit,
+            setShowSettings,
+        ],
+    );
 
     return (
         <div className={"settings"}>

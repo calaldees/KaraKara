@@ -42,11 +42,11 @@ export function TrackDetails(): React.ReactElement {
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request } = useApi();
     const navigate = useNavigate();
-    const [ lyrics, setLyrics ] = useState<Subtitle[]>([]);
+    const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     useEffect(() => {
         if (!trackId) return;
         const subtitleAttachment = tracks[trackId]?.attachments.subtitle?.find(
-            (a) => a.mime === "application/json"
+            (a) => a.mime === "application/json",
         );
         if (!subtitleAttachment) {
             setLyrics([]);

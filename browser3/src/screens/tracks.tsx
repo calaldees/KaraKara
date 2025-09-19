@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -337,22 +337,33 @@ export function TrackList(): React.ReactElement {
     // React will think the list has changed and re-render.
     const filterString = JSON.stringify(searchParams.getAll("filters"));
     const filters = useMemo(() => JSON.parse(filterString), [filterString]);
-    function setSearch(new_search: string | ((search: string) => string)) {
-        if (typeof new_search === "function") {
-            new_search = new_search(search);
-        }
-        setSearchParams({ search: new_search, filters }, { replace: inSearch });
-        setInSearch(true);
-    }
-    function setFilters(
-        new_filters: string[] | ((filters: string[]) => string[]),
-    ) {
-        if (typeof new_filters === "function") {
-            new_filters = new_filters(filters);
-        }
-        setSearchParams({ search, filters: new_filters });
-        setInSearch(false);
-    }
+
+    const setSearch = useCallback(
+        (new_search: string | ((search: string) => string)) => {
+            const updatedSearch =
+                typeof new_search === "function"
+                    ? new_search(search)
+                    : new_search;
+            setSearchParams(
+                { search: updatedSearch, filters },
+                { replace: inSearch },
+            );
+            setInSearch(true);
+        },
+        [search, filters, setSearchParams, inSearch],
+    );
+
+    const setFilters = useCallback(
+        (new_filters: string[] | ((filters: string[]) => string[])) => {
+            const updatedFilters =
+                typeof new_filters === "function"
+                    ? new_filters(filters)
+                    : new_filters;
+            setSearchParams({ search, filters: updatedFilters });
+            setInSearch(false);
+        },
+        [search, filters, setSearchParams],
+    );
 
     return (
         <Screen

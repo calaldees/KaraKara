@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 
 type Notification = {
@@ -58,12 +58,19 @@ export function ClientProvider(props: any) {
     );
     const [notification, setNotification] = useState<Notification>(null);
 
-    function addBookmark(track_id: string): void {
-        setBookmarks([...bookmarks, track_id]);
-    }
-    function removeBookmark(track_id: string): void {
-        setBookmarks(bookmarks.filter((x) => x !== track_id));
-    }
+    const addBookmark = useCallback(
+        (track_id: string): void => {
+            setBookmarks((prev) => [...prev, track_id]);
+        },
+        [setBookmarks],
+    );
+
+    const removeBookmark = useCallback(
+        (track_id: string): void => {
+            setBookmarks((prev) => prev.filter((x) => x !== track_id));
+        },
+        [setBookmarks],
+    );
 
     return (
         <ClientContext

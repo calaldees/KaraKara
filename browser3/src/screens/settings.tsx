@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { BackToExplore, Screen } from "./_common";
 import { copy_type } from "../utils";
 import { RoomContext } from "../providers/room";
@@ -22,35 +22,41 @@ export function RoomSettings(): React.ReactElement {
     }, [roomSettings]);
 
     // when user types in a textbox, update the string:string
-    function update(key: string, value: string) {
-        const newSettings = { ...roomSettingsEdit };
-        newSettings[key] = value;
-        setRoomSettingsEdit(newSettings);
-    }
+    const update = useCallback(
+        (key: string, value: string) => {
+            const newSettings = { ...roomSettingsEdit };
+            newSettings[key] = value;
+            setRoomSettingsEdit(newSettings);
+        },
+        [roomSettingsEdit],
+    );
 
     // when saving settings, convert the string:string into string:any
-    function saveSettings(event: any) {
-        event.preventDefault();
-        const roomSettingsTyped: Record<string, any> = {};
-        for (const key of Object.keys(roomSettings)) {
-            roomSettingsTyped[key] = copy_type(
-                roomSettings[key],
-                roomSettingsEdit[key],
-            );
-        }
-        request({
-            notify: "Saving settings...",
-            notify_ok: "Settings saved!",
-            function: "settings",
-            options: {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
+    const saveSettings = useCallback(
+        (event: any) => {
+            event.preventDefault();
+            const roomSettingsTyped: Record<string, any> = {};
+            for (const key of Object.keys(roomSettings)) {
+                roomSettingsTyped[key] = copy_type(
+                    roomSettings[key],
+                    roomSettingsEdit[key],
+                );
+            }
+            request({
+                notify: "Saving settings...",
+                notify_ok: "Settings saved!",
+                function: "settings",
+                options: {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(roomSettingsTyped),
                 },
-                body: JSON.stringify(roomSettingsTyped),
-            },
-        });
-    }
+            });
+        },
+        [roomSettings, roomSettingsEdit, request],
+    );
 
     const buttons = (
         <footer>
