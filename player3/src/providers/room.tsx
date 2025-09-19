@@ -71,7 +71,20 @@ export function RoomProvider(props: any) {
         });
     }, [root, roomName, roomPassword, request, setSessionId]);
     useEffect(() => {
-        setQueue(current_and_future(now, fullQueue));
+        const newQueue = current_and_future(now, fullQueue);
+        // Only update if something has actually changed, to avoid
+        // unnecessary re-renders every time "now" changes but the
+        // contents of the queue are the same.
+        // setQueue(newQueue);
+        setQueue((prevQueue) => {
+            if (
+                prevQueue.length === newQueue.length &&
+                prevQueue.every((item, idx) => item === newQueue[idx])
+            ) {
+                return prevQueue;
+            }
+            return newQueue;
+        });
     }, [fullQueue, now]);
 
     return (
