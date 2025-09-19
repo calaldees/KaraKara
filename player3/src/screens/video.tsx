@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { percent } from "../utils";
 import { EventInfo, JoinInfo, Video } from "./_common";
-import { ServerContext } from "../providers/server";
 import type { Track, QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 export function VideoScreen({
     track,
@@ -11,7 +11,7 @@ export function VideoScreen({
     track: Track;
     queue_item: QueueItem;
 }) {
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
 
     return (
         <section key="video" className={"screen_video"}>

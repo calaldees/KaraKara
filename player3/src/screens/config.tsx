@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 import { FormEvent, useCallback, useContext, useState } from "react";
-import { ServerContext } from "../providers/server";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 export function ConfigMenu() {
     const { roomName } = useParams();
@@ -21,7 +21,7 @@ export function ConfigMenu() {
         underscan,
         setUnderscan,
     } = useContext(ClientContext);
-    const { now, offset } = useContext(ServerContext);
+    const { now, offset } = useContext(ServerTimeContext);
     const [rootEdit, setRootEdit] = useState(root);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);

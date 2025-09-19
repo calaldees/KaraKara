@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useApi } from "../hooks/api";
 import { useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
 import { current_and_future } from "../utils";
 import { ClientContext } from "./client";
-import { ServerContext } from "./server";
 import type { QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 export interface RoomContextType {
     isAdmin: boolean;
@@ -24,7 +24,7 @@ export const RoomContext = React.createContext<RoomContextType>(
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
     const { root, roomPassword } = useContext(ClientContext);
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
@@ -87,17 +87,18 @@ export function RoomProvider(props: any) {
         });
     }, [fullQueue, now]);
 
-    return (
-        <RoomContext
-            value={{
-                isAdmin,
-                sessionId,
-                queue,
-                setQueue,
-                settings,
-            }}
-        >
-            {props.children}
-        </RoomContext>
+    // This component re-renders every time "now" changes, but
+    // we don't want that to cause re-renders in the consumers
+    const memoValue = useMemo(
+        (): RoomContextType => ({
+            isAdmin,
+            sessionId,
+            queue,
+            setQueue,
+            settings,
+        }),
+        [isAdmin, sessionId, queue, setQueue, settings],
     );
+
+    return <RoomContext value={memoValue}>{props.children}</RoomContext>;
 }

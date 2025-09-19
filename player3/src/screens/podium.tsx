@@ -1,11 +1,11 @@
 import { attachment_path, percent, s_to_mns } from "../utils";
 import { Video } from "./_common";
 import { useCallback, useContext, useState } from "react";
-import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 import type { Track, QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -20,7 +20,7 @@ export function PodiumScreen({
     queue_item: QueueItem;
 }) {
     const { root, blankPodium } = useContext(ClientContext);
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
     const [starting, setStarting] = useState(false);
     const { request } = useApi();

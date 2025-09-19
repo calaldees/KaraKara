@@ -17,6 +17,7 @@ import { VideoScreen } from "./video";
 import { PodiumScreen } from "./podium";
 import { PreviewScreen } from "./preview";
 import { percent } from "../utils";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -45,8 +46,9 @@ function Room() {
         setShowSettings,
         underscan,
     } = useContext(ClientContext);
-    const { now, tracks, downloadSize, downloadDone, connected } =
+    const { tracks, downloadSize, downloadDone, connected } =
         useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { queue, isAdmin, settings } = useContext(RoomContext);
 
     let screen = <section>Unknown state :(</section>;
