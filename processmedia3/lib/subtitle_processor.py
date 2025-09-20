@@ -188,36 +188,6 @@ def _parse_ssa(source: str) -> List[Subtitle]:
     return [parse_line(line_dict) for line_dict in lines]
 
 
-def _strip_toptitles(lines: List[Subtitle]) -> List[Subtitle]:
-    r"""
-    If there are many subs on top, keep them (they're normally trying
-    to get out of the way of something on the bottom of the screen)
-
-    >>> import datetime
-    >>> lines = [
-    ...     Subtitle(text='First', top=True),
-    ...     Subtitle(text='Second', top=True),
-    ...     Subtitle(text='Third', top=True),
-    ... ]
-    >>> [(l.text, l.top) for l in _strip_toptitles(lines)]
-    [('First', True), ('Second', True), ('Third', True)]
-
-    If there are only a few subs on top, strip them (they're normally
-    duplicates of the song title)
-
-    >>> lines = [
-    ...     Subtitle(text='First', top=True),
-    ...     Subtitle(text='Second', top=False),
-    ...     Subtitle(text='Third', top=False),
-    ... ]
-    >>> [(l.text, l.top) for l in _strip_toptitles(lines)]
-    [('Second', False), ('Third', False)]
-
-    """
-    if len([s for s in lines if s.top]) < len(lines) * 0.8:
-        lines = [s for s in lines if not s.top]
-    return lines
-
 
 def parse_subtitles(data: str) -> List[Subtitle]:
     """
@@ -238,12 +208,7 @@ def parse_subtitles(data: str) -> List[Subtitle]:
     >>> parse_subtitles('not real subtitles')
     []
     """
-    assert isinstance(data, str), "Subtitle data should be a string"
-    # Only two tracks actually have duplicate lines - the two .ssa ones.
-    # Other tracks have intentionally repeated lyrics, don't mess with those.
-    lines = _parse_srt(data) or _parse_ssa(data)
-    lines = _strip_toptitles(lines)
-    return lines
+    return _parse_srt(data) or _parse_ssa(data)
 
 
 def create_ssa(subtitles: t.List[Subtitle]) -> str:

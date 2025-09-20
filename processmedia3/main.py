@@ -172,6 +172,12 @@ def lint(tracks: Sequence[Track]) -> None:
                 if len(ls) == 1:
                     log.error(f"{s.file.relative} has only one subtitle: {ls[0].text}")
 
+                # Most lines are on the bottom, but there are a random couple on top,
+                # normally means that a title line got added
+                top_count = len([s for s in ls if s.top])
+                if top_count > 0 and top_count / len(ls) < 0.8:
+                    log.error(f"{s.file.relative} has random topline")
+
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
