@@ -48,18 +48,13 @@ export function TrackDetails(): React.ReactElement {
         const subtitleAttachment = tracks[trackId]?.attachments.subtitle?.find(
             (a) => a.mime === "application/json",
         );
-        if (!subtitleAttachment) {
-            setLyrics([]);
-            return;
+        if (subtitleAttachment) {
+            request({
+                url: attachment_path(root, subtitleAttachment),
+                options: {credentials: "omit"},
+                onAction: (result) => setLyrics(result),
+            });
         }
-        request({
-            url: attachment_path(root, subtitleAttachment),
-            options: {
-                credentials: "omit",
-            },
-            onAction: (result) => setLyrics(result),
-            onException: () => setLyrics([]),
-        });
     }, [request, root, tracks, trackId]);
     if (!trackId) throw Error("Can't get here?");
     const track = tracks[trackId];

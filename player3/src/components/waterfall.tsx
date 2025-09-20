@@ -25,8 +25,8 @@ export default function Waterfall() {
         return getNiceTracks(tracks, MAX_WATERFALL).map((track, n, arr) => ({
             src: attachment_path(root, track.attachments.image[0]),
             style: {
-                animationDelay: ((n % 5) + RAND_ARR[n*2]) * 2 + "s",
-                animationDuration: 5 + RAND_ARR[n*2+1] * 5 + "s",
+                animationDelay: ((n % 5) + RAND_ARR[n * 2]) * 2 + "s",
+                animationDuration: 5 + RAND_ARR[n * 2 + 1] * 5 + "s",
                 left: (n / arr.length) * 90 + "vw",
             },
         }));

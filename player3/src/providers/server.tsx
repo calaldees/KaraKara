@@ -59,7 +59,11 @@ function InternalServerProvider(props: any) {
         }),
         [tracks, downloadSize, downloadDone, connected],
     );
-    return <ServerContext value={serverContextValue}>{props.children}</ServerContext>;
+    return (
+        <ServerContext value={serverContextValue}>
+            {props.children}
+        </ServerContext>
+    );
 }
 
 export function ServerProvider(props: any) {

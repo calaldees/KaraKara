@@ -77,32 +77,40 @@ function QueueItemRender({
     );
 }
 
-export function Queue(): React.ReactElement {
-    const { root, performerName, widescreen } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
-    const { queue, settings, sessionId } = useContext(RoomContext);
+function Lyrics({ track }: { track: Track }) {
+    const { root } = useContext(ClientContext);
     const { request } = useApi();
 
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
-    const firstTrackId = queue[0]?.track_id;
     useEffect(() => {
-        const track = tracks[firstTrackId];
         const subtitleAttachment = track?.attachments.subtitle?.find(
             (a) => a.mime === "application/json",
         );
-        if (!subtitleAttachment) {
-            setLyrics([]);
-            return;
+        if (subtitleAttachment) {
+            request({
+                url: attachment_path(root, subtitleAttachment),
+                options: {credentials: "omit"},
+                onAction: (result) => setLyrics(result),
+            });
         }
-        request({
-            url: attachment_path(root, subtitleAttachment),
-            options: {
-                credentials: "omit",
-            },
-            onAction: (result) => setLyrics(result),
-            onException: () => setLyrics([]),
-        });
-    }, [request, root, tracks, firstTrackId]);
+    }, [request, root, track]);
+    if (lyrics.length > 0) {
+        return <li>
+            <span className={"lyrics"}>
+                {lyrics.map((line, n) => (
+                    <div key={n}>{line.text}</div>
+                ))}
+            </span>
+        </li>;
+    } else {
+        return null;
+    }
+}
+
+export function Queue(): React.ReactElement {
+    const { performerName, widescreen } = useContext(ClientContext);
+    const { tracks } = useContext(ServerContext);
+    const { queue, settings, sessionId } = useContext(RoomContext);
 
     return (
         <Screen
@@ -122,15 +130,10 @@ export function Queue(): React.ReactElement {
                             show_time={true}
                             track={tracks[queue[0].track_id]}
                         />
-                        {lyrics.length > 0 && (
-                            <li>
-                                <span className={"lyrics"}>
-                                    {lyrics.map((line, n) => (
-                                        <div key={n}>{line.text}</div>
-                                    ))}
-                                </span>
-                            </li>
-                        )}
+                        <Lyrics
+                            key={queue[0].track_id}
+                            track={tracks[queue[0].track_id]}
+                        />
                     </ul>
                 </section>
             )}
