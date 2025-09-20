@@ -5,6 +5,7 @@ import {
     Outlet,
     Route,
     RouterProvider,
+    useParams,
 } from "react-router-dom";
 
 import { Login } from "./login";
@@ -56,11 +57,12 @@ function Page() {
     );
 }
 function Room() {
+    const { roomName } = useParams();
     const { widescreen } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
 
     return (
-        <RoomProvider>
+        <RoomProvider key={roomName}>
             {Object.keys(tracks).length > 0 ? (
                 widescreen ? (
                     <div className={"widescreen"}>

@@ -30,8 +30,9 @@ const router = createBrowserRouter(
 );
 
 function RoomWrapper() {
+    const { roomName } = useParams();
     return (
-        <RoomProvider>
+        <RoomProvider key={roomName}>
             <Room />
         </RoomProvider>
     );

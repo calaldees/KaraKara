@@ -38,13 +38,6 @@ export function RoomProvider(props: any) {
     const { request } = useApi();
     const navigate = useNavigate();
 
-    // reset to default when room changes
-    useEffect(() => {
-        setFullQueue([]);
-        setQueue([]);
-        setSettings({});
-    }, [roomName]);
-
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
         console.log(pkt.json());
