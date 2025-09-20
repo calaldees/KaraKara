@@ -11,7 +11,6 @@ import { Root } from "./screens/root";
 import "./static/style.scss";
 import "./static/metalghosts.scss";
 
-
 const root = createRoot(document.getElementById("root")!);
 root.render(
     <StrictMode>

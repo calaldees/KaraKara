@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -6,7 +6,6 @@ import { useApi } from "../hooks/api";
 import { ClientContext } from "./client";
 import { mqtt_url } from "../utils";
 import type { Track } from "../types";
-
 
 export interface ServerContextType {
     tracks: Record<string, Track>;
@@ -51,18 +50,16 @@ function InternalServerProvider(props: any) {
         });
     }, [root, request, tracksUpdated]);
 
-    return (
-        <ServerContext
-            value={{
-                tracks,
-                downloadSize,
-                downloadDone,
-                connected,
-            }}
-        >
-            {props.children}
-        </ServerContext>
+    const serverContextValue = useMemo(
+        (): ServerContextType => ({
+            tracks,
+            downloadSize,
+            downloadDone,
+            connected,
+        }),
+        [tracks, downloadSize, downloadDone, connected],
     );
+    return <ServerContext value={serverContextValue}>{props.children}</ServerContext>;
 }
 
 export function ServerProvider(props: any) {

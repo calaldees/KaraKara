@@ -4,7 +4,6 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 import { ClientContext } from "../providers/client";
 
-
 export function ConfigMenu() {
     const { roomName } = useParams();
     const {
@@ -180,7 +179,7 @@ export function ConfigMenu() {
                             </tr>
                             <tr>
                                 <td colSpan={2}>
-                                    <button>Close</button>
+                                    <button type="submit">Close</button>
                                 </td>
                             </tr>
                         </tbody>

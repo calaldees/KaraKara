@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 
 import { ClientContext } from "../providers/client";
 
-
 export function JoinInfo() {
     const { roomName } = useParams();
     const { root } = useContext(ClientContext);

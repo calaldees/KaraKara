@@ -4,7 +4,6 @@ import { ClientContext } from "../providers/client";
 import type { Track, Attachment } from "../types";
 import { attachment_path } from "../utils";
 
-
 interface VideoProps {
     track: Track;
     [Key: string]: any;

@@ -13,7 +13,6 @@ import { attachment_path } from "../utils";
 
 import world from "../static/world.svg";
 
-
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     // computing stats only takes ~10ms, but we don't want that to happen
     // in the middle of rendering the globe
