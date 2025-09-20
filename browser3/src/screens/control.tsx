@@ -268,11 +268,12 @@ function ProgressBar({
     startDateTime: string;
     endDateTime: string;
 }) {
+    const { now } = useContext(ServerTimeContext);
     if (!queue.length) return null;
     const queue_last = queue[queue.length - 1];
     if (!queue_last.start_time) return null;
     const start = Date.parse(startDateTime);
-    const current = Date.now() - start;
+    const current = now - start;
     const queue_end =
         (queue_last.start_time + queue_last.track_duration) * 1000 - start;
     const end = Date.parse(endDateTime) - start;
