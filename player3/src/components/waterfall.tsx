@@ -15,16 +15,18 @@ function getNiceTracks(tracks: Record<string, Track>, n: number) {
         .slice(0, n);
 }
 
+const MAX_WATERFALL = 25;
+const RAND_ARR = Array.from({ length: MAX_WATERFALL * 2 }, () => Math.random());
 export default function Waterfall() {
     const { settings } = useContext(RoomContext);
     const { root } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const items = useMemo(() => {
-        return getNiceTracks(tracks, 25).map((track, n, arr) => ({
+        return getNiceTracks(tracks, MAX_WATERFALL).map((track, n, arr) => ({
             src: attachment_path(root, track.attachments.image[0]),
             style: {
-                animationDelay: ((n % 5) + Math.random()) * 2 + "s",
-                animationDuration: 5 + Math.random() * 5 + "s",
+                animationDelay: ((n % 5) + RAND_ARR[n*2]) * 2 + "s",
+                animationDuration: 5 + RAND_ARR[n*2+1] * 5 + "s",
                 left: (n / arr.length) * 90 + "vw",
             },
         }));
