@@ -25,7 +25,7 @@ export function Login(): React.ReactElement {
                         onChange={(e) => setRoomNameEdit(e.target.value)}
                         required={true}
                     />
-                    <button disabled={!roomNameEdit.trim()}>
+                    <button type="submit" disabled={!roomNameEdit.trim()}>
                         Enter Room <icons.RightToBracket />
                     </button>
                 </form>

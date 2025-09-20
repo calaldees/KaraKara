@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useMemo, useState, ReactElement } from "react";
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+    ReactElement,
+} from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
@@ -368,6 +375,17 @@ export function TrackList(): ReactElement {
         [search, filters, setSearchParams],
     );
 
+    const exploreContextValue = useMemo(
+        (): ExploreContextType => ({
+            search,
+            setSearch,
+            filters,
+            setFilters,
+            expanded,
+            setExpanded,
+        }),
+        [search, setSearch, filters, setFilters, expanded, setExpanded],
+    );
     return (
         <Screen
             className={"track_list"}
@@ -391,18 +409,9 @@ export function TrackList(): ReactElement {
             }
             footer={isAdmin && !booth && <AdminButtons />}
         >
-            <ExploreContext.Provider
-                value={{
-                    search,
-                    setSearch,
-                    filters,
-                    setFilters,
-                    expanded,
-                    setExpanded,
-                }}
-            >
+            <ExploreContext value={exploreContextValue}>
                 <Explorer />
-            </ExploreContext.Provider>
+            </ExploreContext>
         </Screen>
     );
 }

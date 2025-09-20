@@ -63,6 +63,7 @@ export function RoomSettings(): React.ReactElement {
             <div className={"buttons"}>
                 <button
                     onClick={saveSettings}
+                    type="button"
                     data-cy="save-settings-button"
                     disabled={loading}
                 >

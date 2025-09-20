@@ -247,6 +247,7 @@ function ControlButtons(): React.ReactElement {
                 {Object.entries(buttons).map(([command, icon]) => (
                     <button
                         key={command}
+                        type="button"
                         onClick={(_) => sendCommand(command)}
                         disabled={loading}
                     >

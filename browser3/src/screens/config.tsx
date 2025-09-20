@@ -99,7 +99,9 @@ export function ConfigMenu(): React.ReactElement {
                             </tr>
                             <tr>
                                 <td colSpan={2}>
-                                    <button data-cy="save-button">Close</button>
+                                    <button type="submit" data-cy="save-button">
+                                        Close
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>

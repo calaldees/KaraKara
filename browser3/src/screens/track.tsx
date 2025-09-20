@@ -98,17 +98,24 @@ export function TrackDetails(): React.ReactElement {
                 )}
                 <div className={"buttons"}>
                     <button
+                        type="button"
                         onClick={(_) => setAction(TrackAction.ENQUEUE)}
                         disabled={is_queued}
                     >
                         Enqueue
                     </button>
                     {bookmarks.includes(track.id) ? (
-                        <button onClick={(_) => removeBookmark(track.id)}>
+                        <button
+                            type="button"
+                            onClick={(_) => removeBookmark(track.id)}
+                        >
                             Un-Bookmark
                         </button>
                     ) : (
-                        <button onClick={(_) => addBookmark(track.id)}>
+                        <button
+                            type="button"
+                            onClick={(_) => addBookmark(track.id)}
+                        >
                             Bookmark
                         </button>
                     )}
@@ -128,10 +135,17 @@ export function TrackDetails(): React.ReactElement {
                     onChange={(e) => setPerformerName(e.target.value)}
                 />
                 <div className={"buttons"}>
-                    <button onClick={(_) => setAction(TrackAction.NONE)}>
+                    <button
+                        type="button"
+                        onClick={(_) => setAction(TrackAction.NONE)}
+                    >
                         Cancel
                     </button>
-                    <button onClick={(_) => enqueue(performerName, track.id)}>
+                    <button
+                        type="button"
+                        onClick={(_) => enqueue(performerName, track.id)}
+                        disabled={performerName.trim().length === 0}
+                    >
                         Confirm
                     </button>
                 </div>

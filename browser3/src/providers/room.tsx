@@ -117,7 +117,7 @@ export function RoomProvider(props: any) {
 
     // This component re-renders every time "now" changes, but
     // we don't want that to cause re-renders in the consumers
-    const memoContext = useMemo(
+    const roomContextValue = useMemo(
         (): RoomContextType => ({
             trackList,
             isAdmin,
@@ -130,5 +130,5 @@ export function RoomProvider(props: any) {
         [trackList, isAdmin, sessionId, queue, fullQueue, setQueue, settings],
     );
 
-    return <RoomContext value={memoContext}>{props.children}</RoomContext>;
+    return <RoomContext value={roomContextValue}>{props.children}</RoomContext>;
 }

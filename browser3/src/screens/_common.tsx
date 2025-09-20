@@ -57,10 +57,10 @@ const EmptyHeaderLink = (): React.ReactElement => <a href="#" />;
 export function Screen({
     title,
     className = undefined,
-    footer = <div />,
+    footer = null,
     navLeft = null,
     navRight = null,
-    children = [],
+    children = null,
 }: {
     title: string;
     className?: string | undefined;

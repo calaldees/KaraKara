@@ -10,7 +10,9 @@ import { QRCodeSVG } from "qrcode.react";
 const PrintButtons = (): React.ReactElement => (
     <footer>
         <div className={"buttons"}>
-            <button onClick={() => window.print()}>Print</button>
+            <button type="button" onClick={() => window.print()}>
+                Print
+            </button>
         </div>
     </footer>
 );

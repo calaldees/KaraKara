@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useApi } from "../hooks/api";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { ClientContext } from "./client";
@@ -49,15 +49,17 @@ function InternalServerProvider(props: any) {
         });
     }, [root, request, tracksUpdated]);
 
+    const serverContextValue = useMemo(
+        (): ServerContextType => ({
+            tracks,
+            downloadSize,
+            downloadDone,
+            connected,
+        }),
+        [tracks, downloadSize, downloadDone, connected],
+    );
     return (
-        <ServerContext
-            value={{
-                tracks,
-                downloadSize,
-                downloadDone,
-                connected,
-            }}
-        >
+        <ServerContext value={serverContextValue}>
             {props.children}
         </ServerContext>
     );

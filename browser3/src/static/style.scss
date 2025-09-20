@@ -618,7 +618,9 @@ MAIN.queue ARTICLE {
 /* Don't put stuff in iPhone's weird rounded corners */
 
 MAIN {
-    HEADER, ARTICLE, FOOTER {
+    HEADER,
+    ARTICLE,
+    FOOTER {
         padding-left: max(5%, env(safe-area-inset-left));
         padding-right: max(5%, env(safe-area-inset-right));
     }
