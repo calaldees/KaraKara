@@ -14,7 +14,6 @@ export interface RoomContextType {
     isAdmin: boolean;
     sessionId: string;
     queue: QueueItem[];
-    setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
 }
 
@@ -88,7 +87,6 @@ export function RoomProvider(props: any) {
         isAdmin,
         sessionId,
         queue,
-        setQueue,
         settings,
     });
     return <RoomContext value={ctxVal}>{props.children}</RoomContext>;
