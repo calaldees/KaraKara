@@ -31,7 +31,11 @@ export function RoomProvider(props: any) {
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
-    const queue = useMemo(() => current_and_future(now, fullQueue), [now, fullQueue]);
+    const newQueue = useMemo(() => current_and_future(now, fullQueue), [now, fullQueue]);
+    // ignore eslint warning - we don't actually care if newQueue
+    // changes, we only care if the _value_ changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const queue = useMemo(() => newQueue, [JSON.stringify(newQueue)]);
 
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
