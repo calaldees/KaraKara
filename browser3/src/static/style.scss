@@ -601,17 +601,10 @@ MAIN.queue ARTICLE {
 }
 
 @media print {
-    @page {
-        size: landscape;
-    }
-    MAIN {
-        position: relative;
-        HEADER {
-            display: none !important;
-        }
-        FOOTER {
-            display: none !important;
-        }
+    .printableContent P {
+        font-size: 20pt;
+        text-align: center;
+        padding: 3cm 3cm 1cm 3cm;
     }
 }
 
