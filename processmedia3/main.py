@@ -80,7 +80,12 @@ def scan(
     """
     # Get a list of source files grouped by Track ID, eg
     # {
-    #   "My_Track": ["My Track.mp4", "My Track.srt", "My Track.txt"],
+    #   "My_Track": [
+    #     "My Track [Vocal].mp4",
+    #     "My Track [Instrumental].ogg",
+    #     "My Track.srt",
+    #     "My Track.txt",
+    #   ],
     #   ...
     # }
     grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
@@ -88,10 +93,15 @@ def scan(
         if any((i in file.relative) for i in SCAN_IGNORE):
             continue
         if match is None or match in file.stem:
-            grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].add(file)
+            # filename: "My Track (Miku ver) [Instrumental].mp4"
+            # track_id: "My_Track_Miku_Ver"
+            matches = re.match(r"^(.*?)( \[(.+?)\])?$", file.stem.title())
+            assert matches is not None  # ".*" should always match
+            track_id = re.sub("[^0-9a-zA-Z]+", "_", matches.group(1)).strip("_")
+            grouped[track_id].add(file)
     groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
 
-    # Turn all the (basename, list of filenames) tuples into a
+    # Turn all the (track_id, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
     def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
