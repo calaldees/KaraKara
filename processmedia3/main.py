@@ -23,7 +23,7 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 
 from lib.source import Source, SourceType
 from lib.target import Target
-from lib.track import Track, TrackDict
+from lib.track import Track, TrackDict, TrackValidationException
 from lib.kktypes import TargetType
 from lib.file_abstraction import AbstractFolder, AbstractFile, AbstractFolder_from_str, LocalFile
 
@@ -56,6 +56,7 @@ SCAN_IGNORE = [
     "cache.db",
     "tracks.json",
     "tracks.json.gz",
+    "readme.txt",
     "WorkInProgress",
 ]
 
@@ -84,7 +85,7 @@ def scan(
     # }
     grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
     for file in source_folder.files:
-        if any((i in file.absolute) for i in SCAN_IGNORE):
+        if any((i in file.relative) for i in SCAN_IGNORE):
             continue
         if match is None or match in file.stem:
             grouped[re.sub("[^0-9a-zA-Z]+", "_", file.stem.title())].add(file)
@@ -245,6 +246,9 @@ def export(
     def _export(track: Track) -> TrackDict | None:
         try:
             return track.to_json()
+        except TrackValidationException as e:
+            log.error(f"Error exporting {track.id}: {e}")
+            return None
         except Exception:
             log.exception(f"Error exporting {track.id}")
             return None

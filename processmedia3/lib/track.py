@@ -21,6 +21,10 @@ class TrackDict(t.TypedDict):
     tags: Mapping[str, Sequence[str]]
 
 
+class TrackValidationException(Exception):
+    ...
+
+
 class Track:
     """
     An entry in tracks.json, keeping track of which source files are
@@ -56,9 +60,6 @@ class Track:
         from any set of inputs; this method is where we enforce the specific
         requirements of KaraKara (ie, the assumptions of Browser / Player).
         """
-        media_files = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-        duration = media_files[0].meta.duration.total_seconds()
-
         attachments: MutableMapping[MediaType, MutableSequence[TrackAttachment]] = defaultdict(list)
         for target in self.targets:
             attachments[target.encoder.category].append(
@@ -67,13 +68,17 @@ class Track:
                     "path": str(target.path.relative_to(target.processed_dir)),
                 })
             )
-        assert attachments.get(MediaType.VIDEO), f"{self.id} is missing attachments.video"
-        assert attachments.get(MediaType.IMAGE), f"{self.id} is missing attachments.image"
+        if not attachments.get(MediaType.VIDEO):
+            raise TrackValidationException("missing attachments.video")
+        if not attachments.get(MediaType.IMAGE):
+            raise TrackValidationException("missing attachments.image")
 
         tag_files = self._sources_by_type({SourceType.TAGS})
         tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags)  # type: ignore[arg-type]
-        assert tags.get("title") is not None, f"{self.id} is missing tags.title"
-        assert tags.get("category") is not None, f"{self.id} is missing tags.category"
+        if tags.get("title") is None:
+            raise TrackValidationException("missing tags.title")
+        if tags.get("category") is None:
+            raise TrackValidationException("missing tags.category")
 
         if self._sources_by_type({SourceType.SUBTITLES}):
             tags["subs"] = ["soft"]
@@ -91,18 +96,19 @@ class Track:
         ))
 
         ds = list(set(
-            int(ausrc.meta.duration.total_seconds())
+            ausrc.meta.duration.total_seconds()
             for ausrc
             in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         ))
-        assert len(ds) == 1, f"{self.id} has inconsistent durations: {ds}"
+        if len(ds) > 1:
+            raise TrackValidationException(f"inconsistent durations: {ds}")
 
         if tags.get("date"):
             tags["year"] = [d.split("-")[0] for d in tags["date"]]
 
         return TrackDict(
             id=self.id,
-            duration=round(duration, 1),  # for more consistent unit tests
+            duration=round(ds[0], 1),  # for more consistent unit tests
             attachments=attachments,
             tags=tags,
         )
