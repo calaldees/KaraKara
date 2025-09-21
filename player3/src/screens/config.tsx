@@ -51,9 +51,9 @@ export function ConfigMenu() {
     );
 
     return (
-        <div className={"settings"}>
+        <div className={"config"}>
             <div>
-                <h2>App Settings</h2>
+                <h2>App Config</h2>
                 <form onSubmit={onSubmit}>
                     <table>
                         <tbody>
