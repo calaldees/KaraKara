@@ -1,4 +1,4 @@
-import { FormEvent, useState, useCallback } from "react";
+import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Screen } from "./_common";
@@ -9,13 +9,10 @@ import "../static/login.scss";
 export function Login(): React.ReactElement {
     const [roomNameEdit, setRoomNameEdit] = useState("");
     const navigate = useNavigate();
-    const onSubmit = useCallback(
-        (e: FormEvent) => {
-            e.preventDefault();
-            void navigate(roomNameEdit.toLowerCase());
-        },
-        [navigate, roomNameEdit],
-    );
+    function onSubmit(e: FormEvent) {
+        e.preventDefault();
+        void navigate(roomNameEdit.toLowerCase());
+    }
 
     return (
         <Screen className={"login"} title={"Welcome to KaraKara"}>

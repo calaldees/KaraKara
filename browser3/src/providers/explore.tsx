@@ -21,14 +21,8 @@ export function ExploreProvider(props: any) {
     const [inSearch, setInSearch] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const search = useMemo(
-        () => searchParams.get("search") ?? "",
-        [searchParams],
-    );
-    const filters = useMemo(
-        () => searchParams.getAll("filters"),
-        [searchParams],
-    );
+    const search = searchParams.get("search") ?? "";
+    const filters = searchParams.getAll("filters");
 
     function setSearch(new_search: string | ((search: string) => string)) {
         const updatedSearch =
