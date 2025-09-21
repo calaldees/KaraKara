@@ -1,16 +1,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgr from "vite-plugin-svgr";
+import Sonda from "sonda/vite";
 // import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
     build: {
         target: ["es2015", "ios11"],
+        sourcemap: true,
     },
     plugins: [
         react(),
         svgr(),
+        Sonda(),
         /*
         VitePWA({
             injectRegister: null,
