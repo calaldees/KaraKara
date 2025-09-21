@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import Sonda from "sonda/vite";
 // import { VitePWA } from "vite-plugin-pwa";
@@ -11,7 +11,11 @@ export default defineConfig({
         sourcemap: true,
     },
     plugins: [
-        react(),
+        react({
+            babel: {
+                plugins: ["babel-plugin-react-compiler"],
+            },
+        }),
         svgr(),
         Sonda(),
         /*

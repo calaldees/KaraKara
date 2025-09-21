@@ -1,4 +1,4 @@
-import { useCallback, useState, createContext } from "react";
+import { useState, createContext } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
 import { useMemoObj } from "../hooks/memo";
 
@@ -59,19 +59,13 @@ export function ClientProvider(props: any) {
     );
     const [notification, setNotification] = useState<Notification>(null);
 
-    const addBookmark = useCallback(
-        (track_id: string): void => {
-            setBookmarks((prev) => [...prev, track_id]);
-        },
-        [setBookmarks],
-    );
+    function addBookmark(track_id: string): void {
+        setBookmarks((prev) => [...prev, track_id]);
+    }
 
-    const removeBookmark = useCallback(
-        (track_id: string): void => {
-            setBookmarks((prev) => prev.filter((x) => x !== track_id));
-        },
-        [setBookmarks],
-    );
+    function removeBookmark(track_id: string): void {
+        setBookmarks((prev) => prev.filter((x) => x !== track_id));
+    }
 
     const ctxVal: ClientContextType = useMemoObj({
         root,
