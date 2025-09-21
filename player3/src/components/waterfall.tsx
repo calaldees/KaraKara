@@ -1,10 +1,11 @@
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 
 import { RoomContext } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import type { Track } from "../types";
 import { attachment_path } from "../utils";
+import { useMemoArr } from "../hooks/memo";
 
 function getNiceTracks(tracks: Record<string, Track>, n: number) {
     return Object.values(tracks)
@@ -21,7 +22,7 @@ export default function Waterfall() {
     const { settings } = useContext(RoomContext);
     const { root } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
-    const items = useMemo(() => {
+    const items = useMemoArr(() => {
         return getNiceTracks(tracks, MAX_WATERFALL).map((track, n, arr) => ({
             src: attachment_path(root, track.attachments.image[0]),
             style: {

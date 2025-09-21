@@ -16,6 +16,7 @@ import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import type { Track } from "../types";
+import { useMemoArr } from "../hooks/memo";
 
 interface ExploreContextType {
     search: string;
@@ -197,7 +198,7 @@ function Bookmarks({
     tracks: Record<string, Track>;
     trackList: Track[];
 }) {
-    const visibleTrackIDs = useMemo(
+    const visibleTrackIDs = useMemoArr(
         () => trackList.map((track) => track.id),
         [trackList],
     );
@@ -238,7 +239,7 @@ function Explorer(): React.ReactElement {
     const { search, setSearch, filters, setFilters, setExpanded } =
         useContext(ExploreContext);
 
-    const sections = useMemo(
+    const sections = useMemoArr(
         () => group_tracks(filters, find_tracks(trackList, filters, search)),
         [trackList, search, filters],
     );
@@ -342,11 +343,10 @@ export function TrackList(): ReactElement {
         () => searchParams.get("search") ?? "",
         [searchParams],
     );
-    // getAll returns a new Array object every time, so we need to compare the
-    // string representation of the lists to see if they're the same, otherwise
-    // React will think the list has changed and re-render.
-    const filterString = JSON.stringify(searchParams.getAll("filters"));
-    const filters = useMemo(() => JSON.parse(filterString), [filterString]);
+    const filters = useMemo(
+        () => searchParams.getAll("filters"),
+        [searchParams],
+    );
 
     const setSearch = useCallback(
         (new_search: string | ((search: string) => string)) => {

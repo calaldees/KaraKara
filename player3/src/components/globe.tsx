@@ -12,6 +12,7 @@ import type { Track } from "../types";
 import { attachment_path } from "../utils";
 
 import world from "../static/world.svg";
+import { useMemoArr } from "../hooks/memo";
 
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     // computing stats only takes ~10ms, but we don't want that to happen
@@ -94,7 +95,7 @@ function MyScene() {
     const text2 = useRef<Group>(null);
     const colorMap = useLoader(TextureLoader, world) as THREE.Texture;
 
-    const thumbs = useMemo(() => {
+    const thumbs = useMemoArr(() => {
         return getNiceTracks(tracks, 20).map((track) => [
             attachment_path(root, track.attachments.image[0]),
             attachment_path(root, track.attachments.video[0]),
