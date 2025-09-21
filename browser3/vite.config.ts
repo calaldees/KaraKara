@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 // import { VitePWA } from "vite-plugin-pwa";
 
@@ -9,7 +9,11 @@ export default defineConfig({
         target: ["es2015", "ios11"],
     },
     plugins: [
-        react(),
+        react({
+            babel: {
+                plugins: ["babel-plugin-react-compiler"],
+            },
+        }),
         svgr(),
         /*
         VitePWA({
