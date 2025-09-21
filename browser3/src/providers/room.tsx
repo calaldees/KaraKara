@@ -37,10 +37,10 @@ export function RoomProvider(props: any) {
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
     );
-    const [queue, setQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
     const navigate = useNavigate();
+    const queue = useMemo(() => current_and_future(now, fullQueue), [now, fullQueue]);
 
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -96,25 +96,7 @@ export function RoomProvider(props: any) {
             },
         });
     }, [root, roomName, roomPassword, request, setSessionId, navigate]);
-    useEffect(() => {
-        const newQueue = current_and_future(now, fullQueue);
-        // Only update if something has actually changed, to avoid
-        // unnecessary re-renders every time "now" changes but the
-        // contents of the queue are the same.
-        // setQueue(newQueue);
-        setQueue((prevQueue) => {
-            if (
-                prevQueue.length === newQueue.length &&
-                prevQueue.every((item, idx) => item === newQueue[idx])
-            ) {
-                return prevQueue;
-            }
-            return newQueue;
-        });
-    }, [fullQueue, now]);
 
-    // This component re-renders every time "now" changes, but
-    // we don't want that to cause re-renders in the consumers
     const ctxVal: RoomContextType = useMemoObj({
         trackList,
         isAdmin,
