@@ -1,6 +1,8 @@
 import js from "@eslint/js";
 import globals from "globals";
 import react from "eslint-plugin-react";
+import reactX from "eslint-plugin-react-x";
+import reactDom from "eslint-plugin-react-dom";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
@@ -30,6 +32,8 @@ export default tseslint.config(
         },
         plugins: {
             react: react,
+            "react-x": reactX,
+            "react-dom": reactDom,
             "react-hooks": reactHooks,
             "react-refresh": reactRefresh,
         },
@@ -43,6 +47,10 @@ export default tseslint.config(
                 "warn",
                 { allowConstantExport: true },
             ],
+            ...reactX.configs["recommended-typescript"].rules,
+            "react-x/no-use-context": "off",
+            "react-x/no-array-index-key": "off",
+            ...reactDom.configs.recommended.rules,
             "@typescript-eslint/triple-slash-reference": "off",
             "@typescript-eslint/no-unused-vars": [
                 "error",
