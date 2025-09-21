@@ -36,13 +36,12 @@ export function useApi() {
                 options: {},
                 ...props_,
             };
+            if (!props.options.credentials)
+                props.options.credentials = "include";
 
             setLoading(true);
             if (props.notify)
                 setNotification({ text: props.notify, style: "warning" });
-
-            if (!props.options.credentials)
-                props.options.credentials = "include";
 
             fetch(props.url, props.options)
                 .then((response) => {
