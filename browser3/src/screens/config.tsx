@@ -1,6 +1,9 @@
 import { FormEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import { ClientContext } from "../providers/client";
+
+import "../static/config.scss";
 
 export function ConfigMenu(): React.ReactElement {
     const { roomName } = useParams();
@@ -41,7 +44,7 @@ export function ConfigMenu(): React.ReactElement {
     );
 
     return (
-        <div className={"settings"}>
+        <div className={"config"}>
             <div>
                 <h2>App Settings</h2>
                 <form onSubmit={onSubmit}>

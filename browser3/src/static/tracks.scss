@@ -1,0 +1,52 @@
+MAIN.tracks ARTICLE {
+    .search {
+        margin-top: 1em;
+    }
+    DIV.active_filter_list {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0.5em 0;
+        .active_filter {
+            border: 1px solid var(--list-border);
+            background-color: var(--list-bg);
+            border-radius: 1em;
+            padding: 0.5em;
+            margin-right: 0.5em;
+            margin-bottom: 0.5em;
+            max-width: 10em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            .remove {
+                margin-right: 0.3em;
+            }
+            // SPAN.name {}
+        }
+    }
+    UL {
+        .filter_list_group {
+            border-bottom: 1px solid var(--list-border);
+            background: var(--list-shadow);
+            LI {
+                background: var(--list-bg);
+            }
+            UL {
+                margin: 0em 0em 0 1em;
+                border-radius: 0;
+                border-top: 0;
+                border-bottom: 0;
+                border-right: 0;
+                box-shadow: none;
+            }
+            LI.add_filter {
+                padding-left: 1em;
+            }
+        }
+
+        LI SPAN.track_info {
+            .info {
+                font-weight: normal;
+            }
+        }
+    }
+}

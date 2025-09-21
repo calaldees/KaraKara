@@ -1,9 +1,12 @@
 import { useContext, useRef } from "react";
-import { BackToExplore, Screen } from "./_common";
 import { useParams } from "react-router-dom";
-import { ClientContext } from "../providers/client";
 import { QRCodeSVG } from "qrcode.react";
 import { useReactToPrint } from "react-to-print";
+
+import { BackToExplore, Screen } from "./_common";
+import { ClientContext } from "../providers/client";
+
+import "../static/printable.scss";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -28,7 +31,7 @@ export function Printable(): React.ReactElement {
 
     return (
         <Screen
-            className={"track_list"}
+            className={"printable"}
             navLeft={<BackToExplore />}
             title={"Track List"}
             //navRight={}

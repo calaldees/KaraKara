@@ -6,11 +6,13 @@ import "abortcontroller-polyfill/dist/polyfill-patch-fetch"; // iOS up to 12
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./static/style.scss";
+
 import { ClientProvider } from "./providers/client";
 import { TimeProvider } from "./providers/time";
 import { ServerProvider } from "./providers/server";
 import { Root } from "./screens/root";
+
+import "./static/style.scss";
 
 const root = createRoot(document.getElementById("root")!);
 root.render(

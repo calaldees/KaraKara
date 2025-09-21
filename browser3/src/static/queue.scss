@@ -1,0 +1,69 @@
+MAIN.queue ARTICLE {
+    .readme {
+        H1 {
+            text-align: center;
+            font-size: 6vw;
+            margin: 0.1em;
+        }
+        LI {
+            margin: 0.5em;
+            font-size: 2vw;
+        }
+    }
+    .progress_bar {
+        margin: 1em 0em 1em 0em;
+        height: 1em;
+        border: 1px solid #444;
+        overflow: hidden;
+        white-space: nowrap;
+        DIV {
+            display: inline-block;
+            height: 100%;
+        }
+        .played {
+            background: var(--notification-error);
+        }
+        .queued {
+            background: var(--notification-warning);
+        }
+        .space {
+            background: var(--notification-ok);
+        }
+    }
+    .me {
+        background: var(--notification-warning);
+    }
+    UL LI {
+        &.drop_source {
+            opacity: 0.5;
+        }
+        &.drop_target {
+            border-top: 5px solid var(--drop-target);
+        }
+        &.drop_last {
+            text-align: center;
+            padding: 1em;
+        }
+        &.public {
+            background: var(--notification-warning);
+        }
+        SPAN.lyrics {
+            font-weight: normal;
+        }
+        SPAN.queue_info {
+            .performer {
+                font-weight: normal;
+            }
+        }
+    }
+
+    .coming_later {
+        text-align: center;
+        SPAN::after {
+            content: ", ";
+        }
+        SPAN:last-child::after {
+            content: "";
+        }
+    }
+}

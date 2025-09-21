@@ -1,13 +1,16 @@
 import { useContext, useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+
 import { Screen } from "./_common";
 import { attachment_path } from "../utils";
-import * as icons from "../static/icons";
-import { Link, useParams, useNavigate } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 import { Subtitle } from "../types";
+
+import * as icons from "../static/icons";
+import "../static/track.scss";
 
 const BLOCKED_KEYS = [
     null,
@@ -150,7 +153,7 @@ export function TrackDetails(): React.ReactElement {
 
     return (
         <Screen
-            className={"track_details"}
+            className={"track"}
             navLeft={
                 <div onClick={() => void navigate(-1)} data-cy="back">
                     <icons.CircleChevronLeft className="x2" />

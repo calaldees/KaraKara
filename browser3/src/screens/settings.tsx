@@ -90,7 +90,7 @@ function RoomSettingsInternal({
 
     return (
         <Screen
-            className={"room_settings"}
+            className={"settings"}
             navLeft={<BackToExplore />}
             title={"Room Settings"}
             //navRight={}
