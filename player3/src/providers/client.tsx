@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
+import { useMemoObj } from "../hooks/memo";
 
 export interface ClientContextType {
     root: string;
@@ -69,30 +70,25 @@ export function ClientProvider(props: any) {
         console.log(n);
     }, []);
 
-    return (
-        <ClientContext
-            value={{
-                root,
-                setRoot,
-                roomPassword,
-                setRoomPassword,
-                showSettings,
-                setShowSettings,
-                podium,
-                setPodium,
-                blankPodium,
-                setBlankPodium,
-                audioAllowed,
-                setAudioAllowed,
-                fullscreen,
-                setFullscreen,
-                setNotification,
-                wakeLock,
-                underscan,
-                setUnderscan,
-            }}
-        >
-            {props.children}
-        </ClientContext>
-    );
+    const ctxVal: ClientContextType = useMemoObj({
+        root,
+        setRoot,
+        roomPassword,
+        setRoomPassword,
+        showSettings,
+        setShowSettings,
+        podium,
+        setPodium,
+        blankPodium,
+        setBlankPodium,
+        audioAllowed,
+        setAudioAllowed,
+        fullscreen,
+        setFullscreen,
+        setNotification,
+        wakeLock,
+        underscan,
+        setUnderscan,
+    });
+    return <ClientContext value={ctxVal}>{props.children}</ClientContext>;
 }

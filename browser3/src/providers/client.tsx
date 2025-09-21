@@ -1,5 +1,6 @@
 import { useCallback, useState, createContext } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
+import { useMemoObj } from "../hooks/memo";
 
 type Notification = {
     text: string;
@@ -72,28 +73,23 @@ export function ClientProvider(props: any) {
         [setBookmarks],
     );
 
-    return (
-        <ClientContext
-            value={{
-                root,
-                setRoot,
-                roomPassword,
-                setRoomPassword,
-                showSettings,
-                setShowSettings,
-                booth,
-                setBooth,
-                widescreen,
-                performerName,
-                setPerformerName,
-                bookmarks,
-                addBookmark,
-                removeBookmark,
-                notification,
-                setNotification,
-            }}
-        >
-            {props.children}
-        </ClientContext>
-    );
+    const ctxVal: ClientContextType = useMemoObj({
+        root,
+        setRoot,
+        roomPassword,
+        setRoomPassword,
+        showSettings,
+        setShowSettings,
+        booth,
+        setBooth,
+        widescreen,
+        performerName,
+        setPerformerName,
+        bookmarks,
+        addBookmark,
+        removeBookmark,
+        notification,
+        setNotification,
+    });
+    return <ClientContext value={ctxVal}>{props.children}</ClientContext>;
 }

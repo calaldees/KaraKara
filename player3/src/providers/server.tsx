@@ -6,6 +6,7 @@ import { useApi } from "../hooks/api";
 import { ClientContext } from "./client";
 import { mqtt_url } from "../utils";
 import type { Track } from "../types";
+import { useMemoObj } from "../hooks/memo";
 
 export interface ServerContextType {
     tracks: Record<string, Track>;
@@ -50,20 +51,13 @@ function InternalServerProvider(props: any) {
         });
     }, [root, request, tracksUpdated]);
 
-    const serverContextValue = useMemo(
-        (): ServerContextType => ({
-            tracks,
-            downloadSize,
-            downloadDone,
-            connected,
-        }),
-        [tracks, downloadSize, downloadDone, connected],
-    );
-    return (
-        <ServerContext value={serverContextValue}>
-            {props.children}
-        </ServerContext>
-    );
+    const ctxVal: ServerContextType = useMemoObj({
+        tracks,
+        downloadSize,
+        downloadDone,
+        connected,
+    });
+    return <ServerContext value={ctxVal}>{props.children}</ServerContext>;
 }
 
 export function ServerProvider(props: any) {

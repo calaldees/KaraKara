@@ -9,6 +9,7 @@ import { ServerContext } from "./server";
 import { apply_hidden, apply_tags } from "../track_finder";
 import type { Track, QueueItem } from "../types";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useMemoObj } from "../hooks/memo";
 
 export interface RoomContextType {
     trackList: Track[];
@@ -110,18 +111,14 @@ export function RoomProvider(props: any) {
 
     // This component re-renders every time "now" changes, but
     // we don't want that to cause re-renders in the consumers
-    const roomContextValue = useMemo(
-        (): RoomContextType => ({
-            trackList,
-            isAdmin,
-            sessionId,
-            queue,
-            fullQueue,
-            setQueue,
-            settings,
-        }),
-        [trackList, isAdmin, sessionId, queue, fullQueue, setQueue, settings],
-    );
-
-    return <RoomContext value={roomContextValue}>{props.children}</RoomContext>;
+    const ctxVal: RoomContextType = useMemoObj({
+        trackList,
+        isAdmin,
+        sessionId,
+        queue,
+        fullQueue,
+        setQueue,
+        settings,
+    });
+    return <RoomContext value={ctxVal}>{props.children}</RoomContext>;
 }

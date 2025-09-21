@@ -8,6 +8,7 @@ import { useApi } from "../hooks/api";
 import { current_and_future } from "../utils";
 import { ClientContext } from "./client";
 import type { QueueItem } from "../types";
+import { useMemoObj } from "../hooks/memo";
 
 export interface RoomContextType {
     isAdmin: boolean;
@@ -83,15 +84,12 @@ export function RoomProvider(props: any) {
 
     // This component re-renders every time "now" changes, but
     // we don't want that to cause re-renders in the consumers
-    const roomContextValue = useMemo(
-        (): RoomContextType => ({
-            isAdmin,
-            sessionId,
-            queue,
-            setQueue,
-            settings,
-        }),
-        [isAdmin, sessionId, queue, setQueue, settings],
-    );
-    return <RoomContext value={roomContextValue}>{props.children}</RoomContext>;
+    const ctxVal: RoomContextType = useMemoObj({
+        isAdmin,
+        sessionId,
+        queue,
+        setQueue,
+        settings,
+    });
+    return <RoomContext value={ctxVal}>{props.children}</RoomContext>;
 }
