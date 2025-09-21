@@ -51,7 +51,7 @@ export function TrackDetails(): React.ReactElement {
         if (subtitleAttachment) {
             request({
                 url: attachment_path(root, subtitleAttachment),
-                options: {credentials: "omit"},
+                options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),
             });
         }

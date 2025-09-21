@@ -89,19 +89,21 @@ function Lyrics({ track }: { track: Track }) {
         if (subtitleAttachment) {
             request({
                 url: attachment_path(root, subtitleAttachment),
-                options: {credentials: "omit"},
+                options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),
             });
         }
     }, [request, root, track]);
     if (lyrics.length > 0) {
-        return <li>
-            <span className={"lyrics"}>
-                {lyrics.map((line, n) => (
-                    <div key={n}>{line.text}</div>
-                ))}
-            </span>
-        </li>;
+        return (
+            <li>
+                <span className={"lyrics"}>
+                    {lyrics.map((line, n) => (
+                        <div key={n}>{line.text}</div>
+                    ))}
+                </span>
+            </li>
+        );
     } else {
         return null;
     }
