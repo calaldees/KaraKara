@@ -12,6 +12,7 @@ describe("no tracks", () => {
         cy.mount(<Queue />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {
                 queue: [],
             },
@@ -25,7 +26,8 @@ describe("now playing", () => {
     it("no time", () => {
         cy.mount(<Queue />, {
             client: {},
-            server: {
+            server: {},
+            serverTime: {
                 now: 1000,
             },
             room: {
@@ -43,7 +45,8 @@ describe("now playing", () => {
     it("in the future", () => {
         cy.mount(<Queue />, {
             client: {},
-            server: {
+            server: {},
+            serverTime: {
                 now: 1000,
             },
             room: {
@@ -61,7 +64,8 @@ describe("now playing", () => {
     it("playing now", () => {
         cy.mount(<Queue />, {
             client: {},
-            server: {
+            server: {},
+            serverTime: {
                 now: 1000,
             },
             room: {
@@ -84,6 +88,7 @@ describe("coming soon", () => {
         cy.mount(<Queue />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {
                 settings: {
                     ...settings,
@@ -101,6 +106,7 @@ describe("coming later", () => {
         cy.mount(<Queue />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {},
         });
         cy.contains("Coming Later").should("exist");
@@ -112,6 +118,7 @@ describe("my entries", () => {
         cy.mount(<Queue />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {},
         });
         cy.contains("My Entries").should("exist");
@@ -120,6 +127,7 @@ describe("my entries", () => {
         cy.mount(<Queue />, {
             client: { performerName: "Zazzy" },
             server: {},
+            serverTime: {},
             room: { sessionId: "nobody" },
         });
         cy.contains("My Entries").should("not.exist");
@@ -131,6 +139,7 @@ describe("misc", () => {
         cy.mount(<Queue />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {},
         });
     });

@@ -1,21 +1,18 @@
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 import { BackToExplore, Screen } from "./_common";
 import { useParams } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 import { QRCodeSVG } from "qrcode.react";
+import { useReactToPrint } from "react-to-print";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-const PrintButtons = (): React.ReactElement => (
+const PrintButtons = ({ callback } : { callback: () => void}): React.ReactElement => (
+
     <footer>
         <div className={"buttons"}>
-            <button
-                onClick={function (state) {
-                    window.print();
-                    return state;
-                }}
-            >
+            <button type="button" onClick={callback}>
                 Print
             </button>
         </div>
@@ -26,23 +23,28 @@ export function Printable(): React.ReactElement {
     const { roomName } = useParams();
     const { root } = useContext(ClientContext);
 
+    const contentRef = useRef<HTMLDivElement>(null);
+    const reactToPrintFn = useReactToPrint({ contentRef });
+
     return (
         <Screen
             className={"track_list"}
             navLeft={<BackToExplore />}
             title={"Track List"}
             //navRight={}
-            footer={<PrintButtons />}
+            footer={<PrintButtons callback={reactToPrintFn} />}
         >
-            <p>
-                To get an interactive track list on your phone, scan this QR
-                code or visit {root} and use room name "{roomName}".
-            </p>
-            <div className={"qr_container"}>
-                <QRCodeSVG
-                    value={`${root}/browser3/${roomName}`}
-                    className={"qr_code"}
-                />
+            <div ref={contentRef} className="printableContent">
+                <p>
+                    To get an interactive track list on your phone, scan this QR
+                    code or visit {root} and use room name "{roomName}".
+                </p>
+                <div className={"qr_container"}>
+                    <QRCodeSVG
+                        value={`${root}/browser3/${roomName}`}
+                        className={"qr_code"}
+                    />
+                </div>
             </div>
         </Screen>
     );

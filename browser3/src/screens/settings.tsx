@@ -1,62 +1,84 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState, useCallback } from "react";
 import { BackToExplore, Screen } from "./_common";
 import { copy_type } from "../utils";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 
+function removeTypes(
+    roomSettings: Record<string, any>,
+): Record<string, string> {
+    const roomSettingsUntyped: Record<string, string> = {};
+    for (const key of Object.keys(roomSettings)) {
+        roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
+    }
+    return roomSettingsUntyped;
+}
+
 export function RoomSettings(): React.ReactElement {
     const { settings: roomSettings } = useContext(RoomContext);
+    // Whenever server-side settings change, change the key,
+    // which will totally reset the edit state.
+    return (
+        <RoomSettingsInternal
+            key={JSON.stringify(roomSettings)}
+            roomSettings={roomSettings}
+        />
+    );
+}
+
+function RoomSettingsInternal({
+    roomSettings,
+}: {
+    roomSettings: Record<string, any>;
+}) {
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
         Record<string, string>
-    >({});
+    >(removeTypes(roomSettings));
     const { request, loading } = useApi();
 
-    // on first loading this screen, and whenever server-side settings change,
-    // convert the string:any settings into string:string
-    useEffect(() => {
-        const roomSettingsUntyped: Record<string, string> = {};
-        for (const key of Object.keys(roomSettings)) {
-            roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
-        }
-        setRoomSettingsEdit(roomSettingsUntyped);
-    }, [roomSettings]);
-
     // when user types in a textbox, update the string:string
-    function update(key: string, value: string) {
-        const newSettings = { ...roomSettingsEdit };
-        newSettings[key] = value;
-        setRoomSettingsEdit(newSettings);
-    }
+    const update = useCallback(
+        (key: string, value: string) => {
+            const newSettings = { ...roomSettingsEdit };
+            newSettings[key] = value;
+            setRoomSettingsEdit(newSettings);
+        },
+        [roomSettingsEdit],
+    );
 
     // when saving settings, convert the string:string into string:any
-    function saveSettings(event: any) {
-        event.preventDefault();
-        const roomSettingsTyped: Record<string, any> = {};
-        for (const key of Object.keys(roomSettings)) {
-            roomSettingsTyped[key] = copy_type(
-                roomSettings[key],
-                roomSettingsEdit[key],
-            );
-        }
-        request({
-            notify: "Saving settings...",
-            notify_ok: "Settings saved!",
-            function: "settings",
-            options: {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
+    const saveSettings = useCallback(
+        (event: any) => {
+            event.preventDefault();
+            const roomSettingsTyped: Record<string, any> = {};
+            for (const key of Object.keys(roomSettings)) {
+                roomSettingsTyped[key] = copy_type(
+                    roomSettings[key],
+                    roomSettingsEdit[key],
+                );
+            }
+            request({
+                notify: "Saving settings...",
+                notify_ok: "Settings saved!",
+                function: "settings",
+                options: {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(roomSettingsTyped),
                 },
-                body: JSON.stringify(roomSettingsTyped),
-            },
-        });
-    }
+            });
+        },
+        [roomSettings, roomSettingsEdit, request],
+    );
 
     const buttons = (
         <footer>
             <div className={"buttons"}>
                 <button
                     onClick={saveSettings}
+                    type="button"
                     data-cy="save-settings-button"
                     disabled={loading}
                 >

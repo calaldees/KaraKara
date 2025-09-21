@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useApi } from "../hooks/api";
 import { useSubscription } from "@shish2k/react-mqtt";
@@ -8,6 +8,8 @@ import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 import { apply_hidden, apply_tags } from "../track_finder";
 import type { Track, QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useMemoObj } from "../hooks/memo";
 
 export interface RoomContextType {
     trackList: Track[];
@@ -15,38 +17,40 @@ export interface RoomContextType {
     sessionId: string;
     queue: QueueItem[];
     fullQueue: QueueItem[];
-    setQueue: (q: QueueItem[]) => void;
+    setOptimisticQueue: (q: QueueItem[] | null) => void;
     settings: Record<string, any>;
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const RoomContext = React.createContext<RoomContextType>(
+export const RoomContext = createContext<RoomContextType>(
     {} as RoomContextType,
 );
 
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
     const { root, roomPassword } = useContext(ClientContext);
-    const { now, tracks } = useContext(ServerContext);
+    const { tracks } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
-    const [queue, setQueue] = useState<QueueItem[]>([]);
+    const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
+        null,
+    );
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
     const navigate = useNavigate();
-
-    // reset to default when room changes
-    useEffect(() => {
-        setFullQueue([]);
-        setQueue([]);
-        setSettings({});
-    }, [roomName]);
+    const newQueue = useMemo(() => current_and_future(now, fullQueue), [now, fullQueue]);
+    // ignore eslint warning - we don't actually care if newQueue
+    // changes, we only care if the _value_ changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const queue = useMemo(() => newQueue, [JSON.stringify(newQueue)]);
 
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
         console.log(pkt.json());
         console.groupEnd();
+        setOptimisticQueue(null);
         setFullQueue(pkt.json());
     });
     useSubscription(`room/${roomName}/settings`, (pkt) => {
@@ -96,23 +100,15 @@ export function RoomProvider(props: any) {
             },
         });
     }, [root, roomName, roomPassword, request, setSessionId, navigate]);
-    useEffect(() => {
-        setQueue(current_and_future(now, fullQueue));
-    }, [fullQueue, now]);
 
-    return (
-        <RoomContext
-            value={{
-                trackList,
-                isAdmin,
-                sessionId,
-                queue,
-                fullQueue,
-                setQueue,
-                settings,
-            }}
-        >
-            {props.children}
-        </RoomContext>
-    );
+    const ctxVal: RoomContextType = useMemoObj({
+        trackList,
+        isAdmin,
+        sessionId,
+        queue: optimisticQueue ?? queue,
+        fullQueue,
+        setOptimisticQueue,
+        settings,
+    });
+    return <RoomContext value={ctxVal}>{props.children}</RoomContext>;
 }

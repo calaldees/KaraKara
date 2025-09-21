@@ -42,24 +42,19 @@ export function TrackDetails(): React.ReactElement {
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request } = useApi();
     const navigate = useNavigate();
-    const [ lyrics, setLyrics ] = useState<Subtitle[]>([]);
+    const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     useEffect(() => {
         if (!trackId) return;
         const subtitleAttachment = tracks[trackId]?.attachments.subtitle?.find(
-            (a) => a.mime === "application/json"
+            (a) => a.mime === "application/json",
         );
-        if (!subtitleAttachment) {
-            setLyrics([]);
-            return;
+        if (subtitleAttachment) {
+            request({
+                url: attachment_path(root, subtitleAttachment),
+                options: { credentials: "omit" },
+                onAction: (result) => setLyrics(result),
+            });
         }
-        request({
-            url: attachment_path(root, subtitleAttachment),
-            options: {
-                credentials: "omit",
-            },
-            onAction: (result) => setLyrics(result),
-            onException: () => setLyrics([]),
-        });
     }, [request, root, tracks, trackId]);
     if (!trackId) throw Error("Can't get here?");
     const track = tracks[trackId];
@@ -98,17 +93,24 @@ export function TrackDetails(): React.ReactElement {
                 )}
                 <div className={"buttons"}>
                     <button
+                        type="button"
                         onClick={(_) => setAction(TrackAction.ENQUEUE)}
                         disabled={is_queued}
                     >
                         Enqueue
                     </button>
                     {bookmarks.includes(track.id) ? (
-                        <button onClick={(_) => removeBookmark(track.id)}>
+                        <button
+                            type="button"
+                            onClick={(_) => removeBookmark(track.id)}
+                        >
                             Un-Bookmark
                         </button>
                     ) : (
-                        <button onClick={(_) => addBookmark(track.id)}>
+                        <button
+                            type="button"
+                            onClick={(_) => addBookmark(track.id)}
+                        >
                             Bookmark
                         </button>
                     )}
@@ -128,10 +130,17 @@ export function TrackDetails(): React.ReactElement {
                     onChange={(e) => setPerformerName(e.target.value)}
                 />
                 <div className={"buttons"}>
-                    <button onClick={(_) => setAction(TrackAction.NONE)}>
+                    <button
+                        type="button"
+                        onClick={(_) => setAction(TrackAction.NONE)}
+                    >
                         Cancel
                     </button>
-                    <button onClick={(_) => enqueue(performerName, track.id)}>
+                    <button
+                        type="button"
+                        onClick={(_) => enqueue(performerName, track.id)}
+                        disabled={performerName.trim().length === 0}
+                    >
                         Confirm
                     </button>
                 </div>

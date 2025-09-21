@@ -11,6 +11,7 @@ describe("no tracks", () => {
         cy.mount(<Control />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {
                 queue: [],
             },
@@ -23,7 +24,8 @@ describe("now playing", () => {
     it("no time", () => {
         cy.mount(<Control />, {
             client: {},
-            server: {
+            server: {},
+            serverTime: {
                 now: 1000,
             },
             room: {
@@ -40,7 +42,8 @@ describe("now playing", () => {
     it("in the future", () => {
         cy.mount(<Control />, {
             client: {},
-            server: {
+            server: {},
+            serverTime: {
                 now: 1000,
             },
             room: {
@@ -57,7 +60,8 @@ describe("now playing", () => {
     it("playing now", () => {
         cy.mount(<Control />, {
             client: {},
-            server: {
+            server: {},
+            serverTime: {
                 now: 1000,
             },
             room: {
@@ -98,6 +102,7 @@ describe("drag & drop", () => {
         cy.mount(<Control />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {},
         });
         dnd('[data-item-id="2"]', '[data-item-id="1"]');
@@ -111,6 +116,7 @@ describe("drag & drop", () => {
         cy.mount(<Control />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {},
         });
         dnd('[data-item-id="2"]', '[data-cy="end-marker"]');
@@ -133,6 +139,7 @@ describe("misc", () => {
         cy.mount(<Control />, {
             client: {},
             server: {},
+            serverTime: {},
             room: {},
         });
         cy.contains("READ ME :)").should("not.exist");

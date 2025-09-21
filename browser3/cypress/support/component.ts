@@ -22,7 +22,7 @@ import "./commands";
 import { mount } from "cypress/react";
 import { MountOptions, MountReturn } from "cypress/react";
 
-import React, { useState } from "react";
+import { useState, createElement } from "react";
 import { ClientContext, ClientContextType } from "../../src/providers/client";
 import { RoomContext, RoomContextType } from "../../src/providers/room";
 import { ServerContext, ServerContextType } from "../../src/providers/server";
@@ -33,6 +33,7 @@ import tracks from "../../cypress/fixtures/small_tracks.json";
 import queue from "../../cypress/fixtures/small_queue.json";
 import settings from "../../cypress/fixtures/small_settings.json";
 import type { QueueItem } from "../../src/types";
+import { ServerTimeContextType } from "@shish2k/react-use-servertime";
 
 // Cypress.Commands.add('mount', mount)
 
@@ -54,6 +55,7 @@ declare global {
 type TestProps = {
     client: Partial<ClientContextType>;
     server: Partial<ServerContextType>;
+    serverTime: Partial<ServerTimeContextType>;
     room: Partial<RoomContextType>;
     children?: any;
 };
@@ -86,13 +88,16 @@ function TestHarness(props: TestProps) {
         connected: true,
         ...props.server,
     };
-    const [queue_, setQueue] = useState(queue as QueueItem[]);
+    const [queue_, _setQueue] = useState(queue as QueueItem[]);
+    const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
+        null,
+    );
     const rc = {
         isAdmin: true,
         sessionId: "admin",
-        queue: queue_,
+        queue: optimisticQueue ?? queue_,
         fullQueue: queue_,
-        setQueue: setQueue,
+        setOptimisticQueue,
         settings: settings,
         trackList: Object.values(tracks),
         ...props.room,
@@ -102,34 +107,47 @@ function TestHarness(props: TestProps) {
         [
             {
                 path: "/:roomName",
-                element: React.createElement(RoomContext.Provider, {
-                    value: rc,
-                    children: props.children,
-                }),
+                element: createElement(
+                    RoomContext.Provider,
+                    {
+                        value: rc,
+                    },
+                    props.children,
+                ),
             },
         ],
         { initialEntries: [`/test`] },
     );
-    const router_provider = React.createElement(RouterProvider, {
+    const router_provider = createElement(RouterProvider, {
         router: router,
     });
-    const server_provider = React.createElement(ServerContext.Provider, {
-        value: sc,
-        children: router_provider,
-    });
-    const client_provider = React.createElement(ClientContext.Provider, {
-        value: cc,
-        children: server_provider,
-    });
+    const server_provider = createElement(
+        ServerContext.Provider,
+        {
+            value: sc,
+        },
+        router_provider,
+    );
+    const client_provider = createElement(
+        ClientContext.Provider,
+        {
+            value: cc,
+        },
+        server_provider,
+    );
     return client_provider;
 }
 
 Cypress.Commands.add("mount", (component, options: any = {}) => {
-    const provider = React.createElement(TestHarness, {
-        client: options.client ?? {},
-        server: options.server ?? {},
-        room: options.room ?? {},
-        children: component,
-    });
+    const provider = createElement(
+        TestHarness,
+        {
+            client: options.client ?? {},
+            server: options.server ?? {},
+            serverTime: options.serverTime ?? {},
+            room: options.room ?? {},
+        },
+        component,
+    );
     return mount(provider, options);
 });

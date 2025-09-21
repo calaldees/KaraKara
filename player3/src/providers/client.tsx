@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
+import { useMemoObj } from "../hooks/memo";
 
 export interface ClientContextType {
     root: string;
@@ -24,7 +25,7 @@ export interface ClientContextType {
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const ClientContext = React.createContext<ClientContextType>(
+export const ClientContext = createContext<ClientContextType>(
     {} as ClientContextType,
 );
 
@@ -65,34 +66,29 @@ export function ClientProvider(props: any) {
         }
     }, [isSupported, request]);
 
-    function setNotification(n: any) {
+    const setNotification = useCallback((n: any) => {
         console.log(n);
-    }
+    }, []);
 
-    return (
-        <ClientContext
-            value={{
-                root,
-                setRoot,
-                roomPassword,
-                setRoomPassword,
-                showSettings,
-                setShowSettings,
-                podium,
-                setPodium,
-                blankPodium,
-                setBlankPodium,
-                audioAllowed,
-                setAudioAllowed,
-                fullscreen,
-                setFullscreen,
-                setNotification,
-                wakeLock,
-                underscan,
-                setUnderscan,
-            }}
-        >
-            {props.children}
-        </ClientContext>
-    );
+    const ctxVal: ClientContextType = useMemoObj({
+        root,
+        setRoot,
+        roomPassword,
+        setRoomPassword,
+        showSettings,
+        setShowSettings,
+        podium,
+        setPodium,
+        blankPodium,
+        setBlankPodium,
+        audioAllowed,
+        setAudioAllowed,
+        fullscreen,
+        setFullscreen,
+        setNotification,
+        wakeLock,
+        underscan,
+        setUnderscan,
+    });
+    return <ClientContext value={ctxVal}>{props.children}</ClientContext>;
 }

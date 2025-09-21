@@ -1,7 +1,8 @@
+import { FormEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+
 import { ClientContext } from "../providers/client";
-import { FormEvent, useContext, useState } from "react";
-import { ServerContext } from "../providers/server";
 
 export function ConfigMenu() {
     const { roomName } = useParams();
@@ -21,21 +22,33 @@ export function ConfigMenu() {
         underscan,
         setUnderscan,
     } = useContext(ClientContext);
-    const { now, offset } = useContext(ServerContext);
+    const { now, offset } = useContext(ServerTimeContext);
     const [rootEdit, setRootEdit] = useState(root);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
 
-    function onSubmit(e: FormEvent) {
-        e.preventDefault();
-        setRoot(rootEdit);
-        if (roomNameEdit !== roomName) {
-            void navigate("/" + roomNameEdit);
-        }
-        setRoomPassword(roomPasswordEdit);
-        setShowSettings(false);
-    }
+    const onSubmit = useCallback(
+        (e: FormEvent) => {
+            e.preventDefault();
+            setRoot(rootEdit);
+            if (roomNameEdit !== roomName) {
+                void navigate("/" + roomNameEdit);
+            }
+            setRoomPassword(roomPasswordEdit);
+            setShowSettings(false);
+        },
+        [
+            navigate,
+            roomName,
+            roomNameEdit,
+            roomPasswordEdit,
+            rootEdit,
+            setRoomPassword,
+            setRoot,
+            setShowSettings,
+        ],
+    );
 
     return (
         <div className={"settings"}>
@@ -166,7 +179,7 @@ export function ConfigMenu() {
                             </tr>
                             <tr>
                                 <td colSpan={2}>
-                                    <button>Close</button>
+                                    <button type="submit">Close</button>
                                 </td>
                             </tr>
                         </tbody>

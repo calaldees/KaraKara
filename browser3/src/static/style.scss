@@ -514,15 +514,9 @@ MAIN.track_list ARTICLE {
 /* Track Details */
 MAIN.track_details ARTICLE {
     VIDEO {
-        margin-top: 5vw;
+        margin-top: 1em;
         border: 1px solid var(--list-border);
-    }
-    .code {
-        margin-top: 0;
-        text-align: center;
-        SPAN {
-            font-weight: bold;
-        }
+        width: 100%;
     }
     DIV.tags {
         display: flex;
@@ -540,11 +534,9 @@ MAIN.track_details ARTICLE {
             }
         }
     }
-    VIDEO {
-        width: 100%;
-    }
     DIV.lyrics {
         user-select: text;
+        margin-bottom: 3em;
     }
 }
 
@@ -609,42 +601,29 @@ MAIN.queue ARTICLE {
 }
 
 @media print {
-    @page {
-        size: landscape;
-    }
-    MAIN {
-        position: relative;
-        HEADER {
-            display: none !important;
-        }
-        ARTICLE {
-            overflow: visible !important;
-            column-count: 4;
-            font-size: 0.75em;
-        }
-        FOOTER {
-            display: none !important;
-        }
+    .printableContent P {
+        font-size: 20pt;
+        text-align: center;
+        padding: 3cm 3cm 1cm 3cm;
     }
 }
 
-///////////////////////////////////////////////////////////////////////
-// Don't put stuff in iPhone's weird rounded corners
+/* Don't put stuff in iPhone's weird rounded corners */
 
 MAIN {
+    HEADER,
+    ARTICLE,
+    FOOTER {
+        padding-left: max(5%, env(safe-area-inset-left));
+        padding-right: max(5%, env(safe-area-inset-right));
+    }
     HEADER {
         padding-top: env(safe-area-inset-top);
-        padding-left: Max(5%, env(safe-area-inset-left));
-        padding-right: Max(5%, env(safe-area-inset-right));
     }
-    ARTICLE {
-        padding-left: Max(5%, env(safe-area-inset-left));
-        padding-right: Max(5%, env(safe-area-inset-right));
-        padding-bottom: env(safe-area-inset-bottom);
+    ARTICLE:last-child {
+        padding-bottom: max(0.3em, env(safe-area-inset-bottom));
     }
     FOOTER {
-        padding-left: Max(5%, env(safe-area-inset-left));
-        padding-right: Max(5%, env(safe-area-inset-right));
-        padding-bottom: Max(0.3em, env(safe-area-inset-bottom));
+        padding-bottom: max(0.3em, env(safe-area-inset-bottom));
     }
 }

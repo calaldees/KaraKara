@@ -1,23 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useApi } from "../hooks/api";
-import { useServerTime } from "@shish2k/react-use-servertime";
+import { createContext, useContext, useEffect, useState } from "react";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
+import { useLocalStorage } from "usehooks-ts";
+
+import { useApi } from "../hooks/api";
 import { ClientContext } from "./client";
 import { mqtt_url } from "../utils";
 import type { Track } from "../types";
-import { useLocalStorage } from "usehooks-ts";
+import { useMemoObj } from "../hooks/memo";
 
 export interface ServerContextType {
     tracks: Record<string, Track>;
     downloadSize: number | null;
     downloadDone: number;
-    now: number;
-    offset: number;
     connected: boolean;
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const ServerContext = React.createContext<ServerContextType>(
+export const ServerContext = createContext<ServerContextType>(
     {} as ServerContextType,
 );
 
@@ -31,7 +30,6 @@ function InternalServerProvider(props: any) {
         0,
     );
     const { request } = useApi();
-    const { now, offset } = useServerTime({ url: `${root}/time.json` });
 
     const { connected } = useSubscription(`global/tracks-updated`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -53,20 +51,13 @@ function InternalServerProvider(props: any) {
         });
     }, [root, request, tracksUpdated]);
 
-    return (
-        <ServerContext
-            value={{
-                tracks,
-                downloadSize,
-                downloadDone,
-                now,
-                offset,
-                connected,
-            }}
-        >
-            {props.children}
-        </ServerContext>
-    );
+    const ctxVal: ServerContextType = useMemoObj({
+        tracks,
+        downloadSize,
+        downloadDone,
+        connected,
+    });
+    return <ServerContext value={ctxVal}>{props.children}</ServerContext>;
 }
 
 export function ServerProvider(props: any) {

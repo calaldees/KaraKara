@@ -1,43 +1,41 @@
-import React, { useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useApi } from "../hooks/api";
 import { useSubscription } from "@shish2k/react-mqtt";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useLocalStorage } from "usehooks-ts";
+
+import { useApi } from "../hooks/api";
 import { current_and_future } from "../utils";
 import { ClientContext } from "./client";
-import { ServerContext } from "./server";
 import type { QueueItem } from "../types";
+import { useMemoObj } from "../hooks/memo";
 
 export interface RoomContextType {
     isAdmin: boolean;
     sessionId: string;
     queue: QueueItem[];
-    setQueue: (q: QueueItem[]) => void;
     settings: Record<string, any>;
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const RoomContext = React.createContext<RoomContextType>(
+export const RoomContext = createContext<RoomContextType>(
     {} as RoomContextType,
 );
 
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
     const { root, roomPassword } = useContext(ClientContext);
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
-    const [queue, setQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
-
-    // reset to default when room changes
-    useEffect(() => {
-        setFullQueue([]);
-        setQueue([]);
-        setSettings({});
-    }, [roomName]);
+    const newQueue = useMemo(() => current_and_future(now, fullQueue), [now, fullQueue]);
+    // ignore eslint warning - we don't actually care if newQueue
+    // changes, we only care if the _value_ changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const queue = useMemo(() => newQueue, [JSON.stringify(newQueue)]);
 
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -70,21 +68,14 @@ export function RoomProvider(props: any) {
             },
         });
     }, [root, roomName, roomPassword, request, setSessionId]);
-    useEffect(() => {
-        setQueue(current_and_future(now, fullQueue));
-    }, [fullQueue, now]);
 
-    return (
-        <RoomContext
-            value={{
-                isAdmin,
-                sessionId,
-                queue,
-                setQueue,
-                settings,
-            }}
-        >
-            {props.children}
-        </RoomContext>
-    );
+    // This component re-renders every time "now" changes, but
+    // we don't want that to cause re-renders in the consumers
+    const ctxVal: RoomContextType = useMemoObj({
+        isAdmin,
+        sessionId,
+        queue,
+        settings,
+    });
+    return <RoomContext value={ctxVal}>{props.children}</RoomContext>;
 }

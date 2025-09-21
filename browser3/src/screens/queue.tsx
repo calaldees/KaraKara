@@ -1,12 +1,19 @@
 import { useContext, useEffect, useState } from "react";
 import { Screen, BackToExplore, Thumb } from "./_common";
-import { shuffle, is_my_song, time_until, dict2css, attachment_path } from "../utils";
+import {
+    shuffle,
+    is_my_song,
+    time_until,
+    dict2css,
+    attachment_path,
+} from "../utils";
 import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 import type { Track, QueueItem, Subtitle } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 function QueueItemRender({
     item,
@@ -19,7 +26,7 @@ function QueueItemRender({
 }): React.ReactElement {
     const { performerName } = useContext(ClientContext);
     const { sessionId } = useContext(RoomContext);
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { request } = useApi();
 
     function removeTrack(queue_item_id: number) {
@@ -70,31 +77,42 @@ function QueueItemRender({
     );
 }
 
-export function Queue(): React.ReactElement {
-    const { root, performerName, widescreen } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
-    const { queue, settings, sessionId } = useContext(RoomContext);
+function Lyrics({ track }: { track: Track }) {
+    const { root } = useContext(ClientContext);
     const { request } = useApi();
 
-    const [ lyrics, setLyrics ] = useState<Subtitle[]>([]);
-    const firstTrackId = queue[0]?.track_id;
+    const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     useEffect(() => {
-        const subtitleAttachment = tracks[firstTrackId]?.attachments.subtitle?.find(
-            (a) => a.mime === "application/json"
+        const subtitleAttachment = track?.attachments.subtitle?.find(
+            (a) => a.mime === "application/json",
         );
-        if (!subtitleAttachment) {
-            setLyrics([]);
-            return;
+        if (subtitleAttachment) {
+            request({
+                url: attachment_path(root, subtitleAttachment),
+                options: { credentials: "omit" },
+                onAction: (result) => setLyrics(result),
+            });
         }
-        request({
-            url: attachment_path(root, subtitleAttachment),
-            options: {
-                credentials: "omit",
-            },
-            onAction: (result) => setLyrics(result),
-            onException: () => setLyrics([]),
-        });
-    }, [request, root, tracks, firstTrackId]);
+    }, [request, root, track]);
+    if (lyrics.length > 0) {
+        return (
+            <li>
+                <span className={"lyrics"}>
+                    {lyrics.map((line, n) => (
+                        <div key={n}>{line.text}</div>
+                    ))}
+                </span>
+            </li>
+        );
+    } else {
+        return null;
+    }
+}
+
+export function Queue(): React.ReactElement {
+    const { performerName, widescreen } = useContext(ClientContext);
+    const { tracks } = useContext(ServerContext);
+    const { queue, settings, sessionId } = useContext(RoomContext);
 
     return (
         <Screen
@@ -114,17 +132,10 @@ export function Queue(): React.ReactElement {
                             show_time={true}
                             track={tracks[queue[0].track_id]}
                         />
-                        {lyrics.length > 0 && (
-                            <li>
-                                <span className={"lyrics"}>
-                                    {lyrics.map(
-                                        (line, n) => (
-                                            <div key={n}>{line.text}</div>
-                                        ),
-                                    )}
-                                </span>
-                            </li>
-                        )}
+                        <Lyrics
+                            key={queue[0].track_id}
+                            track={tracks[queue[0].track_id]}
+                        />
                     </ul>
                 </section>
             )}

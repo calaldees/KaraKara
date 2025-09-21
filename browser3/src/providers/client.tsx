@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useCallback, useState, createContext } from "react";
 import { useLocalStorage, useMediaQuery } from "usehooks-ts";
+import { useMemoObj } from "../hooks/memo";
 
 type Notification = {
     text: string;
@@ -26,7 +27,7 @@ export interface ClientContextType {
 }
 
 /* eslint-disable react-refresh/only-export-components */
-export const ClientContext = React.createContext<ClientContextType>(
+export const ClientContext = createContext<ClientContextType>(
     {} as ClientContextType,
 );
 
@@ -58,35 +59,37 @@ export function ClientProvider(props: any) {
     );
     const [notification, setNotification] = useState<Notification>(null);
 
-    function addBookmark(track_id: string): void {
-        setBookmarks([...bookmarks, track_id]);
-    }
-    function removeBookmark(track_id: string): void {
-        setBookmarks(bookmarks.filter((x) => x !== track_id));
-    }
-
-    return (
-        <ClientContext
-            value={{
-                root,
-                setRoot,
-                roomPassword,
-                setRoomPassword,
-                showSettings,
-                setShowSettings,
-                booth,
-                setBooth,
-                widescreen,
-                performerName,
-                setPerformerName,
-                bookmarks,
-                addBookmark,
-                removeBookmark,
-                notification,
-                setNotification,
-            }}
-        >
-            {props.children}
-        </ClientContext>
+    const addBookmark = useCallback(
+        (track_id: string): void => {
+            setBookmarks((prev) => [...prev, track_id]);
+        },
+        [setBookmarks],
     );
+
+    const removeBookmark = useCallback(
+        (track_id: string): void => {
+            setBookmarks((prev) => prev.filter((x) => x !== track_id));
+        },
+        [setBookmarks],
+    );
+
+    const ctxVal: ClientContextType = useMemoObj({
+        root,
+        setRoot,
+        roomPassword,
+        setRoomPassword,
+        showSettings,
+        setShowSettings,
+        booth,
+        setBooth,
+        widescreen,
+        performerName,
+        setPerformerName,
+        bookmarks,
+        addBookmark,
+        removeBookmark,
+        notification,
+        setNotification,
+    });
+    return <ClientContext value={ctxVal}>{props.children}</ClientContext>;
 }

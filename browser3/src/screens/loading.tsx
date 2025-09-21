@@ -13,7 +13,7 @@ export function Loading(): React.ReactElement {
         <Screen className={"loadingPage"} title={"Loading..."}>
             <div className={"flex-center"}>
                 <input type="text" value={roomName} disabled={true} />
-                <button disabled={true}>
+                <button type="button" disabled={true}>
                     Loading Tracks{" "}
                     {downloadSize ? (
                         percent(downloadDone, downloadSize)

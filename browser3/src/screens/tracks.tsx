@@ -1,32 +1,16 @@
-import React, { useContext, useMemo, useState } from "react";
+import { useContext, ReactElement } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
 import { group_tracks } from "../track_grouper";
 import * as icons from "../static/icons";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
+import { ExploreProvider, ExploreContext } from "../providers/explore";
 import type { Track } from "../types";
-
-interface ExploreContextType {
-    search: string;
-    setSearch: (_: string) => void;
-    filters: string[];
-    setFilters: (_: any) => void;
-    expanded: string | null;
-    setExpanded: (_: string | null) => void;
-}
-
-const ExploreContext = React.createContext<ExploreContextType>({
-    search: "",
-    setSearch: (_: string) => null,
-    filters: [],
-    setFilters: (_: any) => null,
-    expanded: null,
-    setExpanded: (_: string | null) => null,
-});
+import { useMemoArr } from "../hooks/memo";
 
 /*
  * List individual tracks
@@ -190,7 +174,7 @@ function Bookmarks({
     tracks: Record<string, Track>;
     trackList: Track[];
 }) {
-    const visibleTrackIDs = useMemo(
+    const visibleTrackIDs = useMemoArr(
         () => trackList.map((track) => track.id),
         [trackList],
     );
@@ -231,7 +215,7 @@ function Explorer(): React.ReactElement {
     const { search, setSearch, filters, setFilters, setExpanded } =
         useContext(ExploreContext);
 
-    const sections = useMemo(
+    const sections = useMemoArr(
         () => group_tracks(filters, find_tracks(trackList, filters, search)),
         [trackList, search, filters],
     );
@@ -323,36 +307,18 @@ function Explorer(): React.ReactElement {
     );
 }
 
-export function TrackList(): React.ReactElement {
+export function TrackList(): ReactElement {
+    return (
+        <ExploreProvider>
+            <TrackListInternal />
+        </ExploreProvider>
+    );
+}
+
+function TrackListInternal(): ReactElement {
     const { isAdmin } = useContext(RoomContext);
     const { booth, widescreen } = useContext(ClientContext);
-
-    const [expanded, setExpanded] = useState<string | null>(null);
-    const [inSearch, setInSearch] = useState(false);
-
-    const [searchParams, setSearchParams] = useSearchParams();
-    const search = searchParams.get("search") ?? "";
-    // getAll returns a new Array object every time, so we need to compare the
-    // string representation of the lists to see if they're the same, otherwise
-    // React will think the list has changed and re-render.
-    const filterString = JSON.stringify(searchParams.getAll("filters"));
-    const filters = useMemo(() => JSON.parse(filterString), [filterString]);
-    function setSearch(new_search: string | ((search: string) => string)) {
-        if (typeof new_search === "function") {
-            new_search = new_search(search);
-        }
-        setSearchParams({ search: new_search, filters }, { replace: inSearch });
-        setInSearch(true);
-    }
-    function setFilters(
-        new_filters: string[] | ((filters: string[]) => string[]),
-    ) {
-        if (typeof new_filters === "function") {
-            new_filters = new_filters(filters);
-        }
-        setSearchParams({ search, filters: new_filters });
-        setInSearch(false);
-    }
+    const { filters, setFilters } = useContext(ExploreContext);
 
     return (
         <Screen
@@ -377,18 +343,7 @@ export function TrackList(): React.ReactElement {
             }
             footer={isAdmin && !booth && <AdminButtons />}
         >
-            <ExploreContext.Provider
-                value={{
-                    search,
-                    setSearch,
-                    filters,
-                    setFilters,
-                    expanded,
-                    setExpanded,
-                }}
-            >
-                <Explorer />
-            </ExploreContext.Provider>
+            <Explorer />
         </Screen>
     );
 }

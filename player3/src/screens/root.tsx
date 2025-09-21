@@ -6,6 +6,7 @@ import {
     RouterProvider,
     useParams,
 } from "react-router-dom";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ClientContext } from "../providers/client";
@@ -29,8 +30,9 @@ const router = createBrowserRouter(
 );
 
 function RoomWrapper() {
+    const { roomName } = useParams();
     return (
-        <RoomProvider>
+        <RoomProvider key={roomName}>
             <Room />
         </RoomProvider>
     );
@@ -45,8 +47,9 @@ function Room() {
         setShowSettings,
         underscan,
     } = useContext(ClientContext);
-    const { now, tracks, downloadSize, downloadDone, connected } =
+    const { tracks, downloadSize, downloadDone, connected } =
         useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { queue, isAdmin, settings } = useContext(RoomContext);
 
     let screen = <section>Unknown state :(</section>;

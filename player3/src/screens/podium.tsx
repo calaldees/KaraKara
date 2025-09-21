@@ -1,11 +1,12 @@
-import { attachment_path, percent, s_to_mns } from "../utils";
-import { Video } from "./_common";
-import { useContext, useState } from "react";
-import { ServerContext } from "../providers/server";
+import { useCallback, useContext, useState } from "react";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+
+import { Video } from "../components/video";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
 import type { Track, QueueItem } from "../types";
+import { attachment_path, percent, s_to_mns } from "../utils";
 
 ///////////////////////////////////////////////////////////////////////
 // Views
@@ -20,16 +21,16 @@ export function PodiumScreen({
     queue_item: QueueItem;
 }) {
     const { root, blankPodium } = useContext(ClientContext);
-    const { now } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
     const [starting, setStarting] = useState(false);
     const { request } = useApi();
 
-    function start() {
+    const start = useCallback(() => {
         setStarting(true);
         request({ function: "command/play" });
         setTimeout(() => setStarting(false), 2000);
-    }
+    }, [request]);
 
     return (
         <section key="podium" className={"screen_podium"}>
@@ -55,6 +56,7 @@ export function PodiumScreen({
                         ?.filter((a) => a.mime === "text/vtt")
                         .map((a) => (
                             <track
+                                key={a.path}
                                 kind="subtitles"
                                 src={attachment_path(root, a)}
                                 default={true}

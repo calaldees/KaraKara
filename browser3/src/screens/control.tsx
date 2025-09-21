@@ -8,10 +8,12 @@ import { ServerContext } from "../providers/server";
 import { useApi } from "../hooks/api";
 import { useParams } from "react-router-dom";
 import type { QueueItem } from "../types";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
-    const { tracks, now } = useContext(ServerContext);
-    const { fullQueue, setQueue } = useContext(RoomContext);
+    const { tracks } = useContext(ServerContext);
+    const { now } = useContext(ServerTimeContext);
+    const { fullQueue, setOptimisticQueue } = useContext(RoomContext);
     const { booth } = useContext(ClientContext);
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
@@ -94,7 +96,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
         }
 
         // update our local queue, tell the server to update server queue,
-        setQueue(new_queue);
+        setOptimisticQueue(new_queue);
         setDropSource(null);
         setDropTarget(null);
         request({
@@ -110,7 +112,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                 }),
             },
             // on network error, revert to original queue
-            onException: () => setQueue(queue),
+            onException: () => setOptimisticQueue(null),
         });
     }
 
@@ -245,6 +247,7 @@ function ControlButtons(): React.ReactElement {
                 {Object.entries(buttons).map(([command, icon]) => (
                     <button
                         key={command}
+                        type="button"
                         onClick={(_) => sendCommand(command)}
                         disabled={loading}
                     >
@@ -265,11 +268,12 @@ function ProgressBar({
     startDateTime: string;
     endDateTime: string;
 }) {
+    const { now } = useContext(ServerTimeContext);
     if (!queue.length) return null;
     const queue_last = queue[queue.length - 1];
     if (!queue_last.start_time) return null;
     const start = Date.parse(startDateTime);
-    const current = Date.now() - start;
+    const current = now - start;
     const queue_end =
         (queue_last.start_time + queue_last.track_duration) * 1000 - start;
     const end = Date.parse(endDateTime) - start;
