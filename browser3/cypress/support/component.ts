@@ -88,13 +88,16 @@ function TestHarness(props: TestProps) {
         connected: true,
         ...props.server,
     };
-    const [queue_, setQueue] = useState(queue as QueueItem[]);
+    const [queue_, _setQueue] = useState(queue as QueueItem[]);
+    const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
+        null,
+    );
     const rc = {
         isAdmin: true,
         sessionId: "admin",
-        queue: queue_,
+        queue: optimisticQueue ?? queue_,
         fullQueue: queue_,
-        setQueue: setQueue,
+        setOptimisticQueue,
         settings: settings,
         trackList: Object.values(tracks),
         ...props.room,
@@ -104,10 +107,13 @@ function TestHarness(props: TestProps) {
         [
             {
                 path: "/:roomName",
-                element: createElement(RoomContext.Provider, {
-                    value: rc,
-                    children: props.children,
-                }),
+                element: createElement(
+                    RoomContext.Provider,
+                    {
+                        value: rc,
+                    },
+                    props.children,
+                ),
             },
         ],
         { initialEntries: [`/test`] },
@@ -115,24 +121,33 @@ function TestHarness(props: TestProps) {
     const router_provider = createElement(RouterProvider, {
         router: router,
     });
-    const server_provider = createElement(ServerContext.Provider, {
-        value: sc,
-        children: router_provider,
-    });
-    const client_provider = createElement(ClientContext.Provider, {
-        value: cc,
-        children: server_provider,
-    });
+    const server_provider = createElement(
+        ServerContext.Provider,
+        {
+            value: sc,
+        },
+        router_provider,
+    );
+    const client_provider = createElement(
+        ClientContext.Provider,
+        {
+            value: cc,
+        },
+        server_provider,
+    );
     return client_provider;
 }
 
 Cypress.Commands.add("mount", (component, options: any = {}) => {
-    const provider = createElement(TestHarness, {
-        client: options.client ?? {},
-        server: options.server ?? {},
-        serverTime: options.serverTime ?? {},
-        room: options.room ?? {},
-        children: component,
-    });
+    const provider = createElement(
+        TestHarness,
+        {
+            client: options.client ?? {},
+            server: options.server ?? {},
+            serverTime: options.serverTime ?? {},
+            room: options.room ?? {},
+        },
+        component,
+    );
     return mount(provider, options);
 });

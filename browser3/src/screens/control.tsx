@@ -13,7 +13,7 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
-    const { fullQueue, setQueue } = useContext(RoomContext);
+    const { fullQueue, setOptimisticQueue } = useContext(RoomContext);
     const { booth } = useContext(ClientContext);
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
@@ -96,7 +96,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
         }
 
         // update our local queue, tell the server to update server queue,
-        setQueue(new_queue);
+        setOptimisticQueue(new_queue);
         setDropSource(null);
         setDropTarget(null);
         request({
@@ -112,7 +112,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                 }),
             },
             // on network error, revert to original queue
-            onException: () => setQueue(queue),
+            onException: () => setOptimisticQueue(null),
         });
     }
 

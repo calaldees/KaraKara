@@ -17,7 +17,7 @@ export interface RoomContextType {
     sessionId: string;
     queue: QueueItem[];
     fullQueue: QueueItem[];
-    setQueue: (q: QueueItem[]) => void;
+    setOptimisticQueue: (q: QueueItem[] | null) => void;
     settings: Record<string, any>;
 }
 
@@ -34,6 +34,9 @@ export function RoomProvider(props: any) {
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
+    const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
+        null,
+    );
     const [queue, setQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
@@ -43,6 +46,7 @@ export function RoomProvider(props: any) {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
         console.log(pkt.json());
         console.groupEnd();
+        setOptimisticQueue(null);
         setFullQueue(pkt.json());
     });
     useSubscription(`room/${roomName}/settings`, (pkt) => {
@@ -115,9 +119,9 @@ export function RoomProvider(props: any) {
         trackList,
         isAdmin,
         sessionId,
-        queue,
+        queue: optimisticQueue ?? queue,
         fullQueue,
-        setQueue,
+        setOptimisticQueue,
         settings,
     });
     return <RoomContext value={ctxVal}>{props.children}</RoomContext>;
