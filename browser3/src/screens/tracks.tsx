@@ -16,7 +16,7 @@ import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import type { Track } from "../types";
-import { useMemoArr } from "../hooks/memo";
+import { useMemoArr, useMemoObj } from "../hooks/memo";
 
 interface ExploreContextType {
     search: string;
@@ -375,17 +375,14 @@ export function TrackList(): ReactElement {
         [search, filters, setSearchParams],
     );
 
-    const exploreContextValue = useMemo(
-        (): ExploreContextType => ({
-            search,
-            setSearch,
-            filters,
-            setFilters,
-            expanded,
-            setExpanded,
-        }),
-        [search, setSearch, filters, setFilters, expanded, setExpanded],
-    );
+    const exploreContextValue = useMemoObj({
+        search,
+        setSearch,
+        filters,
+        setFilters,
+        expanded,
+        setExpanded,
+    });
     return (
         <Screen
             className={"track_list"}
