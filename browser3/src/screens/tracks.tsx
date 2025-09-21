@@ -1,40 +1,16 @@
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useMemo,
-    useState,
-    ReactElement,
-} from "react";
+import { useContext, ReactElement } from "react";
 import { Screen, Thumb } from "./_common";
 import { normalise_cmp, track_info } from "../utils";
 import { find_tracks } from "../track_finder";
 import { group_tracks } from "../track_grouper";
 import * as icons from "../static/icons";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
+import { ExploreProvider, ExploreContext } from "../providers/explore";
 import type { Track } from "../types";
-import { useMemoArr, useMemoObj } from "../hooks/memo";
-
-interface ExploreContextType {
-    search: string;
-    setSearch: (_: string) => void;
-    filters: string[];
-    setFilters: (_: any) => void;
-    expanded: string | null;
-    setExpanded: (_: string | null) => void;
-}
-
-const ExploreContext = createContext<ExploreContextType>({
-    search: "",
-    setSearch: (_: string) => null,
-    filters: [],
-    setFilters: (_: any) => null,
-    expanded: null,
-    setExpanded: (_: string | null) => null,
-});
+import { useMemoArr } from "../hooks/memo";
 
 /*
  * List individual tracks
@@ -332,57 +308,18 @@ function Explorer(): React.ReactElement {
 }
 
 export function TrackList(): ReactElement {
+    return (
+        <ExploreProvider>
+            <TrackListInternal />
+        </ExploreProvider>
+    );
+}
+
+function TrackListInternal(): ReactElement {
     const { isAdmin } = useContext(RoomContext);
     const { booth, widescreen } = useContext(ClientContext);
+    const { filters, setFilters } = useContext(ExploreContext);
 
-    const [expanded, setExpanded] = useState<string | null>(null);
-    const [inSearch, setInSearch] = useState(false);
-
-    const [searchParams, setSearchParams] = useSearchParams();
-    const search = useMemo(
-        () => searchParams.get("search") ?? "",
-        [searchParams],
-    );
-    const filters = useMemo(
-        () => searchParams.getAll("filters"),
-        [searchParams],
-    );
-
-    const setSearch = useCallback(
-        (new_search: string | ((search: string) => string)) => {
-            const updatedSearch =
-                typeof new_search === "function"
-                    ? new_search(search)
-                    : new_search;
-            setSearchParams(
-                { search: updatedSearch, filters },
-                { replace: inSearch },
-            );
-            setInSearch(true);
-        },
-        [search, filters, setSearchParams, inSearch],
-    );
-
-    const setFilters = useCallback(
-        (new_filters: string[] | ((filters: string[]) => string[])) => {
-            const updatedFilters =
-                typeof new_filters === "function"
-                    ? new_filters(filters)
-                    : new_filters;
-            setSearchParams({ search, filters: updatedFilters });
-            setInSearch(false);
-        },
-        [search, filters, setSearchParams],
-    );
-
-    const exploreContextValue = useMemoObj({
-        search,
-        setSearch,
-        filters,
-        setFilters,
-        expanded,
-        setExpanded,
-    });
     return (
         <Screen
             className={"track_list"}
@@ -406,9 +343,7 @@ export function TrackList(): ReactElement {
             }
             footer={isAdmin && !booth && <AdminButtons />}
         >
-            <ExploreContext value={exploreContextValue}>
-                <Explorer />
-            </ExploreContext>
+            <Explorer />
         </Screen>
     );
 }
