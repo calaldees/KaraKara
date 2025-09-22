@@ -28,12 +28,14 @@ class Target:
         type: TargetType,
         encoder: Encoder,
         sources: t.Set[Source],
+        variant: str | None = None,
     ) -> None:
 
         self.processed_dir = processed_dir
         self.type = type
         self.encoder = encoder
         self.sources = sources
+        self.variant = variant
 
         parts = [self.encoder.salt] + [s.hash for s in self.sources]
         hasher = hashlib.sha256()
@@ -69,4 +71,5 @@ class Target:
 
     def __str__(self) -> str:
         source_list = [str(s) for s in self.sources]
-        return f"{self.type.name}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list})"
+        var = f"[{self.variant}]" if self.variant else ""
+        return f"{self.type.name}{var}: {self.friendly!r} = {self.encoder.__class__.__name__}({source_list})"
