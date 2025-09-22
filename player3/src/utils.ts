@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import type { Track, QueueItem, Attachment } from "./types";
 
 export function dict2css(d: Record<string, any>) {
@@ -212,3 +213,5 @@ export function normalise_name(name: string): string {
 export function normalise_cmp(a: string, b: string): number {
     return normalise_name(a) > normalise_name(b) ? 1 : -1;
 }
+
+export const useMemo2 = useMemo;
