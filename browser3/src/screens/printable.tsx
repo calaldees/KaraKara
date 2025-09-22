@@ -11,8 +11,11 @@ import "../static/printable.scss";
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-const PrintButtons = ({ callback } : { callback: () => void}): React.ReactElement => (
-
+const PrintButtons = ({
+    callback,
+}: {
+    callback: () => void;
+}): React.ReactElement => (
     <footer>
         <div className={"buttons"}>
             <button type="button" onClick={callback}>
