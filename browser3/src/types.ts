@@ -1,4 +1,5 @@
 export interface Attachment {
+    variant: string | null;
     mime: string;
     path: string;
 }
