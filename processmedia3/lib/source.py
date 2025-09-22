@@ -17,7 +17,7 @@ class SourceType(enum.Enum):
     AUDIO = frozenset({".mp3", ".flac", ".ogg", ".aac"})
     IMAGE = frozenset({".jpg", ".png", ".webp", ".avif"})
     TAGS = frozenset({".txt"})
-    SUBTITLES = frozenset({".srt", ".ssa"})
+    SUBTITLES = frozenset({".srt", ".ssa", ".ass"})
 
 
 class SourceTypeException(Exception):
