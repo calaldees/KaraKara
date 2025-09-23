@@ -7,7 +7,7 @@ import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
 import { RoomContext } from "../providers/room";
 import { useApi } from "../hooks/api";
-import { Subtitle } from "../types";
+import { Track, Subtitle } from "../types";
 
 import * as icons from "../static/icons";
 import "../static/track.scss";
@@ -29,26 +29,63 @@ enum TrackAction {
     ENQUEUE = 1,
 }
 
-export function TrackDetails(): React.ReactElement {
-    const { trackId } = useParams();
-    const {
-        root,
-        widescreen,
-        bookmarks,
-        addBookmark,
-        removeBookmark,
-        performerName,
-        setPerformerName,
-    } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
-    const { queue } = useContext(RoomContext);
-    const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
-    const { request } = useApi();
-    const navigate = useNavigate();
+function Preview({ track }: { track: Track }) {
+    const { root } = useContext(ClientContext);
+    return (
+        <video
+            className={"video_placeholder"}
+            preload={"none"}
+            poster={attachment_path(root, track.attachments.image.slice(-1)[0])}
+            controls={true}
+            crossOrigin="anonymous"
+        >
+            {track.attachments.video.map((a) => (
+                <source
+                    key={a.path}
+                    src={attachment_path(root, a)}
+                    type={a.mime}
+                />
+            ))}
+            {track.attachments.subtitle
+                ?.filter((a) => a.mime === "text/vtt")
+                .map((a) => (
+                    <track
+                        key={a.path}
+                        src={attachment_path(root, a)}
+                        default={true}
+                    />
+                ))}
+        </video>
+    );
+}
+
+function Tags({ track }: { track: Track }) {
+    return (
+        <>
+            <h2>Tags</h2>
+            <div className={"tags"}>
+                {Object.keys(track.tags)
+                    .filter((key) => !BLOCKED_KEYS.includes(key))
+                    .map((key) => (
+                        <div key={key} className={"tag"}>
+                            <div className={"tag_key"}>{key}</div>
+                            <div className={"tag_value"}>
+                                {track.tags[key]?.join(", ")}
+                            </div>
+                        </div>
+                    ))}
+            </div>
+        </>
+    );
+}
+
+function Lyrics({ track }: { track: Track }): React.ReactElement | null {
+    const { root } = useContext(ClientContext);
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
+    const { request } = useApi();
+
     useEffect(() => {
-        if (!trackId) return;
-        const subtitleAttachment = tracks[trackId]?.attachments.subtitle?.find(
+        const subtitleAttachment = track.attachments.subtitle?.find(
             (a) => a.mime === "application/json",
         );
         if (subtitleAttachment) {
@@ -58,10 +95,35 @@ export function TrackDetails(): React.ReactElement {
                 onAction: (result) => setLyrics(result),
             });
         }
-    }, [request, root, tracks, trackId]);
-    if (!trackId) throw Error("Can't get here?");
-    const track = tracks[trackId];
-    if (!track) return <div>No track with ID {trackId}</div>;
+    }, [request, root, track]);
+
+    if (lyrics.length === 0) {
+        return null;
+    } else {
+        return (
+            <>
+                <h2>Lyrics</h2>
+                <div className={"lyrics"}>
+                    {lyrics.map((item, n) => (
+                        <div key={n}>{item.text}</div>
+                    ))}
+                </div>
+            </>
+        );
+    }
+}
+
+function Buttons({ track }: { track: Track }) {
+    const { queue } = useContext(RoomContext);
+    const {
+        bookmarks,
+        addBookmark,
+        removeBookmark,
+        performerName,
+        setPerformerName,
+    } = useContext(ClientContext);
+    const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
+    const { request } = useApi();
 
     function enqueue(performer_name: string, track_id: string) {
         request({
@@ -82,12 +144,11 @@ export function TrackDetails(): React.ReactElement {
         });
     }
 
-    let buttons = null;
     if (action === TrackAction.NONE) {
         const is_queued =
             queue.find((i) => i.track_id === track.id) !== undefined;
 
-        buttons = (
+        return (
             <footer>
                 {is_queued && (
                     <div className={"already_queued"}>
@@ -122,7 +183,7 @@ export function TrackDetails(): React.ReactElement {
         );
     }
     if (action === TrackAction.ENQUEUE) {
-        buttons = (
+        return (
             <footer>
                 <input
                     type="text"
@@ -150,6 +211,16 @@ export function TrackDetails(): React.ReactElement {
             </footer>
         );
     }
+    return null;
+}
+export function TrackDetails(): React.ReactElement {
+    const { trackId } = useParams();
+    const { widescreen } = useContext(ClientContext);
+    const { tracks } = useContext(ServerContext);
+    const navigate = useNavigate();
+    if (!trackId) throw Error("Can't get here?");
+    const track = tracks[trackId];
+    if (!track) return <div>No track with ID {trackId}</div>;
 
     return (
         <Screen
@@ -167,61 +238,11 @@ export function TrackDetails(): React.ReactElement {
                     </Link>
                 )
             }
-            footer={buttons}
+            footer={<Buttons track={track} />}
         >
-            {/* Preview */}
-            <video
-                className={"video_placeholder"}
-                preload={"none"}
-                poster={attachment_path(
-                    root,
-                    track.attachments.image.slice(-1)[0],
-                )}
-                controls={true}
-                crossOrigin="anonymous"
-            >
-                {track.attachments.video.map((a) => (
-                    <source
-                        key={a.path}
-                        src={attachment_path(root, a)}
-                        type={a.mime}
-                    />
-                ))}
-                {track.attachments.subtitle
-                    ?.filter((a) => a.mime === "text/vtt")
-                    .map((a) => (
-                        <track
-                            key={a.path}
-                            src={attachment_path(root, a)}
-                            default={true}
-                        />
-                    ))}
-            </video>
-
-            {/* Tags */}
-            <h2>Tags</h2>
-            <div className={"tags"}>
-                {Object.keys(track.tags)
-                    .filter((key) => !BLOCKED_KEYS.includes(key))
-                    .map((key) => (
-                        <div key={key} className={"tag"}>
-                            <div className={"tag_key"}>{key}</div>
-                            <div className={"tag_value"}>
-                                {track.tags[key]?.join(", ")}
-                            </div>
-                        </div>
-                    ))}
-            </div>
-
-            {/* Lyrics */}
-            {lyrics.length > 0 && (
-                <div className={"lyrics"}>
-                    <h2>Lyrics</h2>
-                    {lyrics.map((item, n) => (
-                        <div key={n}>{item.text}</div>
-                    ))}
-                </div>
-            )}
+            <Preview track={track} />
+            <Tags track={track} />
+            <Lyrics track={track} />
         </Screen>
     );
 }
