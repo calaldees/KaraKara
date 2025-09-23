@@ -23,6 +23,7 @@
         "react-dom": "^19.0.0",
         "react-router-dom": "^7.5.3",
         "react-to-print": "^3.1.1",
+        "ua-parser-js": "^2.0.5",
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {

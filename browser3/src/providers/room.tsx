@@ -1,14 +1,16 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useApi } from "../hooks/api";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { UAParser } from 'ua-parser-js';
 import { useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
+
+import { useApi } from "../hooks/api";
 import { current_and_future, normalise_cmp } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 import { apply_hidden, apply_tags } from "../track_finder";
 import type { Track, QueueItem } from "../types";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useMemoObj } from "../hooks/memo";
 
 export interface RoomContextType {
@@ -103,6 +105,25 @@ export function RoomProvider(props: any) {
             },
         });
     }, [root, roomName, roomPassword, request, setSessionId, navigate]);
+
+    useEffect(() => {
+        const ua = UAParser();
+        const an = {
+            event: "open_room",
+            ua: ua,
+            dev: process.env.NODE_ENV === "development" ? true : false,
+            admin: isAdmin,
+            room: roomName,
+        };
+        request({
+            url: `${root}/analytics.json`,
+            options: {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(an),
+            },
+        });
+    }, [request, root, roomName, isAdmin])
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,
