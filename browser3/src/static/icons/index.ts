@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-svgr/client" />
 import GripVertical from "./grip-vertical.svg?react";
 import CircleXmark from "./circle-xmark.svg?react";
 import CircleMinus from "./circle-minus.svg?react";
