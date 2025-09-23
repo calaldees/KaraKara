@@ -9,9 +9,6 @@ import queue from "../../../cypress/fixtures/small_queue.json";
 describe("no tracks", () => {
     it("no tracks", () => {
         cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {},
             room: {
                 queue: [],
             },
@@ -23,11 +20,7 @@ describe("no tracks", () => {
 describe("now playing", () => {
     it("no time", () => {
         cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {
-                now: 1000,
-            },
+            serverTime: {now: 1000},
             room: {
                 queue: [
                     {
@@ -41,11 +34,7 @@ describe("now playing", () => {
     });
     it("in the future", () => {
         cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {
-                now: 1000,
-            },
+            serverTime: {now: 1000},
             room: {
                 queue: [
                     {
@@ -59,11 +48,7 @@ describe("now playing", () => {
     });
     it("playing now", () => {
         cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {
-                now: 1000,
-            },
+            serverTime: {now: 1000},
             room: {
                 queue: [
                     {
@@ -99,12 +84,7 @@ describe("drag & drop", () => {
         }).as("move");
     });
     it("drag to top", () => {
-        cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {},
-            room: {},
-        });
+        cy.mount(<Control />, {});
         dnd('[data-item-id="2"]', '[data-item-id="1"]');
         cy.wait("@move").then(({ request, response }) => {
             expect(response?.statusCode).to.eq(200);
@@ -113,12 +93,7 @@ describe("drag & drop", () => {
         });
     });
     it("drag to bottom", () => {
-        cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {},
-            room: {},
-        });
+        cy.mount(<Control />, {});
         dnd('[data-item-id="2"]', '[data-cy="end-marker"]');
         cy.wait("@move").then(({ request, response }) => {
             expect(response?.statusCode).to.eq(200);
@@ -136,12 +111,7 @@ describe("misc", () => {
         }).as("move");
     });
     it("playground", () => {
-        cy.mount(<Control />, {
-            client: {},
-            server: {},
-            serverTime: {},
-            room: {},
-        });
+        cy.mount(<Control />, {});
         cy.contains("READ ME :)").should("not.exist");
     });
 });

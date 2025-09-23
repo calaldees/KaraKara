@@ -10,9 +10,6 @@ import settings from "../../../cypress/fixtures/small_settings.json";
 describe("no tracks", () => {
     it("no tracks", () => {
         cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {},
             room: {
                 queue: [],
             },
@@ -25,11 +22,7 @@ describe("no tracks", () => {
 describe("now playing", () => {
     it("no time", () => {
         cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {
-                now: 1000,
-            },
+            serverTime: {now: 1000},
             room: {
                 queue: [
                     {
@@ -44,11 +37,7 @@ describe("now playing", () => {
     });
     it("in the future", () => {
         cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {
-                now: 1000,
-            },
+            serverTime: {now: 1000},
             room: {
                 queue: [
                     {
@@ -63,11 +52,7 @@ describe("now playing", () => {
     });
     it("playing now", () => {
         cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {
-                now: 1000,
-            },
+            serverTime: {now: 1000},
             room: {
                 queue: [
                     {
@@ -86,9 +71,6 @@ describe("now playing", () => {
 describe("coming soon", () => {
     it("coming soon disabled", () => {
         cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {},
             room: {
                 settings: {
                     ...settings,
@@ -103,31 +85,19 @@ describe("coming soon", () => {
 describe("coming later", () => {
     // FIXME: test order
     it("coming later", () => {
-        cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {},
-            room: {},
-        });
+        cy.mount(<Queue />, {});
         cy.contains("Coming Later").should("exist");
     });
 });
 
 describe("my entries", () => {
     it("with entries", () => {
-        cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {},
-            room: {},
-        });
+        cy.mount(<Queue />, {});
         cy.contains("My Entries").should("exist");
     });
     it("without entries", () => {
         cy.mount(<Queue />, {
             client: { performerName: "Zazzy" },
-            server: {},
-            serverTime: {},
             room: { sessionId: "nobody" },
         });
         cy.contains("My Entries").should("not.exist");
@@ -136,11 +106,6 @@ describe("my entries", () => {
 
 describe("misc", () => {
     it("playground", () => {
-        cy.mount(<Queue />, {
-            client: {},
-            server: {},
-            serverTime: {},
-            room: {},
-        });
+        cy.mount(<Queue />, {});
     });
 });
