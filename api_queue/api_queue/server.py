@@ -159,6 +159,23 @@ async def time(request):
     return sanic.response.json(datetime.now().timestamp())
 
 
+@app.post("/analytics.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": bool}),
+)
+async def analytics(request):
+    try:
+        with open("/logs/analytics.json", 'a', encoding='utf8') as f:
+            data = request.json
+            data["ip"] = request.ip
+            data["time"] = datetime.now().isoformat()
+            f.write(json.dumps(data) + "\n")
+        return sanic.response.json(True)
+    except Exception as e:
+        log.exception("analytics.json error")
+        return sanic.response.json(False)
+
+
 # Queue -----------------------------------------------------------------------
 
 room_blueprint = sanic.blueprints.Blueprint('room', url_prefix='/room/<room_name:([A-Za-z0-9_-]{1,32})>')
