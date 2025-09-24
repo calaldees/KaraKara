@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
-import { RoomContext } from "../providers/room";
-import { short_date } from "../utils";
+import { RoomContext } from "@/providers/room";
+import { short_date } from "@/utils";
 
 export function EventInfo() {
     const { settings } = useContext(RoomContext);

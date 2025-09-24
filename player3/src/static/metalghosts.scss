@@ -500,7 +500,7 @@
                 90deg,
                 rgb(from var(--gradient-dark) r g b / 50%) 0,
                 var(--gradient-light) 50%,
-                rgb(from var(--gradient-dark) r g b / 50%) 50%,
+                rgb(from var(--gradient-dark) r g b / 50%) 50%
             );
             background-size: 200% 100%;
             // NOTE: keep the time here in sync with the frequency of state updates

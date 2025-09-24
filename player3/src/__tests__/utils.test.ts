@@ -1,5 +1,5 @@
 import { describe, expect, test, afterEach } from "vitest";
-import * as utils from "../utils";
+import * as utils from "@/utils";
 import timezone_mock from "timezone-mock";
 
 describe("short_date", () => {

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Screen } from "../_common";
 
-import * as icons from "../../static/icons";
+import * as icons from "@/static/icons";
 import "./login.scss";
 
 export function Login(): React.ReactElement {

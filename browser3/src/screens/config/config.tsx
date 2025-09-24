@@ -1,7 +1,7 @@
 import { FormEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { ClientContext } from "../../providers/client";
+import { ClientContext } from "@/providers/client";
 
 import "./config.scss";
 

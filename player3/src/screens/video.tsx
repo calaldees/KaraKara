@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
-import { EventInfo } from "../components/eventinfo";
-import { JoinInfo } from "../components/joininfo";
-import { Video } from "../components/video";
-import type { Track, QueueItem } from "../types";
-import { percent } from "../utils";
+import { EventInfo } from "@/components/eventinfo";
+import { JoinInfo } from "@/components/joininfo";
+import { Video } from "@/components/video";
+import type { Track, QueueItem } from "@/types";
+import { percent } from "@/utils";
 
 export function VideoScreen({
     track,

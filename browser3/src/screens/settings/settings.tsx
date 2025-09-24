@@ -1,9 +1,9 @@
 import { useContext, useState, useCallback } from "react";
 
 import { BackToExplore, Screen } from "../_common";
-import { copy_type } from "../../utils";
-import { RoomContext } from "../../providers/room";
-import { useApi } from "../../hooks/api";
+import { copy_type } from "@/utils";
+import { RoomContext } from "@/providers/room";
+import { useApi } from "@/hooks/api";
 
 function removeTypes(
     roomSettings: Record<string, any>,

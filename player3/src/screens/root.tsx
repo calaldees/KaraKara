@@ -8,16 +8,16 @@ import {
 } from "react-router-dom";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
-import { RoomContext, RoomProvider } from "../providers/room";
-import { ClientContext } from "../providers/client";
-import { ServerContext } from "../providers/server";
+import { RoomContext, RoomProvider } from "@/providers/room";
+import { ClientContext } from "@/providers/client";
+import { ServerContext } from "@/providers/server";
 
 import { ConfigMenu } from "./config";
 import { TitleScreen } from "./title";
 import { VideoScreen } from "./video";
 import { PodiumScreen } from "./podium";
 import { PreviewScreen } from "./preview";
-import { percent } from "../utils";
+import { percent } from "@/utils";
 
 const router = createBrowserRouter(
     createRoutesFromElements(

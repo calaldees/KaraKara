@@ -1,8 +1,8 @@
 import { useContext } from "react";
 
-import { ClientContext } from "../providers/client";
-import type { Track, Attachment } from "../types";
-import { attachment_path } from "../utils";
+import { ClientContext } from "@/providers/client";
+import type { Track, Attachment } from "@/types";
+import { attachment_path } from "@/utils";
 
 interface VideoProps {
     track: Track;

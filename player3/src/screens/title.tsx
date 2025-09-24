@@ -1,10 +1,10 @@
 import { useContext } from "react";
 
-import { EventInfo } from "../components/eventinfo";
-import { JoinInfo } from "../components/joininfo";
-import Globe from "../components/globe";
-import Waterfall from "../components/waterfall";
-import { RoomContext } from "../providers/room";
+import { EventInfo } from "@/components/eventinfo";
+import { JoinInfo } from "@/components/joininfo";
+import Globe from "@/components/globe";
+import Waterfall from "@/components/waterfall";
+import { RoomContext } from "@/providers/room";
 
 export function TitleScreen() {
     const { settings } = useContext(RoomContext);

@@ -3,8 +3,12 @@ import react from "@vitejs/plugin-react-swc";
 
 // https://vite.dev/config/
 export default defineConfig({
+    resolve: {
+        alias: {
+            "@": "/src",
+        },
+    },
     build: {
-        target: ["es2015", "ios11"],
         // Initial load time doesn't matter for Player, loading
         // everything up-front for stability is more important.
         chunkSizeWarningLimit: 2000,

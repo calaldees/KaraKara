@@ -8,14 +8,14 @@ import {
     time_until,
     dict2css,
     attachment_path,
-} from "../../utils";
-import { ServerContext } from "../../providers/server";
-import { ClientContext } from "../../providers/client";
-import { RoomContext } from "../../providers/room";
-import { useApi } from "../../hooks/api";
-import type { Track, QueueItem, Subtitle } from "../../types";
+} from "@/utils";
+import { ServerContext } from "@/providers/server";
+import { ClientContext } from "@/providers/client";
+import { RoomContext } from "@/providers/room";
+import { useApi } from "@/hooks/api";
+import type { Track, QueueItem, Subtitle } from "@/types";
 
-import * as icons from "../../static/icons";
+import * as icons from "@/static/icons";
 import "./queue.scss";
 
 function QueueItemRender({

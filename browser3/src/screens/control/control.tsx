@@ -3,14 +3,14 @@ import { useParams } from "react-router-dom";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 import { Screen, BackToExplore, Thumb } from "../_common";
-import { dict2css, time_until } from "../../utils";
-import { ClientContext } from "../../providers/client";
-import { RoomContext } from "../../providers/room";
-import { ServerContext } from "../../providers/server";
-import { useApi } from "../../hooks/api";
-import type { QueueItem } from "../../types";
+import { dict2css, time_until } from "@/utils";
+import { ClientContext } from "@/providers/client";
+import { RoomContext } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
+import { useApi } from "@/hooks/api";
+import type { QueueItem } from "@/types";
 
-import * as icons from "../../static/icons";
+import * as icons from "@/static/icons";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks } = useContext(ServerContext);

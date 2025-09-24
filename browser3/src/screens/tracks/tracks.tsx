@@ -2,17 +2,17 @@ import { useContext, ReactElement } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Screen, Thumb } from "../_common";
-import { normalise_cmp, track_info } from "../../utils";
-import { find_tracks } from "../../track_finder";
-import { group_tracks } from "../../track_grouper";
-import { ClientContext } from "../../providers/client";
-import { ServerContext } from "../../providers/server";
-import { RoomContext } from "../../providers/room";
-import { ExploreProvider, ExploreContext } from "../../providers/explore";
-import type { Track } from "../../types";
-import { useMemoArr } from "../../hooks/memo";
+import { normalise_cmp, track_info } from "@/utils";
+import { find_tracks } from "@/track_finder";
+import { group_tracks } from "@/track_grouper";
+import { ClientContext } from "@/providers/client";
+import { ServerContext } from "@/providers/server";
+import { RoomContext } from "@/providers/room";
+import { ExploreProvider, ExploreContext } from "@/providers/explore";
+import type { Track } from "@/types";
+import { useMemoArr } from "@/hooks/memo";
 
-import * as icons from "../../static/icons";
+import * as icons from "@/static/icons";
 import "./tracks.scss";
 
 /*

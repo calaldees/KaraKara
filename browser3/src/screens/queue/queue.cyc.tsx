@@ -2,10 +2,10 @@
 /// <reference path="../../../cypress/support/component.ts" />
 
 import { Queue } from "./queue";
-//import tracks from "../../../cypress/fixtures/small_tracks.json";
-import queue from "../../../cypress/fixtures/small_queue.json";
-import settings from "../../../cypress/fixtures/small_settings.json";
-//import type { Track } from "../../types";
+//import tracks from "@/../cypress/fixtures/small_tracks.json";
+import queue from "@/../cypress/fixtures/small_queue.json";
+import settings from "@/../cypress/fixtures/small_settings.json";
+//import type { Track } from "@/types";
 
 describe("no tracks", () => {
     it("no tracks", () => {
@@ -22,7 +22,7 @@ describe("no tracks", () => {
 describe("now playing", () => {
     it("no time", () => {
         cy.mount(<Queue />, {
-            serverTime: {now: 1000},
+            serverTime: { now: 1000 },
             room: {
                 queue: [
                     {
@@ -37,7 +37,7 @@ describe("now playing", () => {
     });
     it("in the future", () => {
         cy.mount(<Queue />, {
-            serverTime: {now: 1000},
+            serverTime: { now: 1000 },
             room: {
                 queue: [
                     {
@@ -52,7 +52,7 @@ describe("now playing", () => {
     });
     it("playing now", () => {
         cy.mount(<Queue />, {
-            serverTime: {now: 1000},
+            serverTime: { now: 1000 },
             room: {
                 queue: [
                     {

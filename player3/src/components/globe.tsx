@@ -5,14 +5,14 @@ import { Group, TextureLoader } from "three";
 import * as THREE from "three";
 import { useMediaQuery } from "usehooks-ts";
 
-import { RoomContext } from "../providers/room";
-import { ServerContext } from "../providers/server";
-import { ClientContext } from "../providers/client";
-import type { Track } from "../types";
-import { attachment_path } from "../utils";
+import { RoomContext } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
+import { ClientContext } from "@/providers/client";
+import type { Track } from "@/types";
+import { attachment_path } from "@/utils";
 
-import world from "../static/world.svg";
-import { useMemoArr } from "../hooks/memo";
+import world from "@/static/world.svg";
+import { useMemoArr } from "@/hooks/memo";
 
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     // computing stats only takes ~10ms, but we don't want that to happen

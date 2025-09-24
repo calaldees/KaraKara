@@ -2,11 +2,11 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
 
-import { useApi } from "../hooks/api";
+import { useApi } from "@/hooks/api";
 import { ClientContext } from "./client";
-import { mqtt_url } from "../utils";
-import type { Track } from "../types";
-import { useMemoObj } from "../hooks/memo";
+import { mqtt_url } from "@/utils";
+import type { Track } from "@/types";
+import { useMemoObj } from "@/hooks/memo";
 
 export interface ServerContextType {
     tracks: Record<string, Track>;

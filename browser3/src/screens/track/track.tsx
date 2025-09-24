@@ -2,14 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 
 import { Screen } from "../_common";
-import { attachment_path } from "../../utils";
-import { ClientContext } from "../../providers/client";
-import { ServerContext } from "../../providers/server";
-import { RoomContext } from "../../providers/room";
-import { useApi } from "../../hooks/api";
-import { Track, Subtitle } from "../../types";
+import { attachment_path } from "@/utils";
+import { ClientContext } from "@/providers/client";
+import { ServerContext } from "@/providers/server";
+import { RoomContext } from "@/providers/room";
+import { useApi } from "@/hooks/api";
+import { Track, Subtitle } from "@/types";
 
-import * as icons from "../../static/icons";
+import * as icons from "@/static/icons";
 import "./track.scss";
 
 const BLOCKED_KEYS = [
