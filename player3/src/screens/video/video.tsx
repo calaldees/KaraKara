@@ -7,6 +7,8 @@ import { Video } from "@/components/video";
 import type { Track, QueueItem } from "@/types";
 import { percent } from "@/utils";
 
+import "./video.scss";
+
 export function VideoScreen({
     track,
     queue_item,

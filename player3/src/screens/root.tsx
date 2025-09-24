@@ -12,11 +12,11 @@ import { RoomContext, RoomProvider } from "@/providers/room";
 import { ClientContext } from "@/providers/client";
 import { ServerContext } from "@/providers/server";
 
-import { ConfigMenu } from "./config";
-import { TitleScreen } from "./title";
-import { VideoScreen } from "./video";
-import { PodiumScreen } from "./podium";
-import { PreviewScreen } from "./preview";
+import { ConfigMenu } from "./config/config";
+import { TitleScreen } from "./title/title";
+import { VideoScreen } from "./video/video";
+import { PodiumScreen } from "./podium/podium";
+import { PreviewScreen } from "./preview/preview";
 import { percent } from "@/utils";
 
 const router = createBrowserRouter(

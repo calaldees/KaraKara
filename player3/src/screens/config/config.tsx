@@ -4,6 +4,8 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
 import { ClientContext } from "@/providers/client";
 
+import "./config.scss";
+
 export function ConfigMenu() {
     const { roomName } = useParams();
     const {

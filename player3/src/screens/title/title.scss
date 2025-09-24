@@ -1,0 +1,72 @@
+.theme-metalghosts .screen_title {
+    grid-template:
+        "header" min-content
+        "title " 1fr
+        "footer" min-content
+        / 1fr;
+
+    H1 {
+        grid-area: title;
+        justify-self: center;
+        align-self: center;
+        padding: var(--padding);
+        border: var(--border);
+        border-radius: var(--border-radius);
+        background: var(--background);
+        z-index: 100;
+        font-size: 7cqh;
+        text-align: center;
+        padding: 2cqh 4cqw;
+    }
+    H2 {
+        padding: var(--padding);
+        border: var(--border);
+        border-radius: var(--border-radius);
+        background: var(--background);
+    }
+
+    #splash {
+        position: absolute;
+        inset: 0;
+        // avoid using any zero-values in transform, because scss will
+        // optimise that into matrix() which won't animate...
+        @keyframes raincw {
+            0% {
+                transform: translateY(-1cqh) rotate(-180deg);
+            }
+            100% {
+                transform: translateY(120cqh) rotate(180deg);
+            }
+        }
+        @keyframes rainccw {
+            0% {
+                transform: translateY(-1cqh) rotate(180deg);
+            }
+            100% {
+                transform: translateY(120cqh) rotate(-180deg);
+            }
+        }
+        IMG {
+            position: absolute;
+            border: 1px solid black;
+            top: -20cqh;
+            max-width: 20cqw;
+            max-height: 20cqh;
+            height: auto;
+            width: auto;
+            animation: raincw 10s linear infinite;
+        }
+        IMG:nth-child(odd) {
+            animation: rainccw 10s linear infinite;
+        }
+        TABLE {
+            TH {
+                color: #ff7;
+                text-align: right;
+            }
+            TD {
+                padding-left: 0.25em;
+            }
+        }
+    }
+}

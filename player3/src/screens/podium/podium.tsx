@@ -8,6 +8,8 @@ import { useApi } from "@/hooks/api";
 import type { Track, QueueItem } from "@/types";
 import { attachment_path, percent, s_to_mns } from "@/utils";
 
+import "./podium.scss";
+
 ///////////////////////////////////////////////////////////////////////
 // Views
 

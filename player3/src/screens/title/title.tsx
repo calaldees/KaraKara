@@ -6,6 +6,8 @@ import Globe from "@/components/globe";
 import Waterfall from "@/components/waterfall";
 import { RoomContext } from "@/providers/room";
 
+import "./title.scss";
+
 export function TitleScreen() {
     const { settings } = useContext(RoomContext);
     let splash = null;

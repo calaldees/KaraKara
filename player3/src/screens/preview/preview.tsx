@@ -9,6 +9,8 @@ import { RoomContext } from "@/providers/room";
 import type { Track, QueueItem } from "@/types";
 import { time_until } from "@/utils";
 
+import "./preview.scss";
+
 const show_tracks = 5;
 
 ///////////////////////////////////////////////////////////////////////
