@@ -34,4 +34,6 @@ export interface QueueItem {
     start_time: number | null;
     track_duration: number;
     track_id: string;
+    video_variant: string | null;
+    subtitle_variant: string | null;
 }
