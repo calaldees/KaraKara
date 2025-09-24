@@ -15,10 +15,17 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/api": "https://karakara.uk",
-            "/files": "https://karakara.uk",
+            "/api": {
+                target: "https://karakara.uk",
+                changeOrigin: true,
+            },
+            "/files": {
+                target: "https://karakara.uk",
+                changeOrigin: true,
+            },
             "/mqtt": {
                 target: "https://karakara.uk",
+                changeOrigin: true,
                 ws: true,
             },
         },
