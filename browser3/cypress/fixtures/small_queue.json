@@ -5,7 +5,9 @@
         "session_id": "admin",
         "start_time": 1234,
         "track_duration": 30,
-        "track_id": "track_id_1"
+        "track_id": "track_id_1",
+        "video_variant": null,
+        "subtitle_variant": null
     },
     {
         "id": 2,
@@ -13,7 +15,9 @@
         "session_id": "sdfghjm",
         "start_time": 1274,
         "track_duration": 30,
-        "track_id": "track_id_2"
+        "track_id": "track_id_2",
+        "video_variant": null,
+        "subtitle_variant": null
     },
     {
         "id": 3,
@@ -21,7 +25,9 @@
         "session_id": "jhgfds",
         "start_time": 1304,
         "track_duration": 30,
-        "track_id": "track_id_1"
+        "track_id": "track_id_1",
+        "video_variant": null,
+        "subtitle_variant": null
     },
     {
         "id": 4,
@@ -29,7 +35,9 @@
         "session_id": "jhgfddfghn",
         "start_time": 1364,
         "track_duration": 30,
-        "track_id": "track_id_2"
+        "track_id": "track_id_2",
+        "video_variant": null,
+        "subtitle_variant": null
     },
     {
         "id": 5,
@@ -37,7 +45,9 @@
         "session_id": "jhgfghg",
         "start_time": 1404,
         "track_duration": 30,
-        "track_id": "track_id_1"
+        "track_id": "track_id_1",
+        "video_variant": null,
+        "subtitle_variant": null
     },
     {
         "id": 6,
@@ -45,7 +55,9 @@
         "session_id": "tyjty",
         "start_time": 1434,
         "track_duration": 30,
-        "track_id": "track_id_1"
+        "track_id": "track_id_1",
+        "video_variant": null,
+        "subtitle_variant": null
     },
     {
         "id": 7,
@@ -53,6 +65,8 @@
         "session_id": "tyjty",
         "start_time": 1464,
         "track_duration": 30,
-        "track_id": "track_id_1"
+        "track_id": "track_id_1",
+        "video_variant": null,
+        "subtitle_variant": null
     }
 ]
