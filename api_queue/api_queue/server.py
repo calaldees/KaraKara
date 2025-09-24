@@ -14,22 +14,26 @@ from sanic_ext import openapi
 from sanic_ext.extensions.http.cors import add_cors
 
 app = sanic.Sanic("karakara_queue")
-app.config.update({
-    k: v
-    for k, v in {
-        #'REDIS': "redis://redis:6379/0",
-        #'MQTT': 'mqtt',  #:1883
-        'PATH_TRACKS': 'tracks.json',
-        'PATH_QUEUE': '_data',
-        'BACKGROUND_TASK_TRACK_UPDATE_ENABLED': True,
-    }.items()
-    if k not in app.config.keys()
-})
+app.config.update(
+    {
+        k: v
+        for k, v in {
+            #'REDIS': "redis://redis:6379/0",
+            #'MQTT': 'mqtt',  #:1883
+            "PATH_TRACKS": "tracks.json",
+            "PATH_QUEUE": "_data",
+            "BACKGROUND_TASK_TRACK_UPDATE_ENABLED": True,
+        }.items()
+        if k not in app.config.keys()
+    }
+)
 app.ext.openapi.describe(
     "KaraKara Queue API",
     version="0.0.0",
-    description=dedent("""
-    """),  # TODO: Markdown
+    description=dedent(
+        """
+    """
+    ),  # TODO: Markdown
 )
 
 app.config.FALLBACK_ERROR_FORMAT = "json"
@@ -55,55 +59,61 @@ from .queue_updated_actions import QueueValidationError, queue_updated_actions
 from .track_manager import TrackManager
 
 
-@app.listener('before_server_start')
+@app.listener("before_server_start")
 async def tracks_load(_app: sanic.Sanic, _loop):
-    _app.ctx.track_manager = TrackManager(Path(str(_app.config.get('PATH_TRACKS'))))
+    _app.ctx.track_manager = TrackManager(Path(str(_app.config.get("PATH_TRACKS"))))
 
 
 from .queue_manager import QueueManagerCSVAsync
 from .settings_manager import QueueSettings, SettingsManager
 
 
-@app.listener('before_server_start')
+@app.listener("before_server_start")
 async def queue_manager(_app: sanic.Sanic, _loop):
-    path_queue = Path(str(_app.config.get('PATH_QUEUE')))
+    path_queue = Path(str(_app.config.get("PATH_QUEUE")))
     log.info(f"[queue_manager] - {path_queue=}")
     _app.ctx.path_queue = path_queue
     _app.ctx.settings_manager = SettingsManager(path=path_queue)
     _app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=_app.ctx.settings_manager)
 
 
-@app.listener('before_server_start')
+@app.listener("before_server_start")
 async def aio_mqtt_configure(_app: sanic.Sanic, _loop):
-    mqtt = _app.config.get('MQTT')
+    mqtt = _app.config.get("MQTT")
     if isinstance(mqtt, str):
         log.info("[mqtt] connecting")
         import aiomqtt
+
         _app.ctx.mqtt = aiomqtt.Client(mqtt)
         await _app.ctx.mqtt.__aenter__()
     elif mqtt:  # normally pass-through for mock mqtt object
         log.info("[mqtt] bypassed")
         _app.ctx.mqtt = mqtt
-@app.listener('after_server_stop')
+
+
+@app.listener("after_server_stop")
 async def aio_mqtt_close(_app, _loop):
-    mqtt = _app.config.get('MQTT')
+    mqtt = _app.config.get("MQTT")
     if isinstance(mqtt, str):
         log.info("[mqtt] closing")
         await _app.ctx.mqtt.__aexit__(None, None, None)
 
 
-
 # Middleware -------------------------------------------------------------------
+
 
 # pytest debugging - This is needed to see exceptions on failed tests. DEBUG=True wont give me json exceptions. SO CLUMSY!
 # https://sanic.dev/en/guide/best-practices/exceptions.html#custom-error-handling
-def exception_to_dict(exception: Exception) -> dict[str, str|int]:
+def exception_to_dict(exception: Exception) -> dict[str, str | int]:
     import traceback
+
     return {
-        'status': 500,
-        'message': 'Internal Server Error',
-        'exception': "".join(traceback.TracebackException.from_exception(exception).format())
+        "status": 500,
+        "message": "Internal Server Error",
+        "exception": "".join(traceback.TracebackException.from_exception(exception).format()),
     }
+
+
 class CustomErrorHandler(sanic.handlers.ErrorHandler):
     def default(self, request, exception):
         if isinstance(exception, sanic.exceptions.SanicException):
@@ -112,14 +122,20 @@ class CustomErrorHandler(sanic.handlers.ErrorHandler):
             return super().default(request, sanic.exceptions.InvalidUsage(*exception.args))
         log.exception("Error:")
         return sanic.response.json(exception_to_dict(exception), status=500)
+
+
 app.error_handler = CustomErrorHandler()
 
 
 from .login_manager import LoginManager, User
+
+
 @app.on_request
 async def attach_session_id_request(request: sanic.Request):
     request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
     request.ctx.user = LoginManager.from_session(request.ctx.session_id)
+
+
 @app.on_response
 async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse):
     if request.cookies.get("session_id") != request.ctx.session_id:
@@ -127,28 +143,42 @@ async def attach_session_id(request: sanic.Request, response: sanic.HTTPResponse
 
 
 @contextlib.asynccontextmanager
-async def push_queue_to_mqtt(app: sanic.Sanic, room_name: str) -> AsyncGenerator[None]:  # contextlib.AbstractAsyncContextManager[None]
+async def push_queue_to_mqtt(
+    app: sanic.Sanic, room_name: str
+) -> AsyncGenerator[None]:  # contextlib.AbstractAsyncContextManager[None]
     yield
-    if hasattr(app.ctx, 'mqtt'):
+    if hasattr(app.ctx, "mqtt"):
         log.info(f"push_queue_to_mqtt {room_name}")
-        await app.ctx.mqtt.publish(f"room/{room_name}/queue", json.dumps(app.ctx.queue_manager.for_json(room_name)), retain=True)
+        await app.ctx.mqtt.publish(
+            f"room/{room_name}/queue",
+            json.dumps(app.ctx.queue_manager.for_json(room_name)),
+            retain=True,
+        )
+
 
 @contextlib.asynccontextmanager
-async def push_settings_to_mqtt(app: sanic.Sanic, room_name: str) -> AsyncGenerator[None]:  # contextlib.AbstractAsyncContextManager[None]
+async def push_settings_to_mqtt(
+    app: sanic.Sanic, room_name: str
+) -> AsyncGenerator[None]:  # contextlib.AbstractAsyncContextManager[None]
     yield
-    if hasattr(app.ctx, 'mqtt'):
+    if hasattr(app.ctx, "mqtt"):
         log.info(f"push_settings_to_mqtt {room_name}")
-        await app.ctx.mqtt.publish(f"room/{room_name}/settings", app.ctx.queue_manager.settings.get(room_name).model_dump_json(), retain=True)
+        await app.ctx.mqtt.publish(
+            f"room/{room_name}/settings",
+            app.ctx.queue_manager.settings.get(room_name).model_dump_json(),
+            retain=True,
+        )
 
 
 # Routes -----------------------------------------------------------------------
 
+
 @app.get("/")
 @openapi.definition(
-    response=openapi.definitions.Response('redirect to openapi spec', status=302),
+    response=openapi.definitions.Response("redirect to openapi spec", status=302),
 )
 async def root(request):
-    return sanic.response.redirect('/docs')
+    return sanic.response.redirect("/docs")
 
 
 @app.get("/time.json")
@@ -165,7 +195,7 @@ async def time(request):
 )
 async def analytics(request):
     try:
-        with open("/logs/analytics.json", 'a', encoding='utf8') as f:
+        with open("/logs/analytics.json", "a", encoding="utf8") as f:
             data = request.json
             data["ip"] = request.ip
             data["time"] = datetime.now().isoformat()
@@ -178,12 +208,14 @@ async def analytics(request):
 
 # Queue -----------------------------------------------------------------------
 
-room_blueprint = sanic.blueprints.Blueprint('room', url_prefix='/room/<room_name:([A-Za-z0-9_-]{1,32})>')
+room_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/room/<room_name:([A-Za-z0-9_-]{1,32})>")
 app.blueprint(room_blueprint)
 
 
 class NullObjectJson:
     pass
+
+
 class QueueItemJson:
     # We cant use QueueItem(dataclass) directly as the types are not the same as it's `.to_dict()`
     track_id: str
@@ -196,8 +228,11 @@ class QueueItemJson:
 
 # Queue / Login ---------------------------------------------------------------
 
+
 class LoginRequest:
     password: str
+
+
 @room_blueprint.post("/login.json")
 @openapi.definition(
     body={"application/json": LoginRequest},
@@ -217,32 +252,42 @@ async def login(request, room_name):
 
 # Queue / Tracks --------------------------------------------------------------
 
+
 @room_blueprint.get("/tracks.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
-    description=dedent("""
+    description=dedent(
+        """
         Dev convenience.
         Not used by production clients.
         Nginx serves this static content.
-    """),
+    """
+    ),
 )
 async def tracks(request, room_name):
-    return await sanic.response.file(request.app.config.get('PATH_TRACKS'))
+    return await sanic.response.file(request.app.config.get("PATH_TRACKS"))
 
 
 # Queue / Settings ------------------------------------------------------------
 
+
 @room_blueprint.get("/settings.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueSettings}),
-    description=dedent("""
+    description=dedent(
+        """
         Dev convenience.
         Not used by production clients.
         settings received by mqtt event
-    """),
+    """
+    ),
 )
 async def get_settings(request, room_name):
-    return sanic.response.raw(request.app.ctx.settings_manager.get(room_name).model_dump_json(), headers={'content-type': 'application/json'})
+    return sanic.response.raw(
+        request.app.ctx.settings_manager.get(room_name).model_dump_json(),
+        headers={"content-type": "application/json"},
+    )
+
 
 @room_blueprint.put("/settings.json")
 @openapi.definition(
@@ -264,18 +309,21 @@ async def update_settings(request, room_name):
 
 # Queue / Queue ---------------------------------------------------------------
 
+
 @room_blueprint.get("/queue.csv")
 @openapi.definition(
     response=[
         openapi.definitions.Response({"text/csv": str}),
-        openapi.definitions.Response('queue not found', status=400),
+        openapi.definitions.Response("queue not found", status=400),
     ],
-    description=dedent("""
+    description=dedent(
+        """
         Dev convenience.
         Not used by production clients.
         queue received by mqtt event.
         Useful for debugging to see raw datastore on disk.
-    """),
+    """
+    ),
 )
 async def queue_csv(request, room_name):
     path_csv = request.app.ctx.queue_manager.path_csv(room_name)
@@ -283,14 +331,17 @@ async def queue_csv(request, room_name):
         raise sanic.exceptions.NotFound()
     return await sanic.response.file(path_csv)
 
+
 @room_blueprint.get("/queue.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": [QueueItemJson]}),
-    description=dedent("""
+    description=dedent(
+        """
         Dev convenience.
         Not used by production clients.
         queue received by mqtt event
-    """),
+    """
+    ),
 )
 async def queue_json(request, room_name):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(room_name))
@@ -299,24 +350,26 @@ async def queue_json(request, room_name):
 class QueueItemAdd:
     track_id: str
     performer_name: str
+
+
 @room_blueprint.post("/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemAdd},
     response=[
         openapi.definitions.Response({"application/json": QueueItemJson}, status=200),
-        openapi.definitions.Response('missing fields', status=400),
-        openapi.definitions.Response('track_id invalid', status=400),
+        openapi.definitions.Response("missing fields", status=400),
+        openapi.definitions.Response("track_id invalid", status=400),
     ],
 )
 async def add_queue_item(request, room_name):
     track_durations = request.app.ctx.track_manager.track_durations
     # Validation
-    if not request.json or frozenset(request.json.keys()) != frozenset(('track_id', 'performer_name')):
+    if not request.json or frozenset(request.json.keys()) != frozenset(("track_id", "performer_name")):
         raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
-    track_id = request.json['track_id']
+    track_id = request.json["track_id"]
     if track_id not in track_durations:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context=track_id)
-    performer_name = request.json['performer_name']
+    performer_name = request.json["performer_name"]
     if performer_name.strip() == "":
         raise sanic.exceptions.InvalidUsage(message="Performer name cannot be empty")
     # Queue update
@@ -364,6 +417,8 @@ async def delete_queue_item(request, room_name, queue_item_id):
 class QueueItemMove:
     source: int
     target: int
+
+
 @room_blueprint.put("/queue.json")
 @openapi.definition(
     body={"application/json": QueueItemMove},
@@ -371,8 +426,8 @@ class QueueItemMove:
 )
 async def move_queue_item(request, room_name):
     try:
-        source = int(request.json.get('source'))
-        target = int(request.json.get('target'))
+        source = int(request.json.get("source"))
+        target = int(request.json.get("target"))
     except (ValueError, TypeError):
         raise sanic.exceptions.InvalidUsage(message="source and target args required", context=request.json)
     if not request.ctx.user.is_admin:
@@ -385,6 +440,7 @@ async def move_queue_item(request, room_name):
 
 # Queue / Commands ------------------------------------------------------------
 
+
 class Commands(enum.StrEnum):
     PLAY = enum.auto()
     PLAY_ONE = enum.auto()
@@ -393,38 +449,43 @@ class Commands(enum.StrEnum):
     SEEK_BACKWARDS = enum.auto()
     SKIP = enum.auto()
 
-class CommandReturn():
+
+class CommandReturn:
     is_playing: bool
+
 
 @room_blueprint.get("/command/<command:([a-z_]+).json>")
 @openapi.definition(
-    description=dedent(f"""
+    description=dedent(
+        f"""
         Valid commands {', '.join(map(str, Commands))}
-    """),
+    """
+    ),
     response=[
         openapi.definitions.Response({"application/json": CommandReturn}, status=200),
-        openapi.definitions.Response('invalid command', status=400),
-        openapi.definitions.Response('admin required', status=403),
-    ]
+        openapi.definitions.Response("invalid command", status=400),
+        openapi.definitions.Response("admin required", status=403),
+    ],
 )
 async def queue_command(request, room_name, command):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
     if command not in Commands:
-        raise sanic.exceptions.NotFound(message='invalid command')
+        raise sanic.exceptions.NotFound(message="invalid command")
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             getattr(queue, command)()
-            return sanic.response.json({'is_playing': bool(queue.is_playing)})
+            return sanic.response.json({"is_playing": bool(queue.is_playing)})
 
 
 # Background Tasks -------------------------------------------------------------
 
 from .background_tasks import background_tracks_update_event
+
 app.add_task(background_tracks_update_event(app))
 
 
 # Main -------------------------------------------------------------------------
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, dev=True, access_log=True, auto_reload=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, dev=True, access_log=True, auto_reload=True)

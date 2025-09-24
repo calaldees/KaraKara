@@ -41,3 +41,6 @@ filterwarnings = [
 	"ignore:pkg_resources is deprecated as an API",
 	"ignore:Use 'content=<...>' to upload raw bytes/text content",
 ]
+
+[tool.black]
+line-length = 120

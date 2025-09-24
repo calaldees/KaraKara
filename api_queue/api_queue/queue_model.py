@@ -12,7 +12,7 @@ from .type_parsers import parse_datetime, parse_timedelta
 # dataclasses are ment to be this cool hip new happening pattern in python
 # have I missed the point here? this feels like verbose rubbish for such a simple class
 @dataclasses.dataclass
-class QueueItem():
+class QueueItem:
     @staticmethod
     def _now():
         return datetime.datetime.now(tz=datetime.timezone.utc)
@@ -22,7 +22,7 @@ class QueueItem():
     session_id: str
     performer_name: str
     start_time: datetime.datetime | None = None
-    id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
+    id: int = dataclasses.field(default_factory=lambda: random.randint(0, 2**30))
     added_time: datetime.datetime = dataclasses.field(default_factory=_now)
     debug_str: str | None = None
 
@@ -48,8 +48,10 @@ class QueueItem():
         self.track_duration = parse_timedelta(self.track_duration) or datetime.timedelta(0)
         self.start_time = parse_datetime(self.start_time)
         self.added_time = parse_datetime(self.added_time) or self._now()
+
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
+
     @staticmethod
     def dict_factory(key_values):
         """
@@ -57,6 +59,7 @@ class QueueItem():
         >>> i.asdict()
         {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None}
         """
+
         def _to_base_types(dd):
             k, v = dd
             if isinstance(v, datetime.timedelta):
@@ -64,6 +67,7 @@ class QueueItem():
             elif isinstance(v, datetime.datetime):
                 v = v.timestamp()
             return (k, v)
+
         return dict(map(_to_base_types, key_values))
 
     @property
@@ -77,30 +81,35 @@ class QueueItem():
         return self._now() - self.added_time
 
 
-
-class Queue():
+class Queue:
     def __init__(self, items: list[QueueItem], settings: QueueSettings):
         self.items = items
         self.settings = settings
         self.modified = False
         self._now: datetime.datetime | None = None
+
     @property
     def track_space(self) -> datetime.timedelta:
         return self.settings.track_space
+
     @property
     def now(self) -> datetime.datetime:
         return self._now or datetime.datetime.now(tz=datetime.timezone.utc)
+
     @property
     def past(self) -> t.Iterable[QueueItem]:
         now = self.now
         return (i for i in self.items if i.end_time and i.end_time < now)
+
     @property
     def future(self) -> t.Iterable[QueueItem]:
         now = self.now
         return (i for i in self.items if not i.start_time or i.start_time >= now)
+
     @property
     def current(self) -> QueueItem | None:
         return self.playing or next(iter(self.future), None)
+
     @property
     def current_future(self) -> t.Iterable[QueueItem]:
         # fugly mess - you can do this in less lines
@@ -109,26 +118,37 @@ class Queue():
         if current and future and future[0] != current:
             future.insert(0, current)
         return future
+
     @property
     def last(self) -> QueueItem | None:
         return self.items[-1] if self.items else None
+
     @property
     def playing(self) -> QueueItem | None:
         now = self.now
-        return next((i for i in self.items if i.start_time and i.start_time <= now and i.end_time and i.end_time > now), None)
+        return next(
+            (i for i in self.items if i.start_time and i.start_time <= now and i.end_time and i.end_time > now),
+            None,
+        )
+
     @property
     def is_playing(self) -> bool:
         return bool(self.current and self.current.start_time)
+
     @property
     def end_time(self) -> datetime.datetime:
         if self.last and self.last.end_time:
             return self.last.end_time
+
         def track_duration_reducer(end_time: datetime.datetime, i: QueueItem) -> datetime.datetime:
             end_time += i.track_duration + self.track_space
             return end_time
+
         return reduce(track_duration_reducer, self.future, self.now)
+
     def play_one(self, immediate=False) -> None:  # Alias for play(continuous=False)
         self.play(continuous=False, immediate=immediate)
+
     def play(self, continuous=True, immediate=False) -> None:
         if self.current:
             if immediate:
@@ -140,26 +160,38 @@ class Queue():
                 self.current.start_time = self.now + datetime.timedelta(seconds=1)
         if continuous:
             self._recalculate_start_times()
+
     def stop(self) -> None:
         if current := self.current:
             current.start_time = None
             self._recalculate_start_times()
+
     def add(self, queue_item: QueueItem) -> None:
         self.items.append(queue_item)
         self._recalculate_start_times()
+
     def move(self, id1: int, id2: int) -> None:
-        assert {id1, id2} < {i.id for i in self.current_future}|{-1,}, 'move track_ids are not in future track list'
+        assert {id1, id2} < {i.id for i in self.current_future} | {
+            -1,
+        }, "move track_ids are not in future track list"
         index1, queue_item = self.get(id1)
         assert index1 is not None
         assert queue_item is not None
         del self.items[index1]
-        index2, _ = self.get(id2) if id2 != -1 else (len(self.items), None) # id's are positive. `-1` is a special sentinel value for end of list
+        index2, _ = (
+            self.get(id2) if id2 != -1 else (len(self.items), None)
+        )  # id's are positive. `-1` is a special sentinel value for end of list
         assert index2 is not None
         queue_item.start_time = None
         self.items.insert(index2, queue_item)
         self._recalculate_start_times()
+
     def get(self, id: int) -> tuple[int, QueueItem] | tuple[None, None]:
-        return next(((index, queue_item) for index, queue_item in enumerate(self.items) if queue_item.id==id), (None, None))
+        return next(
+            ((index, queue_item) for index, queue_item in enumerate(self.items) if queue_item.id == id),
+            (None, None),
+        )
+
     def delete(self, id: int) -> None:
         if current := self.current:
             # If deleting current item and current item is queued for future playback
@@ -168,7 +200,8 @@ class Queue():
         now = self.now
         self.items[:] = [i for i in self.items if (i.start_time and i.start_time < now) or i.id != id]
         self._recalculate_start_times()
-    def seek_forwards(self, seconds: float=20) -> None:
+
+    def seek_forwards(self, seconds: float = 20) -> None:
         if not self.current or not self.current.start_time or not self.current.end_time:
             return
         delta = datetime.timedelta(seconds=seconds)
@@ -188,7 +221,8 @@ class Queue():
             else:
                 self.current.start_time -= delta
         self._recalculate_start_times()
-    def seek_backwards(self, seconds: float=20) -> None:
+
+    def seek_backwards(self, seconds: float = 20) -> None:
         if not self.current or not self.current.start_time or not self.current.end_time:
             return
         delta = datetime.timedelta(seconds=seconds)
@@ -205,10 +239,12 @@ class Queue():
             else:
                 self.current.start_time += delta
         self._recalculate_start_times()
+
     def skip(self) -> None:
         if self.current:
             self.delete(self.current.id)
+
     def _recalculate_start_times(self) -> None:
         for i_prev, i_next in pairwise(self.current_future):
-            i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None   # type: ignore
+            i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None  # type: ignore
         self.modified = True

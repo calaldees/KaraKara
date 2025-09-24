@@ -20,13 +20,15 @@ async def _background_tracks_update_event(app: sanic.Sanic) -> None:
 
     log.info("`tracks.json` mqtt event")
     await app.ctx.mqtt.publish(
-        'global/tracks-updated',
-        json.dumps({'tracks_json_mtime': tracks_json_mtime}),
+        "global/tracks-updated",
+        json.dumps({"tracks_json_mtime": tracks_json_mtime}),
         retain=True,
     )
 
 
 tracks_update_semaphore = asyncio.Semaphore(1)
+
+
 async def background_tracks_update_event(
     app: sanic.Sanic,
     _asyncio_sleep: Callable[[int], Awaitable[None]] = asyncio.sleep,
@@ -37,7 +39,7 @@ async def background_tracks_update_event(
         log.debug("`tracks.json` background_tracks_update_event already active - cancel task")
         return
     async with tracks_update_semaphore:
-        log.info('background_tracks_update_event started')
+        log.info("background_tracks_update_event started")
         while app.config.BACKGROUND_TASK_TRACK_UPDATE_ENABLED:
             await _background_tracks_update_event(app)
             await _asyncio_sleep(60)

@@ -12,23 +12,23 @@ from .type_parsers import parse_datetime, parse_timedelta
 type Tag = str
 
 
-#class Theme(enum.StrEnum):
+# class Theme(enum.StrEnum):
 #    METALGHOSTS = enum.auto()
 
 
 Timedelta = t.Annotated[
     datetime.timedelta,
-    pydantic.PlainValidator(parse_timedelta, json_schema_input_type=int|float|str),
+    pydantic.PlainValidator(parse_timedelta, json_schema_input_type=int | float | str),
     pydantic.PlainSerializer(lambda td: td.total_seconds() if td else None, return_type=int),
 ]
 
 OptionalDatetime = t.Annotated[
     datetime.datetime | None,
     pydantic.PlainValidator(parse_datetime, json_schema_input_type=str),
-    annotated_types.Timezone(datetime.timezone.utc)
-    #pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
+    annotated_types.Timezone(datetime.timezone.utc),
+    # pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
 ]
-#OptionalDatetime = datetime.datetime | None
+# OptionalDatetime = datetime.datetime | None
 
 
 class QueueSettings(pydantic.BaseModel):
