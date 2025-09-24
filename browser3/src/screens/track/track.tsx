@@ -39,11 +39,7 @@ function Preview({ track }: { track: Track }) {
             crossOrigin="anonymous"
         >
             {track.attachments.video.map((a) => (
-                <source
-                    key={a.path}
-                    src={attachment_path(a)}
-                    type={a.mime}
-                />
+                <source key={a.path} src={attachment_path(a)} type={a.mime} />
             ))}
             {track.attachments.subtitle
                 ?.filter((a) => a.mime === "text/vtt")
