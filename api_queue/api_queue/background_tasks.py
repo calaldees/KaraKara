@@ -1,6 +1,6 @@
 import asyncio
-import contextlib
-from typing import Callable, Awaitable
+from typing import Callable
+from collections.abc import Awaitable
 
 import ujson as json
 import sanic

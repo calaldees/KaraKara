@@ -4,7 +4,7 @@ import shlex
 import subprocess
 from pathlib import Path
 import typing as t
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from collections.abc import Sequence
 import re
 import math
@@ -59,9 +59,9 @@ class EncoderException(Exception):
     pass
 
 
-class Encoder:
+class Encoder(ABC):
     target: TargetType
-    sources: t.Set[SourceType]
+    sources: set[SourceType]
     category: MediaType
     ext: str
     mime: str
@@ -79,9 +79,11 @@ class Encoder:
         self.salt = str(confs)
 
     @abstractmethod
-    def encode(self, target: Path, sources: t.Set[Source]) -> None: ...
+    def encode(self, target: Path, sources: set[Source]) -> None: ...
 
-    def _run(self, *args: str, title: str | None = None, duration: float | None = None) -> None:
+    def _run(
+        self, *args: str, title: str | None = None, duration: float | None = None
+    ) -> None:
         output = []
         with tqdm.tqdm(
             total=int(duration) if duration else None,
@@ -105,19 +107,23 @@ class Encoder:
                 output.append(line)
                 if match := re.search(r"time=(\d+):(\d+):(\d+.\d+)", line):
                     hours, minutes, seconds = match.groups()
-                    current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
+                    current_s = int(
+                        int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds)
+                    )
                     pbar.update(current_s - pbar.n)
 
         proc.wait()
         if proc.returncode != 0:
-            raise subprocess.CalledProcessError(proc.returncode, shlex.join(args), "".join(output))
+            raise subprocess.CalledProcessError(
+                proc.returncode, shlex.join(args), "".join(output)
+            )
 
 
 #######################################################################
 # Video to Video
 
 
-class _Preview(Encoder):
+class _Preview(Encoder, ABC):
     category = MediaType.PREVIEW
     conf_video = SCALE_PREVIEW
 
@@ -129,7 +135,7 @@ class _BaseVideoToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         # fmt: off
         source = list(sources)[0]
         # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
@@ -156,7 +162,9 @@ class _BaseVideoToVideo(Encoder):
         return []
 
     @staticmethod
-    def _append_ffmpeg_video_filter_string(args: Sequence[str], *filters: str) -> Sequence[str]:
+    def _append_ffmpeg_video_filter_string(
+        args: Sequence[str], *filters: str
+    ) -> Sequence[str]:
         """
         >>> _BaseVideoToVideo._append_ffmpeg_video_filter_string(('unknown1', '-vf', 'SOME_FILTER', 'unknown2'))
         ('unknown1', '-vf', 'SOME_FILTER', 'unknown2')
@@ -221,10 +229,18 @@ class VideoToAV1(_BaseVideoToVideo):
         def translate(input_top, input_bot, output_top, output_bot, input_value):
             input_range = input_top - input_bot
             output_range = output_top - output_bot
-            return output_bot + (((input_value - input_bot) / input_range) * output_range)
+            return output_bot + (
+                ((input_value - input_bot) / input_range) * output_range
+            )
 
-        total_pixels = min(meta.width * meta.height, 1280 * 720)  # ffmpeg will max width to 1280. See SCALE_VIDEO
-        crf = int(translate(_top.total_pixels, _bot.total_pixels, _top.crf, _bot.crf, total_pixels))
+        total_pixels = min(
+            meta.width * meta.height, 1280 * 720
+        )  # ffmpeg will max width to 1280. See SCALE_VIDEO
+        crf = int(
+            translate(
+                _top.total_pixels, _bot.total_pixels, _top.crf, _bot.crf, total_pixels
+            )
+        )
         crf = max(crf, 45)
         preset = int(
             translate(
@@ -278,7 +294,7 @@ class _BaseImageToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         def source_by_type(type: SourceType) -> Source:
             return [s for s in sources if s.type == type][0]
 
@@ -349,7 +365,7 @@ class _BaseVideoToImage(Encoder):
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         import tempfile
 
         with tempfile.TemporaryDirectory() as td:
@@ -407,7 +423,7 @@ class _BaseImageToImage(Encoder):
     priority = 2
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         # fmt: off
         self._run(
             "convert",
@@ -449,7 +465,7 @@ class SubtitleToVTT(Encoder):
     mime = "text/vtt"
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt(parse_subtitles(srt)))
@@ -463,7 +479,7 @@ class SubtitleToJSON(Encoder):
     mime = "application/json"
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_json(parse_subtitles(srt)))
@@ -472,8 +488,10 @@ class SubtitleToJSON(Encoder):
 #######################################################################
 
 
-def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
-    return set(cls.__subclasses__()).union(s for c in cls.__subclasses__() for s in all_subclasses(c))
+def all_subclasses(cls: t.Type[t.Any]) -> set[t.Type[Encoder]]:
+    return set(cls.__subclasses__()).union(
+        s for c in cls.__subclasses__() for s in all_subclasses(c)
+    )
 
 
 # Sort encoders by priority, highest first. Priority is manually specified
@@ -485,13 +503,15 @@ def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
 # - encoders who generate empty stubs are low-priority
 encoders = {e for e in all_subclasses(Encoder) if e.__name__[0] != "_"}
 sorted_encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
-encoders_for_type = {t: [e() for e in sorted_encoders if e.target == t] for t in TargetType}
+encoders_for_type = {
+    t: [e() for e in sorted_encoders if e.target == t] for t in TargetType
+}
 
 
 def find_appropriate_encoder(
     type: TargetType,
-    sources: t.Set[Source],
-) -> t.Optional[t.Tuple[Encoder, t.Set[Source]]]:
+    sources: set[Source],
+) -> tuple[Encoder, set[Source]] | None:
     """
     Find the highest priority encoder that can create the given target
     from the given sources.

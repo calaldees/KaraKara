@@ -4,7 +4,7 @@ from io import StringIO
 import csv
 
 
-def parse_tags(data: str) -> t.Dict[str, t.List[str]]:
+def parse_tags(data: str) -> dict[str, list[str]]:
     r"""
     >>> data = '''
     ... \ufeff
@@ -29,7 +29,7 @@ def parse_tags(data: str) -> t.Dict[str, t.List[str]]:
      'use': ['opening']}
     """
     data = data.strip().strip("\ufeff").strip()
-    tags_values: t.Dict[str, t.List[str]] = {}
+    tags_values: dict[str, list[str]] = {}
 
     for row in csv.reader(StringIO(data), delimiter=":"):
         row = list(filter(None, (i.strip() for i in row)))

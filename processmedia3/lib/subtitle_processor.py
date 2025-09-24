@@ -4,7 +4,6 @@
 import re
 from datetime import timedelta
 from itertools import zip_longest
-from typing import NamedTuple, List
 import typing as t
 import logging
 import difflib
@@ -16,7 +15,9 @@ log = logging.getLogger(__name__)
 SSA_NEWLINE = "\\N"
 SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 
-re_time = re.compile(r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)")
+re_time = re.compile(
+    r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)"
+)
 re_srt_line = re.compile(
     r"(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*?)(\n\n|$)",
     flags=re.DOTALL,
@@ -34,7 +35,7 @@ class SubtitleFormatException(Exception):
     pass
 
 
-class Subtitle(NamedTuple):
+class Subtitle(t.NamedTuple):
     start: timedelta = timedelta()
     end: timedelta = timedelta()
     text: str = ""
@@ -120,7 +121,7 @@ def clean_line(text: str) -> str:
     return "\n".join(l.strip() for l in text.split("\\N"))
 
 
-def _parse_srt(source: str) -> List[Subtitle]:
+def _parse_srt(source: str) -> list[Subtitle]:
     r"""
     >>> srt = r'''
     ... 1
@@ -140,7 +141,7 @@ def _parse_srt(source: str) -> List[Subtitle]:
     [Subtitle(start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
     """
 
-    def parse_line(line: t.Dict[str, str]) -> Subtitle:
+    def parse_line(line: dict[str, str]) -> Subtitle:
         return Subtitle(
             _parse_time(line["start"]),
             _parse_time(line["end"]),
@@ -148,11 +149,14 @@ def _parse_srt(source: str) -> List[Subtitle]:
             "\\a6" in line["text"],
         )
 
-    lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
+    lines = [
+        parse_line(line_match.groupdict())
+        for line_match in re_srt_line.finditer(source)
+    ]
     return [line for line in lines if line.text]
 
 
-def _parse_ssa(source: str) -> List[Subtitle]:
+def _parse_ssa(source: str) -> list[Subtitle]:
     r"""
     >>> ssa = r'''
     ... [Events]
@@ -172,7 +176,7 @@ def _parse_ssa(source: str) -> List[Subtitle]:
     """
     lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
 
-    def parse_line(line: t.Dict[str, str]) -> Subtitle:
+    def parse_line(line: dict[str, str]) -> Subtitle:
         return Subtitle(
             _parse_time(line["start"]),
             _parse_time(line["end"]),
@@ -183,7 +187,7 @@ def _parse_ssa(source: str) -> List[Subtitle]:
     return [parse_line(line_dict) for line_dict in lines]
 
 
-def parse_subtitles(data: str) -> List[Subtitle]:
+def parse_subtitles(data: str) -> list[Subtitle]:
     """
     >>> srt = '''
     ... 1
@@ -205,7 +209,7 @@ def parse_subtitles(data: str) -> List[Subtitle]:
     return _parse_srt(data) or _parse_ssa(data)
 
 
-def create_ssa(subtitles: t.List[Subtitle]) -> str:
+def create_ssa(subtitles: list[Subtitle]) -> str:
     data = """[Script Info]
 Title: <untitled>
 Original Script: <unknown>
@@ -234,7 +238,7 @@ Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     return data
 
 
-def create_srt(subtitles: t.List[Subtitle]) -> str:
+def create_srt(subtitles: list[Subtitle]) -> str:
     SRT_FORMAT = """\
 {index}
 {start} --> {end}
@@ -253,7 +257,7 @@ def create_srt(subtitles: t.List[Subtitle]) -> str:
     )
 
 
-def create_json(subtitles: t.List[Subtitle]) -> str:
+def create_json(subtitles: list[Subtitle]) -> str:
     return (
         json.dumps(
             [
@@ -272,7 +276,7 @@ def create_json(subtitles: t.List[Subtitle]) -> str:
     )
 
 
-def create_vtt(subtitles: t.List[Subtitle]) -> str:
+def create_vtt(subtitles: list[Subtitle]) -> str:
     r"""
     https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
     https://w3c.github.io/webvtt/
@@ -402,7 +406,9 @@ def create_vtt(subtitles: t.List[Subtitle]) -> str:
     # lyrics) as opposed to showing what is literally next (a blank space or
     # a progress bar)
     pairs = [
-        (active, next) for (active, next) in zip(padded_lines[:-1], padded_lines[1:]) if active.start != active.end
+        (active, next)
+        for (active, next) in zip(padded_lines[:-1], padded_lines[1:])
+        if active.start != active.end
     ]
 
     # Turn the list of (active line, next line) pairs into VTT-formated strings
@@ -426,7 +432,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert between subtitle formats")
     parser.add_argument("input", type=str, help="input subtitle file")
     parser.add_argument("output", type=str, help="output subtitle file", nargs="?")
-    parser.add_argument("--unblink", action="store_true", help="remove blinking subtitles")
+    parser.add_argument(
+        "--unblink", action="store_true", help="remove blinking subtitles"
+    )
     args = parser.parse_args()
     if args.output is None:
         args.output = args.input

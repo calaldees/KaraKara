@@ -31,7 +31,7 @@ class QueueManager():
                 writer.writerow(i.asdict())
 
     #@abstractmethod
-    #def queue_names(self, newer_than_timestamp:float = 0) -> t.Sequence[str]:
+    #def queue_names(self, newer_than_timestamp:float = 0) -> list[str]:
     #    ...
 
 class QueryManagerAsyncLockMixin():
@@ -53,10 +53,10 @@ class QueueManagerCSV(QueueManager):
     def path_csv(self, name) -> Path:
         return self.path.joinpath(f'{name}.csv')
 
-    def for_json(self, name) -> t.Sequence[t.Mapping[str, t.Any]]:
+    def for_json(self, name) -> list[dict[str, t.Any]]:
         file_context = self.path_csv(name).open('r', encoding='utf8') if self.path_csv(name).is_file() else io.StringIO('')
         with file_context as filehandle:
-            return tuple(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))  # type: ignore[arg-type]  # dataclass.__post_init__ takes care of the types in `**row`
+            return list(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))  # type: ignore[arg-type]  # dataclass.__post_init__ takes care of the types in `**row`
 
     @contextlib.contextmanager
     def queue_modify_context(self, name):
@@ -82,4 +82,3 @@ class QueueManagerStringIO(QueueManager):
             yield queue
         print('StringIO')
         print(filehandle.getvalue())
-

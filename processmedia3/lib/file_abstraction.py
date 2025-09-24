@@ -5,7 +5,8 @@ from typing import override, TypedDict, NamedTuple
 from functools import cached_property
 from abc import abstractmethod
 from typing import Self
-from collections.abc import Mapping, Generator, MutableSet, Set, Iterable
+import typing as t
+from collections.abc import Mapping, Generator, Iterable
 from os import stat_result
 from io import BytesIO
 import gzip
@@ -199,7 +200,7 @@ class HTTPResponse(NamedTuple):
     headers: Mapping[str, str]
     status: int
 
-    def has_headers(self, expected_headers: Set[str]) -> bool:
+    def has_headers(self, expected_headers: frozenset[str]) -> bool:
         return set(key.lower() for key in self.headers.keys()) >= expected_headers
 
 
@@ -450,8 +451,8 @@ class HttpFolder(AbstractFolder):
         >>> HttpFolder_files(build_response(nginx_json, 'application/json'))
         (HttpFile: http://fake_url/folders_and_known_fileexts.conf, HttpFile: http://fake_url/test.conf, HttpFile: http://fake_url/test.json)
         """
-        folders_visited: MutableSet[str] = set()
-        folders_to_visit: MutableSet[str] = set((self.url,))
+        folders_visited: set[str] = set()
+        folders_to_visit: set[str] = set((self.url,))
         while folders_to_visit:
             url = folders_to_visit.pop()
             response = _http(url, headers={"Accept": "application/json, text/html"})
@@ -467,8 +468,9 @@ class HttpFolder(AbstractFolder):
                 }
             elif "html" in content_type:
                 file_dicts[:] = [
-                    file_match.groupdict() for file_match in self.RE_FILE.finditer(body)
-                ]  # type: ignore[misc]
+                    file_match.groupdict()  # type: ignore[misc]
+                    for file_match in self.RE_FILE.finditer(body)
+                ]
                 folders_to_visit |= {
                     f"{url}{folder_match.group(1)}"
                     for folder_match in self.RE_FOLDER.finditer(body)

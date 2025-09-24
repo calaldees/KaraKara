@@ -1,7 +1,7 @@
 import sanic
 import pytest
 import typing as t
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 from api_queue.settings_manager import SettingsManager
 from api_queue.queue_model import Queue
@@ -9,9 +9,6 @@ from api_queue.queue_model import Queue
 import datetime
 import pathlib
 import shutil
-from urllib.parse import urlencode
-
-import ujson as json
 
 
 #@pytest.fixture

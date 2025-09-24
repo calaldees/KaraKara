@@ -1,4 +1,3 @@
-from typing import Optional
 import uuid
 import dataclasses
 
@@ -10,7 +9,7 @@ class User:
 
 class LoginManager:
     @staticmethod
-    def login(room_name: str, username: Optional[str], password: str, requested_session: Optional[str] = None) -> User:
+    def login(room_name: str, username: str | None, password: str, requested_session: str | None = None) -> User:
         if password==room_name:
             session_id = "admin"
         else:

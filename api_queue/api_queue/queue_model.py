@@ -21,10 +21,10 @@ class QueueItem():
     track_duration: datetime.timedelta
     session_id: str
     performer_name: str
-    start_time: t.Optional[datetime.datetime] = None
+    start_time: datetime.datetime | None = None
     id: int = dataclasses.field(default_factory=lambda:random.randint(0,2**30))
     added_time: datetime.datetime = dataclasses.field(default_factory=_now)
-    debug_str: t.Optional[str] = None
+    debug_str: str | None = None
 
     def __post_init__(self):
         """
@@ -67,7 +67,7 @@ class QueueItem():
         return dict(map(_to_base_types, key_values))
 
     @property
-    def end_time(self) -> t.Optional[datetime.datetime]:
+    def end_time(self) -> datetime.datetime | None:
         if self.start_time:
             return self.start_time + self.track_duration
         return None
@@ -83,7 +83,7 @@ class Queue():
         self.items = items
         self.settings = settings
         self.modified = False
-        self._now: t.Optional[datetime.datetime] = None
+        self._now: datetime.datetime | None = None
     @property
     def track_space(self) -> datetime.timedelta:
         return self.settings.track_space
@@ -99,7 +99,7 @@ class Queue():
         now = self.now
         return (i for i in self.items if not i.start_time or i.start_time >= now)
     @property
-    def current(self) -> t.Optional[QueueItem]:
+    def current(self) -> QueueItem | None:
         return self.playing or next(iter(self.future), None)
     @property
     def current_future(self) -> t.Iterable[QueueItem]:
@@ -110,10 +110,10 @@ class Queue():
             future.insert(0, current)
         return future
     @property
-    def last(self) -> t.Optional[QueueItem]:
+    def last(self) -> QueueItem | None:
         return self.items[-1] if self.items else None
     @property
-    def playing(self) -> t.Optional[QueueItem]:
+    def playing(self) -> QueueItem | None:
         now = self.now
         return next((i for i in self.items if i.start_time and i.start_time <= now and i.end_time and i.end_time > now), None)
     @property

@@ -1,11 +1,10 @@
 import datetime
-import typing as t
 
 import dateparser
 import pytimeparse2  # type: ignore
 
 
-def parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optional[datetime.timedelta]:
+def parse_timedelta(duration: int | float | str | datetime.timedelta) -> datetime.timedelta | None:
     """
     >>> parse_timedelta(None)
     >>> parse_timedelta('')
@@ -47,7 +46,7 @@ def parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optio
     return datetime.timedelta(seconds=seconds)
 
 
-def parse_datetime(value: str | int | float | None | datetime.datetime) -> t.Optional[datetime.datetime]:
+def parse_datetime(value: str | int | float | None | datetime.datetime) -> datetime.datetime | None:
     """
     >>> parse_datetime(None)
     >>> parse_datetime('')
@@ -70,7 +69,7 @@ def parse_datetime(value: str | int | float | None | datetime.datetime) -> t.Opt
     #dt = datetime.datetime.fromisoformat(isoformatString)
     if value is None or value == '':
         return None
-    dt: t.Optional[datetime.datetime] = None
+    dt: datetime.datetime | None = None
     if isinstance(value, datetime.datetime):
         dt = value
     if isinstance(value, (int, float)):

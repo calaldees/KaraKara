@@ -12,11 +12,11 @@ import pickle
 import re
 import sys
 import time
+import typing as t
 from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Tuple
-from collections.abc import Mapping, Sequence, MutableMapping, MutableSet, Set
+from collections.abc import Sequence, MutableMapping
 
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
@@ -70,7 +70,7 @@ def scan(
     source_folder: AbstractFolder,
     processed_dir: Path,
     match: str,
-    cache: MutableMapping[str, Any],
+    cache: MutableMapping[str, t.Any],
     threads: int = 1,
 ) -> Sequence[Track]:
     """
@@ -93,7 +93,7 @@ def scan(
     #   ],
     #   ...
     # }
-    grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
+    grouped: dict[str, set[AbstractFile]] = defaultdict(set)
     for file in source_folder.files:
         if any((i in file.relative) for i in SCAN_IGNORE):
             continue
@@ -104,12 +104,12 @@ def scan(
             assert matches is not None  # ".*" should always match
             track_id = re.sub("[^0-9a-zA-Z]+", "_", matches.group(1)).strip("_")
             grouped[track_id].add(file)
-    groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
+    groups: list[tuple[str, set[AbstractFile]]] = sorted(grouped.items())
 
     # Turn all the (track_id, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
-    def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
+    def _load_track(group: tuple[str, set[AbstractFile]]) -> Track | None:
         (track_id, files) = group
         try:
             sources = {Source(file, cache) for file in files}
@@ -121,7 +121,9 @@ def scan(
     return tuple(
         filter(
             None,
-            thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track"),
+            thread_map(
+                _load_track, groups, max_workers=threads, desc="scan   ", unit="track"
+            ),
         )
     )
 
@@ -141,7 +143,7 @@ def view(tracks: Sequence[Track]) -> None:
         print(track.id)
         for t in track.targets:
             if t.path.exists():
-                stats = f"{OK} ({int(t.path.stat().st_size/1024):,} KB)"
+                stats = f"{OK} ({int(t.path.stat().st_size / 1024):,} KB)"
             else:
                 stats = FAIL
             print(f"  - {t} {stats}")
@@ -165,20 +167,28 @@ def lint(tracks: Sequence[Track]) -> None:
 
                 if s.tags.get("vocaltrack") == ["on"]:
                     if not s.tags.get("vocalstyle"):
-                        log.error(f"{s.file.relative} has vocaltrack:on but no vocalstyle")
+                        log.error(
+                            f"{s.file.relative} has vocaltrack:on but no vocalstyle"
+                        )
 
                 use = s.tags.get("use")
                 if use:
                     use = [u.lower() for u in use]
                     for n in range(0, 50):
                         if f"op{n}" in use and "opening" not in use:
-                            log.error(f"{s.file.relative} has use:op{n} but no opening tag")
+                            log.error(
+                                f"{s.file.relative} has use:op{n} but no opening tag"
+                            )
                         if f"en{n}" in use and "ending" not in use:
-                            log.error(f"{s.file.relative} has use:ed{n} but no ending tag")
+                            log.error(
+                                f"{s.file.relative} has use:ed{n} but no ending tag"
+                            )
 
                 if "source" in s.tags:
                     if "http" in s.tags["source"] or "https" in s.tags["source"]:
-                        log.error(f"{s.file.relative} appears to have an unquoted URL in the source tag")
+                        log.error(
+                            f"{s.file.relative} appears to have an unquoted URL in the source tag"
+                        )
 
                 if "red" in s.tags:
                     log.error(f"{s.file.relative} has red tag")
@@ -201,7 +211,9 @@ def lint(tracks: Sequence[Track]) -> None:
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
-                        log.error(f"{s.file.relative}:{index+1} line contains newline: {l.text}")
+                        log.error(
+                            f"{s.file.relative}:{index + 1} line contains newline: {l.text}"
+                        )
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
@@ -211,19 +223,27 @@ def lint(tracks: Sequence[Track]) -> None:
                 botlines = [l for l in ls if not l.top]
                 for ls in [toplines, botlines]:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
-                        if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
-                            log.error(f"{s.file.relative}:{index+1} no gap between 3+ repeats: {l1.text}")
+                        if (
+                            l1.end == l2.start
+                            and l2.end == l3.start
+                            and (l1.text == l2.text == l3.text)
+                        ):
+                            log.error(
+                                f"{s.file.relative}:{index + 1} no gap between 3+ repeats: {l1.text}"
+                            )
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
-                            if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
+                            if gap < timedelta(microseconds=100_000) and not (
+                                l1.text == l2.text
+                            ):
                                 log.error(
-                                    f"{s.file.relative}:{index+1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
+                                    f"{s.file.relative}:{index + 1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
                                 )
                         elif l2.start < l1.end:
                             gap = l1.end - l2.start
                             log.error(
-                                f"{s.file.relative}:{index+1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
+                                f"{s.file.relative}:{index + 1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
                             )
 
     thread_map(_lint, tracks, max_workers=4, desc="lint   ", unit="track")
@@ -273,7 +293,9 @@ def export(
             log.exception(f"Error exporting {track.id}")
             return None
 
-    json_list = thread_map(_export, tracks, max_workers=threads, desc="export ", unit="track")
+    json_list = thread_map(
+        _export, tracks, max_workers=threads, desc="export ", unit="track"
+    )
 
     # Export in alphabetic order
     json_dict = dict(sorted((t["id"], t) for t in json_list if t))
@@ -305,7 +327,9 @@ def export(
         path.with_suffix(".tmp").rename(path)
 
 
-def cleanup(processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1) -> None:
+def cleanup(
+    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
+) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
     """
@@ -386,7 +410,9 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         nargs="?",
         help="Sub-process to run (view, encode, test-encode, export, lint, cleanup)",
     )
-    parser.add_argument("match", nargs="?", help="Only act upon files matching this pattern")
+    parser.add_argument(
+        "match", nargs="?", help="Only act upon files matching this pattern"
+    )
 
     args = parser.parse_args()
     # we need to create AbstractFolder lazily, because
@@ -397,7 +423,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 
 
 @contextlib.contextmanager
-def _pickled_var(path: Path, default: Any):
+def _pickled_var(path: Path, default: t.Any):
     """
     Load a variable from a file on startup,
     save the variable to file on shutdown
@@ -423,12 +449,14 @@ def main(argv: Sequence[str]) -> int:
         format="%(asctime)s %(message)s",
     )
     if args.log_file:
-        handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
+        handler = logging.handlers.RotatingFileHandler(
+            args.log_file, maxBytes=65535, backupCount=3
+        )
         logging.getLogger().addHandler(handler)
 
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
-            cache: MutableMapping[str, Any] = {}
+            cache: MutableMapping[str, t.Any] = {}
             path = Path(args.match)
             local_file = LocalFile(path, path.parent)
             tracks: Sequence[Track] = [
@@ -447,9 +475,14 @@ def main(argv: Sequence[str]) -> int:
             return 0
 
     while True:
-        with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
+        with (
+            _pickled_var(args.processed / "cache.db", {}) as cache,
+            logging_redirect_tqdm(),
+        ):
             tracks = scan(args.source, args.processed, args.match, cache, args.threads)
-            tracks = tuple(track for track in tracks if track.has_tags)  # only encode tracks that have a tag.txt file
+            tracks = tuple(
+                track for track in tracks if track.has_tags
+            )  # only encode tracks that have a tag.txt file
 
             # If no specific command is specified, then encode,
             # export, and cleanup with the default settings

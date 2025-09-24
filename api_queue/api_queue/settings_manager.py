@@ -23,12 +23,12 @@ Timedelta = t.Annotated[
 ]
 
 OptionalDatetime = t.Annotated[
-    t.Optional[datetime.datetime],
+    datetime.datetime | None,
     pydantic.PlainValidator(parse_datetime, json_schema_input_type=str),
     annotated_types.Timezone(datetime.timezone.utc)
     #pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
 ]
-#OptionalDatetime = t.Optional[datetime.datetime]
+#OptionalDatetime = datetime.datetime | None
 
 
 class QueueSettings(pydantic.BaseModel):
@@ -41,15 +41,14 @@ class QueueSettings(pydantic.BaseModel):
     coming_soon_track_count: t.Annotated[int, annotated_types.Gt(0), annotated_types.Lt(10)] = 5
     validation_event_start_datetime: OptionalDatetime = None
     validation_event_end_datetime: OptionalDatetime = None
-    # validation_duplicate_performer_timedelta: t.Optional[Timedelta] = None  # Not implemented
-    # validation_duplicate_track_timedelta: t.Optional[Timedelta] = None  # Not implemented
+    # validation_duplicate_performer_timedelta: Timedelta | None = None  # Not implemented
+    # validation_duplicate_track_timedelta: Timedelta | None = None  # Not implemented
     validation_performer_names: t.Sequence[str] = ()
     auto_reorder_queue: bool = False
 
 
 class SettingsManager:
     def __init__(self, path: Path = Path(".")):
-        path = path if isinstance(path, Path) else Path(path)
         path.mkdir(parents=True, exist_ok=True)  # is this safe?
         assert path.is_dir()
         self.path = path
