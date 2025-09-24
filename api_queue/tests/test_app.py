@@ -135,7 +135,6 @@ async def test_queue_settings_change_invalid(api_queue: APIQueue, mock_mqtt):
 @pytest.mark.parametrize('settings_fieldname', (
     "track_space",
     "validation_event_end_datetime",
-    "theme",
     "preview_volume",
     "coming_soon_track_count",
     "validation_performer_names",

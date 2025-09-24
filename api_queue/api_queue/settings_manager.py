@@ -12,8 +12,8 @@ from .type_parsers import parse_datetime, parse_timedelta
 type Tag = str
 
 
-class Theme(enum.StrEnum):
-    METALGHOSTS = enum.auto()
+#class Theme(enum.StrEnum):
+#    METALGHOSTS = enum.auto()
 
 
 Timedelta = t.Annotated[
@@ -36,7 +36,7 @@ class QueueSettings(pydantic.BaseModel):
     hidden_tags: t.Sequence[Tag] = ("red:duplicate",)
     forced_tags: t.Sequence[Tag] = ()
     title: str = "KaraKara"
-    theme: Theme = Theme.METALGHOSTS
+    # theme: Theme = Theme.METALGHOSTS
     preview_volume: t.Annotated[float, annotated_types.Ge(0), annotated_types.Le(1)] = 0.1
     coming_soon_track_count: t.Annotated[int, annotated_types.Gt(0), annotated_types.Lt(10)] = 5
     validation_event_start_datetime: OptionalDatetime = None
