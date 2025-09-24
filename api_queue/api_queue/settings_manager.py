@@ -54,15 +54,13 @@ class SettingsManager:
     def room_exists(self, name: str) -> bool:
         return self.path.joinpath(f"{name}_settings.json").is_file()
 
-    def get_json(self, name: str) -> dict[str, t.Any]:
+    def set(self, name: str, settings: QueueSettings) -> None:
         path = self.path.joinpath(f"{name}_settings.json")
-        json_str = path.read_text() if path.is_file() else QueueSettings().model_dump_json()
-        return json.loads(json_str)
-
-    def set_json(self, name: str, settings: dict[str, t.Any]) -> None:
-        path = self.path.joinpath(f"{name}_settings.json")
-        json_str = QueueSettings(**{**self.get_json(name), **settings}).model_dump_json()
+        json_str = settings.model_dump_json()
         path.write_text(json_str)
 
     def get(self, name: str) -> QueueSettings:
-        return QueueSettings(**self.get_json(name))
+        path = self.path.joinpath(f"{name}_settings.json")
+        if path.is_file():
+            return QueueSettings(**json.loads(path.read_text()))
+        return QueueSettings()

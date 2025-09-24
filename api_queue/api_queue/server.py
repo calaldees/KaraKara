@@ -228,7 +228,7 @@ async def login(request: Request, room_name: str, body: LoginRequest):
     if not request.app.ctx.settings_manager.room_exists(room_name):
         if not body.create:
             raise sanic.exceptions.NotFound(message=f"Room '{room_name}' not found")
-        request.app.ctx.settings_manager.set_json(room_name, {})
+        request.app.ctx.settings_manager.set(room_name, QueueSettings())
     user = LoginManager.login(room_name, None, body.password, request.ctx.session_id)
     request.ctx.session_id = user.session_id
     return sanic.response.json(user.__dict__)
@@ -275,20 +275,17 @@ async def get_settings(request: Request, room_name: str):
 
 
 @room_blueprint.put("/settings.json")
+@validate(json=QueueSettings)
 @openapi.definition(
     body={"application/json": QueueSettings},
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
-async def update_settings(request: Request, room_name: str):
+async def update_settings(request: Request, room_name: str, body: QueueSettings):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request.app, room_name):
-        try:
-            request.app.ctx.settings_manager.set_json(room_name, request.json)
-            log.info(f"Updated settings for {room_name} with {request.json}")
-        except pydantic.ValidationError as ex:
-            log.warning(f"Rejected settings for {room_name} with {request.json}")
-            raise sanic.exceptions.InvalidUsage(message="invalid settings", context=json.loads(ex.json()))
+        request.app.ctx.settings_manager.set(room_name, body)
+        log.info(f"Updated settings for {room_name} with {request.json}")
         return sanic.response.json({})
 
 

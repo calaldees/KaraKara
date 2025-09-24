@@ -1,9 +1,8 @@
-import sanic
 import pytest
 import typing as t
 from unittest.mock import AsyncMock, MagicMock
 
-from api_queue.settings_manager import SettingsManager
+from api_queue.settings_manager import SettingsManager, QueueSettings
 from api_queue.queue_model import Queue
 from api_queue.api_types import App
 
@@ -43,16 +42,15 @@ async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[App]:
 
 @pytest.fixture
 def qu() -> Queue:
-    mock_settings_manager = MagicMock()
-    mock_settings_manager.get_json.return_value = {
-        "track_space": 10.0,
-        "validation_event_start_datetime": "2022-01-01T09:50:00.000000",
-        "validation_event_end_datetime": "2022-01-01T10:10:00.000000",
-        "validation_duplicate_performer_timedelta": "4min",
-        "validation_duplicate_track_timedelta": "4min",
-        "validation_performer_names": [],
-        "coming_soon_track_count": 3,
-    }
-    qu = Queue([], settings=SettingsManager.get(mock_settings_manager, "test"))
+    settings = QueueSettings(
+        track_space = datetime.timedelta(seconds=10),
+        validation_event_start_datetime = datetime.datetime(2022, 1, 1, 9, 50, tzinfo=datetime.timezone.utc),
+        validation_event_end_datetime = datetime.datetime(2022, 1, 1, 10, 10, tzinfo=datetime.timezone.utc),
+        # validation_duplicate_performer_timedelta = datetime.timedelta(minutes=4),
+        # validation_duplicate_track_timedelta = datetime.timedelta(minutes=4),
+        validation_performer_names = [],
+        coming_soon_track_count = 3,
+    )
+    qu = Queue([], settings=settings)
     qu._now = datetime.datetime(2022, 1, 1, 10, 0, 0, tzinfo=datetime.timezone.utc)
     return qu

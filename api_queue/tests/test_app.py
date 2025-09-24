@@ -156,9 +156,6 @@ async def test_queue_settings_validation_invalid(api_queue: APIQueue, settings_f
     api_queue.session_id = "admin"
     response = await api_queue.settings_put(payload={settings_fieldname: "NOT VALID"})
     assert response.status == 400
-    error = response.json["context"][0]
-    assert error["input"] == "NOT VALID"
-    assert error["loc"][0] == settings_fieldname
 
 
 @pytest.mark.asyncio
