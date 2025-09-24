@@ -22,7 +22,7 @@ export function PodiumScreen({
     track: Track;
     queue_item: QueueItem;
 }) {
-    const { root, blankPodium } = useContext(ClientContext);
+    const { blankPodium } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
     const [starting, setStarting] = useState(false);
@@ -60,7 +60,7 @@ export function PodiumScreen({
                             <track
                                 key={a.path}
                                 kind="subtitles"
-                                src={attachment_path(root, a)}
+                                src={attachment_path(a)}
                                 default={true}
                                 label="English"
                                 srcLang="en"

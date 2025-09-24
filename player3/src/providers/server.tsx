@@ -1,9 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useApi } from "@/hooks/api";
-import { ClientContext } from "./client";
 import { mqtt_url } from "@/utils";
 import type { Track } from "@/types";
 import { useMemoObj } from "@/hooks/memo";
@@ -21,7 +20,6 @@ export const ServerContext = createContext<ServerContextType>(
 );
 
 function InternalServerProvider(props: any) {
-    const { root } = useContext(ClientContext);
     const [tracks, setTracks] = useState<Record<string, Track>>({});
     const [downloadSize, setDownloadSize] = useState<number | null>(null);
     const [downloadDone, setDownloadDone] = useState<number>(0);
@@ -39,7 +37,7 @@ function InternalServerProvider(props: any) {
     });
     useEffect(() => {
         request({
-            url: `${root}/files/tracks.json?ver=${tracksUpdated}`,
+            url: `/files/tracks.json?ver=${tracksUpdated}`,
             options: {
                 credentials: "omit",
             },
@@ -49,7 +47,7 @@ function InternalServerProvider(props: any) {
                 setDownloadSize(size);
             },
         });
-    }, [root, request, tracksUpdated]);
+    }, [request, tracksUpdated]);
 
     const ctxVal: ServerContextType = useMemoObj({
         tracks,
@@ -61,9 +59,8 @@ function InternalServerProvider(props: any) {
 }
 
 export function ServerProvider(props: any) {
-    const { root } = useContext(ClientContext);
     return (
-        <MqttProvider url={mqtt_url(root)}>
+        <MqttProvider url={mqtt_url()}>
             <InternalServerProvider>{props.children}</InternalServerProvider>
         </MqttProvider>
     );

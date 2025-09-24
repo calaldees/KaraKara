@@ -9,8 +9,6 @@ import "./config.scss";
 export function ConfigMenu() {
     const { roomName } = useParams();
     const {
-        root,
-        setRoot,
         roomPassword,
         setRoomPassword,
         podium,
@@ -25,7 +23,6 @@ export function ConfigMenu() {
         setUnderscan,
     } = useContext(ClientContext);
     const { now, offset } = useContext(ServerTimeContext);
-    const [rootEdit, setRootEdit] = useState(root);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
@@ -33,7 +30,6 @@ export function ConfigMenu() {
     const onSubmit = useCallback(
         (e: FormEvent) => {
             e.preventDefault();
-            setRoot(rootEdit);
             if (roomNameEdit !== roomName) {
                 void navigate("/" + roomNameEdit);
             }
@@ -45,9 +41,7 @@ export function ConfigMenu() {
             roomName,
             roomNameEdit,
             roomPasswordEdit,
-            rootEdit,
             setRoomPassword,
-            setRoot,
             setShowSettings,
         ],
     );
@@ -59,18 +53,6 @@ export function ConfigMenu() {
                 <form onSubmit={onSubmit}>
                     <table>
                         <tbody>
-                            <tr>
-                                <td>Server</td>
-                                <td>
-                                    <input
-                                        value={rootEdit}
-                                        type={"text"}
-                                        onChange={(e) =>
-                                            setRootEdit(e.target.value)
-                                        }
-                                    />
-                                </td>
-                            </tr>
                             <tr>
                                 <td>Room</td>
                                 <td>

@@ -7,7 +7,6 @@ import { useMediaQuery } from "usehooks-ts";
 
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-import { ClientContext } from "@/providers/client";
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
 
@@ -85,7 +84,6 @@ function PlaneMaterial({ thumb, vid }: { thumb: string; vid: string }) {
 }
 
 function MyScene() {
-    const { root } = useContext(ClientContext);
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
     const widescreen = useMediaQuery("(min-aspect-ratio: 16/10)");
@@ -97,10 +95,10 @@ function MyScene() {
 
     const thumbs = useMemoArr(() => {
         return getNiceTracks(tracks, 20).map((track) => [
-            attachment_path(root, track.attachments.image[0]),
-            attachment_path(root, track.attachments.video[0]),
+            attachment_path(track.attachments.image[0]),
+            attachment_path(track.attachments.video[0]),
         ]);
-    }, [tracks, root]);
+    }, [tracks]);
 
     useThree((state) => {
         // these debug functions can randomly take ~100ms

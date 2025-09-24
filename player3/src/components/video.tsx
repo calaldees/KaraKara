@@ -1,6 +1,3 @@
-import { useContext } from "react";
-
-import { ClientContext } from "@/providers/client";
 import type { Track, Attachment } from "@/types";
 import { attachment_path } from "@/utils";
 
@@ -10,13 +7,17 @@ interface VideoProps {
     loop?: boolean;
     onLoadStart?: (e: any) => void;
 }
-export function Video({ track, subs=true, loop=false, onLoadStart=undefined }: VideoProps) {
-    const { root } = useContext(ClientContext);
+export function Video({
+    track,
+    subs = true,
+    loop = false,
+    onLoadStart = undefined,
+}: VideoProps) {
     return (
         <div className="videoScaler">
             <video
                 autoPlay={true}
-                poster={attachment_path(root, track.attachments.image[0])}
+                poster={attachment_path(track.attachments.image[0])}
                 // ensure the video element gets re-created when <source> changes
                 key={track.id}
                 crossOrigin="anonymous"
@@ -26,22 +27,23 @@ export function Video({ track, subs=true, loop=false, onLoadStart=undefined }: V
                 {track.attachments.video.map((a: Attachment) => (
                     <source
                         key={a.path}
-                        src={attachment_path(root, a)}
+                        src={attachment_path(a)}
                         type={a.mime}
                     />
                 ))}
-                {subs && track.attachments.subtitle
-                    ?.filter((a) => a.mime === "text/vtt")
-                    .map((a: Attachment) => (
-                        <track
-                            key={a.path}
-                            kind="subtitles"
-                            src={attachment_path(root, a)}
-                            default={true}
-                            label="English"
-                            srcLang="en"
-                        />
-                    ))}
+                {subs &&
+                    track.attachments.subtitle
+                        ?.filter((a) => a.mime === "text/vtt")
+                        .map((a: Attachment) => (
+                            <track
+                                key={a.path}
+                                kind="subtitles"
+                                src={attachment_path(a)}
+                                default={true}
+                                label="English"
+                                srcLang="en"
+                            />
+                        ))}
             </video>
         </div>
     );

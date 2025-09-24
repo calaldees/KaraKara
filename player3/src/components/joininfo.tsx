@@ -1,11 +1,8 @@
-import { useContext } from "react";
 import { useParams } from "react-router-dom";
-
-import { ClientContext } from "@/providers/client";
 
 export function JoinInfo() {
     const { roomName } = useParams();
-    const { root } = useContext(ClientContext);
+    const root = window.location.protocol + "//" + window.location.host;
     return (
         <div id="join_info">
             <span>

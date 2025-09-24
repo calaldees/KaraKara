@@ -24,7 +24,7 @@ export const RoomContext = createContext<RoomContextType>(
 
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
-    const { root, roomPassword } = useContext(ClientContext);
+    const { roomPassword } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
@@ -70,7 +70,7 @@ export function RoomProvider(props: any) {
                 setSessionId(response.session_id);
             },
         });
-    }, [root, roomName, roomPassword, request, setSessionId]);
+    }, [roomName, roomPassword, request, setSessionId]);
 
     // This component re-renders every time "now" changes, but
     // we don't want that to cause re-renders in the consumers
