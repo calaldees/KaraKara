@@ -49,15 +49,14 @@ function QueueItem({
 
 export function PreviewScreen({
     queue,
-    track,
 }: {
     queue: QueueItem[];
-    track: Track;
 }) {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
 
+    const track = tracks[queue[0].track_id];
     return (
         <section key="preview" className={"screen_preview"}>
             <JoinInfo />
@@ -68,6 +67,8 @@ export function PreviewScreen({
                 }}
                 subs={false}
                 loop={true}
+                videoVariant={queue[0].video_variant}
+                subtitleVariant={queue[0].subtitle_variant}
             />
             {queue
                 .slice(0, show_tracks)

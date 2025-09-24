@@ -56,6 +56,7 @@ export function PodiumScreen({
                     <source src={blank.href} />
                     {track.attachments.subtitle
                         ?.filter((a) => a.mime === "text/vtt")
+                        .filter((a) => a.variant === queue_item.subtitle_variant)
                         .map((a) => (
                             <track
                                 key={a.path}
@@ -68,7 +69,12 @@ export function PodiumScreen({
                         ))}
                 </video>
             ) : (
-                <Video track={track} loop={true} />
+                <Video
+                    track={track}
+                    loop={true}
+                    videoVariant={queue_item.video_variant}
+                    subtitleVariant={queue_item.subtitle_variant}
+                />
             )}
 
             {starting ? (

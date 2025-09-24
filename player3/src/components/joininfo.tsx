@@ -5,8 +5,8 @@ export function JoinInfo() {
     return (
         <div id="join_info">
             <span>
-                Join at <strong>{window.location.hostname}</strong> - Room
-                Name is <strong>{roomName}</strong>
+                Join at <strong>{window.location.hostname}</strong> - Room Name
+                is <strong>{roomName}</strong>
             </span>
         </div>
     );

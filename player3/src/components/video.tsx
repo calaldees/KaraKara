@@ -1,18 +1,21 @@
 import type { Track, Attachment } from "@/types";
 import { attachment_path } from "@/utils";
 
-interface VideoProps {
-    track: Track;
-    subs?: boolean;
-    loop?: boolean;
-    onLoadStart?: (e: any) => void;
-}
 export function Video({
     track,
     subs = true,
     loop = false,
     onLoadStart = undefined,
-}: VideoProps) {
+    videoVariant,
+    subtitleVariant,
+}: {
+    track: Track;
+    subs?: boolean;
+    loop?: boolean;
+    onLoadStart?: (e: any) => void;
+    videoVariant: string | null;
+    subtitleVariant: string | null;
+}) {
     return (
         <div className="videoScaler">
             <video
@@ -24,23 +27,26 @@ export function Video({
                 loop={loop}
                 onLoadStart={onLoadStart}
             >
-                {track.attachments.video.map((a: Attachment) => (
-                    <source
-                        key={a.path}
-                        src={attachment_path(a)}
-                        type={a.mime}
-                    />
-                ))}
+                {track.attachments.video
+                    .filter((a) => a.variant === videoVariant)
+                    .map((a: Attachment) => (
+                        <source
+                            key={a.path}
+                            src={attachment_path(a)}
+                            type={a.mime}
+                        />
+                    ))}
                 {subs &&
                     track.attachments.subtitle
                         ?.filter((a) => a.mime === "text/vtt")
+                        .filter((a) => a.variant === subtitleVariant)
                         .map((a: Attachment) => (
                             <track
                                 key={a.path}
                                 kind="subtitles"
                                 src={attachment_path(a)}
                                 default={true}
-                                label="English"
+                                label={a.variant || "Default"}
                                 srcLang="en"
                             />
                         ))}

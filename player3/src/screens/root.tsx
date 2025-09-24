@@ -83,7 +83,7 @@ function Room() {
         );
     else if (queue[0].start_time == null || queue[0].start_time > now)
         screen = (
-            <PreviewScreen track={tracks[queue[0].track_id]} queue={queue} />
+            <PreviewScreen queue={queue} />
         );
     else
         screen = (
