@@ -94,7 +94,7 @@ async def test_queue_invalid_name(app: sanic.Sanic):
 
 @pytest.mark.asyncio
 async def test_tracks(api_queue: APIQueue):
-    assert "KAT_TUN_Your_side_Instrumental_" in (await api_queue.tracks).keys()
+    assert "KAT_TUN_Your_side_Instrumental" in (await api_queue.tracks).keys()
 
 
 @pytest.mark.asyncio

@@ -109,8 +109,8 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    source: "" + src_id,
-                    target: "" + dst_id,
+                    source: src_id,
+                    target: dst_id,
                 }),
             },
             // on network error, revert to original queue

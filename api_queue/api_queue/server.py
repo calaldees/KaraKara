@@ -11,7 +11,7 @@ import pydantic
 import sanic
 import ujson as json
 from sanic.log import logger as log
-from sanic_ext import openapi
+from sanic_ext import openapi, validate
 import sanic.blueprints
 import sanic.handlers
 import sanic.response
@@ -55,17 +55,17 @@ app.config.FALLBACK_ERROR_FORMAT = "json"
 
 
 @app.listener("before_server_start")
-async def tracks_load(_app: App, _loop):
-    _app.ctx.track_manager = TrackManager(Path(_app.config.PATH_TRACKS))
+async def tracks_load(app: App, _loop):
+    app.ctx.track_manager = TrackManager(Path(app.config.PATH_TRACKS))
 
 
 @app.listener("before_server_start")
-async def queue_manager(_app: App, _loop):
-    path_queue = Path(_app.config.PATH_QUEUE)
+async def queue_manager(app: App, _loop):
+    path_queue = Path(app.config.PATH_QUEUE)
     log.info(f"[queue_manager] - {path_queue=}")
-    _app.ctx.path_queue = path_queue
-    _app.ctx.settings_manager = SettingsManager(path=path_queue)
-    _app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=_app.ctx.settings_manager)
+    app.ctx.path_queue = path_queue
+    app.ctx.settings_manager = SettingsManager(path=path_queue)
+    app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=app.ctx.settings_manager)
 
 
 @app.listener("before_server_start")
@@ -160,7 +160,7 @@ async def push_settings_to_mqtt(app: App, room_name: str) -> AsyncGenerator[None
     response=openapi.definitions.Response("redirect to openapi spec", status=302),
 )
 async def root(request: Request):
-    return sanic.response.redirect("/docs")
+    return sanic.response.redirect("/api/docs")
 
 
 @app.get("/time.json")
@@ -217,18 +217,19 @@ class LoginRequest:
 
 
 @room_blueprint.post("/login.json")
+@validate(json=LoginRequest)
 @openapi.definition(
     body={"application/json": LoginRequest},
     response=[
         openapi.definitions.Response({"application/json": User}, status=200),
     ],
 )
-async def login(request: Request, room_name: str):
+async def login(request: Request, room_name: str, body: LoginRequest):
     if not request.app.ctx.settings_manager.room_exists(room_name):
-        if not request.json.get("create"):
+        if not body.create:
             raise sanic.exceptions.NotFound(message=f"Room '{room_name}' not found")
         request.app.ctx.settings_manager.set_json(room_name, {})
-    user = LoginManager.login(room_name, None, request.json["password"], request.ctx.session_id)
+    user = LoginManager.login(room_name, None, body.password, request.ctx.session_id)
     request.ctx.session_id = user.session_id
     return sanic.response.json(user.__dict__)
 
@@ -331,12 +332,13 @@ async def queue_json(request: Request, room_name: str):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(room_name))
 
 
-class QueueItemAdd:
+class QueueItemAdd(pydantic.BaseModel):
     track_id: str
     performer_name: str
 
 
 @room_blueprint.post("/queue.json")
+@validate(json=QueueItemAdd)
 @openapi.definition(
     body={"application/json": QueueItemAdd},
     response=[
@@ -345,25 +347,21 @@ class QueueItemAdd:
         openapi.definitions.Response("track_id invalid", status=400),
     ],
 )
-async def add_queue_item(request: Request, room_name: str):
+async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
     track_durations = request.app.ctx.track_manager.track_durations
     # Validation
-    if not request.json or frozenset(request.json.keys()) != frozenset(("track_id", "performer_name")):
-        raise sanic.exceptions.InvalidUsage(message="missing fields", context=request.json)
-    track_id = request.json["track_id"]
-    if track_id not in track_durations:
-        raise sanic.exceptions.InvalidUsage(message="track_id invalid", context={"track_id": track_id})
-    performer_name = request.json["performer_name"]
-    if performer_name.strip() == "":
+    if body.track_id not in track_durations:
+        raise sanic.exceptions.InvalidUsage(message="track_id invalid", context={"track_id": body.track_id})
+    if body.performer_name.strip() == "":
         raise sanic.exceptions.InvalidUsage(message="Performer name cannot be empty")
     # Queue update
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
-                track_id=track_id,
-                track_duration=track_durations[track_id],  # type: ignore[arg-type]
+                track_id=body.track_id,
+                track_duration=track_durations[body.track_id],  # type: ignore[arg-type]
                 session_id=request.ctx.session_id,
-                performer_name=performer_name,
+                performer_name=body.performer_name,
             )
             queue.add(queue_item)
 
@@ -398,27 +396,23 @@ async def delete_queue_item(request: Request, room_name: str, queue_item_id_str:
             return sanic.response.json(queue_item.asdict())
 
 
-class QueueItemMove:
+class QueueItemMove(pydantic.BaseModel):
     source: int
     target: int
 
 
 @room_blueprint.put("/queue.json")
+@validate(json=QueueItemMove)
 @openapi.definition(
     body={"application/json": QueueItemMove},
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
 )
-async def move_queue_item(request: Request, room_name: str):
-    try:
-        source = int(request.json.get("source"))
-        target = int(request.json.get("target"))
-    except (ValueError, TypeError):
-        raise sanic.exceptions.InvalidUsage(message="source and target args required", context=request.json)
+async def move_queue_item(request: Request, room_name: str, body: QueueItemMove):
     if not request.ctx.user.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
-            queue.move(source, target)
+            queue.move(body.source, body.target)
             return sanic.response.json({}, status=201)
 
 
