@@ -1,6 +1,10 @@
-$DARK: #020f1f;
-$MID: #074d5e;
-$LIGHT: #29edf2;
+:root {
+    --gradient-dark: #020f1f;
+    --gradient-mid: #074d5e;
+    --gradient-light: #29edf2;
+
+    --border: 1px solid var(--gradient-light);
+}
 
 @font-face {
     font-family: metalghosts;
@@ -9,17 +13,18 @@ $LIGHT: #29edf2;
     font-display: swap;
 }
 @mixin radial {
-    background: radial-gradient(rgba($MID, 0.75), rgba($DARK, 0.95));
+    background: radial-gradient(
+        rgb(from var(--gradient-mid) r g b / 75%),
+        rgb(from var(--gradient-dark) r g b / 95%)
+    );
 }
 @mixin border {
     padding: 2cqh 2cqw;
-    border: var(--border-width) solid $LIGHT;
+    border: var(--border);
     border-radius: 2cqh;
 }
 
 .theme-metalghosts {
-    --border-width: 1px;
-
     /*---------------------------------------------------------------------------*/
     /* Common */
     /*---------------------------------------------------------------------------*/
@@ -47,7 +52,6 @@ $LIGHT: #29edf2;
         border-color: black;
         color: white;
 
-        color: white;
         font-family: metalghosts, sans-serif;
         text-shadow:
             -1px -1px 0 #000,
@@ -93,11 +97,11 @@ $LIGHT: #29edf2;
         }
         #join_info {
             grid-area: header;
-            border-bottom: var(--border-width) solid $LIGHT;
+            border-bottom: var(--border);
         }
         #event_info {
             grid-area: footer;
-            border-top: var(--border-width) solid $LIGHT;
+            border-top: var(--border);
         }
     }
 
@@ -471,7 +475,7 @@ $LIGHT: #29edf2;
 
         H1 {
             grid-area: header;
-            border-bottom: var(--border-width) solid $LIGHT;
+            border-bottom: var(--border);
             @include radial;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -490,13 +494,13 @@ $LIGHT: #29edf2;
         DIV.startButton,
         DIV.progressBar {
             grid-area: footer;
-            border-top: var(--border-width) solid $LIGHT;
+            border-top: var(--border);
             @include radial;
             background: linear-gradient(
                 90deg,
-                rgba($DARK, 0.5) 0,
-                $LIGHT 50%,
-                rgba($DARK, 0.5) 50%
+                rgb(from var(--gradient-dark) r g b / 50%) 0,
+                var(--gradient-light) 50%,
+                rgb(from var(--gradient-dark) r g b / 50%) 50%,
             );
             background-size: 200% 100%;
             // NOTE: keep the time here in sync with the frequency of state updates
