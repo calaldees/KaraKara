@@ -50,6 +50,8 @@ class QueueItem:
         self.track_duration = parse_timedelta(self.track_duration) or datetime.timedelta(0)
         self.start_time = parse_datetime(self.start_time)
         self.added_time = parse_datetime(self.added_time) or self._now()
+        self.audio_variant = self.audio_variant or None
+        self.subtitle_variant = self.subtitle_variant or None
 
     def asdict(self):
         return dataclasses.asdict(self, dict_factory=self.dict_factory)
