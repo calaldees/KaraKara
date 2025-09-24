@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { useReactToPrint } from "react-to-print";
 
-import { BackToExplore, Screen } from "./_common";
-import { ClientContext } from "../providers/client";
+import { BackToExplore, Screen } from "../_common";
+import { ClientContext } from "../../providers/client";
 
-import "../static/printable.scss";
+import "./printable.scss";
 
 ///////////////////////////////////////////////////////////////////////
 // Views

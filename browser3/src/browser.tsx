@@ -12,7 +12,9 @@ import { TimeProvider } from "./providers/time";
 import { ServerProvider } from "./providers/server";
 import { Root } from "./screens/root";
 
-import "./static/style.scss";
+import "./static/forms.scss";
+import "./static/vars.scss";
+import "./static/layout.scss";
 
 const root = createRoot(document.getElementById("root")!);
 root.render(

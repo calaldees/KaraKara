@@ -1,22 +1,22 @@
 import { useContext, useEffect, useState } from "react";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
-import { Screen, BackToExplore, Thumb } from "./_common";
+import { Screen, BackToExplore, Thumb } from "../_common";
 import {
     shuffle,
     is_my_song,
     time_until,
     dict2css,
     attachment_path,
-} from "../utils";
-import { ServerContext } from "../providers/server";
-import { ClientContext } from "../providers/client";
-import { RoomContext } from "../providers/room";
-import { useApi } from "../hooks/api";
-import type { Track, QueueItem, Subtitle } from "../types";
+} from "../../utils";
+import { ServerContext } from "../../providers/server";
+import { ClientContext } from "../../providers/client";
+import { RoomContext } from "../../providers/room";
+import { useApi } from "../../hooks/api";
+import type { Track, QueueItem, Subtitle } from "../../types";
 
-import * as icons from "../static/icons";
-import "../static/queue.scss";
+import * as icons from "../../static/icons";
+import "./queue.scss";
 
 function QueueItemRender({
     item,

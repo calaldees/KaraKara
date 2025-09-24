@@ -1,10 +1,10 @@
 import { FormEvent, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Screen } from "./_common";
+import { Screen } from "../_common";
 
-import * as icons from "../static/icons";
-import "../static/login.scss";
+import * as icons from "../../static/icons";
+import "./login.scss";
 
 export function Login(): React.ReactElement {
     const [roomNameEdit, setRoomNameEdit] = useState("");

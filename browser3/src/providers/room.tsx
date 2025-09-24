@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { UAParser } from 'ua-parser-js';
+import { UAParser } from "ua-parser-js";
 import { useSubscription } from "@shish2k/react-mqtt";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -119,11 +119,11 @@ export function RoomProvider(props: any) {
             url: `${root}/analytics.json`,
             options: {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(an),
             },
         });
-    }, [request, root, roomName, isAdmin])
+    }, [request, root, roomName, isAdmin]);
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,

@@ -1,9 +1,10 @@
 import { useContext } from "react";
-import { Screen } from "./_common";
-import { percent } from "../utils";
-import * as icons from "../static/icons";
-import { ServerContext } from "../providers/server";
 import { useParams } from "react-router-dom";
+
+import { Screen } from "../_common";
+import { percent } from "../../utils";
+import * as icons from "../../static/icons";
+import { ServerContext } from "../../providers/server";
 
 export function Loading(): React.ReactElement {
     const { downloadDone, downloadSize } = useContext(ServerContext);

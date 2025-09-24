@@ -1,0 +1,47 @@
+INPUT[type="text"],
+INPUT[type="password"],
+SELECT,
+BUTTON,
+.button {
+    font-size: 1rem;
+    width: 100%;
+    border-radius: 5px;
+    padding: 0.5rem;
+}
+A.button {
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+}
+INPUT[type="checkbox"] {
+    margin: 0.5rem;
+}
+INPUT[type="text"],
+INPUT[type="password"] {
+    color: var(--input-fg);
+    font-weight: bold;
+    background: var(--input-bg);
+    box-shadow: var(--input-shade) 0px 1px 3px 0px inset;
+    border: 1px solid;
+    border-color: var(--input-shade) var(--input-light) var(--input-light)
+        var(--input-shade);
+}
+SELECT,
+BUTTON,
+.button {
+    color: var(--button-fg);
+    font-weight: bold;
+    background: var(--button-bg);
+    border: 1px solid;
+    border-color: var(--input-light) var(--input-shade) var(--input-shade)
+        var(--input-light);
+
+    &:active {
+        background: var(--button-bg-active);
+        border-color: var(--input-shade) var(--input-light) var(--input-light)
+            var(--input-shade);
+    }
+    &:disabled {
+        color: var(--input-fg-disabled);
+    }
+}

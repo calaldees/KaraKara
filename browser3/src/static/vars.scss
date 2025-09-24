@@ -1,0 +1,75 @@
+:root {
+    --page-fg: #000;
+    --page-bg: #f9f9f9;
+
+    --header-bg: #e9e9e9;
+    --header-border: #ddd;
+
+    --input-fg: #000;
+    --input-fg-disabled: #aaa;
+    --input-bg: #fff;
+    --input-light: #eee;
+    --input-shade: #999;
+
+    --button-fb: #000;
+    --button-bg: #e9e9e9;
+    --button-bg-active: #d0d0d0;
+
+    --list-bg: #f9f9f9;
+    --list-border: #ddd;
+    --list-shadow: #e9e9e9;
+
+    --drag-handle-bg: #f9f9f9a0;
+
+    --notification-ok: #afa;
+    --notification-ok-border: #0d0;
+    --notification-warning: #ffa;
+    --notification-warning-border: #dd0;
+    --notification-error: #faa;
+    --notification-error-border: #d00;
+
+    --settings-bg: #fff;
+    --settings-border: #000;
+    --settings-color: #000;
+
+    --drop-target: #f00;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --page-fg: #fff;
+        --page-bg: #111;
+
+        --header-bg: #333;
+        --header-border: #222;
+
+        --input-fg: #000;
+        --input-fg-disabled: #888;
+        --input-bg: #ddd;
+        --input-light: #555;
+        --input-shade: #222;
+
+        --button-fg: #ddd;
+        --button-bg: #444;
+        --button-bg-active: #333;
+
+        --list-bg: #333;
+        --list-border: #222;
+        --list-shadow: #222;
+
+        --drag-handle-bg: #444;
+
+        --notification-ok: #060;
+        --notification-ok-border: #020;
+        --notification-warning: #762;
+        --notification-warning-border: #220;
+        --notification-error: #600;
+        --notification-error-border: #200;
+
+        --settings-bg: #222;
+        --settings-border: #444;
+        --settings-color: #fff;
+
+        --drop-target: #600;
+    }
+}

@@ -8,18 +8,18 @@ import {
     useParams,
 } from "react-router-dom";
 
-import { Login } from "./login";
-import { TrackList } from "./tracks";
-import { TrackDetails } from "./track";
-import { Queue } from "./queue";
-import { Control } from "./control";
-import { ConfigMenu } from "./config";
-import { Printable } from "./printable";
-import { RoomSettings } from "./settings";
+import { Login } from "./login/login";
+import { TrackList } from "./tracks/tracks";
+import { TrackDetails } from "./track/track";
+import { Queue } from "./queue/queue";
+import { Control } from "./control/control";
+import { ConfigMenu } from "./config/config";
+import { Printable } from "./printable/printable";
+import { RoomSettings } from "./settings/settings";
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ClientContext } from "../providers/client";
 import { ServerContext } from "../providers/server";
-import { Loading } from "./loading";
+import { Loading } from "./loading/loading";
 
 // the null loader here is just to ensure that useNavigation() has
 // a "loading" phase, so that we can react to the navigation before

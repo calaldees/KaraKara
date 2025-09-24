@@ -1,79 +1,3 @@
-:root {
-    --page-fg: #000;
-    --page-bg: #f9f9f9;
-
-    --header-bg: #e9e9e9;
-    --header-border: #ddd;
-
-    --input-fg: #000;
-    --input-fg-disabled: #aaa;
-    --input-bg: #fff;
-    --input-light: #eee;
-    --input-shade: #999;
-
-    --button-fb: #000;
-    --button-bg: #e9e9e9;
-    --button-bg-active: #d0d0d0;
-
-    --list-bg: #f9f9f9;
-    --list-border: #ddd;
-    --list-shadow: #e9e9e9;
-
-    --drag-handle-bg: #f9f9f9a0;
-
-    --notification-ok: #afa;
-    --notification-ok-border: #0d0;
-    --notification-warning: #ffa;
-    --notification-warning-border: #dd0;
-    --notification-error: #faa;
-    --notification-error-border: #d00;
-
-    --settings-bg: #fff;
-    --settings-border: #000;
-    --settings-color: #000;
-
-    --drop-target: #f00;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --page-fg: #fff;
-        --page-bg: #111;
-
-        --header-bg: #333;
-        --header-border: #222;
-
-        --input-fg: #000;
-        --input-fg-disabled: #888;
-        --input-bg: #ddd;
-        --input-light: #555;
-        --input-shade: #222;
-
-        --button-fg: #ddd;
-        --button-bg: #444;
-        --button-bg-active: #333;
-
-        --list-bg: #333;
-        --list-border: #222;
-        --list-shadow: #222;
-
-        --drag-handle-bg: #444;
-
-        --notification-ok: #060;
-        --notification-ok-border: #020;
-        --notification-warning: #762;
-        --notification-warning-border: #220;
-        --notification-error: #600;
-        --notification-error-border: #200;
-
-        --settings-bg: #222;
-        --settings-border: #444;
-        --settings-color: #fff;
-
-        --drop-target: #600;
-    }
-}
-
 /* svg wibbling */
 svg:not(.qr_code) {
     path {
@@ -240,18 +164,19 @@ MAIN {
         flex-flow: column;
         border-top: 1px solid var(--header-border);
         background-color: var(--header-bg);
-        padding: 0.3em 5%;
+        padding-top: 0.3em;
 
-        .already_queued {
-            text-align: center;
+        & > * {
+            margin-top: 0.3em;
+            margin-bottom: 0.3em;
         }
 
         .buttons {
             display: flex;
             flex-flow: row;
             justify-content: space-between;
-            BUTTON,
-            .button {
+
+            & > * {
                 flex: 1 0;
                 margin-left: 0.3em;
                 margin-right: 0.3em;
@@ -345,54 +270,6 @@ UL {
         border-bottom: 0;
     }
 }
-
-INPUT[type="text"],
-INPUT[type="password"],
-BUTTON,
-.button {
-    font-size: 1em;
-    width: 100%;
-    margin: 0.25em 0;
-    border-radius: 5px;
-    padding: 0.5em;
-}
-A.button {
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-}
-INPUT[type="checkbox"] {
-    margin: 0.5em;
-}
-INPUT[type="text"],
-INPUT[type="password"] {
-    color: var(--input-fg);
-    font-weight: bold;
-    background: var(--input-bg);
-    box-shadow: var(--input-shade) 0px 1px 3px 0px inset;
-    border: 1px solid;
-    border-color: var(--input-shade) var(--input-light) var(--input-light)
-        var(--input-shade);
-}
-BUTTON,
-.button {
-    color: var(--button-fg);
-    font-weight: bold;
-    background: var(--button-bg);
-    border: 1px solid;
-    border-color: var(--input-light) var(--input-shade) var(--input-shade)
-        var(--input-light);
-
-    &:active {
-        background: var(--button-bg-active);
-        border-color: var(--input-shade) var(--input-light) var(--input-light)
-            var(--input-shade);
-    }
-    &:disabled {
-        color: var(--input-fg-disabled);
-    }
-}
-
 /* Don't put stuff in iPhone's weird rounded corners */
 MAIN {
     HEADER,

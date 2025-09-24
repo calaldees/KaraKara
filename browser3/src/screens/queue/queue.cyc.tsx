@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 /// <reference path="../../../cypress/support/component.ts" />
 
-import { Queue } from "../queue";
+import { Queue } from "./queue";
 //import tracks from "../../../cypress/fixtures/small_tracks.json";
 import queue from "../../../cypress/fixtures/small_queue.json";
 import settings from "../../../cypress/fixtures/small_settings.json";
