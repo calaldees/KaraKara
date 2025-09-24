@@ -117,7 +117,7 @@ function Buttons({ track }: { track: Track }) {
         setPerformerName,
     } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
-    const [audioVariant, setAudioVariant] = useState<string>("");
+    const [videoVariant, setVideoVariant] = useState<string>("");
     const [subtitleVariant, setSubtitleVariant] = useState<string>("");
     const { request } = useApi();
 
@@ -134,7 +134,7 @@ function Buttons({ track }: { track: Track }) {
                 body: JSON.stringify({
                     track_id: track_id,
                     performer_name: performer_name.trim(),
-                    audio_variant: audioVariant || null,
+                    video_variant: videoVariant || null,
                     subtitle_variant: subtitleVariant || null,
                 }),
             },
@@ -142,23 +142,24 @@ function Buttons({ track }: { track: Track }) {
         });
     }
 
-    let audioSelect = null;
-    const audioVariants = [
+    let videoSelect = null;
+    const videoVariants = [
         ...new Set(
             track.attachments.video
                 .map((a) => a.variant)
                 .filter((v) => v !== null),
         ),
     ];
-    if (audioVariants.length > 1) {
-        audioSelect = (
+    if (videoVariants.length > 1) {
+        videoSelect = (
             <select
-                name="audio_variant"
-                onChange={(e) => setAudioVariant(e.target.value)}
-                value={audioVariant}
+                name="video_variant"
+                onChange={(e) => setVideoVariant(e.target.value)}
+                value={videoVariant}
             >
+                {/** while the variants are different videos, the effect for the user is different audio */}
                 <option value="">Select Audio</option>
-                {audioVariants.map((v) => (
+                {videoVariants.map((v) => (
                     <option key={v} value={v}>
                         {v}
                     </option>
@@ -193,16 +194,16 @@ function Buttons({ track }: { track: Track }) {
     }
 
     let variantSelect = null;
-    if (audioSelect || subtitleSelect) {
+    if (videoSelect || subtitleSelect) {
         variantSelect = <div className="buttons">
-            {audioSelect}
+            {videoSelect}
             {subtitleSelect}
         </div>;
     }
 
     const validInputs = performerName.trim().length >= 0 &&
-        (audioVariants.length === 0 || audioVariant !== null) &&
-        (subtitleVariants.length === 0 || subtitleVariant !== null);
+        (videoVariants.length === 0 || videoVariant !== "") &&
+        (subtitleVariants.length === 0 || subtitleVariant !== "");
 
     if (action === TrackAction.NONE) {
         const is_queued =

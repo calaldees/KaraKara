@@ -107,9 +107,9 @@ export function Thumb({
     return (
         <div className={"thumb"} {...kwargs}>
             <picture>
-                {track?.attachments.image.map((a) => (
+                {track?.attachments.image.map((a, n) => (
                     <source
-                        key={a.path}
+                        key={a.path + n}
                         srcSet={attachment_path(a)}
                         type={a.mime}
                     />
