@@ -2,7 +2,6 @@ import typing as t
 from collections import defaultdict
 import copy
 from pathlib import Path
-from collections.abc import Sequence, Mapping, MutableMapping, MutableSequence
 from .kktypes import MediaType, TargetType
 from .source import Source, SourceType
 from .target import Target
@@ -18,8 +17,8 @@ class TrackAttachment(t.TypedDict):
 class TrackDict(t.TypedDict):
     id: str
     duration: float
-    attachments: Mapping[MediaType, Sequence[TrackAttachment]]
-    tags: Mapping[str, Sequence[str]]
+    attachments: dict[MediaType, list[TrackAttachment]]
+    tags: dict[str, list[str]]
 
 
 class TrackValidationException(Exception): ...
@@ -37,7 +36,7 @@ class Track:
         processed_dir: Path,
         id: str,
         sources: set[Source],
-        target_types: Sequence[TargetType],
+        target_types: list[TargetType],
     ) -> None:
         self.id = id
         self.sources = sources
@@ -59,7 +58,7 @@ class Track:
 
         self.targets = targets
 
-    def _sources_by_type(self, types: set[SourceType]) -> Sequence[Source]:
+    def _sources_by_type(self, types: set[SourceType]) -> list[Source]:
         return [s for s in self.sources if s.type in types]
 
     @property
@@ -72,7 +71,7 @@ class Track:
         from any set of inputs; this method is where we enforce the specific
         requirements of KaraKara (ie, the assumptions of Browser / Player).
         """
-        attachments: MutableMapping[MediaType, MutableSequence[TrackAttachment]] = defaultdict(list)
+        attachments: dict[MediaType, list[TrackAttachment]] = defaultdict(list)
         for target in self.targets:
             attachments[target.encoder.category].append(
                 TrackAttachment(
@@ -89,7 +88,7 @@ class Track:
             raise TrackValidationException("missing attachments.image")
 
         tag_files = self._sources_by_type({SourceType.TAGS})
-        tags: MutableMapping[str, MutableSequence[str]] = copy.deepcopy(tag_files[0].tags)  # type: ignore[arg-type]
+        tags: dict[str, list[str]] = copy.deepcopy(tag_files[0].tags)  # type: ignore[arg-type]
         if tags.get("title") is None:
             raise TrackValidationException("missing tags.title")
         if tags.get("category") is None:

@@ -15,9 +15,7 @@ log = logging.getLogger(__name__)
 SSA_NEWLINE = "\\N"
 SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 
-re_time = re.compile(
-    r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)"
-)
+re_time = re.compile(r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)")
 re_srt_line = re.compile(
     r"(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*?)(\n\n|$)",
     flags=re.DOTALL,
@@ -149,10 +147,7 @@ def _parse_srt(source: str) -> list[Subtitle]:
             "\\a6" in line["text"],
         )
 
-    lines = [
-        parse_line(line_match.groupdict())
-        for line_match in re_srt_line.finditer(source)
-    ]
+    lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
     return [line for line in lines if line.text]
 
 
@@ -293,7 +288,7 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     BIG_GAP_PREVIEW = timedelta(seconds=3)
 
     last_end = timedelta(0)
-    padded_lines = []
+    padded_lines: list[Subtitle] = []
     # Turn each line of source text into one or more lines of output text
     # by inserting blank lines or progress bars as needed
     for line in subtitles:
@@ -406,9 +401,7 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     # lyrics) as opposed to showing what is literally next (a blank space or
     # a progress bar)
     pairs = [
-        (active, next)
-        for (active, next) in zip(padded_lines[:-1], padded_lines[1:])
-        if active.start != active.end
+        (active, next) for (active, next) in zip(padded_lines[:-1], padded_lines[1:]) if active.start != active.end
     ]
 
     # Turn the list of (active line, next line) pairs into VTT-formated strings
@@ -432,9 +425,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert between subtitle formats")
     parser.add_argument("input", type=str, help="input subtitle file")
     parser.add_argument("output", type=str, help="output subtitle file", nargs="?")
-    parser.add_argument(
-        "--unblink", action="store_true", help="remove blinking subtitles"
-    )
+    parser.add_argument("--unblink", action="store_true", help="remove blinking subtitles")
     args = parser.parse_args()
     if args.output is None:
         args.output = args.input

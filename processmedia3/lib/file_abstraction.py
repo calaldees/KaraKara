@@ -233,9 +233,7 @@ class HttpFile(AbstractFile):
     HEADERS_REQUIRED = frozenset({"accept-ranges", "last-modified", "content-length"})
     HEADER_DATETIME_STRPTIME = r"%a, %d %b %Y %H:%M:%S %Z"
 
-    def __init__(
-        self, url: str, url_root: str, mtime_str: str = "", size_str: str = ""
-    ):
+    def __init__(self, url: str, url_root: str, mtime_str: str = "", size_str: str = ""):
         self.url = url
         self.url_root = url_root
         self._size = size_str
@@ -324,18 +322,14 @@ class HttpFile(AbstractFile):
             headers={"Range": f"bytes=0-{self.block_size - 1},-{self.block_size}"},
         )
         if not response.has_headers(self.HEADERS_REQUIRED):
-            raise AbstractFileException(
-                f"http server does support required headers: {self.HEADERS_REQUIRED}"
-            )
+            raise AbstractFileException(f"http server does support required headers: {self.HEADERS_REQUIRED}")
         self._mtime = response.headers.get("last-modified", "")
         multipart_boundary = re.match(
             r"multipart/byteranges; boundary=(.+)",
             response.headers.get("content-type", ""),
         )
         body = (
-            gzip.decompress(response.body)
-            if "gzip" in response.headers.get("content-encoding", "")
-            else response.body
+            gzip.decompress(response.body) if "gzip" in response.headers.get("content-encoding", "") else response.body
         )
         if not multipart_boundary:
             # self._size = response.headers.get('content-length', '')
@@ -343,16 +337,12 @@ class HttpFile(AbstractFile):
             return body
         HEAD_END = b"\r\n\r\n"
         bytes_io = BytesIO()
-        parts: Iterable[bytes] = body.split(
-            f"\r\n--{multipart_boundary.group(1)}".encode("utf8")
-        )
+        parts: Iterable[bytes] = body.split(f"\r\n--{multipart_boundary.group(1)}".encode("utf8"))
         parts = filter(lambda data: len(data) > self.block_size, parts)
         for part in parts:
             i = part.index(HEAD_END) + len(HEAD_END)
             meta, body = part[:i], part[i:]
-            if size_match := re.search(
-                r"Content-range: bytes [\d-]+/(\d+)", meta.decode("utf8"), re.IGNORECASE
-            ):
+            if size_match := re.search(r"Content-range: bytes [\d-]+/(\d+)", meta.decode("utf8"), re.IGNORECASE):
                 self._size = size_match.group(1)
             bytes_io.write(body)
         return bytes_io.getvalue()
@@ -361,9 +351,7 @@ class HttpFile(AbstractFile):
     def headers(self) -> Mapping[str, str]:
         response = _http(self.url, method="HEAD")
         if not response.has_headers(self.HEADERS_REQUIRED):
-            raise AbstractFileException(
-                f"http server does support required headers: {self.HEADERS_REQUIRED}"
-            )
+            raise AbstractFileException(f"http server does support required headers: {self.HEADERS_REQUIRED}")
         return response.headers
 
     @property
@@ -395,9 +383,7 @@ class HttpFolder(AbstractFolder):
 
     def __init__(self, url: str):
         self.url = url
-        assert self.url.endswith("/"), (
-            "url should end in `/` because it should be a folder"
-        )
+        assert self.url.endswith("/"), "url should end in `/` because it should be a folder"
 
     @override
     @classmethod
@@ -463,18 +449,12 @@ class HttpFolder(AbstractFolder):
             if "json" in content_type:
                 data = json.loads(response.body)
                 file_dicts[:] = (i for i in data if i["type"] == "file")
-                folders_to_visit |= {
-                    f"{url}{i['name']}/" for i in data if i["type"] == "directory"
-                }
+                folders_to_visit |= {f"{url}{i['name']}/" for i in data if i["type"] == "directory"}
             elif "html" in content_type:
                 file_dicts[:] = [
-                    file_match.groupdict()  # type: ignore[misc]
-                    for file_match in self.RE_FILE.finditer(body)
+                    file_match.groupdict() for file_match in self.RE_FILE.finditer(body)  # type: ignore[misc]
                 ]
-                folders_to_visit |= {
-                    f"{url}{folder_match.group(1)}"
-                    for folder_match in self.RE_FOLDER.finditer(body)
-                }
+                folders_to_visit |= {f"{url}{folder_match.group(1)}" for folder_match in self.RE_FOLDER.finditer(body)}
             else:
                 raise AbstractFileException(f"unknown {content_type}")
             folders_to_visit -= folders_visited
@@ -482,10 +462,9 @@ class HttpFolder(AbstractFolder):
                 yield HttpFile(
                     url=f"{url}{file_dict['name']}",
                     url_root=self.url,
-                    mtime_str=(
-                        dateparser.parse(file_dict["mtime"])
-                        or datetime.fromtimestamp(0)
-                    ).strftime(HttpFile.HEADER_DATETIME_STRPTIME),
+                    mtime_str=(dateparser.parse(file_dict["mtime"]) or datetime.fromtimestamp(0)).strftime(
+                        HttpFile.HEADER_DATETIME_STRPTIME
+                    ),
                     size_str=file_dict["size"],
                 )
 
@@ -510,9 +489,7 @@ def _examples() -> None:
         "https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).mp4",
         url_root="https://calaldees.dreamhosters.com/karakara_media/",
     )
-    bb = LocalFile(
-        Path("../media/source/Captain America (1966).mp4"), Path("../media/source/")
-    )
+    bb = LocalFile(Path("../media/source/Captain America (1966).mp4"), Path("../media/source/"))
     cc = HttpFile(
         "https://calaldees.dreamhosters.com/karakara_media/Captain%20America%20(1966).srt",
         url_root="https://calaldees.dreamhosters.com/karakara_media/",

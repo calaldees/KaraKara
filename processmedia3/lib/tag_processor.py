@@ -1,5 +1,4 @@
 from itertools import pairwise
-import typing as t
 from io import StringIO
 import csv
 
