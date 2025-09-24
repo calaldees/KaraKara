@@ -212,7 +212,7 @@ class QueueItemJson:
 
 
 class LoginRequest(pydantic.BaseModel):
-    create: bool
+    create: bool = False
     password: str
 
 
