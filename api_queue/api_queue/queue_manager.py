@@ -40,17 +40,6 @@ class QueueManager:
     #    ...
 
 
-class QueryManagerAsyncLockMixin:
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.queue_async_locks: defaultdict[QueueName, asyncio.Lock] = defaultdict(asyncio.Lock)
-
-    @contextlib.asynccontextmanager
-    async def lock_resource(self, name: QueueName):
-        async with self.queue_async_locks[name]:
-            yield
-
-
 class QueueManagerCSV(QueueManager):
     def __init__(self, path: Path = Path("."), **kwargs):
         super().__init__(**kwargs)
@@ -76,10 +65,14 @@ class QueueManagerCSV(QueueManager):
                 yield queue
 
 
-class QueueManagerCSVAsync(QueueManagerCSV, QueryManagerAsyncLockMixin):
+class QueueManagerCSVAsync(QueueManagerCSV):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.queue_async_locks: defaultdict[QueueName, asyncio.Lock] = defaultdict(asyncio.Lock)
+
     @contextlib.asynccontextmanager
     async def async_queue_modify_context(self, name: QueueName):
-        async with self.lock_resource(name):
+        async with self.queue_async_locks[name]:
             with self.queue_modify_context(name) as queue:
                 yield queue
 
