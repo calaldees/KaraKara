@@ -112,6 +112,7 @@ export function RoomProvider(props: any) {
             event: "open_room",
             ua: ua,
             dev: process.env.NODE_ENV === "development" ? true : false,
+            session: sessionId,
             admin: isAdmin,
             room: roomName,
         };
@@ -123,7 +124,7 @@ export function RoomProvider(props: any) {
                 body: JSON.stringify(an),
             },
         });
-    }, [request, root, roomName, isAdmin]);
+    }, [request, root, roomName, sessionId, isAdmin]);
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,
