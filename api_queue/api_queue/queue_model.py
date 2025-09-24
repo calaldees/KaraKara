@@ -25,6 +25,8 @@ class QueueItem:
     id: int = dataclasses.field(default_factory=lambda: random.randint(0, 2**30))
     added_time: datetime.datetime = dataclasses.field(default_factory=_now)
     debug_str: str | None = None
+    audio_variant: str | None = None
+    subtitle_variant: str | None = None
 
     def __post_init__(self):
         """
