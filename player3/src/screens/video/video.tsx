@@ -20,7 +20,7 @@ export function VideoScreen({
 
     return (
         <section key="video" className={"screen_video"}>
-            <Video track={track} lowres={false} />
+            <Video track={track} />
             <JoinInfo />
             <EventInfo />
             <div

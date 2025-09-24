@@ -6,9 +6,11 @@ import { attachment_path } from "@/utils";
 
 interface VideoProps {
     track: Track;
-    [Key: string]: any;
+    subs?: boolean;
+    loop?: boolean;
+    onLoadStart?: (e: any) => void;
 }
-export function Video({ track, ...kwargs }: VideoProps) {
+export function Video({ track, subs=true, loop=false, onLoadStart=undefined }: VideoProps) {
     const { root } = useContext(ClientContext);
     return (
         <div className="videoScaler">
@@ -18,7 +20,8 @@ export function Video({ track, ...kwargs }: VideoProps) {
                 // ensure the video element gets re-created when <source> changes
                 key={track.id}
                 crossOrigin="anonymous"
-                {...kwargs}
+                loop={loop}
+                onLoadStart={onLoadStart}
             >
                 {track.attachments.video.map((a: Attachment) => (
                     <source
@@ -27,7 +30,7 @@ export function Video({ track, ...kwargs }: VideoProps) {
                         type={a.mime}
                     />
                 ))}
-                {track.attachments.subtitle
+                {subs && track.attachments.subtitle
                     ?.filter((a) => a.mime === "text/vtt")
                     .map((a: Attachment) => (
                         <track

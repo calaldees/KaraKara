@@ -66,7 +66,7 @@ export function PreviewScreen({
                 onLoadStart={(e: any) => {
                     e.target.volume = settings["preview_volume"];
                 }}
-                lowres={false}
+                subs={false}
                 loop={true}
             />
             {queue

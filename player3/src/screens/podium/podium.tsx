@@ -68,7 +68,7 @@ export function PodiumScreen({
                         ))}
                 </video>
             ) : (
-                <Video track={track} lowres={true} loop={true} />
+                <Video track={track} loop={true} />
             )}
 
             {starting ? (
