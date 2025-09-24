@@ -23,7 +23,7 @@ type ApiRequestProps = FunctionRequestProps | UrlRequestProps;
 
 export function useApi() {
     const { roomName } = useParams();
-    const { root, setNotification } = useContext(ClientContext);
+    const { setNotification } = useContext(ClientContext);
     const [loading, setLoading] = useState(false);
 
     const request = useCallback(
@@ -32,7 +32,7 @@ export function useApi() {
                 response: "json",
                 url:
                     props_.url ??
-                    `${root}/room/${roomName}/${props_.function}.json`,
+                    `/api/room/${roomName}/${props_.function}.json`,
                 options: {},
                 ...props_,
             };
@@ -138,7 +138,7 @@ export function useApi() {
                     }
                 });
         },
-        [roomName, root, setNotification],
+        [roomName, setNotification],
     );
 
     const sendCommand = useCallback(

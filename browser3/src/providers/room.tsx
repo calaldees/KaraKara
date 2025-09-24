@@ -30,7 +30,7 @@ export const RoomContext = createContext<RoomContextType>(
 
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
-    const { root, roomPassword } = useContext(ClientContext);
+    const { roomPassword } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -104,7 +104,7 @@ export function RoomProvider(props: any) {
                 void navigate("/");
             },
         });
-    }, [root, roomName, roomPassword, request, setSessionId, navigate]);
+    }, [roomName, roomPassword, request, setSessionId, navigate]);
 
     useEffect(() => {
         const ua = UAParser();
@@ -117,14 +117,14 @@ export function RoomProvider(props: any) {
             room: roomName,
         };
         request({
-            url: `${root}/analytics.json`,
+            url: `/api/analytics.json`,
             options: {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(an),
             },
         });
-    }, [request, root, roomName, sessionId, isAdmin]);
+    }, [request, roomName, sessionId, isAdmin]);
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,

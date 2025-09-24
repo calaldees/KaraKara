@@ -308,9 +308,10 @@ function ProgressBar({
 
 export function Control(): React.ReactElement {
     const { roomName } = useParams();
-    const { root, widescreen } = useContext(ClientContext);
+    const { widescreen } = useContext(ClientContext);
     const { queue, fullQueue, settings } = useContext(RoomContext);
 
+    const root = window.location.protocol + "//" + window.location.host;
     return (
         <Screen
             className={"queue"}

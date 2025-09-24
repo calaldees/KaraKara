@@ -1,10 +1,9 @@
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { useParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { useReactToPrint } from "react-to-print";
 
 import { BackToExplore, Screen } from "../_common";
-import { ClientContext } from "@/providers/client";
 
 import "./printable.scss";
 
@@ -27,11 +26,11 @@ const PrintButtons = ({
 
 export function Printable(): React.ReactElement {
     const { roomName } = useParams();
-    const { root } = useContext(ClientContext);
 
     const contentRef = useRef<HTMLDivElement>(null);
     const reactToPrintFn = useReactToPrint({ contentRef });
 
+    const root = window.location.protocol + "//" + window.location.host;
     return (
         <Screen
             className={"printable"}

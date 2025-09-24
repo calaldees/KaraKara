@@ -13,6 +13,16 @@ export default defineConfig({
     build: {
         target: ["es2015", "ios11"],
     },
+    server: {
+        proxy: {
+            "/api": "https://karakara.uk",
+            "/files": "https://karakara.uk",
+            "/mqtt": {
+                target: "https://karakara.uk",
+                ws: true,
+            },
+        },
+    },
     plugins: [
         react(),
         svgr(),

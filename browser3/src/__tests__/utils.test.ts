@@ -22,9 +22,7 @@ describe("dict2css", () => {
 describe("attachment_path", () => {
     const attachment = track_dict["track_id_1"].attachments.video[0];
     test("should basically work", () => {
-        expect(utils.attachment_path("http://example.com", attachment)).toEqual(
-            "http://example.com/files/f/foo.mp4",
-        );
+        expect(utils.attachment_path(attachment)).toEqual("/files/f/foo.mp4");
     });
 });
 
@@ -33,14 +31,6 @@ describe("shuffle", () => {
         expect(utils.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])).not.toEqual([
             1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
         ]);
-    });
-});
-
-describe("mqtt_url", () => {
-    test("should basically work", () => {
-        expect(utils.mqtt_url("https://example.com")).toEqual(
-            "wss://example.com/mqtt",
-        );
     });
 });
 

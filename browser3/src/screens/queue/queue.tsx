@@ -81,7 +81,6 @@ function QueueItemRender({
 }
 
 function Lyrics({ track }: { track: Track }) {
-    const { root } = useContext(ClientContext);
     const { request } = useApi();
 
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
@@ -91,12 +90,12 @@ function Lyrics({ track }: { track: Track }) {
         );
         if (subtitleAttachment) {
             request({
-                url: attachment_path(root, subtitleAttachment),
+                url: attachment_path(subtitleAttachment),
                 options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),
             });
         }
-    }, [request, root, track]);
+    }, [request, track]);
     if (lyrics.length > 0) {
         return (
             <li>

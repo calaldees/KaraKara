@@ -8,15 +8,12 @@ import "./config.scss";
 export function ConfigMenu(): React.ReactElement {
     const { roomName } = useParams();
     const {
-        root,
-        setRoot,
         roomPassword,
         setRoomPassword,
         booth,
         setBooth,
         setShowSettings,
     } = useContext(ClientContext);
-    const [rootEdit, setRootEdit] = useState(root);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
@@ -24,7 +21,6 @@ export function ConfigMenu(): React.ReactElement {
     const onSubmit = useCallback(
         (e: FormEvent) => {
             e.preventDefault();
-            setRoot(rootEdit);
             if (roomNameEdit !== roomName) {
                 void navigate("/" + roomNameEdit);
             }
@@ -32,8 +28,6 @@ export function ConfigMenu(): React.ReactElement {
             setShowSettings(false);
         },
         [
-            setRoot,
-            rootEdit,
             roomNameEdit,
             roomName,
             navigate,
@@ -50,19 +44,6 @@ export function ConfigMenu(): React.ReactElement {
                 <form onSubmit={onSubmit}>
                     <table>
                         <tbody>
-                            <tr>
-                                <td>Server</td>
-                                <td>
-                                    <input
-                                        value={rootEdit}
-                                        type={"text"}
-                                        data-cy="server-input"
-                                        onChange={(e) =>
-                                            setRootEdit(e.target.value)
-                                        }
-                                    />
-                                </td>
-                            </tr>
                             <tr>
                                 <td>Room</td>
                                 <td>

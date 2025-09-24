@@ -30,19 +30,18 @@ enum TrackAction {
 }
 
 function Preview({ track }: { track: Track }) {
-    const { root } = useContext(ClientContext);
     return (
         <video
             className={"video_placeholder"}
             preload={"none"}
-            poster={attachment_path(root, track.attachments.image.slice(-1)[0])}
+            poster={attachment_path(track.attachments.image.slice(-1)[0])}
             controls={true}
             crossOrigin="anonymous"
         >
             {track.attachments.video.map((a) => (
                 <source
                     key={a.path}
-                    src={attachment_path(root, a)}
+                    src={attachment_path(a)}
                     type={a.mime}
                 />
             ))}
@@ -51,7 +50,7 @@ function Preview({ track }: { track: Track }) {
                 .map((a) => (
                     <track
                         key={a.path}
-                        src={attachment_path(root, a)}
+                        src={attachment_path(a)}
                         default={true}
                     />
                 ))}
@@ -80,7 +79,6 @@ function Tags({ track }: { track: Track }) {
 }
 
 function Lyrics({ track }: { track: Track }): React.ReactElement | null {
-    const { root } = useContext(ClientContext);
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const { request } = useApi();
 
@@ -90,12 +88,12 @@ function Lyrics({ track }: { track: Track }): React.ReactElement | null {
         );
         if (subtitleAttachment) {
             request({
-                url: attachment_path(root, subtitleAttachment),
+                url: attachment_path(subtitleAttachment),
                 options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),
             });
         }
-    }, [request, root, track]);
+    }, [request, track]);
 
     if (lyrics.length === 0) {
         return null;

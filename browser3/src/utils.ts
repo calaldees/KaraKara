@@ -19,10 +19,10 @@ export function s_to_mns(t: number): string {
 /**
  * Looking at an Attachment, get the full URL
  *
- * eg attachment_path(state.root, attachment) -> https://karakara.uk/files/asdfasdfa.mp4
+ * eg attachment_path(attachment) -> /files/asdfasdfa.mp4
  */
-export function attachment_path(root: string, attachment: Attachment): string {
-    return root + "/files/" + attachment.path;
+export function attachment_path(attachment: Attachment): string {
+    return "/files/" + attachment.path;
 }
 
 /**
@@ -72,10 +72,9 @@ export function shuffle<T>(array: T[]): T[] {
 /**
  * Get the URL, username, and password to be passed to MQTTSubscribe or MQTTPublish
  */
-export function mqtt_url(root: string): string {
-    return (
-        root.replace("https://", "wss://").replace("http://", "ws://") + "/mqtt"
-    );
+export function mqtt_url(): string {
+    const proto = window.location.protocol == "https:" ? "wss:" : "ws:";
+    return proto + "//" + window.location.host + "/mqtt";
 }
 
 /**
