@@ -16,7 +16,6 @@ import sanic.blueprints
 import sanic.handlers
 import sanic.response
 import sanic.exceptions
-from sanic_ext.extensions.http.cors import add_cors
 
 from .queue_model import QueueItem
 from .queue_updated_actions import QueueValidationError, queue_updated_actions
@@ -51,20 +50,6 @@ app.ext.openapi.describe(
 )
 
 app.config.FALLBACK_ERROR_FORMAT = "json"
-
-# Allow dev-mode clients to connect to prod server.
-# When allowing connections with credentials, allowed
-# headers MUST be explicitly listed.
-app.config.CORS_SUPPORTS_CREDENTIALS = True
-app.config.CORS_ALLOW_HEADERS = ["Content-Type"]
-app.config.CORS_ORIGINS = [
-    "http://127.0.0.1:1236",  # browser3
-    "http://localhost:1236",  # browser3
-    "http://127.0.0.1:1237",  # player3
-    "http://localhost:1237",  # player3
-]
-add_cors(app)
-
 
 # Startup ----------------------------------------------------------------------
 
