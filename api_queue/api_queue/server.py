@@ -33,7 +33,7 @@ app.config.update(
     {
         k: v
         for k, v in {
-            'MQTT': None,
+            "MQTT": None,
             "PATH_TRACKS": "tracks.json",
             "PATH_QUEUE": "_data",
             "BACKGROUND_TASK_TRACK_UPDATE_ENABLED": True,

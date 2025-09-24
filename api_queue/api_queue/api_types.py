@@ -18,13 +18,16 @@ class Ctx(types.SimpleNamespace):
     settings_manager: SettingsManager
     queue_manager: QueueManagerCSVAsync
 
+
 class Config(sanic.Config):
     PATH_TRACKS: str
     PATH_QUEUE: str
     BACKGROUND_TASK_TRACK_UPDATE_ENABLED: bool
     MQTT: str | None
 
+
 class App(sanic.Sanic[Config, Ctx]):
     pass
+
 
 type Request = sanic.Request[App, Ctx]
