@@ -1,5 +1,4 @@
 import datetime
-import enum
 import typing as t
 from pathlib import Path
 
@@ -28,7 +27,6 @@ OptionalDatetime = t.Annotated[
     annotated_types.Timezone(datetime.timezone.utc),
     # pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
 ]
-# OptionalDatetime = datetime.datetime | None
 
 
 class QueueSettings(pydantic.BaseModel):
@@ -56,12 +54,12 @@ class SettingsManager:
     def room_exists(self, name: str) -> bool:
         return self.path.joinpath(f"{name}_settings.json").is_file()
 
-    def get_json(self, name: str) -> dict:
+    def get_json(self, name: str) -> dict[str, t.Any]:
         path = self.path.joinpath(f"{name}_settings.json")
         json_str = path.read_text() if path.is_file() else QueueSettings().model_dump_json()
         return json.loads(json_str)
 
-    def set_json(self, name: str, settings: dict) -> None:
+    def set_json(self, name: str, settings: dict[str, t.Any]) -> None:
         path = self.path.joinpath(f"{name}_settings.json")
         json_str = QueueSettings(**{**self.get_json(name), **settings}).model_dump_json()
         path.write_text(json_str)

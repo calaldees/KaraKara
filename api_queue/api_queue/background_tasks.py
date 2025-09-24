@@ -3,11 +3,11 @@ from typing import Callable
 from collections.abc import Awaitable
 
 import ujson as json
-import sanic
 from sanic.log import logger as log
+from .api_types import App
 
 
-async def _background_tracks_update_event(app: sanic.Sanic) -> None:
+async def _background_tracks_update_event(app: App) -> None:
     log.debug("`tracks.json` check mtime")
 
     if not app.ctx.track_manager.has_tracks_updated:
@@ -30,7 +30,7 @@ tracks_update_semaphore = asyncio.Semaphore(1)
 
 
 async def background_tracks_update_event(
-    app: sanic.Sanic,
+    app: App,
     _asyncio_sleep: Callable[[int], Awaitable[None]] = asyncio.sleep,
 ) -> None:
     # A background task is created for each sanic worker - Only allow one background process by aborting if another task has the semaphore

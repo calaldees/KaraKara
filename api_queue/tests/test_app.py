@@ -174,20 +174,20 @@ async def test_queue_add(api_queue: APIQueue, mock_mqtt):
 
     mock_mqtt.publish.assert_not_awaited()
     # add track
-    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="test")
+    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test")
     assert response.status == 200
     mock_mqtt.publish.assert_awaited_once()
     # check track now in queue
     queue = await api_queue.queue
     assert len(queue) == 1
-    assert {"track_id": "KAT_TUN_Your_side_Instrumental_", "performer_name": "test"}.items() <= queue[0].items()
+    assert {"track_id": "KAT_TUN_Your_side_Instrumental", "performer_name": "test"}.items() <= queue[0].items()
     assert mock_mqtt.publish.await_args.args == ("room/test/queue", json.dumps(queue))
     assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
 
 
 @pytest.mark.asyncio
 async def test_queue_add_csv(api_queue: APIQueue):
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="test1")
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
     csv = await api_queue.queue_csv
     assert csv.count(",") > 10  # TODO: assert this is valid csv?
     assert "test1" in csv
@@ -197,7 +197,7 @@ async def test_queue_add_csv(api_queue: APIQueue):
 async def test_queue_delete(api_queue: APIQueue, mock_mqtt):
     # populate queue
     assert len(await api_queue.queue) == 0
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="test1")
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
     await api_queue.post(track_id="Animaniacs_OP", performer_name="test2")
     queue = await api_queue.queue
     assert len(queue) == 2
@@ -232,7 +232,7 @@ async def test_queue_delete(api_queue: APIQueue, mock_mqtt):
 @pytest.mark.asyncio
 async def test_queue_move(api_queue: APIQueue, mock_mqtt):
     # populate queue
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="test1")
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
     await api_queue.post(track_id="Animaniacs_OP", performer_name="test2")
     await api_queue.post(track_id="Macross_Dynamite7_OP_Dynamite_Explosion", performer_name="test3")
     queue = await api_queue.queue
@@ -256,14 +256,14 @@ async def test_queue_move(api_queue: APIQueue, mock_mqtt):
     queue = await api_queue.queue
     assert [i["track_id"] for i in queue] == [
         "Animaniacs_OP",
-        "KAT_TUN_Your_side_Instrumental_",
+        "KAT_TUN_Your_side_Instrumental",
         "Macross_Dynamite7_OP_Dynamite_Explosion",
     ]
     # move to end
     response = await api_queue.put(source=queue[0]["id"], target=-1)
     queue = await api_queue.queue
     assert [i["track_id"] for i in queue] == [
-        "KAT_TUN_Your_side_Instrumental_",
+        "KAT_TUN_Your_side_Instrumental",
         "Macross_Dynamite7_OP_Dynamite_Explosion",
         "Animaniacs_OP",
     ]
@@ -272,7 +272,7 @@ async def test_queue_move(api_queue: APIQueue, mock_mqtt):
 @pytest.mark.asyncio
 async def test_queue_command(api_queue: APIQueue, mock_mqtt):
     # populate tracks
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="test1")
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
     await api_queue.post(track_id="Animaniacs_OP", performer_name="test2")
     await api_queue.post(track_id="Macross_Dynamite7_OP_Dynamite_Explosion", performer_name="test3")
     queue = await api_queue.queue
@@ -313,9 +313,9 @@ async def test_queue_updated_actions(api_queue: APIQueue):
     settings = await api_queue.settings
     assert settings["validation_performer_names"] == ["valid_name1", "valid_name2"]
 
-    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="invalid_name")
+    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="invalid_name")
     assert response.status == 400
-    assert "invalid_name" in response.json["context"]
+    assert "invalid_name" in str(response.json["context"])
 
 
 @pytest.mark.asyncio
@@ -335,5 +335,5 @@ async def test_queue_updated_actions__end_datetime(api_queue: APIQueue):
     assert response.status == 200
     api_queue.session_id = _original_session_id
 
-    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental_", performer_name="test_name")
+    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test_name")
     assert response.status == 200

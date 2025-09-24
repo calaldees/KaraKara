@@ -5,17 +5,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 from api_queue.settings_manager import SettingsManager
 from api_queue.queue_model import Queue
+from api_queue.api_types import App
 
 import datetime
 import pathlib
 import shutil
-
-
-# @pytest.fixture
-# async def mock_redis():
-#    import api_queue.server
-#    with patch.object(api_queue.server.aioredis, 'from_url', side_effect=AsyncMock()) as mock_redis:
-#        yield await mock_redis()
 
 
 @pytest.fixture
@@ -24,7 +18,7 @@ def mock_mqtt():
 
 
 @pytest.fixture
-async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[sanic.Sanic]:
+async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[App]:
     # get the single registered app - is this needed? can we just import app from server?
     # from sanic import Sanic
     # app = Sanic.get_app()

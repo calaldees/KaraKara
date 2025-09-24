@@ -6,11 +6,12 @@ from pathlib import Path
 import pytest
 import sanic
 
+from api_queue.api_types import App
 from api_queue.background_tasks import _background_tracks_update_event
 
 
 @pytest.mark.asyncio
-async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: AsyncMock) -> None:
+async def test_background_tracks_update_event(app: App, mock_mqtt: AsyncMock) -> None:
     await app.asgi_client.get("/")  # needed to kickstart `before_start` events and setup track_manager/settings_manager
 
     # `tracks.json` mtime should not have changed since server start. Background task should do nothing
