@@ -117,6 +117,8 @@ function Buttons({ track }: { track: Track }) {
         setPerformerName,
     } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
+    const [audioVariant, setAudioVariant] = useState<string>("");
+    const [subtitleVariant, setSubtitleVariant] = useState<string>("");
     const { request } = useApi();
 
     function enqueue(performer_name: string, track_id: string) {
@@ -130,13 +132,77 @@ function Buttons({ track }: { track: Track }) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    track_id: track_id || "error",
+                    track_id: track_id,
                     performer_name: performer_name.trim(),
+                    audio_variant: audioVariant || null,
+                    subtitle_variant: subtitleVariant || null,
                 }),
             },
             onAction: () => setAction(TrackAction.NONE),
         });
     }
+
+    let audioSelect = null;
+    const audioVariants = [
+        ...new Set(
+            track.attachments.video
+                .map((a) => a.variant)
+                .filter((v) => v !== null),
+        ),
+    ];
+    if (audioVariants.length > 1) {
+        audioSelect = (
+            <select
+                name="audio_variant"
+                onChange={(e) => setAudioVariant(e.target.value)}
+                value={audioVariant}
+            >
+                <option value="">Select Audio</option>
+                {audioVariants.map((v) => (
+                    <option key={v} value={v}>
+                        {v}
+                    </option>
+                ))}
+            </select>
+        );
+    }
+
+    let subtitleSelect = null;
+    const subtitleVariants = [
+        ...new Set(
+            track.attachments.subtitle
+                ?.map((a) => a.variant)
+                .filter((v) => v !== null),
+        ),
+    ];
+    if (subtitleVariants.length > 1) {
+        subtitleSelect = (
+            <select
+                name="subtitle_variant"
+                onChange={(e) => setSubtitleVariant(e.target.value)}
+                value={subtitleVariant}
+            >
+                <option value={""}>Select Subtitles</option>
+                {subtitleVariants.map((v) => (
+                    <option key={v} value={v}>
+                        {v}
+                    </option>
+                ))}
+            </select>
+        );
+    }
+
+    let variantSelect = null;
+    if (audioSelect || subtitleSelect) {
+        variantSelect = <div className="buttons">
+            {audioSelect}
+            {subtitleSelect}
+        </div>;
+    }
+
+    const validInputs = performerName.trim().length >= 0 &&
+        (audioVariants.length === 0 || audioVariant !== null) &&
+        (subtitleVariants.length === 0 || subtitleVariant !== null);
 
     if (action === TrackAction.NONE) {
         const is_queued =
@@ -179,6 +245,7 @@ function Buttons({ track }: { track: Track }) {
     if (action === TrackAction.ENQUEUE) {
         return (
             <footer>
+                {variantSelect}
                 <input
                     type="text"
                     name="performer_name"
@@ -197,7 +264,7 @@ function Buttons({ track }: { track: Track }) {
                     <button
                         type="button"
                         onClick={(_) => enqueue(performerName, track.id)}
-                        disabled={performerName.trim().length === 0}
+                        disabled={!validInputs}
                     >
                         Confirm
                     </button>
@@ -207,6 +274,7 @@ function Buttons({ track }: { track: Track }) {
     }
     return null;
 }
+
 export function TrackDetails(): React.ReactElement {
     const { trackId } = useParams();
     const { widescreen } = useContext(ClientContext);
