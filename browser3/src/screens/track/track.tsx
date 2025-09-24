@@ -195,13 +195,16 @@ function Buttons({ track }: { track: Track }) {
 
     let variantSelect = null;
     if (videoSelect || subtitleSelect) {
-        variantSelect = <div className="buttons">
-            {videoSelect}
-            {subtitleSelect}
-        </div>;
+        variantSelect = (
+            <div className="buttons">
+                {videoSelect}
+                {subtitleSelect}
+            </div>
+        );
     }
 
-    const validInputs = performerName.trim().length >= 0 &&
+    const validInputs =
+        performerName.trim().length >= 0 &&
         (videoVariants.length === 0 || videoVariant !== "") &&
         (subtitleVariants.length === 0 || subtitleVariant !== "");
 

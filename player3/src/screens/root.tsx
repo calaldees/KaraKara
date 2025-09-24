@@ -82,9 +82,7 @@ function Room() {
             />
         );
     else if (queue[0].start_time == null || queue[0].start_time > now)
-        screen = (
-            <PreviewScreen queue={queue} />
-        );
+        screen = <PreviewScreen queue={queue} />;
     else
         screen = (
             <VideoScreen

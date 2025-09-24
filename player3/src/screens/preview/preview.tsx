@@ -47,11 +47,7 @@ function QueueItem({
     );
 }
 
-export function PreviewScreen({
-    queue,
-}: {
-    queue: QueueItem[];
-}) {
+export function PreviewScreen({ queue }: { queue: QueueItem[] }) {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);

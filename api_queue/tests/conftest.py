@@ -43,13 +43,13 @@ async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[App]:
 @pytest.fixture
 def qu() -> Queue:
     settings = QueueSettings(
-        track_space = datetime.timedelta(seconds=10),
-        validation_event_start_datetime = datetime.datetime(2022, 1, 1, 9, 50, tzinfo=datetime.timezone.utc),
-        validation_event_end_datetime = datetime.datetime(2022, 1, 1, 10, 10, tzinfo=datetime.timezone.utc),
+        track_space=datetime.timedelta(seconds=10),
+        validation_event_start_datetime=datetime.datetime(2022, 1, 1, 9, 50, tzinfo=datetime.timezone.utc),
+        validation_event_end_datetime=datetime.datetime(2022, 1, 1, 10, 10, tzinfo=datetime.timezone.utc),
         # validation_duplicate_performer_timedelta = datetime.timedelta(minutes=4),
         # validation_duplicate_track_timedelta = datetime.timedelta(minutes=4),
-        validation_performer_names = [],
-        coming_soon_track_count = 3,
+        validation_performer_names=[],
+        coming_soon_track_count=3,
     )
     qu = Queue([], settings=settings)
     qu._now = datetime.datetime(2022, 1, 1, 10, 0, 0, tzinfo=datetime.timezone.utc)
