@@ -81,13 +81,13 @@ class Encoder:
     @abstractmethod
     def encode(self, target: Path, sources: t.Set[Source]) -> None: ...
 
-    def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> None:
+    def _run(self, *args: str, title: str | None = None, duration: float | None = None) -> None:
         output = []
         with tqdm.tqdm(
             total=int(duration) if duration else None,
             unit="s",
             disable=duration is None,
-            leave=False
+            leave=False,
         ) as pbar:
             pbar.set_description(title)
 
@@ -115,6 +115,7 @@ class Encoder:
 
 #######################################################################
 # Video to Video
+
 
 class _Preview(Encoder):
     category = MediaType.PREVIEW
@@ -163,9 +164,9 @@ class _BaseVideoToVideo(Encoder):
         ('unknown1', '-vf', 'SOME_FILTER,ANOTHER_FILTER,MORE_FILTER', 'unknown2')
         """
         for arg_a, arg_b in itertools.pairwise(args):
-            if arg_a in {'-vf', '-filter:v'}:
+            if arg_a in {"-vf", "-filter:v"}:
                 replace = arg_b
-                replacement = ','.join(itertools.chain((arg_b,), filters))
+                replacement = ",".join(itertools.chain((arg_b,), filters))
         return tuple(arg if arg != replace else replacement for arg in args)
 
 
@@ -208,22 +209,32 @@ class VideoToAV1(_BaseVideoToVideo):
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1920, 1080))
         ['-crf', '56', '-preset', '6']
         """
+
         class AV1Args(t.NamedTuple):
             total_pixels: int
             crf: int
             preset: int
-        _top = AV1Args(total_pixels=1280*720, crf=56, preset=6)
-        _bot = AV1Args(total_pixels=960*720, crf=55, preset=5)
+
+        _top = AV1Args(total_pixels=1280 * 720, crf=56, preset=6)
+        _bot = AV1Args(total_pixels=960 * 720, crf=55, preset=5)
 
         def translate(input_top, input_bot, output_top, output_bot, input_value):
             input_range = input_top - input_bot
             output_range = output_top - output_bot
-            return output_bot + (((input_value-input_bot)/input_range)*output_range)
+            return output_bot + (((input_value - input_bot) / input_range) * output_range)
 
-        total_pixels = min(meta.width*meta.height, 1280*720)  # ffmpeg will max width to 1280. See SCALE_VIDEO
+        total_pixels = min(meta.width * meta.height, 1280 * 720)  # ffmpeg will max width to 1280. See SCALE_VIDEO
         crf = int(translate(_top.total_pixels, _bot.total_pixels, _top.crf, _bot.crf, total_pixels))
         crf = max(crf, 45)
-        preset = int(translate(_top.total_pixels, _bot.total_pixels, _top.preset, _bot.preset, total_pixels))
+        preset = int(
+            translate(
+                _top.total_pixels,
+                _bot.total_pixels,
+                _top.preset,
+                _bot.preset,
+                total_pixels,
+            )
+        )
         preset = max(preset, 4)
         return ["-crf", str(crf), "-preset", str(preset)]
 
@@ -340,6 +351,7 @@ class _BaseVideoToImage(Encoder):
     @t.override
     def encode(self, target: Path, sources: t.Set[Source]) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
             # - ffmpeg is best at extracting frames
@@ -461,9 +473,7 @@ class SubtitleToJSON(Encoder):
 
 
 def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
-    return set(cls.__subclasses__()).union(
-        s for c in cls.__subclasses__() for s in all_subclasses(c)
-    )
+    return set(cls.__subclasses__()).union(s for c in cls.__subclasses__() for s in all_subclasses(c))
 
 
 # Sort encoders by priority, highest first. Priority is manually specified
@@ -475,9 +485,7 @@ def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
 # - encoders who generate empty stubs are low-priority
 encoders = {e for e in all_subclasses(Encoder) if e.__name__[0] != "_"}
 sorted_encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
-encoders_for_type = {
-    t: [e() for e in sorted_encoders if e.target == t] for t in TargetType
-}
+encoders_for_type = {t: [e() for e in sorted_encoders if e.target == t] for t in TargetType}
 
 
 def find_appropriate_encoder(
@@ -509,10 +517,11 @@ def select_best_image(paths: Sequence[Path]) -> Path:
 
     def score(p: Path) -> float:
         from PIL import Image
+
         img = Image.open(p.as_posix()).convert("L")
         # r, g, b = img.split()
         h = img.histogram()
-        px_cnt = sum(h) # total number of pixels in the image
+        px_cnt = sum(h)  # total number of pixels in the image
 
         # if blacks make up most of the image, or if whites make up most of the image
         thresh = 0.5
@@ -532,4 +541,5 @@ def select_best_image(paths: Sequence[Path]) -> Path:
 
 if __name__ == "__main__":
     import sys
+
     print(select_best_image(list(Path(sys.argv[1]).glob("*.bmp"))))

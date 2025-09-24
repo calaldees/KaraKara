@@ -25,7 +25,12 @@ from lib.source import Source, SourceType
 from lib.target import Target
 from lib.track import Track, TrackDict, TrackValidationException
 from lib.kktypes import TargetType
-from lib.file_abstraction import AbstractFolder, AbstractFile, AbstractFolder_from_str, LocalFile
+from lib.file_abstraction import (
+    AbstractFolder,
+    AbstractFile,
+    AbstractFolder_from_str,
+    LocalFile,
+)
 
 
 log = logging.getLogger()
@@ -34,11 +39,11 @@ TARGET_TYPES = [
     # TargetType.VIDEO_H264,
     TargetType.VIDEO_AV1,
     TargetType.VIDEO_H265,
-    #TargetType.PREVIEW_AV1,
-    #TargetType.PREVIEW_H265,
+    # TargetType.PREVIEW_AV1,
+    # TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,
     TargetType.IMAGE_AVIF,
-    #TargetType.IMAGE_WEBP,
+    # TargetType.IMAGE_WEBP,
     TargetType.SUBTITLES_VTT,
     TargetType.SUBTITLES_JSON,
 ]
@@ -113,9 +118,12 @@ def scan(
             log.exception(f"Error calculating track {track_id}")
             return None
 
-    return tuple(filter(None,
-        thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
-    ))
+    return tuple(
+        filter(
+            None,
+            thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track"),
+        )
+    )
 
 
 def view(tracks: Sequence[Track]) -> None:
@@ -144,8 +152,9 @@ def lint(tracks: Sequence[Track]) -> None:
     Scan through all the data, looking for things which seem suspicious
     and probably want a human to investigate
     """
+
     def _lint(track: Track) -> None:
-        #for t in track.targets:
+        # for t in track.targets:
         #    if not t.path.exists():
         #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
         for s in track.sources:
@@ -208,10 +217,15 @@ def lint(tracks: Sequence[Track]) -> None:
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
                             if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
-                                log.error(f"{s.file.relative}:{index+1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")
+                                log.error(
+                                    f"{s.file.relative}:{index+1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
+                                )
                         elif l2.start < l1.end:
                             gap = l1.end - l2.start
-                            log.error(f"{s.file.relative}:{index+1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")
+                            log.error(
+                                f"{s.file.relative}:{index+1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
+                            )
+
     thread_map(_lint, tracks, max_workers=4, desc="lint   ", unit="track")
 
 
@@ -221,11 +235,7 @@ def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) ->
     """
 
     # Come up with a single list of every Target object that we can imagine
-    targets = tuple(
-        target
-        for track in tracks
-        for target in track.targets
-    )
+    targets = tuple(target for track in tracks for target in track.targets)
 
     # Only check if the file exists at the last minute, not at the start,
     # because somebody else might have finished this encode while we still
@@ -295,9 +305,7 @@ def export(
         path.with_suffix(".tmp").rename(path)
 
 
-def cleanup(
-    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
-) -> None:
+def cleanup(processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
     """
@@ -378,9 +386,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         nargs="?",
         help="Sub-process to run (view, encode, test-encode, export, lint, cleanup)",
     )
-    parser.add_argument(
-        "match", nargs="?", help="Only act upon files matching this pattern"
-    )
+    parser.add_argument("match", nargs="?", help="Only act upon files matching this pattern")
 
     args = parser.parse_args()
     # we need to create AbstractFolder lazily, because
@@ -417,9 +423,7 @@ def main(argv: Sequence[str]) -> int:
         format="%(asctime)s %(message)s",
     )
     if args.log_file:
-        handler = logging.handlers.RotatingFileHandler(
-            args.log_file, maxBytes=65535, backupCount=3
-        )
+        handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
         logging.getLogger().addHandler(handler)
 
     if args.cmd == "test-encode":
@@ -427,18 +431,18 @@ def main(argv: Sequence[str]) -> int:
             cache: MutableMapping[str, Any] = {}
             path = Path(args.match)
             local_file = LocalFile(path, path.parent)
-            tracks: Sequence[Track] = [Track(
-                local_file.root,
-                local_file.stem,
-                {
-                    Source(local_file, cache)
-                },
-                [
-                    TargetType.VIDEO_H264,
-                    TargetType.VIDEO_AV1,
-                    TargetType.VIDEO_H265,
-                ]
-            )]
+            tracks: Sequence[Track] = [
+                Track(
+                    local_file.root,
+                    local_file.stem,
+                    {Source(local_file, cache)},
+                    [
+                        TargetType.VIDEO_H264,
+                        TargetType.VIDEO_AV1,
+                        TargetType.VIDEO_H265,
+                    ],
+                )
+            ]
             encode(tracks, args.reencode, args.threads)
             return 0
 

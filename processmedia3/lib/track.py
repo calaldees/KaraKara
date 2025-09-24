@@ -22,8 +22,7 @@ class TrackDict(t.TypedDict):
     tags: Mapping[str, Sequence[str]]
 
 
-class TrackValidationException(Exception):
-    ...
+class TrackValidationException(Exception): ...
 
 
 class Track:
@@ -37,14 +36,14 @@ class Track:
         self,
         processed_dir: Path,
         id: str,
-        sources: t.Set[Source],
+        sources: set[Source],
         target_types: Sequence[TargetType],
     ) -> None:
         self.id = id
         self.sources = sources
 
         # eg: sources = {"XX [Vocal].mp4", "XX [Instr].ogg", "XX [Instr].jpg", "XX.srt", "XX.txt"}
-        targets: t.List[Target] = []
+        targets: list[Target] = []
         for target_type in target_types:
             # eg: variants = {"Vocal", "Instr", None}
             for variant in {s.variant for s in sources}:
@@ -60,7 +59,7 @@ class Track:
 
         self.targets = targets
 
-    def _sources_by_type(self, types: t.Set[SourceType]) -> Sequence[Source]:
+    def _sources_by_type(self, types: set[SourceType]) -> Sequence[Source]:
         return [s for s in self.sources if s.type in types]
 
     @property
@@ -76,11 +75,13 @@ class Track:
         attachments: MutableMapping[MediaType, MutableSequence[TrackAttachment]] = defaultdict(list)
         for target in self.targets:
             attachments[target.encoder.category].append(
-                TrackAttachment({
-                    "variant": target.variant,
-                    "mime": target.encoder.mime,
-                    "path": str(target.path.relative_to(target.processed_dir)),
-                })
+                TrackAttachment(
+                    {
+                        "variant": target.variant,
+                        "mime": target.encoder.mime,
+                        "path": str(target.path.relative_to(target.processed_dir)),
+                    }
+                )
             )
         if not attachments.get(MediaType.VIDEO):
             raise TrackValidationException("missing attachments.video")
@@ -103,17 +104,16 @@ class Track:
             tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
-        tags["aspect_ratio"] = list(set(
-            pxsrc.meta.aspect_ratio_str
-            for pxsrc
-            in self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
-        ))
+        tags["aspect_ratio"] = list(
+            set(pxsrc.meta.aspect_ratio_str for pxsrc in self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE}))
+        )
 
-        ds = list(set(
-            ausrc.meta.duration.total_seconds()
-            for ausrc
-            in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-        ))
+        ds = list(
+            set(
+                ausrc.meta.duration.total_seconds()
+                for ausrc in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
+            )
+        )
         if len(ds) > 1:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 

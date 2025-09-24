@@ -42,18 +42,12 @@ class Target:
         hasher.update("".join(sorted(parts)).encode("ascii"))
         hash = re.sub("[+/=]", "_", base64.b64encode(hasher.digest()).decode("ascii"))
         self.friendly = hash[0].lower() + "/" + hash[:11] + "." + self.encoder.ext
-        self.path = (
-            processed_dir / hash[0].lower() / (hash[:11] + "." + self.encoder.ext)
-        )
-        log.debug(
-            f"Filename for {self.encoder.__class__.__name__} = {self.friendly} based on {parts}"
-        )
+        self.path = processed_dir / hash[0].lower() / (hash[:11] + "." + self.encoder.ext)
+        log.debug(f"Filename for {self.encoder.__class__.__name__} = {self.friendly} based on {parts}")
 
     def encode(self) -> None:
         log.info(
-            f"{self.encoder.__class__.__name__}("
-            f"{self.friendly!r}, "
-            f"{[s.file.relative for s in self.sources]})"
+            f"{self.encoder.__class__.__name__}(" f"{self.friendly!r}, " f"{[s.file.relative for s in self.sources]})"
         )
         with tempfile.TemporaryDirectory() as tempdir:
             temppath = Path(tempdir) / ("out." + self.encoder.ext)
