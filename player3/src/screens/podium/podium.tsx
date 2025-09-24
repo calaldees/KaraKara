@@ -10,11 +10,6 @@ import { attachment_path, percent, s_to_mns } from "@/utils";
 
 import "./podium.scss";
 
-///////////////////////////////////////////////////////////////////////
-// Views
-
-const blank = new URL("@/static/blank.mp4", import.meta.url);
-
 export function PodiumScreen({
     track,
     queue_item,
@@ -22,7 +17,6 @@ export function PodiumScreen({
     track: Track;
     queue_item: QueueItem;
 }) {
-    const { blankPodium } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
     const [starting, setStarting] = useState(false);
@@ -42,40 +36,12 @@ export function PodiumScreen({
                 Performed by <strong>{queue_item.performer_name}</strong>
             </h1>
 
-            {blankPodium ? (
-                <video
-                    muted={true}
-                    key={
-                        queue_item.id +
-                        "-" +
-                        (queue_item.start_time && queue_item.start_time < now)
-                    }
-                    autoPlay={true}
-                    crossOrigin="anonymous"
-                >
-                    <source src={blank.href} />
-                    {track.attachments.subtitle
-                        ?.filter((a) => a.mime === "text/vtt")
-                        .filter((a) => a.variant === queue_item.subtitle_variant)
-                        .map((a) => (
-                            <track
-                                key={a.path}
-                                kind="subtitles"
-                                src={attachment_path(a)}
-                                default={true}
-                                label="English"
-                                srcLang="en"
-                            />
-                        ))}
-                </video>
-            ) : (
-                <Video
-                    track={track}
-                    loop={true}
-                    videoVariant={queue_item.video_variant}
-                    subtitleVariant={queue_item.subtitle_variant}
-                />
-            )}
+            <Video
+                track={track}
+                loop={true}
+                videoVariant={queue_item.video_variant}
+                subtitleVariant={queue_item.subtitle_variant}
+            />
 
             {starting ? (
                 <div className={"startButton"}>

@@ -10,8 +10,6 @@ export interface ClientContextType {
     setShowSettings: (n: boolean) => void;
     podium: boolean;
     setPodium: (b: boolean) => void;
-    blankPodium: boolean;
-    setBlankPodium: (b: boolean) => void;
     audioAllowed: boolean;
     setAudioAllowed: (b: boolean) => void;
     fullscreen: boolean;
@@ -38,7 +36,6 @@ export function ClientProvider(props: any) {
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [podium, setPodium] = useState<boolean>(false);
-    const [blankPodium, setBlankPodium] = useState<boolean>(false);
     const [audioAllowed, setAudioAllowed] = useState<boolean>(false);
     const [fullscreen, setFullscreen] = useState<boolean>(false);
     const [wakeLock, setWakeLock] = useState<string>("Not supported");
@@ -67,8 +64,6 @@ export function ClientProvider(props: any) {
         setShowSettings,
         podium,
         setPodium,
-        blankPodium,
-        setBlankPodium,
         audioAllowed,
         setAudioAllowed,
         fullscreen,

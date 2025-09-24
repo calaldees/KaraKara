@@ -13,8 +13,6 @@ export function ConfigMenu() {
         setRoomPassword,
         podium,
         setPodium,
-        blankPodium,
-        setBlankPodium,
         setShowSettings,
         fullscreen,
         setFullscreen,
@@ -87,20 +85,6 @@ export function ConfigMenu() {
                                     />
                                 </td>
                             </tr>
-                            {podium && (
-                                <tr>
-                                    <td>Blank Podium</td>
-                                    <td>
-                                        <input
-                                            checked={blankPodium}
-                                            type={"checkbox"}
-                                            onChange={(_) =>
-                                                setBlankPodium(!blankPodium)
-                                            }
-                                        />
-                                    </td>
-                                </tr>
-                            )}
                             {document.body.requestFullscreen && (
                                 <tr>
                                     <td>Fullscreen</td>
