@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen, BackToExplore, Thumb } from "../_common";
+import { Screen, BackToExplore, Thumb, FontAwesomeIcon } from "../_common";
 import {
     shuffle,
     is_my_song,
@@ -15,7 +16,6 @@ import { RoomContext } from "@/providers/room";
 import { useApi } from "@/hooks/api";
 import type { Track, QueueItem, Subtitle } from "@/types";
 
-import * as icons from "@/static/icons";
 import "./queue.scss";
 
 function QueueItemRender({
@@ -73,7 +73,7 @@ function QueueItemRender({
                     className={"go_arrow"}
                     onClick={(_) => removeTrack(item.id)}
                 >
-                    <icons.CircleXmark />
+                    <FontAwesomeIcon icon={faCircleXmark} />
                 </span>
             )}
         </li>

@@ -1,13 +1,36 @@
 import { useContext, useRef } from "react";
 import { Link } from "react-router-dom";
+import {
+    faCircleChevronLeft,
+    faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
+
 import { attachment_path, is_my_song } from "../utils";
-import * as icons from "../static/icons";
 import { ServerContext } from "../providers/server";
 import { ClientContext } from "../providers/client";
 import { RoomContext } from "../providers/room";
 import placeholder from "../static/placeholder.svg";
 import { useScrollRestoration } from "../hooks/scrollrestoration";
 import type { Track, QueueItem } from "../types";
+
+// This is a minimal reimplementation of FontAwesomeIcon
+// to avoid pulling in the whole ~80kb library
+// See https://docs.fontawesome.com/v5/web/use-with/react
+export function FontAwesomeIcon({icon, className=""}: {icon: any, className?: string}) {
+    const [width, height, _aliases, _unicode, svgPathData] = icon.icon;
+    return <svg
+        aria-hidden="true"
+        focusable="false"
+        data-prefix={icon.prefix}
+        data-icon={icon.iconName}
+        className={`svg-inline--fa fa-${icon.iconName} ${className}`}
+        role="img"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${width} ${height}`}
+    >
+        <path fill="currentColor" d={svgPathData}></path>
+    </svg>
+}
 
 export function Notification() {
     const { notification, setNotification } = useContext(ClientContext);
@@ -19,7 +42,7 @@ export function Notification() {
                 onClick={(_) => setNotification(null)}
             >
                 <span>{notification.text}</span>
-                <icons.CircleXmark />
+                <FontAwesomeIcon icon={faCircleXmark} />
             </div>
         )
     );
@@ -91,7 +114,7 @@ export function Screen({
 
 export const BackToExplore = (): React.ReactElement => (
     <Link to={"../"} data-cy="back">
-        <icons.CircleChevronLeft className="x2" />
+        <FontAwesomeIcon icon={faCircleChevronLeft} className="x2" />
     </Link>
 );
 

@@ -1,7 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import {
+    faCircleChevronLeft,
+    faListOl,
+} from "@fortawesome/free-solid-svg-icons";
 
-import { Screen } from "../_common";
+import { Screen, FontAwesomeIcon } from "../_common";
 import { attachment_path } from "@/utils";
 import { ClientContext } from "@/providers/client";
 import { ServerContext } from "@/providers/server";
@@ -9,7 +13,6 @@ import { RoomContext } from "@/providers/room";
 import { useApi } from "@/hooks/api";
 import { Track, Subtitle } from "@/types";
 
-import * as icons from "@/static/icons";
 import "./track.scss";
 
 const BLOCKED_KEYS = [
@@ -293,14 +296,17 @@ export function TrackDetails(): React.ReactElement {
             className={"track"}
             navLeft={
                 <div onClick={() => void navigate(-1)} data-cy="back">
-                    <icons.CircleChevronLeft className="x2" />
+                    <FontAwesomeIcon
+                        icon={faCircleChevronLeft}
+                        className="x2"
+                    />
                 </div>
             }
             title={track.tags.title[0]}
             navRight={
                 !widescreen && (
                     <Link to={"../queue"} data-cy="queue">
-                        <icons.ListOl className="x2" />
+                        <FontAwesomeIcon icon={faListOl} className="x2" />
                     </Link>
                 )
             }

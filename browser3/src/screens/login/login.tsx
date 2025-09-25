@@ -1,9 +1,9 @@
 import { FormEvent, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen } from "../_common";
+import { Screen, FontAwesomeIcon } from "../_common";
 
-import * as icons from "@/static/icons";
 import "./login.scss";
 
 export function Login(): React.ReactElement {
@@ -29,7 +29,7 @@ export function Login(): React.ReactElement {
                         required={true}
                     />
                     <button type="submit" disabled={!roomNameEdit.trim()}>
-                        Enter Room <icons.RightToBracket />
+                        Enter Room <FontAwesomeIcon icon={faRightToBracket} />
                     </button>
                 </form>
             </div>

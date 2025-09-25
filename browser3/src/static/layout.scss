@@ -1,25 +1,14 @@
 /* svg wibbling */
-svg:not(.qr_code) {
-    path {
-        fill: currentColor;
-    }
-    width: 1em;
+.svg-inline--fa {
+    box-sizing: content-box;
+    display: inline-block;
     height: 1em;
+    width: 1em;
+    overflow: visible;
+    vertical-align: -0.125em;
 }
 svg.x2 {
     font-size: 2em;
-}
-P > svg,
-LI > svg {
-    vertical-align: middle;
-}
-BUTTON > svg,
-SPAN > svg {
-    top: 0.125em;
-    position: relative;
-}
-A svg {
-    color: var(--page-fg);
 }
 
 /* subtitle wibbling */
