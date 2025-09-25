@@ -1,0 +1,68 @@
+@property --h1x {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 45deg;
+}
+@property --h1y {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 45deg;
+}
+@property --h2x {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 45deg;
+}
+@property --h2y {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 45deg;
+}
+
+.theme-metalghosts .screen_title {
+    .html3d {
+        position: absolute;
+        inset: 0;
+        perspective: 100cqw;
+        transform-style: preserve-3d;
+        pointer-events: none;
+
+        // instead of animating each element, which can get out of sync,
+        // we animate the variables that control their rotation within
+        // a single animation
+        @keyframes floaties {
+            0%,
+            100% {
+                --h1y: 30deg;
+                --h1x: -10deg;
+                --h2y: 30deg;
+                --h2x: 10deg;
+            }
+            50% {
+                --h1y: 40deg;
+                --h1x: -20deg;
+                --h2y: 40deg;
+                --h2x: 20deg;
+            }
+        }
+        animation: floaties 5s ease infinite;
+
+        H1,
+        H2 {
+            position: absolute;
+            display: inline-block;
+        }
+        H1 {
+            font-size: 10cqh;
+            top: 20cqh;
+            left: 25cqw;
+            transform: translateX(-50%) rotateY(var(--h1y)) rotateX(var(--h1x));
+        }
+        H2 {
+            font-size: 6cqh;
+            bottom: 20cqh;
+            left: 25cqw;
+            transform: translateX(-50%) rotateY(var(--h2y)) rotateX(var(--h2x));
+        }
+    }
+}

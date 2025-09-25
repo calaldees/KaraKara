@@ -1,6 +1,6 @@
-import { Html, useTexture, useVideoTexture } from "@react-three/drei";
+import { useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { Suspense, useContext, useMemo, useRef } from "react";
+import { useContext, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Group, TextureLoader } from "three";
 import { useMediaQuery } from "usehooks-ts";
@@ -9,9 +9,10 @@ import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
-
 import { useMemoArr } from "@/hooks/memo";
+
 import world from "@/static/world.svg";
+import "./globe.scss";
 
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     // computing stats only takes ~10ms, but we don't want that to happen
@@ -30,20 +31,18 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
         };
     }, [tracks]);
     return (
-        <h2>
-            <table>
-                <tbody>
-                    {Object.entries(stats).map(([key, value]) => (
-                        <tr key={key}>
-                            <th>
-                                <strong>{value}</strong>
-                            </th>
-                            <td>{key}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </h2>
+        <table>
+            <tbody>
+                {Object.entries(stats).map(([key, value]) => (
+                    <tr key={key}>
+                        <th>
+                            <strong>{value}</strong>
+                        </th>
+                        <td>{key}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     );
 }
 
@@ -56,13 +55,8 @@ function getNiceTracks(tracks: Record<string, Track>, n: number) {
         .slice(0, n);
 }
 
-function VideoMaterial({ url }: { url: string }) {
-    const texture = useVideoTexture(url);
-    return <meshBasicMaterial map={texture} toneMapped={false} />;
-}
-
-function FallbackMaterial({ url }: { url: string }) {
-    const texture = useTexture(url);
+function PlaneMaterial({ thumb }: { thumb: string }) {
+    const texture = useTexture(thumb);
     return (
         <meshBasicMaterial
             map={texture}
@@ -72,19 +66,7 @@ function FallbackMaterial({ url }: { url: string }) {
     );
 }
 
-function PlaneMaterial({ thumb, vid }: { thumb: string; vid: string }) {
-    const videos = false;
-    return videos ? (
-        <Suspense fallback={<FallbackMaterial url={thumb} />}>
-            <VideoMaterial url={vid} />
-        </Suspense>
-    ) : (
-        <FallbackMaterial url={thumb} />
-    );
-}
-
 function MyScene() {
-    const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
     const widescreen = useMediaQuery("(min-aspect-ratio: 16/10)");
 
@@ -94,10 +76,9 @@ function MyScene() {
     const colorMap = useLoader(TextureLoader, world) as THREE.Texture;
 
     const thumbs = useMemoArr(() => {
-        return getNiceTracks(tracks, 20).map((track) => [
+        return getNiceTracks(tracks, 20).map((track) =>
             attachment_path(track.attachments.image[0]),
-            attachment_path(track.attachments.video[0]),
-        ]);
+        );
     }, [tracks]);
 
     useThree((state) => {
@@ -148,40 +129,34 @@ function MyScene() {
                             transparent={true}
                         />
                     </mesh>
-                    {thumbs.map(([thumb, vid], n) => (
+                    {thumbs.map((thumb, n) => (
                         <group key={n} rotation={[0, -0.314 * n, 0]}>
                             <mesh position={[0, 0, 3.5]}>
                                 <planeGeometry args={[1, 9 / 16]} />
-                                <PlaneMaterial thumb={thumb} vid={vid} />
+                                <PlaneMaterial thumb={thumb} />
                             </mesh>
                         </group>
                     ))}
                 </group>
-            </group>
-            <group
-                ref={text1}
-                position={[-3, 2, -5]}
-                onUpdate={(self) => self.lookAt(0, 0, 0)}
-            >
-                <Html transform>
-                    <h1>{settings["title"]}</h1>
-                </Html>
-            </group>
-            <group ref={text2} position={[-3, -1.5, -5]}>
-                <Html transform>
-                    <StatsTable tracks={tracks} />
-                </Html>
             </group>
         </>
     );
 }
 
 export default function Globe() {
+    const { settings } = useContext(RoomContext);
+    const { tracks } = useContext(ServerContext);
     return (
         <div id={"splash"}>
             <Canvas>
                 <MyScene />
             </Canvas>
+            <div className="html3d">
+                <h1>{settings["title"]}</h1>
+                <h2>
+                    <StatsTable tracks={tracks} />
+                </h2>
+            </div>
         </div>
     );
 }
