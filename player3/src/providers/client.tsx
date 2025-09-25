@@ -1,7 +1,7 @@
 import { useMemoObj } from "@/hooks/memo";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
-import { useLocalStorage } from "usehooks-ts";
+import { useLocalStorage, useSessionStorage } from "usehooks-ts";
 
 export interface ClientContextType {
     roomPassword: string;
@@ -30,12 +30,12 @@ export function ClientProvider(props: any) {
         "room_password",
         "",
     );
-    const [underscan, setUnderscan] = useLocalStorage<string>(
+    const [underscan, setUnderscan] = useSessionStorage<string>(
         "underscan",
         "0em 0em",
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
-    const [podium, setPodium] = useState<boolean>(false);
+    const [podium, setPodium] = useSessionStorage<boolean>("podium", false);
     const [audioAllowed, setAudioAllowed] = useState<boolean>(false);
     const [fullscreen, setFullscreen] = useState<boolean>(false);
     const [wakeLock, setWakeLock] = useState<string>("Not supported");
