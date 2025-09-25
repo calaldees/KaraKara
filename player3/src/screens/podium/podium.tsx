@@ -21,7 +21,7 @@ export function PodiumScreen({
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const [starting, setStarting] = useState(false);
     const { request } = useApi();
-    const currentEl = useRef<HTMLElement>(null);
+    const currentEl = useRef<HTMLLIElement>(null);
 
     const start = useCallback(() => {
         setStarting(true);
