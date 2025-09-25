@@ -358,7 +358,7 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
                 track_id=body.track_id,
-                track_duration=track_durations[body.track_id],  # type: ignore[arg-type]
+                track_duration=track_durations[body.track_id],
                 session_id=request.ctx.session_id,
                 performer_name=body.performer_name,
                 video_variant=body.video_variant,
