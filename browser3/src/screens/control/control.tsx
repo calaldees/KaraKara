@@ -11,7 +11,7 @@ import {
     faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen, BackToExplore, Thumb, FontAwesomeIcon } from "../_common";
+import { BackToExplore, Thumb, Screen, FontAwesomeIcon } from "@/components";
 import { dict2css, time_until } from "@/utils";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";

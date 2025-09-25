@@ -2,9 +2,9 @@ import { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen, FontAwesomeIcon } from "../_common";
-import { percent } from "@/utils";
+import { Screen, FontAwesomeIcon } from "@/components";
 import { ServerContext } from "@/providers/server";
+import { percent } from "@/utils";
 
 export function Loading(): React.ReactElement {
     const { downloadDone, downloadSize } = useContext(ServerContext);

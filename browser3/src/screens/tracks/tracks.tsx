@@ -1,5 +1,3 @@
-import { useContext, ReactElement } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import {
     faCircleChevronLeft,
     faCircleChevronRight,
@@ -8,17 +6,19 @@ import {
     faCircleXmark,
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
+import { ReactElement, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Screen, Thumb, FontAwesomeIcon } from "../_common";
-import { normalise_cmp, track_info } from "@/utils";
+import { FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { useMemoArr } from "@/hooks/memo";
+import { ClientContext } from "@/providers/client";
+import { ExploreContext, ExploreProvider } from "@/providers/explore";
+import { RoomContext } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
 import { find_tracks } from "@/track_finder";
 import { group_tracks } from "@/track_grouper";
-import { ClientContext } from "@/providers/client";
-import { ServerContext } from "@/providers/server";
-import { RoomContext } from "@/providers/room";
-import { ExploreProvider, ExploreContext } from "@/providers/explore";
 import type { Track } from "@/types";
-import { useMemoArr } from "@/hooks/memo";
+import { normalise_cmp, track_info } from "@/utils";
 
 import "./tracks.scss";
 

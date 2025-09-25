@@ -5,13 +5,13 @@ import {
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen, FontAwesomeIcon } from "../_common";
-import { attachment_path } from "@/utils";
+import { Screen, FontAwesomeIcon } from "@/components";
 import { ClientContext } from "@/providers/client";
 import { ServerContext } from "@/providers/server";
 import { RoomContext } from "@/providers/room";
 import { useApi } from "@/hooks/api";
 import { Track, Subtitle } from "@/types";
+import { attachment_path } from "@/utils";
 
 import "./track.scss";
 

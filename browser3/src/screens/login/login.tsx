@@ -2,7 +2,7 @@ import { FormEvent, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen, FontAwesomeIcon } from "../_common";
+import { Screen, FontAwesomeIcon } from "@/components";
 
 import "./login.scss";
 

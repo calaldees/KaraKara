@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import { useReactToPrint } from "react-to-print";
 
-import { BackToExplore, Screen } from "../_common";
+import { BackToExplore, Screen } from "@/components";
 
 import "./printable.scss";
 
