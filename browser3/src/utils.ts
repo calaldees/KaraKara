@@ -91,7 +91,7 @@ export function short_date(long_date: string): string {
 }
 
 export function is_my_song(
-    session_id: string,
+    session_id: string | null,
     performer_name: string,
     item?: Pick<QueueItem, "session_id" | "performer_name">,
 ): boolean {

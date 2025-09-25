@@ -3,8 +3,8 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UAParser } from "ua-parser-js";
-import { useLocalStorage } from "usehooks-ts";
 
+import { useCookieStore } from "@/hooks/useCookieStore";
 import { useApi } from "../hooks/api";
 import { useMemoObj } from "../hooks/memo";
 import { apply_hidden, apply_tags } from "../track_finder";
@@ -16,7 +16,7 @@ import { ServerContext } from "./server";
 export interface RoomContextType {
     trackList: Track[];
     isAdmin: boolean;
-    sessionId: string;
+    sessionId: string|null;
     queue: QueueItem[];
     fullQueue: QueueItem[];
     setOptimisticQueue: (q: QueueItem[] | null) => void;
@@ -34,7 +34,7 @@ export function RoomProvider(props: any) {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
+    const [sessionId] = useCookieStore<string|null>("session_id", null);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
@@ -96,7 +96,6 @@ export function RoomProvider(props: any) {
             },
             onAction: (response) => {
                 setIsAdmin(response.is_admin);
-                setSessionId(response.session_id);
             },
             onException: () => {
                 // request() function will already have shown an error,
@@ -104,7 +103,7 @@ export function RoomProvider(props: any) {
                 void navigate("/");
             },
         });
-    }, [roomName, roomPassword, request, setSessionId, navigate]);
+    }, [roomName, roomPassword, request, navigate]);
 
     useEffect(() => {
         const ua = UAParser();
