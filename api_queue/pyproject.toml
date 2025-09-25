@@ -2,6 +2,7 @@
 name = "api_queue"
 version = "0.0.0"
 readme = "README.md"
+requires-python = ">=3.11"
 dependencies = [
 	"sanic",  # ~= 23.12
 	"sanic-ext",  # ~= 23.12

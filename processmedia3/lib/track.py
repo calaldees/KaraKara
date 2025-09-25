@@ -114,7 +114,7 @@ class Track:
         # see how long a track is before enqueueing it.
         audio_sources = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         ds = list(set(s.meta.duration.total_seconds() for s in audio_sources))
-        tags["duration"] = [f"{d // 60}m{d % 60:02}s" for d in ds]
+        tags["duration"] = [f"{int(d // 60)}m{int(d % 60):02}s" for d in ds]
         if len(ds) > 1:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 
