@@ -1,4 +1,4 @@
-import type { Attachment, QueueItem, Track } from "./types";
+import type { Track, QueueItem, Attachment, Subtitle } from "@/types";
 
 export function dict2css(d: Record<string, any>) {
     return Object.entries(d)
@@ -210,4 +210,28 @@ export function normalise_name(name: string): string {
  */
 export function normalise_cmp(a: string, b: string): number {
     return normalise_name(a) > normalise_name(b) ? 1 : -1;
+}
+
+const BIG_GAP = 5;
+
+/*
+ * If there is a large gap between subtitles, insert a new "..." subtitle
+ * to indicate the gap
+ */
+export function add_dot_dot_dots(subtitles: Subtitle[]): Subtitle[] {
+    let last_end = subtitles[0]?.start ?? 0;
+    const out: Subtitle[] = [];
+    for (const subtitle of subtitles) {
+        if (subtitle.start - last_end > BIG_GAP) {
+            out.push({
+                start: last_end,
+                end: subtitle.start,
+                text: "···",
+                top: false,
+            });
+        }
+        out.push(subtitle);
+        last_end = subtitle.end;
+    }
+    return out;
 }
