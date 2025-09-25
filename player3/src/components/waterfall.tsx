@@ -17,7 +17,7 @@ function getNiceTracks(tracks: Record<string, Track>, n: number) {
 
 const MAX_WATERFALL = 25;
 const RAND_ARR = Array.from({ length: MAX_WATERFALL * 2 }, () => Math.random());
-export default function Waterfall() {
+export function Waterfall() {
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
     const items = useMemoArr(() => {

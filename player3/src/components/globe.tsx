@@ -143,7 +143,7 @@ function MyScene() {
     );
 }
 
-export default function Globe() {
+export function Globe() {
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
     return (

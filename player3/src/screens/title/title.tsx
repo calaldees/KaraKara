@@ -1,9 +1,9 @@
 import { useContext } from "react";
 
 import { EventInfo } from "@/components/eventinfo";
-import Globe from "@/components/globe";
+import { Globe } from "@/components/globe";
 import { JoinInfo } from "@/components/joininfo";
-import Waterfall from "@/components/waterfall";
+import { Waterfall } from "@/components/waterfall";
 import { RoomContext } from "@/providers/room";
 
 import "./title.scss";
