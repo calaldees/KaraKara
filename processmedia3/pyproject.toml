@@ -25,6 +25,9 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"
+filterwarnings = [
+	"ignore:Parsing dates involving a day of month without a year specified is ambiguious",
+]
 
 [tool.black]
 line-length = 120
