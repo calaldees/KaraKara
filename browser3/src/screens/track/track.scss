@@ -1,0 +1,35 @@
+MAIN.track {
+    ARTICLE {
+        VIDEO {
+            margin-top: 1rem;
+            border: 1px solid var(--list-border);
+            width: 100%;
+        }
+        DIV.tags {
+            display: flex;
+            flex-wrap: wrap;
+            DIV.tag {
+                flex: 0 0 30%;
+                justify-content: space-between;
+                margin-bottom: 1em;
+                .tag_key {
+                    font-size: 0.75em;
+                    font-weight: bold;
+                }
+                .tag_value {
+                    padding-left: 0.5em;
+                }
+            }
+        }
+        DIV.lyrics {
+            user-select: text;
+            margin-bottom: 3em;
+        }
+    }
+
+    FOOTER {
+        .already_queued {
+            text-align: center;
+        }
+    }
+}

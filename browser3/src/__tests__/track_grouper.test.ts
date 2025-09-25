@@ -1,6 +1,6 @@
+import * as fs from "fs";
 import { describe, expect, test } from "vitest";
 import * as grouper from "../track_grouper";
-import * as fs from "fs";
 import type { Track } from "../types";
 
 const track_dict = JSON.parse(

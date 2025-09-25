@@ -1,17 +1,17 @@
+import { useSubscription } from "@shish2k/react-mqtt";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { UAParser } from 'ua-parser-js';
-import { useSubscription } from "@shish2k/react-mqtt";
+import { UAParser } from "ua-parser-js";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useApi } from "../hooks/api";
+import { useMemoObj } from "../hooks/memo";
+import { apply_hidden, apply_tags } from "../track_finder";
+import type { QueueItem, Track } from "../types";
 import { current_and_future, normalise_cmp } from "../utils";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
-import { apply_hidden, apply_tags } from "../track_finder";
-import type { Track, QueueItem } from "../types";
-import { useMemoObj } from "../hooks/memo";
 
 export interface RoomContextType {
     trackList: Track[];
@@ -30,7 +30,7 @@ export const RoomContext = createContext<RoomContextType>(
 
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
-    const { root, roomPassword } = useContext(ClientContext);
+    const { roomPassword } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -104,7 +104,7 @@ export function RoomProvider(props: any) {
                 void navigate("/");
             },
         });
-    }, [root, roomName, roomPassword, request, setSessionId, navigate]);
+    }, [roomName, roomPassword, request, setSessionId, navigate]);
 
     useEffect(() => {
         const ua = UAParser();
@@ -112,18 +112,19 @@ export function RoomProvider(props: any) {
             event: "open_room",
             ua: ua,
             dev: process.env.NODE_ENV === "development" ? true : false,
+            session: sessionId,
             admin: isAdmin,
             room: roomName,
         };
         request({
-            url: `${root}/analytics.json`,
+            url: `/api/analytics.json`,
             options: {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(an),
             },
         });
-    }, [request, root, roomName, isAdmin])
+    }, [request, roomName, sessionId, isAdmin]);
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,

@@ -6,12 +6,13 @@ from pathlib import Path
 import pytest
 import sanic
 
+from api_queue.api_types import App
 from api_queue.background_tasks import _background_tracks_update_event
 
 
 @pytest.mark.asyncio
-async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: AsyncMock) -> None:
-    await app.asgi_client.get('/')  # needed to kickstart `before_start` events and setup track_manager/settings_manager
+async def test_background_tracks_update_event(app: App, mock_mqtt: AsyncMock) -> None:
+    await app.asgi_client.get("/")  # needed to kickstart `before_start` events and setup track_manager/settings_manager
 
     # `tracks.json` mtime should not have changed since server start. Background task should do nothing
     mock_mqtt.publish.assert_not_awaited()
@@ -22,7 +23,7 @@ async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: Async
     tracks_json: Path = app.ctx.track_manager.path
     tracks_json_mtime: float = tracks_json.stat().st_mtime
     tracks_json_mtime += -1
-    os.utime(tracks_json, times=(tracks_json_mtime,tracks_json_mtime))
+    os.utime(tracks_json, times=(tracks_json_mtime, tracks_json_mtime))
 
     mock_mqtt.publish.assert_not_awaited()
     await _background_tracks_update_event(app)
@@ -30,5 +31,5 @@ async def test_background_tracks_update_event(app: sanic.Sanic, mock_mqtt: Async
 
     channel, payload = mock_mqtt.publish.await_args.args
     payload = json.loads(payload)
-    assert channel == 'global/tracks-updated'
-    assert payload['tracks_json_mtime'] == tracks_json_mtime
+    assert channel == "global/tracks-updated"
+    assert payload["tracks_json_mtime"] == tracks_json_mtime

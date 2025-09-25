@@ -1,7 +1,7 @@
-import { describe, expect, test } from "vitest";
-import * as utils from "../utils";
 import * as fs from "fs";
+import { describe, expect, test } from "vitest";
 import type { QueueItem } from "../types";
+import * as utils from "../utils";
 
 const track_dict = JSON.parse(
     fs.readFileSync("./cypress/fixtures/small_tracks.json", "utf8"),
@@ -22,9 +22,7 @@ describe("dict2css", () => {
 describe("attachment_path", () => {
     const attachment = track_dict["track_id_1"].attachments.video[0];
     test("should basically work", () => {
-        expect(utils.attachment_path("http://example.com", attachment)).toEqual(
-            "http://example.com/files/f/foo.mp4",
-        );
+        expect(utils.attachment_path(attachment)).toEqual("/files/f/foo.mp4");
     });
 });
 
@@ -33,14 +31,6 @@ describe("shuffle", () => {
         expect(utils.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])).not.toEqual([
             1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
         ]);
-    });
-});
-
-describe("mqtt_url", () => {
-    test("should basically work", () => {
-        expect(utils.mqtt_url("https://example.com")).toEqual(
-            "wss://example.com/mqtt",
-        );
     });
 });
 
@@ -222,6 +212,8 @@ describe("current_and_future", () => {
         start_time: 0,
         track_duration: 100,
         track_id: "My_Song",
+        video_variant: null,
+        subtitle_variant: null,
     };
     test("empty", () => {
         expect(utils.current_and_future(1000, [])).toEqual([]);

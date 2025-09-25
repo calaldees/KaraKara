@@ -1,11 +1,12 @@
 import datetime
-import typing as t
 
 import dateparser
 import pytimeparse2  # type: ignore
 
 
-def parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optional[datetime.timedelta]:
+def parse_timedelta(
+    duration: int | float | str | datetime.timedelta,
+) -> datetime.timedelta | None:
     """
     >>> parse_timedelta(None)
     >>> parse_timedelta('')
@@ -31,7 +32,7 @@ def parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optio
     >>> parse_timedelta(60.25)
     datetime.timedelta(seconds=60, microseconds=250000)
     """
-    if duration is None or duration == '':
+    if duration is None or duration == "":
         return None
     if isinstance(duration, datetime.timedelta):
         return duration
@@ -41,13 +42,15 @@ def parse_timedelta(duration: int | float | str | datetime.timedelta) -> t.Optio
     if isinstance(duration, str):
         seconds = pytimeparse2.parse(duration)
     if not isinstance(seconds, (int, float)):
-        raise ValueError(f'unable to parse seconds from {duration}')
+        raise ValueError(f"unable to parse seconds from {duration}")
     if seconds < 0:
-        raise ValueError('must be positive')
+        raise ValueError("must be positive")
     return datetime.timedelta(seconds=seconds)
 
 
-def parse_datetime(value: str | int | float | None | datetime.datetime) -> t.Optional[datetime.datetime]:
+def parse_datetime(
+    value: str | int | float | None | datetime.datetime,
+) -> datetime.datetime | None:
     """
     >>> parse_datetime(None)
     >>> parse_datetime('')
@@ -67,10 +70,10 @@ def parse_datetime(value: str | int | float | None | datetime.datetime) -> t.Opt
     Traceback (most recent call last):
     ValueError: ...
     """
-    #dt = datetime.datetime.fromisoformat(isoformatString)
-    if value is None or value == '':
+    # dt = datetime.datetime.fromisoformat(isoformatString)
+    if value is None or value == "":
         return None
-    dt: t.Optional[datetime.datetime] = None
+    dt: datetime.datetime | None = None
     if isinstance(value, datetime.datetime):
         dt = value
     if isinstance(value, (int, float)):
@@ -78,11 +81,11 @@ def parse_datetime(value: str | int | float | None | datetime.datetime) -> t.Opt
     if isinstance(value, str):
         dt = dateparser.parse(value)
         if not dt:
-            raise ValueError(f'unable to parse datetime {value}')
+            raise ValueError(f"unable to parse datetime {value}")
     if not dt:
         return None
     if not dt.tzinfo:
         dt = dt.replace(tzinfo=datetime.timezone.utc)
-    #if dt < (datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1)):
+    # if dt < (datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=1)):
     #    raise ValueError(f'dates in the past are probably not what you want {dt}')
     return dt

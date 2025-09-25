@@ -21,10 +21,8 @@
                 }
             ],
             "image": [],
-            "preview": [],
             "subtitle": []
-        },
-        "lyrics": []
+        }
     },
     "track_id_2": {
         "id": "track_id_2",
@@ -40,9 +38,7 @@
         "attachments": {
             "video": [],
             "image": [],
-            "preview": [],
             "subtitle": []
-        },
-        "lyrics": []
+        }
     }
 }

@@ -1,11 +1,10 @@
 import { useContext } from "react";
 
-import { RoomContext } from "../providers/room";
-import { ServerContext } from "../providers/server";
-import { ClientContext } from "../providers/client";
-import type { Track } from "../types";
-import { attachment_path } from "../utils";
-import { useMemoArr } from "../hooks/memo";
+import { useMemoArr } from "@/hooks/memo";
+import { RoomContext } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
+import type { Track } from "@/types";
+import { attachment_path } from "@/utils";
 
 function getNiceTracks(tracks: Record<string, Track>, n: number) {
     return Object.values(tracks)
@@ -18,20 +17,19 @@ function getNiceTracks(tracks: Record<string, Track>, n: number) {
 
 const MAX_WATERFALL = 25;
 const RAND_ARR = Array.from({ length: MAX_WATERFALL * 2 }, () => Math.random());
-export default function Waterfall() {
+export function Waterfall() {
     const { settings } = useContext(RoomContext);
-    const { root } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const items = useMemoArr(() => {
         return getNiceTracks(tracks, MAX_WATERFALL).map((track, n, arr) => ({
-            src: attachment_path(root, track.attachments.image[0]),
+            src: attachment_path(track.attachments.image[0]),
             style: {
                 animationDelay: ((n % 5) + RAND_ARR[n * 2]) * 2 + "s",
                 animationDuration: 5 + RAND_ARR[n * 2 + 1] * 5 + "s",
                 left: (n / arr.length) * 90 + "vw",
             },
         }));
-    }, [tracks, root]);
+    }, [tracks]);
     return (
         <>
             <div id={"splash"}>

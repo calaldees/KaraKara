@@ -24,3 +24,6 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"
+
+[tool.black]
+line-length = 120

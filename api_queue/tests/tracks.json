@@ -1,8 +1,6 @@
 {
-	"KAT_TUN_Your_side_Instrumental_": {
-		"id": "KAT_TUN_Your_side_Instrumental_",
-		"source_hash": "jWBWalw4cbn",
-		"source_filename": "KAT-TUN Your side [Instrumental]",
+	"KAT_TUN_Your_side_Instrumental": {
+		"id": "KAT_TUN_Your_side_Instrumental",
 		"duration": 212.5,
 		"attachments": {
 			"video": [
@@ -27,30 +25,6 @@
 					"path": "a/aZZEKto94P3.avif"
 				},
 				{
-					"mime": "image/avif",
-					"path": "w/w2YUTI1JDdv.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "T/TOTxamGRB_s.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "_/_6VRCXsrvbP.avif"
-				},
-				{
-					"mime": "image/webp",
-					"path": "B/BV5QE9uIQYc.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "X/X56Tg0QUKGp.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "b/bZk_k7Kx792.webp"
-				},
-				{
 					"mime": "image/webp",
 					"path": "F/F9GQBHGxkbA.webp"
 				}
@@ -62,53 +36,6 @@
 				}
 			]
 		},
-		"lyrics": [
-			"It's a little funny story",
-			"sou mou modorenai",
-			"Iie wo dete I miss your heart",
-			"Kimi no tame sagashiteta Present",
-			"Nakusanu you ni",
-			"mune ni shimau Oh nono...",
-			"Kuchibiru karamete ita ase iki zukai",
-			"Ikisou de You kiss so smart",
-			"Yurusarenai futari no koi wa",
-			"choppoke na guuzen demo",
-			"If you love I imagine you",
-			"kimi no kanashimi zembu",
-			"Kakushiteru namida no wake",
-			"Subete wo tsutsumi kimi wo ai su yo~",
-			"Sore kurai shika dekinai kedo",
-			"I'm on your side",
-			"Nisemono no yubiwa ga ima sei ippai",
-			"Nani mo nai I hate myself",
-			"Sore nanoni kimi wa ore ni dake",
-			"subete yurusu dakishimetai",
-			"If you love I imagine you",
-			"Kimi no yasashisa sagashi",
-			"Mayotteta toki wa sugite",
-			"Neru made ore wa",
-			"kimi wo aisu yo~",
-			"Sore kurai shikai ienai kedo",
-			"(I'm on your side) Baby, I can see in your eyes",
-			"It's a holy slowly night",
-			"Hold you tight, shiritai kokoro no kizuato",
-			"Know the last chance. I cannot miss this shot",
-			"Whenever, wherever, futari forever...",
-			"Sore nanoni ore ni dake...",
-			"Kimi to ikiruu..",
-			"If you love I imagine you",
-			"Kimi no kanashimi zembu",
-			"Kakushiteru namida no wake",
-			"Subete wo tsutsumi kimi wo aisu yo~",
-			"Sore kurai shika dekinai kedo",
-			"If you love I imagine you",
-			"Kimi no yasashisa sagashi",
-			"Mayotteta toki wa sugite",
-			"Neru made ore wa kimi wo aisu yo",
-			"Sore kurai shikai ienai kedo",
-			"I?m on your side",
-			"Ooooh......"
-		],
 		"tags": {
 			"category": [
 				"jpop"
@@ -138,8 +65,6 @@
 	},
 	"AKB0048_Next_Stage_ED1_Kono_Namida_wo_Kimi_ni_Sasagu": {
 		"id": "AKB0048_Next_Stage_ED1_Kono_Namida_wo_Kimi_ni_Sasagu",
-		"source_hash": "U91_t7Bgll_",
-		"source_filename": "AKB0048 Next Stage - ED1 - Kono Namida wo Kimi ni Sasagu",
 		"duration": 89.9,
 		"attachments": {
 			"video": [
@@ -164,30 +89,6 @@
 					"path": "T/T6VRGMd_QgW.avif"
 				},
 				{
-					"mime": "image/avif",
-					"path": "k/kNiYWaHcZQ_.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "X/XUxDWfVqb0h.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "N/NElc68pABrg.avif"
-				},
-				{
-					"mime": "image/webp",
-					"path": "R/RbnQK0JXdMS.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "_/_wRqZ3eNmW0.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "5/5xBoMdo7B6R.webp"
-				},
-				{
 					"mime": "image/webp",
 					"path": "n/nZjXtOUf_4V.webp"
 				}
@@ -199,24 +100,6 @@
 				}
 			]
 		},
-		"lyrics": [
-			"itsuka no negai wa",
-			"tsuchi no naka de nemutte",
-			"yakusoku no jikoku ni",
-			"kibou no me ga derunda",
-			"futari ga deatta koro",
-			"yume nado mada tane datta",
-			"dore kurai toki ga sugi",
-			"hana wa saku no darou",
-			"kono namida wo kimi ni sasagu",
-			"motto kimi ga kagayaku nara",
-			"zutto mima motteta chinmoku no sora kara",
-			"ima boku wa ame ni narou",
-			"aa kimi ni sasagu",
-			"konna boku ni dekiru koto wa",
-			"kimi no munashisa wo sukoshi demo iyasu koto",
-			"saa boku wa ame ni narou"
-		],
 		"tags": {
 			"category": [
 				"anime"
@@ -257,8 +140,6 @@
 	},
 	"Evangelion_ED_Fly_Me_To_The_Moon": {
 		"id": "Evangelion_ED_Fly_Me_To_The_Moon",
-		"source_hash": "LIJ3hQj4kuQ",
-		"source_filename": "Evangelion - ED - Fly Me To The Moon",
 		"duration": 67.5,
 		"attachments": {
 			"video": [
@@ -283,30 +164,6 @@
 					"path": "k/kymuhb5caoZ.avif"
 				},
 				{
-					"mime": "image/avif",
-					"path": "n/nCW4aWRaXoM.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "i/i00PRIP7t95.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "3/3GqDWEBZHMs.avif"
-				},
-				{
-					"mime": "image/webp",
-					"path": "Q/QeU8nWIqhz4.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "R/ReS24PsjaeS.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "v/vZsyntF2oOK.webp"
-				},
-				{
 					"mime": "image/webp",
 					"path": "m/m_pInb44kc1.webp"
 				}
@@ -318,24 +175,6 @@
 				}
 			]
 		},
-		"lyrics": [
-			"fly me to the moon",
-			"and let me play among the stars",
-			"let me see what spring is like",
-			"on Jupiter and Mars",
-			"in other words",
-			"hold my hand",
-			"in other words",
-			"darling, kiss me",
-			"fill my heart with song",
-			"and let me sing for ever more",
-			"you are all I long for",
-			"all I worship and adore",
-			"in other words",
-			"please be true",
-			"in other words",
-			"I love you"
-		],
 		"tags": {
 			"category": [
 				"anime"
@@ -376,8 +215,6 @@
 	},
 	"Macross_Dynamite7_OP_Dynamite_Explosion": {
 		"id": "Macross_Dynamite7_OP_Dynamite_Explosion",
-		"source_hash": "rgll4djKoy9",
-		"source_filename": "Macross Dynamite7 - OP - Dynamite Explosion",
 		"duration": 128.1,
 		"attachments": {
 			"video": [
@@ -402,30 +239,6 @@
 					"path": "h/hzNE68nMVZu.avif"
 				},
 				{
-					"mime": "image/avif",
-					"path": "Y/YR9jH_DKFk8.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "Y/Y4_GTfSMPHV.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "Z/Z_0aG9zutUE.avif"
-				},
-				{
-					"mime": "image/webp",
-					"path": "o/ovHTLuQGOTO.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "G/G6aLTpXfaw7.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "v/vMEwXpO7qAY.webp"
-				},
-				{
 					"mime": "image/webp",
 					"path": "C/Cu5lHvg0xYG.webp"
 				}
@@ -437,36 +250,6 @@
 				}
 			]
 		},
-		"lyrics": [
-			"utai hajimeta koro no",
-			"kodou yusaburu omoi",
-			"naze ka itsuka",
-			"dokoka ni oki wasureteita",
-			"namanu rui mainichi ni",
-			"koko de sayonara iu no sa",
-			"sou sa dare mo",
-			"ore no atsui omoi tomerare nai",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Every day every night everywhere",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Dynamite explosion once again",
-			"Dynamite dynamite",
-			"Every day every night everywhere"
-		],
 		"tags": {
 			"category": [
 				"anime"
@@ -509,8 +292,6 @@
 	},
 	"Animaniacs_OP": {
 		"id": "Animaniacs_OP",
-		"source_hash": "GjwjyEGOUtz",
-		"source_filename": "Animaniacs - OP",
 		"duration": 73.6,
 		"attachments": {
 			"video": [
@@ -535,30 +316,6 @@
 					"path": "n/nvm3Q8BR0eN.avif"
 				},
 				{
-					"mime": "image/avif",
-					"path": "4/4vz3it86vhq.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "m/mG33dDz2om8.avif"
-				},
-				{
-					"mime": "image/avif",
-					"path": "K/KBYW_vNyMG0.avif"
-				},
-				{
-					"mime": "image/webp",
-					"path": "B/BWKRS1z9UKa.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "T/TWgQDHFzvVN.webp"
-				},
-				{
-					"mime": "image/webp",
-					"path": "Z/ZEnRFbJowNe.webp"
-				},
-				{
 					"mime": "image/webp",
 					"path": "N/NKk7jbOFc2A.webp"
 				}
@@ -570,42 +327,6 @@
 				}
 			]
 		},
-		"lyrics": [
-			"it's time for Animaniacs",
-			"and we're zany to the max",
-			"so just sit back and relax",
-			"you'll laugh 'til you collapse",
-			"we're Animaniacs",
-			"come join the Warner Brothers",
-			"and the Warner Sister Dot",
-			"just for fun we run around the Warner movie lot",
-			"they lock us in the tower",
-			"whenever we get caught",
-			"but we break loose and then vamoose",
-			"and now you know the plot",
-			"we're Animaniacs",
-			"Dot is cute and Yakko yaks",
-			"Wakko packs away the snacks",
-			"while Bill Clinton plays the sax",
-			"we're Animaniacs",
-			"meet Pinky and the Brain",
-			"who want to rule the universe",
-			"Goodfeathers flock together",
-			"Slappy whacks them with her purse",
-			"Buttons chases Mindy",
-			"while Rita sings a verse",
-			"the writers flipped, we have no script",
-			"why bother to rehearse?",
-			"we're Animaniacs",
-			"we have pay or play contracts",
-			"we're zany to the max",
-			"there's baloney in our slacks",
-			"We're Animani-",
-			"totally insane-y",
-			"cockamamie",
-			"Animaniacs",
-			"those are the facts"
-		],
 		"tags": {
 			"category": [
 				"cartoon"

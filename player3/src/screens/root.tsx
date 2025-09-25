@@ -1,3 +1,4 @@
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useContext } from "react";
 import {
     createBrowserRouter,
@@ -6,18 +7,17 @@ import {
     RouterProvider,
     useParams,
 } from "react-router-dom";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
 
-import { RoomContext, RoomProvider } from "../providers/room";
-import { ClientContext } from "../providers/client";
-import { ServerContext } from "../providers/server";
+import { ClientContext } from "@/providers/client";
+import { RoomContext, RoomProvider } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
 
-import { ConfigMenu } from "./config";
-import { TitleScreen } from "./title";
-import { VideoScreen } from "./video";
-import { PodiumScreen } from "./podium";
-import { PreviewScreen } from "./preview";
-import { percent } from "../utils";
+import { percent } from "@/utils";
+import { ConfigMenu } from "./config/config";
+import { PodiumScreen } from "./podium/podium";
+import { PreviewScreen } from "./preview/preview";
+import { TitleScreen } from "./title/title";
+import { VideoScreen } from "./video/video";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -82,9 +82,7 @@ function Room() {
             />
         );
     else if (queue[0].start_time == null || queue[0].start_time > now)
-        screen = (
-            <PreviewScreen track={tracks[queue[0].track_id]} queue={queue} />
-        );
+        screen = <PreviewScreen queue={queue} />;
     else
         screen = (
             <VideoScreen

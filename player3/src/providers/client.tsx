@@ -1,19 +1,15 @@
+import { useMemoObj } from "@/hooks/memo";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
-import { useMemoObj } from "../hooks/memo";
 
 export interface ClientContextType {
-    root: string;
-    setRoot: (n: string) => void;
     roomPassword: string;
     setRoomPassword: (n: string) => void;
     showSettings: boolean;
     setShowSettings: (n: boolean) => void;
     podium: boolean;
     setPodium: (b: boolean) => void;
-    blankPodium: boolean;
-    setBlankPodium: (b: boolean) => void;
     audioAllowed: boolean;
     setAudioAllowed: (b: boolean) => void;
     fullscreen: boolean;
@@ -30,14 +26,6 @@ export const ClientContext = createContext<ClientContextType>(
 );
 
 export function ClientProvider(props: any) {
-    // If we're running stand-alone, then use the main karakara.uk
-    // server; else we're probably running as part of the full-stack,
-    // in which case we should use server we were loaded from.
-    const auto_root =
-        process.env.NODE_ENV === "development"
-            ? "https://karakara.uk"
-            : window.location.protocol + "//" + window.location.host;
-    const [root, setRoot] = useLocalStorage<string>("root", auto_root);
     const [roomPassword, setRoomPassword] = useLocalStorage<string>(
         "room_password",
         "",
@@ -48,7 +36,6 @@ export function ClientProvider(props: any) {
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [podium, setPodium] = useState<boolean>(false);
-    const [blankPodium, setBlankPodium] = useState<boolean>(false);
     const [audioAllowed, setAudioAllowed] = useState<boolean>(false);
     const [fullscreen, setFullscreen] = useState<boolean>(false);
     const [wakeLock, setWakeLock] = useState<string>("Not supported");
@@ -71,16 +58,12 @@ export function ClientProvider(props: any) {
     }, []);
 
     const ctxVal: ClientContextType = useMemoObj({
-        root,
-        setRoot,
         roomPassword,
         setRoomPassword,
         showSettings,
         setShowSettings,
         podium,
         setPodium,
-        blankPodium,
-        setBlankPodium,
         audioAllowed,
         setAudioAllowed,
         fullscreen,

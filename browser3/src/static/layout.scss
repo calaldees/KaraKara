@@ -1,0 +1,279 @@
+/* svg wibbling */
+.svg-inline--fa {
+    box-sizing: content-box;
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    overflow: visible;
+    vertical-align: -0.125em;
+}
+svg.x2 {
+    font-size: 2em;
+}
+
+/* subtitle wibbling */
+::cue(v[voice="active"]) {
+    color: yellow;
+}
+::cue(v[voice="next"]) {
+    color: white;
+}
+::cue {
+    // font-family: metalghosts, sans-serif;
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    font-size: 1.5em;
+}
+
+/* Overall Layout */
+* {
+    box-sizing: border-box;
+}
+BODY {
+    color: var(--page-fg);
+    margin: 0;
+    padding: 0;
+    font-family: arial, sans-serif;
+    user-select: none;
+}
+.widescreen {
+    background: black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    MAIN:nth-child(1) {
+        position: relative;
+        flex: 0 0 50%;
+        max-width: 50%;
+        border-right: 2px solid black;
+        .main-only {
+            display: none;
+        }
+    }
+    MAIN:nth-child(2) {
+        position: relative;
+        flex: 0 0 50%;
+        max-width: 50%;
+        border-left: 2px solid black;
+    }
+}
+MAIN {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-start;
+
+    background: var(--page-bg);
+
+    HEADER {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        background-color: var(--header-bg);
+        border-bottom: 1px solid var(--header-border);
+        padding: 0 5%;
+        & > A,
+        & > DIV {
+            display: block;
+            flex: 0 0 auto;
+            width: 2em;
+            height: 2em;
+        }
+        H1 {
+            width: 100%;
+            font-size: 1.5em;
+            flex: 0 1 auto;
+            text-align: center;
+            margin: 0.5em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+    .upnext {
+        background: var(--notification-warning);
+        border-bottom: 1px solid var(--notification-warning-border);
+        padding: 1em;
+        margin: 0;
+    }
+    .notification {
+        position: absolute;
+        left: 2em;
+        right: 2em;
+        top: 4em;
+        display: flex;
+        align-items: center;
+        border-radius: 1em;
+        padding: 1em;
+        // For some reason even though the notification appears over
+        // the top of the video, clicks act as if the video is on top?
+        // z-index appears to fix it...
+        z-index: 2;
+        SPAN {
+            flex: 1 1 auto;
+        }
+        I {
+            flex: 0 0 auto;
+            padding: 0em 0.5em;
+        }
+        &.ok {
+            background-color: var(--notification-ok);
+            border: 1px solid var(--notification-ok-border);
+        }
+        &.warning {
+            background-color: var(--notification-warning);
+            border: 1px solid var(--notification-warning-border);
+        }
+        &.error {
+            background-color: var(--notification-error);
+            border: 1px solid var(--notification-error-border);
+        }
+    }
+    ARTICLE {
+        flex: 1 1 auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+    FOOTER {
+        flex: 0 0 auto;
+        display: flex;
+        flex-flow: column;
+        border-top: 1px solid var(--header-border);
+        background-color: var(--header-bg);
+        padding-top: 0.3em;
+
+        & > * {
+            margin-top: 0.3em;
+            margin-bottom: 0.3em;
+        }
+
+        .buttons {
+            display: flex;
+            flex-flow: row;
+            justify-content: space-between;
+
+            & > * {
+                flex: 1 0;
+                margin-left: 0.3em;
+                margin-right: 0.3em;
+                &:first-child {
+                    margin-left: 0;
+                }
+                &:last-child {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
+
+/* Common elements */
+.flex-center {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    height: 100%;
+}
+H2 {
+    text-align: center;
+    margin-bottom: 0.5em;
+    font-size: 1.2em;
+}
+UL {
+    border: 1px solid var(--list-border);
+    background-color: var(--list-bg);
+    margin: 0.5em 0;
+    border-radius: 0.5em;
+    overflow: hidden;
+    box-shadow: var(--list-shadow) 2px 2px 4px;
+    padding: 0;
+    LI {
+        display: flex;
+        border-bottom: 1px solid var(--list-border);
+        padding: 0.75em;
+        font-weight: bold;
+        align-items: center;
+        .thumb {
+            height: 4em;
+            width: 6em;
+            margin: -0.75em;
+            margin-right: 0.75em;
+            background-size: cover;
+            background-position: center;
+            border-right: 1px solid var(--list-border);
+            flex: 0 0 auto;
+            position: relative;
+            IMG {
+                object-fit: cover;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            .drag-handle {
+                position: absolute;
+                top: 1em;
+                left: 0;
+                bottom: 1em;
+                background: var(--drag-handle-bg);
+                border: 1px solid var(--list-border);
+                border-radius: 0 0.5em 0.5em 0;
+                padding: 0.4em 0.4em 0.5em 0.2em;
+            }
+        }
+        SPAN.text {
+            flex: 1 1 auto;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            padding-right: 0.4em;
+        }
+        SPAN.count {
+            flex: 0 0 auto;
+            margin-right: 0.5em;
+            border: 1px solid var(--list-border);
+            background: var(--page-bg);
+            font-size: 0.75em;
+            padding: 0.2em 0.4em;
+            border-radius: 0.2em;
+        }
+        SPAN.go_arrow {
+            flex: 0 0 auto;
+        }
+    }
+    LI:last-child {
+        border-bottom: 0;
+    }
+}
+/* Don't put stuff in iPhone's weird rounded corners */
+MAIN {
+    HEADER,
+    ARTICLE,
+    FOOTER {
+        padding-left: max(5%, env(safe-area-inset-left));
+        padding-right: max(5%, env(safe-area-inset-right));
+    }
+    HEADER {
+        padding-top: env(safe-area-inset-top);
+    }
+    ARTICLE:last-child {
+        padding-bottom: max(0.3em, env(safe-area-inset-bottom));
+    }
+    FOOTER {
+        padding-bottom: max(0.3em, env(safe-area-inset-bottom));
+    }
+}

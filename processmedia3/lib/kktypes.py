@@ -40,14 +40,18 @@ class MediaMeta(t.NamedTuple):
 
     @property
     def aspect_ratio_str(self) -> str:
-        return ':'.join(map(str,self.aspect_ratio.as_integer_ratio()))
+        return ":".join(map(str, self.aspect_ratio.as_integer_ratio()))
 
     @classmethod
     def from_width_height(cls, width: int, height: int) -> "MediaMeta":
         return cls(width=width, height=height, aspect_ratio=Fraction(width, height))
 
     @classmethod
-    def from_uri(cls, uri, _subprocess_run: t.Callable[...,subprocess.CompletedProcess]=subprocess.run) -> t.Self:
+    def from_uri(
+        cls,
+        uri,
+        _subprocess_run: t.Callable[..., subprocess.CompletedProcess] = subprocess.run,
+    ) -> t.Self:
         r"""
         >>> MediaMeta.from_uri("tests/source/test1.mp4")
         MediaMeta(fps=10.0, width=640, height=480, duration=datetime.timedelta(seconds=30), aspect_ratio=Fraction(4, 3))
@@ -58,18 +62,23 @@ class MediaMeta(t.NamedTuple):
         >>> MediaMeta.from_uri("tests/source/test2.ogg")
         MediaMeta(fps=0.0, width=0, height=0, duration=datetime.timedelta(seconds=15), aspect_ratio=Fraction(1, 1))
         """
-        completed_process = _subprocess_run([
-            "ffprobe",
-            "-v", "quiet",
-            "-print_format", "json",
-            "-show_format",
-            "-show_streams",
-            uri,
-        ], capture_output=True)
+        completed_process = _subprocess_run(
+            [
+                "ffprobe",
+                "-v",
+                "quiet",
+                "-print_format",
+                "json",
+                "-show_format",
+                "-show_streams",
+                uri,
+            ],
+            capture_output=True,
+        )
         if completed_process.returncode != 0:
-            log.error(f'Unable to ffprobe {uri}')
+            log.error(f"Unable to ffprobe {uri}")
             return cls()
-        ffprobe_output = json.loads(completed_process.stdout.decode('utf8', errors="ignore"))
+        ffprobe_output = json.loads(completed_process.stdout.decode("utf8", errors="ignore"))
 
         fps = 0.0
         width = 0
@@ -77,7 +86,7 @@ class MediaMeta(t.NamedTuple):
 
         video = next((s for s in ffprobe_output["streams"] if s["codec_type"] == "video"), None)
         if video:
-            num, denom = map(int, video["r_frame_rate"].split('/'))
+            num, denom = map(int, video["r_frame_rate"].split("/"))
             fps = num / denom if denom != 0 else 0.0
             width = video["width"]
             height = video["height"]

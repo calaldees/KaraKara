@@ -62,7 +62,9 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
 
     def test_newline(self) -> None:
         ssa = create_ssa(
-            [Subtitle(timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),]
+            [
+                Subtitle(timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),
+            ]
         )
         self.assertIn("newline\\Ntest", ssa)
 

@@ -4,8 +4,7 @@ import shlex
 import subprocess
 from pathlib import Path
 import typing as t
-from abc import abstractmethod
-from collections.abc import Sequence
+from abc import abstractmethod, ABC
 import re
 import math
 
@@ -59,18 +58,18 @@ class EncoderException(Exception):
     pass
 
 
-class Encoder:
+class Encoder(ABC):
     target: TargetType
-    sources: t.Set[SourceType]
+    sources: set[SourceType]
     category: MediaType
     ext: str
     mime: str
     priority: int = 1
-    conf_audio: Sequence[str] = []
-    conf_video: Sequence[str] = []
-    conf_container: Sequence[str] = []
-    conf_acodec: Sequence[str] = []
-    conf_vcodec: Sequence[str] = []
+    conf_audio: list[str] = []
+    conf_video: list[str] = []
+    conf_container: list[str] = []
+    conf_acodec: list[str] = []
+    conf_vcodec: list[str] = []
 
     def __init__(self) -> None:
         # sort, concatenate, and flatten all of the conf_* arrays
@@ -79,15 +78,15 @@ class Encoder:
         self.salt = str(confs)
 
     @abstractmethod
-    def encode(self, target: Path, sources: t.Set[Source]) -> None: ...
+    def encode(self, target: Path, sources: set[Source]) -> None: ...
 
-    def _run(self, *args: str, title: str|None = None, duration: float|None=None) -> None:
-        output = []
+    def _run(self, *args: str, title: str | None = None, duration: float | None = None) -> None:
+        output: list[str] = []
         with tqdm.tqdm(
             total=int(duration) if duration else None,
             unit="s",
             disable=duration is None,
-            leave=False
+            leave=False,
         ) as pbar:
             pbar.set_description(title)
 
@@ -108,15 +107,15 @@ class Encoder:
                     current_s = int(int(hours) * 60 * 60 + int(minutes) * 60 + float(seconds))
                     pbar.update(current_s - pbar.n)
 
-        proc.wait()
-        if proc.returncode != 0:
+        if proc.wait() != 0:
             raise subprocess.CalledProcessError(proc.returncode, shlex.join(args), "".join(output))
 
 
 #######################################################################
 # Video to Video
 
-class _Preview(Encoder):
+
+class _Preview(Encoder, ABC):
     category = MediaType.PREVIEW
     conf_video = SCALE_PREVIEW
 
@@ -128,7 +127,7 @@ class _BaseVideoToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         # fmt: off
         source = list(sources)[0]
         # framestep: Reduce framerate down to 30fps max - there is no need for 60fps in karaoke
@@ -151,11 +150,11 @@ class _BaseVideoToVideo(Encoder):
         )
         # fmt: on
 
-    def additional_vcodec_arguments(self, meta: MediaMeta) -> Sequence[str]:
+    def additional_vcodec_arguments(self, meta: MediaMeta) -> list[str]:
         return []
 
     @staticmethod
-    def _append_ffmpeg_video_filter_string(args: Sequence[str], *filters: str) -> Sequence[str]:
+    def _append_ffmpeg_video_filter_string(args: list[str], *filters: str) -> list[str]:
         """
         >>> _BaseVideoToVideo._append_ffmpeg_video_filter_string(('unknown1', '-vf', 'SOME_FILTER', 'unknown2'))
         ('unknown1', '-vf', 'SOME_FILTER', 'unknown2')
@@ -163,10 +162,10 @@ class _BaseVideoToVideo(Encoder):
         ('unknown1', '-vf', 'SOME_FILTER,ANOTHER_FILTER,MORE_FILTER', 'unknown2')
         """
         for arg_a, arg_b in itertools.pairwise(args):
-            if arg_a in {'-vf', '-filter:v'}:
+            if arg_a in {"-vf", "-filter:v"}:
                 replace = arg_b
-                replacement = ','.join(itertools.chain((arg_b,), filters))
-        return tuple(arg if arg != replace else replacement for arg in args)
+                replacement = ",".join(itertools.chain((arg_b,), filters))
+        return [arg if arg != replace else replacement for arg in args]
 
 
 class VideoToAV1(_BaseVideoToVideo):
@@ -178,7 +177,7 @@ class VideoToAV1(_BaseVideoToVideo):
 
     @t.override
     @classmethod
-    def additional_vcodec_arguments(cls, meta: MediaMeta) -> Sequence[str]:
+    def additional_vcodec_arguments(cls, meta: MediaMeta) -> list[str]:
         """
         Goals
         1. per track (per minute) roughly the same size
@@ -208,22 +207,32 @@ class VideoToAV1(_BaseVideoToVideo):
         >>> VideoToAV1.additional_vcodec_arguments(MediaMeta.from_width_height(1920, 1080))
         ['-crf', '56', '-preset', '6']
         """
+
         class AV1Args(t.NamedTuple):
             total_pixels: int
             crf: int
             preset: int
-        _top = AV1Args(total_pixels=1280*720, crf=56, preset=6)
-        _bot = AV1Args(total_pixels=960*720, crf=55, preset=5)
+
+        _top = AV1Args(total_pixels=1280 * 720, crf=56, preset=6)
+        _bot = AV1Args(total_pixels=960 * 720, crf=55, preset=5)
 
         def translate(input_top, input_bot, output_top, output_bot, input_value):
             input_range = input_top - input_bot
             output_range = output_top - output_bot
-            return output_bot + (((input_value-input_bot)/input_range)*output_range)
+            return output_bot + (((input_value - input_bot) / input_range) * output_range)
 
-        total_pixels = min(meta.width*meta.height, 1280*720)  # ffmpeg will max width to 1280. See SCALE_VIDEO
+        total_pixels = min(meta.width * meta.height, 1280 * 720)  # ffmpeg will max width to 1280. See SCALE_VIDEO
         crf = int(translate(_top.total_pixels, _bot.total_pixels, _top.crf, _bot.crf, total_pixels))
         crf = max(crf, 45)
-        preset = int(translate(_top.total_pixels, _bot.total_pixels, _top.preset, _bot.preset, total_pixels))
+        preset = int(
+            translate(
+                _top.total_pixels,
+                _bot.total_pixels,
+                _top.preset,
+                _bot.preset,
+                total_pixels,
+            )
+        )
         preset = max(preset, 4)
         return ["-crf", str(crf), "-preset", str(preset)]
 
@@ -267,7 +276,7 @@ class _BaseImageToVideo(Encoder):
     conf_video = SCALE_VIDEO
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         def source_by_type(type: SourceType) -> Source:
             return [s for s in sources if s.type == type][0]
 
@@ -338,8 +347,9 @@ class _BaseVideoToImage(Encoder):
     conf_vcodec = ["-quality", str(IMAGE_QUALITY)]
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         import tempfile
+
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
             # - ffmpeg is best at extracting frames
@@ -395,7 +405,7 @@ class _BaseImageToImage(Encoder):
     priority = 2
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         # fmt: off
         self._run(
             "convert",
@@ -437,7 +447,7 @@ class SubtitleToVTT(Encoder):
     mime = "text/vtt"
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_vtt(parse_subtitles(srt)))
@@ -451,7 +461,7 @@ class SubtitleToJSON(Encoder):
     mime = "application/json"
 
     @t.override
-    def encode(self, target: Path, sources: t.Set[Source]) -> None:
+    def encode(self, target: Path, sources: set[Source]) -> None:
         srt = list(sources)[0].file.text
         with open(target.as_posix(), "w") as vtt:
             vtt.write(create_json(parse_subtitles(srt)))
@@ -460,10 +470,8 @@ class SubtitleToJSON(Encoder):
 #######################################################################
 
 
-def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
-    return set(cls.__subclasses__()).union(
-        s for c in cls.__subclasses__() for s in all_subclasses(c)
-    )
+def all_subclasses(cls: t.Type[t.Any]) -> set[t.Type[Encoder]]:
+    return set(cls.__subclasses__()).union(s for c in cls.__subclasses__() for s in all_subclasses(c))
 
 
 # Sort encoders by priority, highest first. Priority is manually specified
@@ -475,15 +483,13 @@ def all_subclasses(cls: t.Type[t.Any]) -> t.Set[t.Type[Encoder]]:
 # - encoders who generate empty stubs are low-priority
 encoders = {e for e in all_subclasses(Encoder) if e.__name__[0] != "_"}
 sorted_encoders = sorted(encoders, key=lambda x: x.priority, reverse=True)
-encoders_for_type = {
-    t: [e() for e in sorted_encoders if e.target == t] for t in TargetType
-}
+encoders_for_type = {t: [e() for e in sorted_encoders if e.target == t] for t in TargetType}
 
 
 def find_appropriate_encoder(
     type: TargetType,
-    sources: t.Set[Source],
-) -> t.Optional[t.Tuple[Encoder, t.Set[Source]]]:
+    sources: set[Source],
+) -> tuple[Encoder, set[Source]] | None:
     """
     Find the highest priority encoder that can create the given target
     from the given sources.
@@ -499,7 +505,7 @@ def find_appropriate_encoder(
         return None
 
 
-def select_best_image(paths: Sequence[Path]) -> Path:
+def select_best_image(paths: list[Path]) -> Path:
     """
     Given a selection of thumbnails, try to choose one which
     isn't just a black or white frame.
@@ -509,10 +515,11 @@ def select_best_image(paths: Sequence[Path]) -> Path:
 
     def score(p: Path) -> float:
         from PIL import Image
+
         img = Image.open(p.as_posix()).convert("L")
         # r, g, b = img.split()
         h = img.histogram()
-        px_cnt = sum(h) # total number of pixels in the image
+        px_cnt = sum(h)  # total number of pixels in the image
 
         # if blacks make up most of the image, or if whites make up most of the image
         thresh = 0.5
@@ -532,4 +539,5 @@ def select_best_image(paths: Sequence[Path]) -> Path:
 
 if __name__ == "__main__":
     import sys
+
     print(select_best_image(list(Path(sys.argv[1]).glob("*.bmp"))))

@@ -1,16 +1,36 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import svgr from "vite-plugin-svgr";
+import { defineConfig } from "vite";
 // import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
+    resolve: {
+        alias: {
+            "@": "/src",
+        },
+    },
     build: {
         target: ["es2015", "ios11"],
     },
+    server: {
+        proxy: {
+            "/api": {
+                target: "https://karakara.uk",
+                changeOrigin: true,
+            },
+            "/files": {
+                target: "https://karakara.uk",
+                changeOrigin: true,
+            },
+            "/mqtt": {
+                target: "https://karakara.uk",
+                changeOrigin: true,
+                ws: true,
+            },
+        },
+    },
     plugins: [
         react(),
-        svgr(),
         /*
         VitePWA({
             injectRegister: null,

@@ -17,7 +17,9 @@ class TrackManager:
         self.mtime: float = 0
         self.track_durations: TrackDurations = MappingProxyType({})
         if not path.is_file():
-            log.error('No `tracks.json` file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. `processmedia` should output `tracks.json` when encoding is complete')
+            log.error(
+                "No `tracks.json` file present or provided. api_queue WILL NOT FUNCTION IN PRODUCTION. `processmedia` should output `tracks.json` when encoding is complete"
+            )
         self.reload_tracks()
 
     @property
@@ -26,11 +28,10 @@ class TrackManager:
 
     def reload_tracks(self) -> None:
         if not self.path.is_file():
-            log.error('`tracks.json` does not exist - unable to reload_tracks')
+            log.error("`tracks.json` does not exist - unable to reload_tracks")
             return
         with self.path.open() as filehandle:
-            self.track_durations = MappingProxyType({
-                track_id: track_payload['duration']
-                for track_id, track_payload in json.load(filehandle).items()
-            })
+            self.track_durations = MappingProxyType(
+                {track_id: track_payload["duration"] for track_id, track_payload in json.load(filehandle).items()}
+            )
         self.mtime = self.path.stat().st_mtime

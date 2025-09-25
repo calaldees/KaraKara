@@ -1,0 +1,101 @@
+.theme-metalghosts .screen_video {
+    grid-template:
+        "video " 1fr
+        / 1fr;
+
+    background: black;
+
+    #join_info,
+    #event_info {
+        display: none;
+    }
+    .videoScaler {
+        grid-area: video;
+    }
+
+    .pimp {
+        max-width: 50%;
+        position: absolute;
+        animation-iteration-count: 2;
+        animation-direction: alternate;
+        animation-duration: 5s;
+        text-shadow:
+            -1px -1px 0 #000,
+            1px -1px 0 #000,
+            -1px 1px 0 #000,
+            1px 1px 0 #000,
+            0 0 5vh #000;
+    }
+    @keyframes popright {
+        0% {
+            transform: translate(200cqw);
+        }
+        20% {
+            transform: translate(200cqw);
+        }
+        40% {
+            transform: translate(0cqw);
+        }
+        100% {
+            transform: translate(0cqw);
+        }
+    }
+    #pimpkk {
+        font-size: 10vh;
+        top: 5vh;
+        right: 5vw;
+        animation-name: popright;
+    }
+    #pimpcontributor {
+        display: none;
+    }
+
+    @keyframes popleft {
+        0% {
+            transform: translate(-200vw);
+        }
+        20% {
+            transform: translate(-200vw);
+        }
+        40% {
+            transform: translate(0vw);
+        }
+        100% {
+            transform: translate(0vw);
+        }
+    }
+    #pimpsong {
+        font-size: 5vh;
+        top: 5vh;
+        left: 5vw;
+        animation-name: popleft;
+    }
+
+    @media (max-aspect-ratio: 16/11) {
+        grid-template:
+            "header" min-content
+            "video " 1fr
+            "footer" min-content
+            / 1fr;
+        #pimpkk {
+            top: 15vh;
+        }
+        #pimpsong {
+            top: 15vh;
+        }
+        @keyframes fadeout {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.25;
+            }
+        }
+        #join_info,
+        #event_info {
+            display: flex;
+            animation-name: fadeout;
+            animation-duration: 5s;
+        }
+    }
+}

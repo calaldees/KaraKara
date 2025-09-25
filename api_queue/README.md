@@ -2,21 +2,14 @@ api_queue
 =========
 
 * no database
-    * Redis datastore for queues.
-    * (no need to have any info/coupling about tracks)
 * sqlite3 for community login tokens?
-
-
 
 * asgi
     * [sanic](https://sanic.dev/en/plugins/sanic-ext/getting-started.html#features)
-    * https://aioredis.readthedocs.io/en/latest/getting-started/
     * [sanic-jwt](https://sanic-jwt.readthedocs.io/en/latest/pages/simpleusage.html)
 * mqtt
-    * [aiormq](https://github.com/mosquito/aiormq) - Pure python AMQP 0.9.1 asynchronous client library 
+    * [aiormq](https://github.com/mosquito/aiormq) - Pure python AMQP 0.9.1 asynchronous client library
     * [paho-mqtt](https://pypi.org/project/paho-mqtt/) - MQTT version 5.0/3.1.1 client class
-* redis
-    * [redis-py](https://github.com/redis/redis-py) - aoi?
 
 
 queue datamodel

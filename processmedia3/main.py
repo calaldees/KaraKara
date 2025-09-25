@@ -12,11 +12,11 @@ import pickle
 import re
 import sys
 import time
+import typing as t
 from datetime import timedelta
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Tuple
-from collections.abc import Mapping, Sequence, MutableMapping, MutableSet, Set
+from collections.abc import Sequence, MutableMapping
 
 from tqdm.contrib.concurrent import thread_map
 from tqdm.contrib.logging import logging_redirect_tqdm
@@ -25,7 +25,12 @@ from lib.source import Source, SourceType
 from lib.target import Target
 from lib.track import Track, TrackDict, TrackValidationException
 from lib.kktypes import TargetType
-from lib.file_abstraction import AbstractFolder, AbstractFile, AbstractFolder_from_str, LocalFile
+from lib.file_abstraction import (
+    AbstractFolder,
+    AbstractFile,
+    AbstractFolder_from_str,
+    LocalFile,
+)
 
 
 log = logging.getLogger()
@@ -34,11 +39,11 @@ TARGET_TYPES = [
     # TargetType.VIDEO_H264,
     TargetType.VIDEO_AV1,
     TargetType.VIDEO_H265,
-    #TargetType.PREVIEW_AV1,
-    #TargetType.PREVIEW_H265,
+    # TargetType.PREVIEW_AV1,
+    # TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,
     TargetType.IMAGE_AVIF,
-    #TargetType.IMAGE_WEBP,
+    # TargetType.IMAGE_WEBP,
     TargetType.SUBTITLES_VTT,
     TargetType.SUBTITLES_JSON,
 ]
@@ -65,7 +70,7 @@ def scan(
     source_folder: AbstractFolder,
     processed_dir: Path,
     match: str,
-    cache: MutableMapping[str, Any],
+    cache: MutableMapping[str, t.Any],
     threads: int = 1,
 ) -> Sequence[Track]:
     """
@@ -88,7 +93,7 @@ def scan(
     #   ],
     #   ...
     # }
-    grouped: Mapping[str, MutableSet[AbstractFile]] = defaultdict(set)
+    grouped: dict[str, set[AbstractFile]] = defaultdict(set)
     for file in source_folder.files:
         if any((i in file.relative) for i in SCAN_IGNORE):
             continue
@@ -99,12 +104,12 @@ def scan(
             assert matches is not None  # ".*" should always match
             track_id = re.sub("[^0-9a-zA-Z]+", "_", matches.group(1)).strip("_")
             grouped[track_id].add(file)
-    groups: Sequence[Tuple[str, Set[AbstractFile]]] = sorted(grouped.items())
+    groups: list[tuple[str, set[AbstractFile]]] = sorted(grouped.items())
 
     # Turn all the (track_id, list of filenames) tuples into a
     # list of Tracks (log an error and return None if we can't
     # figure out how to turn these files into a valid Track)
-    def _load_track(group: Tuple[str, Set[AbstractFile]]) -> Track | None:
+    def _load_track(group: tuple[str, set[AbstractFile]]) -> Track | None:
         (track_id, files) = group
         try:
             sources = {Source(file, cache) for file in files}
@@ -113,9 +118,12 @@ def scan(
             log.exception(f"Error calculating track {track_id}")
             return None
 
-    return tuple(filter(None,
-        thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
-    ))
+    return tuple(
+        filter(
+            None,
+            thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track"),
+        )
+    )
 
 
 def view(tracks: Sequence[Track]) -> None:
@@ -133,7 +141,7 @@ def view(tracks: Sequence[Track]) -> None:
         print(track.id)
         for t in track.targets:
             if t.path.exists():
-                stats = f"{OK} ({int(t.path.stat().st_size/1024):,} KB)"
+                stats = f"{OK} ({int(t.path.stat().st_size / 1024):,} KB)"
             else:
                 stats = FAIL
             print(f"  - {t} {stats}")
@@ -144,8 +152,9 @@ def lint(tracks: Sequence[Track]) -> None:
     Scan through all the data, looking for things which seem suspicious
     and probably want a human to investigate
     """
+
     def _lint(track: Track) -> None:
-        #for t in track.targets:
+        # for t in track.targets:
         #    if not t.path.exists():
         #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
         for s in track.sources:
@@ -192,7 +201,7 @@ def lint(tracks: Sequence[Track]) -> None:
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
-                        log.error(f"{s.file.relative}:{index+1} line contains newline: {l.text}")
+                        log.error(f"{s.file.relative}:{index + 1} line contains newline: {l.text}")
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
@@ -203,15 +212,20 @@ def lint(tracks: Sequence[Track]) -> None:
                 for ls in [toplines, botlines]:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
                         if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
-                            log.error(f"{s.file.relative}:{index+1} no gap between 3+ repeats: {l1.text}")
+                            log.error(f"{s.file.relative}:{index + 1} no gap between 3+ repeats: {l1.text}")
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
                             if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
-                                log.error(f"{s.file.relative}:{index+1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")
+                                log.error(
+                                    f"{s.file.relative}:{index + 1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
+                                )
                         elif l2.start < l1.end:
                             gap = l1.end - l2.start
-                            log.error(f"{s.file.relative}:{index+1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")
+                            log.error(
+                                f"{s.file.relative}:{index + 1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
+                            )
+
     thread_map(_lint, tracks, max_workers=4, desc="lint   ", unit="track")
 
 
@@ -221,11 +235,7 @@ def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) ->
     """
 
     # Come up with a single list of every Target object that we can imagine
-    targets = tuple(
-        target
-        for track in tracks
-        for target in track.targets
-    )
+    targets = tuple(target for track in tracks for target in track.targets)
 
     # Only check if the file exists at the last minute, not at the start,
     # because somebody else might have finished this encode while we still
@@ -295,9 +305,7 @@ def export(
         path.with_suffix(".tmp").rename(path)
 
 
-def cleanup(
-    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
-) -> None:
+def cleanup(processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
     """
@@ -378,9 +386,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         nargs="?",
         help="Sub-process to run (view, encode, test-encode, export, lint, cleanup)",
     )
-    parser.add_argument(
-        "match", nargs="?", help="Only act upon files matching this pattern"
-    )
+    parser.add_argument("match", nargs="?", help="Only act upon files matching this pattern")
 
     args = parser.parse_args()
     # we need to create AbstractFolder lazily, because
@@ -391,7 +397,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 
 
 @contextlib.contextmanager
-def _pickled_var(path: Path, default: Any):
+def _pickled_var(path: Path, default: t.Any):
     """
     Load a variable from a file on startup,
     save the variable to file on shutdown
@@ -417,33 +423,34 @@ def main(argv: Sequence[str]) -> int:
         format="%(asctime)s %(message)s",
     )
     if args.log_file:
-        handler = logging.handlers.RotatingFileHandler(
-            args.log_file, maxBytes=65535, backupCount=3
-        )
+        handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
         logging.getLogger().addHandler(handler)
 
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
-            cache: MutableMapping[str, Any] = {}
+            cache: MutableMapping[str, t.Any] = {}
             path = Path(args.match)
             local_file = LocalFile(path, path.parent)
-            tracks: Sequence[Track] = [Track(
-                local_file.root,
-                local_file.stem,
-                {
-                    Source(local_file, cache)
-                },
-                [
-                    TargetType.VIDEO_H264,
-                    TargetType.VIDEO_AV1,
-                    TargetType.VIDEO_H265,
-                ]
-            )]
+            tracks: Sequence[Track] = [
+                Track(
+                    local_file.root,
+                    local_file.stem,
+                    {Source(local_file, cache)},
+                    [
+                        TargetType.VIDEO_H264,
+                        TargetType.VIDEO_AV1,
+                        TargetType.VIDEO_H265,
+                    ],
+                )
+            ]
             encode(tracks, args.reencode, args.threads)
             return 0
 
     while True:
-        with _pickled_var(args.processed / "cache.db", {}) as cache, logging_redirect_tqdm():
+        with (
+            _pickled_var(args.processed / "cache.db", {}) as cache,
+            logging_redirect_tqdm(),
+        ):
             tracks = scan(args.source, args.processed, args.match, cache, args.threads)
             tracks = tuple(track for track in tracks if track.has_tags)  # only encode tracks that have a tag.txt file
 

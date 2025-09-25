@@ -21,11 +21,11 @@ Cypress.Commands.add(
         cy.get("h1").dblclick();
         cy.get("[data-cy=room-input]").type(room || "test");
         cy.get("[data-cy=password-input]").type(password || room || "test");
-        booth && cy.get("[data-cy=booth-input]").check();
+        if (booth) cy.get("[data-cy=booth-input]").check();
         cy.get("[data-cy=save-button]").click();
     },
 );
-//
+
 //
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
@@ -43,9 +43,9 @@ declare global {
     namespace Cypress {
         interface Chainable {
             login(room?: string, password?: string, booth?: boolean): Chainable;
-            //       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-            //       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-            //       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
+            // drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+            // dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+            // visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
         }
     }
 }

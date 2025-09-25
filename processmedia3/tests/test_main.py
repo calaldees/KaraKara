@@ -30,7 +30,7 @@ class TestE2E(unittest.TestCase):
             processed = Path(processed_str)
 
             # Scan should detect source files for two tracks
-            tracks = main.scan(AbstractFolder_from_str("./tests/source"), processed, '', {})
+            tracks = main.scan(AbstractFolder_from_str("./tests/source"), processed, "", {})
 
             self.assertEqual("Test1", tracks[0].id)
             self.assertEqual(
@@ -38,7 +38,7 @@ class TestE2E(unittest.TestCase):
                 {s.type for s in tracks[0].sources},
             )
             self.assertEqual(TargetType.VIDEO_AV1, tracks[0].targets[0].type)
-            self.assertEqual('QbcWNbOP07G', tracks[0].targets[0].path.stem)
+            self.assertEqual("QbcWNbOP07G", tracks[0].targets[0].path.stem)
             self.assertEqual("Test2", tracks[1].id)
 
             # Encode should generate output video
@@ -55,9 +55,27 @@ class TestE2E(unittest.TestCase):
 
             for k, v in {
                 "attachments": {
-                    "image": [{"variant": None, "mime": "image/avif", "path": "a/AFJz1z_uAoG.avif"}],
-                    "subtitle": [{"variant": None, "mime": "text/vtt", "path": "g/gHe0erd2h5b.vtt"}],
-                    'video': [{"variant": None, 'mime': 'video/webm; codecs=av01.0.05M.08,opus', 'path': 'q/QbcWNbOP07G.webm'}]
+                    "image": [
+                        {
+                            "variant": None,
+                            "mime": "image/avif",
+                            "path": "a/AFJz1z_uAoG.avif",
+                        }
+                    ],
+                    "subtitle": [
+                        {
+                            "variant": None,
+                            "mime": "text/vtt",
+                            "path": "g/gHe0erd2h5b.vtt",
+                        }
+                    ],
+                    "video": [
+                        {
+                            "variant": None,
+                            "mime": "video/webm; codecs=av01.0.05M.08,opus",
+                            "path": "q/QbcWNbOP07G.webm",
+                        }
+                    ],
                 },
                 "duration": 30.0,
                 "id": "Test1",
@@ -75,9 +93,27 @@ class TestE2E(unittest.TestCase):
                 self.assertEqual(v, tracks_json["Test1"][k])
             for k, v in {
                 "attachments": {
-                    "image": [{"variant": None, "mime": "image/avif", "path": "g/g0hYJlNw99D.avif"}],
-                    "subtitle": [{"variant": None, "mime": "text/vtt", "path": "6/6u2Zuq6Cuho.vtt"}],
-                    "video": [{"variant": None, 'mime': 'video/webm; codecs=av01.0.05M.08,opus', 'path': 'k/kQiTVqqX7if.webm'}],
+                    "image": [
+                        {
+                            "variant": None,
+                            "mime": "image/avif",
+                            "path": "g/g0hYJlNw99D.avif",
+                        }
+                    ],
+                    "subtitle": [
+                        {
+                            "variant": None,
+                            "mime": "text/vtt",
+                            "path": "6/6u2Zuq6Cuho.vtt",
+                        }
+                    ],
+                    "video": [
+                        {
+                            "variant": None,
+                            "mime": "video/webm; codecs=av01.0.05M.08,opus",
+                            "path": "k/kQiTVqqX7if.webm",
+                        }
+                    ],
                 },
                 "duration": 15.0,
                 "id": "Test2",

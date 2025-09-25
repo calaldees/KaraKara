@@ -19,21 +19,27 @@ import "./commands";
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from "cypress/react";
-import { MountOptions, MountReturn } from "cypress/react";
+import {
+    ServerTimeContext,
+    ServerTimeContextType,
+} from "@shish2k/react-use-servertime";
+import { mount, MountOptions, MountReturn } from "cypress/react";
+import { createElement, useState } from "react";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-import { useState, createElement } from "react";
+import queue from "../../cypress/fixtures/small_queue.json";
+import settings from "../../cypress/fixtures/small_settings.json";
+import tracks from "../../cypress/fixtures/small_tracks.json";
+
 import { ClientContext, ClientContextType } from "../../src/providers/client";
 import { RoomContext, RoomContextType } from "../../src/providers/room";
 import { ServerContext, ServerContextType } from "../../src/providers/server";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-import "../../src/static/style.scss";
-import tracks from "../../cypress/fixtures/small_tracks.json";
-import queue from "../../cypress/fixtures/small_queue.json";
-import settings from "../../cypress/fixtures/small_settings.json";
 import type { QueueItem } from "../../src/types";
-import { ServerTimeContextType } from "@shish2k/react-use-servertime";
+
+import "../../src/static/forms.scss";
+import "../../src/static/layout.scss";
+import "../../src/static/vars.scss";
 
 // Cypress.Commands.add('mount', mount)
 
@@ -53,10 +59,10 @@ declare global {
 }
 
 type TestProps = {
-    client: Partial<ClientContextType>;
-    server: Partial<ServerContextType>;
-    serverTime: Partial<ServerTimeContextType>;
-    room: Partial<RoomContextType>;
+    client?: Partial<ClientContextType>;
+    server?: Partial<ServerContextType>;
+    serverTime?: Partial<ServerTimeContextType>;
+    room?: Partial<RoomContextType>;
     children?: any;
 };
 function TestHarness(props: TestProps) {
@@ -102,6 +108,13 @@ function TestHarness(props: TestProps) {
         trackList: Object.values(tracks),
         ...props.room,
     };
+    const st = {
+        now: 1000,
+        offset: 1.5,
+        tweak: 1,
+        setTweak: (_n: number) => {},
+        ...props.serverTime,
+    };
 
     const router = createMemoryRouter(
         [
@@ -135,7 +148,14 @@ function TestHarness(props: TestProps) {
         },
         server_provider,
     );
-    return client_provider;
+    const server_time_provider = createElement(
+        ServerTimeContext.Provider,
+        {
+            value: st,
+        },
+        client_provider,
+    );
+    return server_time_provider;
 }
 
 Cypress.Commands.add("mount", (component, options: any = {}) => {
