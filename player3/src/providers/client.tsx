@@ -1,7 +1,7 @@
+import { useMemoObj } from "@/hooks/memo";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage } from "usehooks-ts";
-import { useMemoObj } from "@/hooks/memo";
 
 export interface ClientContextType {
     roomPassword: string;

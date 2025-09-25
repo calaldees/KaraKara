@@ -1,12 +1,12 @@
-import { useContext } from "react";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useContext } from "react";
 
 import { EventInfo } from "@/components/eventinfo";
 import { JoinInfo } from "@/components/joininfo";
 import { Video } from "@/components/video";
-import { ServerContext } from "@/providers/server";
 import { RoomContext } from "@/providers/room";
-import type { Track, QueueItem } from "@/types";
+import { ServerContext } from "@/providers/server";
+import type { QueueItem, Track } from "@/types";
 import { time_until } from "@/utils";
 
 import "./preview.scss";

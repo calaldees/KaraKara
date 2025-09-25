@@ -1,10 +1,10 @@
-import { useContext } from "react";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useContext } from "react";
 
 import { EventInfo } from "@/components/eventinfo";
 import { JoinInfo } from "@/components/joininfo";
 import { Video } from "@/components/video";
-import type { Track, QueueItem } from "@/types";
+import type { QueueItem, Track } from "@/types";
 import { percent } from "@/utils";
 
 import "./video.scss";

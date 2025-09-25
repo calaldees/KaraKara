@@ -1,6 +1,6 @@
+import { QRCodeSVG } from "qrcode.react";
 import { useRef } from "react";
 import { useParams } from "react-router-dom";
-import { QRCodeSVG } from "qrcode.react";
 import { useReactToPrint } from "react-to-print";
 
 import { BackToExplore, Screen } from "@/components";

@@ -1,8 +1,8 @@
-import { Suspense, useContext, useMemo, useRef } from "react";
+import { Html, useTexture, useVideoTexture } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { Html, useVideoTexture, useTexture } from "@react-three/drei";
-import { Group, TextureLoader } from "three";
+import { Suspense, useContext, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { Group, TextureLoader } from "three";
 import { useMediaQuery } from "usehooks-ts";
 
 import { RoomContext } from "@/providers/room";
@@ -10,8 +10,8 @@ import { ServerContext } from "@/providers/server";
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
 
-import world from "@/static/world.svg";
 import { useMemoArr } from "@/hooks/memo";
+import world from "@/static/world.svg";
 
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     // computing stats only takes ~10ms, but we don't want that to happen

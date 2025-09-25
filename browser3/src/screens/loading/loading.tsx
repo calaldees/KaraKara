@@ -1,8 +1,8 @@
+import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
 import { useParams } from "react-router-dom";
-import { faRotate } from "@fortawesome/free-solid-svg-icons";
 
-import { Screen, FontAwesomeIcon } from "@/components";
+import { FontAwesomeIcon, Screen } from "@/components";
 import { ServerContext } from "@/providers/server";
 import { percent } from "@/utils";
 

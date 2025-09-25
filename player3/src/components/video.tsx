@@ -1,4 +1,4 @@
-import type { Track, Attachment } from "@/types";
+import type { Attachment, Track } from "@/types";
 import { attachment_path } from "@/utils";
 
 export function Video({

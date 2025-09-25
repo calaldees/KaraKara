@@ -1,4 +1,4 @@
-import type { Track, QueueItem, Attachment } from "./types";
+import type { Attachment, QueueItem, Track } from "./types";
 
 export function dict2css(d: Record<string, any>) {
     return Object.entries(d)

@@ -1,16 +1,16 @@
-import { useContext, useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
 import {
     faCircleChevronLeft,
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { Screen, FontAwesomeIcon } from "@/components";
-import { ClientContext } from "@/providers/client";
-import { ServerContext } from "@/providers/server";
-import { RoomContext } from "@/providers/room";
+import { FontAwesomeIcon, Screen } from "@/components";
 import { useApi } from "@/hooks/api";
-import { Track, Subtitle } from "@/types";
+import { ClientContext } from "@/providers/client";
+import { RoomContext } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
+import { Subtitle, Track } from "@/types";
 import { attachment_path } from "@/utils";
 
 import "./track.scss";

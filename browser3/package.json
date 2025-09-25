@@ -42,6 +42,7 @@
         "eslint-plugin-react-x": "^1.53.1",
         "globals": "^16.4.0",
         "prettier": "^3.5.3",
+        "prettier-plugin-organize-imports": "^4.3.0",
         "sass-embedded": "^1.85.1",
         "typescript": "^5.8.2",
         "typescript-eslint": "^8.24.1",
@@ -50,6 +51,9 @@
     },
     "prettier": {
         "tabWidth": 4,
-        "trailingComma": "all"
+        "trailingComma": "all",
+        "plugins": [
+            "prettier-plugin-organize-imports"
+        ]
     }
 }

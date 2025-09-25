@@ -1,19 +1,19 @@
-import { useContext, useEffect, useState } from "react";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useContext, useEffect, useState } from "react";
 
-import { BackToExplore, Thumb, Screen, FontAwesomeIcon } from "@/components";
-import { ServerContext } from "@/providers/server";
+import { BackToExplore, FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import { useApi } from "@/hooks/api";
-import type { Track, QueueItem, Subtitle } from "@/types";
+import { ServerContext } from "@/providers/server";
+import type { QueueItem, Subtitle, Track } from "@/types";
 import {
-    shuffle,
-    is_my_song,
-    time_until,
-    dict2css,
     attachment_path,
+    dict2css,
+    is_my_song,
+    shuffle,
+    time_until,
 } from "@/utils";
 
 import "./queue.scss";

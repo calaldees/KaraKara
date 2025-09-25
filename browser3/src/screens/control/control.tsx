@@ -1,23 +1,23 @@
-import { useContext, useState } from "react";
-import { useParams } from "react-router-dom";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import {
-    faGripVertical,
     faBackward,
+    faCircleXmark,
     faForward,
+    faForwardStep,
+    faGripVertical,
     faPlay,
     faStop,
-    faForwardStep,
-    faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useContext, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import { BackToExplore, Thumb, Screen, FontAwesomeIcon } from "@/components";
-import { dict2css, time_until } from "@/utils";
+import { BackToExplore, FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-import { useApi } from "@/hooks/api";
 import type { QueueItem } from "@/types";
+import { dict2css, time_until } from "@/utils";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks } = useContext(ServerContext);

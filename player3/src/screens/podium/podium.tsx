@@ -1,10 +1,10 @@
-import { useCallback, useContext, useState } from "react";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
+import { useCallback, useContext, useState } from "react";
 
 import { Video } from "@/components/video";
-import { RoomContext } from "@/providers/room";
 import { useApi } from "@/hooks/api";
-import type { Track, QueueItem } from "@/types";
+import { RoomContext } from "@/providers/room";
+import type { QueueItem, Track } from "@/types";
 import { percent, s_to_mns } from "@/utils";
 
 import "./podium.scss";

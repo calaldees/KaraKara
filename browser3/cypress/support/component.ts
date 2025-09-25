@@ -19,18 +19,17 @@ import "./commands";
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from "cypress/react";
-import { MountOptions, MountReturn } from "cypress/react";
-import { useState, createElement } from "react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import {
     ServerTimeContext,
     ServerTimeContextType,
 } from "@shish2k/react-use-servertime";
+import { mount, MountOptions, MountReturn } from "cypress/react";
+import { createElement, useState } from "react";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-import tracks from "../../cypress/fixtures/small_tracks.json";
 import queue from "../../cypress/fixtures/small_queue.json";
 import settings from "../../cypress/fixtures/small_settings.json";
+import tracks from "../../cypress/fixtures/small_tracks.json";
 
 import { ClientContext, ClientContextType } from "../../src/providers/client";
 import { RoomContext, RoomContextType } from "../../src/providers/room";
@@ -38,9 +37,9 @@ import { ServerContext, ServerContextType } from "../../src/providers/server";
 
 import type { QueueItem } from "../../src/types";
 
-import "../../src/static/vars.scss";
-import "../../src/static/layout.scss";
 import "../../src/static/forms.scss";
+import "../../src/static/layout.scss";
+import "../../src/static/vars.scss";
 
 // Cypress.Commands.add('mount', mount)
 

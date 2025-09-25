@@ -1,7 +1,7 @@
-import { describe, expect, test } from "vitest";
-import * as utils from "../utils";
 import * as fs from "fs";
+import { describe, expect, test } from "vitest";
 import type { QueueItem } from "../types";
+import * as utils from "../utils";
 
 const track_dict = JSON.parse(
     fs.readFileSync("./cypress/fixtures/small_tracks.json", "utf8"),

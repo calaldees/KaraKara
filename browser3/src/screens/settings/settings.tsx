@@ -1,8 +1,8 @@
-import { useContext, useState, useCallback } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { BackToExplore, Screen } from "@/components";
-import { RoomContext } from "@/providers/room";
 import { useApi } from "@/hooks/api";
+import { RoomContext } from "@/providers/room";
 import { copy_type } from "@/utils";
 
 function removeTypes(
