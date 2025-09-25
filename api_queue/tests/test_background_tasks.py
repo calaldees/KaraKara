@@ -4,7 +4,6 @@ from unittest.mock import AsyncMock
 from pathlib import Path
 
 import pytest
-import sanic
 
 from api_queue.api_types import App
 from api_queue.background_tasks import _background_tracks_update_event

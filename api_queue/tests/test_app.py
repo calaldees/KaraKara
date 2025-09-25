@@ -1,14 +1,14 @@
-import sanic
 import pytest
 import collections.abc
 import datetime
 import typing as t
 
 import ujson as json
+from api_queue.api_types import App
 
 
 class APIQueue:
-    def __init__(self, app: sanic.Sanic, queue: str):
+    def __init__(self, app: App, queue: str):
         self.app = app
         self._queue = queue
         del self.session_id
@@ -70,18 +70,18 @@ class APIQueue:
 
 
 @pytest.fixture
-def api_queue(app: sanic.Sanic):
+def api_queue(app: App):
     return APIQueue(app, "test")
 
 
 @pytest.mark.asyncio
-async def test_root(app: sanic.Sanic):  # mock_redis,
+async def test_root(app: App):  # mock_redis,
     request, response = await app.asgi_client.get("/")
     assert response.status == 302
 
 
 @pytest.mark.asyncio
-async def test_queue_invalid_name(app: sanic.Sanic):
+async def test_queue_invalid_name(app: App):
     request, response = await app.asgi_client.get("/room/キ/queue.json")
     assert response.status == 404
     request, response = await app.asgi_client.get("/room/ /queue.json")
