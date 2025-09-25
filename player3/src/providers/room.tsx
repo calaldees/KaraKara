@@ -2,7 +2,6 @@ import { useSubscription } from "@shish2k/react-mqtt";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useLocalStorage } from "usehooks-ts";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
@@ -12,7 +11,6 @@ import { ClientContext } from "./client";
 
 export interface RoomContextType {
     isAdmin: boolean;
-    sessionId: string;
     queue: QueueItem[];
     settings: Record<string, any>;
 }
@@ -27,7 +25,6 @@ export function RoomProvider(props: any) {
     const { roomPassword } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [sessionId, setSessionId] = useLocalStorage<string>("session_id", "");
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request } = useApi();
@@ -67,16 +64,14 @@ export function RoomProvider(props: any) {
             },
             onAction: (response) => {
                 setIsAdmin(response.is_admin);
-                setSessionId(response.session_id);
             },
         });
-    }, [roomName, roomPassword, request, setSessionId]);
+    }, [roomName, roomPassword, request]);
 
     // This component re-renders every time "now" changes, but
     // we don't want that to cause re-renders in the consumers
     const ctxVal: RoomContextType = useMemoObj({
         isAdmin,
-        sessionId,
         queue,
         settings,
     });
