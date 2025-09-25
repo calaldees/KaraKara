@@ -44,6 +44,7 @@
         "prettier": "^3.5.3",
         "prettier-plugin-organize-imports": "^4.3.0",
         "sass-embedded": "^1.85.1",
+        "sonda": "^0.9.0",
         "typescript": "^5.8.2",
         "typescript-eslint": "^8.24.1",
         "vite": "^7.1.7",

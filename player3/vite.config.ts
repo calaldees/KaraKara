@@ -1,4 +1,5 @@
 import react from "@vitejs/plugin-react-swc";
+import Sonda from "sonda/vite";
 import { defineConfig } from "vite";
 
 // https://vite.dev/config/
@@ -12,6 +13,7 @@ export default defineConfig({
         // Initial load time doesn't matter for Player, loading
         // everything up-front for stability is more important.
         chunkSizeWarningLimit: 2000,
+        sourcemap: true,
     },
     server: {
         proxy: {
@@ -30,5 +32,5 @@ export default defineConfig({
             },
         },
     },
-    plugins: [react()],
+    plugins: [react(), Sonda()],
 });

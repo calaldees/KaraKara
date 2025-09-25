@@ -1,4 +1,5 @@
 import react from "@vitejs/plugin-react-swc";
+import Sonda from "sonda/vite";
 import { defineConfig } from "vite";
 // import { VitePWA } from "vite-plugin-pwa";
 
@@ -11,6 +12,7 @@ export default defineConfig({
     },
     build: {
         target: ["es2015", "ios11"],
+        sourcemap: true,
     },
     server: {
         proxy: {
@@ -31,6 +33,7 @@ export default defineConfig({
     },
     plugins: [
         react(),
+        Sonda(),
         /*
         VitePWA({
             injectRegister: null,
