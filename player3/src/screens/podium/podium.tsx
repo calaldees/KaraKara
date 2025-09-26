@@ -5,7 +5,7 @@ import { Video } from "@/components/video";
 import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
 import type { QueueItem, Subtitle, Track } from "@/types";
-import { attachment_path, percent, s_to_mns } from "@/utils";
+import { attachment_path, percent, s_to_mns, parse_duration } from "@/utils";
 
 import "./podium.scss";
 
@@ -116,7 +116,7 @@ export function PodiumScreen({
                         style={{
                             backgroundPosition: percent(
                                 queue_item.start_time - now,
-                                settings["track_space"],
+                                parse_duration(settings["track_space"]),
                             ),
                         }}
                     >

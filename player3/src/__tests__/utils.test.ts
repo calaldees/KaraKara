@@ -65,3 +65,18 @@ describe("add_dot_dot_dots", () => {
         ]);
     });
 });
+
+describe("parse_duration", () => {
+    test("number", () => {
+        expect(utils.parse_duration(123)).toEqual(123);
+    });
+    test("seconds only", () => {
+        expect(utils.parse_duration("PT45S")).toEqual(45);
+    });
+    test("minutes and seconds", () => {
+        expect(utils.parse_duration("PT2M30S")).toEqual(150);
+    });
+    test("minutes only", () => {
+        expect(utils.parse_duration("PT2M")).toEqual(120);
+    });
+});

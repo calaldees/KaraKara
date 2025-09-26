@@ -1,5 +1,5 @@
 {
-    "track_space": 30,
+    "track_space": "PT30S",
     "hidden_tags": ["category:cartoon", "red"],
     "forced_tags": [],
     "title": "KaraKara",

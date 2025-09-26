@@ -23,6 +23,7 @@
         "react-router-dom": "^7.6.0",
         "react-screen-wake-lock": "^3.0.4",
         "three": "^0.180.0",
+        "tinyduration": "^3.4.1",
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
