@@ -119,7 +119,12 @@ app.error_handler = CustomErrorHandler()
 
 @app.on_request
 async def attach_session_id_request(request: Request):
-    request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
+    # if user doesn't have a session, or is using the legacy
+    # "admin" session, give them a new random one.
+    sess_cook = request.cookies.get("session_id")
+    if sess_cook is None or sess_cook == "admin":
+        sess_cook = str(uuid.uuid4())
+    request.ctx.session_id = sess_cook
 
 
 @app.on_response
