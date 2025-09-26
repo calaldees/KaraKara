@@ -119,18 +119,13 @@ app.error_handler = CustomErrorHandler()
 
 @app.on_request
 async def attach_session_id_request(request: Request):
-    # if user doesn't have a session, or is using the legacy
-    # "admin" session, give them a new random one.
-    sess_cook = request.cookies.get("session_id")
-    if sess_cook is None or sess_cook == "admin":
-        sess_cook = str(uuid.uuid4())
-    request.ctx.session_id = sess_cook
+    request.ctx.session_id = request.cookies.get("kksid") or str(uuid.uuid4())
 
 
 @app.on_response
 async def attach_session_id(request: Request, response: sanic.HTTPResponse):
-    if request.cookies.get("session_id") != request.ctx.session_id:
-        response.cookies.add_cookie("session_id", request.ctx.session_id, secure=False, samesite=None)
+    if request.cookies.get("kksid") != request.ctx.session_id:
+        response.cookies.add_cookie("kksid", request.ctx.session_id, secure=False, samesite=None)
 
 
 @contextlib.asynccontextmanager

@@ -210,7 +210,7 @@ async def test_queue_delete(api_queue: APIQueue, mock_mqtt):
     assert queue[0]["track_id"] == "Animaniacs_OP"
 
     # user can't delete other people's tracks
-    api_queue.app.asgi_client.cookies.delete("session_id")
+    api_queue.app.asgi_client.cookies.delete("kksid")
     response = await api_queue.delete(queue_item_id=queue[0]["id"])
     assert response.status == 403
 
