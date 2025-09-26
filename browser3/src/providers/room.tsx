@@ -31,6 +31,7 @@ export function RoomProvider(props: any) {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
@@ -82,9 +83,7 @@ export function RoomProvider(props: any) {
             function: "login",
             options: {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     password: roomPassword,
                     create: roomPassword !== "",
@@ -92,6 +91,7 @@ export function RoomProvider(props: any) {
             },
             onAction: (response) => {
                 setIsAdmin(response.is_admin);
+                setIsLoggedIn(true);
             },
             onException: () => {
                 // request() function will already have shown an error,
@@ -102,6 +102,7 @@ export function RoomProvider(props: any) {
     }, [roomName, roomPassword, request, navigate]);
 
     useEffect(() => {
+        if (!isLoggedIn) return;
         const an = {
             event: "open_room",
             dev: process.env.NODE_ENV === "development" ? true : false,
@@ -116,7 +117,7 @@ export function RoomProvider(props: any) {
                 body: JSON.stringify(an),
             },
         });
-    }, [request, roomName, isAdmin]);
+    }, [request, roomName, isAdmin, isLoggedIn]);
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,
