@@ -72,3 +72,10 @@ curl -X PUT --cookie "session_id=admin" https://karakara.uk/room/test/settings.j
 curl -X GET --cookie "session_id=admin" http://localhost:8000/room/test/command/play.json
 curl -X GET --cookie "session_id=admin" http://localhost:8000/room/test/command/stop/json
 ```
+
+
+utils
+-----
+```
+docker compose exec api_queue ./analytics.py
+```

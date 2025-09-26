@@ -13,6 +13,7 @@ FROM python_dependencies AS python_dependencies_test
 
 FROM python_dependencies AS code
     COPY ./api_queue ./api_queue
+    COPY ./*.py ./
 
 FROM code AS test
     COPY --from=python_dependencies_test /site-packages /site-packages

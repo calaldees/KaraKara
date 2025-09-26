@@ -13,6 +13,7 @@ dependencies = [
 	"dateparser ~= 1.2",
 	"setuptools ~= 80.9",
 	"pydantic ~= 2.11",  # To be replaced with msgspec?
+	"ua_parser ~= 1.0.1",
 ]
 
 [project.optional-dependencies]
