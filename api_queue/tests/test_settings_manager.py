@@ -73,6 +73,15 @@ def test_settings_custom_json():
     assert qs.track_space.total_seconds() == 60
 
 
+def test_settings_custom_iso_duration():
+    # ISO duration string for track_space
+    qs = QueueSettings(
+        title="Custom Room",
+        track_space="PT2M30S",  # pyright: ignore[reportArgumentType]
+    )
+    assert qs.track_space.total_seconds() == 150
+
+
 def test_settings_datetime_timezones():
     # datetimes with custom timezone should be converted to UTC
     # datetime without timezone should be assumed as UTC
