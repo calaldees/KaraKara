@@ -6,7 +6,7 @@ FROM python:3.13-alpine AS base
 
 FROM base AS python_dependencies
     COPY ./pyproject.toml ./
-    RUN pip install --no-cache-dir -e . -t /site-packages
+    RUN pip install --no-cache-dir -e '.[analytics]' -t /site-packages
     ENV PYTHONPATH=/site-packages
 FROM python_dependencies AS python_dependencies_test
     RUN pip install --no-cache-dir -e '.[test]' -t /site-packages

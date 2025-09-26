@@ -13,7 +13,6 @@ dependencies = [
 	"dateparser ~= 1.2",
 	"setuptools ~= 80.9",
 	"pydantic ~= 2.11",  # To be replaced with msgspec?
-	"ua_parser ~= 1.0.1",
 ]
 
 [project.optional-dependencies]
@@ -25,6 +24,10 @@ test = [
 	"sanic-testing ~= 24.6",
 	"types-ujson ~= 5.10",
 	"types-dateparser ~= 1.2",
+]
+analytics = [
+    "ua_parser ~= 1.0.1",
+	"tqdm ~= 4.67",
 ]
 
 [tool.mypy]
