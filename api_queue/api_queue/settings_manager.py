@@ -4,7 +4,6 @@ from pathlib import Path
 
 import annotated_types
 import pydantic
-import ujson as json
 
 from .type_parsers import parse_datetime, parse_timedelta
 
@@ -15,7 +14,7 @@ type Tag = str
 #    METALGHOSTS = enum.auto()
 
 
-Timedelta = t.Annotated[
+TimeDelta = t.Annotated[
     datetime.timedelta,
     pydantic.PlainValidator(parse_timedelta, json_schema_input_type=int | float | str),
     pydantic.PlainSerializer(lambda td: td.total_seconds() if td else None, return_type=int),
@@ -30,7 +29,7 @@ OptionalDatetime = t.Annotated[
 
 
 class QueueSettings(pydantic.BaseModel):
-    track_space: Timedelta = datetime.timedelta(seconds=15)
+    track_space: TimeDelta = datetime.timedelta(seconds=15)
     hidden_tags: t.Sequence[Tag] = ("red:duplicate",)
     forced_tags: t.Sequence[Tag] = ()
     title: str = "KaraKara"
@@ -62,5 +61,5 @@ class SettingsManager:
     def get(self, name: str) -> QueueSettings:
         path = self.path.joinpath(f"{name}_settings.json")
         if path.is_file():
-            return QueueSettings(**json.loads(path.read_text()))
+            return QueueSettings.model_validate_json(path.read_text())
         return QueueSettings()

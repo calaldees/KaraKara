@@ -13,10 +13,8 @@ type QueueName = str
 
 
 class QueueManager:
-    def __init__(self, *args, settings: SettingsManager, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, settings: SettingsManager):
         self.settings = settings
-        assert isinstance(settings, SettingsManager)
 
     @contextlib.contextmanager
     def _queue_modify_context(self, name: QueueName, filehandle: io.TextIOBase):
@@ -33,10 +31,6 @@ class QueueManager:
             writer.writeheader()
             for i in queue.items:
                 writer.writerow(i.model_dump(mode="json"))
-
-    # @abstractmethod
-    # def queue_names(self, newer_than_timestamp:float = 0) -> list[str]:
-    #    ...
 
 
 class QueueManagerCSV(QueueManager):
@@ -77,13 +71,3 @@ class QueueManagerCSVAsync(QueueManagerCSV):
         async with self.queue_async_locks[name]:
             with self.queue_modify_context(name) as queue:
                 yield queue
-
-
-class QueueManagerStringIO(QueueManager):
-    @contextlib.contextmanager
-    def queue_modify_context(self, name: QueueName):
-        filehandle = io.StringIO()
-        with self._queue_modify_context(name, filehandle) as queue:
-            yield queue
-        print("StringIO")
-        print(filehandle.getvalue())

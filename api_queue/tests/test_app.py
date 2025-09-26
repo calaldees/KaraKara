@@ -75,7 +75,7 @@ async def api_queue(app: App):
 
 
 @pytest.mark.asyncio
-async def test_root(app: App):  # mock_redis,
+async def test_root(app: App):
     request, response = await app.asgi_client.get("/")
     assert response.status == 302
 

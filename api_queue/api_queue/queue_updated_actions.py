@@ -81,16 +81,16 @@ def _rank(queue: Queue, queue_item: QueueItem) -> float:
     Duration of sung songs (decayed with time ago)
     """
 
-    def _minuets(t: datetime.timedelta) -> float:
+    def _minutes(t: datetime.timedelta) -> float:
         return t.total_seconds() / 60
 
-    def _minuets_ago(d: datetime.datetime) -> float:
-        return _minuets(queue.now - d)
+    def _minutes_ago(d: datetime.datetime) -> float:
+        return _minutes(queue.now - d)
 
     def _hours_ago(d: datetime.datetime) -> float:
-        return _minuets_ago(d) / 60
+        return _minutes_ago(d) / 60
 
-    added_minuets_ago = _minuets_ago(queue_item.added_time)
+    added_minutes_ago = _minutes_ago(queue_item.added_time)
 
     queued_by_this_performer: t.Sequence[QueueItem] = tuple(
         filter(
@@ -105,19 +105,19 @@ def _rank(queue: Queue, queue_item: QueueItem) -> float:
         if i.start_time:
             # the start_time could be hypothetical (e.g: it has not been sung, but is scheduled/estimated to be start_time)
             sang_hours_ago = _hours_ago(i.start_time)
-            # if you sang a single 4 minuet song 1 hour ago
-            # added_minuets_ago will rise linearly with time while this rank decays with time
+            # if you sang a single 4 minute song 1 hour ago
+            # added_minutes_ago will rise linearly with time while this rank decays with time
             # for a 20min since the last sang track = ((1/0.35) * 4min * 5) = 57 is equivalent to 60min in the queue
-            return (1 / sang_hours_ago) * _minuets(i.track_duration) * 5
+            return (1 / sang_hours_ago) * _minutes(i.track_duration) * 5
         # need thought - it's in the queue, but has no start_time, so the queue is currently paused
         # the queue could be reordered, so we apply a static penalty
         # I don't even know if this is needed
-        return _minuets(i.track_duration) * 2
+        return _minutes(i.track_duration) * 2
 
     sang_ago_penalty = sum(map(_sang_ago_score, queued_by_this_performer))
 
-    # print(f'{queue_item.track_id=}: {sang_ago_penalty=} - {added_minuets_ago=}')
-    return sang_ago_penalty - added_minuets_ago
+    # print(f'{queue_item.track_id=}: {sang_ago_penalty=} - {added_minutes_ago=}')
+    return sang_ago_penalty - added_minutes_ago
 
 
 def reorder(queue: Queue):

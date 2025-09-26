@@ -5,7 +5,7 @@ from functools import reduce
 from itertools import pairwise
 import pydantic
 
-from .settings_manager import QueueSettings, Timedelta
+from .settings_manager import QueueSettings, TimeDelta
 
 
 class QueueItem(pydantic.BaseModel):
@@ -65,7 +65,7 @@ class QueueItem(pydantic.BaseModel):
         return v.timestamp() if v else None
 
     track_id: str
-    track_duration: Timedelta
+    track_duration: TimeDelta
     session_id: str
     performer_name: str
     start_time: datetime.datetime | None = None
@@ -180,9 +180,8 @@ class Queue:
         assert index1 is not None
         assert queue_item is not None
         del self.items[index1]
-        index2, _ = (
-            self.get(id2) if id2 != -1 else (len(self.items), None)
-        )  # id's are positive. `-1` is a special sentinel value for end of list
+        # id's are positive. `-1` is a special sentinel value for end of list
+        index2, _ = self.get(id2) if id2 != -1 else (len(self.items), None)
         assert index2 is not None
         queue_item.start_time = None
         self.items.insert(index2, queue_item)

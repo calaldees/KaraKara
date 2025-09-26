@@ -43,10 +43,6 @@ app.config.update(
 app.ext.openapi.describe(
     "KaraKara Queue API",
     version="0.0.0",
-    description=dedent(
-        """
-    """
-    ),  # TODO: Markdown
 )
 
 app.config.FALLBACK_ERROR_FORMAT = "json"

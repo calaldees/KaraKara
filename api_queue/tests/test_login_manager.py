@@ -1,5 +1,4 @@
 from pathlib import Path
-import datetime
 
 from api_queue.login_manager import LoginManager
 
@@ -11,19 +10,19 @@ def test_login_manager(tmp_path: Path):
     user = lm.load("test_room", "my_session_id")
     assert user.is_admin is False
 
-    # login with wrong password is still user
+    # login with wrong password -> still user
     user = lm.login("test_room", "my_session_id", "password123")
     assert user.is_admin is False
 
-    # login with correct password is admin
+    # login with correct password -> become admin
     user = lm.login("test_room", "my_session_id", "test_room")
     assert user.is_admin is True
 
-    # further request from the same session are admin
+    # further request from the same session are still admin
     user = lm.load("test_room", "my_session_id")
     assert user.is_admin is True
 
-    # login with wrong password downgrades to user
+    # login with wrong password -> downgrades to user
     user = lm.login("test_room", "my_session_id", "")
     assert user.is_admin is False
 
