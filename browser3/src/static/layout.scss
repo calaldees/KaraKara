@@ -152,30 +152,19 @@ MAIN {
         flex: 0 0 auto;
         display: flex;
         flex-flow: column;
+        gap: 0.5em;
         border-top: 1px solid var(--header-border);
         background-color: var(--header-bg);
-        padding-top: 0.3em;
-
-        & > * {
-            margin-top: 0.3em;
-            margin-bottom: 0.3em;
-        }
+        padding-top: 0.5em;
 
         .buttons {
             display: flex;
             flex-flow: row;
+            gap: 0.5em;
             justify-content: space-between;
 
             & > * {
                 flex: 1 0;
-                margin-left: 0.3em;
-                margin-right: 0.3em;
-                &:first-child {
-                    margin-left: 0;
-                }
-                &:last-child {
-                    margin-right: 0;
-                }
             }
         }
     }
@@ -272,9 +261,9 @@ MAIN {
         padding-top: env(safe-area-inset-top);
     }
     ARTICLE:last-child {
-        padding-bottom: max(0.3em, env(safe-area-inset-bottom));
+        padding-bottom: max(0.5em, env(safe-area-inset-bottom));
     }
     FOOTER {
-        padding-bottom: max(0.3em, env(safe-area-inset-bottom));
+        padding-bottom: max(0.5em, env(safe-area-inset-bottom));
     }
 }
