@@ -1,49 +1,10 @@
-import type { Attachment, QueueItem, Track } from "./types";
+import { QueueItem, Track } from "@/types";
 
 export function dict2css(d: Record<string, any>) {
     return Object.entries(d)
         .filter(([_, v]) => v)
         .map(([k, _]) => k)
         .join(" ");
-}
-
-/**
- * turn seconds into {MM}:{SS}
- */
-export function s_to_mns(t: number): string {
-    return (
-        Math.floor(t / 60) + ":" + (Math.floor(t % 60) + "").padStart(2, "0")
-    );
-}
-
-/**
- * Looking at an Attachment, get the full URL
- *
- * eg attachment_path(attachment) -> /files/asdfasdfa.mp4
- */
-export function attachment_path(attachment: Attachment): string {
-    return "/files/" + attachment.path;
-}
-
-/**
- * turn timestamp into into "{X}min / {X}sec [in the future]"
- */
-export function time_until(now: number, time: number | null): string {
-    if (time === null) return "";
-
-    const seconds_total = Math.floor(time - now);
-    const seconds = seconds_total % 60;
-    const minutes = Math.floor(seconds_total / 60);
-    if (minutes > 1) {
-        return `In ${minutes} mins`;
-    }
-    if (minutes === 1) {
-        return `In ${minutes} min`;
-    }
-    if (seconds <= 0) {
-        return "Now";
-    }
-    return `In ${seconds} secs`;
 }
 
 /**
@@ -69,27 +30,6 @@ export function shuffle<T>(array: T[]): T[] {
     return array;
 }
 
-/**
- * Get the URL, username, and password to be passed to MQTTSubscribe or MQTTPublish
- */
-export function mqtt_url(): string {
-    const proto = window.location.protocol == "https:" ? "wss:" : "ws:";
-    return proto + "//" + window.location.host + "/mqtt";
-}
-
-/**
- * Turn an ISO8601 UTC datetime into the user's local time
- *
- * eg "2021-01-03T14:00:00" -> "14:00"
- */
-export function short_date(long_date: string): string {
-    const date = new Date(long_date);
-    return date.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-}
-
 export function is_my_song(
     session_id: string | null,
     performer_name: string,
@@ -101,34 +41,18 @@ export function is_my_song(
     );
 }
 
-export function percent(a: number, b: number): string {
-    return Math.round((a / b) * 100) + "%";
-}
-
-export function shortest_tag(n: string[] | undefined): string {
-    if (n === undefined) {
-        return "";
-    }
-    return n.sort((a, b) => (a.length > b.length ? 1 : -1))[0];
-}
-
 /*
-Given a tag set like
-
-  from:macross
-  macross:macross frontier
-
-we want last_tag("from") to get "macross frontier"
-*/
-export function last_tag(
-    tags: Record<string, string[]>,
-    start: string,
-): string {
-    let tag = start;
-    while (tags[tag]) {
-        tag = tags[tag][0];
+ * Given a string value from the settings form, check what data
+ * type the setting is now, and try to keep that type
+ */
+export function copy_type(original: any, value: any) {
+    if (Array.isArray(original)) {
+        return value.split(",").filter((x: any) => x);
+    } else if (typeof original == "number") {
+        return parseFloat(value);
+    } else {
+        return value;
     }
-    return tag;
 }
 
 /**
@@ -165,33 +89,6 @@ export function track_info(
         .map((x) => track_tags[x].join(", "));
     const info = info_data.join(" - ");
     return info;
-}
-
-/*
- * Given a string value from the settings form, check what data
- * type the setting is now, and try to keep that type
- */
-export function copy_type(original: any, value: any) {
-    if (Array.isArray(original)) {
-        return value.split(",").filter((x: any) => x);
-    } else if (typeof original == "number") {
-        return parseFloat(value);
-    } else {
-        return value;
-    }
-}
-
-/*
- * Given a list of all tracks in the queue, find which ones are in-progress
- * now or queued for the future
- */
-export function current_and_future(
-    now: number,
-    tracks: QueueItem[],
-): QueueItem[] {
-    return tracks.filter(
-        (t) => t.start_time == null || t.start_time + t.track_duration > now,
-    );
 }
 
 /*

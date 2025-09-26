@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import { describe, expect, test } from "vitest";
-import * as grouper from "../track_grouper";
-import type { Track } from "../types";
+
+import type { Track } from "@/types";
+
+import * as grouper from "./track_grouper";
 
 const track_dict = JSON.parse(
     fs.readFileSync("./cypress/fixtures/small_tracks.json", "utf8"),

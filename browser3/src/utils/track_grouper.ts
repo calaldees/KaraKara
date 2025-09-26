@@ -1,5 +1,5 @@
-import type { Track } from "./types";
-import { normalise_cmp, normalise_name } from "./utils";
+import type { Track } from "@/types";
+import { normalise_cmp, normalise_name } from "@/utils";
 
 interface TrackListSection {
     tracks?: Track[];

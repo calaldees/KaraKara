@@ -1,4 +1,4 @@
-import type { Track } from "./types";
+import type { Track } from "@/types";
 
 /**
  * If track has a 'hidden' tag, then skip it, UNLESS it also has

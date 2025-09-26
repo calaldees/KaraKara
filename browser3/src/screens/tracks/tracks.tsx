@@ -15,9 +15,9 @@ import { ClientContext } from "@/providers/client";
 import { ExploreContext, ExploreProvider } from "@/providers/explore";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-import { find_tracks } from "@/track_finder";
-import { group_tracks } from "@/track_grouper";
 import type { Track } from "@/types";
+import { find_tracks } from "@/utils/track_finder";
+import { group_tracks } from "@/utils/track_grouper";
 import { normalise_cmp, track_info } from "@/utils";
 
 import "./tracks.scss";

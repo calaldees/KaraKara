@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import { describe, expect, test } from "vitest";
-import * as finder from "../track_finder";
-import type { Track } from "../types";
+
+import type { Track } from "@/types";
+
+import * as finder from "./track_finder";
 
 const track_dict: Record<string, Track> = JSON.parse(
     fs.readFileSync("./cypress/fixtures/small_tracks.json", "utf8"),
