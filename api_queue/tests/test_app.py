@@ -13,12 +13,16 @@ class APIQueue:
         self._queue = queue
 
     async def login(self):
-        request, response = await self.app.asgi_client.post(f"/room/{self._queue}/login.json", data=json.dumps(dict(password=self._queue, create=True)))
+        request, response = await self.app.asgi_client.post(
+            f"/room/{self._queue}/login.json", data=json.dumps(dict(password=self._queue, create=True))
+        )
         assert response.status == 200
         assert response.json["is_admin"] is True
 
     async def logout(self):
-        request, response = await self.app.asgi_client.post(f"/room/{self._queue}/login.json", data=json.dumps(dict(password="")))
+        request, response = await self.app.asgi_client.post(
+            f"/room/{self._queue}/login.json", data=json.dumps(dict(password=""))
+        )
         assert response.status == 200
         assert response.json["is_admin"] is False
 

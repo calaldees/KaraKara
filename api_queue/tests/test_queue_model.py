@@ -9,6 +9,12 @@ from api_queue.settings_manager import QueueSettings
 ONE_MINUTE = datetime.timedelta(seconds=60)
 
 
+def qi(name: str, duration: datetime.timedelta, session: str, performer: str, **kwargs) -> QueueItem:
+    return QueueItem.model_validate(
+        {"track_id": name, "track_duration": duration, "session_id": session, "performer_name": performer} | kwargs
+    )
+
+
 @pytest.fixture
 def qu() -> Queue:
     qu = Queue([], settings=QueueSettings(track_space=datetime.timedelta(seconds=10)))
@@ -22,20 +28,20 @@ def test_queue_empty(qu: Queue):
 
 
 def test_queue_add_tracks(qu: Queue):
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
     assert [i.track_id for i in qu.items] == ["Track1"]
     assert qu.current
     assert qu.current.track_id == "Track1"
     assert not qu.current.start_time
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
     assert [i.track_id for i in qu.items] == ["Track1", "Track2"]
     assert qu.current.track_id == "Track1"
 
 
 def test_queue_time_moves_forwards(qu: Queue):
     assert qu._now
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
 
     # Playing state when moving time forward
     qu.play(immediate=False)  # play queues a track to start in 1s
@@ -57,8 +63,8 @@ def test_queue_time_moves_forwards(qu: Queue):
 
 def test_queue_past_future(qu: Queue):
     assert qu._now
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=150)
 
@@ -76,13 +82,13 @@ def test_queue_past_future(qu: Queue):
 
 def test_queue_append(qu: Queue):
     assert qu._now
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=150)
     # Adding + Deleting + Future + current tracks work after played past tracks
-    qu.add(QueueItem("Track3", ONE_MINUTE, "TestSession3", "test_name"))
-    qu.add(QueueItem("Track4", ONE_MINUTE, "TestSession4", "test_name"))
+    qu.add(qi("Track3", ONE_MINUTE, "TestSession3", "test_name"))
+    qu.add(qi("Track4", ONE_MINUTE, "TestSession4", "test_name"))
     assert not qu.playing
     assert qu.current
     assert qu.current.track_id == "Track3"
@@ -93,18 +99,10 @@ def test_queue_append(qu: Queue):
     assert qu.current.track_id == "Track4"
 
 
-def test_queue_play_one(qu: Queue):
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
-    qu.play_one(immediate=True)
-    assert qu.items[0].start_time
-    assert not qu.items[1].start_time
-
-
 def test_queue_delete_playing_item_stops_playback(qu: Queue):
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
-    qu.add(QueueItem("Track3", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track3", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=True)
     assert qu.playing
     assert qu.last
@@ -116,9 +114,9 @@ def test_queue_delete_playing_item_stops_playback(qu: Queue):
 
 
 def test_queue_delete_scheduled_playing_item_stops_playback(qu: Queue):
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
-    qu.add(QueueItem("Track3", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track3", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=False)  # queue to start playing in 1 second time
     assert not qu.playing
     assert qu.items[0].start_time, "all items should have start_time"
@@ -129,7 +127,7 @@ def test_queue_delete_scheduled_playing_item_stops_playback(qu: Queue):
 
 def test_queue_append_while_playing_populates_start_time(qu: Queue):
     assert qu._now
-    qu.add(QueueItem("Track4", ONE_MINUTE, "TestSession4", "test_name"))
+    qu.add(qi("Track4", ONE_MINUTE, "TestSession4", "test_name"))
     qu._now += datetime.timedelta(seconds=30)
     assert not qu.playing
     assert qu.current
@@ -139,7 +137,7 @@ def test_queue_append_while_playing_populates_start_time(qu: Queue):
     assert qu.playing.track_id == "Track4"
     qu._now += datetime.timedelta(seconds=30)
     assert qu.playing.track_id == "Track4"
-    qu.add(QueueItem("Track5", ONE_MINUTE, "TestSession5", "test_name"))
+    qu.add(qi("Track5", ONE_MINUTE, "TestSession5", "test_name"))
     assert qu.last
     assert qu.last.track_id == "Track5"
     assert qu.last.start_time
@@ -152,8 +150,8 @@ def test_queue_append_while_playing_populates_start_time(qu: Queue):
 
 def test_queue_stop(qu: Queue):
     assert qu._now
-    qu.add(QueueItem("Track6", ONE_MINUTE, "TestSession6", "test_name"))
-    qu.add(QueueItem("Track7", ONE_MINUTE, "TestSession7", "test_name"))
+    qu.add(qi("Track6", ONE_MINUTE, "TestSession6", "test_name"))
+    qu.add(qi("Track7", ONE_MINUTE, "TestSession7", "test_name"))
     assert not qu.playing
     qu._now += datetime.timedelta(seconds=60)
     assert not qu.playing
@@ -181,19 +179,19 @@ def test_queue_stop(qu: Queue):
 
 def test_queue_end_time(qu: Queue):
     assert qu._now
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=True)
     qu._now += datetime.timedelta(seconds=150)
     assert qu.end_time == qu.last.end_time  # type: ignore
-    qu.add(QueueItem("Track3", ONE_MINUTE, "TestSession3", "test_name"))
-    qu.add(QueueItem("Track4", ONE_MINUTE, "TestSession4", "test_name"))
+    qu.add(qi("Track3", ONE_MINUTE, "TestSession3", "test_name"))
+    qu.add(qi("Track4", ONE_MINUTE, "TestSession4", "test_name"))
     assert qu.end_time == qu.now + (datetime.timedelta(seconds=60) * 2) + (qu.track_space * 2)
 
 
 def test_queue_seek_forwards(qu: Queue):
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=True)
     assert qu.items[0].start_time == qu.now
     assert qu.items[1].start_time == qu.now + datetime.timedelta(seconds=60) + qu.track_space
@@ -216,8 +214,8 @@ def test_queue_seek_forwards(qu: Queue):
 
 
 def test_queue_seek_backwards(qu: Queue):
-    qu.add(QueueItem("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    qu.add(QueueItem("Track2", ONE_MINUTE, "TestSession2", "test_name"))
+    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
+    qu.add(qi("Track2", ONE_MINUTE, "TestSession2", "test_name"))
     qu.play(immediate=True)
     # Starting from the middle of space between tracks
     qu._now += datetime.timedelta(seconds=60) + qu.track_space / 2  # type: ignore
@@ -245,7 +243,7 @@ def test_queue_seek_backwards(qu: Queue):
 
 def test_queue_get(qu: Queue):
     # .get(id)
-    track10 = QueueItem("Track10", ONE_MINUTE, "TestSession10", "test_name")
+    track10 = qi("Track10", ONE_MINUTE, "TestSession10", "test_name")
     qu.add(track10)
     index, queue_item = qu.get(track10.id)
     assert queue_item
@@ -254,10 +252,10 @@ def test_queue_get(qu: Queue):
 
 def test_queue_move(qu: Queue):
     assert qu._now
-    t1 = QueueItem("Track11", ONE_MINUTE, "TestSession11", "test_name")
-    t2 = QueueItem("Track12", ONE_MINUTE, "TestSession12", "test_name")
-    t3 = QueueItem("Track13", ONE_MINUTE, "TestSession13", "test_name")
-    t4 = QueueItem("Track14", ONE_MINUTE, "TestSession14", "test_name")
+    t1 = qi("Track11", ONE_MINUTE, "TestSession11", "test_name")
+    t2 = qi("Track12", ONE_MINUTE, "TestSession12", "test_name")
+    t3 = qi("Track13", ONE_MINUTE, "TestSession13", "test_name")
+    t4 = qi("Track14", ONE_MINUTE, "TestSession14", "test_name")
     qu.add(t1)
     qu.add(t2)
     qu.add(t3)

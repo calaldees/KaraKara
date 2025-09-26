@@ -216,6 +216,7 @@ class LoginRequest(pydantic.BaseModel):
     create: bool = False
     password: str
 
+
 @room_blueprint.post("/login.json")
 @validate(json=LoginRequest)
 @openapi.definition(
@@ -378,7 +379,7 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
                     # for now, we require this exact string.
                     raise sanic.exceptions.InvalidUsage(message="queue validation failed", context={"exc": str(ex)})
                     # TODO: validation error properly!
-            return sanic.response.json(queue_item.asdict())
+            return sanic.response.json(queue_item.model_dump(mode="json"))
 
 
 @room_blueprint.delete(r"/queue/<queue_item_id_str:(\d+).json>")
@@ -396,7 +397,7 @@ async def delete_queue_item(request: Request, room_name: str, queue_item_id_str:
             if queue_item.session_id != request.ctx.session_id and not user.is_admin:
                 raise sanic.exceptions.Forbidden(message="queue_item.session_id does not match session_id")
             queue.delete(queue_item_id)
-            return sanic.response.json(queue_item.asdict())
+            return sanic.response.json(queue_item.model_dump(mode="json"))
 
 
 class QueueItemMove(pydantic.BaseModel):

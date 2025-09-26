@@ -1,5 +1,4 @@
 import contextlib
-import dataclasses
 import csv
 from pathlib import Path
 import io
@@ -22,18 +21,18 @@ class QueueManager:
     @contextlib.contextmanager
     def _queue_modify_context(self, name: QueueName, filehandle: io.TextIOBase):
         queue = Queue(
-            [QueueItem(**row) for row in csv.DictReader(filehandle)],  # type: ignore[arg-type]
+            [QueueItem.model_validate(row) for row in csv.DictReader(filehandle)],
             self.settings.get(name),
         )
         yield queue
         if queue.modified:
             filehandle.seek(0)
             filehandle.truncate(0)
-            fields = tuple(field.name for field in dataclasses.fields(QueueItem))
+            fields = QueueItem.model_json_schema()["properties"].keys()
             writer = csv.DictWriter(filehandle, fields)
             writer.writeheader()
             for i in queue.items:
-                writer.writerow(i.asdict())
+                writer.writerow(i.model_dump(mode="json"))
 
     # @abstractmethod
     # def queue_names(self, newer_than_timestamp:float = 0) -> list[str]:
@@ -54,7 +53,10 @@ class QueueManagerCSV(QueueManager):
             self.path_csv(name).open("r", encoding="utf8") if self.path_csv(name).is_file() else io.StringIO("")
         )
         with file_context as filehandle:
-            return list(QueueItem(**row).asdict() for row in csv.DictReader(filehandle))  # type: ignore[arg-type]  # dataclass.__post_init__ takes care of the types in `**row`
+            return list(
+                QueueItem.model_validate(row).model_dump(mode="json", exclude={"added_time", "debug_str"})
+                for row in csv.DictReader(filehandle)
+            )
 
     @contextlib.contextmanager
     def queue_modify_context(self, name: QueueName):

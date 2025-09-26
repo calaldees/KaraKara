@@ -1,78 +1,79 @@
-import dataclasses
 import datetime
 import typing as t
 import random
 from functools import reduce
 from itertools import pairwise
+import pydantic
 
-from .settings_manager import QueueSettings
-from .type_parsers import parse_datetime, parse_timedelta
+from .settings_manager import QueueSettings, Timedelta
 
 
-# dataclasses are ment to be this cool hip new happening pattern in python
-# have I missed the point here? this feels like verbose rubbish for such a simple class
-@dataclasses.dataclass
-class QueueItem:
+class QueueItem(pydantic.BaseModel):
+    """
+    >>> qi1 = QueueItem(
+    ...     track_id='Track1',
+    ...     track_duration=60.25,
+    ...     session_id='Session1',
+    ...     performer_name='test_name',
+    ...     start_time=123456789.123456789,
+    ...     id=123456789,
+    ...     added_time=111111111.111111111
+    ... )
+    >>> qi1
+    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=TzInfo(UTC)), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(UTC)), debug_str=None, video_variant=None, subtitle_variant=None)
+
+    >>> qi2 = QueueItem(
+    ...     track_id='Track1',
+    ...     track_duration='60.25',
+    ...     session_id='Session1',
+    ...     performer_name='test_name',
+    ...     start_time='1973-11-29 21:33:09.123457',
+    ...     id='123456789',
+    ...     added_time=111111111.111111111
+    ... )
+    >>> qi2
+    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(UTC)), debug_str=None, video_variant=None, subtitle_variant=None)
+
+    >>> qi1.model_dump(mode="json")
+    {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None, 'video_variant': None, 'subtitle_variant': None}
+
+    >>> queue_item = QueueItem(track_id='', track_duration=42, session_id='', performer_name='', start_time='')
+    >>> type(queue_item.track_duration)
+    <class 'datetime.timedelta'>
+    >>> type(queue_item.id)
+    <class 'int'>
+    >>> type(queue_item.added_time)
+    <class 'datetime.datetime'>
+    >>> queue_item.added_time.year >= 2023
+    True
+    """
+
     @staticmethod
     def _now():
         return datetime.datetime.now(tz=datetime.timezone.utc)
 
+    @pydantic.field_validator("start_time", "video_variant", "subtitle_variant", "debug_str", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, v: str | None) -> str | None:
+        if v == "":
+            return None
+        return v
+
+    @pydantic.field_serializer("start_time", "added_time", mode="plain")
+    @classmethod
+    def serialize_datetime(cls, v: datetime.datetime | None) -> float | None:
+        return v.timestamp() if v else None
+
     track_id: str
-    track_duration: datetime.timedelta
+    track_duration: Timedelta
     session_id: str
     performer_name: str
     start_time: datetime.datetime | None = None
-    id: int = dataclasses.field(default_factory=lambda: random.randint(0, 2**30))
-    added_time: datetime.datetime = dataclasses.field(default_factory=_now)
-    debug_str: str | None = None
+    id: int = pydantic.Field(default_factory=lambda: random.randint(0, 2**30))
+    added_time: datetime.datetime = pydantic.Field(default_factory=_now)
+    debug_str: str | None = pydantic.Field(default=None)
     video_variant: str | None = None
     subtitle_variant: str | None = None
-
-    def __post_init__(self):
-        """
-        >>> QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789, 111111111.111111111)
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None, video_variant=None, subtitle_variant=None)
-
-        >>> QueueItem('Track1', '60.25', 'Session1', 'test_name', '1973-11-29 21:33:09.123457', '123456789', 111111111.111111111)
-        QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=datetime.timezone.utc), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=datetime.timezone.utc), debug_str=None, video_variant=None, subtitle_variant=None)
-
-        >>> queue_item = QueueItem('', '', '', '', '')
-        >>> type(queue_item.track_duration)
-        <class 'datetime.timedelta'>
-        >>> type(queue_item.id)
-        <class 'int'>
-        >>> type(queue_item.added_time)
-        <class 'datetime.datetime'>
-        >>> queue_item.added_time.year >= 2023
-        True
-        """
-        self.id = int(self.id)
-        self.track_duration = parse_timedelta(self.track_duration) or datetime.timedelta(0)
-        self.start_time = parse_datetime(self.start_time)
-        self.added_time = parse_datetime(self.added_time) or self._now()
-        self.video_variant = self.video_variant or None
-        self.subtitle_variant = self.subtitle_variant or None
-
-    def asdict(self):
-        return dataclasses.asdict(self, dict_factory=self.dict_factory)
-
-    @staticmethod
-    def dict_factory(key_values):
-        """
-        >>> i = QueueItem('Track1', 60.25, 'Session1', 'test_name', 123456789.123456789, 123456789, 111111111.111111111)
-        >>> i.asdict()
-        {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None, 'video_variant': None, 'subtitle_variant': None}
-        """
-
-        def _to_base_types(dd):
-            k, v = dd
-            if isinstance(v, datetime.timedelta):
-                v = v.total_seconds()
-            elif isinstance(v, datetime.datetime):
-                v = v.timestamp()
-            return (k, v)
-
-        return dict(map(_to_base_types, key_values))
 
     @property
     def end_time(self) -> datetime.datetime | None:
@@ -150,10 +151,7 @@ class Queue:
 
         return reduce(track_duration_reducer, self.future, self.now)
 
-    def play_one(self, immediate=False) -> None:  # Alias for play(continuous=False)
-        self.play(continuous=False, immediate=immediate)
-
-    def play(self, continuous=True, immediate=False) -> None:
+    def play(self, continuous: bool = True, immediate: bool = False) -> None:
         if self.current:
             if immediate:
                 self.current.start_time = self.now
@@ -250,5 +248,5 @@ class Queue:
 
     def _recalculate_start_times(self) -> None:
         for i_prev, i_next in pairwise(self.current_future):
-            i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.start_time else None  # type: ignore
+            i_next.start_time = i_prev.end_time + self.track_space if i_prev and i_prev.end_time else None
         self.modified = True
