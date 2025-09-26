@@ -91,7 +91,7 @@ export function short_date(long_date: string): string {
 }
 
 export function is_my_song(
-    session_id: string,
+    session_id: string | null,
     performer_name: string,
     item?: Pick<QueueItem, "session_id" | "performer_name">,
 ): boolean {
@@ -187,9 +187,9 @@ export function copy_type(original: any, value: any) {
  */
 export function current_and_future(
     now: number,
-    tracks: QueueItem[],
+    queue: QueueItem[],
 ): QueueItem[] {
-    return tracks.filter(
+    return queue.filter(
         (t) => t.start_time == null || t.start_time + t.track_duration > now,
     );
 }

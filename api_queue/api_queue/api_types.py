@@ -3,17 +3,17 @@ import aiomqtt
 import sanic
 from pathlib import Path
 
+from .login_manager import LoginManager
 from .track_manager import TrackManager
 from .queue_manager import QueueManagerCSVAsync
 from .settings_manager import SettingsManager
-from .login_manager import User
 
 
 class Ctx(types.SimpleNamespace):
     mqtt: aiomqtt.Client
     path_queue: Path
     session_id: str
-    user: User
+    login_manager: LoginManager
     track_manager: TrackManager
     settings_manager: SettingsManager
     queue_manager: QueueManagerCSVAsync

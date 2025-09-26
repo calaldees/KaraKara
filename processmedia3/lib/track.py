@@ -54,7 +54,9 @@ class Track:
                 # We then try to find an encoder that can create the target_type
                 # from those sources. If we find one, we create a Target for it.
                 if enc := find_appropriate_encoder(target_type, variant_sources):
-                    targets.append(Target(processed_dir, target_type, enc[0], enc[1], variant))
+                    targets.append(
+                        Target(processed_dir, target_type, enc[0], enc[1], variant)
+                    )
 
         self.targets = targets
 
@@ -103,16 +105,16 @@ class Track:
             tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
-        tags["aspect_ratio"] = list(
-            set(pxsrc.meta.aspect_ratio_str for pxsrc in self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE}))
-        )
 
-        ds = list(
-            set(
-                ausrc.meta.duration.total_seconds()
-                for ausrc in self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-            )
-        )
+        pixel_sources = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
+        tags["aspect_ratio"] = list(set(s.meta.aspect_ratio_str for s in pixel_sources))
+
+        # duration isn't useful for searching, but having it as a
+        # tag means it's visible in the browser UI so singers can
+        # see how long a track is before enqueueing it.
+        audio_sources = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
+        ds = list(set(s.meta.duration.total_seconds() for s in audio_sources))
+        tags["duration"] = [f"{int(d // 60)}m{int(d % 60):02}s" for d in ds]
         if len(ds) > 1:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 

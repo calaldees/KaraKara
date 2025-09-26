@@ -20,6 +20,8 @@ def parse_timedelta(
     datetime.timedelta(seconds=3)
     >>> parse_timedelta('4 seconds')
     datetime.timedelta(seconds=4)
+    >>> parse_timedelta('PT1M30S')
+    datetime.timedelta(seconds=90)
     >>> parse_timedelta('NOT REAL')
     Traceback (most recent call last):
     ValueError: ...
@@ -40,6 +42,11 @@ def parse_timedelta(
     if isinstance(duration, (int, float)):
         seconds = duration
     if isinstance(duration, str):
+        # ISO durations (used by pydantic / msgspec, etc),
+        # eg "PT1M30S", can be parsed by pytimeparse2 if
+        # we strip "PT" from the front.
+        if duration.startswith("PT"):
+            duration = duration[2:]
         seconds = pytimeparse2.parse(duration)
     if not isinstance(seconds, (int, float)):
         raise ValueError(f"unable to parse seconds from {duration}")
@@ -65,7 +72,7 @@ def parse_datetime(
     >>> parse_datetime('1st January 2000')
     datetime.datetime(2000, 1, 1, 0, 0, tzinfo=datetime.timezone.utc)
     >>> parse_datetime('tomorrow midnight')
-    datetime.datetime(...
+    datetime.datetime(...)
     >>> parse_datetime('NOT REAL')
     Traceback (most recent call last):
     ValueError: ...

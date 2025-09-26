@@ -3,12 +3,13 @@ import logging
 import json
 import typing as t
 from types import MappingProxyType
+import datetime
 
 log = logging.getLogger(__name__)
 
 
 type TrackID = str
-type TrackDurations = t.Mapping[TrackID, int | float]
+type TrackDurations = t.Mapping[TrackID, datetime.timedelta]
 
 
 class TrackManager:
@@ -32,6 +33,9 @@ class TrackManager:
             return
         with self.path.open() as filehandle:
             self.track_durations = MappingProxyType(
-                {track_id: track_payload["duration"] for track_id, track_payload in json.load(filehandle).items()}
+                {
+                    track_id: datetime.timedelta(seconds=track_payload["duration"])
+                    for track_id, track_payload in json.load(filehandle).items()
+                }
             )
         self.mtime = self.path.stat().st_mtime

@@ -142,7 +142,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
         for (let i = 0; i < fullQueue.length; i++) {
             if (fullQueue[i].performer_name === performer_name) {
                 n++;
-                airtime += fullQueue[i].track_duration;
+                airtime += tracks[fullQueue[i].track_id].duration;
             }
             if (fullQueue[i].id === queue_item_id) {
                 break;

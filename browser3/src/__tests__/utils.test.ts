@@ -210,7 +210,6 @@ describe("current_and_future", () => {
         performer_name: "test",
         session_id: "test",
         start_time: 0,
-        track_duration: 100,
         track_id: "My_Song",
         video_variant: null,
         subtitle_variant: null,

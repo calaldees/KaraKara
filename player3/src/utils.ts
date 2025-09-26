@@ -1,4 +1,5 @@
-import type { Attachment, QueueItem, Track } from "./types";
+import type { Attachment, QueueItem, Subtitle, Track } from "@/types";
+import { parse as parse_iso_duration } from "tinyduration";
 
 export function dict2css(d: Record<string, any>) {
     return Object.entries(d)
@@ -187,9 +188,9 @@ export function copy_type(original: any, value: any) {
  */
 export function current_and_future(
     now: number,
-    tracks: QueueItem[],
+    queue: QueueItem[],
 ): QueueItem[] {
-    return tracks.filter(
+    return queue.filter(
         (t) => t.start_time == null || t.start_time + t.track_duration > now,
     );
 }
@@ -210,4 +211,41 @@ export function normalise_name(name: string): string {
  */
 export function normalise_cmp(a: string, b: string): number {
     return normalise_name(a) > normalise_name(b) ? 1 : -1;
+}
+
+const BIG_GAP = 5;
+
+/*
+ * If there is a large gap between subtitles, insert a new "..." subtitle
+ * to indicate the gap
+ */
+export function add_dot_dot_dots(subtitles: Subtitle[]): Subtitle[] {
+    let last_end = subtitles[0]?.start ?? 0;
+    const out: Subtitle[] = [];
+    for (const subtitle of subtitles) {
+        if (subtitle.start - last_end > BIG_GAP) {
+            out.push({
+                start: last_end,
+                end: subtitle.start,
+                text: "···",
+                top: false,
+            });
+        }
+        out.push(subtitle);
+        last_end = subtitle.end;
+    }
+    return out;
+}
+
+export function parse_duration(inp: string | number): number {
+    if (typeof inp === "number") {
+        return inp;
+    } else {
+        const parsed = parse_iso_duration(inp);
+        return (
+            (parsed.hours ?? 0) * 3600 +
+            (parsed.minutes ?? 0) * 60 +
+            (parsed.seconds ?? 0)
+        );
+    }
 }

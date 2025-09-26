@@ -36,3 +36,47 @@ describe("short_date", () => {
         expect(utils.short_date("2023-08-14T12:00:00-04:00")).toEqual("01:30");
     });
 });
+
+describe("add_dot_dot_dots", () => {
+    test("no lyrics", () => {
+        expect(utils.add_dot_dot_dots([])).toEqual([]);
+    });
+    test("no gap", () => {
+        expect(
+            utils.add_dot_dot_dots([
+                { start: 0, end: 2, text: "line 1", top: false },
+                { start: 2, end: 4, text: "line 2", top: false },
+            ]),
+        ).toEqual([
+            { start: 0, end: 2, text: "line 1", top: false },
+            { start: 2, end: 4, text: "line 2", top: false },
+        ]);
+    });
+    test("has gap", () => {
+        expect(
+            utils.add_dot_dot_dots([
+                { start: 0, end: 2, text: "line 1", top: false },
+                { start: 12, end: 14, text: "line 2", top: false },
+            ]),
+        ).toEqual([
+            { start: 0, end: 2, text: "line 1", top: false },
+            { start: 2, end: 12, text: "···", top: false },
+            { start: 12, end: 14, text: "line 2", top: false },
+        ]);
+    });
+});
+
+describe("parse_duration", () => {
+    test("number", () => {
+        expect(utils.parse_duration(123)).toEqual(123);
+    });
+    test("seconds only", () => {
+        expect(utils.parse_duration("PT45S")).toEqual(45);
+    });
+    test("minutes and seconds", () => {
+        expect(utils.parse_duration("PT2M30S")).toEqual(150);
+    });
+    test("minutes only", () => {
+        expect(utils.parse_duration("PT2M")).toEqual(120);
+    });
+});

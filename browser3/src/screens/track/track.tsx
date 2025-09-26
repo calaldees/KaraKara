@@ -38,6 +38,7 @@ function Preview({ track }: { track: Track }) {
             className={"video_placeholder"}
             preload={"none"}
             poster={attachment_path(track.attachments.image.slice(-1)[0])}
+            playsInline={true}
             controls={true}
             crossOrigin="anonymous"
         >

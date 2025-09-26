@@ -7,7 +7,7 @@ from textwrap import dedent
 from collections.abc import AsyncGenerator
 
 import aiomqtt
-import pydantic
+import msgspec
 import sanic
 import ujson as json
 from sanic.log import logger as log
@@ -64,6 +64,7 @@ async def queue_manager(app: App, _loop):
     path_queue = Path(app.config.PATH_QUEUE)
     log.info(f"[queue_manager] - {path_queue=}")
     app.ctx.path_queue = path_queue
+    app.ctx.login_manager = LoginManager(path=path_queue)
     app.ctx.settings_manager = SettingsManager(path=path_queue)
     app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=app.ctx.settings_manager)
 
@@ -118,14 +119,13 @@ app.error_handler = CustomErrorHandler()
 
 @app.on_request
 async def attach_session_id_request(request: Request):
-    request.ctx.session_id = request.cookies.get("session_id") or str(uuid.uuid4())
-    request.ctx.user = LoginManager.from_session(request.ctx.session_id)
+    request.ctx.session_id = request.cookies.get("kksid") or str(uuid.uuid4())
 
 
 @app.on_response
 async def attach_session_id(request: Request, response: sanic.HTTPResponse):
-    if request.cookies.get("session_id") != request.ctx.session_id:
-        response.cookies.add_cookie("session_id", request.ctx.session_id, secure=False, samesite=None)
+    if request.cookies.get("kksid") != request.ctx.session_id:
+        response.cookies.add_cookie("kksid", request.ctx.session_id, secure=False, samesite=None)
 
 
 @contextlib.asynccontextmanager
@@ -147,7 +147,7 @@ async def push_settings_to_mqtt(app: App, room_name: str) -> AsyncGenerator[None
         log.info(f"push_settings_to_mqtt {room_name}")
         await app.ctx.mqtt.publish(
             f"room/{room_name}/settings",
-            app.ctx.queue_manager.settings.get(room_name).model_dump_json(),
+            msgspec.json.encode(app.ctx.queue_manager.settings.get(room_name)),
             retain=True,
         )
 
@@ -181,6 +181,7 @@ async def analytics(request: Request):
             data = request.json
             data["ip"] = request.ip
             data["time"] = datetime.now().isoformat()
+            data["session"] = request.ctx.session_id
             f.write(json.dumps(data) + "\n")
         return sanic.response.json(True)
     except Exception as e:
@@ -211,10 +212,9 @@ class QueueItemJson:
 # Queue / Login ---------------------------------------------------------------
 
 
-class LoginRequest(pydantic.BaseModel):
-    create: bool = False
+class LoginRequest(msgspec.Struct):
     password: str
-
+    create: bool = False
 
 @room_blueprint.post("/login.json")
 @validate(json=LoginRequest)
@@ -229,9 +229,8 @@ async def login(request: Request, room_name: str, body: LoginRequest):
         if not body.create:
             raise sanic.exceptions.NotFound(message=f"Room '{room_name}' not found")
         request.app.ctx.settings_manager.set(room_name, QueueSettings())
-    user = LoginManager.login(room_name, None, body.password, request.ctx.session_id)
-    request.ctx.session_id = user.session_id
-    return sanic.response.json(user.__dict__)
+    user = request.app.ctx.login_manager.login(room_name, request.ctx.session_id, body.password)
+    return sanic.response.json(user.model_dump(mode="json"))
 
 
 # Queue / Tracks --------------------------------------------------------------
@@ -269,7 +268,7 @@ async def tracks(request: Request, room_name: str):
 )
 async def get_settings(request: Request, room_name: str):
     return sanic.response.raw(
-        request.app.ctx.settings_manager.get(room_name).model_dump_json(),
+        msgspec.json.encode(request.app.ctx.settings_manager.get(room_name)),
         headers={"content-type": "application/json"},
     )
 
@@ -281,7 +280,8 @@ async def get_settings(request: Request, room_name: str):
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
 async def update_settings(request: Request, room_name: str, body: QueueSettings):
-    if not request.ctx.user.is_admin:
+    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
+    if not user.is_admin:
         raise sanic.exceptions.Forbidden(message="Only admins can update settings")
     async with push_settings_to_mqtt(request.app, room_name):
         request.app.ctx.settings_manager.set(room_name, body)
@@ -329,10 +329,10 @@ async def queue_json(request: Request, room_name: str):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(room_name))
 
 
-class QueueItemAdd(pydantic.BaseModel):
+class QueueItemAdd(msgspec.Struct):
     track_id: str
     performer_name: str
-    audio_variant: str | None = None
+    video_variant: str | None = None
     subtitle_variant: str | None = None
 
 
@@ -347,6 +347,7 @@ class QueueItemAdd(pydantic.BaseModel):
     ],
 )
 async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
+    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     track_durations = request.app.ctx.track_manager.track_durations
     # Validation
     if body.track_id not in track_durations:
@@ -358,15 +359,15 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             queue_item = QueueItem(
                 track_id=body.track_id,
-                track_duration=track_durations[body.track_id],  # type: ignore[arg-type]
+                track_duration=track_durations[body.track_id],
                 session_id=request.ctx.session_id,
                 performer_name=body.performer_name,
-                audio_variant=body.audio_variant,
+                video_variant=body.video_variant,
                 subtitle_variant=body.subtitle_variant,
             )
             queue.add(queue_item)
 
-            if not request.ctx.user.is_admin:
+            if not user.is_admin:
                 try:
                     queue_updated_actions(queue)
                 except QueueValidationError as ex:
@@ -385,19 +386,20 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
 async def delete_queue_item(request: Request, room_name: str, queue_item_id_str: str):
+    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     queue_item_id = int(queue_item_id_str)
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
             _, queue_item = queue.get(queue_item_id)
             if not queue_item:
                 raise sanic.exceptions.NotFound()
-            if queue_item.session_id != request.ctx.session_id and not request.ctx.user.is_admin:
+            if queue_item.session_id != request.ctx.session_id and not user.is_admin:
                 raise sanic.exceptions.Forbidden(message="queue_item.session_id does not match session_id")
             queue.delete(queue_item_id)
             return sanic.response.json(queue_item.asdict())
 
 
-class QueueItemMove(pydantic.BaseModel):
+class QueueItemMove(msgspec.Struct):
     source: int
     target: int
 
@@ -409,7 +411,8 @@ class QueueItemMove(pydantic.BaseModel):
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
 )
 async def move_queue_item(request: Request, room_name: str, body: QueueItemMove):
-    if not request.ctx.user.is_admin:
+    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
+    if not user.is_admin:
         raise sanic.exceptions.Forbidden(message="queue updates are for admin only")
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
@@ -447,7 +450,8 @@ class CommandReturn:
     ],
 )
 async def queue_command(request: Request, room_name: str, command: str):
-    if not request.ctx.user.is_admin:
+    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
+    if not user.is_admin:
         raise sanic.exceptions.Forbidden(message="commands are for admin only")
     if command not in Commands:
         raise sanic.exceptions.NotFound(message="invalid command")

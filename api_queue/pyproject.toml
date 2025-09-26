@@ -2,27 +2,28 @@
 name = "api_queue"
 version = "0.0.0"
 readme = "README.md"
+requires-python = ">=3.12"
 dependencies = [
-	"sanic",  # ~= 23.12
-	"sanic-ext",  # ~= 23.12
-	"sanic-openapi",  # ~= 21.12
-	"ujson",  # ~= 5.9
-	"aiomqtt",  #  ~= 2.0
-	"pytimeparse2",  # ~= 1.1
-	"dateparser",
-	"setuptools",  # ~= 75.5
-	"pydantic",  # To be replaced with msgspec?
+	"sanic ~= 25.3",
+	"sanic-ext ~= 24.12",
+	"sanic-openapi ~= 21.12",
+	"ujson ~= 5.11",
+	"aiomqtt ~= 2.4",
+	"pytimeparse2 ~= 1.7",
+	"dateparser ~= 1.2",
+	"setuptools ~= 80.9",
+	"msgspec ~= 0.19",
 ]
 
 [project.optional-dependencies]
 test = [
-	"mypy",  # ~= 1.8
-	"pytest",  # ~= 8.0
-	"pytest-asyncio",  #  ~= 0.23
-	"pytest-mypy",
-	"sanic-testing",  #  ~= 23.12
-	"types-ujson", #  ~= 5.9
-	"types-dateparser",
+	"mypy ~= 1.18",
+	"pytest ~= 8.4",
+	"pytest-asyncio ~= 1.2",
+	"pytest-mypy ~= 1.0",
+	"sanic-testing ~= 24.6",
+	"types-ujson ~= 5.10",
+	"types-dateparser ~= 1.2",
 ]
 
 [tool.mypy]

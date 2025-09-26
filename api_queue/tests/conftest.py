@@ -2,6 +2,7 @@ import pytest
 import typing as t
 from unittest.mock import AsyncMock, MagicMock
 
+import api_queue.server
 from api_queue.settings_manager import SettingsManager, QueueSettings
 from api_queue.queue_model import Queue
 from api_queue.api_types import App
@@ -18,15 +19,9 @@ def mock_mqtt():
 
 @pytest.fixture
 async def app(tmp_path, mock_mqtt) -> t.AsyncGenerator[App]:
-    # get the single registered app - is this needed? can we just import app from server?
-    # from sanic import Sanic
-    # app = Sanic.get_app()
-
     test_path_tracks = pathlib.Path(__file__).parent.joinpath("tracks.json")
     temp_path_tracks = tmp_path.joinpath("tracks.json")
     shutil.copy(test_path_tracks, temp_path_tracks)
-
-    import api_queue.server
 
     app = api_queue.server.app
     app.config.update(

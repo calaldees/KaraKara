@@ -30,7 +30,9 @@ class TestE2E(unittest.TestCase):
             processed = Path(processed_str)
 
             # Scan should detect source files for two tracks
-            tracks = main.scan(AbstractFolder_from_str("./tests/source"), processed, "", {})
+            tracks = main.scan(
+                AbstractFolder_from_str("./tests/source"), processed, "", {}
+            )
 
             self.assertEqual("Test1", tracks[0].id)
             self.assertEqual(
@@ -86,6 +88,7 @@ class TestE2E(unittest.TestCase):
                     "artist": ["Artipie"],
                     "category": ["anime"],
                     "contributor": ["ここにいくつかのテキストです。"],
+                    "duration": ["0m30s"],
                     "from": ["test series T"],
                     "title": ["Test1"],
                 },
@@ -124,6 +127,7 @@ class TestE2E(unittest.TestCase):
                     "artist": ["Mr Monkey"],
                     "category": ["anime"],
                     "contributor": ["contributor", "ここにいくつかのテキストです。"],
+                    "duration": ["0m15s"],
                     "from": ["gundam"],
                     "gundam": ["gundam seed"],
                     "title": ["Test2"],

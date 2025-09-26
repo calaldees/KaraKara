@@ -5,6 +5,7 @@ export function Video({
     track,
     subs = true,
     loop = false,
+    mute = false,
     onLoadStart = undefined,
     videoVariant,
     subtitleVariant,
@@ -12,6 +13,7 @@ export function Video({
     track: Track;
     subs?: boolean;
     loop?: boolean;
+    mute?: boolean;
     onLoadStart?: (e: any) => void;
     videoVariant: string | null;
     subtitleVariant: string | null;
@@ -25,6 +27,7 @@ export function Video({
                 key={track.id}
                 crossOrigin="anonymous"
                 loop={loop}
+                muted={mute}
                 onLoadStart={onLoadStart}
             >
                 {track.attachments.video

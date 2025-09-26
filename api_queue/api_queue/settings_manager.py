@@ -2,9 +2,7 @@ import datetime
 import typing as t
 from pathlib import Path
 
-import annotated_types
-import pydantic
-import ujson as json
+import msgspec
 
 from .type_parsers import parse_datetime, parse_timedelta
 
@@ -15,32 +13,18 @@ type Tag = str
 #    METALGHOSTS = enum.auto()
 
 
-Timedelta = t.Annotated[
-    datetime.timedelta,
-    pydantic.PlainValidator(parse_timedelta, json_schema_input_type=int | float | str),
-    pydantic.PlainSerializer(lambda td: td.total_seconds() if td else None, return_type=int),
-]
-
-OptionalDatetime = t.Annotated[
-    datetime.datetime | None,
-    pydantic.PlainValidator(parse_datetime, json_schema_input_type=str),
-    annotated_types.Timezone(datetime.timezone.utc),
-    # pydantic.PlainSerializer(_parse_datetime, json_schema_input_type=str),
-]
-
-
-class QueueSettings(pydantic.BaseModel):
-    track_space: Timedelta = datetime.timedelta(seconds=15)
+class QueueSettings(msgspec.Struct):
+    track_space: datetime.timedelta = datetime.timedelta(seconds=15)
     hidden_tags: t.Sequence[Tag] = ("red:duplicate",)
     forced_tags: t.Sequence[Tag] = ()
     title: str = "KaraKara"
     # theme: Theme = Theme.METALGHOSTS
-    preview_volume: t.Annotated[float, annotated_types.Ge(0), annotated_types.Le(1)] = 0.1
-    coming_soon_track_count: t.Annotated[int, annotated_types.Gt(0), annotated_types.Lt(10)] = 5
-    validation_event_start_datetime: OptionalDatetime = None
-    validation_event_end_datetime: OptionalDatetime = None
-    # validation_duplicate_performer_timedelta: Timedelta | None = None  # Not implemented
-    # validation_duplicate_track_timedelta: Timedelta | None = None  # Not implemented
+    preview_volume: t.Annotated[float, msgspec.Meta(ge=0, le=1)] = 0.1
+    coming_soon_track_count: t.Annotated[int, msgspec.Meta(gt=0, lt=10)] = 5
+    validation_event_start_datetime: t.Annotated[datetime.datetime | None, msgspec.Meta(tz=True)] = None
+    validation_event_end_datetime: t.Annotated[datetime.datetime | None, msgspec.Meta(tz=True)] = None
+    # validation_duplicate_performer_timedelta: datetime.timedelta | None = None  # Not implemented
+    # validation_duplicate_track_timedelta: datetime.timedelta | None = None  # Not implemented
     validation_performer_names: t.Sequence[str] = ()
     auto_reorder_queue: bool = False
 
@@ -56,11 +40,10 @@ class SettingsManager:
 
     def set(self, name: str, settings: QueueSettings) -> None:
         path = self.path.joinpath(f"{name}_settings.json")
-        json_str = settings.model_dump_json()
-        path.write_text(json_str)
+        path.write_bytes(msgspec.json.encode(settings))
 
     def get(self, name: str) -> QueueSettings:
         path = self.path.joinpath(f"{name}_settings.json")
         if path.is_file():
-            return QueueSettings(**json.loads(path.read_text()))
+            msgspec.json.decode(path.read_bytes(), type=QueueSettings)
         return QueueSettings()

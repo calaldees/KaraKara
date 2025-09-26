@@ -18,6 +18,29 @@
         padding: 1cqh;
     }
 
+    .lyrics {
+        list-style: none;
+        overflow-y: hidden;
+        font-size: 8vh;
+        background: var(--background);
+
+        LI:first-child {
+            margin-top: 50vh;
+        }
+        LI:last-child {
+            margin-bottom: 50vh;
+        }
+        LI {
+            color: grey;
+            transition: color 2s ease;
+        }
+        LI.current {
+            color: white;
+            transition: color 1s ease;
+            font-weight: bold;
+        }
+    }
+    .lyrics,
     .videoScaler {
         grid-area: video;
         padding: var(--padding);
