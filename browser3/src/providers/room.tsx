@@ -2,7 +2,6 @@ import { useSubscription } from "@shish2k/react-mqtt";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { UAParser } from "ua-parser-js";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
@@ -103,10 +102,8 @@ export function RoomProvider(props: any) {
     }, [roomName, roomPassword, request, navigate]);
 
     useEffect(() => {
-        const ua = UAParser();
         const an = {
             event: "open_room",
-            ua: ua,
             dev: process.env.NODE_ENV === "development" ? true : false,
             admin: isAdmin,
             room: roomName,

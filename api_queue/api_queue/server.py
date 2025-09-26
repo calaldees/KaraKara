@@ -177,6 +177,7 @@ async def analytics(request: Request):
             data = request.json
             data["ip"] = request.ip
             data["time"] = datetime.now().isoformat()
+            data["ua"] = request.headers.get("user-agent")
             data["session"] = request.ctx.session_id
             f.write(json.dumps(data) + "\n")
         return sanic.response.json(True)
