@@ -12,7 +12,7 @@ dependencies = [
 	"pytimeparse2 ~= 1.7",
 	"dateparser ~= 1.2",
 	"setuptools ~= 80.9",
-	"pydantic ~= 2.11",  # To be replaced with msgspec?
+	"msgspec ~= 0.19",
 ]
 
 [project.optional-dependencies]

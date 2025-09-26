@@ -187,9 +187,9 @@ export function copy_type(original: any, value: any) {
  */
 export function current_and_future(
     now: number,
-    tracks: QueueItem[],
+    queue: QueueItem[],
 ): QueueItem[] {
-    return tracks.filter(
+    return queue.filter(
         (t) => t.start_time == null || t.start_time + t.track_duration > now,
     );
 }
