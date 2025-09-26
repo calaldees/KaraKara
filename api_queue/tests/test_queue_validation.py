@@ -25,14 +25,14 @@ def test_single_item(qu: Queue):
 
 
 def test_start_time(qu: Queue):
-    qu.settings.validation_event_start_datetime += datetime.timedelta(hours=1)
+    qu.settings.validation_event_start_datetime += datetime.timedelta(hours=1)  # type: ignore
     qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
     with pytest.raises(QueueValidationError, match="starts"):
         validate_queue(qu)
 
 
 def test_end_time(qu: Queue):
-    qu.settings.validation_event_end_datetime += datetime.timedelta(hours=-1)
+    qu.settings.validation_event_end_datetime += datetime.timedelta(hours=-1)  # type: ignore
     qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
     with pytest.raises(QueueValidationError, match="is full"):
         validate_queue(qu)
