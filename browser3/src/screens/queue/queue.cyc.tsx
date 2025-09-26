@@ -98,7 +98,6 @@ describe("my entries", () => {
     it("without entries", () => {
         cy.mount(<Queue />, {
             client: { performerName: "Zazzy" },
-            room: { sessionId: "nobody" },
         });
         cy.contains("My Entries").should("not.exist");
     });

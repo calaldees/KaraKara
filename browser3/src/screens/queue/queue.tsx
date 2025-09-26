@@ -28,9 +28,8 @@ function QueueItemRender({
     track: Track;
 }): React.ReactElement {
     const { performerName } = useContext(ClientContext);
-    const { sessionId } = useContext(RoomContext);
     const { now } = useContext(ServerTimeContext);
-    const { request } = useApi();
+    const { request, sessionId } = useApi();
 
     function removeTrack(queue_item_id: number) {
         request({
@@ -114,7 +113,8 @@ function Lyrics({ track }: { track: Track }) {
 export function Queue(): React.ReactElement {
     const { performerName, widescreen } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
-    const { queue, settings, sessionId } = useContext(RoomContext);
+    const { queue, settings } = useContext(RoomContext);
+    const { sessionId } = useApi();
 
     return (
         <Screen

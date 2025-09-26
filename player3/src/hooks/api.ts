@@ -25,6 +25,7 @@ export function useApi() {
     const { roomName } = useParams();
     const { setNotification } = useContext(ClientContext);
     const [loading, setLoading] = useState(false);
+    const [sessionId, setSessionId] = useState<string | null>(null);
 
     const request = useCallback(
         function (props_: ApiRequestProps) {
@@ -45,6 +46,14 @@ export function useApi() {
 
             fetch(props.url, props.options)
                 .then((response) => {
+                    // Cookie-observer API is not widely supported yet,
+                    // so let's check for a cookie manually after every
+                    // API request...
+                    const c = document.cookie.match(/kksid=([a-z0-9-]+)/);
+                    if (c && c[1] && c[1] !== sessionId) {
+                        setSessionId(c[1]);
+                    }
+
                     if (response.status >= 500) {
                         throw new Error(response.statusText);
                     }
@@ -151,5 +160,5 @@ export function useApi() {
         [request],
     );
 
-    return { request, sendCommand, loading };
+    return { request, sendCommand, loading, sessionId };
 }

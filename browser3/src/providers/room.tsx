@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UAParser } from "ua-parser-js";
 
-import { useCookieStore } from "@/hooks/useCookieStore";
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
@@ -16,7 +15,6 @@ import { ServerContext } from "./server";
 export interface RoomContextType {
     trackList: Track[];
     isAdmin: boolean;
-    sessionId: string|null;
     queue: QueueItem[];
     fullQueue: QueueItem[];
     setOptimisticQueue: (q: QueueItem[] | null) => void;
@@ -34,7 +32,6 @@ export function RoomProvider(props: any) {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [sessionId] = useCookieStore<string|null>("session_id", null);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
@@ -127,7 +124,6 @@ export function RoomProvider(props: any) {
     const ctxVal: RoomContextType = useMemoObj({
         trackList,
         isAdmin,
-        sessionId,
         queue: optimisticQueue ?? queue,
         fullQueue,
         setOptimisticQueue,
