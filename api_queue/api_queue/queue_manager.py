@@ -27,10 +27,12 @@ class QueueManager:
             self.path_csv(name).open("r", encoding="utf8") if self.path_csv(name).is_file() else io.StringIO("")
         )
         with file_context as filehandle:
-            return list(
-                QueueItem.model_validate(row).model_dump(mode="json", exclude={"added_time", "debug_str"})
-                for row in csv.DictReader(filehandle)
-            )
+            outs = []
+            for row in csv.DictReader(filehandle):
+                item = QueueItem.model_validate(row).model_dump(mode="json", exclude={"added_time", "debug_str"})
+                item['session_id'] = item['session_id'].split("-")[0]
+                outs.append(item)
+            return outs
 
     @contextlib.contextmanager
     def queue_modify_context(self, name: QueueName):

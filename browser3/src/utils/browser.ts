@@ -36,7 +36,7 @@ export function is_my_song(
     item?: Pick<QueueItem, "session_id" | "performer_name">,
 ): boolean {
     return (
-        item?.session_id === session_id ||
+        item?.session_id === (session_id || "").split("-")[0] ||
         item?.performer_name === performer_name
     );
 }
