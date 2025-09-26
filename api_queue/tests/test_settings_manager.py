@@ -121,3 +121,13 @@ def test_settings_invalid():
         assert False, "Expected ValueError for coming_soon_track_count <= 0"
     except ValueError:
         pass
+
+
+def test_json_output():
+    qs = QueueSettings(
+        title="Custom Room",
+        track_space=150,  # pyright: ignore[reportArgumentType]
+    )
+    json_str = qs.model_dump_json()
+    assert '"track_space":"PT2M30S"' in json_str
+    assert '"title":"Custom Room"' in json_str

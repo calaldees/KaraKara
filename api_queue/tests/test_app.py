@@ -108,16 +108,16 @@ async def test_queue_settings_default(api_queue: APIQueue):
 @pytest.mark.asyncio
 async def test_queue_settings_change(api_queue: APIQueue, mock_mqtt):
     settings = await api_queue.settings
-    assert settings["track_space"] == 15.0
+    assert settings["track_space"] == "PT15S"
 
     mock_mqtt.publish.assert_not_awaited()
     await api_queue.login()
-    response = await api_queue.settings_put(payload={"track_space": 10.0})
+    response = await api_queue.settings_put(payload={"track_space": 10.5})
     assert response.status == 200
     mock_mqtt.publish.assert_awaited_once()
 
     settings = await api_queue.settings
-    assert settings["track_space"] == 10.0
+    assert settings["track_space"] == "PT10.5S"
 
     assert mock_mqtt.publish.await_args.args == ("room/test/settings", json.dumps(settings))
     assert mock_mqtt.publish.await_args.kwargs == dict(retain=True)
