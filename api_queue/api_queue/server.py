@@ -7,7 +7,7 @@ from textwrap import dedent
 from collections.abc import AsyncGenerator
 
 import aiomqtt
-import pydantic
+import msgspec
 import sanic
 import ujson as json
 from sanic.log import logger as log
@@ -147,7 +147,7 @@ async def push_settings_to_mqtt(app: App, room_name: str) -> AsyncGenerator[None
         log.info(f"push_settings_to_mqtt {room_name}")
         await app.ctx.mqtt.publish(
             f"room/{room_name}/settings",
-            app.ctx.queue_manager.settings.get(room_name).model_dump_json(),
+            msgspec.json.encode(app.ctx.queue_manager.settings.get(room_name)),
             retain=True,
         )
 
@@ -212,9 +212,9 @@ class QueueItemJson:
 # Queue / Login ---------------------------------------------------------------
 
 
-class LoginRequest(pydantic.BaseModel):
-    create: bool = False
+class LoginRequest(msgspec.Struct):
     password: str
+    create: bool = False
 
 @room_blueprint.post("/login.json")
 @validate(json=LoginRequest)
@@ -268,7 +268,7 @@ async def tracks(request: Request, room_name: str):
 )
 async def get_settings(request: Request, room_name: str):
     return sanic.response.raw(
-        request.app.ctx.settings_manager.get(room_name).model_dump_json(),
+        msgspec.json.encode(request.app.ctx.settings_manager.get(room_name)),
         headers={"content-type": "application/json"},
     )
 
@@ -329,7 +329,7 @@ async def queue_json(request: Request, room_name: str):
     return sanic.response.json(request.app.ctx.queue_manager.for_json(room_name))
 
 
-class QueueItemAdd(pydantic.BaseModel):
+class QueueItemAdd(msgspec.Struct):
     track_id: str
     performer_name: str
     video_variant: str | None = None
@@ -399,7 +399,7 @@ async def delete_queue_item(request: Request, room_name: str, queue_item_id_str:
             return sanic.response.json(queue_item.asdict())
 
 
-class QueueItemMove(pydantic.BaseModel):
+class QueueItemMove(msgspec.Struct):
     source: int
     target: int
 

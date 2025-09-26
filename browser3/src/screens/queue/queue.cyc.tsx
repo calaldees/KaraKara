@@ -58,7 +58,6 @@ describe("now playing", () => {
                     {
                         ...queue[1],
                         start_time: 990,
-                        track_duration: 60,
                     },
                 ],
             },

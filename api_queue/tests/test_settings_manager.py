@@ -1,5 +1,6 @@
 from pathlib import Path
 import datetime
+import msgspec
 
 from api_queue.settings_manager import SettingsManager, QueueSettings
 
@@ -128,6 +129,6 @@ def test_json_output():
         title="Custom Room",
         track_space=150,  # pyright: ignore[reportArgumentType]
     )
-    json_str = qs.model_dump_json()
+    json_str = msgspec.json.encode(qs).decode("utf-8")
     assert '"track_space":"PT2M30S"' in json_str
     assert '"title":"Custom Room"' in json_str
