@@ -13,31 +13,11 @@ type QueueName = str
 
 
 class QueueManager:
-    def __init__(self, settings: SettingsManager):
-        self.settings = settings
-
-    @contextlib.contextmanager
-    def _queue_modify_context(self, name: QueueName, filehandle: io.TextIOBase):
-        queue = Queue(
-            [QueueItem.model_validate(row) for row in csv.DictReader(filehandle)],
-            self.settings.get(name),
-        )
-        yield queue
-        if queue.modified:
-            filehandle.seek(0)
-            filehandle.truncate(0)
-            fields = QueueItem.model_json_schema()["properties"].keys()
-            writer = csv.DictWriter(filehandle, fields)
-            writer.writeheader()
-            for i in queue.items:
-                writer.writerow(i.model_dump(mode="json"))
-
-
-class QueueManagerCSV(QueueManager):
-    def __init__(self, path: Path = Path("."), **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, path: Path, settings: SettingsManager):
         assert path.is_dir()
         self.path = path
+        self.settings = settings
+        self.queue_async_locks: defaultdict[QueueName, asyncio.Lock] = defaultdict(asyncio.Lock)
 
     def path_csv(self, name: QueueName) -> Path:
         return self.path.joinpath(f"{name}.csv")
@@ -57,14 +37,19 @@ class QueueManagerCSV(QueueManager):
         path_csv = self.path_csv(name)
         path_csv.touch()
         with path_csv.open("r+", encoding="utf8") as filehandle:
-            with self._queue_modify_context(name, filehandle) as queue:
-                yield queue
-
-
-class QueueManagerCSVAsync(QueueManagerCSV):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.queue_async_locks: defaultdict[QueueName, asyncio.Lock] = defaultdict(asyncio.Lock)
+            queue = Queue(
+                [QueueItem.model_validate(row) for row in csv.DictReader(filehandle)],
+                self.settings.get(name),
+            )
+            yield queue
+            if queue.modified:
+                filehandle.seek(0)
+                filehandle.truncate(0)
+                fields = QueueItem.model_json_schema()["properties"].keys()
+                writer = csv.DictWriter(filehandle, fields)
+                writer.writeheader()
+                for i in queue.items:
+                    writer.writerow(i.model_dump(mode="json"))
 
     @contextlib.asynccontextmanager
     async def async_queue_modify_context(self, name: QueueName):

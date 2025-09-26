@@ -20,7 +20,7 @@ import sanic.exceptions
 from .queue_model import QueueItem
 from .queue_updated_actions import QueueValidationError, queue_updated_actions
 from .track_manager import TrackManager
-from .queue_manager import QueueManagerCSVAsync
+from .queue_manager import QueueManager
 from .settings_manager import QueueSettings, SettingsManager
 from .login_manager import LoginManager, User
 from .background_tasks import background_tracks_update_event
@@ -62,7 +62,7 @@ async def queue_manager(app: App, _loop):
     app.ctx.path_queue = path_queue
     app.ctx.login_manager = LoginManager(path=path_queue)
     app.ctx.settings_manager = SettingsManager(path=path_queue)
-    app.ctx.queue_manager = QueueManagerCSVAsync(path=path_queue, settings=app.ctx.settings_manager)
+    app.ctx.queue_manager = QueueManager(path=path_queue, settings=app.ctx.settings_manager)
 
 
 @app.listener("before_server_start")

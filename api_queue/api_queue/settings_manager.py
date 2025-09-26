@@ -45,7 +45,7 @@ class QueueSettings(pydantic.BaseModel):
 
 
 class SettingsManager:
-    def __init__(self, path: Path = Path(".")):
+    def __init__(self, path: Path):
         path.mkdir(parents=True, exist_ok=True)  # is this safe?
         assert path.is_dir()
         self.path = path

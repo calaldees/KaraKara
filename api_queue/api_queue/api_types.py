@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .login_manager import LoginManager
 from .track_manager import TrackManager
-from .queue_manager import QueueManagerCSVAsync
+from .queue_manager import QueueManager
 from .settings_manager import SettingsManager
 
 
@@ -16,7 +16,7 @@ class Ctx(types.SimpleNamespace):
     login_manager: LoginManager
     track_manager: TrackManager
     settings_manager: SettingsManager
-    queue_manager: QueueManagerCSVAsync
+    queue_manager: QueueManager
 
 
 class Config(sanic.Config):
