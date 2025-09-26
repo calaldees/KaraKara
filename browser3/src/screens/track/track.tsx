@@ -260,12 +260,14 @@ function Buttons({ track }: { track: Track }) {
                     value={performerName}
                     placeholder={"Enter Name"}
                     required={true}
+                    autoFocus={performerName.trim().length === 0}
                     onChange={(e) => setPerformerName(e.target.value)}
                 />
                 <div className={"buttons"}>
                     <button
                         type="button"
                         onClick={(_) => setAction(TrackAction.NONE)}
+                        autoFocus={performerName.trim().length > 0}
                     >
                         Cancel
                     </button>
