@@ -133,7 +133,7 @@ export function useApi() {
                     setNotification({
                         text:
                             error.message === "queue validation failed" // TODO: convert this to new exception schema from client
-                                ? error.context
+                                ? error.context["exc"]
                                 : "Internal Error: " +
                                   (error.message ?? "unknown") +
                                   (error.context
