@@ -40,6 +40,9 @@ BODY {
     font-family: arial, sans-serif;
     user-select: none;
 }
+A {
+    color: inherit;
+}
 .widescreen {
     background: black;
     position: fixed;
