@@ -259,6 +259,7 @@ function Buttons({ track }: { track: Track }) {
                     placeholder={"Enter Name"}
                     required={true}
                     autoFocus={performerName.trim().length === 0}
+                    enterKeyHint="done"
                     onChange={(e) => setPerformerName(e.target.value)}
                 />
                 <div className={"buttons"}>

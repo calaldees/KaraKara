@@ -239,9 +239,10 @@ function Explorer(): React.ReactElement {
             {/* Full-text search */}
             <input
                 className={"search"}
-                type={"text"}
+                type={"search"}
                 placeholder={"Add search keywords"}
                 defaultValue={search}
+                enterKeyHint="done"
                 data-cy="search"
                 onChange={(e) => setSearch(e.target.value)}
             />
