@@ -5,9 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
-import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import type { QueueItem, Track } from "@/types";
 import { current_and_future, normalise_cmp } from "@/utils";
+import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
 

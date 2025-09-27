@@ -16,7 +16,15 @@ export function FontAwesomeIcon({
             focusable="false"
             data-prefix={icon.prefix}
             data-icon={icon.iconName}
-            className={`svg-inline--fa fa-${icon.iconName} ${className}`}
+            className={`fa-${icon.iconName} ${className}`}
+            style={{
+                boxSizing: "content-box",
+                display: "inline-block",
+                height: "1em",
+                width: "1em",
+                overflow: "visible",
+                verticalAlign: "-0.125em",
+            }}
             role="img"
             xmlns="http://www.w3.org/2000/svg"
             viewBox={`0 0 ${width} ${height}`}
