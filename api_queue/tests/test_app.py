@@ -2,7 +2,9 @@ import pytest
 import collections.abc
 import datetime
 import typing as t
+import collections.abc as ct
 
+from sanic.response import HTTPResponse
 import ujson as json
 from api_queue.api_types import App
 
@@ -12,14 +14,14 @@ class APIQueue:
         self.app = app
         self._queue = queue
 
-    async def login(self):
+    async def login(self) -> None:
         request, response = await self.app.asgi_client.post(
             f"/room/{self._queue}/login.json", data=json.dumps(dict(password=self._queue, create=True))
         )
         assert response.status == 200
         assert response.json["is_admin"] is True
 
-    async def logout(self):
+    async def logout(self) -> None:
         request, response = await self.app.asgi_client.post(
             f"/room/{self._queue}/login.json", data=json.dumps(dict(password=""))
         )
@@ -32,39 +34,39 @@ class APIQueue:
         return response.text
 
     @property
-    async def queue(self) -> t.Sequence[t.Mapping]:
+    async def queue(self) -> ct.Sequence[ct.Mapping[str, t.Any]]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
         return response.json
 
     @property
-    async def tracks(self):
+    async def tracks(self) -> ct.Mapping[str, ct.Mapping[str, t.Any]]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/tracks.json")
         return response.json
 
     @property
-    async def settings(self) -> t.Mapping[str, t.Any]:
+    async def settings(self) -> ct.Mapping[str, t.Any]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
         return response.json
 
-    async def settings_put(self, payload: t.Mapping[str, t.Any]):
+    async def settings_put(self, payload: ct.Mapping[str, t.Any]) -> HTTPResponse:
         request, response = await self.app.asgi_client.put(
             f"/room/{self._queue}/settings.json", data=json.dumps(payload)
         )
         return response
 
-    async def post(self, **kwargs):
+    async def post(self, **kwargs) -> HTTPResponse:
         request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
-    async def delete(self, queue_item_id: int):
+    async def delete(self, queue_item_id: int) -> HTTPResponse:
         request, response = await self.app.asgi_client.delete(f"/room/{self._queue}/queue/{queue_item_id}.json")
         return response
 
-    async def put(self, **kwargs):
+    async def put(self, **kwargs) -> HTTPResponse:
         request, response = await self.app.asgi_client.put(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
-    async def command(self, command: str):
+    async def command(self, command: str) -> HTTPResponse:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/command/{command}.json")
         return response
 

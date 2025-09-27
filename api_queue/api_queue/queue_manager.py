@@ -27,7 +27,7 @@ class QueueManager:
             self.path_csv(name).open("r", encoding="utf8") if self.path_csv(name).is_file() else io.StringIO("")
         )
         with file_context as filehandle:
-            outs = []
+            outs: list[dict[str, t.Any]] = []
             for row in csv.DictReader(filehandle):
                 item = QueueItem.model_validate(row).model_dump(mode="json", exclude={"added_time", "debug_str"})
                 item['session_id'] = item['session_id'].split("-")[0]

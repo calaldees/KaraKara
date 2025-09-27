@@ -1,5 +1,6 @@
 import datetime
 import typing as t
+import collections.abc as ct
 from pathlib import Path
 
 import annotated_types
@@ -30,8 +31,8 @@ OptionalDatetime = t.Annotated[
 
 class QueueSettings(pydantic.BaseModel):
     track_space: TimeDelta = datetime.timedelta(seconds=15)
-    hidden_tags: t.Sequence[Tag] = ("red:duplicate",)
-    forced_tags: t.Sequence[Tag] = ()
+    hidden_tags: ct.Sequence[Tag] = ("red:duplicate",)
+    forced_tags: ct.Sequence[Tag] = ()
     title: str = "KaraKara"
     # theme: Theme = Theme.METALGHOSTS
     preview_volume: t.Annotated[float, annotated_types.Ge(0), annotated_types.Le(1)] = 0.1
@@ -40,7 +41,7 @@ class QueueSettings(pydantic.BaseModel):
     validation_event_end_datetime: OptionalDatetime = None
     # validation_duplicate_performer_timedelta: Timedelta | None = None  # Not implemented
     # validation_duplicate_track_timedelta: Timedelta | None = None  # Not implemented
-    validation_performer_names: t.Sequence[str] = ()
+    validation_performer_names: ct.Sequence[str] = ()
     auto_reorder_queue: bool = False
 
 

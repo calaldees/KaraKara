@@ -1,4 +1,4 @@
-import typing as t
+import collections.abc as ct
 from functools import partial
 import datetime
 
@@ -92,7 +92,7 @@ def _rank(queue: Queue, queue_item: QueueItem) -> float:
 
     added_minutes_ago = _minutes_ago(queue_item.added_time)
 
-    queued_by_this_performer: t.Sequence[QueueItem] = tuple(
+    queued_by_this_performer: ct.Sequence[QueueItem] = tuple(
         filter(
             lambda i: i.performer_name == queue_item.performer_name
             and i.added_time < queue_item.added_time

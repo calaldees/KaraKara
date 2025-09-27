@@ -56,3 +56,4 @@ reportUnusedCallResult = false
 reportUninitializedInstanceVariable = false
 reportUnreachable = false
 reportUnannotatedClassAttribute = false
+reportUnusedParameter = false

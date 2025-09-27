@@ -5,7 +5,7 @@ import pytimeparse2  # type: ignore
 
 
 def parse_timedelta(
-    duration: int | float | str | datetime.timedelta,
+    duration: int | float | str | None | datetime.timedelta,
 ) -> datetime.timedelta | None:
     """
     >>> parse_timedelta(None)

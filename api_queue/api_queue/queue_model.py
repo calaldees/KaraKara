@@ -1,5 +1,5 @@
 import datetime
-import typing as t
+import collections.abc as ct
 import random
 from functools import reduce
 from itertools import pairwise
@@ -102,12 +102,12 @@ class Queue:
         return self._now or datetime.datetime.now(tz=datetime.timezone.utc)
 
     @property
-    def past(self) -> t.Iterable[QueueItem]:
+    def past(self) -> ct.Iterable[QueueItem]:
         now = self.now
         return (i for i in self.items if i.end_time and i.end_time < now)
 
     @property
-    def future(self) -> t.Iterable[QueueItem]:
+    def future(self) -> ct.Iterable[QueueItem]:
         now = self.now
         return (i for i in self.items if not i.start_time or i.start_time >= now)
 
@@ -116,7 +116,7 @@ class Queue:
         return self.playing or next(iter(self.future), None)
 
     @property
-    def current_future(self) -> t.Iterable[QueueItem]:
+    def current_future(self) -> ct.Iterable[QueueItem]:
         # fugly mess - you can do this in less lines
         current = self.current
         future = list(self.future)
