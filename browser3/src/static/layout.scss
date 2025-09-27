@@ -32,6 +32,9 @@ svg.x2 {
 * {
     box-sizing: border-box;
 }
+:root {
+    color-scheme: light dark;
+}
 BODY {
     color: var(--page-fg);
     background: var(--page-bg);
