@@ -2,6 +2,9 @@ import typing as t
 from collections import defaultdict
 import copy
 from pathlib import Path
+import datetime
+import dateutil.parser
+
 from .kktypes import MediaType, TargetType
 from .source import Source, SourceType
 from .target import Target
@@ -120,6 +123,15 @@ class Track:
 
         if tags.get("date"):
             tags["year"] = [d.split("-")[0] for d in tags["date"]]
+
+        if tags.get("added"):
+            # add "category:new" tag for any track added in the last year
+            # and a bit (so that if a convention is held eg Jan 5th 2020,
+            # then we get a request to add a track on Jan 6th 2020, it's
+            # still "new" when the next convention happens on Jan 12th 2021)
+            added_date = dateutil.parser.parse(tags["added"][0])
+            if added_date > datetime.datetime.now() - datetime.timedelta(days=380):
+                tags["category"].append("new")
 
         return TrackDict(
             id=self.id,
