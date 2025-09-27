@@ -31,13 +31,12 @@ export function RoomProvider(props: any) {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
     );
     const [settings, setSettings] = useState<Record<string, any>>({});
-    const { request } = useApi();
+    const { request, sessionId } = useApi();
     const navigate = useNavigate();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),
@@ -91,7 +90,6 @@ export function RoomProvider(props: any) {
             },
             onAction: (response) => {
                 setIsAdmin(response.is_admin);
-                setIsLoggedIn(true);
             },
             onException: () => {
                 // request() function will already have shown an error,
@@ -102,9 +100,10 @@ export function RoomProvider(props: any) {
     }, [roomName, roomPassword, request, navigate]);
 
     useEffect(() => {
-        if (!isLoggedIn) return;
+        if (!sessionId) return;
         const an = {
             event: "open_room",
+            app: "browser3",
             dev: process.env.NODE_ENV === "development" ? true : false,
             admin: isAdmin,
             room: roomName,
@@ -117,7 +116,7 @@ export function RoomProvider(props: any) {
                 body: JSON.stringify(an),
             },
         });
-    }, [request, roomName, isAdmin, isLoggedIn]);
+    }, [request, roomName, isAdmin, sessionId]);
 
     const ctxVal: RoomContextType = useMemoObj({
         trackList,

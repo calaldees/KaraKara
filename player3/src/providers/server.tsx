@@ -38,9 +38,7 @@ function InternalServerProvider(props: any) {
     useEffect(() => {
         request({
             url: `/files/tracks.json?ver=${tracksUpdated}`,
-            options: {
-                credentials: "omit",
-            },
+            options: { credentials: "omit" },
             onAction: (result) => setTracks(result),
             onProgress: ({ done, size }) => {
                 setDownloadDone(done);

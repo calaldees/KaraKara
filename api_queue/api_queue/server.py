@@ -115,13 +115,7 @@ app.error_handler = CustomErrorHandler()
 
 @app.on_request
 async def attach_session_id_request(request: Request):
-    request.ctx.session_id = request.cookies.get("kksid") or str(uuid.uuid4())
-
-
-@app.on_response
-async def attach_session_id(request: Request, response: sanic.HTTPResponse):
-    if request.cookies.get("kksid") != request.ctx.session_id:
-        response.cookies.add_cookie("kksid", request.ctx.session_id, secure=False, samesite=None)
+    request.ctx.session_id = request.cookies.get("kksid")
 
 
 @contextlib.asynccontextmanager
@@ -227,8 +221,13 @@ async def login(request: Request, room_name: str, body: LoginRequest):
         if not body.create:
             raise sanic.exceptions.NotFound(message=f"Room '{room_name}' not found")
         request.app.ctx.settings_manager.set(room_name, QueueSettings())
+
+    if not request.ctx.session_id:
+        request.ctx.session_id = str(uuid.uuid4())
     user = request.app.ctx.login_manager.login(room_name, request.ctx.session_id, body.password)
-    return sanic.response.json(user.model_dump(mode="json"))
+    resp = sanic.response.json(user.model_dump(mode="json"))
+    resp.cookies.add_cookie("kksid", request.ctx.session_id, secure=False, samesite=None)
+    return resp
 
 
 # Queue / Tracks --------------------------------------------------------------
@@ -348,6 +347,8 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     track_durations = request.app.ctx.track_manager.track_durations
     # Validation
+    if request.ctx.session_id is None:
+        raise sanic.exceptions.InvalidUsage(message="session_id missing")
     if body.track_id not in track_durations:
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context={"track_id": body.track_id})
     if body.performer_name.strip() == "":

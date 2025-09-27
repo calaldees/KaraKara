@@ -12,7 +12,7 @@ from .settings_manager import SettingsManager
 class Ctx(types.SimpleNamespace):
     mqtt: aiomqtt.Client
     path_queue: Path
-    session_id: str
+    session_id: str | None
     login_manager: LoginManager
     track_manager: TrackManager
     settings_manager: SettingsManager

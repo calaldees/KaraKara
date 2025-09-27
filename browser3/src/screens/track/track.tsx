@@ -132,9 +132,7 @@ function Buttons({ track }: { track: Track }) {
             function: "queue",
             options: {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     track_id: track_id,
                     performer_name: performer_name.trim(),

@@ -49,7 +49,9 @@ class LoginManager:
     def load(
         self,
         room_name: str,
-        session_id: str,
+        session_id: str | None,
     ) -> User:
+        if session_id is None:
+            return User(is_admin=False)
         with load_obj(self.path / f"{room_name}_accounts.json", RoomAccounts) as accounts:
             return User(is_admin=session_id in accounts.admin_sessions)

@@ -112,9 +112,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
             function: "queue",
             options: {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     source: src_id,
                     target: dst_id,
