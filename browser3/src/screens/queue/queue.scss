@@ -2,12 +2,12 @@ MAIN.queue ARTICLE {
     .readme {
         H1 {
             text-align: center;
-            font-size: 6vw;
+            font-size: max(6vw, 2em);
             margin: 0.1em;
         }
         LI {
             margin: 0.5em;
-            font-size: 2vw;
+            font-size: max(2vw, 1em);
         }
     }
     .progress_bar {
