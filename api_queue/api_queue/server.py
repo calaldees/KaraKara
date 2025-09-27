@@ -246,7 +246,7 @@ async def login(request: Request, room_name: str, body: LoginRequest):
 )
 async def tracks(request: Request, room_name: str):
     filename: str = request.app.config.PATH_TRACKS
-    return await sanic.response.file(filename)  # type: ignore[arg-type]
+    return await sanic.response.file(filename)
 
 
 # Queue / Settings ------------------------------------------------------------

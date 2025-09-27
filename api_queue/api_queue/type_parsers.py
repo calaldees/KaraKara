@@ -1,7 +1,7 @@
 import datetime
 
 import dateparser
-import pytimeparse2  # type: ignore
+import pytimeparse2
 
 
 def parse_timedelta(

@@ -4,8 +4,8 @@ import datetime
 import typing as t
 import collections.abc as ct
 
-from sanic.response import HTTPResponse
 import ujson as json
+from sanic_testing.testing import TestingResponse as Response
 from api_queue.api_types import App
 
 
@@ -48,25 +48,25 @@ class APIQueue:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
         return response.json
 
-    async def settings_put(self, payload: ct.Mapping[str, t.Any]) -> HTTPResponse:
+    async def settings_put(self, payload: ct.Mapping[str, t.Any]) -> Response:
         request, response = await self.app.asgi_client.put(
             f"/room/{self._queue}/settings.json", data=json.dumps(payload)
         )
         return response
 
-    async def post(self, **kwargs) -> HTTPResponse:
+    async def post(self, **kwargs) -> Response:
         request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
-    async def delete(self, queue_item_id: int) -> HTTPResponse:
+    async def delete(self, queue_item_id: int) -> Response:
         request, response = await self.app.asgi_client.delete(f"/room/{self._queue}/queue/{queue_item_id}.json")
         return response
 
-    async def put(self, **kwargs) -> HTTPResponse:
+    async def put(self, **kwargs) -> Response:
         request, response = await self.app.asgi_client.put(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
-    async def command(self, command: str) -> HTTPResponse:
+    async def command(self, command: str) -> Response:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/command/{command}.json")
         return response
 
@@ -313,7 +313,7 @@ async def test_queue_updated_actions(api_queue: APIQueue):
 
     response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="invalid_name")
     assert response.status == 400
-    assert "invalid_name" in str(response.json["context"])
+    assert "invalid_name" in str(response.json)
 
 
 @pytest.mark.asyncio
