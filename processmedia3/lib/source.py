@@ -34,12 +34,16 @@ class Source:
     def __init__(self, file: AbstractFile, cache: MutableMapping[str, t.Any]):
         self.file = file
         self.cache = cache
-        self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
+        self.type: SourceType | None = next(
+            (type for type in SourceType if self.file.suffix in type.value), None
+        )
         variant_match = re.search(r"\[(.+?)\]$", self.file.stem)
         self.variant = variant_match.group(1) if variant_match else None
 
         if not self.type:
-            raise SourceTypeException(f"Can't tell what type of source {self.file.relative} is")
+            raise SourceTypeException(
+                f"Can't tell what type of source {self.file.relative} is"
+            )
 
     def __str__(self) -> str:
         return self.file.relative
@@ -84,6 +88,6 @@ class Source:
 
     @property
     @_cache
-    def tags(self) -> Mapping[str, Sequence[str]]:
+    def tags(self) -> dict[str, list[str]]:
         log.info(f"Parsing tags from {self.file.relative}")
         return parse_tags(self.file.text)
