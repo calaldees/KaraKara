@@ -1,7 +1,7 @@
 import enum
 import contextlib
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from textwrap import dedent
 from collections.abc import AsyncGenerator
@@ -226,7 +226,8 @@ async def login(request: Request, room_name: str, body: LoginRequest):
         request.ctx.session_id = str(uuid.uuid4())
     user = request.app.ctx.login_manager.login(room_name, request.ctx.session_id, body.password)
     resp = sanic.response.json(user.model_dump(mode="json"))
-    resp.cookies.add_cookie("kksid", request.ctx.session_id, secure=False, samesite=None)
+    next_year = datetime.now() + timedelta(days=400)
+    resp.cookies.add_cookie("kksid", request.ctx.session_id, samesite="strict", expires=next_year)
     return resp
 
 
