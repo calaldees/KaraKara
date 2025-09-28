@@ -157,29 +157,77 @@ def lint(tracks: Sequence[Track]) -> None:
         # for t in track.targets:
         #    if not t.path.exists():
         #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
+
         for s in track.sources:
             if s.type == SourceType.TAGS:
-                for tag in ["title", "category", "vocaltrack", "lang"]:
-                    if not s.tags.get(tag):
-                        log.error(f"{s.file.relative} has no {tag} tag")
+                # All top-level keys should be lowercase
+                # from:Cake Series             -- correct top-level tag
+                # Cake Series:Cakes of Doom    -- valid sub-tag
+                # Artist:Bob                   -- incorrect top-level tag
+                all_values = [v for vs in s.tags.values() for v in vs]
+                for key in s.tags.keys():
+                    if key != key.lower() and key not in all_values:
+                        log.error(f"{s.file.relative} has {key} key which is not lowercase")
 
+                # Values should be lowercase unless they are known exceptions
+                # (eg, titles and artist names)
+                for key, values in s.tags.items():
+                    if key in all_values:
+                        continue
+                    if key in [
+                        "title",
+                        "artist",
+                        "from",
+                        "use",
+                        "contributor",
+                        "source",
+                    ]:
+                        continue
+                    for value in values:
+                        if value != value.lower():
+                            log.error(f"{s.file.relative} {key}:{value} should be lowercase")
+
+                # Certain tags are required
+                for key in ["title", "category", "vocaltrack", "lang"]:
+                    if not s.tags.get(key):
+                        log.error(f"{s.file.relative} has no {key} tag")
+
+                # Tracks with vocals should have a vocalstyle
                 if s.tags.get("vocaltrack") == ["on"]:
                     if not s.tags.get("vocalstyle"):
                         log.error(f"{s.file.relative} has vocaltrack:on but no vocalstyle")
 
-                use = s.tags.get("use")
-                if use:
-                    use = [u.lower() for u in use]
+                # "use" tags should be consistent
+                if uses := s.tags.get("use"):
+                    known_uses = [
+                        "opening",
+                        "ending",
+                        "insert",
+                        "character song",
+                        "doujin song",
+                        "trailer song",  # ??
+                        "image",  # ??
+                        "title",  # ??
+                        "theme",
+                    ]
+                    for use in uses:
+                        if use not in known_uses and re.match(r"^(OP|ED)(\d+)$", use) is None:
+                            log.error(f"{s.file.relative} has weird use:{use} tag")
+                    use = [u.lower() for u in uses]
                     for n in range(0, 50):
                         if f"op{n}" in use and "opening" not in use:
                             log.error(f"{s.file.relative} has use:op{n} but no opening tag")
                         if f"en{n}" in use and "ending" not in use:
                             log.error(f"{s.file.relative} has use:ed{n} but no ending tag")
 
+                # "source" tags should not contain unquoted URLs
+                #    source:http://example.com -- bad, becomes "source":["http"] + "http":["//example.com"]
+                #    source:"http://example.com" -- good, becomes "source":["http://example.com"]
                 if "source" in s.tags:
                     if "http" in s.tags["source"] or "https" in s.tags["source"]:
                         log.error(f"{s.file.relative} appears to have an unquoted URL in the source tag")
 
+                # No "red" tags - move these tracks to the WorkInProgress folder instead
                 if "red" in s.tags:
                     log.error(f"{s.file.relative} has red tag")
 
@@ -227,6 +275,29 @@ def lint(tracks: Sequence[Track]) -> None:
                             )
 
     thread_map(_lint, tracks, max_workers=4, desc="lint   ", unit="track")
+
+    # Check for inconsistent capitalization of tags across multiple tracks
+    # Do this outside of _lint() to avoid threading issues
+    all_tags: dict[str, set[str]] = {}
+    for track in tracks:
+        for s in track.sources:
+            if s.type == SourceType.TAGS:
+                for k, v in s.tags.items():
+                    all_tags.setdefault(k, set()).update(v)
+    for k, vs in all_tags.items():
+        # There are several different tracks with the same title
+        if k == "title":
+            continue
+        v_by_lower: dict[str, str] = {}
+        for v in vs:
+            vl = v.lower()
+            # BoA and Boa are different
+            # Bis, bis, and BiS are three different bands...
+            if k == "artist" and vl.lower() in ["boa", "bis"]:
+                continue
+            if vl in v_by_lower and v_by_lower[vl] != v:
+                log.error(f"Tag {k}:{v} has inconsistent capitalization")
+            v_by_lower[vl] = v
 
 
 def encode(tracks: Sequence[Track], reencode: bool = False, threads: int = 1) -> None:
