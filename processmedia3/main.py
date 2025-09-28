@@ -213,12 +213,11 @@ def lint(tracks: Sequence[Track]) -> None:
                     for use in uses:
                         if use not in known_uses and re.match(r"^(OP|ED)(\d+)$", use) is None:
                             log.error(f"{s.file.relative} has weird use:{use} tag")
-                    use = [u.lower() for u in uses]
                     for n in range(0, 50):
-                        if f"op{n}" in use and "opening" not in use:
-                            log.error(f"{s.file.relative} has use:op{n} but no opening tag")
-                        if f"en{n}" in use and "ending" not in use:
-                            log.error(f"{s.file.relative} has use:ed{n} but no ending tag")
+                        if f"OP{n}" in uses and "opening" not in uses:
+                            log.error(f"{s.file.relative} has use:OP{n} but no opening tag")
+                        if f"EN{n}" in uses and "ending" not in uses:
+                            log.error(f"{s.file.relative} has use:ED{n} but no ending tag")
 
                 # "source" tags should not contain unquoted URLs
                 #    source:http://example.com -- bad, becomes "source":["http"] + "http":["//example.com"]
@@ -278,12 +277,12 @@ def lint(tracks: Sequence[Track]) -> None:
 
     # Check for inconsistent capitalization of tags across multiple tracks
     # Do this outside of _lint() to avoid threading issues
-    all_tags: dict[str, set[str]] = {}
+    all_tags: dict[str, list[str]] = {}
     for track in tracks:
-        for s in track.sources:
-            if s.type == SourceType.TAGS:
-                for k, v in s.tags.items():
-                    all_tags.setdefault(k, set()).update(v)
+        for source in track.sources:
+            if source.type == SourceType.TAGS:
+                for k, vs in source.tags.items():
+                    all_tags.setdefault(k, []).extend(vs)
     for k, vs in all_tags.items():
         # There are several different tracks with the same title
         if k == "title":
