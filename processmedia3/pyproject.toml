@@ -24,6 +24,10 @@ test = [
 module = "mypy-tqdm.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "brotli.*"
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"
 filterwarnings = [
