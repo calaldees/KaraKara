@@ -30,7 +30,7 @@ class QueueManager:
             outs: list[dict[str, t.Any]] = []
             for row in csv.DictReader(filehandle):
                 item = QueueItem.model_validate(row).model_dump(mode="json", exclude={"added_time", "debug_str"})
-                item['session_id'] = item['session_id'].split("-")[0]
+                item["session_id"] = item["session_id"].split("-")[0]
                 outs.append(item)
             return outs
 
