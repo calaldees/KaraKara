@@ -86,10 +86,10 @@ Core components
 ```mermaid
 graph TD
     internet{{internet}}
-    internet -- http 443 ---> public-server --http 80--> nginx
+    internet -- http 443 ---> public-server --http 80--> frontend
 
     subgraph docker-compose [docker-compose]
-        nginx
+        frontend
         mqtt
         processmedia
         browser
@@ -97,18 +97,18 @@ graph TD
         api_queue
 
         logs[(/logs/)]
-        nginx ..-> logs
+        frontend ..-> logs
         processmedia ..-> logs
         api_queue ..-> logs
 
         /data/queue/[(/data/queue/)]
 
-        nginx -- http 80 --> browser
-        nginx -- http 80 --> player
-        nginx -- http 8000 --> api_queue
+        frontend -- http 80 --> browser
+        frontend -- http 80 --> player
+        frontend -- http 8000 --> api_queue
         api_queue --mqtt 1887--> mqtt
         api_queue <--> /data/queue/
-        mqtt -- websocket 9001 --> nginx
+        mqtt -- websocket 9001 --> frontend
     end
 
     syncthing --> /media/source/
@@ -118,7 +118,7 @@ graph TD
         /media/processed/[(/media/processed/)]
     end
 
-    /media/processed/ --> nginx
+    /media/processed/ --> frontend
     /media/processed/ -- tracks.json --> api_queue
     /media/source/ --> processmedia --> /media/processed/
 ```
@@ -142,7 +142,7 @@ graph TD
 * [player3](player3/README.md) ![Player2](https://github.com/calaldees/KaraKara/workflows/Player3/badge.svg)
   * Displays the current queue for use on a projector
   * Gets data from website / `queue` api
-  * Streams final video from `nginx` in fullscreen mode.
+  * Streams final video from `caddy` in fullscreen mode.
   * Automatically updates track list when the queue is changed.
   * Queue order is obscured past a configurable time
 
