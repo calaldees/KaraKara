@@ -39,6 +39,8 @@ services:
             SANIC_MQTT: mqtt
             SANIC_PATH_TRACKS: /media/processed/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
             SANIC_PATH_QUEUE: /data/queue/   # See volumes below
+            SANIC_PROXIES_COUNT: 1
+            SANIC_REAL_IP_HEADER: x-real-ip
         #ports:  # for local dev
         #    - 8000:8000
         links:

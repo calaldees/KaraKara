@@ -169,9 +169,9 @@ async def analytics(request: Request):
     try:
         with open("/logs/analytics.json", "a", encoding="utf8") as f:
             data = request.json
-            data["ip"] = request.ip
+            data["remote_addr"] = request.remote_addr
             data["time"] = datetime.now().isoformat()
-            data["ua"] = request.headers.get("user-agent")
+            data["user_agent"] = request.headers.get("user-agent")
             data["session"] = request.ctx.session_id
             f.write(json.dumps(data) + "\n")
         return sanic.response.json(True)

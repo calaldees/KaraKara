@@ -75,13 +75,13 @@ def main():
             d = json.loads(line)
 
             if args.dedupe:
-                ip = d.get("session", d.get("ip", d.get("remote_addr", None)))
+                ip = d.get("session", d.get("remote_addr", None))
                 if ip in ips:
                     continue
                 ips.add(ip)
 
             # analytics.json
-            if "ua" in d:
+            if "user_agent" in d:
                 if args.dev is not None:
                     if d.get("dev") != args.dev:
                         continue
@@ -94,7 +94,7 @@ def main():
                 if args.room is not None:
                     if d.get("room") != args.room:
                         continue
-                ua = parse(d["ua"])
+                ua = parse(d["user_agent"])
 
             # nginx-access.json
             elif "http_user_agent" in d:
