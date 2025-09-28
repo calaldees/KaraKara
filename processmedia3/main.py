@@ -3,6 +3,7 @@
 import argparse
 import contextlib
 import gzip
+import brotli
 import json
 import logging
 import logging.handlers
@@ -372,6 +373,10 @@ def export(
 
         path = processed_dir / "tracks.json.gz"
         path.with_suffix(".tmp").write_bytes(gzip.compress(data))
+        path.with_suffix(".tmp").rename(path)
+
+        path = processed_dir / "tracks.json.br"
+        path.with_suffix(".tmp").write_bytes(brotli.compress(data))
         path.with_suffix(".tmp").rename(path)
 
 
