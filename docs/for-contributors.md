@@ -124,7 +124,7 @@ My Track [Kanji].srt
 ## Video Files
 * Should avoid having baked-in subtitles
 * Should avoid having watermarks
-- DVD / Bluray "special features" often include creditless OPs/EDs - these are ideal
+* DVD / Bluray "special features" often include creditless OPs/EDs - these are ideal
 * Currently supported formats: `.mp4`, `.mkv`, `.avi`, `.mpg`, `.webm`
   * Adding new formats is easy - if you have a file in a different format, please ask us to add that format to the list rather than converting it
 
