@@ -69,7 +69,7 @@ syncthing --> /media/source/
 * Rebuild and rerun with `docker compose up --detach --build`
 * Note that while docker is the simplest and most reliable way to get up and running, it can be slow to rebuild
 * For faster iteration, you can run components directly on your host machine - the process for this is different for each component, and will be documented in each component's README file
-  * (processmedia3)[../processmedia3/README.md]
-  * (browser3)[../browser3/README.md]
-  * (api_queue)[../api_queue/README.md]
-  * (player3)[../player3/README.md]
+  * [processmedia3](../processmedia3/README.md)
+  * [browser3](../browser3/README.md)
+  * [api_queue](../api_queue/README.md)
+  * [player3](../player3/README.md)
