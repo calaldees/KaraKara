@@ -73,6 +73,9 @@ class APIQueue:
 
 @pytest.fixture
 async def api_queue(app: App):
+    import api_queue.server
+
+    api_queue.server.SECURE_COOKIES = False
     return APIQueue(app, "test")
 
 

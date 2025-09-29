@@ -26,6 +26,10 @@ from .login_manager import LoginManager, User
 from .background_tasks import background_tracks_update_event
 from .api_types import App, Request
 
+# The test client from sanic_testing considers itself to be insecure, so
+# secure cookies are invisible... so let's be secure by default, but
+# set this to false in unit tests?
+SECURE_COOKIES = True
 
 app = App("karakara_queue")
 app.config.update(
@@ -227,7 +231,13 @@ async def login(request: Request, room_name: str, body: LoginRequest):
     user = request.app.ctx.login_manager.login(room_name, request.ctx.session_id, body.password)
     resp = sanic.response.json(user.model_dump(mode="json"))
     next_year = datetime.now() + timedelta(days=400)
-    resp.cookies.add_cookie("kksid", request.ctx.session_id, samesite="strict", expires=next_year)
+    resp.cookies.add_cookie(
+        "kksid",
+        request.ctx.session_id,
+        samesite="strict",
+        expires=next_year,
+        secure=SECURE_COOKIES,
+    )
     return resp
 
 
