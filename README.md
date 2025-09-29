@@ -5,7 +5,8 @@ Karaoke Event System - hosted at [karakara.uk](http://karakara.uk/)
 
 * Run small events in your livingroom or big events with multiple karaoke rooms
 * Attendees view and queue tracks from their mobile phones
-* A Projector/TV shows a HTML5 player
+* A projector/TV shows a playlist and subtitled videos
+* An optional tablet can show just the lyrics for singers to read on stage
 * Internet connection is required
 
 
@@ -77,9 +78,34 @@ Then build and run the software:
 $ docker compose up --build
 ```
 
+Core components (conceptual)
+----------------------------
+```mermaid
+graph TD
+    users{{users}}
+    browser["browser<br>(user mode)"]
+    browser_a["browser<br>(admin mode)"]
+    users --"open on<br>phone"---> browser
+    browser --"fetch track list"--> processed
+    browser --"request add<br>to queue"--> api_queue
+    browser_a --"commands to<br>stop / start /<br>edit the queue"--> api_queue
+    api_queue --"publish queue"--> player
 
-Core components
----------------
+    admins{{admins}}
+    admins --"open on<br>projector"---> player
+    admins --"open on<br>laptop"---> browser_a
+    player --"fetch videos<br>for display"--> processed
+
+    contributors{{contributors}}
+    contributors --"upload files"--> syncthing
+    syncthing --"download files"--> source
+    source[(Source Videos +<br>Subtitles + Metadata)]
+    processed[(Encoded Videos +<br>Track List)]
+    source --> processmedia --> processed
+```
+
+Core components (technical)
+---------------------------
 
 
 ```mermaid
@@ -108,7 +134,7 @@ graph TD
      api_queue <--> /data/queue/
      mqtt -- websocket 9001 --> frontend
 
-    syncthing --> /media/source/
+     syncthing --> /media/source/
 
      /media/source/[(/media/source/)]
      /media/processed/[(/media/processed/)]
