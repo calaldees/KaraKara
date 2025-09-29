@@ -29,32 +29,6 @@ Suggested Hardware:
 * Microphone(s) plugged into a karaoke speaker
 * Alternatively, microphone(s) plugged into a HDMI-mixer to use the TV's speakers
 
-## Component Diagram
-
-```mermaid
-graph TD
-
-users{{users}}
-browser_u["browser<br>(user mode)"]
-browser_a["browser<br>(admin mode)"]
-users --"open on<br>phone"---> browser_u
-browser_u --"fetch track list"--> processed
-browser_u --"request add<br>to queue"--> api_queue
-browser_a --"commands to<br>stop / start /<br>edit the queue"--> api_queue
-api_queue --"publish queue"--> player
-
-admins{{admins}}
-admins --"open on<br>projector"---> player
-admins --"open on<br>laptop"---> browser_a
-player --"fetch videos<br>for display"--> processed
-
-contributors{{contributors}}
-contributors --"upload files"--> syncthing
-syncthing --"download files"--> source
-source[(Source Videos +<br>Subtitles + Metadata)]
-processed[(Encoded Videos +<br>Track List)]
-source --> processmedia --> processed
-```
 
 ## Event Setup
 
@@ -87,3 +61,31 @@ source --> processmedia --> processed
     * This setting is a CSS "padding" command, so you can use values like:
       * `5%` - make the screen 5% smaller on all sides
       * `10px 20px` - make the screen 10 pixels smaller top and bottom, 20 pixels smaller left and right
+
+
+## Component Diagram
+
+```mermaid
+graph TD
+
+users{{users}}
+browser_u["browser<br>(user mode)"]
+browser_a["browser<br>(admin mode)"]
+users --"open on<br>phone"---> browser_u
+browser_u --"fetch track list"--> processed
+browser_u --"request add<br>to queue"--> api_queue
+browser_a --"commands to<br>stop / start /<br>edit the queue"--> api_queue
+api_queue --"publish queue"--> player
+
+admins{{admins}}
+admins --"open on<br>projector"---> player
+admins --"open on<br>laptop"---> browser_a
+player --"fetch videos<br>for display"--> processed
+
+contributors{{contributors}}
+contributors --"upload files"--> syncthing
+syncthing --"download files"--> source
+source[(Source Videos +<br>Subtitles + Metadata)]
+processed[(Encoded Videos +<br>Track List)]
+source --> processmedia --> processed
+```
