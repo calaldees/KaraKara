@@ -2,7 +2,7 @@ import { MqttProvider, useSubscription } from "@shish2k/react-mqtt";
 import { createContext, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { useApi } from "@/hooks/api";
+import { ApiRequestProps, useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import type { Track } from "@/types";
 import { mqtt_url } from "@/utils";
@@ -12,6 +12,10 @@ export interface ServerContextType {
     downloadSize: number | null;
     downloadDone: number;
     connected: boolean;
+    request: (props: ApiRequestProps) => void,
+    sessionId: string | null,
+    sendCommand: (command: string, args?: Record<string, any>) => void,
+    loading: boolean,
 }
 
 /* eslint-disable react-refresh/only-export-components */
@@ -27,7 +31,7 @@ function InternalServerProvider(props: any) {
         "tracksUpdated",
         0,
     );
-    const { request } = useApi();
+    const { request, sessionId, sendCommand, loading } = useApi();
 
     const { connected } = useSubscription(`global/tracks-updated`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
@@ -52,6 +56,10 @@ function InternalServerProvider(props: any) {
         downloadSize,
         downloadDone,
         connected,
+        request,
+        sessionId,
+        sendCommand,
+        loading,
     });
     return <ServerContext value={ctxVal}>{props.children}</ServerContext>;
 }
