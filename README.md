@@ -74,8 +74,7 @@ Then edit settings in .env
 
 Then build and run the software:
 ```console
-$ docker compose build
-$ docker compose up
+$ docker compose up --build
 ```
 
 
@@ -129,7 +128,7 @@ graph TD
   * Users can add tracks to the queue
   * Tracks will be validated to make sure one user isn't filling the whole queue, and nobody can add tracks past the end of the event time limit
   * Admins can re-order and delete tracks
-* [processmedia3](processmedia2/README.md) ![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)
+* [processmedia3](processmedia3/README.md) ![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)
   * Takes folders of source data (video, image+audio, subtitles)
   * Create high-bitrate video for the player interface.
   * Create low-bitrate previews for mobile devices
@@ -144,7 +143,6 @@ graph TD
   * Gets data from website / `queue` api
   * Streams final video from `caddy` in fullscreen mode.
   * Automatically updates track list when the queue is changed.
-  * Queue order is obscured past a configurable time
 
 
 History
