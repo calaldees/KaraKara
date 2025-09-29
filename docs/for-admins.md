@@ -27,7 +27,9 @@ Suggested Hardware:
   * Browser full-screen on the laptop screen, logged in as admin with "Booth mode" enabled
   * Player full-screen on the TV
 * Microphone(s) plugged into a karaoke speaker
+  * eg [Link](https://www.amazon.co.uk/JYX-Portable-Wireless-Microphones-Bluetooth-Black/dp/B0D5D6G7LQ) - I haven't used this one, just giving it as an example of the type of device I mean, if anybody knows audio equipment and can vouch for a good model please let us know
 * Alternatively, microphone(s) plugged into a HDMI-mixer to use the TV's speakers
+  * eg [Link](https://www.amazon.co.uk/Portable-Karaoke-Microphone-Wireless-Amplifier/dp/B07GRKXKC3) - This got used to run MinamiCon's booth room -- laptop and microphones both connected to the mixer, mixer connected to the TV
 
 
 ## Event Setup
@@ -52,6 +54,10 @@ Suggested Hardware:
 
 ### Load the Queue Player
 * On a laptop connected to TV or projector screen - https://karakara.uk/player3/
+  * Using Google Chrome (or a Chrome-based browser) because nothing else supports formatted subtitles properly
+  * Set laptop to do-not-disturb mode to avoid notifications making beeps or showing up on screen
+  * Close other apps to minimise the chances of interrupting the show
+  * Test in-advance to make sure the laptop has enough CPU power to play 720p AV1 videos
 * double click anywhere for settings
   * room: test, password: test
   * "Podium mode" shows just the lyrics - useful to stick on a tablet on a podium for singers to see their lyrics while facing the audience (otherwise singers tend to sing while facing the projector screen)
