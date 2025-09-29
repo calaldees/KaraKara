@@ -85,37 +85,33 @@ Core components
 ```mermaid
 graph TD
     internet{{internet}}
-    internet -- http 443 ---> public-server --http 80--> frontend
+    internet -- http 443 ---> frontend
 
-    subgraph docker-compose [docker-compose]
-        frontend
-        mqtt
-        processmedia
-        browser
-        player
-        api_queue
+     frontend
+     mqtt
+     processmedia
+     browser
+     player
+     api_queue
 
-        logs[(/logs/)]
-        frontend ..-> logs
-        processmedia ..-> logs
-        api_queue ..-> logs
+     logs[(/logs/)]
+     frontend ..-> logs
+     processmedia ..-> logs
+     api_queue ..-> logs
 
-        /data/queue/[(/data/queue/)]
+     /data/queue/[(/data/queue/)]
 
-        frontend -- http 80 --> browser
-        frontend -- http 80 --> player
-        frontend -- http 8000 --> api_queue
-        api_queue --mqtt 1887--> mqtt
-        api_queue <--> /data/queue/
-        mqtt -- websocket 9001 --> frontend
-    end
+     frontend -- http 80 --> browser
+     frontend -- http 80 --> player
+     frontend -- http 8000 --> api_queue
+     api_queue --mqtt 1887--> mqtt
+     api_queue <--> /data/queue/
+     mqtt -- websocket 9001 --> frontend
 
     syncthing --> /media/source/
 
-    subgraph filesystem
-        /media/source/[(/media/source/)]
-        /media/processed/[(/media/processed/)]
-    end
+     /media/source/[(/media/source/)]
+     /media/processed/[(/media/processed/)]
 
     /media/processed/ --> frontend
     /media/processed/ -- tracks.json --> api_queue
