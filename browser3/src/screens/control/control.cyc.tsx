@@ -76,7 +76,7 @@ function dnd(drag: string, drop: string) {
 }
 describe("drag & drop", () => {
     beforeEach(function () {
-        cy.intercept("PUT", "/room/test/queue.json", (req) => {
+        cy.intercept("PUT", "/api/room/test/queue.json", (req) => {
             req.reply({
                 body: {},
                 //delay: 1000
@@ -88,8 +88,8 @@ describe("drag & drop", () => {
         dnd('[data-item-id="2"]', '[data-item-id="1"]');
         cy.wait("@move").then(({ request, response }) => {
             expect(response?.statusCode).to.eq(200);
-            expect(request.body.source).to.eq("2");
-            expect(request.body.target).to.eq("1");
+            expect(request.body.source).to.eq(2);
+            expect(request.body.target).to.eq(1);
         });
     });
     it("drag to bottom", () => {
@@ -97,8 +97,8 @@ describe("drag & drop", () => {
         dnd('[data-item-id="2"]', '[data-cy="end-marker"]');
         cy.wait("@move").then(({ request, response }) => {
             expect(response?.statusCode).to.eq(200);
-            expect(request.body.source).to.eq("2");
-            expect(request.body.target).to.eq("-1");
+            expect(request.body.source).to.eq(2);
+            expect(request.body.target).to.eq(-1);
         });
         cy.contains("Shish").should("exist");
     });
@@ -106,7 +106,7 @@ describe("drag & drop", () => {
 
 describe("misc", () => {
     beforeEach(function () {
-        cy.intercept("PUT", "/room/test/queue.json", (req) => {
+        cy.intercept("PUT", "/api/room/test/queue.json", (req) => {
             req.reply({ body: {}, delay: 1000 });
         }).as("move");
     });

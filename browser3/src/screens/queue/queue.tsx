@@ -3,7 +3,6 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useContext, useEffect, useState } from "react";
 
 import { BackToExplore, FontAwesomeIcon, Screen, Thumb } from "@/components";
-import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
@@ -29,7 +28,7 @@ function QueueItemRender({
 }): React.ReactElement {
     const { performerName } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
-    const { request, sessionId } = useApi();
+    const { request, sessionId } = useContext(ServerContext);
 
     function removeTrack(queue_item_id: number) {
         request({
@@ -80,7 +79,7 @@ function QueueItemRender({
 }
 
 function Lyrics({ track }: { track: Track }) {
-    const { request } = useApi();
+    const { request } = useContext(ServerContext);
 
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     useEffect(() => {
@@ -112,9 +111,8 @@ function Lyrics({ track }: { track: Track }) {
 
 export function Queue(): React.ReactElement {
     const { performerName, widescreen } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
+    const { tracks, sessionId } = useContext(ServerContext);
     const { queue, settings } = useContext(RoomContext);
-    const { sessionId } = useApi();
 
     return (
         <Screen

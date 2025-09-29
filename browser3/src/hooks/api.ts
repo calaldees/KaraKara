@@ -19,7 +19,7 @@ type UrlRequestProps = CommonRequestProps & {
     function?: never;
     url: string;
 };
-type ApiRequestProps = FunctionRequestProps | UrlRequestProps;
+export type ApiRequestProps = FunctionRequestProps | UrlRequestProps;
 
 export function useApi() {
     const { roomName } = useParams();

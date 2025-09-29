@@ -1,6 +1,5 @@
 import { useContext } from "react";
 
-import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
@@ -12,8 +11,7 @@ export function YoureNext({
     queue: QueueItem[];
 }): React.ReactElement {
     const { performerName } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
-    const { sessionId } = useApi();
+    const { tracks, sessionId } = useContext(ServerContext);
 
     return (
         <>

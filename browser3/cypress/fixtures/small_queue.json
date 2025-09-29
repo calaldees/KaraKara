@@ -2,7 +2,7 @@
     {
         "id": 1,
         "performer_name": "Shish",
-        "session_id": "admin",
+        "session_id": "asdf",
         "start_time": 1234,
         "track_duration": 30,
         "track_id": "track_id_1",
@@ -12,7 +12,7 @@
     {
         "id": 2,
         "performer_name": "Alice",
-        "session_id": "sdfghjm",
+        "session_id": "wert",
         "start_time": 1274,
         "track_duration": 30,
         "track_id": "track_id_2",
@@ -22,7 +22,7 @@
     {
         "id": 3,
         "performer_name": "Bob",
-        "session_id": "jhgfds",
+        "session_id": "dfgh",
         "start_time": 1304,
         "track_duration": 30,
         "track_id": "track_id_1",
@@ -32,7 +32,7 @@
     {
         "id": 4,
         "performer_name": "Charlie",
-        "session_id": "jhgfddfghn",
+        "session_id": "yuio",
         "start_time": 1364,
         "track_duration": 30,
         "track_id": "track_id_2",
@@ -42,7 +42,7 @@
     {
         "id": 5,
         "performer_name": "Dave",
-        "session_id": "jhgfghg",
+        "session_id": "zxcv",
         "start_time": 1404,
         "track_duration": 30,
         "track_id": "track_id_1",
@@ -52,7 +52,7 @@
     {
         "id": 6,
         "performer_name": "Eve",
-        "session_id": "tyjty",
+        "session_id": "qwer",
         "start_time": 1434,
         "track_duration": 30,
         "track_id": "track_id_1",
@@ -62,7 +62,7 @@
     {
         "id": 7,
         "performer_name": "Eve",
-        "session_id": "tyjty",
+        "session_id": "dfgh",
         "start_time": 1464,
         "track_duration": 30,
         "track_id": "track_id_1",

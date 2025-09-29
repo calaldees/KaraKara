@@ -1,8 +1,8 @@
 import { useCallback, useContext, useState } from "react";
 
 import { BackToExplore, Screen } from "@/components";
-import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
+import { ServerContext } from "@/providers/server";
 import { copy_type } from "@/utils";
 
 function removeTypes(
@@ -32,10 +32,10 @@ function RoomSettingsInternal({
 }: {
     roomSettings: Record<string, any>;
 }) {
+    const { request, loading } = useContext(ServerContext);
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
         Record<string, string>
     >(removeTypes(roomSettings));
-    const { request, loading } = useApi();
 
     // when user types in a textbox, update the string:string
     const update = useCallback(

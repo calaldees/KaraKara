@@ -6,7 +6,6 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon, Screen } from "@/components";
-import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
@@ -81,7 +80,7 @@ function Tags({ track }: { track: Track }) {
 
 function Lyrics({ track }: { track: Track }): React.ReactElement | null {
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
-    const { request } = useApi();
+    const { request } = useContext(ServerContext);
 
     useEffect(() => {
         const subtitleAttachment = track.attachments.subtitle?.find(
@@ -121,10 +120,10 @@ function Buttons({ track }: { track: Track }) {
         performerName,
         setPerformerName,
     } = useContext(ClientContext);
+    const { request } = useContext(ServerContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const [videoVariant, setVideoVariant] = useState<string>("");
     const [subtitleVariant, setSubtitleVariant] = useState<string>("");
-    const { request } = useApi();
 
     function enqueue(performer_name: string, track_id: string) {
         request({
