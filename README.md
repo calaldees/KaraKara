@@ -6,11 +6,18 @@ Karaoke Event System - hosted at [karakara.uk](http://karakara.uk/)
 * Run small events in your livingroom or big events with multiple karaoke rooms
 * Attendees view and queue tracks from their mobile phones
 * A projector/TV shows a playlist and subtitled videos
-* An optional tablet can show just the lyrics for singers to read on stage
+* An optional tablet can show the lyrics for singers to read on stage
 * Internet connection is required
 
 
-Overview of a karaoke event
+Quickstart Guides
+-----------------
+* [For people running events](docs/for-admins.md)
+* [For people adding tracks to the database](docs/for-contributors.md)
+* [For people developing the software](docs/for-developers.md)
+
+
+Overview of a Karaoke Event
 ---------------------------
 
 * A projector is fired up in a dimly lit room and a microphone stands ready on the mic stand. The PA is buzzing lightly. The attendees slowly enter the room. But this time is different. Attendees see advertised on the projector and "Join at `karakara.uk` room `eventname`" and a QRcode. A mobile / tablet / laptop interface to browse, search, see preview videos of tracks, lists of lyrics, see the current queued tracks with estimated times. Attendees can queue a track themselves. Pass the device to a friend to browse and queue a track under a different name.
@@ -60,115 +67,17 @@ Headline Feature Descriptions
         * Various formats and codecs (including RM, gah!)
 
 
-Developer setup (local machine)
+Core Components
 ---------------
-
-TODO: refine
-
-See [getting-started.md](docs/getting-started.md) for a tour and description
-
-Configure site settings (eg which folders contain your media):
-```
-$ cp .env.example .env
-```
-Then edit settings in .env
-
-Then build and run the software:
-```console
-$ docker compose up --build
-```
-
-Core components (conceptual)
-----------------------------
-```mermaid
-graph TD
-    users{{users}}
-    browser["browser<br>(user mode)"]
-    browser_a["browser<br>(admin mode)"]
-    users --"open on<br>phone"---> browser
-    browser --"fetch track list"--> processed
-    browser --"request add<br>to queue"--> api_queue
-    browser_a --"commands to<br>stop / start /<br>edit the queue"--> api_queue
-    api_queue --"publish queue"--> player
-
-    admins{{admins}}
-    admins --"open on<br>projector"---> player
-    admins --"open on<br>laptop"---> browser_a
-    player --"fetch videos<br>for display"--> processed
-
-    contributors{{contributors}}
-    contributors --"upload files"--> syncthing
-    syncthing --"download files"--> source
-    source[(Source Videos +<br>Subtitles + Metadata)]
-    processed[(Encoded Videos +<br>Track List)]
-    source --> processmedia --> processed
-```
-
-Core components (technical)
----------------------------
-
-
-```mermaid
-graph TD
-    internet{{internet}}
-    internet -- http 443 ---> frontend
-
-     frontend
-     mqtt
-     processmedia
-     browser
-     player
-     api_queue
-
-     logs[(/logs/)]
-     frontend ..-> logs
-     processmedia ..-> logs
-     api_queue ..-> logs
-
-     /data/queue/[(/data/queue/)]
-
-     frontend -- http 80 --> browser
-     frontend -- http 80 --> player
-     frontend -- http 8000 --> api_queue
-     api_queue --mqtt 1887--> mqtt
-     api_queue <--> /data/queue/
-     mqtt -- websocket 9001 --> frontend
-
-     syncthing --> /media/source/
-
-     /media/source/[(/media/source/)]
-     /media/processed/[(/media/processed/)]
-
-    /media/processed/ --> frontend
-    /media/processed/ -- tracks.json --> api_queue
-    /media/source/ --> processmedia --> /media/processed/
-```
-
-
-* [api_queue](api_queue/README.md) ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
-  * An API for managing queues
-  * Users can add tracks to the queue
-  * Tracks will be validated to make sure one user isn't filling the whole queue, and nobody can add tracks past the end of the event time limit
-  * Admins can re-order and delete tracks
 * [processmedia3](processmedia3/README.md) ![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)
-  * Takes folders of source data (video, image+audio, subtitles)
-  * Create high-bitrate video for the player interface.
-  * Create low-bitrate previews for mobile devices
-  * Create thumbnail images for the track browser
-  * Convert subtitles into a format that web browsers understand
-  * Export an index of all the created files and metadata into `tracks.json`
-* [browser3](browser3/README.md) ![Browser2](https://github.com/calaldees/KaraKara/workflows/Browser3/badge.svg)
-  * Mobile webapp interface to search / preview / queue tracks
-  * Gets data from `tracks.json`
-* [player3](player3/README.md) ![Player2](https://github.com/calaldees/KaraKara/workflows/Player3/badge.svg)
-  * Displays the current queue for use on a projector
-  * Gets data from website / `queue` api
-  * Streams final video from `caddy` in fullscreen mode.
-  * Automatically updates track list when the queue is changed.
-
-
-History
--------
-
-* Each component has been re-written and refined multiple times since it's inception in 2012
-* When the project was started we could not rely on a venues reliable free wifi and 4g didn't exist. A physical server and wireless router were needed in the room. Since then the project has evolved to be 'Karaoke as a service' run on an external webserver.
+  * Takes a folder of all kinds of source data (video, image+audio, subtitles)
+  * Create consistently encoded outputs, and a track index in `tracks.json`
+* [browser3](browser3/README.md) ![Browser3](https://github.com/calaldees/KaraKara/workflows/Browser3/badge.svg)
+  * Mobile app to browse the data in `tracks.json`
+  * Users can send tracks to the queue
+* [api_queue](api_queue/README.md) ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
+  * Takes requests from users and commands from admins
+  * Publishes the current queue to the player
+* [player3](player3/README.md) ![Player3](https://github.com/calaldees/KaraKara/workflows/Player3/badge.svg)
+  * Fullscreen video player for the projector
+  * Displays the current queue in between tracks
