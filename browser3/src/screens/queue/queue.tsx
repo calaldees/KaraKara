@@ -27,7 +27,6 @@ function QueueItemRender({
     show_time: boolean;
     track: Track;
 }): React.ReactElement {
-    const { performerName } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
     const { request, sessionId } = useApi();
 
@@ -46,7 +45,7 @@ function QueueItemRender({
         <li
             className={dict2css({
                 queue_item: true,
-                me: is_my_song(sessionId, performerName, item),
+                me: is_my_song(sessionId, item),
             })}
         >
             <Thumb track={track} />
@@ -61,12 +60,7 @@ function QueueItemRender({
                 </span>
             )}
 
-            {/*
-             * Specifically check ID matches, not name-or-ID matches
-             * (as in is_my_song()) because ID needs to match otherwise
-             * the server will reject it
-             */}
-            {sessionId === item.session_id && (
+            {is_my_song(sessionId, item) && (
                 <span
                     data-cy="remove"
                     className={"go_arrow"}
@@ -111,7 +105,7 @@ function Lyrics({ track }: { track: Track }) {
 }
 
 export function Queue(): React.ReactElement {
-    const { performerName, widescreen } = useContext(ClientContext);
+    const { widescreen } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const { queue, settings } = useContext(RoomContext);
     const { sessionId } = useApi();
@@ -178,14 +172,14 @@ export function Queue(): React.ReactElement {
             )}
 
             {/* My Stuff */}
-            {queue.filter((item) => is_my_song(sessionId, performerName, item))
+            {queue.filter((item) => is_my_song(sessionId, item))
                 .length > 0 && (
                 <section>
                     <h2>My Entries</h2>
                     <ul>
                         {queue
                             .filter((item) =>
-                                is_my_song(sessionId, performerName, item),
+                                is_my_song(sessionId, item),
                             )
                             .map((item) => (
                                 <QueueItemRender
