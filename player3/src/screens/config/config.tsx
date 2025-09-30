@@ -60,6 +60,7 @@ export function ConfigMenu() {
                                         onChange={(e) =>
                                             setRoomNameEdit(e.target.value)
                                         }
+                                        required={true}
                                     />
                                 </td>
                             </tr>
@@ -72,6 +73,7 @@ export function ConfigMenu() {
                                         onChange={(e) =>
                                             setRoomPasswordEdit(e.target.value)
                                         }
+                                        required={true}
                                     />
                                 </td>
                             </tr>
