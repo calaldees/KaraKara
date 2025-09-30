@@ -3,8 +3,8 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { Video } from "@/components/video";
 import { RoomContext } from "@/providers/room";
-import { ServerContext } from "@/providers/server";
 import type { QueueItem, Subtitle, Track } from "@/types";
+import { useApi } from "@/hooks/api";
 import { attachment_path, percent, s_to_mns, parse_duration } from "@/utils";
 
 import "./podium.scss";
@@ -18,7 +18,7 @@ export function PodiumScreen({
 }) {
     const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
-    const { request } = useContext(ServerContext);
+    const { request } = useApi();
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const [starting, setStarting] = useState(false);
     const currentEl = useRef<HTMLLIElement>(null);

@@ -3,11 +3,11 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import type { QueueItem } from "@/types";
 import { current_and_future } from "@/utils";
 import { ClientContext } from "./client";
-import { ServerContext } from "./server";
 
 export interface RoomContextType {
     isAdmin: boolean;
@@ -24,10 +24,10 @@ export function RoomProvider(props: any) {
     const { roomName } = useParams();
     const { roomPassword } = useContext(ClientContext);
     const { now } = useContext(ServerTimeContext);
-    const { request } = useContext(ServerContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
+    const { request } = useApi();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),
         [now, fullQueue],
