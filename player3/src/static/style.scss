@@ -87,8 +87,12 @@ MAIN {
     position: absolute;
     text-align: center;
     background: black;
-    border-radius: 0.5em;
-    left: 1vw;
-    right: 1vw;
-    top: 1vh;
+    border-top: 0.1em solid #822;
+    border-bottom: 0.1em solid #822;
+    margin: 0;
+    padding: 1vh;
+    translate: 0 -50%;
+    left: 0;
+    right: 0;
+    top: 50%;
 }
