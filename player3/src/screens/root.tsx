@@ -22,12 +22,23 @@ import { VideoScreen } from "./video/video";
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/">
-            <Route index element={<RoomWrapper />} />
+            <Route index element={<NoRoomWrapper />} />
             <Route path=":roomName" element={<RoomWrapper />} />
         </Route>,
     ),
     { basename: process.env.NODE_ENV === "development" ? "/" : "/player3" },
 );
+
+function NoRoomWrapper() {
+    return (
+        <>
+            <main className={"theme-metalghosts"}>
+                <section key="title" className={"screen_title"}></section>
+            </main>
+            <ConfigMenu />
+        </>
+    );
+}
 
 function RoomWrapper() {
     const { roomName } = useParams();
