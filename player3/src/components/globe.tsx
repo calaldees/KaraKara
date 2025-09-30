@@ -5,11 +5,11 @@ import * as THREE from "three";
 import { Group, TextureLoader } from "three";
 import { useMediaQuery } from "usehooks-ts";
 
+import { useMemoArr } from "@/hooks/memo";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
-import { useMemoArr } from "@/hooks/memo";
 
 import world from "@/static/world.svg";
 import "./globe.scss";

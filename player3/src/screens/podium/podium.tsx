@@ -2,10 +2,10 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { Video } from "@/components/video";
+import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
 import type { QueueItem, Subtitle, Track } from "@/types";
-import { useApi } from "@/hooks/api";
-import { attachment_path, percent, s_to_mns, parse_duration } from "@/utils";
+import { attachment_path, parse_duration, percent, s_to_mns } from "@/utils";
 
 import "./podium.scss";
 
