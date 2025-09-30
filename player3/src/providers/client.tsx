@@ -1,4 +1,5 @@
 import { useMemoObj } from "@/hooks/memo";
+import { canAutoplayWithSound } from "@/utils";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage, useSessionStorage } from "usehooks-ts";
@@ -52,6 +53,12 @@ export function ClientProvider(props: any) {
             });
         }
     }, [isSupported, request]);
+
+    useEffect(() => {
+        canAutoplayWithSound()
+            .then((r) => r && setAudioAllowed(r))
+            .catch(() => {});
+    }, []);
 
     const setNotification = useCallback((n: any) => {
         console.log(n);
