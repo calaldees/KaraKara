@@ -32,7 +32,7 @@ export function ClientProvider(props: any) {
     );
     const [underscan, setUnderscan] = useSessionStorage<string>(
         "underscan",
-        "0em 0em",
+        "0px",
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [podium, setPodium] = useSessionStorage<boolean>("podium", false);
