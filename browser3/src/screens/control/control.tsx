@@ -12,6 +12,7 @@ import { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { BackToExplore, FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
@@ -19,12 +20,13 @@ import type { QueueItem } from "@/types";
 import { dict2css, time_until } from "@/utils";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
-    const { tracks, request } = useContext(ServerContext);
+    const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const { fullQueue, setOptimisticQueue } = useContext(RoomContext);
     const { booth } = useContext(ClientContext);
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
+    const { request } = useApi();
 
     function onDragStart(e: any, src_id: number) {
         if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
@@ -236,7 +238,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
 }
 
 function ControlButtons(): React.ReactElement {
-    const { sendCommand, loading } = useContext(ServerContext);
+    const { sendCommand, loading } = useApi();
 
     const buttons = {
         seek_backwards: <FontAwesomeIcon icon={faBackward} />,

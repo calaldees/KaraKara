@@ -89,11 +89,9 @@ function TestHarness(props: TestProps) {
         tracks: tracks,
         downloadSize: 100,
         downloadDone: 100,
+        now: 1234,
+        offset: 1.5,
         connected: true,
-        request: () => {},
-        sessionId: "asdf-1234-ghjk-5678",
-        sendCommand: () => {},
-        loading: false,
         ...props.server,
     };
     const [queue_, _setQueue] = useState(queue as QueueItem[]);
@@ -102,6 +100,7 @@ function TestHarness(props: TestProps) {
     );
     const rc = {
         isAdmin: true,
+        sessionId: "admin",
         queue: optimisticQueue ?? queue_,
         fullQueue: queue_,
         setOptimisticQueue,

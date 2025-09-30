@@ -3,6 +3,7 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import type { QueueItem, Track } from "@/types";
 import { current_and_future, normalise_cmp } from "@/utils";
@@ -27,7 +28,7 @@ export const RoomContext = createContext<RoomContextType>(
 export function RoomProvider(props: any) {
     const { roomName } = useParams();
     const { roomPassword } = useContext(ClientContext);
-    const { tracks, request, sessionId } = useContext(ServerContext);
+    const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
@@ -35,6 +36,7 @@ export function RoomProvider(props: any) {
         null,
     );
     const [settings, setSettings] = useState<Record<string, any>>({});
+    const { request, sessionId } = useApi();
     const navigate = useNavigate();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),
