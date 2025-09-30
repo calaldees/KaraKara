@@ -59,3 +59,19 @@ export function parse_duration(inp: string | number): number {
         );
     }
 }
+
+export async function canAutoplayWithSound() {
+    try {
+        const ctx = new window.AudioContext();
+        const source = ctx.createBufferSource();
+        source.buffer = ctx.createBuffer(1, 1, 22050); // tiny silent buffer
+        source.connect(ctx.destination);
+        source.start(0);
+        await ctx.resume();
+        source.disconnect();
+        await ctx.close();
+        return true;
+    } catch (_e) {
+        return false;
+    }
+}
