@@ -32,13 +32,9 @@ export function shuffle<T>(array: T[]): T[] {
 
 export function is_my_song(
     session_id: string | null,
-    performer_name: string,
-    item?: Pick<QueueItem, "session_id" | "performer_name">,
+    item?: Pick<QueueItem, "session_id">,
 ): boolean {
-    return (
-        item?.session_id === (session_id || "").split("-")[0] ||
-        item?.performer_name === performer_name
-    );
+    return item?.session_id === (session_id || "").split("-")[0];
 }
 
 /*
