@@ -42,7 +42,7 @@ export function ClientProvider(props: any) {
 
     const { isSupported, request } = useWakeLock({
         onRequest: () => setWakeLock("Requested"),
-        onError: () => setWakeLock("Error"),
+        onError: (error: Error) => setWakeLock("Error: " + error.message),
         onRelease: () => setWakeLock("Released"),
     });
     useEffect(() => {
