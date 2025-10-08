@@ -2,8 +2,10 @@ import pytest
 import collections.abc
 import datetime
 import typing as t
+import collections.abc as ct
 
 import ujson as json
+from sanic_testing.testing import TestingResponse as Response
 from api_queue.api_types import App
 
 
@@ -12,14 +14,14 @@ class APIQueue:
         self.app = app
         self._queue = queue
 
-    async def login(self):
+    async def login(self) -> None:
         request, response = await self.app.asgi_client.post(
             f"/room/{self._queue}/login.json", data=json.dumps(dict(password=self._queue, create=True))
         )
         assert response.status == 200
         assert response.json["is_admin"] is True
 
-    async def logout(self):
+    async def logout(self) -> None:
         request, response = await self.app.asgi_client.post(
             f"/room/{self._queue}/login.json", data=json.dumps(dict(password=""))
         )
@@ -32,45 +34,48 @@ class APIQueue:
         return response.text
 
     @property
-    async def queue(self) -> t.Sequence[t.Mapping]:
+    async def queue(self) -> ct.Sequence[ct.Mapping[str, t.Any]]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
         return response.json
 
     @property
-    async def tracks(self):
+    async def tracks(self) -> ct.Mapping[str, ct.Mapping[str, t.Any]]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/tracks.json")
         return response.json
 
     @property
-    async def settings(self) -> t.Mapping[str, t.Any]:
+    async def settings(self) -> ct.Mapping[str, t.Any]:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
         return response.json
 
-    async def settings_put(self, payload: t.Mapping[str, t.Any]):
+    async def settings_put(self, payload: ct.Mapping[str, t.Any]) -> Response:
         request, response = await self.app.asgi_client.put(
             f"/room/{self._queue}/settings.json", data=json.dumps(payload)
         )
         return response
 
-    async def post(self, **kwargs):
+    async def post(self, **kwargs) -> Response:
         request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
-    async def delete(self, queue_item_id: int):
+    async def delete(self, queue_item_id: int) -> Response:
         request, response = await self.app.asgi_client.delete(f"/room/{self._queue}/queue/{queue_item_id}.json")
         return response
 
-    async def put(self, **kwargs):
+    async def put(self, **kwargs) -> Response:
         request, response = await self.app.asgi_client.put(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
-    async def command(self, command: str):
+    async def command(self, command: str) -> Response:
         request, response = await self.app.asgi_client.get(f"/room/{self._queue}/command/{command}.json")
         return response
 
 
 @pytest.fixture
 async def api_queue(app: App):
+    import api_queue.server
+
+    api_queue.server.SECURE_COOKIES = False
     return APIQueue(app, "test")
 
 
@@ -311,7 +316,7 @@ async def test_queue_updated_actions(api_queue: APIQueue):
 
     response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="invalid_name")
     assert response.status == 400
-    assert "invalid_name" in str(response.json["context"])
+    assert "invalid_name" in str(response.json)
 
 
 @pytest.mark.asyncio

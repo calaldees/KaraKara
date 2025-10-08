@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 import json
-import typing as t
+import collections.abc as ct
 from types import MappingProxyType
 import datetime
 
@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 type TrackID = str
-type TrackDurations = t.Mapping[TrackID, datetime.timedelta]
+type TrackDurations = ct.Mapping[TrackID, datetime.timedelta]
 
 
 class TrackManager:

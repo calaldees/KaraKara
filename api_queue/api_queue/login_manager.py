@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 import contextlib
 import typing as t
+import collections.abc as ct
 import pydantic
 
 
@@ -9,7 +10,7 @@ T = t.TypeVar("T", bound=pydantic.BaseModel)
 
 
 @contextlib.contextmanager
-def load_obj(path: Path, cls: type[T]) -> t.Generator[T]:
+def load_obj(path: Path, cls: type[T]) -> ct.Generator[T]:
     oldData: dict[str, t.Any] = json.loads(path.read_text()) if path.is_file() else {}
     obj = cls.model_validate(oldData)
     yield obj

@@ -28,6 +28,7 @@ export function Login(): React.ReactElement {
                         enterKeyHint="go"
                         onChange={(e) => setRoomNameEdit(e.target.value)}
                         required={true}
+                        autoFocus={true}
                     />
                     <button type="submit" disabled={!roomNameEdit.trim()}>
                         Enter Room <FontAwesomeIcon icon={faRightToBracket} />

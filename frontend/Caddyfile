@@ -1,0 +1,54 @@
+:80 {
+	root * /var/empty
+	encode zstd gzip
+
+	log {
+		output file /logs/caddy-access.json
+		format json {
+			time_format iso8601
+		}
+		format filter {
+			request>headers delete
+			resp_headers delete
+		}
+	}
+
+	handle_path /files/* {
+		root * /media/processed
+		file_server {
+			precompressed
+		}
+		header Cache-Control "public, max-age=21600, immutable"
+	}
+
+	handle_path /logs/* {
+		root * /logs
+		file_server browse
+	}
+
+	handle_path /data/queue/* {
+		root * /data/queue
+		file_server browse
+	}
+
+	handle_path /tools/* {
+		root * /static/tools
+		file_server
+	}
+
+	handle_path /mqtt {
+		reverse_proxy mqtt:9001
+	}
+
+	handle_path /api/* {
+		reverse_proxy api_queue:8000
+	}
+
+	handle_path /browser3/* {
+		reverse_proxy browser3
+	}
+
+	handle_path /player3/* {
+		reverse_proxy player3
+	}
+}

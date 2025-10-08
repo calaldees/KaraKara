@@ -3,13 +3,19 @@
     --gradient-mid: #074d5e;
     --gradient-light: #29edf2;
 
-    --border: 1px solid var(--gradient-light);
+    --border-thickness: 1px;
+    --border: var(--border-thickness) solid var(--gradient-light);
     --border-radius: 2cqh;
     --padding: 2cqh 2cqw;
     --background: radial-gradient(
         rgb(from var(--gradient-mid) r g b / 75%),
         rgb(from var(--gradient-dark) r g b / 95%)
     );
+
+    // on large screens, 2px border thickness
+    @media (min-width: 1000px) {
+        --border-thickness: 2px;
+    }
 }
 
 @font-face {

@@ -5,8 +5,8 @@ networks:
 
 services:
 
-    nginx:
-        image: nginx:alpine
+    frontend:
+        image: caddy:2-alpine
         restart: unless-stopped
         mem_limit: 1g
         ports:
@@ -16,8 +16,7 @@ services:
             - ${PATH_HOST_data}/queues:/data/queue/:ro
             - ${PATH_HOST_processed}:/media/processed:ro
             - ${PWD}/tools/:/static/tools/:ro
-            - ${PWD}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-            #- ${PWD}/nginx/logrotate.conf:/etc/logrotate.d/nginx:ro
+            - ${PWD}/frontend/:/etc/caddy/
         links:
             - api_queue
             - mqtt
@@ -39,6 +38,8 @@ services:
             SANIC_MQTT: mqtt
             SANIC_PATH_TRACKS: /media/processed/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
             SANIC_PATH_QUEUE: /data/queue/   # See volumes below
+            SANIC_PROXIES_COUNT: 1
+            SANIC_REAL_IP_HEADER: x-real-ip
         #ports:  # for local dev
         #    - 8000:8000
         links:

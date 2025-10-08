@@ -1,4 +1,5 @@
 import { useMemoObj } from "@/hooks/memo";
+import { canAutoplayWithSound } from "@/utils";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage, useSessionStorage } from "usehooks-ts";
@@ -32,7 +33,7 @@ export function ClientProvider(props: any) {
     );
     const [underscan, setUnderscan] = useSessionStorage<string>(
         "underscan",
-        "0em 0em",
+        "0px",
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [podium, setPodium] = useSessionStorage<boolean>("podium", false);
@@ -42,7 +43,7 @@ export function ClientProvider(props: any) {
 
     const { isSupported, request } = useWakeLock({
         onRequest: () => setWakeLock("Requested"),
-        onError: () => setWakeLock("Error"),
+        onError: (error: Error) => setWakeLock("Error: " + error.message),
         onRelease: () => setWakeLock("Released"),
     });
     useEffect(() => {
@@ -52,6 +53,12 @@ export function ClientProvider(props: any) {
             });
         }
     }, [isSupported, request]);
+
+    useEffect(() => {
+        canAutoplayWithSound()
+            .then((r) => r && setAudioAllowed(r))
+            .catch(() => {});
+    }, []);
 
     const setNotification = useCallback((n: any) => {
         console.log(n);

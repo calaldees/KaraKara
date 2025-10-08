@@ -36,6 +36,14 @@ analytics = [
 module = "mypy-sanic_ext.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "sanic_testing.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytimeparse2.*"
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 addopts = "--doctest-modules -p no:cacheprovider"  # --mypy # mypy slows my flow down
@@ -56,3 +64,4 @@ reportUnusedCallResult = false
 reportUninitializedInstanceVariable = false
 reportUnreachable = false
 reportUnannotatedClassAttribute = false
+reportUnusedParameter = false

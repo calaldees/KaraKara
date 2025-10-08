@@ -1,7 +1,7 @@
 import enum
 import contextlib
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from textwrap import dedent
 from collections.abc import AsyncGenerator
@@ -26,6 +26,10 @@ from .login_manager import LoginManager, User
 from .background_tasks import background_tracks_update_event
 from .api_types import App, Request
 
+# The test client from sanic_testing considers itself to be insecure, so
+# secure cookies are invisible... so let's be secure by default, but
+# set this to false in unit tests?
+SECURE_COOKIES = True
 
 app = App("karakara_queue")
 app.config.update(
@@ -169,9 +173,9 @@ async def analytics(request: Request):
     try:
         with open("/logs/analytics.json", "a", encoding="utf8") as f:
             data = request.json
-            data["ip"] = request.ip
+            data["remote_addr"] = request.remote_addr
             data["time"] = datetime.now().isoformat()
-            data["ua"] = request.headers.get("user-agent")
+            data["user_agent"] = request.headers.get("user-agent")
             data["session"] = request.ctx.session_id
             f.write(json.dumps(data) + "\n")
         return sanic.response.json(True)
@@ -226,7 +230,14 @@ async def login(request: Request, room_name: str, body: LoginRequest):
         request.ctx.session_id = str(uuid.uuid4())
     user = request.app.ctx.login_manager.login(room_name, request.ctx.session_id, body.password)
     resp = sanic.response.json(user.model_dump(mode="json"))
-    resp.cookies.add_cookie("kksid", request.ctx.session_id, secure=False, samesite=None)
+    next_year = datetime.now() + timedelta(days=400)
+    resp.cookies.add_cookie(
+        "kksid",
+        request.ctx.session_id,
+        samesite="strict",
+        expires=next_year,
+        secure=SECURE_COOKIES,
+    )
     return resp
 
 
@@ -246,7 +257,7 @@ async def login(request: Request, room_name: str, body: LoginRequest):
 )
 async def tracks(request: Request, room_name: str):
     filename: str = request.app.config.PATH_TRACKS
-    return await sanic.response.file(filename)  # type: ignore[arg-type]
+    return await sanic.response.file(filename)
 
 
 # Queue / Settings ------------------------------------------------------------

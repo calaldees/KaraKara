@@ -104,7 +104,7 @@ export function useApi() {
                         throw result;
                     }
 
-                    console.groupCollapsed("api_request(", props.url, ")");
+                    console.groupCollapsed(`api_request(${props.url})`);
                     console.log(result);
                     console.groupEnd();
 
@@ -121,11 +121,7 @@ export function useApi() {
                     }
                 })
                 .catch(function (error) {
-                    console.groupCollapsed(
-                        "api_request(",
-                        props.url,
-                        ") [error]",
-                    );
+                    console.groupCollapsed(`api_request(${props.url}) [error]`);
                     console.log(error);
                     console.groupEnd();
 
@@ -147,7 +143,7 @@ export function useApi() {
                     }
                 });
         },
-        [roomName, setNotification],
+        [roomName, setNotification, sessionId],
     );
 
     const sendCommand = useCallback(

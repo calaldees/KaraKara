@@ -21,39 +21,17 @@ describe("shuffle", () => {
 
 describe("is_my_song", () => {
     test("match based only on session ID", () => {
-        expect(
-            utils.is_my_song("sess1", "Jim", {
-                session_id: "sess1",
-                performer_name: "Bob",
-            }),
-        ).toEqual(true);
-    });
-    test("match based only on performer name", () => {
-        expect(
-            utils.is_my_song("sess1", "Jim", {
-                session_id: "sess2",
-                performer_name: "Jim",
-            }),
-        ).toEqual(true);
-    });
-    test("match based on both", () => {
-        expect(
-            utils.is_my_song("sess1", "Jim", {
-                session_id: "sess1",
-                performer_name: "Jim",
-            }),
-        ).toEqual(true);
+        expect(utils.is_my_song("sess-1234", { session_id: "sess" })).toEqual(
+            true,
+        );
     });
     test("no-match based only on neither", () => {
-        expect(
-            utils.is_my_song("sess1", "Jim", {
-                session_id: "sess2",
-                performer_name: "Bob",
-            }),
-        ).toEqual(false);
+        expect(utils.is_my_song("sess-1234", { session_id: "asdf" })).toEqual(
+            false,
+        );
     });
     test("no-match when track is missing", () => {
-        expect(utils.is_my_song("sess1", "Jim", undefined)).toEqual(false);
+        expect(utils.is_my_song("sess-1234", undefined)).toEqual(false);
     });
 });
 

@@ -73,7 +73,7 @@ tracks = [
             Target(
                 type=VIDEO_AV1,
                 sources=[
-                    Source(type=AUDIO, path="JPop/Novid.ogg")
+                    Source(type=AUDIO, path="JPop/Novid.ogg"),
                     Source(type=IMAGE, path="JPop/Novid.jpg")
                 ]
             ),
@@ -87,16 +87,17 @@ tracks = [
 `main.py` has a function for each step in the process:
 - `scan()` looks at the input directory and creates the above list of Tracks
 - `view()` iterates over each Track, and prints out data about them
-- `encode()` iterates over each Track, and makes sure that each `Target` file
-  exists, calling `target.encode()` to create it if needed
+- `encode()` iterates over each Track, and makes sure that each `Target` file exists, calling `target.encode()` to create it if needed
 - `export()` iterates over each Track, converts it to JSON, and writes `tracks.json`
-- `cleanup()` iterates over each Track, collecs a list of all Target filenames,
-  and deletes any file in the output directory that we aren't expecting to exist
+- `cleanup()` iterates over each Track, collecs a list of all Target filenames, and deletes any file in the output directory that we aren't expecting to exist
+- `lint()` iterates over all the sources and checks for various common mistakes like typos in tag names or overlapping subtitles
 
-`lib/kktypes.py` has classes for `Source` / `Target` / `Track`
+`lib/` has classes for `Source` / `Target` / `Track`
 
-The above two are all of the high-level workflow; the rest of the code is more
-specific implementation details for translating avi to webm, srt to vtt, etc.
+
+Encoders
+--------
+`lib/encoders.py` has a collection of `Encoder` classes which define "I can take these inputs" (eg. "Image" and "Audio file") and "I can create these outputs" (eg. "AV1 Video"). We then gather all the sources for a `Track`, and check each `Encoder` for "Who can create (this output type) given (these input types)?"
 
 
 Debugging Tools
@@ -111,7 +112,7 @@ Debugging Tools
 * Encoding a single file into various formats to test with
     * `./main.py test-encode --reencode ~/Videos/kk-stress-test/demo.webm`
 
-Commands: scan, view, encode, export, cleanup
+Commands: scan, view, encode, export, cleanup, lint
 
 
 Dev Setup
