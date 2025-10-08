@@ -16,8 +16,6 @@ import { attachment_path } from "@/utils";
 import "./track.scss";
 
 const BLOCKED_KEYS = [
-    null,
-    "null",
     "",
     "title",
     "from",
