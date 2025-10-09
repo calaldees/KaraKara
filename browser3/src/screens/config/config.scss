@@ -3,12 +3,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     DIV {
-        flex: 0 0 auto;
         text-align: center;
         z-index: 9999;
         color: var(--settings-color);
