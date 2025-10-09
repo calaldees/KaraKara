@@ -4,11 +4,11 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "serve": "vite --host 127.0.0.1 --port 1236",
-        "build": "tsc -b && vite build --base /browser3/",
+        "serve": "rsbuild dev",
+        "build": "tsc -b && rsbuild build",
         "cypress": "npx cypress open",
         "format": "prettier --write .",
-        "preview": "npm run build && vite preview --host 127.0.0.1 --port 1236 --base /browser3/",
+        "preview": "rsbuild preview",
         "lint": "eslint src",
         "test": "vitest",
         "test-once": "vitest run"
@@ -28,11 +28,13 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",
+        "@rsbuild/core": "^1.1.13",
+        "@rsbuild/plugin-react": "^1.1.1",
+        "@rsbuild/plugin-sass": "^1.1.1",
         "@types/node": "^24.5.2",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
-        "@vitejs/plugin-react-swc": "^4.1.0",
-        "cypress": "^15.3.0",
+        "cypress": "^14.1.0",
         "eslint": "^9.21.0",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-dom": "^1.53.1",
@@ -42,10 +44,8 @@
         "globals": "^16.4.0",
         "prettier": "^3.5.3",
         "prettier-plugin-organize-imports": "^4.3.0",
-        "sass-embedded": "^1.85.1",
         "typescript": "^5.8.2",
         "typescript-eslint": "^8.24.1",
-        "vite": "^7.1.7",
         "vitest": "^3.0.8"
     },
     "prettier": {
