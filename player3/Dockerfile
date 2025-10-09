@@ -14,4 +14,14 @@ RUN npm run build
 # Copy built app to httpd container
 FROM nginx:alpine
 COPY --from=build /app/dist /app
-RUN echo "server { root /app; try_files \$uri /index.html; }" > /etc/nginx/conf.d/default.conf
+RUN cat > /etc/nginx/conf.d/default.conf <<'EOF'
+server {
+    root /app;
+    try_files $uri /index.html;
+
+    location /static/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+EOF
