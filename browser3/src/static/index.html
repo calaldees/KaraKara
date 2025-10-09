@@ -1,7 +1,30 @@
 <!doctype html>
 <html lang="en">
-  <head></head>
-  <body>
-    <div id="<%= mountId %>"></div>
-  </body>
+    <head>
+        <style>
+            .js-loaded #fallback {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="fallback">
+            <p>
+                Sorry, the app failed to load. Please refresh or check your
+                connection.
+            </p>
+        </div>
+        <script>
+            document.documentElement.classList.add("js-loaded");
+            setTimeout(() => {
+                if (
+                    !document.querySelector("#<%= mountId %>").childElementCount
+                ) {
+                    document.documentElement.classList.remove("js-loaded");
+                }
+            }, 5000);
+        </script>
+        <div id="<%= mountId %>"></div>
+    </body>
 </html>
