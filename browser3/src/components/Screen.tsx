@@ -6,7 +6,7 @@ import { RoomContext } from "@/providers/room";
 import { Notification } from "./Notification";
 import { YoureNext } from "./YoureNext";
 
-const EmptyHeaderLink = (): React.ReactElement => <a href="#" />;
+const EmptyHeaderLink = (): React.ReactElement => <div />;
 
 export function Screen({
     title,

@@ -296,7 +296,12 @@ export function TrackDetails(): React.ReactElement {
         <Screen
             className={"track"}
             navLeft={
-                <div onClick={() => void navigate(-1)} data-cy="back">
+                <div
+                    onClick={() => void navigate(-1)}
+                    data-cy="back"
+                    role="button"
+                    aria-label="Go Back"
+                >
                     <FontAwesomeIcon
                         icon={faCircleChevronLeft}
                         className="x2"
@@ -306,7 +311,7 @@ export function TrackDetails(): React.ReactElement {
             title={track.tags.title[0]}
             navRight={
                 !widescreen && (
-                    <Link to={"../queue"} data-cy="queue">
+                    <Link to={"../queue"} data-cy="queue" aria-label="Show Queue">
                         <FontAwesomeIcon icon={faListOl} className="x2" />
                     </Link>
                 )
