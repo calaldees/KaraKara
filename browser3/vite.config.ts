@@ -9,9 +9,6 @@ export default defineConfig({
             "@": "/src",
         },
     },
-    build: {
-        target: ["es2015", "ios11"],
-    },
     server: {
         proxy: {
             "/api": {
