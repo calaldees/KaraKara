@@ -1,4 +1,3 @@
-import placeholder from "@/static/placeholder.svg";
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
 
@@ -13,20 +12,11 @@ export function Thumb({
 }): React.ReactElement {
     return (
         <div className={"thumb"} {...kwargs}>
-            <picture>
-                {track?.attachments.image.map((a, n) => (
-                    <source
-                        key={a.path + n}
-                        srcSet={attachment_path(a)}
-                        type={a.mime}
-                    />
-                ))}
-                <img
-                    alt=""
-                    style={{ backgroundImage: `url("${placeholder}")` }}
-                    draggable="false"
-                />
-            </picture>
+            <img
+                alt=""
+                draggable="false"
+                src={track?.attachments.image[0] && attachment_path(track.attachments.image[0])}
+            />
             {children}
         </div>
     );
