@@ -186,10 +186,9 @@ UL {
         .thumb {
             height: 4em;
             width: 6em;
+            flex: 0 0 auto;
             margin: -0.75em;
             margin-right: 0.75em;
-            background-size: cover;
-            background-position: center;
             border-right: 1px solid var(--list-border);
             position: relative;
             IMG {
@@ -219,12 +218,16 @@ UL {
             padding-right: 0.4em;
         }
         SPAN.count {
+            flex: 0 0 auto;
             margin-right: 0.5em;
             border: 1px solid var(--list-border);
             background: var(--page-bg);
             font-size: 0.75em;
             padding: 0.2em 0.4em;
             border-radius: 0.2em;
+        }
+        SPAN.go_arrow {
+            flex: 0 0 auto;
         }
     }
     LI:last-child {
