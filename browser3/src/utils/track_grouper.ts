@@ -49,6 +49,7 @@ export function suggest_next_filters(
         "lang:en": ["category", "vocalstyle", "vocaltrack"],
         "vocaltrack:on": ["category", "vocalstyle", "lang"],
         "vocaltrack:off": ["category", "vocalstyle", "lang"],
+        "category:new": ["added"],
     };
     if (search_configs[last_filter]) {
         return search_configs[last_filter];
