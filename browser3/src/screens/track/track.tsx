@@ -311,7 +311,11 @@ export function TrackDetails(): React.ReactElement {
             title={track.tags.title[0]}
             navRight={
                 !widescreen && (
-                    <Link to={"../queue"} data-cy="queue" aria-label="Show Queue">
+                    <Link
+                        to={"../queue"}
+                        data-cy="queue"
+                        aria-label="Show Queue"
+                    >
                         <FontAwesomeIcon icon={faListOl} className="x2" />
                     </Link>
                 )

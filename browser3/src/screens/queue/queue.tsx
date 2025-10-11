@@ -172,15 +172,12 @@ export function Queue(): React.ReactElement {
             )}
 
             {/* My Stuff */}
-            {queue.filter((item) => is_my_song(sessionId, item))
-                .length > 0 && (
+            {queue.filter((item) => is_my_song(sessionId, item)).length > 0 && (
                 <section>
                     <h2>My Entries</h2>
                     <ul>
                         {queue
-                            .filter((item) =>
-                                is_my_song(sessionId, item),
-                            )
+                            .filter((item) => is_my_song(sessionId, item))
                             .map((item) => (
                                 <QueueItemRender
                                     key={item.id}

@@ -2,7 +2,6 @@
 
 A self-contained client-side version of the KaraKara library browser
 
-
 ## Layout
 
 ```
@@ -17,7 +16,6 @@ src/
   types.ts     -- type definitions, should be in-sync with player3 and api_queue
 dist/          -- compiled results for serving to users
 ```
-
 
 ## Architecture
 
@@ -35,7 +33,6 @@ Login
      \- QR Code (admin only)
 
 ```
-
 
 ## Dev Setup
 
@@ -57,15 +54,16 @@ And then visit the browser at `http://localhost:1236/`
 
 With `npm run serve`, files will automatically get rebuilt and hot-reloaded, no need to even hit refresh in the browser :)
 
-
 ## Testing
 
 Unit tests for the more processing-heavy parts of the code (basically just the parts in `src/utils`)
+
 ```
 npm run test
 ```
 
 Automated end-to-end GUI tests using Cypress
+
 ```
 npm run cypress
 ```
