@@ -24,6 +24,7 @@ const BLOCKED_KEYS = [
     "aspect_ratio",
     "date",
     "added",
+    "new",
     "source", // TODO: figure out a nice way to display source URLs?
 ];
 enum TrackAction {

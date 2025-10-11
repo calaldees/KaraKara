@@ -49,7 +49,6 @@ export function suggest_next_filters(
         "lang:en": ["category", "vocalstyle", "vocaltrack"],
         "vocaltrack:on": ["category", "vocalstyle", "lang"],
         "vocaltrack:off": ["category", "vocalstyle", "lang"],
-        "category:new": ["added"],
     };
     if (search_configs[last_filter]) {
         return search_configs[last_filter];
@@ -134,7 +133,12 @@ export function group_tracks(
     }
 
     // If we have a few tracks, just list them all
-    else if (tracks.length < 25) {
+    // (category:new is a special case where we want to always
+    // show all of the tracks, grouped by date, in reverse)
+    else if (
+        tracks.length < 25 ||
+        (filters.length === 1 && filters[0] === "category:new")
+    ) {
         // If we are searching for some tags, see if our most recently
         // searched tag has any children, eg if we are currently searching
         // for "from:Macross" then the resulting list of tracks will be
@@ -148,6 +152,11 @@ export function group_tracks(
             const tag_children = Object.keys(all_tags[tag_key]).sort(
                 normalise_cmp,
             );
+            // category:new is a special case where we want to
+            // show the newest tracks first, so reverse the order
+            if (filters.length === 1 && filters[0] === "category:new") {
+                tag_children.reverse();
+            }
             // tag_children then lists the children of this tag
             // like ["Delta", "Frontier", "Plus"], and we want to
             // add one [section title, track list] pair into the
