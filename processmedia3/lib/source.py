@@ -15,7 +15,7 @@ T = t.TypeVar("T")
 
 class SourceType(enum.Enum):
     VIDEO = frozenset({".mp4", ".mkv", ".avi", ".mpg", ".webm"})
-    AUDIO = frozenset({".mp3", ".flac", ".ogg", ".aac"})
+    AUDIO = frozenset({".mp3", ".flac", ".ogg", ".aac", ".opus"})
     IMAGE = frozenset({".jpg", ".png", ".webp", ".avif"})
     TAGS = frozenset({".txt"})
     SUBTITLES = frozenset({".srt", ".ssa", ".ass"})
