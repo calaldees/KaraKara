@@ -57,7 +57,9 @@ class Track:
                 # We then try to find an encoder that can create the target_type
                 # from those sources. If we find one, we create a Target for it.
                 if enc := find_appropriate_encoder(target_type, variant_sources):
-                    targets.append(Target(processed_dir, target_type, enc[0], enc[1], variant))
+                    targets.append(
+                        Target(processed_dir, target_type, enc[0], enc[1], variant)
+                    )
 
         self.targets = targets
 
@@ -133,11 +135,13 @@ class Track:
             # then we get a request to add a track on Jan 6th 2020, it's
             # still "new" when the next convention happens on Jan 12th 2021)
             added_date = self._parse_date(tags["added"][0])
-            last_year = datetime.datetime.now() - datetime.timedelta(days=380)
+            last_year = datetime.date.today() - datetime.timedelta(days=380)
             if added_date and added_date > last_year:
                 tags["category"].append("new")
             # also convert "added" to "YYYY-MM" format for better grouping
-            tags["added"] = [self._parse_date(d).strftime("%Y-%m") for d in tags["added"]]
+            tags["added"] = [
+                self._parse_date(d).strftime("%Y-%m") for d in tags["added"]
+            ]
 
         return TrackDict(
             id=self.id,
