@@ -57,9 +57,7 @@ class Track:
                 # We then try to find an encoder that can create the target_type
                 # from those sources. If we find one, we create a Target for it.
                 if enc := find_appropriate_encoder(target_type, variant_sources):
-                    targets.append(
-                        Target(processed_dir, target_type, enc[0], enc[1], variant)
-                    )
+                    targets.append(Target(processed_dir, target_type, enc[0], enc[1], variant))
 
         self.targets = targets
 
@@ -69,6 +67,11 @@ class Track:
     @property
     def has_tags(self) -> bool:
         return bool(self._sources_by_type({SourceType.TAGS}))
+
+    def _parse_date(self, date_str: str) -> datetime.date:
+        if parsed := dateparser.parse(date_str):
+            return parsed.date()
+        raise TrackValidationException(f"unparseable date: {date_str}")
 
     def to_json(self) -> TrackDict:
         """
@@ -122,17 +125,19 @@ class Track:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 
         if tags.get("date"):
-            tags["year"] = [d.split("-")[0] for d in tags["date"]]
+            tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["date"]]
 
         if tags.get("added"):
             # add "category:new" tag for any track added in the last year
             # and a bit (so that if a convention is held eg Jan 5th 2020,
             # then we get a request to add a track on Jan 6th 2020, it's
             # still "new" when the next convention happens on Jan 12th 2021)
-            added_date = dateparser.parse(tags["added"][0])
+            added_date = self._parse_date(tags["added"][0])
             last_year = datetime.datetime.now() - datetime.timedelta(days=380)
             if added_date and added_date > last_year:
                 tags["category"].append("new")
+            # also convert "added" to "YYYY-MM" format for better grouping
+            tags["added"] = [self._parse_date(d).strftime("%Y-%m") for d in tags["added"]]
 
         return TrackDict(
             id=self.id,
