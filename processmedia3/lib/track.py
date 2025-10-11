@@ -123,7 +123,7 @@ class Track:
         audio_sources = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
         ds = list(set(s.meta.duration.total_seconds() for s in audio_sources))
         tags["duration"] = [f"{int(d // 60)}m{int(d % 60):02}s" for d in ds]
-        if len(ds) > 1:
+        if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 
         if tags.get("date"):
