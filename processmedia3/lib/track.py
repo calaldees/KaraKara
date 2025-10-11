@@ -136,7 +136,7 @@ class Track:
             # still "new" when the next convention happens on Jan 12th 2021)
             added_date = self._parse_date(tags["added"][0])
             last_year = datetime.date.today() - datetime.timedelta(days=380)
-            if added_date and added_date > last_year:
+            if added_date > last_year:
                 tags["category"].append("new")
             # also convert "added" to "YYYY-MM" format for better grouping
             tags["added"] = [
