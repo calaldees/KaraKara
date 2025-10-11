@@ -61,6 +61,7 @@ SCAN_IGNORE = [
     ".gitignore",
     "cache.db",
     "tracks.json",
+    "tracks.json.br",
     "tracks.json.gz",
     "readme.txt",
     "WorkInProgress",
@@ -122,7 +123,9 @@ def scan(
     return tuple(
         filter(
             None,
-            thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track"),
+            thread_map(
+                _load_track, groups, max_workers=threads, desc="scan   ", unit="track"
+            ),
         )
     )
 
@@ -168,7 +171,9 @@ def lint(tracks: Sequence[Track]) -> None:
                 all_values = [v for vs in s.tags.values() for v in vs]
                 for key in s.tags.keys():
                     if key != key.lower() and key not in all_values:
-                        log.error(f"{s.file.relative} has {key} key which is not lowercase")
+                        log.error(
+                            f"{s.file.relative} has {key} key which is not lowercase"
+                        )
 
                 # Values should be lowercase unless they are known exceptions
                 # (eg, titles and artist names)
@@ -186,7 +191,9 @@ def lint(tracks: Sequence[Track]) -> None:
                         continue
                     for value in values:
                         if value != value.lower():
-                            log.error(f"{s.file.relative} {key}:{value} should be lowercase")
+                            log.error(
+                                f"{s.file.relative} {key}:{value} should be lowercase"
+                            )
 
                 # Certain tags are required
                 for key in ["title", "category", "vocaltrack", "lang"]:
@@ -196,7 +203,9 @@ def lint(tracks: Sequence[Track]) -> None:
                 # Tracks with vocals should have a vocalstyle
                 if s.tags.get("vocaltrack") == ["on"]:
                     if not s.tags.get("vocalstyle"):
-                        log.error(f"{s.file.relative} has vocaltrack:on but no vocalstyle")
+                        log.error(
+                            f"{s.file.relative} has vocaltrack:on but no vocalstyle"
+                        )
 
                 # "use" tags should be consistent
                 if uses := s.tags.get("use"):
@@ -212,20 +221,29 @@ def lint(tracks: Sequence[Track]) -> None:
                         "theme",
                     ]
                     for use in uses:
-                        if use not in known_uses and re.match(r"^(OP|ED)(\d+)$", use) is None:
+                        if (
+                            use not in known_uses
+                            and re.match(r"^(OP|ED)(\d+)$", use) is None
+                        ):
                             log.error(f"{s.file.relative} has weird use:{use} tag")
                     for n in range(0, 50):
                         if f"OP{n}" in uses and "opening" not in uses:
-                            log.error(f"{s.file.relative} has use:OP{n} but no opening tag")
+                            log.error(
+                                f"{s.file.relative} has use:OP{n} but no opening tag"
+                            )
                         if f"EN{n}" in uses and "ending" not in uses:
-                            log.error(f"{s.file.relative} has use:ED{n} but no ending tag")
+                            log.error(
+                                f"{s.file.relative} has use:ED{n} but no ending tag"
+                            )
 
                 # "source" tags should not contain unquoted URLs
                 #    source:http://example.com -- bad, becomes "source":["http"] + "http":["//example.com"]
                 #    source:"http://example.com" -- good, becomes "source":["http://example.com"]
                 if "source" in s.tags:
                     if "http" in s.tags["source"] or "https" in s.tags["source"]:
-                        log.error(f"{s.file.relative} appears to have an unquoted URL in the source tag")
+                        log.error(
+                            f"{s.file.relative} appears to have an unquoted URL in the source tag"
+                        )
 
                 # No "red" tags - move these tracks to the WorkInProgress folder instead
                 if "red" in s.tags:
@@ -249,7 +267,9 @@ def lint(tracks: Sequence[Track]) -> None:
                 # Check for weird stuff at the line level
                 for index, l in enumerate(ls):
                     if "\n" in l.text:
-                        log.error(f"{s.file.relative}:{index + 1} line contains newline: {l.text}")
+                        log.error(
+                            f"{s.file.relative}:{index + 1} line contains newline: {l.text}"
+                        )
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
@@ -259,12 +279,20 @@ def lint(tracks: Sequence[Track]) -> None:
                 botlines = [l for l in ls if not l.top]
                 for ls in [toplines, botlines]:
                     for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
-                        if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
-                            log.error(f"{s.file.relative}:{index + 1} no gap between 3+ repeats: {l1.text}")
+                        if (
+                            l1.end == l2.start
+                            and l2.end == l3.start
+                            and (l1.text == l2.text == l3.text)
+                        ):
+                            log.error(
+                                f"{s.file.relative}:{index + 1} no gap between 3+ repeats: {l1.text}"
+                            )
                     for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
                         if l2.start > l1.end:
                             gap = l2.start - l1.end
-                            if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
+                            if gap < timedelta(microseconds=100_000) and not (
+                                l1.text == l2.text
+                            ):
                                 log.error(
                                     f"{s.file.relative}:{index + 1} blink between lines: {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
                                 )
@@ -344,7 +372,9 @@ def export(
             log.exception(f"Error exporting {track.id}")
             return None
 
-    json_list = thread_map(_export, tracks, max_workers=threads, desc="export ", unit="track")
+    json_list = thread_map(
+        _export, tracks, max_workers=threads, desc="export ", unit="track"
+    )
 
     # Export in alphabetic order
     json_dict = dict(sorted((t["id"], t) for t in json_list if t))
@@ -380,7 +410,9 @@ def export(
         path.with_suffix(".tmp").rename(path)
 
 
-def cleanup(processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1) -> None:
+def cleanup(
+    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
+) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
     """
@@ -461,7 +493,9 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         nargs="?",
         help="Sub-process to run (view, encode, test-encode, export, lint, cleanup)",
     )
-    parser.add_argument("match", nargs="?", help="Only act upon files matching this pattern")
+    parser.add_argument(
+        "match", nargs="?", help="Only act upon files matching this pattern"
+    )
 
     args = parser.parse_args()
     # we need to create AbstractFolder lazily, because
@@ -498,7 +532,9 @@ def main(argv: Sequence[str]) -> int:
         format="%(asctime)s %(message)s",
     )
     if args.log_file:
-        handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
+        handler = logging.handlers.RotatingFileHandler(
+            args.log_file, maxBytes=65535, backupCount=3
+        )
         logging.getLogger().addHandler(handler)
 
     if args.cmd == "test-encode":
@@ -527,7 +563,9 @@ def main(argv: Sequence[str]) -> int:
             logging_redirect_tqdm(),
         ):
             tracks = scan(args.source, args.processed, args.match, cache, args.threads)
-            tracks = tuple(track for track in tracks if track.has_tags)  # only encode tracks that have a tag.txt file
+            tracks = tuple(
+                track for track in tracks if track.has_tags
+            )  # only encode tracks that have a tag.txt file
 
             # If no specific command is specified, then encode,
             # export, and cleanup with the default settings
