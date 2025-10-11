@@ -138,10 +138,9 @@ class Track:
             last_year = datetime.date.today() - datetime.timedelta(days=380)
             if added_date > last_year:
                 tags["category"].append("new")
-            # also convert "added" to "YYYY-MM" format for better grouping
-            tags["added"] = [
-                self._parse_date(d).strftime("%Y-%m") for d in tags["added"]
-            ]
+                tags["new"] = [
+                    self._parse_date(d).strftime("%Y-%m") for d in tags["added"]
+                ]
 
         return TrackDict(
             id=self.id,
