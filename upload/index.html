@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KaraKara Upload</title>
+    <script src="https://unpkg.com/tus-js-client/dist/tus.js"></script>
+    <style>
+      body { font-family: system-ui, -apple-system, Roboto, 'Segoe UI', sans-serif; padding: 2rem; }
+      form { max-width: 600px; margin: auto; }
+      input, button { margin-top: .5rem; width: 100%; }
+      .file { margin: 1em 0; padding: .5em; border: 1px solid #ccc; border-radius: 6px; }
+      progress { width: 100%; }
+    </style>
+  </head>
+  <body>
+    <h1>Parallel Upload with Metadata</h1>
+    <form id="uploadForm">
+      <label>Title <input type="text" id="title" required /></label>
+      <label>Artist <input type="text" id="artist" required /></label>
+      <label>Release Date <input type="date" id="releaseDate" required /></label>
+      <label>Select Files <input type="file" id="fileInput" multiple required /></label>
+      <button type="submit">Start Upload</button>
+    </form>
+    <div id="uploads"></div>
+
+    <script>
+      const uploadForm = document.getElementById('uploadForm');
+      const fileInput = document.getElementById('fileInput');
+      const uploadsDiv = document.getElementById('uploads');
+
+      uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('title').value;
+        const artist = document.getElementById('artist').value;
+        const releaseDate = document.getElementById('releaseDate').value;
+        const files = fileInput.files;
+
+        if (!files.length) return alert('Please select files.');
+
+        // Create a session
+        const res = await fetch('./session', { method: 'POST' });
+        const { session_id } = await res.json();
+
+        const uploadedFiles = [];
+
+        const uploads = Array.from(files).map(file => {
+          const fileRow = document.createElement('div');
+          fileRow.className = 'file';
+          fileRow.innerHTML = `<strong>${file.name}</strong><br><progress max="100" value="0"></progress>`;
+          uploadsDiv.appendChild(fileRow);
+          const progressEl = fileRow.querySelector('progress');
+
+          return new Promise((resolve, reject) => {
+            const upload = new tus.Upload(file, {
+              endpoint: `./files/${session_id}`,
+              retryDelays: [0, 1000, 3000, 5000],
+              metadata: { filename: file.name },
+              onError: (err) => {
+                progressEl.value = 0;
+                console.error('Failed:', err);
+                reject(err);
+              },
+              onProgress: (bytesUploaded, bytesTotal) => {
+                progressEl.value = (bytesUploaded / bytesTotal) * 100;
+              },
+              onSuccess: () => {
+                uploadedFiles.push(file.name);
+                progressEl.value = 100;
+                resolve();
+              }
+            });
+            upload.start();
+          });
+        });
+
+        try {
+          await Promise.all(uploads);
+
+          const meta = {
+            session_id,
+            metadata: { title, artist, release_date: releaseDate },
+            files: uploadedFiles
+          };
+
+          const finalizeRes = await fetch('./finalize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(meta)
+          });
+          const json = await finalizeRes.json();
+          alert('Upload complete! Files: ' + json.written_files.join(', '));
+        } catch (err) {
+          alert('Upload failed: ' + err.message);
+        }
+      });
+    </script>
+  </body>
+</html>
+
