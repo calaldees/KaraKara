@@ -118,11 +118,14 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
     for info_path in TEMP_DIR.rglob("*.info"):
         async with aiofiles.open(info_path, "r") as f:
             info: dict[str, str] = json.loads(await f.read())["metadata"]
-        if info.get("session_id") == session_id:
+        if info["session_id"] == session_id:
             data_path = info_path.with_suffix("")
-            fname = Path(info.get("filename", data_path)).name
+            orig_path = Path(info["filename"])
+            fname = session_dir / Path(track_id).with_suffix(orig_path.suffix).name
+            while fname.exists():
+                fname = fname.with_stem(fname.stem + "_")
             data_path.rename(session_dir / fname)
-            moved_files.append(fname)
+            moved_files.append(orig_path.name)
             info_path.unlink()
 
     meta_path = session_dir / f"{track_id}.txt"
