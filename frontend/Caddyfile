@@ -51,4 +51,8 @@
 	handle_path /player3/* {
 		reverse_proxy player3
 	}
+
+	handle_path /upload/* {
+		reverse_proxy upload:8000
+	}
 }
