@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>KaraKara Track Submission</title>
+        <script src="https://unpkg.com/tus-js-client/dist/tus.js"></script>
+        <link rel="icon" type="image/svg+xml" href="static/favicon.svg" />
+        <link rel="stylesheet" href="static/style.css" />
+        <script src="static/script.js"></script>
+    </head>
+    <body>
+        <h1>KaraKara Track Submission</h1>
+
+        <form id="upload-form">
+            <div>
+                Suggesting tracks to be added to karakara.uk (Making a
+                suggestion is no guarantee of a track being added; having
+                good-quality files in the right formats is hugely helpful but
+                still not a guarantee of being added)
+            </div>
+            <div id="wips">
+                <h3>Work-in-Progress Tracks</h3>
+            </div>
+            <div>
+                <label>
+                    <h3>Your contact info (Required)</h3>
+                    <p>To ask clarifying questions / notify you
+                    when it's ready - eg "BobbyTables on the
+                    Minamicon Discord"</p>
+                    <input type="text" name="contact" required />
+                </label>
+            </div>
+            <div>
+                <label>
+                    <h3>Track Title (Required)</h3>
+                    <input type="text" name="title" required />
+                </label>
+            </div>
+            <div>
+                <label>
+                    <h3>Artist(s)</h3>
+                    <input type="text" name="artist" />
+                </label>
+            </div>
+            <div>
+                <label>
+                    <h3>Category</h3>
+                    <ul>
+                        <li><label><input type="checkbox" name="category" value="anime"> Anime</label></li>
+                        <li><label><input type="checkbox" name="category" value="cartoon"> Cartoon</label></li>
+                        <li><label><input type="checkbox" name="category" value="game"> Game</label></li>
+                        <li><label>Other: <input type="text" name="category"></label></li>
+                    </ul>
+                </label>
+            </div>
+            <div>
+                <label>
+                    <h3>From</h3>
+                    <p>Series / Game / Movie name</p>
+                    <input type="text" name="from" />
+                </label>
+            </div>
+            <div>
+                <h3>Use</h3>
+                <ul>
+                    <li><label><input type="checkbox" name="use" value="opening"> Opening</label></li>
+                    <li><label><input type="checkbox" name="use" value="ending"> Ending</label></li>
+                    <li><label><input type="checkbox" name="use" value="insert"> Insert</label></li>
+                    <li><label>Other: <input type="text" name="use"></label></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Language</h3>
+                <ul>
+                    <li><label><input type="checkbox" name="lang" value="en"> English</label></li>
+                    <li><label><input type="checkbox" name="lang" value="jp"> Japanese</label></li>
+                    <li><label><input type="checkbox" name="lang" value="kr"> Korean</label></li>
+                    <li><label>Other: <input type="text" name="lang"></label></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Vocal style</h3>
+                <ul>
+                    <li><label><input type="checkbox" name="vocalstyle" value="male"> Male</label></li>
+                    <li><label><input type="checkbox" name="vocalstyle" value="female"> Female</label></li>
+                    <li><label><input type="checkbox" name="vocalstyle" value="duet"> Duet</label></li>
+                    <li><label><input type="checkbox" name="vocalstyle" value="group"> Group</label></li>
+                    <li><label>Other: <input type="text" name="vocalstyle"></label></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Vocal or Instrumental</h3>
+                <p>
+                    (Note that it's considerably easier to add an instrumental if we
+                    already have the vocal version in our database)
+                </p>
+                <ul>
+                    <li><label><input type="radio" name="vocaltrack" value="on"> Vocal</label></li>
+                    <li><label><input type="radio" name="vocaltrack" value="off"> Instrumental</label></li>
+                </ul>
+            </div>
+
+            <div>
+                <label>
+                    <h3>Release date</h3>
+                    <input type="date" name="date" />
+                </label>
+            </div>
+
+            <div class="file-group">
+                <h3>Video (or Audio) File</h3>
+                <ul>
+                    <li>Without baked-in subtitles or watermarks</li>
+                    <li>DVD / Bluray “special features” often include creditless OPs/EDs - these are ideal</li>
+                    <li>Pretty much any video format is fine as input; it’ll all get re-encoded to optimised files for iphones / androids / projectors</li>
+                    <li>If the video doesn't have clean audio (eg characters are talking over the top of an insert song), we'd want a different copy of the audio (eg from a soundtrack album) which can be spliced together</li>
+                </ul>
+                <input multiple type="file" />
+            </div>
+
+            <div class="file-group">
+                <h3>Image (Required if you're uploading an audio file, optional otherwise)</h3>
+                <p>
+                    If the video has a particularly good moment to use as a thumbnail, take a
+                    screenshot and upload that (otherwise the system will pick a random moment
+                    from the video to use as a thumbnail)
+                </p>
+                <input type="file" accept=".jpg,.png,.jpeg" />
+            </div>
+
+            <div class="file-group">
+                <h3>Subtitles</h3>
+                <ul>
+                    <li>The end goal is to get a .srt subtitle file with accurate timings; if you have this, it’ll save a lot of work :) Personally I’m making these with Aegisub but anything which outputs SRT files should work.</li>
+                    <li>Don't do anything fancy - no formatting, no mid-line timings, no "[instrumental break]" markers, no preview of the next line -- the input .srt file should _only_ contain the timings for the lyrics at the moment that they are being sung, and the system will take care of the rest automatically</li>
+                    <li>Western alphabet (eg, english or romaji) required, other alphabets (eg hiragana on hangul) can optionally be added as extras</li>
+                </ul>
+                <input type="file" id="textFiles" multiple accept=".srt" />
+            </div>
+
+            <div>
+                <label>
+                    <h3>Contributor(s)</h3>
+                    <p>If you've done the subtitling / editing work yourself, what name would you like to be credited as?</p>
+                    <input type="text" name="contributor" />
+                </label>
+            </div>
+
+            <div id="uploads"></div>
+
+            <button type="submit">Start Upload</button>
+        </form>
+    </body>
+</html>
