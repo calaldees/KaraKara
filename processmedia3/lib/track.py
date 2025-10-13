@@ -99,6 +99,8 @@ class Track:
 
         tag_files = self._sources_by_type({SourceType.TAGS})
         tags: dict[str, list[str]] = copy.deepcopy(tag_files[0].tags)
+        if tags.get("contact"):
+            del tags["contact"]
         if tags.get("title") is None:
             raise TrackValidationException("missing tags.title")
         if tags.get("category") is None:
