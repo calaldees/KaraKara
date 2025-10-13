@@ -3,6 +3,7 @@ import aiofiles
 import uuid
 import json
 import re
+import shutil
 from glob import glob
 import typing as t
 from fastapi import FastAPI, HTTPException
@@ -106,7 +107,7 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
         track_id = f"{artist[0]} - {title[0]}"
     else:
         track_id = title[0]
-    track_id = re.sub(r"[^a-zA-Z0-9 _-\.]+", " ", track_id)
+    track_id = re.sub(r"[^a-zA-Z0-9_\-\.]+", " ", track_id)
 
     session_dir = UPLOAD_ROOT / session_id
     os.makedirs(session_dir, exist_ok=True)
@@ -121,10 +122,11 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
         if info["session_id"] == session_id:
             data_path = info_path.with_suffix("")
             orig_path = Path(info["filename"])
-            fname = session_dir / Path(track_id).with_suffix(orig_path.suffix).name
-            while fname.exists():
-                fname = fname.with_stem(fname.stem + "_")
-            data_path.rename(session_dir / fname)
+            targ_path = session_dir / Path(track_id).with_suffix(orig_path.suffix).name
+            while targ_path.exists():
+                targ_path = targ_path.with_stem(targ_path.stem + "_")
+            # data_path.move(fname)  # py3.14
+            shutil.move(data_path.as_posix(), targ_path.as_posix())
             moved_files.append(orig_path.name)
             info_path.unlink()
 
