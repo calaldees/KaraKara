@@ -1,0 +1,40 @@
+:root {
+    color-scheme: light dark;
+}
+body {
+    font-family:
+        system-ui,
+        -apple-system,
+        Roboto,
+        "Segoe UI",
+        sans-serif;
+    padding: 2rem;
+}
+h1 {
+    text-align: center;
+}
+form {
+    max-width: 600px;
+    margin: auto;
+}
+form>div {
+    border: 1px solid #ccc;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+}
+h3 {
+    margin: 0;
+    margin-bottom: 0.3em;
+}
+div>label>input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.3em;
+}
+.file {
+    margin-top: 0.5em;
+}
+progress {
+    width: 100%;
+}
