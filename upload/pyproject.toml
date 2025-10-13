@@ -17,7 +17,7 @@ test = [
 	"pytest-asyncio ~= 1.2",
 	"pytest-mypy ~= 1.0",
 	"sanic-testing ~= 24.6",
-	"types-ujson ~= 5.10",
+	"types-aiofiles",
 	"types-dateparser ~= 1.2",
 ]
 
