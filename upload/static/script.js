@@ -12,12 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       data["wips"].forEach((track) => {
         const trackDiv = document.createElement("div");
-        trackDiv.className = "wip-track";
-        const strong = document.createElement("strong");
-        strong.textContent = track.title;
-        trackDiv.appendChild(strong);
-        const byText = document.createTextNode(` by ${track.artist}`);
-        trackDiv.appendChild(byText);
+        trackDiv.appendChild(document.createTextNode(track.title));
+        trackDiv.appendChild(document.createTextNode(` by ${track.artist}`));
+        if (track.status) {
+          trackDiv.appendChild(document.createTextNode(` (${track.status})`));
+        }
         wipDiv.appendChild(trackDiv);
       });
     })

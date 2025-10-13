@@ -3,6 +3,7 @@ import aiofiles
 import shutil
 import uuid
 import json
+import re
 from glob import glob
 import typing as t
 from fastapi import FastAPI, HTTPException
@@ -74,7 +75,7 @@ async def list_wips():
             parts = line.split(":", 1)
             if len(parts) == 2:
                 key = parts[0].strip()
-                if key in ("title", "artist"):
+                if key in ("title", "artist", "status"):
                     meta[key] = parts[1].strip()
         if meta.get("title"):
             metas.append(meta)
@@ -102,10 +103,19 @@ async def finalize(payload: dict[str, t.Any]):
     """
     session_id = payload.get("session_id")
     tags = payload.get("tags", {})
-    files = payload.get("files", [])
 
     if not session_id:
         raise HTTPException(400, "Missing session_id")
+
+    # create a track ID from tags as either "from - title" or "artist - title"
+    title = tags.get("title", "Untitled")
+    if from_ := tags.get("from"):
+        track_id = f"{from_} - {title}"
+    elif artist := tags.get("artist"):
+        track_id = f"{artist} - {title}"
+    else:
+        track_id = title
+    track_id = re.sub(r"[^a-zA-Z0-9 _-\.]+", " ", track_id)
 
     session_dir = os.path.join(UPLOAD_ROOT, session_id)
     os.makedirs(session_dir, exist_ok=True)
@@ -120,19 +130,22 @@ async def finalize(payload: dict[str, t.Any]):
         if info.get("session_id") == session_id:
             data_path = info_path[:-5]  # remove .info
             fname = os.path.basename(info.get("filename", data_path))
-
             dest = os.path.join(session_dir, fname)
             shutil.move(data_path, dest)
             moved_files.append(fname)
             os.remove(info_path)
 
-    meta_path = os.path.join(session_dir, "tags.txt")
+    meta_path = os.path.join(session_dir, f"{track_id}.txt")
     async with aiofiles.open(meta_path, "w") as f:
         for key, values in tags.items():
             for value in values:
                 if value:
                     await f.write(f"{key}:{value}\n")
         await f.write(f"added:{datetime.now().strftime('%Y-%m-%d')}\n")
+        if not moved_files:
+            await f.write("status:needs files\n")
+        else:
+            await f.write("status:awaiting moderator approval\n")
 
     return JSONResponse(
         {"ok": True, "moved_files": moved_files, "session_id": session_id}

@@ -14,10 +14,21 @@
 
         <form id="upload-form">
             <div>
-                Suggesting tracks to be added to karakara.uk (Making a
-                suggestion is no guarantee of a track being added; having
-                good-quality files in the right formats is hugely helpful but
-                still not a guarantee of being added)
+                <p>Suggesting tracks to be added to karakara.uk (Making a
+                suggestion is no guarantee of a track being added - some
+                companies have very grumpy lawyers, etc.)</p>
+
+                <p>Having good-quality files in the right formats is hugely
+                helpful but not required, it'll just take longer for one of
+                us to find a video and make the subs ourselves</p>
+
+                <p>Also note that
+                specific events might choose to restrict which tracks
+                are available, eg even if you submit a modern track and
+                it gets added to the database, it might not be available
+                at a retro-themed event</p>
+
+                <p>Happy singing! &mdash; The KaraKara Volunteers &lt;3</p>
             </div>
             <div id="wips">
                 <h3>Work-in-Progress Tracks</h3>
@@ -120,21 +131,29 @@
             </div>
 
             <div class="file-group">
-                <h3>Image (Required if you're uploading an audio file, optional otherwise)</h3>
-                <p>
-                    If the video has a particularly good moment to use as a thumbnail, take a
+                <h3>Image</h3>
+                <ul>
+                    <li>Required if you're uploading an audio file, optional otherwise</li>
+                    <li>If the video has a particularly good moment to use as a thumbnail, take a
                     screenshot and upload that (otherwise the system will pick a random moment
-                    from the video to use as a thumbnail)
-                </p>
+                    from the video to use as a thumbnail)</li>
+                </ul>
                 <input type="file" accept=".jpg,.png,.jpeg" />
             </div>
 
             <div class="file-group">
                 <h3>Subtitles</h3>
                 <ul>
-                    <li>The end goal is to get a .srt subtitle file with accurate timings; if you have this, it’ll save a lot of work :) Personally I’m making these with Aegisub but anything which outputs SRT files should work.</li>
-                    <li>Don't do anything fancy - no formatting, no mid-line timings, no "[instrumental break]" markers, no preview of the next line -- the input .srt file should _only_ contain the timings for the lyrics at the moment that they are being sung, and the system will take care of the rest automatically</li>
-                    <li>Western alphabet (eg, english or romaji) required, other alphabets (eg hiragana on hangul) can optionally be added as extras</li>
+                    <li>The end goal is to get a .srt subtitle file with accurate timings;
+                    if you have this, it’ll save a lot of work :) Personally I’m making
+                    these with Aegisub but anything which outputs SRT files should work.</li>
+                    <li>Don't do anything fancy - no formatting, no mid-line timings, no
+                    "[instrumental break]" markers, no preview of the next line &mdash; the
+                    input .srt file should <em>only</em> contain the timings for the lyrics
+                    at the moment that they are being sung, and the system will take care
+                    of the rest automatically</li>
+                    <li>Western alphabet (eg, english or romaji) required, other alphabets
+                    (eg hiragana or hangul) can optionally be added as extras</li>
                 </ul>
                 <input type="file" id="textFiles" multiple accept=".srt" />
             </div>
@@ -145,6 +164,16 @@
                     <p>If you've done the subtitling / editing work yourself, what name would you like to be credited as?</p>
                     <input type="text" name="contributor" />
                 </label>
+            </div>
+
+            <div>
+                <h3>Links / any other info</h3>
+                <ul>
+                    <li>If you don't have a subtitle file, a link to a website with the lyrics is helpful</li>
+                    <li>If you don't have a video file, specifying the season / episode number can help to track one down</li>
+                    <li>Youtube links are helpful to make sure we've got the right version of the right song, but rarely work well as sources (frequent watermarks, extra "like and subscribe for more!!!" clips tacked onto the beginning or end, weird cropping, inconsistent volumes...)</li>
+                </ul>
+                <textarea name="info" rows="4"></textarea>
             </div>
 
             <div id="uploads"></div>

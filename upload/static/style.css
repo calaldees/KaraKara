@@ -12,6 +12,7 @@ body {
 }
 h1 {
     text-align: center;
+    margin-top: 0;
 }
 form {
     max-width: 600px;
@@ -27,7 +28,18 @@ h3 {
     margin: 0;
     margin-bottom: 0.3em;
 }
+p:first-child {
+    margin-top: 0;
+}
+p:last-child {
+    margin-bottom: 0;
+}
 div>label>input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.3em;
+}
+textarea {
     width: 100%;
     box-sizing: border-box;
     margin-top: 0.3em;
