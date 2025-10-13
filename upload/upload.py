@@ -66,7 +66,7 @@ async def list_wips():
     # find all .txt files in UPLOAD_ROOT, check them for "title:" tags,
     # return a list
     metas = []
-    for fn in glob(os.path.join(UPLOAD_ROOT, "**/*.txt")):
+    for fn in glob(os.path.join(UPLOAD_ROOT, "**/*.txt"), recursive=True):
         meta = {}
         async with aiofiles.open(fn, "r") as f:
             contents = await f.read()
