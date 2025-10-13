@@ -22,6 +22,7 @@ services:
             - mqtt
             - player3
             - browser3
+            - upload
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
@@ -129,3 +130,11 @@ services:
           #- CYPRESS_BASE_URL=http://client:8001/?api=http://server:8000
         #user: ${USER}  # ummm, problems with user on cypress startup
 
+    upload:
+        build:
+            context: ./upload
+        restart: unless-stopped
+        mem_limit: 1g
+        volumes:
+            - ${PATH_HOST_source}/WorkInProgress:/uploads:rw
+            - ${PATH_HOST_data}/logs:/logs
