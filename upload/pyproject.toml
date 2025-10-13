@@ -1,0 +1,38 @@
+[project]
+name = "upload"
+version = "0.0.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "tuspyserver",
+	"aiofiles",
+]
+
+[project.optional-dependencies]
+test = [
+	"mypy ~= 1.18",
+	"pytest ~= 8.4",
+	"pytest-asyncio ~= 1.2",
+	"pytest-mypy ~= 1.0",
+	"sanic-testing ~= 24.6",
+	"types-ujson ~= 5.10",
+	"types-dateparser ~= 1.2",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--doctest-modules -p no:cacheprovider"  # --mypy # mypy slows my flow down
+filterwarnings = [
+]
+
+[tool.black]
+line-length = 120
+
+[tool.pyright]
+reportUnusedCallResult = false
+reportUninitializedInstanceVariable = false
+reportUnreachable = false
+reportUnannotatedClassAttribute = false
+reportUnusedParameter = false
