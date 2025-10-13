@@ -11,12 +11,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       data["wips"].forEach((track) => {
-        const trackDiv = document.createElement("div");
-        trackDiv.appendChild(document.createTextNode(track.title));
-        trackDiv.appendChild(document.createTextNode(` by ${track.artist}`));
-        if (track.status) {
-          trackDiv.appendChild(document.createTextNode(` (${track.status})`));
+        let text = track.title ?? "Unknown Title";
+        if (track.from) {
+          text = `${track.from} - ${text}`;
+        } else if (track.artist) {
+          text = `${track.artist} - ${text}`;
         }
+        if (track.status) {
+          text += ` (${track.status})`;
+        }
+
+        const trackDiv = document.createElement("li");
+        trackDiv.appendChild(document.createTextNode(text));
         wipDiv.appendChild(trackDiv);
       });
     })

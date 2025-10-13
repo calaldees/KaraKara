@@ -67,7 +67,7 @@ async def list_wips() -> JSONResponse:
             parts = line.split(":", 1)
             if len(parts) == 2:
                 key = parts[0].strip()
-                if key in ("title", "artist", "status"):
+                if key in ("title", "from", "artist", "status"):
                     meta[key] = parts[1].strip()
         if meta.get("title"):
             metas.append(meta)
