@@ -215,10 +215,7 @@ def lint(tracks: Sequence[Track]) -> None:
                         "insert",
                         "character song",
                         "doujin song",
-                        "trailer song",  # ??
-                        "image",  # ??
-                        "title",  # ??
-                        "theme",
+                        "trailer",  # ??
                     ]
                     for use in uses:
                         if (
