@@ -14,19 +14,43 @@ h1 {
     text-align: center;
     margin-top: 0;
 }
-form {
-    max-width: 600px;
+
+.columns {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-areas:
+        "info"
+        "form";
+    justify-content: center;
+    max-width: 1200px;
     margin: auto;
 }
-form>div {
+@media (min-width: 800px) {
+    .columns {
+        grid-template-areas: "form info";
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.column {
+    max-width: 600px;
+}
+#info {
+    grid-area: info;
+}
+#upload-form {
+    grid-area: form;
+}
+
+.column>div {
     border: 1px solid #ccc;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: 1rem;
 }
+
 h3 {
     margin: 0;
-    margin-bottom: 0.3em;
+    margin-bottom: 0.3rem;
 }
 p:first-child {
     margin-top: 0;
@@ -37,15 +61,24 @@ p:last-child {
 div>label>input[type="text"] {
     width: 100%;
     box-sizing: border-box;
-    margin-top: 0.3em;
+    margin-top: 0.3rem;
 }
 textarea {
     width: 100%;
     box-sizing: border-box;
-    margin-top: 0.3em;
+    margin-top: 0.3rem;
+}
+button {
+    width: 100%;
+    padding: 1rem;
 }
 .file {
-    margin-top: 0.5em;
+    margin-top: 0.5rem;
+}
+ul.check-cols {
+    columns: 3;
+    list-style: none;
+    padding-left: 0;
 }
 progress {
     width: 100%;

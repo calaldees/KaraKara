@@ -12,174 +12,194 @@
     <body>
         <h1>KaraKara Track Submission</h1>
 
-        <form id="upload-form">
-            <div>
-                <p>Suggesting tracks to be added to karakara.uk (Making a
-                suggestion is no guarantee of a track being added - some
-                companies have very grumpy lawyers, etc.)</p>
+        <div class="columns">
+            <div id="info" class="column">
+                <div>
+                    <p>Suggesting tracks to be added to karakara.uk (Making a
+                    suggestion is no guarantee of a track being added - some
+                    companies have very grumpy lawyers, etc.)</p>
 
-                <p>Having good-quality files in the right formats is hugely
-                helpful but not required, it'll just take longer for one of
-                us to find a video and make the subs ourselves</p>
+                    <p>Having good-quality files in the right formats is hugely
+                    helpful but not required, it'll just take longer for one of
+                    us to find a video and make the subs ourselves</p>
 
-                <p>Also note that
-                specific events might choose to restrict which tracks
-                are available, eg even if you submit a modern track and
-                it gets added to the database, it might not be available
-                at a retro-themed event</p>
+                    <p>Also note that
+                    specific events might choose to restrict which tracks
+                    are available, eg even if you submit a modern track and
+                    it gets added to the database, it might not be available
+                    at a retro-themed event</p>
 
-                <p>Happy singing! &mdash; The KaraKara Volunteers &lt;3</p>
+                    <p>Happy singing! &mdash; The KaraKara Volunteers &lt;3</p>
+                </div>
+                <div>
+                    <h3>Work-in-Progress Tracks</h3>
+                    <ul id="wips"></ul>
+                </div>
             </div>
-            <div>
-                <h3>Work-in-Progress Tracks</h3>
-                <ul id="wips"></ul>
-            </div>
-            <div>
-                <label>
-                    <h3>Your contact info (Required)</h3>
-                    <p>To ask clarifying questions / notify you
-                    when it's ready - eg "BobbyTables on the
-                    Minamicon Discord"</p>
-                    <input type="text" name="contact" required />
-                </label>
-            </div>
-            <div>
-                <label>
-                    <h3>Track Title (Required)</h3>
-                    <input type="text" name="title" required />
-                </label>
-            </div>
-            <div>
-                <label>
-                    <h3>Artist(s)</h3>
-                    <input type="text" name="artist" />
-                </label>
-            </div>
-            <div>
-                <label>
+
+            <form id="upload-form" class="column">
+                <div>
+                    <label>
+                        <h3>Your contact info (Required)</h3>
+                        <p>To ask clarifying questions / notify you
+                        when it's ready - eg "BobbyTables on the
+                        Minamicon Discord"</p>
+                        <input type="text" name="contact" required />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <h3>Track Title (Required)</h3>
+                        <input type="text" name="title" required />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <h3>Artist(s)</h3>
+                        <input type="text" name="artist" />
+                    </label>
+                </div>
+                <div>
                     <h3>Category</h3>
-                    <ul>
+                    <ul class="check-cols">
                         <li><label><input type="checkbox" name="category" value="anime"> Anime</label></li>
                         <li><label><input type="checkbox" name="category" value="cartoon"> Cartoon</label></li>
                         <li><label><input type="checkbox" name="category" value="game"> Game</label></li>
-                        <li><label>Other: <input type="text" name="category"></label></li>
+                        <li><label><input type="checkbox" name="category" value="jpop"> JPop</label></li>
+                        <li><label><input type="checkbox" name="category" value="kpop"> KPop</label></li>
+                        <li><label><input type="checkbox" name="category" value="tokusatsu"> Tokusatsu</label></li>
+                        <li><label><input type="checkbox" name="category" value="tv"> TV</label></li>
+                        <li><label><input type="checkbox" name="category" value="vocaloid"> Vocaloid</label></li>
+                        <li><label><input type="checkbox" name="category" value="oddballs"> Other</label></li>
                     </ul>
-                </label>
-            </div>
-            <div>
-                <label>
-                    <h3>From</h3>
-                    <p>Series / Game / Movie name</p>
-                    <input type="text" name="from" />
-                </label>
-            </div>
-            <div>
-                <h3>Use</h3>
-                <ul>
-                    <li><label><input type="checkbox" name="use" value="opening"> Opening</label></li>
-                    <li><label><input type="checkbox" name="use" value="ending"> Ending</label></li>
-                    <li><label><input type="checkbox" name="use" value="insert"> Insert</label></li>
-                    <li><label>Other: <input type="text" name="use"></label></li>
-                </ul>
-            </div>
-            <div>
-                <h3>Language</h3>
-                <ul>
-                    <li><label><input type="checkbox" name="lang" value="en"> English</label></li>
-                    <li><label><input type="checkbox" name="lang" value="jp"> Japanese</label></li>
-                    <li><label><input type="checkbox" name="lang" value="kr"> Korean</label></li>
-                    <li><label>Other: <input type="text" name="lang"></label></li>
-                </ul>
-            </div>
-            <div>
-                <h3>Vocal style</h3>
-                <ul>
-                    <li><label><input type="checkbox" name="vocalstyle" value="male"> Male</label></li>
-                    <li><label><input type="checkbox" name="vocalstyle" value="female"> Female</label></li>
-                    <li><label><input type="checkbox" name="vocalstyle" value="duet"> Duet</label></li>
-                    <li><label><input type="checkbox" name="vocalstyle" value="group"> Group</label></li>
-                    <li><label>Other: <input type="text" name="vocalstyle"></label></li>
-                </ul>
-            </div>
-            <div>
-                <h3>Vocal or Instrumental</h3>
-                <p>
-                    (Note that it's considerably easier to add an instrumental if we
-                    already have the vocal version in our database)
-                </p>
-                <ul>
-                    <li><label><input type="radio" name="vocaltrack" value="on"> Vocal</label></li>
-                    <li><label><input type="radio" name="vocaltrack" value="off"> Instrumental</label></li>
-                </ul>
-            </div>
+                </div>
+                <div>
+                    <label>
+                        <h3>From</h3>
+                        <p>Series / Game / Movie name</p>
+                        <input type="text" name="from" />
+                    </label>
+                </div>
+                <div>
+                    <h3>Use</h3>
+                    <ul>
+                        <li><label><input type="checkbox" name="use" value="opening"> Opening</label></li>
+                        <li><label><input type="checkbox" name="use" value="ending"> Ending</label></li>
+                        <li><label><input type="checkbox" name="use" value="insert"> Insert</label></li>
+                        <li><label>Other: <input type="text" name="use"></label></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Language</h3>
+                    <ul>
+                        <li><label><input type="checkbox" name="lang" value="en"> English</label></li>
+                        <li><label><input type="checkbox" name="lang" value="jp"> Japanese</label></li>
+                        <li><label><input type="checkbox" name="lang" value="kr"> Korean</label></li>
+                        <li><label>Other: <input type="text" name="lang"></label></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Vocal style</h3>
+                    <ul>
+                        <li><label><input type="checkbox" name="vocalstyle" value="male"> Male</label></li>
+                        <li><label><input type="checkbox" name="vocalstyle" value="female"> Female</label></li>
+                        <li><label><input type="checkbox" name="vocalstyle" value="duet"> Duet</label></li>
+                        <li><label><input type="checkbox" name="vocalstyle" value="group"> Group</label></li>
+                        <li><label>Other: <input type="text" name="vocalstyle"></label></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Vocal or Instrumental</h3>
+                    <p>
+                        (Note that it's considerably easier to add an instrumental if we
+                        already have the vocal version in our database)
+                    </p>
+                    <ul>
+                        <li><label><input type="radio" name="vocaltrack" value="on"> Vocal</label></li>
+                        <li><label><input type="radio" name="vocaltrack" value="off"> Instrumental</label></li>
+                    </ul>
+                </div>
 
-            <div>
-                <label>
-                    <h3>Release date</h3>
-                    <input type="date" name="date" />
-                </label>
-            </div>
+                <div>
+                    <label>
+                        <h3>Release date</h3>
+                        <input type="date" name="date" />
+                    </label>
+                </div>
 
-            <div class="file-group">
-                <h3>Video (or Audio) File</h3>
-                <ul>
-                    <li>Without baked-in subtitles or watermarks</li>
-                    <li>DVD / Bluray “special features” often include creditless OPs/EDs - these are ideal</li>
-                    <li>Pretty much any video format is fine as input; it’ll all get re-encoded to optimised files for iphones / androids / projectors</li>
-                    <li>If the video doesn't have clean audio (eg characters are talking over the top of an insert song), we'd want a different copy of the audio (eg from a soundtrack album) which can be spliced together</li>
-                </ul>
-                <input multiple type="file" />
-            </div>
+                <div class="file-group">
+                    <h3>Video (or Audio) File</h3>
+                    <ul>
+                        <li>Without baked-in subtitles or watermarks</li>
+                        <li>DVD / Bluray “special features” often include creditless OPs/EDs -
+                            these are ideal</li>
+                        <li>If the video is just a static image, then uploading audio file + image
+                            is preferred over uploading a video file</li>
+                        <li>Pretty much any video format is fine as input; it’ll all get re-encoded
+                            to optimised files for iphones / androids / projectors</li>
+                        <li>If the video doesn't have clean audio (eg characters are talking over
+                            the top of an insert song), we'd want a different copy of the audio
+                            (eg from a soundtrack album) which can be spliced together</li>
+                    </ul>
+                    <input multiple type="file" />
+                </div>
 
-            <div class="file-group">
-                <h3>Image</h3>
-                <ul>
-                    <li>Required if you're uploading an audio file, optional otherwise</li>
-                    <li>If the video has a particularly good moment to use as a thumbnail, take a
-                    screenshot and upload that (otherwise the system will pick a random moment
-                    from the video to use as a thumbnail)</li>
-                </ul>
-                <input type="file" accept=".jpg,.png,.jpeg" />
-            </div>
+                <div class="file-group">
+                    <h3>Image</h3>
+                    <ul>
+                        <li>Required if you're uploading an audio file, optional otherwise</li>
+                        <li>If the video has a particularly good moment to use as a thumbnail, take a
+                        screenshot and upload that (otherwise the system will pick a random moment
+                        from the video to use as a thumbnail)</li>
+                    </ul>
+                    <input type="file" accept=".jpg,.png,.jpeg" />
+                </div>
 
-            <div class="file-group">
-                <h3>Subtitles</h3>
-                <ul>
-                    <li>The end goal is to get a .srt subtitle file with accurate timings;
-                    if you have this, it’ll save a lot of work :) Personally I’m making
-                    these with Aegisub but anything which outputs SRT files should work.</li>
-                    <li>Don't do anything fancy - no formatting, no mid-line timings, no
-                    "[instrumental break]" markers, no preview of the next line &mdash; the
-                    input .srt file should <em>only</em> contain the timings for the lyrics
-                    at the moment that they are being sung, and the system will take care
-                    of the rest automatically</li>
-                    <li>Western alphabet (eg, english or romaji) required, other alphabets
-                    (eg hiragana or hangul) can optionally be added as extras</li>
-                </ul>
-                <input type="file" id="textFiles" multiple accept=".srt" />
-            </div>
+                <div class="file-group">
+                    <h3>Subtitles</h3>
+                    <ul>
+                        <li>The end goal is to get a .srt subtitle file with accurate timings;
+                        if you have this, it’ll save a lot of work :) Personally I’m making
+                        these with Aegisub but anything which outputs SRT files should work.</li>
+                        <li>Don't do anything fancy - no formatting, no mid-line timings, no
+                        "[instrumental break]" markers, no preview of the next line &mdash; the
+                        input .srt file should <em>only</em> contain the timings for the lyrics
+                        at the moment that they are being sung, and the system will take care
+                        of the rest automatically</li>
+                        <li>Western alphabet (eg, english or romaji) required, other alphabets
+                        (eg hiragana or hangul) can optionally be added as extras</li>
+                    </ul>
+                    <input type="file" id="textFiles" multiple accept=".srt" />
+                </div>
 
-            <div>
-                <label>
-                    <h3>Contributor(s)</h3>
-                    <p>If you've done the subtitling / editing work yourself, what name would you like to be credited as?</p>
-                    <input type="text" name="contributor" />
-                </label>
-            </div>
+                <div>
+                    <label>
+                        <h3>Contributor(s)</h3>
+                        <p>If you've done the subtitling / editing work yourself, what name
+                            would you like to be credited as?</p>
+                        <input type="text" name="contributor" />
+                    </label>
+                </div>
 
-            <div>
-                <h3>Links / any other info</h3>
-                <ul>
-                    <li>If you don't have a subtitle file, a link to a website with the lyrics is helpful</li>
-                    <li>If you don't have a video file, specifying the season / episode number can help to track one down</li>
-                    <li>Youtube links are helpful to make sure we've got the right version of the right song, but rarely work well as sources (frequent watermarks, extra "like and subscribe for more!!!" clips tacked onto the beginning or end, weird cropping, inconsistent volumes...)</li>
-                </ul>
-                <textarea name="info" rows="4"></textarea>
-            </div>
+                <div>
+                    <h3>Links / any other info</h3>
+                    <ul>
+                        <li>If you don't have a subtitle file, a link to a website with the
+                            lyrics is helpful</li>
+                        <li>If you don't have a video file, specifying the season / episode
+                            number can help to track one down</li>
+                        <li>Youtube links are helpful to make sure we've got the right version
+                            of the right song, but rarely work well as sources (frequent
+                            watermarks, extra "like and subscribe for more!!!" clips tacked
+                            onto the beginning or end, weird cropping, inconsistent volumes...)</li>
+                    </ul>
+                    <textarea name="info" rows="4"></textarea>
+                </div>
 
-            <div id="uploads"></div>
+                <div id="uploads"></div>
 
-            <button type="submit">Start Upload</button>
-        </form>
+                <button type="submit">Start Upload</button>
+            </form>
+        </div>
     </body>
 </html>
