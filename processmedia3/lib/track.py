@@ -99,14 +99,17 @@ class Track:
 
         tag_files = self._sources_by_type({SourceType.TAGS})
         tags: dict[str, list[str]] = copy.deepcopy(tag_files[0].tags)
-        for internal in ["contact", "status"]:
-            if tags.get(internal):
-                del tags[internal]
         if tags.get("title") is None:
             raise TrackValidationException("missing tags.title")
         if tags.get("category") is None:
             raise TrackValidationException("missing tags.category")
 
+        # these are internal tags for the uploader, not for end users
+        for internal in ["contact", "status", "info"]:
+            if tags.get(internal):
+                del tags[internal]
+
+        # not-hard-subs + image + 16:9 = good for splash screen
         if self._sources_by_type({SourceType.SUBTITLES}):
             tags["subs"] = ["soft"]
         else:
@@ -116,7 +119,6 @@ class Track:
             tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
-
         pixel_sources = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
         tags["aspect_ratio"] = list(set(s.meta.aspect_ratio_str for s in pixel_sources))
 
@@ -129,21 +131,25 @@ class Track:
         if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 
+        # date can be a full date, but years are more useful for searching
         if tags.get("date"):
             tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["date"]]
 
+        # add "category:new" tag for any track added in the last year
+        # and a bit (so that if a convention is held eg Jan 5th 2020,
+        # then we get a request to add a track on Jan 6th 2020, it's
+        # still "new" when the next convention happens on Jan 12th 2021).
+        # Also add a "new:<date>" tag so that when users click "new",
+        # they then get a list sorted by date added.
         if tags.get("added"):
-            # add "category:new" tag for any track added in the last year
-            # and a bit (so that if a convention is held eg Jan 5th 2020,
-            # then we get a request to add a track on Jan 6th 2020, it's
-            # still "new" when the next convention happens on Jan 12th 2021)
             added_date = self._parse_date(tags["added"][0])
-            last_year = datetime.date.today() - datetime.timedelta(days=380)
-            if added_date > last_year:
+            today_date = datetime.date.today()
+            if added_date > today_date - datetime.timedelta(days=30):
                 tags["category"].append("new")
-                tags["new"] = [
-                    self._parse_date(d).strftime("%Y-%m") for d in tags["added"]
-                ]
+                tags["new"] = [added_date.strftime("%Y-%m-%d")]
+            elif added_date > today_date - datetime.timedelta(days=380):
+                tags["category"].append("new")
+                tags["new"] = [added_date.strftime("%Y-%m")]
 
         return TrackDict(
             id=self.id,
