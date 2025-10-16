@@ -1,20 +1,49 @@
 :root {
     color-scheme: light dark;
+    --accent-color: #0090d9;
+    --accent-color-light: #66bfff;
+    --page-bg: #f9fafc;
+    --page-fg: #111;
+    --section-bg: #ffffff;
+    --border: #d0d7de;
+    --outline: white;
+    --input-bg: #f1f5f9;
+    --input-fg: #111;
 }
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --accent-color: #66ccff;
+        --accent-color-light: #99ccff;
+        --page-bg: #121222;
+        --page-fg: #eee;
+        --section-bg: #1c1c2c;
+        --border: #113;
+        --outline: black;
+        --input-bg: #080808;
+        --input-fg: #fff;
+    }
+}
+
 body {
-    font-family:
-        system-ui,
-        -apple-system,
-        Roboto,
-        "Segoe UI",
-        sans-serif;
+    background-color: var(--page-bg);
+    color: var(--page-fg);
+    font-family: system-ui, sans-serif;
     padding: 2rem;
 }
 h1 {
     text-align: center;
+    font-size: 2.5rem;
     margin-top: 0;
+    color: var(--accent-color);
+    text-shadow:
+        -2px -2px 0 var(--outline),
+        2px -2px 0 var(--outline),
+        -2px 2px 0 var(--outline),
+        2px 2px 0 var(--outline);
 }
 
+/* Page Layout */
 .columns {
     display: grid;
     gap: 1.5rem;
@@ -25,7 +54,7 @@ h1 {
     max-width: 1200px;
     margin: auto;
 }
-@media (min-width: 800px) {
+@media (min-width: 1200px) {
     .columns {
         grid-template-areas: "form info";
         grid-template-columns: 1fr 1fr;
@@ -41,16 +70,19 @@ h1 {
     grid-area: form;
 }
 
-.column>div {
-    border: 1px solid #ccc;
+/* Section Layout */
+section {
     margin-bottom: 1.5rem;
     padding: 1rem;
     border-radius: 1rem;
+    border: 1px solid var(--border);
+    background: var(--section-bg);
+    box-shadow: 0 0 20px rgba(127, 127, 127, 0.5);
 }
-
 h3 {
     margin: 0;
     margin-bottom: 0.3rem;
+    color: var(--accent-color);
 }
 p:first-child {
     margin-top: 0;
@@ -58,27 +90,61 @@ p:first-child {
 p:last-child {
     margin-bottom: 0;
 }
-div>label>input[type="text"] {
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 0.3rem;
+ul.check {
+    list-style: none;
+    padding-left: 0;
 }
+ul.cols3 {
+    columns: 3;
+}
+ul.cols2 {
+    columns: 2;
+}
+
+/* Form Elements */
+input[type="text"],
+input[type="date"],
 textarea {
     width: 100%;
     box-sizing: border-box;
     margin-top: 0.3rem;
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--input-fg);
+    transition: all 0.2s ease;
 }
-button {
+input:focus,
+textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0.5rem var(--accent-color);
+    outline: none;
+}
+input[type="checkbox"] {
+    accent-color: var(--accent-color);
+}
+button,
+input[type="submit"] {
     width: 100%;
     padding: 1rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    background: linear-gradient(
+        90deg,
+        var(--accent-color),
+        var(--accent-color-light)
+    );
+    color: var(--input-bg);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
 }
-.file {
-    margin-top: 0.5rem;
-}
-ul.check-cols {
-    columns: 3;
-    list-style: none;
-    padding-left: 0;
+button:hover,
+input[type="submit"]:hover {
+    box-shadow: 0 0 1rem var(--accent-color);
 }
 progress {
     width: 100%;
