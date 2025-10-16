@@ -187,6 +187,9 @@ def lint(tracks: Sequence[Track]) -> None:
                         "use",
                         "contributor",
                         "source",
+                        "contact",
+                        "info",
+                        "status",
                     ]:
                         continue
                     for value in values:
