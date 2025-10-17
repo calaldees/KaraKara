@@ -135,6 +135,7 @@ services:
             context: ./upload
         restart: unless-stopped
         mem_limit: 1g
+        env_file: .env
         volumes:
             - ${PATH_HOST_source}/WorkInProgress:/uploads:rw
             - ${PATH_HOST_data}/logs:/logs

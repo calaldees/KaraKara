@@ -6,6 +6,7 @@ import re
 import shutil
 from glob import glob
 import typing as t
+import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi import Request, Response
@@ -141,6 +142,28 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
             await f.write("status:needs files\n")
         else:
             await f.write("status:awaiting moderator approval\n")
+
+    try:
+        mg_base = os.getenv("MG_BASE", "https://api.mailgun.net")
+        mg_sandbox = os.getenv("MG_SANDBOX")
+        mg_api_key = os.getenv("MG_API_KEY")
+        if mg_sandbox and mg_api_key:
+            requests.post(
+                f"{mg_base}/v3/{mg_sandbox}/messages",
+                auth=("api", mg_api_key),
+                data={
+                    "from": f"KaraKara Uploader <postmaster@{mg_sandbox}>",
+                    "to": "Shish <shish+karakara@shishnet.org>",
+                    "subject": (
+                        f"New Track - {track_id}"
+                        if moved_files
+                        else f"New Request - {track_id}"
+                    ),
+                    "text": "Check /media/source/WorkInProgress",
+                },
+            )
+    except Exception as e:
+        print(f"Failed to send Mailgun notification: {e}")
 
     return JSONResponse(
         {"ok": True, "moved_files": moved_files, "session_id": session_id}

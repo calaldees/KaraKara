@@ -8,6 +8,7 @@ dependencies = [
     "uvicorn",
     "tuspyserver",
 	"aiofiles",
+	"requests",
 ]
 
 [project.optional-dependencies]
