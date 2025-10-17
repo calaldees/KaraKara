@@ -184,7 +184,6 @@ def lint(tracks: Sequence[Track]) -> None:
                         "title",
                         "artist",
                         "from",
-                        "use",
                         "contributor",
                         "source",
                         "contact",
@@ -223,17 +222,17 @@ def lint(tracks: Sequence[Track]) -> None:
                     for use in uses:
                         if (
                             use not in known_uses
-                            and re.match(r"^(OP|ED)(\d+)$", use) is None
+                            and re.match(r"^(op|ed)(\d+)$", use) is None
                         ):
                             log.error(f"{s.file.relative} has weird use:{use} tag")
                     for n in range(0, 50):
-                        if f"OP{n}" in uses and "opening" not in uses:
+                        if f"op{n}" in uses and "opening" not in uses:
                             log.error(
-                                f"{s.file.relative} has use:OP{n} but no opening tag"
+                                f"{s.file.relative} has use:op{n} but no opening tag"
                             )
-                        if f"EN{n}" in uses and "ending" not in uses:
+                        if f"ed{n}" in uses and "ending" not in uses:
                             log.error(
-                                f"{s.file.relative} has use:ED{n} but no ending tag"
+                                f"{s.file.relative} has use:ed{n} but no ending tag"
                             )
 
                 # "source" tags should not contain unquoted URLs
