@@ -167,7 +167,7 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
                     "text": "Check /media/source/WorkInProgress",
                 },
             )
-            log.info("Sent email notification")
+            log.info(f"Sent email notification via {mg_sandbox}")
         else:
             log.warning("Mailgun config missing, not sending notification")
     except Exception:
