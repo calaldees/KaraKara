@@ -74,28 +74,33 @@ class MediaMeta(t.NamedTuple):
                 uri,
             ],
             capture_output=True,
+            check=True,
         )
-        if completed_process.returncode != 0:
-            log.error(f"Unable to ffprobe {uri}")
-            return cls()
         ffprobe_output = json.loads(completed_process.stdout.decode("utf8", errors="ignore"))
 
-        fps = 0.0
-        width = 0
-        height = 0
+        try:
+            fps = 0.0
+            width = 0
+            height = 0
 
-        video = next((s for s in ffprobe_output["streams"] if s["codec_type"] == "video"), None)
-        if video:
-            num, denom = map(int, video["r_frame_rate"].split("/"))
-            fps = num / denom if denom != 0 else 0.0
-            width = video["width"]
-            height = video["height"]
+            video = next(
+                (s for s in ffprobe_output["streams"] if s["codec_type"] == "video"),
+                None,
+            )
+            if video:
+                num, denom = map(int, video["r_frame_rate"].split("/"))
+                fps = num / denom if denom != 0 else 0.0
+                width = video["width"]
+                height = video["height"]
 
-        duration = timedelta(seconds=float(ffprobe_output["format"].get("duration", "0.0")))
+            duration = timedelta(seconds=float(ffprobe_output["format"].get("duration", "0.0")))
 
-        aspect_ratio = Fraction(width or 1, height or 1)
-        if video:
-            w, h = map(int, video["display_aspect_ratio"].split(":"))
-            aspect_ratio = Fraction(w, h)
+            if video and "display_aspect_ratio" in video:
+                w, h = map(int, video["display_aspect_ratio"].split(":"))
+                aspect_ratio = Fraction(w, h)
+            else:
+                aspect_ratio = Fraction(width or 1, height or 1)
 
-        return cls(fps, width, height, duration, aspect_ratio)
+            return cls(fps, width, height, duration, aspect_ratio)
+        except Exception as e:
+            raise ValueError(f"Could not parse media metadata for {uri}: {e}\n{ffprobe_output}") from e
