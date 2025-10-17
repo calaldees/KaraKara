@@ -63,7 +63,6 @@ async def serve_index() -> FileResponse:
 
 @app.get("/wips")
 async def list_wips() -> JSONResponse:
-    log.info("wip")
     metas: list[dict[str, str]] = []
     for fn in glob(os.path.join(UPLOAD_ROOT, "**/*.txt"), recursive=True):
         meta: dict[str, str] = {}
