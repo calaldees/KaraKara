@@ -4,6 +4,7 @@ import uuid
 import json
 import re
 import shutil
+import logging
 from glob import glob
 import typing as t
 import requests
@@ -24,6 +25,9 @@ STATIC_DIR = Path(__file__).parent / "static"
 
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 app = FastAPI(title="FastAPI TUS Upload Server")
 app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix()))
@@ -59,6 +63,7 @@ async def serve_index() -> FileResponse:
 
 @app.get("/wips")
 async def list_wips() -> JSONResponse:
+    log.info("wip")
     metas: list[dict[str, str]] = []
     for fn in glob(os.path.join(UPLOAD_ROOT, "**/*.txt"), recursive=True):
         meta: dict[str, str] = {}
@@ -162,8 +167,13 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
                     "text": "Check /media/source/WorkInProgress",
                 },
             )
-    except Exception as e:
-        print(f"Failed to send Mailgun notification: {e}")
+            log.info("Sent email notification")
+        else:
+            log.warning("Mailgun config missing, not sending notification")
+    except Exception:
+        log.exception("Failed to send notification:")
+
+    log.info(f"Finalized session {session_id!r}, track id {track_id!r}")
 
     return JSONResponse(
         {"ok": True, "moved_files": moved_files, "session_id": session_id}
