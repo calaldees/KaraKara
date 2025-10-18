@@ -158,6 +158,12 @@ def lint(tracks: Sequence[Track]) -> None:
     """
 
     def _lint(track: Track) -> None:
+        json = track.to_json()
+
+        # Check for a bug where a 3 minute track was reported as 92 minutes
+        if json["duration"] > 10 * 60:
+            log.error(f"{track.id} is very long ({int(json['duration']) // 60}m)")
+
         # for t in track.targets:
         #    if not t.path.exists():
         #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
@@ -256,6 +262,21 @@ def lint(tracks: Sequence[Track]) -> None:
                     log.error(f"{s.file.relative} has no subtitles")
                 if len(ls) == 1:
                     log.error(f"{s.file.relative} has only one subtitle: {ls[0].text}")
+
+                # Check for large amounts of dead air between lines relative to track duration
+                # Commented out as there's a surprising number of tracks that are very empty
+                """
+                total_silence = timedelta(0)
+                total_silence += ls[0].start
+                for l1, l2 in zip(ls[:-1], ls[1:]):
+                    total_silence += l2.start - l1.end
+                total_silence += timedelta(seconds=json["duration"]) - ls[-1].end
+                total_duration = json["duration"]
+                if total_silence.total_seconds() / total_duration > 0.5:
+                    log.error(
+                        f"{s.file.relative} has a lot of dead air between lines: {int(total_silence.total_seconds())}s over {int(total_duration)}s"
+                    )
+                """
 
                 # Most lines are on the bottom, but there are a random couple on top,
                 # normally means that a title line got added
