@@ -69,7 +69,9 @@ export function ConfigMenu() {
                                 <td>
                                     <input
                                         value={roomPasswordEdit}
-                                        type={"password"}
+                                        type={"text"}
+                                        autoComplete="off"
+                                        className="fakePassword"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(e.target.value)
                                         }

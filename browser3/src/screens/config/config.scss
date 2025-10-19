@@ -20,5 +20,10 @@
         BUTTON {
             width: 100%;
         }
+        // input type=password triggers password manager / haveibeenpwned
+        // extensions - we just want regular text, but visually obscured
+        .fakePassword {
+            -webkit-text-security: disc;
+        }
     }
 }

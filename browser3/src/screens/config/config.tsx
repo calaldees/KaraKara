@@ -57,7 +57,9 @@ export function ConfigMenu(): React.ReactElement {
                                 <td>
                                     <input
                                         value={roomPasswordEdit}
-                                        type={"password"}
+                                        type={"text"}
+                                        autoComplete="off"
+                                        className="fakePassword"
                                         data-cy="password-input"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(e.target.value)
