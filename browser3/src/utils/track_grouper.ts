@@ -102,6 +102,13 @@ export function summarise_tags(
     return tags;
 }
 
+function find_children(
+    all_tags: Record<string, Record<string, number>>,
+    tag: string,
+): string[] {
+    return Object.keys(all_tags[tag] || {}).sort(normalise_cmp);
+}
+
 /**
  * Given a number of tracks from 0 to LOTS, decide how best
  * to render the list.
@@ -126,6 +133,7 @@ export function group_tracks(
     const sections: [string, TrackListSection][] = [];
     let leftover_tracks: Track[] = tracks;
     const all_tags = summarise_tags(tracks);
+    const most_recent_tag = filters[filters.length - 1]?.split(":")[1];
 
     // If there are no tracks, show a friendly error
     if (tracks.length === 0) {
@@ -135,26 +143,20 @@ export function group_tracks(
     // If we have a few tracks, just list them all
     // (category:new is a special case where we want to always
     // show all of the tracks, grouped by date, in reverse)
-    else if (
-        tracks.length < 25 ||
-        (filters.length === 1 && filters[0] === "category:new")
-    ) {
+    else if (tracks.length < 25 || most_recent_tag === "new") {
         // If we are searching for some tags, see if our most recently
         // searched tag has any children, eg if we are currently searching
         // for "from:Macross" then the resulting list of tracks will be
         // grouped by "Macross:*".
-        const most_recent_tag = filters[filters.length - 1]?.split(":")[1];
         if (most_recent_tag && all_tags[most_recent_tag]) {
             let found_track_ids: string[] = [];
 
             const tag_key = most_recent_tag;
             // Look at our all_tags table to see what children we have
-            const tag_children = Object.keys(all_tags[tag_key]).sort(
-                normalise_cmp,
-            );
+            const tag_children = find_children(all_tags, tag_key);
             // category:new is a special case where we want to
             // show the newest tracks first, so reverse the order
-            if (filters.length === 1 && filters[0] === "category:new") {
+            if (most_recent_tag === "new") {
                 tag_children.reverse();
             }
             // tag_children then lists the children of this tag
@@ -206,9 +208,7 @@ export function group_tracks(
         // For each section, either add a filter list, or a grouped filter list
         next_filters.forEach(function (tag_key) {
             // Look at our all_tags table to see what children we have
-            const tag_children = Object.keys(all_tags[tag_key]).sort(
-                normalise_cmp,
-            );
+            const tag_children = find_children(all_tags, tag_key);
             // If a tag has a lot of children (eg artist=...) then show
             // children grouped alphabetically
             if (tag_children.length > 50) {
