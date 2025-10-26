@@ -106,10 +106,10 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
 
     # create a track ID from tags as either "from - title" or "artist - title"
     title = tags.get("title", ["Untitled"])
-    if from_ := tags.get("from"):
-        track_id = f"{from_[0]} - {title[0]}"
-    elif artist := tags.get("artist"):
-        track_id = f"{artist[0]} - {title[0]}"
+    if "from" in tags and tags["from"] and tags["from"][0].strip():
+        track_id = f"{tags['from'][0].strip()} - {title[0]}"
+    elif "artist" in tags and tags["artist"] and tags["artist"][0].strip():
+        track_id = f"{tags['artist'][0].strip()} - {title[0]}"
     else:
         track_id = title[0]
     track_id = re.sub(r"[^a-zA-Z0-9_\-\.]+", " ", track_id)
