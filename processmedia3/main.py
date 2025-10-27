@@ -296,6 +296,13 @@ def lint(tracks: Sequence[Track]) -> None:
                         log.error(
                             f"{s.file.relative}:{index + 1} line contains newline: {l.text}"
                         )
+                    # People manually adding "instrumental break" markers - they should
+                    # just leave it empty and subtitle_processor will add as appropriate.
+                    # Perhaps better to warn on all non-alphanumeric / punctuation text?
+                    if "♪" in l.text:
+                        log.error(
+                            f"{s.file.relative}:{index + 1} line contains music note: {l.text}"
+                        )
 
                 # Check for weird stuff between lines (eg gaps or overlaps)
                 # separate out the top and bottom lines because they may have
