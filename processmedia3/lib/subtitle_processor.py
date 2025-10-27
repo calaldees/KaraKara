@@ -436,7 +436,8 @@ if __name__ == "__main__":
 
     if args.unblink:
         for i in range(len(subs) - 1):
-            if subs[i + 1].start - subs[i].end < timedelta(seconds=0.1):
+            diff = subs[i + 1].start - subs[i].end
+            if timedelta(seconds=-0.01) < diff < timedelta(seconds=0.01):
                 subs[i] = Subtitle(
                     start=subs[i].start,
                     end=subs[i + 1].start,
