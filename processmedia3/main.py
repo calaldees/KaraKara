@@ -340,7 +340,7 @@ def lint(tracks: Sequence[Track]) -> None:
                     all_tags.setdefault(k, []).extend(vs)
     for k, vs in all_tags.items():
         # There are several different tracks with the same title
-        if k == "title":
+        if k in {"title", "contact"}:
             continue
         v_by_lower: dict[str, str] = {}
         for v in vs:
