@@ -164,6 +164,12 @@ def lint(tracks: Sequence[Track]) -> None:
         if json["duration"] > 10 * 60:
             log.error(f"{track.id} is very long ({int(json['duration']) // 60}m)")
 
+        variants = {s.variant for s in track.sources}
+        if "Vocal" in variants and "on" not in json["tags"]["vocaltrack"]:
+            log.error(f"{track.id} has Vocal variant but no vocaltrack:on tag")
+        if "Instrumental" in variants and "off" not in json["tags"]["vocaltrack"]:
+            log.error(f"{track.id} has Instrumental variant but no vocaltrack:off tag")
+
         # for t in track.targets:
         #    if not t.path.exists():
         #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
