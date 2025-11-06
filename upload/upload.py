@@ -99,10 +99,16 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
     then writes metadata.json there.
     """
     session_id: str | None = payload.get("session_id")
-    tags: dict[str, list[str]] = payload.get("tags", {})
+    tags: dict[str, list[str]] | None = payload.get("tags")
 
     if not session_id:
         raise HTTPException(400, "Missing session_id")
+
+    if not tags:
+        raise HTTPException(400, "Missing tags")
+
+    for key in tags:
+        tags[key] = [v.strip() for v in tags[key] if v.strip()]
 
     # create a track ID from tags as either "from - title" or "artist - title"
     title = tags.get("title", ["Untitled"])
