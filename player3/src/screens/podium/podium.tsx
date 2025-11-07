@@ -21,6 +21,7 @@ export function PodiumScreen({
     const { request } = useApi();
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const [starting, setStarting] = useState(false);
+    const lyricsEl = useRef<HTMLUListElement>(null);
     const currentEl = useRef<HTMLLIElement>(null);
 
     const start = useCallback(() => {
@@ -45,6 +46,11 @@ export function PodiumScreen({
     }, [request, track]);
 
     useEffect(() => {
+        if (lyricsEl.current) {
+            lyricsEl.current.scrollTop = 0;
+        }
+    }, [lyrics]);
+    useEffect(() => {
         if (currentEl.current) {
             currentEl.current.scrollIntoView({
                 behavior: "smooth",
@@ -63,7 +69,7 @@ export function PodiumScreen({
             </h1>
 
             {lyrics.length > 0 ? (
-                <ul className="lyrics">
+                <ul className="lyrics" ref={lyricsEl}>
                     {lyrics.map((line) => {
                         // bias towards hilighting text early, and have it fade out slowly
                         const is_current =
