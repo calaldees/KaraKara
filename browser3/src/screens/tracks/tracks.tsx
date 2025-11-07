@@ -33,6 +33,12 @@ function TrackItem({
     filters: string[];
 }): React.ReactElement {
     const navigate = useNavigate();
+    let extra = "";
+    if (track.tags.vocaltrack?.includes("on") && track.tags.vocaltrack?.includes("off")) {
+        extra = " (Vocal + Instr.)";
+    } else if (track.tags.vocaltrack?.includes("off")) {
+        extra = " (Instrumental)";
+    }
 
     return (
         <li
@@ -43,7 +49,7 @@ function TrackItem({
             <span className={"text track_info"}>
                 <span className={"title"}>
                     {track.tags.title[0]}
-                    {track.tags.vocaltrack?.[0] === "off" && " (Instrumental)"}
+                    {extra}
                 </span>
                 <br />
                 <span className={"info"}>{track_info(filters, track)}</span>
