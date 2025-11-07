@@ -35,6 +35,9 @@ MAIN {
     container: main / size;
     margin: var(--underscan);
 }
+SECTION.screen_podium {
+    cursor: auto;
+}
 
 #seekbar {
     position: absolute;
