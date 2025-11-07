@@ -39,6 +39,8 @@ export function PodiumScreen({
                 options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),
             });
+        } else {
+            setLyrics([]);
         }
     }, [request, track]);
 
