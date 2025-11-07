@@ -45,6 +45,9 @@ export function ConfigMenu(): React.ReactElement {
                                     <input
                                         value={roomNameEdit}
                                         type={"text"}
+                                        autoComplete="off"
+                                        autoCorrect="off"
+                                        autoCapitalize="none"
                                         data-cy="room-input"
                                         onChange={(e) =>
                                             setRoomNameEdit(e.target.value)
@@ -59,6 +62,8 @@ export function ConfigMenu(): React.ReactElement {
                                         value={roomPasswordEdit}
                                         type={"text"}
                                         autoComplete="off"
+                                        autoCorrect="off"
+                                        autoCapitalize="none"
                                         className="fakePassword"
                                         data-cy="password-input"
                                         onChange={(e) =>

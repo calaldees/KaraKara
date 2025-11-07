@@ -57,6 +57,9 @@ export function ConfigMenu() {
                                     <input
                                         value={roomNameEdit}
                                         type={"text"}
+                                        autoComplete="off"
+                                        autoCorrect="off"
+                                        autoCapitalize="none"
                                         onChange={(e) =>
                                             setRoomNameEdit(e.target.value)
                                         }
@@ -71,6 +74,8 @@ export function ConfigMenu() {
                                         value={roomPasswordEdit}
                                         type={"text"}
                                         autoComplete="off"
+                                        autoCorrect="off"
+                                        autoCapitalize="none"
                                         className="fakePassword"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(e.target.value)
