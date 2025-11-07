@@ -25,7 +25,11 @@ export function useApi() {
     const { roomName } = useParams();
     const { setNotification } = useContext(ClientContext);
     const [loading, setLoading] = useState(false);
-    const [sessionId, setSessionId] = useState<string | null>(null);
+
+    const c = document.cookie.match(/kksid=([a-z0-9-]+)/);
+    const [sessionId, setSessionId] = useState<string | null>(
+        c && c[1] ? c[1] : null,
+    );
 
     const request = useCallback(
         function (props_: ApiRequestProps) {
