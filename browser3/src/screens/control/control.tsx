@@ -279,11 +279,11 @@ function ProgressBar({
     if (!queue.length) return null;
     const queue_last = queue[queue.length - 1];
     if (!queue_last.start_time) return null;
-    const start = Date.parse(startDateTime);
+    const start = Date.parse(startDateTime) / 1000;
     const current = now - start;
     const queue_end =
-        (queue_last.start_time + queue_last.track_duration) * 1000 - start;
-    const end = Date.parse(endDateTime) - start;
+        (queue_last.start_time + queue_last.track_duration) - start;
+    const end = (Date.parse(endDateTime) / 1000) - start;
     return (
         <div className="progress_bar">
             <div
