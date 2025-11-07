@@ -7,7 +7,7 @@ import re
 from collections import defaultdict
 import argparse
 from tqdm import tqdm
-
+import dateparser
 
 def boolean_flag(parser, name, default=None, help=None):
     group = parser.add_mutually_exclusive_group()
@@ -34,6 +34,8 @@ def parse_args():
     boolean_flag(p, "test", help="Only show 'test' room (--no-test to exclude 'test' room)")
     p.add_argument("--room", help="Only show stats for the given room")
     p.add_argument("--event", help="Only show stats for the given event")
+    p.add_argument("--date-from", help="Only show stats from this date (YYYY-MM-DD)", type=dateparser.parse)
+    p.add_argument("--date-to", help="Only show stats up to this date (YYYY-MM-DD)", type=dateparser.parse)
     p.add_argument("--dedupe", default=False, action="store_true", help="Only count each session / IP address once")
     return p.parse_args()
 
@@ -68,6 +70,7 @@ def main():
         #op_mob
         #opera
     }
+
     for fn in args.inputs:
         with open(fn) as fp:
             lines = fp.readlines()
@@ -95,6 +98,7 @@ def main():
                     if d.get("room") != args.room:
                         continue
                 ua = parse(d["user_agent"])
+                date = dateparser.parse(d["time"])
 
             # nginx-access.json
             elif "http_user_agent" in d:
@@ -103,11 +107,19 @@ def main():
                 if args.room and f"/room/{args.room}/login.json" not in d["request"]:
                     continue
                 ua = parse(d["http_user_agent"])
+                date = dateparser.parse(d["time_local"])
 
             # unknown
             else:
                 ua = None
+                date = None
 
+            if date and args.date_from is not None:
+                if date < args.date_from:
+                    continue
+            if date and args.date_to is not None:
+                if date > args.date_to:
+                    continue
 
             if ua and ua.user_agent and ua.user_agent.family and ua.user_agent.major:
                 bs[ua.user_agent.family][ua.user_agent.major] += 1
