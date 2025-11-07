@@ -121,9 +121,25 @@ function Buttons({ track }: { track: Track }) {
         setPerformerName,
     } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
-    const [videoVariant, setVideoVariant] = useState<string>("");
-    const [subtitleVariant, setSubtitleVariant] = useState<string>("");
     const { request } = useApi();
+
+    const videoVariants = [
+        ...new Set(
+            track.attachments.video
+                .map((a) => a.variant)
+                .filter((v) => v !== null),
+        ),
+    ];
+    const [videoVariant, setVideoVariant] = useState<string>(videoVariants.length === 1 ? videoVariants[0] : "");
+
+    const subtitleVariants = [
+        ...new Set(
+            track.attachments.subtitle
+                ?.map((a) => a.variant)
+                .filter((v) => v !== null),
+        ),
+    ];
+    const [subtitleVariant, setSubtitleVariant] = useState<string>(subtitleVariants.length === 1 ? subtitleVariants[0] : "");
 
     function enqueue(performer_name: string, track_id: string) {
         request({
@@ -145,13 +161,6 @@ function Buttons({ track }: { track: Track }) {
     }
 
     let videoSelect = null;
-    const videoVariants = [
-        ...new Set(
-            track.attachments.video
-                .map((a) => a.variant)
-                .filter((v) => v !== null),
-        ),
-    ];
     if (videoVariants.length > 1) {
         videoSelect = (
             <select
@@ -171,13 +180,6 @@ function Buttons({ track }: { track: Track }) {
     }
 
     let subtitleSelect = null;
-    const subtitleVariants = [
-        ...new Set(
-            track.attachments.subtitle
-                ?.map((a) => a.variant)
-                .filter((v) => v !== null),
-        ),
-    ];
     if (subtitleVariants.length > 1) {
         subtitleSelect = (
             <select
