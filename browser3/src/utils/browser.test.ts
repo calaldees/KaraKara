@@ -19,6 +19,31 @@ describe("shuffle", () => {
     });
 });
 
+describe("sorted", () => {
+    test("should basically work", () => {
+        expect(utils.sorted([5, 3, 1, 4, 2])).toEqual([1, 2, 3, 4, 5]);
+    });
+});
+
+describe("unique", () => {
+    test("should basically work", () => {
+        expect(utils.unique([1, 2, 2, 3, 4, 4, 5])).toEqual([1, 2, 3, 4, 5]);
+    });
+});
+
+describe("nth", () => {
+    test("should basically work", () => {
+        expect(utils.nth(1)).toEqual("1st");
+        expect(utils.nth(2)).toEqual("2nd");
+        expect(utils.nth(3)).toEqual("3rd");
+        expect(utils.nth(4)).toEqual("4th");
+        expect(utils.nth(11)).toEqual("11th");
+        expect(utils.nth(22)).toEqual("22nd");
+        expect(utils.nth(33)).toEqual("33rd");
+        expect(utils.nth(44)).toEqual("44th");
+    });
+});
+
 describe("is_my_song", () => {
     test("match based only on session ID", () => {
         expect(utils.is_my_song("sess-1234", { session_id: "sess" })).toEqual(
