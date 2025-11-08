@@ -17,7 +17,7 @@ import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
-import { dict2css, time_until } from "@/utils";
+import { dict2css, time_until, nth } from "@/utils";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks } = useContext(ServerContext);
@@ -146,9 +146,8 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                 break;
             }
         }
-        const nth = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
         const airtime_mins = Math.floor(airtime / 60);
-        const text = n + nth + " track, " + airtime_mins + " mins total";
+        const text = `${nth(n)} track, ${airtime_mins} mins total`;
         return text;
     }
 

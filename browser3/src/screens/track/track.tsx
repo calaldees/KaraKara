@@ -11,7 +11,7 @@ import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import { Subtitle, Track } from "@/types";
-import { attachment_path, unique } from "@/utils";
+import { attachment_path, is_my_song, nth, unique } from "@/utils";
 
 import "./track.scss";
 
@@ -121,7 +121,7 @@ function Buttons({ track }: { track: Track }) {
         setPerformerName,
     } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
-    const { request } = useApi();
+    const { request, sessionId } = useApi();
 
     const videoVariants = unique(track.attachments.video
         .map((a) => a.variant)
@@ -207,13 +207,37 @@ function Buttons({ track }: { track: Track }) {
         (videoVariants.length === 0 || videoVariant !== "") &&
         (subtitleVariants.length === 0 || subtitleVariant !== "");
 
-    if (action === TrackAction.NONE) {
-        const is_queued =
-            queue.find((i) => i.track_id === track.id) !== undefined;
+    const isQueued =
+        queue.find((i) => i.track_id === track.id) !== undefined;
 
+    const myTracks = queue.filter((item) =>
+        is_my_song(sessionId, item)
+    );
+    const otherPeoplesTracks = queue.filter((item) =>
+        !is_my_song(sessionId, item)
+    );
+    const averageTracksPerPerformer = otherPeoplesTracks.length > 0
+        ? otherPeoplesTracks.length /
+          unique(otherPeoplesTracks.map((item) => item.performer_name)).length
+        : 0;
+    const myTrackCount = myTracks.length + 1;
+    let warning = null;
+    if (!isQueued && queue.length > 3 && myTrackCount > averageTracksPerPerformer * 2) {
+        warning = (
+            <div className="warning" style={{ textAlign: "center" }}>
+                The average person has {averageTracksPerPerformer.toFixed(0)}{" "}
+                {averageTracksPerPerformer >= 2 ? "tracks" : "track"} in the queue, this will be{" "}
+                your {nth(myTrackCount)} — please make sure everybody
+                gets a chance to sing ❤️
+            </div>
+        );
+    }
+
+    if (action === TrackAction.NONE) {
         return (
             <footer>
-                {is_queued && (
+                {warning}
+                {isQueued && (
                     <div className={"already_queued"}>
                         Track is already queued
                     </div>
@@ -222,7 +246,7 @@ function Buttons({ track }: { track: Track }) {
                     <button
                         type="button"
                         onClick={(_) => setAction(TrackAction.ENQUEUE)}
-                        disabled={is_queued}
+                        disabled={isQueued}
                     >
                         Enqueue
                     </button>
@@ -249,6 +273,7 @@ function Buttons({ track }: { track: Track }) {
         return (
             <footer>
                 {variantSelect}
+                {warning}
                 <input
                     type="text"
                     name="performer_name"

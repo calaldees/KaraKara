@@ -40,6 +40,12 @@ export function unique<T>(array: T[]): T[] {
     return Array.from(new Set(array));
 }
 
+export function nth(n: number): string {
+    const suffixes = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+}
+
 export function is_my_song(
     session_id: string | null,
     item?: Pick<QueueItem, "session_id">,
