@@ -12,7 +12,8 @@ import {
     attachment_path,
     dict2css,
     is_my_song,
-    shuffle,
+    sorted,
+    unique,
     time_until,
 } from "@/utils";
 
@@ -160,12 +161,12 @@ export function Queue(): React.ReactElement {
                 <section>
                     <h2>Coming Later</h2>
                     <div className={"coming_later"}>
-                        {shuffle(
-                            queue.slice(
-                                1 + settings["coming_soon_track_count"],
-                            ),
-                        ).map((item) => (
-                            <span key={item.id}>{item.performer_name}</span>
+                        {sorted(unique(queue.slice(
+                            1 + settings["coming_soon_track_count"],
+                        ).map(
+                            (item) => item.performer_name
+                        ))).map((name) => (
+                            <span key={name}>{name}</span>
                         ))}
                     </div>
                 </section>

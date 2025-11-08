@@ -30,6 +30,16 @@ export function shuffle<T>(array: T[]): T[] {
     return array;
 }
 
+export function sorted<T>(array: T[], cmp?: (a: T, b: T) => number): T[] {
+    const new_array = array.slice();
+    new_array.sort(cmp);
+    return new_array;
+}
+
+export function unique<T>(array: T[]): T[] {
+    return Array.from(new Set(array));
+}
+
 export function is_my_song(
     session_id: string | null,
     item?: Pick<QueueItem, "session_id">,
