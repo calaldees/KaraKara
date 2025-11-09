@@ -10,6 +10,8 @@ from .settings_manager import QueueSettings, TimeDelta
 
 class QueueItem(pydantic.BaseModel):
     """
+    "TzInfo(...)" because some versions of python output "TzInfo(UTC)" and others "TzInfo(0)"
+
     >>> qi1 = QueueItem(
     ...     track_id='Track1',
     ...     track_duration=60.25,
@@ -20,7 +22,7 @@ class QueueItem(pydantic.BaseModel):
     ...     added_time=111111111.111111111
     ... )
     >>> qi1
-    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=TzInfo(UTC)), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(UTC)), debug_str=None, video_variant=None, subtitle_variant=None)
+    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=TzInfo(...)), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(...)), debug_str=None, video_variant=None, subtitle_variant=None)
 
     >>> qi2 = QueueItem(
     ...     track_id='Track1',
@@ -32,7 +34,7 @@ class QueueItem(pydantic.BaseModel):
     ...     added_time=111111111.111111111
     ... )
     >>> qi2
-    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(UTC)), debug_str=None, video_variant=None, subtitle_variant=None)
+    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(...)), debug_str=None, video_variant=None, subtitle_variant=None)
 
     >>> qi1.model_dump(mode="json")
     {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None, 'video_variant': None, 'subtitle_variant': None}
