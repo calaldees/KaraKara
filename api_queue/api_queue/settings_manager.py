@@ -17,8 +17,8 @@ type Tag = str
 
 TimeDelta = t.Annotated[
     datetime.timedelta,
-    pydantic.PlainValidator(parse_timedelta, json_schema_input_type=int | float | str),
-    pydantic.PlainSerializer(lambda td: td.total_seconds() if td else None, return_type=int),
+    pydantic.PlainValidator(parse_timedelta, json_schema_input_type=float | int | str),
+    pydantic.PlainSerializer(lambda td: td.total_seconds() if td else None, return_type=float),
 ]
 
 OptionalDatetime = t.Annotated[
