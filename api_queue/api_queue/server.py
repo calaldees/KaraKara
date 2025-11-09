@@ -165,23 +165,56 @@ async def time(request: Request):
     return sanic.response.json(datetime.now().timestamp())
 
 
-@app.post("/analytics.json")
-@openapi.definition(
-    response=openapi.definitions.Response({"application/json": bool}),
-)
-async def analytics(request: Request):
+async def write_analytics_log(request: Request, data: dict) -> bool:
     try:
         with open("/logs/analytics.json", "a", encoding="utf8") as f:
-            data = request.json
             data["remote_addr"] = request.remote_addr
             data["time"] = datetime.now().isoformat()
             data["user_agent"] = request.headers.get("user-agent")
             data["session"] = request.ctx.session_id
             f.write(json.dumps(data) + "\n")
-        return sanic.response.json(True)
-    except Exception as e:
-        log.exception("analytics.json error")
-        return sanic.response.json(False)
+            return True
+    except Exception:
+        log.exception("failed to write analytics")
+    return False
+
+
+@app.post("/analytics.json")
+@openapi.definition(
+    response=openapi.definitions.Response({"application/json": bool}),
+)
+async def analytics(request: Request):
+    logged = await write_analytics_log(request, request.json)
+    return sanic.response.json(logged)
+
+
+def log_user_action(fields: list(str) | None = None):
+    def decorator(handler):
+        async def wrapper(request: Request, *args, **kwargs):
+            room_name = kwargs.get("room_name", "None")
+            user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
+            data = {
+                "app": "api_queue",
+                "room": room_name,
+                "action": handler.__name__,
+                "admin": user.is_admin,
+                "ok": True,
+            }
+            if fields:
+                for field in fields:
+                    if "field" in kwargs:
+                        data[field] = kwargs[field]
+            try:
+                result = await handler(request, *args, **kwargs)
+                await write_analytics_log(request, data)
+                return result
+            except Exception as ex:
+                data["ok"] = False
+                data["err"] = str(ex)
+                await write_analytics_log(request, data)
+                raise ex
+        return wrapper
+    return decorator
 
 
 # Queue -----------------------------------------------------------------------
@@ -287,6 +320,7 @@ async def get_settings(request: Request, room_name: str):
     body={"application/json": QueueSettings},
     response=openapi.definitions.Response({"application/json": NullObjectJson}),
 )
+@log_user_action()
 async def update_settings(request: Request, room_name: str, body: QueueSettings):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     if not user.is_admin:
@@ -354,6 +388,7 @@ class QueueItemAdd(pydantic.BaseModel):
         openapi.definitions.Response("track_id invalid", status=400),
     ],
 )
+@log_user_action(["body"])
 async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     track_durations = request.app.ctx.track_manager.track_durations
@@ -395,6 +430,7 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
+@log_user_action(["queue_item_id_str"])
 async def delete_queue_item(request: Request, room_name: str, queue_item_id_str: str):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     queue_item_id = int(queue_item_id_str)
@@ -420,6 +456,7 @@ class QueueItemMove(pydantic.BaseModel):
     body={"application/json": QueueItemMove},
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
 )
+@log_user_action(["body"])
 async def move_queue_item(request: Request, room_name: str, body: QueueItemMove):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     if not user.is_admin:
@@ -459,6 +496,7 @@ class CommandReturn:
         openapi.definitions.Response("admin required", status=403),
     ],
 )
+@log_user_action(["command"])
 async def queue_command(request: Request, room_name: str, command: str):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     if not user.is_admin:
