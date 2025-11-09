@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import {
     createBrowserRouter,
     createRoutesFromElements,
@@ -91,5 +91,17 @@ function QueueOrControl(): React.ReactElement {
 
 export function Root(): React.ReactElement {
     //const { root } = useContext(ClientContext);
+
+    // Refresh the app if it has been open for more than
+    // 12 hours to avoid stale API clients
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (performance.now() > 12 * 60 * 60 * 1000) {
+                window.location.reload();
+            }
+        }, 60 * 1000); // check every minute
+        return () => clearInterval(interval);
+    }, []);
+
     return <RouterProvider router={router} />;
 }
