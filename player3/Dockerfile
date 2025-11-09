@@ -8,6 +8,7 @@ RUN npm install
 
 # Build app
 COPY . /app
+COPY --from=root .git /app/.git
 RUN npm run test-once
 RUN npm run build
 

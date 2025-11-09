@@ -22,7 +22,7 @@ Global state (eg track list, queue, server time) is set in `src/providers/`
 Depending on whether you prefer Docker or Node:
 
 ```
-docker build -t kk-player3 .
+docker build -t kk-player3 --build-context root=.. .
 docker run --rm -p 1237:80 -ti kk-player3
 ```
 

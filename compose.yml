@@ -62,12 +62,16 @@ services:
     player3:
         build:
             context: ./player3
+            additional_contexts:
+                root: .
         restart: unless-stopped
         mem_limit: 1g
 
     browser3:
         build:
             context: ./browser3
+            additional_contexts:
+                root: .
         restart: unless-stopped
         mem_limit: 1g
 

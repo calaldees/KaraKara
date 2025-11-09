@@ -39,7 +39,7 @@ Login
 Depending on whether you prefer Docker or Node:
 
 ```
-docker build -t kk-browser3 .
+docker build -t kk-browser3 --build-context root=.. .
 docker run --rm -p 1236:80 -ti kk-browser3
 ```
 
