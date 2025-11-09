@@ -56,10 +56,13 @@
 		reverse_proxy upload:8000
 	}
 
-	@needsSlash {
-		path_regexp top ^/[^/]+$
-		not path */
-		not file
+	handle_path /* {
+		@needsSlash {
+			path_regexp top ^/[^/]+$
+			not path */
+			not file
+		}
+		redir @needsSlash {path}/
+		respond "Not Found" 404
 	}
-	redir @needsSlash {path}/
 }
