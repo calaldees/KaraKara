@@ -376,6 +376,7 @@ class QueueItemAdd(pydantic.BaseModel):
     performer_name: str
     video_variant: str | None = None
     subtitle_variant: str | None = None
+    version: int | None = None
 
 
 @room_blueprint.post("/queue.json")
@@ -399,6 +400,8 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
         raise sanic.exceptions.InvalidUsage(message="track_id invalid", context={"track_id": body.track_id})
     if body.performer_name.strip() == "":
         raise sanic.exceptions.InvalidUsage(message="Performer name cannot be empty")
+    if body.version != 2: # temporary hack until adding client force-updater
+        raise sanic.exceptions.InvalidUsage(message="App out of date, please refresh")
     # Queue update
     async with push_queue_to_mqtt(request.app, room_name):
         async with request.app.ctx.queue_manager.async_queue_modify_context(room_name) as queue:
