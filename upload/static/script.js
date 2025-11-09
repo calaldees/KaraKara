@@ -1,8 +1,8 @@
+// Fetch and display work-in-progress tracks
+// fetch from ./wips endpoint (returns JSON array of {title, artist, added})
 document.addEventListener("DOMContentLoaded", () => {
   const wipDiv = document.getElementById("wips");
 
-  // Fetch and display work-in-progress tracks
-  // fetch from ./wips endpoint (returns JSON array of {title, artist, added})
   fetch("./wips")
     .then((res) => res.json())
     .then((data) => {
@@ -32,6 +32,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// Have submit button be labelled "Send Suggestion" if no file inputs have any files,
+// or "Start Upload" if there are files
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("upload-form");
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  const updateButtonLabel = () => {
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    let hasFiles = false;
+    fileInputs.forEach((input) => {
+      if (input.files.length > 0) {
+        hasFiles = true;
+      }
+    });
+    submitButton.textContent = hasFiles ? "Start Upload" : "Send Suggestion";
+  };
+
+  form.addEventListener("change", updateButtonLabel);
+  updateButtonLabel(); // Initial call to set the correct label
+});
+
+// Handle form submission with TUS resumable uploads
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("upload-form");
   const uploadsDiv = document.getElementById("uploads");
