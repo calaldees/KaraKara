@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "serve": "rsbuild dev",
-        "build": "tsc -b && rsbuild build",
+        "build": "./update-version.sh && tsc -b && rsbuild build",
         "cypress": "npx cypress open",
         "format": "prettier --write .",
         "preview": "rsbuild preview",

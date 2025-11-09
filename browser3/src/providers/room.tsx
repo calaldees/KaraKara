@@ -10,6 +10,7 @@ import { current_and_future, normalise_cmp } from "@/utils";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
+import { COMMIT, BUILD_DATE } from "@/utils/build_info";
 
 export interface RoomContextType {
     trackList: Track[];
@@ -105,6 +106,7 @@ export function RoomProvider(props: any) {
             event: "open_room",
             app: "browser3",
             dev: process.env.NODE_ENV === "development" ? true : false,
+            version: `${COMMIT} - ${BUILD_DATE}`,
             admin: isAdmin,
             room: roomName,
         };
