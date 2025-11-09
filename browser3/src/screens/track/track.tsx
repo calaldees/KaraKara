@@ -119,6 +119,7 @@ function Buttons({ track }: { track: Track }) {
         removeBookmark,
         performerName,
         setPerformerName,
+        booth,
     } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request, sessionId } = useApi();
@@ -222,7 +223,7 @@ function Buttons({ track }: { track: Track }) {
         : 0;
     const myTrackCount = myTracks.length + 1;
     let warning = null;
-    if (!isQueued && queue.length > 3 && myTrackCount > averageTracksPerPerformer * 2) {
+    if (!isQueued && !booth && queue.length > 3 && myTrackCount > averageTracksPerPerformer * 2) {
         warning = (
             <div className="warning" style={{ textAlign: "center" }}>
                 The average person has {averageTracksPerPerformer.toFixed(0)}{" "}
