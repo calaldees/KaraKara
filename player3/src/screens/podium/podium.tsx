@@ -87,13 +87,7 @@ export function PodiumScreen({
                     })}
                 </ul>
             ) : (
-                <Video
-                    track={track}
-                    loop={true}
-                    mute={true}
-                    videoVariant={queue_item.video_variant}
-                    subtitleVariant={queue_item.subtitle_variant}
-                />
+                <div className="lyrics">(Hard-subbed song, please check the projector for lyrics ;( )</div>
             )}
 
             {starting ? (
