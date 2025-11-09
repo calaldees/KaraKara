@@ -12,6 +12,7 @@ import sanic
 import ujson as json
 from sanic.log import logger as log
 from sanic_ext import openapi, validate
+from decorator import decorator
 import sanic.blueprints
 import sanic.handlers
 import sanic.response
@@ -188,33 +189,31 @@ async def analytics(request: Request):
     return sanic.response.json(logged)
 
 
-def log_user_action(fields: list(str) | None = None):
-    def decorator(handler):
-        async def wrapper(request: Request, *args, **kwargs):
-            room_name = kwargs.get("room_name", "None")
-            user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
-            data = {
-                "app": "api_queue",
-                "room": room_name,
-                "action": handler.__name__,
-                "admin": user.is_admin,
-                "ok": True,
-            }
-            if fields:
-                for field in fields:
-                    if "field" in kwargs:
-                        data[field] = kwargs[field]
-            try:
-                result = await handler(request, *args, **kwargs)
-                await write_analytics_log(request, data)
-                return result
-            except Exception as ex:
-                data["ok"] = False
-                data["err"] = str(ex)
-                await write_analytics_log(request, data)
-                raise ex
-        return wrapper
-    return decorator
+@decorator
+async def log_user_action(func, fields: list[str] | None = None, *args, **kwargs):
+    request = args[0]
+    room_name = kwargs.get("room_name", "None")
+    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
+    data = {
+        "event": func.__name__,
+        "app": "api_queue",
+        "room": room_name,
+        "admin": user.is_admin,
+        "ok": True,
+    }
+    if fields:
+        for field in fields:
+            if "field" in kwargs:
+                data[field] = kwargs[field]
+    try:
+        result = await func(*args, **kwargs)
+        await write_analytics_log(request, data)
+        return result
+    except Exception as ex:
+        data["ok"] = False
+        data["err"] = str(ex)
+        await write_analytics_log(request, data)
+        raise ex
 
 
 # Queue -----------------------------------------------------------------------
@@ -389,7 +388,7 @@ class QueueItemAdd(pydantic.BaseModel):
         openapi.definitions.Response("track_id invalid", status=400),
     ],
 )
-@log_user_action(["body"])
+@log_user_action(fields=["body"])
 async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     track_durations = request.app.ctx.track_manager.track_durations
@@ -433,7 +432,7 @@ async def add_queue_item(request: Request, room_name: str, body: QueueItemAdd):
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": QueueItemJson}),
 )
-@log_user_action(["queue_item_id_str"])
+@log_user_action(fields=["queue_item_id_str"])
 async def delete_queue_item(request: Request, room_name: str, queue_item_id_str: str):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     queue_item_id = int(queue_item_id_str)
@@ -459,7 +458,7 @@ class QueueItemMove(pydantic.BaseModel):
     body={"application/json": QueueItemMove},
     response=openapi.definitions.Response({"application/json": NullObjectJson}, description="...", status=201),
 )
-@log_user_action(["body"])
+@log_user_action(fields=["body"])
 async def move_queue_item(request: Request, room_name: str, body: QueueItemMove):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     if not user.is_admin:
@@ -499,7 +498,7 @@ class CommandReturn:
         openapi.definitions.Response("admin required", status=403),
     ],
 )
-@log_user_action(["command"])
+@log_user_action(fields=["command"])
 async def queue_command(request: Request, room_name: str, command: str):
     user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
     if not user.is_admin:
