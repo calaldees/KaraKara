@@ -12,7 +12,7 @@ import sanic
 import ujson as json
 from sanic.log import logger as log
 from sanic_ext import openapi, validate
-from decorator import decorator
+from functools import wraps
 import sanic.blueprints
 import sanic.handlers
 import sanic.response
@@ -189,31 +189,35 @@ async def analytics(request: Request):
     return sanic.response.json(logged)
 
 
-@decorator
-async def log_user_action(func, fields: list[str] | None = None, *args, **kwargs):
-    request = args[0]
-    room_name = kwargs.get("room_name", "None")
-    user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
-    data = {
-        "event": func.__name__,
-        "app": "api_queue",
-        "room": room_name,
-        "admin": user.is_admin,
-        "ok": True,
-    }
-    if fields:
-        for field in fields:
-            if "field" in kwargs:
-                data[field] = kwargs[field]
-    try:
-        result = await func(*args, **kwargs)
-        await write_analytics_log(request, data)
-        return result
-    except Exception as ex:
-        data["ok"] = False
-        data["err"] = str(ex)
-        await write_analytics_log(request, data)
-        raise ex
+def log_user_action(fields: list[str] | None = None):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            request = args[0]
+            room_name = kwargs.get("room_name", "None")
+            user = request.app.ctx.login_manager.load(room_name, request.ctx.session_id)
+            data = {
+                "event": func.__name__,
+                "app": "api_queue",
+                "room": room_name,
+                "admin": user.is_admin,
+                "ok": True,
+            }
+            if fields:
+                for field in fields:
+                    if "field" in kwargs:
+                        data[field] = kwargs[field]
+            try:
+                result = await func(*args, **kwargs)
+                await write_analytics_log(request, data)
+                return result
+            except Exception as ex:
+                data["ok"] = False
+                data["err"] = str(ex)
+                await write_analytics_log(request, data)
+                raise ex
+        return wrapper
+    return decorator
 
 
 # Queue -----------------------------------------------------------------------

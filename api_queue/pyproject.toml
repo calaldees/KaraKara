@@ -11,7 +11,6 @@ dependencies = [
 	"aiomqtt ~= 2.4",
 	"pytimeparse2 ~= 1.7",
 	"dateparser ~= 1.2",
-	"decorator ~= 5.2",
 	"setuptools ~= 80.9",
 	"pydantic ~= 2.11",  # To be replaced with msgspec?
 ]
@@ -26,7 +25,6 @@ test = [
 	"types-tqdm ~= 4.67",
 	"types-ujson ~= 5.10",
 	"types-dateparser ~= 1.2",
-	"types-decorator ~= 5.2",
 ]
 analytics = [
     "ua_parser ~= 1.0.1",
