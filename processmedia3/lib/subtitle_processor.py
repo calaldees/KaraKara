@@ -436,8 +436,8 @@ if __name__ == "__main__":
 
     if args.unblink:
         for i in range(len(subs) - 1):
-            diff = subs[i + 1].start - subs[i].end
-            if timedelta(seconds=-0.01) < diff < timedelta(seconds=0.01):
+            tdiff = subs[i + 1].start - subs[i].end
+            if timedelta(seconds=-0.01) < tdiff < timedelta(seconds=0.01):
                 subs[i] = Subtitle(
                     start=subs[i].start,
                     end=subs[i + 1].start,
@@ -457,12 +457,12 @@ if __name__ == "__main__":
         raise SubtitleFormatException("Unknown output format")
 
     if args.input == args.output:
-        diff = difflib.unified_diff(
+        linediff = difflib.unified_diff(
             indata.splitlines(keepends=True),
             outdata.splitlines(keepends=True),
             fromfile=args.input,
             tofile=args.output,
         )
-        print("".join(diff))
+        print("".join(linediff))
     with open(args.output, "w") as f:
         f.write(outdata)
