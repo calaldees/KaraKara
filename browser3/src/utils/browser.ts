@@ -47,10 +47,17 @@ export function nth(n: number): string {
 }
 
 export function is_my_song(
-    session_id: string | null,
-    item?: Pick<QueueItem, "session_id">,
+    item?: Pick<QueueItem, "session_id" | "performer_name">,
+    sessionId?: string | null,
+    performerName?: string | null,
 ): boolean {
-    return item?.session_id === (session_id || "").split("-")[0];
+    if (sessionId) {
+        if (item?.session_id === sessionId.split("-")[0]) return true;
+    }
+    if (performerName) {
+        if (item?.performer_name === performerName) return true;
+    }
+    return false;
 }
 
 /*

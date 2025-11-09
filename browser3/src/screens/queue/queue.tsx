@@ -29,6 +29,7 @@ function QueueItemRender({
     track: Track;
 }): React.ReactElement {
     const { now } = useContext(ServerTimeContext);
+    const { performerName } = useContext(ClientContext);
     const { request, sessionId } = useApi();
 
     function removeTrack(queue_item_id: number) {
@@ -46,7 +47,7 @@ function QueueItemRender({
         <li
             className={dict2css({
                 queue_item: true,
-                me: is_my_song(sessionId, item),
+                me: is_my_song(item, sessionId, performerName),
             })}
         >
             <Thumb track={track} />
@@ -61,7 +62,7 @@ function QueueItemRender({
                 </span>
             )}
 
-            {is_my_song(sessionId, item) && (
+            {is_my_song(item, sessionId) && (
                 <span
                     data-cy="remove"
                     className={"go_arrow"}
@@ -173,12 +174,12 @@ export function Queue(): React.ReactElement {
             )}
 
             {/* My Stuff */}
-            {queue.filter((item) => is_my_song(sessionId, item)).length > 0 && (
+            {queue.filter((item) => is_my_song(item, sessionId)).length > 0 && (
                 <section>
                     <h2>My Entries</h2>
                     <ul>
                         {queue
-                            .filter((item) => is_my_song(sessionId, item))
+                            .filter((item) => is_my_song(item, sessionId))
                             .map((item) => (
                                 <QueueItemRender
                                     key={item.id}

@@ -213,10 +213,10 @@ function Buttons({ track }: { track: Track }) {
         queue.find((i) => i.track_id === track.id) !== undefined;
 
     const myTracks = queue.filter((item) =>
-        is_my_song(sessionId, item)
+        is_my_song(item, sessionId, performerName)
     );
     const otherPeoplesTracks = queue.filter((item) =>
-        !is_my_song(sessionId, item)
+        !is_my_song(item, sessionId, performerName)
     );
     const averageTracksPerPerformer = otherPeoplesTracks.length > 0
         ? otherPeoplesTracks.length /
