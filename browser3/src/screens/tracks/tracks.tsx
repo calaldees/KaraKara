@@ -308,6 +308,13 @@ function Explorer(): React.ReactElement {
                         </ul>
                     );
                 }
+                if (body === null) {
+                    body = <ul>
+                        <li>
+                            <a  style={{ textAlign: "center", display: "block", width: "100%", padding: ".5em" }} href="https://karakara.uk/upload/">Submit or request additional tracks</a>
+                        </li>
+                    </ul>
+                }
                 return (
                     <div key={heading}>
                         {heading && <h2>{heading}</h2>}
