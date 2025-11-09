@@ -222,13 +222,14 @@ function Buttons({ track }: { track: Track }) {
         ? otherPeoplesTracks.length /
           unique(otherPeoplesTracks.map((item) => item.performer_name)).length
         : 0;
+    const averageTracksPerPerformerStr = averageTracksPerPerformer.toFixed(1);
     const myTrackCount = myTracks.length + 1;
     let warning = null;
     if (!isQueued && !booth && queue.length > 3 && myTrackCount > averageTracksPerPerformer * 2) {
         warning = (
             <div className="warning" style={{ textAlign: "center" }}>
-                The average person has {averageTracksPerPerformer.toFixed(0)}{" "}
-                {averageTracksPerPerformer >= 2 ? "tracks" : "track"} in the queue, this will be{" "}
+                The average person has {averageTracksPerPerformerStr}{" "}
+                {averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"} in the queue, this will be{" "}
                 your {nth(myTrackCount)} — please make sure everybody
                 gets a chance to sing ❤️
             </div>
