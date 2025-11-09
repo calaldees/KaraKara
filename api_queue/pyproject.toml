@@ -26,6 +26,7 @@ test = [
 	"types-tqdm ~= 4.67",
 	"types-ujson ~= 5.10",
 	"types-dateparser ~= 1.2",
+	"types-decorator ~= 5.2",
 ]
 analytics = [
     "ua_parser ~= 1.0.1",
