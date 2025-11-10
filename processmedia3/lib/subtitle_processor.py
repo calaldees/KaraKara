@@ -148,6 +148,21 @@ def _parse_srt(source: str) -> list[Subtitle]:
         )
 
     lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
+
+    # Aegisub has a bug where lines sometimes overlap or have a gap of <10ms -
+    # rather than manually fixing these in the source files, let's just assume
+    # all such cases are unintentional and fix them here.
+    # https://github.com/TypesettingTools/Aegisub/issues/448
+    for i in range(len(lines) - 1):
+        tdiff = lines[i + 1].start - lines[i].end
+        if timedelta(seconds=-0.010) < tdiff < timedelta(seconds=0.010):
+            lines[i] = Subtitle(
+                start=lines[i].start,
+                end=lines[i + 1].start,
+                text=lines[i].text,
+                top=lines[i].top,
+            )
+
     return [line for line in lines if line.text]
 
 
@@ -432,27 +447,27 @@ if __name__ == "__main__":
 
     with open(args.input, "r") as f:
         indata = f.read()
-        subs = parse_subtitles(indata)
+        lines = parse_subtitles(indata)
 
     if args.unblink:
-        for i in range(len(subs) - 1):
-            tdiff = subs[i + 1].start - subs[i].end
+        for i in range(len(lines) - 1):
+            tdiff = lines[i + 1].start - lines[i].end
             if timedelta(seconds=-0.01) < tdiff < timedelta(seconds=0.01):
-                subs[i] = Subtitle(
-                    start=subs[i].start,
-                    end=subs[i + 1].start,
-                    text=subs[i].text,
-                    top=subs[i].top,
+                lines[i] = Subtitle(
+                    start=lines[i].start,
+                    end=lines[i + 1].start,
+                    text=lines[i].text,
+                    top=lines[i].top,
                 )
 
     if args.output.endswith(".vtt"):
-        outdata = create_vtt(subs)
+        outdata = create_vtt(lines)
     elif args.output.endswith(".srt"):
-        outdata = create_srt(subs)
+        outdata = create_srt(lines)
     elif args.output.endswith(".ssa"):
-        outdata = create_ssa(subs)
+        outdata = create_ssa(lines)
     elif args.output.endswith(".json"):
-        outdata = create_json(subs)
+        outdata = create_json(lines)
     else:
         raise SubtitleFormatException("Unknown output format")
 
