@@ -250,7 +250,7 @@ function Explorer(): React.ReactElement {
                 defaultValue={search}
                 enterKeyHint="done"
                 data-cy="search"
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.currentTarget.value)}
             />
 
             {/* List active filters */}

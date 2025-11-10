@@ -54,7 +54,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     function onTouchMove(e: TouchEvent) {
         // target = the innermost element of the heirachy that was touched
         // but we want to find the root UL
-        let ul: HTMLElement | null = e.target as HTMLElement;
+        let ul: HTMLElement | null = e.currentTarget as HTMLElement;
         while (ul && ul.tagName !== "UL") ul = ul.parentElement;
         if (!ul) return;
 

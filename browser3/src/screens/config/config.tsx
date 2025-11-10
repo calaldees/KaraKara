@@ -50,7 +50,7 @@ export function ConfigMenu(): React.ReactElement {
                                         autoCapitalize="none"
                                         data-cy="room-input"
                                         onChange={(e) =>
-                                            setRoomNameEdit(e.target.value)
+                                            setRoomNameEdit(e.currentTarget.value)
                                         }
                                     />
                                 </td>
@@ -67,7 +67,7 @@ export function ConfigMenu(): React.ReactElement {
                                         className="fakePassword"
                                         data-cy="password-input"
                                         onChange={(e) =>
-                                            setRoomPasswordEdit(e.target.value)
+                                            setRoomPasswordEdit(e.currentTarget.value)
                                         }
                                     />
                                 </td>

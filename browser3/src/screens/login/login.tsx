@@ -26,7 +26,7 @@ export function Login(): React.ReactElement {
                         placeholder={"Room Name"}
                         value={roomNameEdit}
                         enterKeyHint="go"
-                        onChange={(e) => setRoomNameEdit(e.target.value)}
+                        onChange={(e) => setRoomNameEdit(e.currentTarget.value)}
                         required={true}
                         autoFocus={true}
                     />

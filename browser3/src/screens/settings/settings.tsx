@@ -107,7 +107,7 @@ function RoomSettingsInternal({
                             name={key}
                             data-setting={key}
                             value={value ?? ""}
-                            onChange={(e) => update(key, e.target.value)}
+                            onChange={(e) => update(key, e.currentTarget.value)}
                         />
                     </p>
                 ))}

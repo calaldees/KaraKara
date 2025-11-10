@@ -162,7 +162,7 @@ function Buttons({ track }: { track: Track }) {
         videoSelect = (
             <select
                 name="video_variant"
-                onChange={(e) => setVideoVariant(e.target.value)}
+                onChange={(e) => setVideoVariant(e.currentTarget.value)}
                 value={videoVariant}
             >
                 {/** while the variants are different videos, the effect for the user is different audio */}
@@ -181,7 +181,7 @@ function Buttons({ track }: { track: Track }) {
         subtitleSelect = (
             <select
                 name="subtitle_variant"
-                onChange={(e) => setSubtitleVariant(e.target.value)}
+                onChange={(e) => setSubtitleVariant(e.currentTarget.value)}
                 value={subtitleVariant}
             >
                 <option value={""}>Select Subtitles</option>
@@ -285,7 +285,7 @@ function Buttons({ track }: { track: Track }) {
                     required={true}
                     autoFocus={performerName.trim().length === 0}
                     enterKeyHint="done"
-                    onChange={(e) => setPerformerName(e.target.value)}
+                    onChange={(e) => setPerformerName(e.currentTarget.value)}
                 />
                 <div className={"buttons"}>
                     <button
