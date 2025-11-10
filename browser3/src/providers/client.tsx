@@ -51,14 +51,14 @@ export function ClientProvider(props: any) {
 
     const addBookmark = useCallback(
         (track_id: string): void => {
-            setBookmarks((prev) => [...prev, track_id]);
+            setBookmarks((prev: string[]) => [...prev, track_id]);
         },
         [setBookmarks],
     );
 
     const removeBookmark = useCallback(
         (track_id: string): void => {
-            setBookmarks((prev) => prev.filter((x) => x !== track_id));
+            setBookmarks((prev: string[]) => prev.filter((x) => x !== track_id));
         },
         [setBookmarks],
     );
