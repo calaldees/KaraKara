@@ -256,6 +256,13 @@ def lint(tracks: Sequence[Track]) -> None:
                             f"{s.file.relative} appears to have an unquoted URL in the source tag"
                         )
 
+                dur = json["duration"]
+                if dur > 5 * 60:
+                    if "full" not in s.tags.get("length", []):
+                        log.error(
+                            f"{s.file.relative} is {dur}s but has no length:full tag"
+                        )
+
                 # No "red" tags - move these tracks to the WorkInProgress folder instead
                 if "red" in s.tags:
                     log.error(f"{s.file.relative} has red tag")
