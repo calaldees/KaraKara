@@ -171,12 +171,12 @@ async def test_queue_add(api_queue: APIQueue, mock_mqtt):
     # reject add tracks that are not in track list
     response = await api_queue.post()
     assert response.status == 400
-    response = await api_queue.post(track_id="NotRealTrackId", performer_name="test", version=2)
+    response = await api_queue.post(track_id="NotRealTrackId", performer_name="test")
     assert response.status == 400
 
     mock_mqtt.publish.assert_not_awaited()
     # add track
-    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test", version=2)
+    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test")
     assert response.status == 200
     mock_mqtt.publish.assert_awaited_once()
     # check track now in queue
@@ -189,7 +189,7 @@ async def test_queue_add(api_queue: APIQueue, mock_mqtt):
 
 @pytest.mark.asyncio
 async def test_queue_add_csv(api_queue: APIQueue):
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1", version=2)
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
     csv = await api_queue.queue_csv
     assert csv.count(",") > 10  # TODO: assert this is valid csv?
     assert "test1" in csv
@@ -199,8 +199,8 @@ async def test_queue_add_csv(api_queue: APIQueue):
 async def test_queue_delete(api_queue: APIQueue, mock_mqtt):
     # user can populate queue
     assert len(await api_queue.queue) == 0
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1", version=2)
-    await api_queue.post(track_id="Animaniacs_OP", performer_name="test2", version=2)
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
+    await api_queue.post(track_id="Animaniacs_OP", performer_name="test2")
     queue = await api_queue.queue
     assert len(queue) == 2
 
@@ -234,9 +234,9 @@ async def test_queue_delete(api_queue: APIQueue, mock_mqtt):
 @pytest.mark.asyncio
 async def test_queue_move(api_queue: APIQueue, mock_mqtt):
     # populate queue
-    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1", version=2)
-    await api_queue.post(track_id="Animaniacs_OP", performer_name="test2", version=2)
-    await api_queue.post(track_id="Macross_Dynamite7_OP_Dynamite_Explosion", performer_name="test3", version=2)
+    await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test1")
+    await api_queue.post(track_id="Animaniacs_OP", performer_name="test2")
+    await api_queue.post(track_id="Macross_Dynamite7_OP_Dynamite_Explosion", performer_name="test3")
     queue = await api_queue.queue
     assert len(queue) == 3
 
@@ -317,7 +317,6 @@ async def test_queue_updated_actions(api_queue: APIQueue):
     response = await api_queue.post(
         track_id="KAT_TUN_Your_side_Instrumental",
         performer_name="invalid_name",
-        version=2,
     )
     assert response.status == 400
     assert "invalid_name" in str(response.json)
@@ -339,5 +338,5 @@ async def test_queue_updated_actions__end_datetime(api_queue: APIQueue):
     assert response.status == 200
     await api_queue.logout()
 
-    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test_name", version=2)
+    response = await api_queue.post(track_id="KAT_TUN_Your_side_Instrumental", performer_name="test_name")
     assert response.status == 200

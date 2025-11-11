@@ -150,7 +150,6 @@ function Buttons({ track }: { track: Track }) {
                     performer_name: performer_name.trim(),
                     video_variant: videoVariant || null,
                     subtitle_variant: subtitleVariant || null,
-                    version: 2, // temporary hack, remove when we have proper versioning
                 }),
             },
             onAction: () => setAction(TrackAction.NONE),
