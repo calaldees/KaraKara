@@ -61,7 +61,7 @@ export function ConfigMenu() {
                                         autoCorrect="off"
                                         autoCapitalize="none"
                                         onChange={(e) =>
-                                            setRoomNameEdit(e.target.value)
+                                            setRoomNameEdit(e.currentTarget.value)
                                         }
                                         required={true}
                                     />
@@ -78,7 +78,7 @@ export function ConfigMenu() {
                                         autoCapitalize="none"
                                         className="fakePassword"
                                         onChange={(e) =>
-                                            setRoomPasswordEdit(e.target.value)
+                                            setRoomPasswordEdit(e.currentTarget.value)
                                         }
                                         required={true}
                                     />
@@ -149,7 +149,7 @@ export function ConfigMenu() {
                                     <input
                                         value={underscan}
                                         onChange={(e) =>
-                                            setUnderscan(e.target.value)
+                                            setUnderscan(e.currentTarget.value)
                                         }
                                     />
                                 </td>

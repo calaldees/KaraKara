@@ -59,7 +59,7 @@ export function PreviewScreen({ queue }: { queue: QueueItem[] }) {
             <Video
                 track={track}
                 onLoadStart={(e: any) => {
-                    e.target.volume = settings["preview_volume"];
+                    e.currentTarget.volume = settings["preview_volume"];
                 }}
                 subs={false}
                 loop={true}
