@@ -34,7 +34,7 @@ function RoomSettingsInternal({
 }) {
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
         Record<string, string>
-    >(removeTypes(roomSettings));
+    >(() => removeTypes(roomSettings));
     const { request, loading } = useApi();
 
     // when user types in a textbox, update the string:string
