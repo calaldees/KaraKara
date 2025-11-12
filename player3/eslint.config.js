@@ -58,6 +58,7 @@ export default tseslint.config(
                     args: "all",
                     argsIgnorePattern: "^_",
                     varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "^_",
                 },
             ],
             "@typescript-eslint/no-explicit-any": "off",

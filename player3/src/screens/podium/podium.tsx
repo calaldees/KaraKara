@@ -15,6 +15,21 @@ export function PodiumScreen({
     track: Track;
     queue_item: QueueItem;
 }) {
+    // Use key= to force reset of all state when track changes
+    return <PodiumInner
+        track={track}
+        queue_item={queue_item}
+        key={queue_item.id}
+    />;
+}
+
+function PodiumInner({
+    track,
+    queue_item,
+}: {
+    track: Track;
+    queue_item: QueueItem;
+}) {
     const { now } = useContext(ServerTimeContext);
     const { settings } = useContext(RoomContext);
     const { request } = useApi();
@@ -39,8 +54,6 @@ export function PodiumScreen({
                 options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),
             });
-        } else {
-            setLyrics([]);
         }
     }, [request, track]);
 
