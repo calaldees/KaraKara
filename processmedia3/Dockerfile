@@ -1,5 +1,6 @@
 ARG FFMPEG_VERSION=7.1.1
-ARG PYTHON_VERSION=3.14
+# Pillow only builds for python3.13, not yet 3.14
+ARG PYTHON_VERSION=3.13
 
 # Can't use ARG variables in `COPY --from`, but can use them in `FROM`...
 FROM mwader/static-ffmpeg:${FFMPEG_VERSION} AS ffmpeg
