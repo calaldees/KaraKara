@@ -8,6 +8,7 @@ dependencies = [
 	"pillow ~= 10.4",
 	"dateparser ~= 1.2",
 	"Brotli ~= 1.1",
+	"requests ~= 2.32",
 ]
 
 [project.optional-dependencies]
@@ -17,6 +18,7 @@ test = [
 	"types-tqdm ~= 4.67",
 	"types-Pillow ~= 10.2",
 	"types-dateparser ~= 1.2",
+	"types-requests ~= 2.32",
 ]
 
 [tool.mypy]

@@ -82,6 +82,7 @@ services:
             context: ./processmedia3
         restart: unless-stopped
         mem_limit: 8g
+        env_file: .env
         volumes:
             - ${PATH_HOST_data}/logs:/logs
             - ${PATH_HOST_source}:/media/source:ro

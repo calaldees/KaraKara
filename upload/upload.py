@@ -119,6 +119,7 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
     else:
         track_id = title[0]
     track_id = re.sub(r"[^a-zA-Z0-9_\-\.]+", " ", track_id)
+    contact = tags.get("contact", [""])[0]
 
     session_dir = UPLOAD_ROOT / session_id
     os.makedirs(session_dir, exist_ok=True)
@@ -149,32 +150,33 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
                     await f.write(f"{key}:{value}\n")
         await f.write(f"added:{datetime.now().strftime('%Y-%m-%d')}\n")
         if not moved_files:
-            await f.write("status:needs files\n")
+            await f.write("status:needs files, lyrics, timings\n")
         else:
             await f.write("status:awaiting moderator approval\n")
 
     try:
-        mg_base = os.getenv("MG_BASE", "https://api.mailgun.net")
-        mg_sandbox = os.getenv("MG_SANDBOX")
-        mg_api_key = os.getenv("MG_API_KEY")
-        if mg_sandbox and mg_api_key:
-            requests.post(
-                f"{mg_base}/v3/{mg_sandbox}/messages",
-                auth=("api", mg_api_key),
-                data={
-                    "from": f"KaraKara Uploader <postmaster@{mg_sandbox}>",
-                    "to": "Shish <shish+karakara@shishnet.org>",
-                    "subject": (
-                        f"New Track - {track_id}"
-                        if moved_files
-                        else f"New Request - {track_id}"
-                    ),
-                    "text": "Check /media/source/WorkInProgress",
+        if moved_files:
+            webhook_url = os.getenv("DISCORD_WEBHOOK_SUBMISSIONS_URL")
+            content = f"New submission: **{track_id}** (from {contact})"
+        else:
+            webhook_url = os.getenv("DISCORD_WEBHOOK_REQUESTS_URL")
+            content = f"New request: **{track_id}** (from {contact})"
+
+        if webhook_url:
+            response = requests.post(
+                webhook_url,
+                json={
+                    "content": content.strip(),
                 },
             )
-            log.info(f"Sent email notification via {mg_sandbox}")
+            if response.status_code != 204:
+                log.error(
+                    f"Failed to call webhook: {response.status_code} {response.text}"
+                )
+
+            log.info("Sent email notification via discord")
         else:
-            log.warning("Mailgun config missing, not sending notification")
+            log.warning("Webhook config missing, not sending notification")
     except Exception:
         log.exception("Failed to send notification:")
 
