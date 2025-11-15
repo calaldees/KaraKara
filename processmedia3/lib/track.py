@@ -124,13 +124,18 @@ class Track:
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
         pixel_sources = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
-        tags["aspect_ratio"] = list(set(s.meta.aspect_ratio_str for s in pixel_sources))
+        tags["aspect_ratio"] = sorted({s.meta.aspect_ratio_str for s in pixel_sources})
 
         # duration isn't useful for searching, but having it as a
         # tag means it's visible in the browser UI so singers can
         # see how long a track is before enqueueing it.
         audio_sources = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-        ds = list(set(s.meta.duration.total_seconds() for s in audio_sources))
+        # reverse-sort because if two variants are very-slightly different
+        # lengths, we want the longest to be the "official" duration.
+        ds = sorted(
+            {s.meta.duration.total_seconds() for s in audio_sources},
+            reverse=True,
+        )
         tags["duration"] = [f"{int(d // 60)}m{int(d % 60):02}s" for d in ds]
         if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
