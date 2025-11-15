@@ -96,6 +96,8 @@ class Track:
             raise TrackValidationException("missing attachments.video")
         if not attachments.get(MediaType.IMAGE):
             raise TrackValidationException("missing attachments.image")
+        for media_type in attachments:
+            attachments[media_type].sort(key=lambda a: a["path"])
 
         tag_files = self._sources_by_type({SourceType.TAGS})
         if not tag_files:
@@ -130,7 +132,7 @@ class Track:
         # tag means it's visible in the browser UI so singers can
         # see how long a track is before enqueueing it.
         audio_sources = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-        ds = sorted({s.meta.duration.total_seconds() for s in audio_sources})
+        ds = {s.meta.duration.total_seconds() for s in audio_sources}
         tags["duration"] = [f"{int(d // 60)}m{int(d % 60):02}s" for d in ds]
         if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
@@ -139,7 +141,7 @@ class Track:
         if tags.get("date"):
             tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["date"]]
 
-        # add "category:new" tag for any track added in the last year
+        # Add "category:new" tag for any track added in the last year
         # and a bit (so that if a convention is held eg Jan 5th 2020,
         # then we get a request to add a track on Jan 6th 2020, it's
         # still "new" when the next convention happens on Jan 12th 2021).
@@ -155,14 +157,20 @@ class Track:
                 tags["category"].append("new")
                 tags["new"] = [added_date.strftime("%Y-%m")]
 
-        # Longest because if two variants are very-slightly different
-        # durations, we want to use the longest one when calculating
-        # the start-time of each track in the queue.
-        # Round to 0.1s for more consistent unit tests.
-        longest_duration = round(sorted(ds, reverse=True)[0], 1)
+        # Sort all the tags' values because some of our input files are
+        # processed in a non-deterministic order but we want the output
+        # to be deterministic.
+        for k in tags:
+            tags[k] = sorted(set(tags[k]))
+
+        # duration=max(durations) because if two variants are very-slightly
+        # different, we want to use the longest one when calculating the
+        # start-time of the next track in the queue (If they are more than
+        # very-sligtly different, that should be an error).
+        # duration=round(duration) to avoid floating point issues in unit tests.
         return TrackDict(
             id=self.id,
-            duration=longest_duration,
+            duration=round(max(ds), 1),
             attachments=attachments,
             tags=tags,
         )
