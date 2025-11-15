@@ -130,12 +130,7 @@ class Track:
         # tag means it's visible in the browser UI so singers can
         # see how long a track is before enqueueing it.
         audio_sources = self._sources_by_type({SourceType.VIDEO, SourceType.AUDIO})
-        # reverse-sort because if two variants are very-slightly different
-        # lengths, we want the longest to be the "official" duration.
-        ds = sorted(
-            {s.meta.duration.total_seconds() for s in audio_sources},
-            reverse=True,
-        )
+        ds = sorted({s.meta.duration.total_seconds() for s in audio_sources})
         tags["duration"] = [f"{int(d // 60)}m{int(d % 60):02}s" for d in ds]
         if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
@@ -160,9 +155,14 @@ class Track:
                 tags["category"].append("new")
                 tags["new"] = [added_date.strftime("%Y-%m")]
 
+        # Longest because if two variants are very-slightly different
+        # durations, we want to use the longest one when calculating
+        # the start-time of each track in the queue.
+        # Round to 0.1s for more consistent unit tests.
+        longest_duration = round(sorted(ds, reverse=True)[0], 1)
         return TrackDict(
             id=self.id,
-            duration=round(ds[0], 1),  # for more consistent unit tests
+            duration=longest_duration,
             attachments=attachments,
             tags=tags,
         )
