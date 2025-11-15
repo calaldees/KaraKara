@@ -413,12 +413,12 @@ def export(
             log.exception(f"Error exporting {track.id}")
             return None
 
-    json_list: list[Track] = thread_map(
+    json_list: list[TrackDict] = thread_map(
         _export, tracks, max_workers=threads, desc="export ", unit="track"
     )
 
     # Export in alphabetic order
-    json_dict: dict[str, Track] = dict(sorted((t["id"], t) for t in json_list if t))
+    json_dict: dict[str, TrackDict] = dict(sorted((t["id"], t) for t in json_list if t))
 
     try:
         old_tracklist = json.loads((processed_dir / "tracks.json").read_text())
@@ -453,7 +453,10 @@ def export(
         announce(old_tracklist, json_dict)
 
 
-def announce(old_tracklist: dict[str, Track], new_tracklist: dict[str, Track]) -> None:
+def announce(
+    old_tracklist: dict[str, TrackDict],
+    new_tracklist: dict[str, TrackDict],
+) -> None:
     added = []
     updated = []
     removed = []
