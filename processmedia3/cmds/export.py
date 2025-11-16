@@ -82,27 +82,34 @@ def announce(
     old_tracklist: dict[str, TrackDict],
     new_tracklist: dict[str, TrackDict],
 ) -> None:
-    added = []
-    updated = []
-    removed = []
+    added: list[str] = []
+    updated: list[str] = []
+    removed: list[str] = []
+    track_base_url = "https://karakara.org/browser3/test/tracks/"
     for track_id in new_tracklist:
         if track_id not in old_tracklist:
-            added.append(track_id)
+            title = new_tracklist[track_id]["tags"]["title"][0]
+            added.append(f"* [{title}]({track_base_url}/{track_id})")
         elif new_tracklist[track_id] != old_tracklist[track_id]:
-            updated.append(track_id)
+            new_track = new_tracklist[track_id]
+            old_track = old_tracklist[track_id]
+            title = new_track["tags"]["title"][0]
+            what_changed = list_changes(old_track, new_track)
+            updated.append(f"* [{title}]({track_base_url}/{track_id}) - {what_changed}")
     for track_id in old_tracklist:
         if track_id not in new_tracklist:
-            removed.append(track_id)
+            title = old_tracklist[track_id]["tags"]["title"][0]
+            removed.append(f"* {title}")
     if not (added or updated or removed):
         return
 
     content = ""
     if added:
-        content += "**Added:** " + ", ".join(added) + "\n"
+        content += "**Added:**\n" + "\n".join(added) + "\n"
     if updated:
-        content += "**Updated:** " + ", ".join(updated) + "\n"
+        content += "**Updated:**\n" + "\n".join(updated) + "\n"
     if removed:
-        content += "**Removed:** " + ", ".join(removed) + "\n"
+        content += "**Removed:**\n" + "\n".join(removed) + "\n"
     try:
         webhook_url = os.getenv("DISCORD_WEBHOOK_UPDATES_URL")
         if webhook_url:
@@ -120,3 +127,19 @@ def announce(
             log.warning("Webhook config missing, not sending notification")
     except Exception:
         log.exception("Failed to send notification:")
+
+
+def list_changes(old_track: TrackDict, new_track: TrackDict) -> str:
+    what_changed = []
+
+    if new_track["tags"] != old_track["tags"]:
+        what_changed.append("tags")
+
+    old_attachments = old_track.get("attachments", {})
+    new_attachments = new_track.get("attachments", {})
+    all_categories = set(old_attachments.keys() | new_attachments.keys())
+    for att_cat in all_categories:
+        if new_attachments.get(att_cat) != old_attachments.get(att_cat):
+            what_changed.append(att_cat)
+
+    return ", ".join(what_changed)
