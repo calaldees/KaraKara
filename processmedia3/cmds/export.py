@@ -85,7 +85,7 @@ def announce(
     added: list[str] = []
     updated: list[str] = []
     removed: list[str] = []
-    track_base_url = "https://karakara.org/browser3/test/tracks/"
+    track_base_url = "https://karakara.uk/browser3/test/tracks/"
     for track_id in new_tracklist:
         if track_id not in old_tracklist:
             title = new_tracklist[track_id]["tags"]["title"][0]
