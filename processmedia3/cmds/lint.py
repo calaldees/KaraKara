@@ -241,11 +241,11 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
     """
     >>> from datetime import timedelta as d
     >>> lines = [
-    ...     Subtitle(text="Hello\nWorld", start=d(0), end=d(seconds=2)),
+    ...     Subtitle(text="Hello\\nWorld", start=d(0), end=d(seconds=2)),
     ...     Subtitle(text="This is a test ♪", start=d(seconds=2), end=d(seconds=4)),
     ... ]
     >>> list(lint_subtitles_line_contents(lines))
-    ['line 1 line contains newline: Hello\nWorld', 'line 2 line contains music note: This is a test ♪']
+    ['line 1 line contains newline: Hello\\nWorld', 'line 2 line contains music note: This is a test ♪']
     """
     for index, l in enumerate(ls):
         if "\n" in l.text:
