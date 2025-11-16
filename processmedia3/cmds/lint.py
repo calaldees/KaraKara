@@ -1,6 +1,7 @@
 import logging
 import re
 from datetime import timedelta
+import string
 from collections.abc import Sequence, Generator
 
 from tqdm.contrib.concurrent import thread_map
@@ -233,8 +234,11 @@ def lint_subtitles_random_topline(ls: list[Subtitle]) -> ErrGen:
     normally means that a title line got added
     """
     top_count = len([s for s in ls if s.top])
-    if top_count > 0 and top_count / len(ls) < 0.8:
-        yield "random topline"
+    bot_count = len(ls) - top_count
+    if bot_count > top_count and 3 > top_count > 0:
+        yield "random topline: " + ", ".join(repr(s.text) for s in ls if s.top)
+    if top_count > bot_count and 3 > bot_count > 0:
+        yield "random bottomline: " + ", ".join(repr(s.text) for s in ls if not s.top)
 
 
 def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
@@ -250,15 +254,21 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
     for index, l in enumerate(ls):
         if "\n" in l.text:
             yield f"line {index + 1} line contains newline: {l.text}"
-        # People manually adding "instrumental break" markers - they should
-        # just leave it empty and subtitle_processor will add as appropriate.
-        # Perhaps better to warn on all non-alphanumeric / punctuation text?
-        if "♪" in l.text:
-            yield f"line {index + 1} line contains music note: {l.text}"
-        # ok = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.'\"[]!?()~-—–:/+’*;&áéñāōòè"
-        # for char in l.text:
-        #    if char not in ok:
-        #        yield f"line {index + 1} line contains non-alphanumeric: {l.text!r}: {char!r}"
+        # Manunal things:
+        #   "♪" -> people adding "instrumental break" markers manually
+        # Various unicode look-alike characters (watermarking??):
+        #   "е" (\u0435) -> "e"
+        #   " " (\u2005) -> space
+        #   (and several others that I removed by hand but didn't think to list here)
+        ok = (
+            string.ascii_letters
+            + "0123456789"
+            + " ,.'\"[]!?()~-—–:/+’*;&"
+            + "áéñāōòèàóíŪú"
+        )
+        for char in l.text:
+            if char not in ok:
+                yield f"line {index + 1} line contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
 
 
 def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
