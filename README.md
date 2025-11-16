@@ -69,15 +69,15 @@ Headline Feature Descriptions
 
 Core Components
 ---------------
-* [processmedia3](processmedia3/README.md) ![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)
+* [processmedia3](processmedia3/README.md) [![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/processmedia3.yml)
   * Takes a folder of all kinds of source data (video, image+audio, subtitles)
   * Create consistently encoded outputs, and a track index in `tracks.json`
-* [browser3](browser3/README.md) ![Browser3](https://github.com/calaldees/KaraKara/workflows/Browser3/badge.svg)
+* [browser3](browser3/README.md) [![Browser3](https://github.com/calaldees/KaraKara/workflows/Browser3/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/browser3.yml)
   * Mobile app to browse the data in `tracks.json`
   * Users can send tracks to the queue
-* [api_queue](api_queue/README.md) ![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)
+* [api_queue](api_queue/README.md) [![ApiQueue](https://github.com/calaldees/KaraKara/workflows/ApiQueue/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/api_queue.yml)
   * Takes requests from users and commands from admins
   * Publishes the current queue to the player
-* [player3](player3/README.md) ![Player3](https://github.com/calaldees/KaraKara/workflows/Player3/badge.svg)
+* [player3](player3/README.md) [![Player3](https://github.com/calaldees/KaraKara/workflows/Player3/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/player3.yml)
   * Fullscreen video player for the projector
   * Displays the current queue in between tracks
