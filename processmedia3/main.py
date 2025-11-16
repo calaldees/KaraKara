@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import argparse
 import contextlib
 import logging
 import logging.handlers
@@ -11,10 +10,11 @@ import sys
 import time
 import typing as t
 from pathlib import Path
-from collections.abc import Sequence, MutableMapping
-from typing import TypeVar, Generator
+from collections.abc import Sequence, MutableMapping, Generator
+from typing import TypeVar
 
 from tqdm.contrib.logging import logging_redirect_tqdm
+import tap
 
 from lib.source import Source
 from lib.track import Track
@@ -32,75 +32,24 @@ log = logging.getLogger()
 T = TypeVar("T")
 
 
-def parse_args(argv: Sequence[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--source",
-        type=str,
-        default="/media/source",
-        metavar="DIR/URL",
-        help="Where to find source files (Default: %(default)s) (can be local path or http path)",
-    )
-    parser.add_argument(
-        "--processed",
-        type=Path,  # TODO: AbstractFolder?
-        default=Path("/media/processed"),
-        metavar="DIR",
-        help="Where to place output files (Default: %(default)s)",
-    )
-    parser.add_argument(
-        "--threads",
-        type=int,
-        default=math.ceil((os.cpu_count() or 1) / 4),
-        metavar="N",
-        help="How many encodes to run in parallel (Default: %(default)s)",
-    )
-    parser.add_argument(
-        "--loop",
-        type=int,
-        default=None,
-        metavar="SECONDS",
-        help="Run forever, polling for changes in the source directory this often (in seconds)",
-    )
-    parser.add_argument(
-        "--delete",
-        action="store_true",
-        default=False,
-        help="Actually delete files for-real during cleanup",
-    )
-    parser.add_argument(
-        "--reencode",
-        action="store_true",
-        default=False,
-        help="Re-encode files, even if they already exist in the processed directory",
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        default=False,
-        help="Super-extra verbose logging",
-    )
-    parser.add_argument(
-        "--log-file",
-        type=Path,
-        help="Where to write logs to",
-    )
-    parser.add_argument(
-        "cmd",
-        default="all",
-        nargs="?",
-        help="Sub-process to run (view, encode, test-encode, export, lint, cleanup)",
-    )
-    parser.add_argument(
-        "match", nargs="?", help="Only act upon files matching this pattern"
-    )
+class PM3Args(tap.Tap):
+    # fmt: off
+    source: str = "/media/source"  # Where to find source files (can be local path or http path)
+    processed: Path = Path("/media/processed")  # Where to place output files
+    threads: int = math.ceil((os.cpu_count() or 1) / 4)  # How many encodes to run in parallel
+    loop: int | None = None  # Run forever, polling for changes in the source directory this often (in seconds)
+    delete: bool = False  # Actually delete files for-real during cleanup
+    reencode: bool = False  # Re-encode files, even if they already exist in the processed directory
+    debug: bool = False  # Super-extra verbose logging
+    log_file: Path | None = None  # Where to write logs to
+    cmd: str | None = "all"  # Sub-process to run (view, encode, test-encode, export, lint, cleanup)
+    match: str | None = None  # Only act upon files matching this pattern
+    # fmt: on
 
-    args = parser.parse_args(argv[1:])
-    # we need to create AbstractFolder lazily, because
-    # `default=AbstractFolder("/blah")` crashes when `/blah`
-    # doesn't exist, even when we specify `--source ../media/source`
-    args.source = AbstractFolder_from_str(args.source)
-    return args
+    def configure(self) -> None:
+        cmds = ["all", "view", "encode", "export", "lint", "cleanup", "test-encode"]
+        self.add_argument("cmd", nargs="?", choices=cmds)
+        self.add_argument("match", nargs="?", default=None)
 
 
 @contextlib.contextmanager
@@ -123,7 +72,7 @@ def _pickled_var(path: Path, default: T) -> Generator[T, None, None]:
 
 
 def main(argv: Sequence[str]) -> int:
-    args = parse_args(argv)
+    args = PM3Args().parse_args(argv[1:])
 
     logging.basicConfig(
         level=logging.DEBUG if args.debug else logging.INFO,
@@ -137,6 +86,8 @@ def main(argv: Sequence[str]) -> int:
 
     if args.cmd == "test-encode":
         with logging_redirect_tqdm():
+            if args.match is None:
+                raise ValueError("test-encode requires --match to be specified")
             cache: MutableMapping[str, t.Any] = {}
             path = Path(args.match)
             local_file = LocalFile(path, path.parent)
@@ -160,10 +111,15 @@ def main(argv: Sequence[str]) -> int:
             _pickled_var(args.processed / "cache.db", {}) as cache,
             logging_redirect_tqdm(),
         ):
-            tracks = scan(args.source, args.processed, args.match, cache, args.threads)
-            tracks = tuple(
-                track for track in tracks if track.has_tags
-            )  # only encode tracks that have a tag.txt file
+            tracks = scan(
+                AbstractFolder_from_str(args.source),
+                args.processed,
+                args.match,
+                cache,
+                args.threads,
+            )
+            # only encode tracks that have a tag.txt file
+            tracks = [track for track in tracks if track.has_tags]
 
             # If no specific command is specified, then encode,
             # export, and cleanup with the default settings

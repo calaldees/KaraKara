@@ -9,6 +9,7 @@ dependencies = [
 	"dateparser ~= 1.2",
 	"Brotli ~= 1.1",
 	"requests ~= 2.32",
+	"typed-argument-parser ~= 1.11",
 ]
 
 [project.optional-dependencies]

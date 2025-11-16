@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import override, TypedDict, NamedTuple
 from functools import cached_property
 from abc import abstractmethod
-from typing import Self
+from typing import Self, cast
 from collections.abc import Mapping, Generator, Iterable
 from os import stat_result
 from io import BytesIO
@@ -467,8 +467,8 @@ class HttpFolder(AbstractFolder):
                 }
             elif "html" in content_type:
                 file_dicts[:] = [
-                    file_match.groupdict()
-                    for file_match in self.RE_FILE.finditer(body)  # type: ignore[misc]
+                    cast(HttpFolder.FileItem, file_match.groupdict())
+                    for file_match in self.RE_FILE.finditer(body)
                 ]
                 folders_to_visit |= {
                     f"{url}{folder_match.group(1)}"
