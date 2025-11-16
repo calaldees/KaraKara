@@ -262,13 +262,37 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
         #   (and several others that I removed by hand but didn't think to list here)
         ok = (
             string.ascii_letters
-            + "0123456789"
+            + string.digits
             + " ,.'\"[]!?()~-—–:/+’*;&\n"
             + "áéñāōòèàóíŪú"
         )
         for char in l.text:
             if char not in ok:
                 yield f"line {index + 1} line contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
+
+    # check that lines have matched brackets
+    bracket_pairs = {
+        "(": ")",
+        "[": "]",
+        "{": "}",
+        "«": "»",
+        "“": "”",
+        # "‘": "’",
+    }
+    for index, l in enumerate(ls):
+        stack = []
+        for char in l.text:
+            if char in bracket_pairs:
+                stack.append(char)
+            elif char in bracket_pairs.values():
+                if not stack:
+                    yield f"line {index + 1} line has unmatched closing bracket: {l.text!r}: {char!r}"
+                else:
+                    open_bracket = stack.pop()
+                    if bracket_pairs[open_bracket] != char:
+                        yield f"line {index + 1} line has mismatched brackets: {l.text!r}: {open_bracket!r} / {char!r}"
+        if stack:
+            yield f"line {index + 1} line has unmatched opening bracket: {l.text!r}: {stack!r}"
 
 
 def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
