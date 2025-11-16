@@ -50,6 +50,7 @@ class PM3Args(tap.Tap):
         cmds = ["all", "view", "encode", "export", "lint", "cleanup", "test-encode"]
         self.add_argument("cmd", nargs="?", choices=cmds)
         self.add_argument("match", nargs="?", default=None)
+        self.add_argument("--log-file", type=Path, default=None)
 
 
 @contextlib.contextmanager
