@@ -117,6 +117,7 @@ def announce(
                 webhook_url,
                 json={
                     "content": content.strip(),
+                    "flags": 4,  # avoid URL previews
                 },
             )
             if response.status_code != 204:
