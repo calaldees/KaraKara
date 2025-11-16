@@ -249,7 +249,7 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
     ...     Subtitle(text="This is a test ♪", start=d(seconds=2), end=d(seconds=4)),
     ... ]
     >>> list(lint_subtitles_line_contents(lines))
-    ['line 1 line contains newline: Hello\\nWorld', 'line 2 line contains music note: This is a test ♪']
+    ['line 1 line contains newline: Hello\\nWorld', "line 2 line contains non-alphanumeric: 'This is a test ♪': '♪' ('\\\\u266a')"]
     """
     for index, l in enumerate(ls):
         if "\n" in l.text:
@@ -263,7 +263,7 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
         ok = (
             string.ascii_letters
             + "0123456789"
-            + " ,.'\"[]!?()~-—–:/+’*;&"
+            + " ,.'\"[]!?()~-—–:/+’*;&\n"
             + "áéñāōòèàóíŪú"
         )
         for char in l.text:
