@@ -27,6 +27,7 @@ RUN pip install --no-cache-dir -e '.[test]' -t /site-packages
 FROM dependencies AS code
 COPY main.py .
 COPY lib ./lib
+COPY cmds ./cmds
 
 FROM code AS test
 COPY --from=dependencies_test /site-packages /site-packages
