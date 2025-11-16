@@ -2,7 +2,7 @@ import enum
 import typing as t
 import logging
 import re
-from collections.abc import Sequence, MutableMapping
+from collections.abc import MutableMapping
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags
@@ -82,7 +82,7 @@ class Source:
 
     @property
     @_cache
-    def subtitles(self) -> Sequence[Subtitle]:
+    def subtitles(self) -> list[Subtitle]:
         log.info(f"Parsing subtitles from {self.file.relative}")
         return parse_subtitles(self.file.text)
 
