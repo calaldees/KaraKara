@@ -38,3 +38,6 @@ filterwarnings = [
 
 [tool.black]
 line-length = 120
+
+[tool.pyright]
+reportUnusedCallResult = false

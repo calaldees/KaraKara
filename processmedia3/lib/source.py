@@ -2,7 +2,7 @@ import enum
 import typing as t
 import logging
 import re
-from collections.abc import Sequence, Mapping, MutableMapping
+from collections.abc import Sequence, MutableMapping
 
 from .subtitle_processor import parse_subtitles, Subtitle
 from .tag_processor import parse_tags

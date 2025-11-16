@@ -84,7 +84,7 @@ tracks = [
 ]
 ```
 
-`main.py` has a function for each step in the process:
+`cmds/` has a module for each step in the process:
 - `scan()` looks at the input directory and creates the above list of Tracks
 - `view()` iterates over each Track, and prints out data about them
 - `encode()` iterates over each Track, and makes sure that each `Target` file exists, calling `target.encode()` to create it if needed
@@ -111,8 +111,6 @@ Debugging Tools
     * `./lib/subtitle_processor.py input.srt output.vtt`
 * Encoding a single file into various formats to test with
     * `./main.py test-encode --reencode ~/Videos/kk-stress-test/demo.webm`
-
-Commands: scan, view, encode, export, cleanup, lint
 
 
 Dev Setup
