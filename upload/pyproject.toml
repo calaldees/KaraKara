@@ -4,22 +4,23 @@ version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "fastapi",
-    "uvicorn",
-    "tuspyserver",
-	"aiofiles",
-	"requests",
+    "fastapi ~= 0.121",
+    "uvicorn ~= 0.38",
+    "tuspyserver ~= 4.2",
+    "aiofiles ~= 25.1",
+    "requests ~= 2.32",
 ]
 
-[project.optional-dependencies]
-test = [
-	"mypy ~= 1.18",
-	"pytest ~= 8.4",
-	"pytest-asyncio ~= 1.2",
-	"pytest-mypy ~= 1.0",
-	"sanic-testing ~= 24.6",
-	"types-aiofiles",
-	"types-dateparser ~= 1.2",
+[dependency-groups]
+dev = [
+    "mypy ~= 1.18",
+    "pytest ~= 8.4",
+    "pytest-asyncio ~= 1.2",
+    "pytest-mypy ~= 1.0",
+    "ruff ~= 0.14",
+    "types-aiofiles ~= 25.1",
+    "types-dateparser ~= 1.2",
+    "types-requests ~= 2.32",
 ]
 
 [tool.pytest.ini_options]
@@ -28,7 +29,7 @@ addopts = "--doctest-modules -p no:cacheprovider"  # --mypy # mypy slows my flow
 filterwarnings = [
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 120
 
 [tool.pyright]

@@ -1,6 +1,6 @@
 # KaraKara Upload Service
 
-Allows users to upload tracks for review and submission to the KaraKara platform.
+Allows users to request or upload tracks to the KaraKara platform.
 
 ## Run
 
@@ -12,6 +12,15 @@ uv run uvicorn upload:app --reload
 Prod:
 ```
 uv run uvicorn upload:app
+```
+
+## Test
+
+```
+uv run pytest        # unit tests
+uv run mypy .        # type checking
+uv run ruff format   # formatting
+uv run ruff check    # misc linting
 ```
 
 ## Settings:

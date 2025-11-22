@@ -53,6 +53,13 @@ app.add_middleware(PrefixLocationMiddleware)
 
 @app.get("/health")
 async def health() -> JSONResponse:
+    """
+    Simple test just so that `pytest` doesn't complain about no tests.
+
+    >>> import asyncio
+    >>> asyncio.run(health()).body
+    b'{"status":"ok"}'
+    """
     return JSONResponse({"status": "ok"})
 
 
@@ -63,6 +70,9 @@ async def serve_index() -> FileResponse:
 
 @app.get("/wips")
 async def list_wips() -> JSONResponse:
+    """
+    List any .txt files in the upload folder, to give any progress updates.
+    """
     metas: list[dict[str, str]] = []
     for fn in glob(os.path.join(UPLOAD_ROOT, "**/*.txt"), recursive=True):
         meta: dict[str, str] = {}
@@ -80,7 +90,10 @@ async def list_wips() -> JSONResponse:
 
 
 @app.post("/session")
-async def create_session() -> JSONResponse:
+async def begin_upload_session() -> JSONResponse:
+    """
+    Create a temporary directory for files to be uploaded to.
+    """
     session_id = str(uuid.uuid4())
     sess_path = os.path.join(UPLOAD_ROOT, session_id)
     os.makedirs(sess_path, exist_ok=True)
@@ -88,15 +101,17 @@ async def create_session() -> JSONResponse:
 
 
 @app.post("/finalize")
-async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
+async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
     """
     Expected JSON body:
+
       {
         "session_id": "uuid",
         "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
       }
-    Moves files from the temp dir into /uploads/<session_id>/,
-    then writes metadata.json there.
+
+    Moves files from the temp dir into /uploads/<session_id>/, and writes
+    the metadata to a karakara formatted .txt file.
     """
     session_id: str | None = payload.get("session_id")
     tags: dict[str, list[str]] | None = payload.get("tags")
@@ -154,6 +169,7 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
         else:
             await f.write("status:awaiting moderator approval\n")
 
+    content = None
     try:
         if moved_files:
             webhook_url = os.getenv("DISCORD_WEBHOOK_SUBMISSIONS_URL")
@@ -170,9 +186,7 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
                 },
             )
             if response.status_code != 204:
-                log.error(
-                    f"Failed to call webhook: {response.status_code} {response.text}"
-                )
+                log.error(f"Failed to call webhook: {response.status_code} {response.text}")
 
             log.info("Sent notification via discord")
         else:
@@ -182,6 +196,4 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
 
     log.info(f"Finalized session {session_id!r}, track id {track_id!r}")
 
-    return JSONResponse(
-        {"ok": True, "moved_files": moved_files, "session_id": session_id}
-    )
+    return JSONResponse({"ok": True, "moved_files": moved_files, "session_id": session_id})

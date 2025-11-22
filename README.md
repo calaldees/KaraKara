@@ -69,9 +69,12 @@ Headline Feature Descriptions
 
 Core Components
 ---------------
+* [upload](upload/README.md) [![Upload](https://github.com/calaldees/KaraKara/workflows/Upload/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/upload.yml)
+  * Accept all sorts of media files and metadata
+  * Store them in a folder
 * [processmedia3](processmedia3/README.md) [![ProcessMedia3](https://github.com/calaldees/KaraKara/workflows/ProcessMedia3/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/processmedia3.yml)
   * Takes a folder of all kinds of source data (video, image+audio, subtitles)
-  * Create consistently encoded outputs, and a track index in `tracks.json`
+  * Encode browser-friendly videos and subtitles, and a track index in `tracks.json`
 * [browser3](browser3/README.md) [![Browser3](https://github.com/calaldees/KaraKara/workflows/Browser3/badge.svg)](https://github.com/calaldees/KaraKara/actions/workflows/browser3.yml)
   * Mobile app to browse the data in `tracks.json`
   * Users can send tracks to the queue
