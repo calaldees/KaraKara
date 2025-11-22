@@ -133,6 +133,11 @@ def announce(
 
 
 def list_changes(old_track: TrackDict, new_track: TrackDict) -> str | None:
+    """
+    Compare two TrackDicts, and return a string describing what changed
+    in ways that matter to users (tags and attachments), or None if nothing
+    important changed.
+    """
     what_changed = []
 
     if new_track["tags"] != old_track["tags"]:
@@ -140,15 +145,23 @@ def list_changes(old_track: TrackDict, new_track: TrackDict) -> str | None:
         new_tags = new_track.get("tags", {})
         all_tag_keys = set(old_tags.keys() | new_tags.keys())
         tag_changes = []
-        for tag_key in all_tag_keys:
+        for tag_key in sorted(all_tag_keys):
+            # if the only difference is "new" in the tag keys or values, ignore it
+            if tag_key == "new":
+                continue
+            if set(new_tags.get(tag_key, [])).symmetric_difference(
+                set(old_tags.get(tag_key, []))
+            ) == {"new"}:
+                continue
             if new_tags.get(tag_key) != old_tags.get(tag_key):
                 tag_changes.append(tag_key)
-        what_changed.append(f"tags ({', '.join(tag_changes)})")
+        if tag_changes:
+            what_changed.append(f"tags ({', '.join(tag_changes)})")
 
     old_attachments = old_track.get("attachments", {})
     new_attachments = new_track.get("attachments", {})
     all_categories = set(old_attachments.keys() | new_attachments.keys())
-    for att_cat in all_categories:
+    for att_cat in sorted(all_categories):
         if new_attachments.get(att_cat) != old_attachments.get(att_cat):
             what_changed.append(att_cat)
 

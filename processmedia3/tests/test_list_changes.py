@@ -1,10 +1,11 @@
 import unittest
-from cmds.export import list_changes
-from lib.track import TrackDict
+from pm3.cmds.export import list_changes
+from pm3.lib.track import TrackDict
 
 
 class TestCreateSsa(unittest.TestCase):
     def test_same(self) -> None:
+        # identical tracks
         t1: TrackDict = {
             "id": "track1",
             "tags": {"title": ["Song A"], "artist": ["Artist A"]},
@@ -27,10 +28,11 @@ class TestCreateSsa(unittest.TestCase):
         }
         self.assertEqual(list_changes(t1, t2), None)
 
-    def test_diff(self) -> None:
+    def test_diff_tags_subtitles(self) -> None:
+        # tag changes
         t1: TrackDict = {
             "id": "track1",
-            "tags": {"title": ["Song A"], "artist": ["Artist A"]},
+            "tags": {"title": ["Snog A"], "artist": ["Artist A"]},
             "duration": 300,
             "attachments": {
                 "subtitle": [
@@ -39,13 +41,35 @@ class TestCreateSsa(unittest.TestCase):
             },
         }
         t2: TrackDict = {
-            "id": "track2",
-            "tags": {"title": ["Song B"], "artist": ["Artist B"]},
+            "id": "track1",
+            "tags": {"title": ["Song A"], "artist": ["Artistee"]},
             "duration": 300,
             "attachments": {
                 "subtitle": [
                     {"mime": "text/srt", "variant": None, "path": "subs2.srt"},
                 ],
             },
+        }
+        self.assertEqual(list_changes(t1, t2), "tags (artist, title), subtitle")
+
+    def test_diff_new(self) -> None:
+        t1: TrackDict = {
+            "id": "track1",
+            "tags": {
+                "title": ["Song A"],
+                "artist": ["Artist A"],
+                "category": ["anime", "new"],
+                "new": ["2020-04-16"],
+            },
+            "duration": 300,
+        }
+        t2: TrackDict = {
+            "id": "track1",
+            "tags": {
+                "title": ["Song A"],
+                "artist": ["Artist A"],
+                "category": ["anime"],
+            },
+            "duration": 300,
         }
         self.assertEqual(list_changes(t1, t2), None)
