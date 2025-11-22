@@ -94,8 +94,10 @@ def announce(
             new_track = new_tracklist[track_id]
             old_track = old_tracklist[track_id]
             title = new_track["tags"]["title"][0]
-            what_changed = list_changes(old_track, new_track)
-            updated.append(f"* [{title}]({track_base_url}/{track_id}) - {what_changed}")
+            if what_changed := list_changes(old_track, new_track):
+                updated.append(
+                    f"* [{title}]({track_base_url}/{track_id}) - {what_changed}"
+                )
     for track_id in old_tracklist:
         if track_id not in new_tracklist:
             title = old_tracklist[track_id]["tags"]["title"][0]
@@ -130,11 +132,18 @@ def announce(
         log.exception("Failed to send notification:")
 
 
-def list_changes(old_track: TrackDict, new_track: TrackDict) -> str:
+def list_changes(old_track: TrackDict, new_track: TrackDict) -> str | None:
     what_changed = []
 
     if new_track["tags"] != old_track["tags"]:
-        what_changed.append("tags")
+        old_tags = old_track.get("tags", {})
+        new_tags = new_track.get("tags", {})
+        all_tag_keys = set(old_tags.keys() | new_tags.keys())
+        tag_changes = []
+        for tag_key in all_tag_keys:
+            if new_tags.get(tag_key) != old_tags.get(tag_key):
+                tag_changes.append(tag_key)
+        what_changed.append(f"tags ({', '.join(tag_changes)})")
 
     old_attachments = old_track.get("attachments", {})
     new_attachments = new_track.get("attachments", {})
@@ -143,4 +152,4 @@ def list_changes(old_track: TrackDict, new_track: TrackDict) -> str:
         if new_attachments.get(att_cat) != old_attachments.get(att_cat):
             what_changed.append(att_cat)
 
-    return ", ".join(what_changed)
+    return ", ".join(what_changed) if what_changed else None
