@@ -9,7 +9,7 @@ import brotli
 import requests
 from tqdm.contrib.concurrent import thread_map
 
-from lib.track import Track, TrackDict, TrackValidationException
+from pm3.lib.track import Track, TrackDict, TrackValidationException
 
 
 log = logging.getLogger(__name__)

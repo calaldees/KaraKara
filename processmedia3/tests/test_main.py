@@ -4,15 +4,15 @@ import tempfile
 from functools import partialmethod
 from pathlib import Path
 import unittest
-
-import cmds.scan
-import cmds.encode
-import cmds.export
-import cmds.cleanup
-from lib.source import SourceType
-from lib.kktypes import TargetType
-from lib.file_abstraction import AbstractFolder_from_str
 from tqdm import tqdm
+
+import pm3.cmds.scan as scan
+import pm3.cmds.encode as encode
+import pm3.cmds.export as export
+import pm3.cmds.cleanup as cleanup
+from pm3.lib.source import SourceType
+from pm3.lib.kktypes import TargetType
+from pm3.lib.file_abstraction import AbstractFolder_from_str
 
 # disable progress bars in unit tests
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)  # type: ignore
@@ -23,7 +23,7 @@ class TestE2E(unittest.TestCase):
         logging.basicConfig(level=logging.DEBUG)
         self.maxDiff = 2000
 
-        cmds.scan.TARGET_TYPES = [
+        scan.TARGET_TYPES = [
             TargetType.VIDEO_AV1,
             TargetType.IMAGE_AVIF,
             TargetType.SUBTITLES_VTT,
@@ -33,7 +33,7 @@ class TestE2E(unittest.TestCase):
             processed = Path(processed_str)
 
             # Scan should detect source files for two tracks
-            tracks = cmds.scan.scan(
+            tracks = scan.scan(
                 AbstractFolder_from_str("./tests/source"), processed, "", {}
             )
 
@@ -47,12 +47,12 @@ class TestE2E(unittest.TestCase):
             self.assertEqual("Test2", tracks[1].id)
 
             # Encode should generate output video
-            cmds.encode.encode(tracks)
+            encode.encode(tracks)
 
             self.assertTrue(tracks[0].targets[0].path.exists())
 
             # Export should generate tracks.json
-            cmds.export.export(processed, tracks)
+            export.export(processed, tracks)
 
             self.assertTrue((processed / "tracks.json").exists())
             tracks_json = json.loads((processed / "tracks.json").read_text())
@@ -139,13 +139,13 @@ class TestE2E(unittest.TestCase):
                 self.assertEqual(v, tracks_json["Test2"][k])
 
             # Cleanup should leave expected tracks alone
-            cmds.cleanup.cleanup(processed, tracks, True)
+            cleanup.cleanup(processed, tracks, True)
 
             self.assertTrue(tracks[0].targets[0].path.exists())
 
             # Cleanup with an empty list of expected tracks should
             # clean up the files we created
-            cmds.cleanup.cleanup(processed, [], True)
+            cleanup.cleanup(processed, [], True)
 
             self.assertEqual([], list(processed.glob("*/*")))
 

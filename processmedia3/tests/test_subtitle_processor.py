@@ -2,14 +2,15 @@
 
 import unittest
 from datetime import timedelta
-from lib.subtitle_processor import (
+from pathlib import Path
+
+from pm3.lib.subtitle_processor import (
     create_srt,
     create_ssa,
     create_vtt,
     Subtitle,
     parse_subtitles,
 )
-from pathlib import Path
 
 
 class TestCreateSsa(unittest.TestCase):

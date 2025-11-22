@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 from tqdm.contrib.concurrent import thread_map
 
-from lib.track import Track
+from pm3.lib.track import Track
 from .scan import SCAN_IGNORE
 
 

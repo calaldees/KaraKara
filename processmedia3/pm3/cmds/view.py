@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from lib.track import Track
+from pm3.lib.track import Track
 
 
 def view(tracks: Sequence[Track]) -> None:

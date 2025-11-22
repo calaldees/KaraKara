@@ -6,9 +6,9 @@ from collections.abc import Sequence, Generator
 
 from tqdm.contrib.concurrent import thread_map
 
-from lib.subtitle_processor import Subtitle
-from lib.source import SourceType
-from lib.track import Track
+from pm3.lib.subtitle_processor import Subtitle
+from pm3.lib.source import SourceType
+from pm3.lib.track import Track
 
 
 type ErrGen = Generator[str, None, None]

@@ -3,8 +3,8 @@ from collections.abc import Sequence
 
 from tqdm.contrib.concurrent import thread_map
 
-from lib.target import Target
-from lib.track import Track
+from pm3.lib.target import Target
+from pm3.lib.track import Track
 
 
 log = logging.getLogger(__name__)

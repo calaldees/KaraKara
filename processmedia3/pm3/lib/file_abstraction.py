@@ -304,7 +304,7 @@ class HttpFile(AbstractFile):
         ... )
 
         >>> from unittest.mock import patch
-        >>> with patch('lib.file_abstraction._http') as mock_http:
+        >>> with patch('pm3.lib.file_abstraction._http') as mock_http:
         ...     mock_http.return_value = response
         ...     file = HttpFile(url='fake_root/fake_url', url_root='fake_root')
         ...     hash = file.hash
@@ -421,7 +421,7 @@ class HttpFolder(AbstractFolder):
         ...     return HTTPResponse(body=body.encode('utf8'), headers={'accept-ranges': 'bytes', 'content-type': content_type}, status=200)
 
         >>> def HttpFolder_files(response):
-        ...     with patch('lib.file_abstraction._http') as mock_http:
+        ...     with patch('pm3.lib.file_abstraction._http') as mock_http:
         ...         mock_http.return_value = response
         ...         return tuple(HttpFolder('http://fake_url/').files)
 

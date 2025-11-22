@@ -7,10 +7,10 @@ from collections.abc import Sequence, MutableMapping
 
 from tqdm.contrib.concurrent import thread_map
 
-from lib.kktypes import TargetType
-from lib.source import Source
-from lib.track import Track
-from lib.file_abstraction import AbstractFolder, AbstractFile
+from pm3.lib.kktypes import TargetType
+from pm3.lib.source import Source
+from pm3.lib.track import Track
+from pm3.lib.file_abstraction import AbstractFolder, AbstractFile
 
 TARGET_TYPES = [
     # TargetType.VIDEO_H264,
