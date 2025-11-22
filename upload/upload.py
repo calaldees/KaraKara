@@ -19,8 +19,8 @@ from pathlib import Path
 
 
 TEMP_DIR = Path("/tmp/kk_upload_files")
-BASE_PATH = os.environ.get("BASE_PATH", "/upload")
-UPLOAD_ROOT = Path(os.environ.get("UPLOAD_DIR", "/uploads"))
+BASE_PATH = os.environ.get("BASE_PATH", "")
+UPLOAD_ROOT = Path(os.environ.get("UPLOAD_DIR", "../media/source/WorkInProgress"))
 STATIC_DIR = Path(__file__).parent / "static"
 
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
