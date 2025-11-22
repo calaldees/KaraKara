@@ -174,11 +174,11 @@ async def finalize(payload: dict[str, t.Any]) -> JSONResponse:
                     f"Failed to call webhook: {response.status_code} {response.text}"
                 )
 
-            log.info("Sent email notification via discord")
+            log.info("Sent notification via discord")
         else:
-            log.warning("Webhook config missing, not sending notification")
+            log.warning(f"Webhook config missing, not notifying ({content!r})")
     except Exception:
-        log.exception("Failed to send notification:")
+        log.exception(f"Failed to send notification ({content!r}):")
 
     log.info(f"Finalized session {session_id!r}, track id {track_id!r}")
 
