@@ -68,6 +68,12 @@ def lint_track(track: Track) -> None:
     #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
 
     for s in track.sources:
+        if s.type in {SourceType.VIDEO, SourceType.IMAGE}:
+            if s.meta.aspect_ratio < 1 / 1:
+                log.error(
+                    f"{s.file.relative} has weird aspect ratio {s.meta.aspect_ratio_str}"
+                )
+
         if s.type == SourceType.TAGS:
             for err_list in [
                 lint_tags_required(s.tags),
