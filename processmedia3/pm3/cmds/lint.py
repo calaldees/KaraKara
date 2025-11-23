@@ -70,9 +70,7 @@ def lint_track(track: Track) -> None:
     for s in track.sources:
         if s.type in {SourceType.VIDEO, SourceType.IMAGE}:
             if s.meta.aspect_ratio < 1 / 1:
-                log.error(
-                    f"{s.file.relative} has weird aspect ratio {s.meta.aspect_ratio_str}"
-                )
+                log.error(f"{s.file.relative} has weird aspect ratio {s.meta.aspect_ratio_str}")
 
         if s.type == SourceType.TAGS:
             for err_list in [
@@ -266,12 +264,7 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
         #   "е" (\u0435) -> "e"
         #   " " (\u2005) -> space
         #   (and several others that I removed by hand but didn't think to list here)
-        ok = (
-            string.ascii_letters
-            + string.digits
-            + " ,.'\"[]!?()~-—–:/+’*;&\n"
-            + "áéñāōòèàóíŪú"
-        )
+        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "áéñāōòèàóíŪú"
         for char in l.text:
             if char not in ok:
                 yield f"line {index + 1} line contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
@@ -324,11 +317,7 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
     botlines = [l for l in ls if not l.top]
     for ls in [toplines, botlines]:
         for index, (l1, l2, l3) in enumerate(zip(ls[:-1], ls[1:], ls[2:])):
-            if (
-                l1.end == l2.start
-                and l2.end == l3.start
-                and (l1.text == l2.text == l3.text)
-            ):
+            if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
                 yield f"line {index + 1} no gap between 3+ repeats: {l1.text}"
         for index, (l1, l2) in enumerate(zip(ls[:-1], ls[1:])):
             if l2.start > l1.end:
@@ -339,6 +328,4 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
                     )
             elif l2.start < l1.end:
                 gap = l1.end - l2.start
-                yield (
-                    f"line {index + 1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}"
-                )
+                yield (f"line {index + 1} overlapping lines {int(gap.microseconds / 1000)}: {l1.text} / {l2.text}")

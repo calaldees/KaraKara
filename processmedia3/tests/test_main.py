@@ -33,9 +33,7 @@ class TestE2E(unittest.TestCase):
             processed = Path(processed_str)
 
             # Scan should detect source files for two tracks
-            tracks = scan.scan(
-                AbstractFolder_from_str("./tests/source"), processed, "", {}
-            )
+            tracks = scan.scan(AbstractFolder_from_str("./tests/source"), processed, "", {})
 
             self.assertEqual("Test1", tracks[0].id)
             self.assertEqual(

@@ -57,9 +57,7 @@ class Track:
                 # We then try to find an encoder that can create the target_type
                 # from those sources. If we find one, we create a Target for it.
                 if enc := find_appropriate_encoder(target_type, variant_sources):
-                    targets.append(
-                        Target(processed_dir, target_type, enc[0], enc[1], variant)
-                    )
+                    targets.append(Target(processed_dir, target_type, enc[0], enc[1], variant))
 
         self.targets = targets
 

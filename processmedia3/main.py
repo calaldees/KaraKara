@@ -80,9 +80,7 @@ def main(argv: Sequence[str]) -> int:
         format="%(asctime)s %(message)s",
     )
     if args.log_file:
-        handler = logging.handlers.RotatingFileHandler(
-            args.log_file, maxBytes=65535, backupCount=3
-        )
+        handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
         logging.getLogger().addHandler(handler)
 
     if args.cmd == "test-encode":

@@ -38,9 +38,7 @@ def export(
             log.exception(f"Error exporting {track.id}")
             return None
 
-    json_list: list[TrackDict] = thread_map(
-        _export, tracks, max_workers=threads, desc="export ", unit="track"
-    )
+    json_list: list[TrackDict] = thread_map(_export, tracks, max_workers=threads, desc="export ", unit="track")
 
     # Export in alphabetic order
     json_dict: dict[str, TrackDict] = dict(sorted((t["id"], t) for t in json_list if t))
@@ -95,9 +93,7 @@ def announce(
             old_track = old_tracklist[track_id]
             title = new_track["tags"]["title"][0]
             if what_changed := list_changes(old_track, new_track):
-                updated.append(
-                    f"* [{title}]({track_base_url}/{track_id}) - {what_changed}"
-                )
+                updated.append(f"* [{title}]({track_base_url}/{track_id}) - {what_changed}")
     for track_id in old_tracklist:
         if track_id not in new_tracklist:
             title = old_tracklist[track_id]["tags"]["title"][0]
@@ -123,9 +119,7 @@ def announce(
                 },
             )
             if response.status_code != 204:
-                log.error(
-                    f"Failed to call webhook: {response.status_code} {response.text}"
-                )
+                log.error(f"Failed to call webhook: {response.status_code} {response.text}")
         else:
             log.warning("Webhook config missing, not sending notification")
     except Exception:
@@ -149,9 +143,7 @@ def list_changes(old_track: TrackDict, new_track: TrackDict) -> str | None:
             # if the only difference is "new" in the tag keys or values, ignore it
             if tag_key == "new":
                 continue
-            if set(new_tags.get(tag_key, [])).symmetric_difference(
-                set(old_tags.get(tag_key, []))
-            ) == {"new"}:
+            if set(new_tags.get(tag_key, [])).symmetric_difference(set(old_tags.get(tag_key, []))) == {"new"}:
                 continue
             if new_tags.get(tag_key) != old_tags.get(tag_key):
                 tag_changes.append(tag_key)

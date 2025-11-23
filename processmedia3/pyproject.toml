@@ -2,7 +2,8 @@
 name = "processmedia3"
 version = "0.0.0"
 readme = "README.md"
-requires-python = ">=3.13"
+# pillow doesn't yet have a 3.14 build
+requires-python = ">=3.13,<3.14"
 dependencies = [
 	"tqdm ~= 4.67",
 	"pillow ~= 10.4",
@@ -12,10 +13,11 @@ dependencies = [
 	"typed-argument-parser ~= 1.11",
 ]
 
-[project.optional-dependencies]
-test = [
+[dependency-groups]
+dev = [
 	"mypy ~= 1.15",
 	"pytest ~= 8.4",
+	"ruff ~= 0.14",
 	"types-tqdm ~= 4.67",
 	"types-Pillow ~= 10.2",
 	"types-dateparser ~= 1.2",
@@ -37,7 +39,7 @@ filterwarnings = [
 	"ignore:Parsing dates involving a day of month without a year specified is ambiguious",
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 120
 
 [tool.pyright]

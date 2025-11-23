@@ -98,7 +98,5 @@ def scan(
             log.exception(f"Error calculating track {track_id}")
             return None
 
-    maybe_tracks = thread_map(
-        _load_track, groups, max_workers=threads, desc="scan   ", unit="track"
-    )
+    maybe_tracks = thread_map(_load_track, groups, max_workers=threads, desc="scan   ", unit="track")
     return [t for t in maybe_tracks if t is not None]

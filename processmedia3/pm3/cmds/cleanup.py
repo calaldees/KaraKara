@@ -11,9 +11,7 @@ from .scan import SCAN_IGNORE
 log = logging.getLogger(__name__)
 
 
-def cleanup(
-    processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1
-) -> None:
+def cleanup(processed_dir: Path, tracks: Sequence[Track], delete: bool, threads: int = 1) -> None:
     """
     Delete any files from the processed dir that aren't included in any tracks
     """

@@ -1,5 +1,4 @@
-processmedia3
-=============
+# processmedia3
 
 Encode media (videos + images) for use with KaraKara.
 
@@ -22,8 +21,7 @@ processed/tracks.json
 processed/tracks.json.gz
 ```
 
-Use
----
+## Use
 
 Below describes the intended modes of use
 
@@ -34,8 +32,8 @@ Below describes the intended modes of use
   karakara-formatted videos in the processed folder.
 
 
-Architecture
-------------
+## Architecture
+
 All of the processing revolves around a single "track list" data structure,
 which looks like this:
 
@@ -84,7 +82,7 @@ tracks = [
 ]
 ```
 
-`cmds/` has a module for each step in the process:
+`pm3/cmds/` has a module for each step in the process:
 - `scan()` looks at the input directory and creates the above list of Tracks
 - `view()` iterates over each Track, and prints out data about them
 - `encode()` iterates over each Track, and makes sure that each `Target` file exists, calling `target.encode()` to create it if needed
@@ -92,32 +90,30 @@ tracks = [
 - `cleanup()` iterates over each Track, collecs a list of all Target filenames, and deletes any file in the output directory that we aren't expecting to exist
 - `lint()` iterates over all the sources and checks for various common mistakes like typos in tag names or overlapping subtitles
 
-`lib/` has classes for `Source` / `Target` / `Track`
+`pm3/lib/` has classes for `Source` / `Target` / `Track`
 
 
-Encoders
---------
+## Encoders
+
 `lib/encoders.py` has a collection of `Encoder` classes which define "I can take these inputs" (eg. "Image" and "Audio file") and "I can create these outputs" (eg. "AV1 Video"). We then gather all the sources for a `Track`, and check each `Encoder` for "Who can create (this output type) given (these input types)?"
 
 
-Debugging Tools
----------------
+## Debugging Tools
 
 * Raw python: `./main.py <command>`
     * You'll need to make sure the `--source` / `--processed` flags are set appropriately
 * In docker: `docker compose run --rm -ti processmedia3 <command>`
     * Docker automatically sets the `--source` / `--processed` flags based on `.env`
 * Testing subtitle encoding
-    * `./lib/subtitle_processor.py input.srt output.vtt`
+    * `./pm3/lib/subtitle_processor.py input.srt output.vtt`
 * Encoding a single file into various formats to test with
     * `./main.py test-encode --reencode ~/Videos/kk-stress-test/demo.webm`
 
 
-Dev Setup
----------
+## Dev Setup
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip install -e '.[test]'
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --group dev .
 ./main.py --help
 ```

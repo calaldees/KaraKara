@@ -1,6 +1,6 @@
 import unittest
 from pm3.cmds.export import list_changes
-from pm3.lib.track import TrackDict
+from pm3.lib.track import TrackDict, MediaType
 
 
 class TestCreateSsa(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestCreateSsa(unittest.TestCase):
             "tags": {"title": ["Song A"], "artist": ["Artist A"]},
             "duration": 300,
             "attachments": {
-                "subtitle": [
+                MediaType.SUBTITLE: [
                     {"mime": "text/srt", "variant": None, "path": "subs.srt"},
                 ],
             },
@@ -21,7 +21,7 @@ class TestCreateSsa(unittest.TestCase):
             "tags": {"title": ["Song A"], "artist": ["Artist A"]},
             "duration": 300,
             "attachments": {
-                "subtitle": [
+                MediaType.SUBTITLE: [
                     {"mime": "text/srt", "variant": None, "path": "subs.srt"},
                 ],
             },
@@ -35,7 +35,7 @@ class TestCreateSsa(unittest.TestCase):
             "tags": {"title": ["Snog A"], "artist": ["Artist A"]},
             "duration": 300,
             "attachments": {
-                "subtitle": [
+                MediaType.SUBTITLE: [
                     {"mime": "text/srt", "variant": None, "path": "subs1.srt"},
                 ],
             },
@@ -45,7 +45,7 @@ class TestCreateSsa(unittest.TestCase):
             "tags": {"title": ["Song A"], "artist": ["Artistee"]},
             "duration": 300,
             "attachments": {
-                "subtitle": [
+                MediaType.SUBTITLE: [
                     {"mime": "text/srt", "variant": None, "path": "subs2.srt"},
                 ],
             },
@@ -62,6 +62,7 @@ class TestCreateSsa(unittest.TestCase):
                 "new": ["2020-04-16"],
             },
             "duration": 300,
+            "attachments": {},
         }
         t2: TrackDict = {
             "id": "track1",
@@ -71,5 +72,6 @@ class TestCreateSsa(unittest.TestCase):
                 "category": ["anime"],
             },
             "duration": 300,
+            "attachments": {},
         }
         self.assertEqual(list_changes(t1, t2), None)

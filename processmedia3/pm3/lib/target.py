@@ -44,9 +44,7 @@ class Target:
         log.debug(f"Filename for {self.encoder.__class__.__name__} = {self.friendly} based on {parts}")
 
     def encode(self) -> None:
-        log.info(
-            f"{self.encoder.__class__.__name__}(" f"{self.friendly!r}, " f"{[s.file.relative for s in self.sources]})"
-        )
+        log.info(f"{self.encoder.__class__.__name__}({self.friendly!r}, {[s.file.relative for s in self.sources]})")
         with tempfile.TemporaryDirectory() as tempdir:
             temppath = Path(tempdir) / ("out." + self.encoder.ext)
             try:

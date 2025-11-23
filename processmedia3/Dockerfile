@@ -1,39 +1,25 @@
-ARG FFMPEG_VERSION=7.1.1
 # Pillow only builds for python3.13, not yet 3.14
-ARG PYTHON_VERSION=3.13
+FROM python:3.13-alpine AS base
+WORKDIR /app
+COPY --from=mwader/static-ffmpeg:7.1.1 /ffmpeg /usr/local/bin/
+COPY --from=mwader/static-ffmpeg:7.1.1 /ffprobe /usr/local/bin/
+RUN apk add --no-cache \
+    imagemagick imagemagick-jpeg imagemagick-webp imagemagick-heic
+RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    pip install -e .
+COPY ./pm3 ./pm3
+COPY ./main.py .
 
-# Can't use ARG variables in `COPY --from`, but can use them in `FROM`...
-FROM mwader/static-ffmpeg:${FFMPEG_VERSION} AS ffmpeg
+FROM base AS test
+RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    pip install --group dev -e .
+COPY tests ./tests
+RUN pytest
+RUN mypy .
 
-FROM python:${PYTHON_VERSION}-alpine AS dependencies
-WORKDIR /app/
+FROM base AS production
 VOLUME /logs
 VOLUME /media/source
 VOLUME /media/processed
-
-RUN apk add --no-cache \
-    imagemagick imagemagick-jpeg imagemagick-webp imagemagick-heic
-
-COPY ./pyproject.toml ./
-RUN pip install --no-cache-dir -e . -t /site-packages
-ENV PYTHONPATH=/site-packages
-
-COPY --from=ffmpeg /ffmpeg /usr/local/bin/
-COPY --from=ffmpeg /ffprobe /usr/local/bin/
-
-FROM dependencies AS dependencies_test
-RUN pip install --no-cache-dir -e '.[test]' -t /site-packages
-
-FROM dependencies AS code
-COPY main.py .
-COPY pm3 ./pm3
-
-FROM code AS test
-COPY --from=dependencies_test /site-packages /site-packages
-COPY tests ./tests
-RUN python3 -m mypy .
-RUN python3 -m pytest
-
-FROM code AS production
 ENTRYPOINT [ "python3", "main.py", "--source", "/media/source", "--processed", "/media/processed", "--log-file", "/logs/processmedia3.log" ]
 CMD ["all", "--loop", "600"]
