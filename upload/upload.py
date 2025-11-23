@@ -100,6 +100,29 @@ async def begin_upload_session() -> JSONResponse:
     return JSONResponse({"session_id": session_id})
 
 
+def tags_to_id(tags: dict[str, t.Any]) -> str:
+    """
+    >>> tags_to_id({"title": ["My Song"], "artist": ["The Artist"]})
+    'The Artist - My Song'
+    >>> tags_to_id({"title": ["My Song"], "from": ["The Show"]})
+    'The Show - My Song'
+    >>> tags_to_id({"title": ["My Song"]})
+    'My Song'
+    >>> tags_to_id({"title": ["My/Song: I'm The*Best?"], "artist": ["The/Artist"]})
+    'The Artist - My Song Im The Best'
+    """
+    title = tags.get("title", ["Untitled"])
+    if "from" in tags and tags["from"] and tags["from"][0].strip():
+        track_id = f"{tags['from'][0].strip()} - {title[0]}"
+    elif "artist" in tags and tags["artist"] and tags["artist"][0].strip():
+        track_id = f"{tags['artist'][0].strip()} - {title[0]}"
+    else:
+        track_id = title[0]
+    track_id = re.sub(r"[']", "", track_id)
+    track_id = re.sub(r"[^a-zA-Z0-9_\-\.]+", " ", track_id)
+    return track_id.strip()
+
+
 @app.post("/finalize")
 async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
     """
@@ -125,15 +148,7 @@ async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
     for key in tags:
         tags[key] = [v.strip() for v in tags[key] if v.strip()]
 
-    # create a track ID from tags as either "from - title" or "artist - title"
-    title = tags.get("title", ["Untitled"])
-    if "from" in tags and tags["from"] and tags["from"][0].strip():
-        track_id = f"{tags['from'][0].strip()} - {title[0]}"
-    elif "artist" in tags and tags["artist"] and tags["artist"][0].strip():
-        track_id = f"{tags['artist'][0].strip()} - {title[0]}"
-    else:
-        track_id = title[0]
-    track_id = re.sub(r"[^a-zA-Z0-9_\-\.]+", " ", track_id)
+    track_id = tags_to_id(tags)
     contact = tags.get("contact", [""])[0]
 
     session_dir = UPLOAD_ROOT / session_id
