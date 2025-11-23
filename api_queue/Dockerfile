@@ -7,8 +7,7 @@ COPY ./api_queue ./api_queue
 COPY ./*.py ./
 
 FROM base AS test
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    pip install --group dev -e .
+COPY pyproject.toml ./
 COPY ./tests ./tests
 RUN pytest
 RUN mypy .
