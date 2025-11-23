@@ -11,8 +11,8 @@ COPY ./pm3 ./pm3
 COPY ./main.py .
 
 FROM base AS test
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    pip install --group dev -e .
+COPY pyproject.toml ./
+RUN pip install --group dev -e .
 COPY tests ./tests
 RUN pytest
 RUN mypy .
