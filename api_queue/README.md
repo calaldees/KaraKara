@@ -1,13 +1,12 @@
-api_queue
-=========
+# api_queue
+
 * An API for managing queues
 * Users can add tracks to the queue
 * Tracks will be validated to make sure one user isn't filling the whole queue, and nobody can add tracks past the end of the event time limit
 * Admins can re-order and delete tracks
 
 
-queue datamodel
----------------
+## data model
 
 Don't need JSON - newline text? split? No need for field names? `test/csv` records? (no heading?)
 
@@ -18,13 +17,7 @@ def456,MahName2,xyz457,1661094271426
 ```
 
 
-api
----
-TODO: link to OpenAPI spec
-
-
-curls
------
+## curls
 
 ```
 curl -X GET http://localhost:8000/room/test/tracks.json
@@ -45,8 +38,8 @@ curl -X GET --cookie "session_id=admin" http://localhost:8000/room/test/command/
 ```
 
 
-utils
------
+## utils
+
 ```
 docker compose exec api_queue ./analytics.py
 ```
