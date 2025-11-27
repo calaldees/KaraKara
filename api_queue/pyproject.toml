@@ -18,7 +18,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "mypy ~= 1.18",
-	"pytest ~= 8.4",
+	"pytest ~= 9.0",
 	"pytest-asyncio ~= 1.2",
 	"pytest-mypy ~= 1.0",
 	"ruff ~= 0.14",
@@ -49,7 +49,7 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--doctest-modules -p no:cacheprovider"  # --mypy # mypy slows my flow down
+addopts = ["--doctest-modules", "-p", "no:cacheprovider"]  # --mypy # mypy slows my flow down
 filterwarnings = [
 	"ignore:The `schema` method is deprecated.*",
 	"ignore:Pydantic serializer warnings",
