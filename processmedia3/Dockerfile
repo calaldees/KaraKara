@@ -1,5 +1,4 @@
-# Pillow only builds for python3.13, not yet 3.14
-FROM python:3.13-alpine AS base
+FROM python:3.14-alpine AS base
 WORKDIR /app
 COPY --from=mwader/static-ffmpeg:7.1.1 /ffmpeg /usr/local/bin/
 COPY --from=mwader/static-ffmpeg:7.1.1 /ffprobe /usr/local/bin/
