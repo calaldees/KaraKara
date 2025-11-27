@@ -1,7 +1,6 @@
 FROM python:3.14-alpine AS base
 WORKDIR /app
-COPY --from=mwader/static-ffmpeg:7.1.1 /ffmpeg /usr/local/bin/
-COPY --from=mwader/static-ffmpeg:7.1.1 /ffprobe /usr/local/bin/
+COPY --from=mwader/static-ffmpeg:7.1.1 /ffmpeg /ffprobe /usr/local/bin/
 RUN apk add --no-cache \
     imagemagick imagemagick-jpeg imagemagick-webp imagemagick-heic
 RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
