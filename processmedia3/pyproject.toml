@@ -18,7 +18,6 @@ dev = [
 	"pytest ~= 9.0",
 	"ruff ~= 0.14",
 	"types-tqdm ~= 4.67",
-	"types-Pillow ~= 10.2",
 	"types-dateparser ~= 1.2",
 	"types-requests ~= 2.32",
 ]
