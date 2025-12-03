@@ -1,8 +1,9 @@
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useContext, useEffect, useState } from "react";
 
-import { BackToExplore, FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { BackToExplore, Screen, Thumb } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
@@ -63,13 +64,12 @@ function QueueItemRender({
             )}
 
             {is_my_song(item, sessionId) && (
-                <span
+                <FAIcon
+                    icon={faCircleXmark}
                     data-cy="remove"
                     className={"go_arrow"}
                     onClick={(_) => removeTrack(item.id)}
-                >
-                    <FontAwesomeIcon icon={faCircleXmark} />
-                </span>
+                />
             )}
         </li>
     );

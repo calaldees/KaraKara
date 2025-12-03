@@ -9,12 +9,12 @@ import pickle
 import sys
 import time
 import typing as t
+from collections.abc import Generator, MutableMapping, Sequence
 from pathlib import Path
-from collections.abc import Sequence, MutableMapping, Generator
 from typing import TypeVar
 
-from tqdm.contrib.logging import logging_redirect_tqdm
 import tap
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from pm3.cmds.cleanup import cleanup
 from pm3.cmds.encode import encode
@@ -22,11 +22,10 @@ from pm3.cmds.export import export
 from pm3.cmds.lint import lint
 from pm3.cmds.scan import scan
 from pm3.cmds.view import view
-
+from pm3.lib.file_abstraction import AbstractFolder_from_str, LocalFile
+from pm3.lib.kktypes import TargetType
 from pm3.lib.source import Source
 from pm3.lib.track import Track
-from pm3.lib.kktypes import TargetType
-from pm3.lib.file_abstraction import AbstractFolder_from_str, LocalFile
 
 log = logging.getLogger()
 T = TypeVar("T")

@@ -1,8 +1,9 @@
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { useContext } from "react";
 import { useParams } from "react-router-dom";
 
-import { FontAwesomeIcon, Screen } from "@/components";
+import { Screen } from "@/components";
 import { ServerContext } from "@/providers/server";
 import { percent } from "@/utils";
 
@@ -19,10 +20,7 @@ export function Loading(): React.ReactElement {
                     {downloadSize ? (
                         percent(downloadDone, downloadSize)
                     ) : (
-                        <FontAwesomeIcon
-                            icon={faRotate}
-                            className={"loading"}
-                        />
+                        <FAIcon icon={faRotate} className={"loading"} />
                     )}
                 </button>
             </div>

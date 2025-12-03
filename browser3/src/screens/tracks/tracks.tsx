@@ -6,10 +6,11 @@ import {
     faCircleXmark,
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { ReactElement, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { Screen, Thumb } from "@/components";
 import { useMemoArr } from "@/hooks/memo";
 import { ClientContext } from "@/providers/client";
 import { ExploreContext, ExploreProvider } from "@/providers/explore";
@@ -57,9 +58,7 @@ function TrackItem({
                 <br />
                 <span className={"info"}>{track_info(filters, track)}</span>
             </span>
-            <span className={"go_arrow"}>
-                <FontAwesomeIcon icon={faCircleChevronRight} />
-            </span>
+            <FAIcon icon={faCircleChevronRight} className={"go_arrow"} />
         </li>
     );
 }
@@ -87,13 +86,10 @@ function FilterListGroupHeader({
         >
             <span className={"text"}>{children}</span>
             <span className={"count"}>{count}</span>
-            <span className={"go_arrow"}>
-                {expanded ? (
-                    <FontAwesomeIcon icon={faCircleMinus} />
-                ) : (
-                    <FontAwesomeIcon icon={faCirclePlus} />
-                )}
-            </span>
+            <FAIcon
+                icon={expanded ? faCircleMinus : faCirclePlus}
+                className={"go_arrow"}
+            />
         </li>
     );
 }
@@ -179,9 +175,10 @@ function FilterList({
                     >
                         <span className={"text"}>{child}</span>
                         <span className={"count"}>{filters[child]}</span>
-                        <span className={"go_arrow"}>
-                            <FontAwesomeIcon icon={faCircleChevronRight} />
-                        </span>
+                        <FAIcon
+                            icon={faCircleChevronRight}
+                            className={"go_arrow"}
+                        />
                     </li>
                 ))}
         </ul>
@@ -267,9 +264,7 @@ function Explorer(): React.ReactElement {
                             setFilters(filters.filter((v) => v !== filter));
                         }}
                     >
-                        <span className={"remove"}>
-                            <FontAwesomeIcon icon={faCircleXmark} />
-                        </span>
+                        <FAIcon icon={faCircleXmark} className={"remove"} />
                         <span className={"name"} title={filter}>
                             {filter.split(":")[1]}
                         </span>
@@ -368,22 +363,19 @@ function TrackListInternal(): ReactElement {
             className={"tracks"}
             navLeft={
                 filters.length > 0 && (
-                    <div
+                    <FAIcon
+                        icon={faCircleChevronLeft}
                         onClick={(_) => setFilters(filters.slice(0, -1))}
                         data-cy="back"
-                    >
-                        <FontAwesomeIcon
-                            icon={faCircleChevronLeft}
-                            className="x2"
-                        />
-                    </div>
+                        className="x2"
+                    />
                 )
             }
             title={"Explore Tracks"}
             navRight={
                 !widescreen && (
                     <Link to="queue" data-cy="queue">
-                        <FontAwesomeIcon icon={faListOl} className="x2" />
+                        <FAIcon icon={faListOl} className="x2" />
                     </Link>
                 )
             }

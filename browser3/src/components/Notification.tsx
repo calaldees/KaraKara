@@ -1,8 +1,8 @@
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { useContext } from "react";
 
 import { ClientContext } from "@/providers/client";
-import { FontAwesomeIcon } from "./FontAwesomeIcon";
 
 export function Notification() {
     const { notification, setNotification } = useContext(ClientContext);
@@ -14,7 +14,7 @@ export function Notification() {
                 onClick={(_) => setNotification(null)}
             >
                 <span>{notification.text}</span>
-                <FontAwesomeIcon icon={faCircleXmark} />
+                <FAIcon icon={faCircleXmark} />
             </div>
         )
     );

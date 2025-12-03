@@ -2,10 +2,11 @@ import {
     faCircleChevronLeft,
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { FontAwesomeIcon, Screen } from "@/components";
+import { Screen } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
@@ -336,10 +337,7 @@ export function TrackDetails(): React.ReactElement {
                     role="button"
                     aria-label="Go Back"
                 >
-                    <FontAwesomeIcon
-                        icon={faCircleChevronLeft}
-                        className="x2"
-                    />
+                    <FAIcon icon={faCircleChevronLeft} className="x2" />
                 </div>
             }
             title={track.tags.title[0]}
@@ -350,7 +348,7 @@ export function TrackDetails(): React.ReactElement {
                         data-cy="queue"
                         aria-label="Show Queue"
                     >
-                        <FontAwesomeIcon icon={faListOl} className="x2" />
+                        <FAIcon icon={faListOl} className="x2" />
                     </Link>
                 )
             }

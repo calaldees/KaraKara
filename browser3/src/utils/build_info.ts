@@ -1,2 +1,2 @@
-export const COMMIT = "272bf9ff";
-export const BUILD_DATE = "2025-11-09T18:11:39Z";
+export const COMMIT = '8506add6';
+export const BUILD_DATE = '2025-12-03T03:36:42Z';

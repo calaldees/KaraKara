@@ -7,11 +7,12 @@ import {
     faPlay,
     faStop,
 } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { BackToExplore, FontAwesomeIcon, Screen, Thumb } from "@/components";
+import { BackToExplore, Screen, Thumb } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
@@ -178,9 +179,10 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                             onTouchEnd={(e: TouchEvent) => onTouchEnd(e)}
                             onTouchCancel={(e: TouchEvent) => onTouchCancel(e)}
                         >
-                            <span className={"drag-handle"}>
-                                <FontAwesomeIcon icon={faGripVertical} />
-                            </span>
+                            <FAIcon
+                                icon={faGripVertical}
+                                className={"drag-handle"}
+                            />
                         </Thumb>
                         <span className={"text queue_info"}>
                             <span className={"title"}>
@@ -209,12 +211,11 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                             </span>
                         )}
 
-                        <span
+                        <FAIcon
+                            icon={faCircleXmark}
                             className={"go_arrow"}
                             onClick={(_) => removeTrack(item.id)}
-                        >
-                            <FontAwesomeIcon icon={faCircleXmark} />
-                        </span>
+                        />
                     </li>
                 ))}
                 {dropSource && (
@@ -240,11 +241,11 @@ function ControlButtons(): React.ReactElement {
     const { sendCommand, loading } = useApi();
 
     const buttons = {
-        seek_backwards: <FontAwesomeIcon icon={faBackward} />,
-        seek_forwards: <FontAwesomeIcon icon={faForward} />,
-        play: <FontAwesomeIcon icon={faPlay} />,
-        stop: <FontAwesomeIcon icon={faStop} />,
-        skip: <FontAwesomeIcon icon={faForwardStep} />,
+        seek_backwards: <FAIcon icon={faBackward} />,
+        seek_forwards: <FAIcon icon={faForward} />,
+        play: <FAIcon icon={faPlay} />,
+        stop: <FAIcon icon={faStop} />,
+        skip: <FAIcon icon={faForwardStep} />,
     };
 
     return (
@@ -342,8 +343,8 @@ export function Control(): React.ReactElement {
                         </li>
                         <li>
                             Push the play button (
-                            <FontAwesomeIcon icon={faPlay} />) down below when
-                            you're ready to start singing.
+                            <FAIcon icon={faPlay} />) down below when you're
+                            ready to start singing.
                         </li>
                     </ol>
                 </div>

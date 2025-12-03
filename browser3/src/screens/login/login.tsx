@@ -1,8 +1,9 @@
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { FormEvent, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { FontAwesomeIcon, Screen } from "@/components";
+import { Screen } from "@/components";
 
 import "./login.scss";
 
@@ -31,7 +32,7 @@ export function Login(): React.ReactElement {
                         autoFocus={true}
                     />
                     <button type="submit" disabled={!roomNameEdit.trim()}>
-                        Enter Room <FontAwesomeIcon icon={faRightToBracket} />
+                        Enter Room <FAIcon icon={faRightToBracket} />
                     </button>
                 </form>
             </div>
