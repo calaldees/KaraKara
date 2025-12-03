@@ -13,8 +13,8 @@ import {
     dict2css,
     is_my_song,
     sorted,
-    unique,
     time_until,
+    unique,
 } from "@/utils";
 
 import "./queue.scss";
@@ -162,11 +162,15 @@ export function Queue(): React.ReactElement {
                 <section>
                     <h2>Coming Later</h2>
                     <div className={"coming_later"}>
-                        {sorted(unique(queue.slice(
-                            1 + settings["coming_soon_track_count"],
-                        ).map(
-                            (item) => item.performer_name
-                        ))).map((name) => (
+                        {sorted(
+                            unique(
+                                queue
+                                    .slice(
+                                        1 + settings["coming_soon_track_count"],
+                                    )
+                                    .map((item) => item.performer_name),
+                            ),
+                        ).map((name) => (
                             <span key={name}>{name}</span>
                         ))}
                     </div>

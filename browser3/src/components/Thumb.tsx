@@ -15,7 +15,10 @@ export function Thumb({
             <img
                 alt=""
                 draggable="false"
-                src={track?.attachments.image[0] && attachment_path(track.attachments.image[0])}
+                src={
+                    track?.attachments.image[0] &&
+                    attachment_path(track.attachments.image[0])
+                }
             />
             {children}
         </div>

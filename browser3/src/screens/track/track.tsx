@@ -124,18 +124,21 @@ function Buttons({ track }: { track: Track }) {
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request, sessionId } = useApi();
 
-    const videoVariants = unique(track.attachments.video
-        .map((a) => a.variant)
-        .filter((v) => v !== null)
+    const videoVariants = unique(
+        track.attachments.video.map((a) => a.variant).filter((v) => v !== null),
     );
-    const [videoVariant, setVideoVariant] = useState<string>(videoVariants.length === 1 ? videoVariants[0] : "");
+    const [videoVariant, setVideoVariant] = useState<string>(
+        videoVariants.length === 1 ? videoVariants[0] : "",
+    );
 
     const subtitleVariants = unique(
         track.attachments.subtitle
             ?.map((a) => a.variant)
-            .filter((v) => v !== null) ?? []
+            .filter((v) => v !== null) ?? [],
     );
-    const [subtitleVariant, setSubtitleVariant] = useState<string>(subtitleVariants.length === 1 ? subtitleVariants[0] : "");
+    const [subtitleVariant, setSubtitleVariant] = useState<string>(
+        subtitleVariants.length === 1 ? subtitleVariants[0] : "",
+    );
 
     function enqueue(performer_name: string, track_id: string) {
         request({
@@ -208,29 +211,35 @@ function Buttons({ track }: { track: Track }) {
         (videoVariants.length === 0 || videoVariant !== "") &&
         (subtitleVariants.length === 0 || subtitleVariant !== "");
 
-    const isQueued =
-        queue.find((i) => i.track_id === track.id) !== undefined;
+    const isQueued = queue.find((i) => i.track_id === track.id) !== undefined;
 
     const myTracks = queue.filter((item) =>
-        is_my_song(item, sessionId, performerName)
+        is_my_song(item, sessionId, performerName),
     );
-    const otherPeoplesTracks = queue.filter((item) =>
-        !is_my_song(item, sessionId, performerName)
+    const otherPeoplesTracks = queue.filter(
+        (item) => !is_my_song(item, sessionId, performerName),
     );
-    const averageTracksPerPerformer = otherPeoplesTracks.length > 0
-        ? otherPeoplesTracks.length /
-          unique(otherPeoplesTracks.map((item) => item.performer_name)).length
-        : 0;
+    const averageTracksPerPerformer =
+        otherPeoplesTracks.length > 0
+            ? otherPeoplesTracks.length /
+              unique(otherPeoplesTracks.map((item) => item.performer_name))
+                  .length
+            : 0;
     const averageTracksPerPerformerStr = averageTracksPerPerformer.toFixed(1);
     const myTrackCount = myTracks.length + 1;
     let warning = null;
-    if (!isQueued && !booth && queue.length > 3 && myTrackCount > averageTracksPerPerformer * 2) {
+    if (
+        !isQueued &&
+        !booth &&
+        queue.length > 3 &&
+        myTrackCount > averageTracksPerPerformer * 2
+    ) {
         warning = (
             <div className="warning" style={{ textAlign: "center" }}>
                 The average person has {averageTracksPerPerformerStr}{" "}
-                {averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"} in the queue, this will be{" "}
-                your {nth(myTrackCount)} — please make sure everybody
-                gets a chance to sing ❤️
+                {averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"} in
+                the queue, this will be your {nth(myTrackCount)} — please make
+                sure everybody gets a chance to sing ❤️
             </div>
         );
     }

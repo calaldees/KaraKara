@@ -58,7 +58,9 @@ export function ClientProvider(props: any) {
 
     const removeBookmark = useCallback(
         (track_id: string): void => {
-            setBookmarks((prev: string[]) => prev.filter((x) => x !== track_id));
+            setBookmarks((prev: string[]) =>
+                prev.filter((x) => x !== track_id),
+            );
         },
         [setBookmarks],
     );

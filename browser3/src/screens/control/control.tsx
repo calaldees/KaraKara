@@ -17,7 +17,7 @@ import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
-import { dict2css, time_until, nth } from "@/utils";
+import { dict2css, nth, time_until } from "@/utils";
 
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks } = useContext(ServerContext);
@@ -280,9 +280,8 @@ function ProgressBar({
     if (!queue_last.start_time) return null;
     const start = Date.parse(startDateTime) / 1000;
     const current = now - start;
-    const queue_end =
-        (queue_last.start_time + queue_last.track_duration) - start;
-    const end = (Date.parse(endDateTime) / 1000) - start;
+    const queue_end = queue_last.start_time + queue_last.track_duration - start;
+    const end = Date.parse(endDateTime) / 1000 - start;
     return (
         <div className="progress_bar">
             <div

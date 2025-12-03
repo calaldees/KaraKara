@@ -34,7 +34,10 @@ function TrackItem({
 }): React.ReactElement {
     const navigate = useNavigate();
     let extra = "";
-    if (track.tags.vocaltrack?.includes("on") && track.tags.vocaltrack?.includes("off")) {
+    if (
+        track.tags.vocaltrack?.includes("on") &&
+        track.tags.vocaltrack?.includes("off")
+    ) {
         extra = " (Vocal + Instr.)";
     } else if (track.tags.vocaltrack?.includes("off")) {
         extra = " (Instrumental)";
@@ -309,11 +312,23 @@ function Explorer(): React.ReactElement {
                     );
                 }
                 if (body === null) {
-                    body = <ul>
-                        <li>
-                            <a  style={{ textAlign: "center", display: "block", width: "100%", padding: ".5em" }} href="https://karakara.uk/upload/">Submit or request additional tracks</a>
-                        </li>
-                    </ul>
+                    body = (
+                        <ul>
+                            <li>
+                                <a
+                                    style={{
+                                        textAlign: "center",
+                                        display: "block",
+                                        width: "100%",
+                                        padding: ".5em",
+                                    }}
+                                    href="https://karakara.uk/upload/"
+                                >
+                                    Submit or request additional tracks
+                                </a>
+                            </li>
+                        </ul>
+                    );
                 }
                 return (
                     <div key={heading}>
