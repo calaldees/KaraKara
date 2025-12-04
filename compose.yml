@@ -141,6 +141,9 @@ services:
         restart: unless-stopped
         mem_limit: 1g
         env_file: .env
+        environment:
+            BASE_PATH: /upload
+            UPLOAD_DIR: /uploads
         volumes:
             - ${PATH_HOST_source}/WorkInProgress:/uploads:rw
             - ${PATH_HOST_data}/logs:/logs
