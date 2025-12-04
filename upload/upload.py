@@ -132,7 +132,7 @@ async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
         "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
       }
 
-    Moves files from the temp dir into /uploads/<session_id>/, and writes
+    Moves files from the temp dir into /uploads/<track_id>/, and writes
     the metadata to a karakara formatted .txt file.
     """
     session_id: str | None = payload.get("session_id")
@@ -148,9 +148,13 @@ async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
         tags[key] = [v.strip() for v in tags[key] if v.strip()]
 
     track_id = tags_to_id(tags)
-    contact = tags.get("contact", [""])[0]
 
-    session_dir = UPLOAD_ROOT / session_id
+    # Find a unique directory name based on track_id
+    session_dir = UPLOAD_ROOT / track_id
+    counter = 2
+    while session_dir.exists():
+        session_dir = UPLOAD_ROOT / f"{track_id} ({counter})"
+        counter += 1
     os.makedirs(session_dir, exist_ok=True)
 
     moved_files: list[str] = []
