@@ -1,22 +1,21 @@
-import os
-import aiofiles
-import uuid
 import json
+import logging
+import os
 import re
 import shutil
-import logging
-from glob import glob
 import typing as t
-import requests
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
-from fastapi import Request, Response
-from starlette.middleware.base import BaseHTTPMiddleware
-from fastapi.staticfiles import StaticFiles
-from tuspyserver import create_tus_router
+import uuid
 from datetime import datetime
+from glob import glob
 from pathlib import Path
 
+import aiofiles
+import requests
+from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
+from tuspyserver import create_tus_router
 
 TEMP_DIR = Path("/tmp/kk_upload_files")
 BASE_PATH = os.environ.get("BASE_PATH", "")
@@ -188,10 +187,10 @@ async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
     try:
         if moved_files:
             webhook_url = os.getenv("DISCORD_WEBHOOK_SUBMISSIONS_URL")
-            content = f"New submission: **{track_id}** (from {contact})"
+            content = f"New submission: **{track_id}**"
         else:
             webhook_url = os.getenv("DISCORD_WEBHOOK_REQUESTS_URL")
-            content = f"New request: **{track_id}** (from {contact})"
+            content = f"New request: **{track_id}**"
 
         if webhook_url:
             response = requests.post(
