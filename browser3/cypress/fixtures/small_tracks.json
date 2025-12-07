@@ -15,7 +15,7 @@
         "attachments": {
             "video": [
                 {
-                    "variant": null,
+                    "variant": "Default",
                     "path": "f/foo.mp4",
                     "mime": "video/mp4"
                 }

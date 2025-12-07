@@ -6,8 +6,8 @@
         "start_time": 1234,
         "track_duration": 30,
         "track_id": "track_id_1",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     },
     {
         "id": 2,
@@ -16,8 +16,8 @@
         "start_time": 1274,
         "track_duration": 30,
         "track_id": "track_id_2",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     },
     {
         "id": 3,
@@ -26,8 +26,8 @@
         "start_time": 1304,
         "track_duration": 30,
         "track_id": "track_id_1",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     },
     {
         "id": 4,
@@ -36,8 +36,8 @@
         "start_time": 1364,
         "track_duration": 30,
         "track_id": "track_id_2",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     },
     {
         "id": 5,
@@ -46,8 +46,8 @@
         "start_time": 1404,
         "track_duration": 30,
         "track_id": "track_id_1",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     },
     {
         "id": 6,
@@ -56,8 +56,8 @@
         "start_time": 1434,
         "track_duration": 30,
         "track_id": "track_id_1",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     },
     {
         "id": 7,
@@ -66,7 +66,7 @@
         "start_time": 1464,
         "track_duration": 30,
         "track_id": "track_id_1",
-        "video_variant": null,
-        "subtitle_variant": null
+        "video_variant": "Default",
+        "subtitle_variant": "Default"
     }
 ]

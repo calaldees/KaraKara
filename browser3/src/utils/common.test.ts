@@ -42,8 +42,8 @@ describe("current_and_future", () => {
         start_time: 0,
         track_duration: 100,
         track_id: "My_Song",
-        video_variant: null,
-        subtitle_variant: null,
+        video_variant: "Default",
+        subtitle_variant: "Default",
     };
     test("empty", () => {
         expect(utils.current_and_future(1000, [])).toEqual([]);
