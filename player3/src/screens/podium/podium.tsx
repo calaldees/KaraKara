@@ -46,7 +46,7 @@ function PodiumInner({
 
     useEffect(() => {
         const subtitleAttachment = track.attachments.subtitle?.find(
-            (a) => a.mime === "application/json",
+            (a) => a.mime === "application/json" && a.variant === queue_item.subtitle_variant,
         );
         if (subtitleAttachment) {
             request({
