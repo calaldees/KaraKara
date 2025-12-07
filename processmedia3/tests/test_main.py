@@ -1,18 +1,19 @@
 import json
 import logging
 import tempfile
+import unittest
 from functools import partialmethod
 from pathlib import Path
-import unittest
+
 from tqdm import tqdm
 
-import pm3.cmds.scan as scan
+import pm3.cmds.cleanup as cleanup
 import pm3.cmds.encode as encode
 import pm3.cmds.export as export
-import pm3.cmds.cleanup as cleanup
-from pm3.lib.source import SourceType
-from pm3.lib.kktypes import TargetType
+import pm3.cmds.scan as scan
 from pm3.lib.file_abstraction import AbstractFolder_from_str
+from pm3.lib.kktypes import TargetType
+from pm3.lib.source import SourceType
 
 # disable progress bars in unit tests
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)  # type: ignore
@@ -60,21 +61,21 @@ class TestE2E(unittest.TestCase):
                 "attachments": {
                     "image": [
                         {
-                            "variant": None,
+                            "variant": "Default",
                             "mime": "image/avif",
                             "path": "a/AFJz1z_uAoG.avif",
                         }
                     ],
                     "subtitle": [
                         {
-                            "variant": None,
+                            "variant": "Default",
                             "mime": "text/vtt",
                             "path": "g/gHe0erd2h5b.vtt",
                         }
                     ],
                     "video": [
                         {
-                            "variant": None,
+                            "variant": "Default",
                             "mime": "video/webm; codecs=av01.0.05M.08,opus",
                             "path": "q/QbcWNbOP07G.webm",
                         }
@@ -99,21 +100,21 @@ class TestE2E(unittest.TestCase):
                 "attachments": {
                     "image": [
                         {
-                            "variant": None,
+                            "variant": "Default",
                             "mime": "image/avif",
                             "path": "g/g0hYJlNw99D.avif",
                         }
                     ],
                     "subtitle": [
                         {
-                            "variant": None,
+                            "variant": "Default",
                             "mime": "text/vtt",
                             "path": "6/6u2Zuq6Cuho.vtt",
                         }
                     ],
                     "video": [
                         {
-                            "variant": None,
+                            "variant": "Default",
                             "mime": "video/webm; codecs=av01.0.05M.08,opus",
                             "path": "k/kQiTVqqX7if.webm",
                         }
