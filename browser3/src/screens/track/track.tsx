@@ -59,7 +59,7 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
     const videoVariants = unique(
         track.attachments.video.map((a) => a.variant),
     );
-    const [videoVariant, setVideoVariant] = useState<string | null>(() =>
+    const [videoVariant, setVideoVariant] = useState<string>(() =>
         preferred_variant(videoVariants),
     );
 
@@ -67,7 +67,7 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
         track.attachments.subtitle
             ?.map((a) => a.variant) ?? [],
     );
-    const [subtitleVariant, setSubtitleVariant] = useState<string | null>(() =>
+    const [subtitleVariant, setSubtitleVariant] = useState<string>(() =>
         preferred_variant(subtitleVariants),
     );
 
@@ -242,11 +242,11 @@ function Buttons({
     setSubtitleVariant,
 }: {
     track: Track;
-    videoVariants: (string|null)[];
-    videoVariant: string | null;
+    videoVariants: string[];
+    videoVariant: string;
     setVideoVariant: (v: string) => void;
-    subtitleVariants: (string|null)[];
-    subtitleVariant: string | null;
+    subtitleVariants: string[];
+    subtitleVariant: string;
     setSubtitleVariant: (v: string) => void;
 }) {
     const { queue } = useContext(RoomContext);
@@ -272,8 +272,8 @@ function Buttons({
                 body: JSON.stringify({
                     track_id: track_id,
                     performer_name: performer_name.trim(),
-                    video_variant: videoVariant || null,
-                    subtitle_variant: subtitleVariant || null,
+                    video_variant: videoVariant,
+                    subtitle_variant: subtitleVariant,
                 }),
             },
             onAction: () => setAction(TrackAction.NONE),
@@ -286,10 +286,10 @@ function Buttons({
             <select
                 name="video_variant"
                 onChange={(e) => setVideoVariant(e.currentTarget.value)}
-                value={videoVariant ?? ""}
+                value={videoVariant}
             >
                 {/** while the variants are different videos, the effect for the user is different audio */}
-                {videoVariants.filter(v => v !== null).map((v) => (
+                {videoVariants.map((v) => (
                     <option key={v} value={v}>
                         {v}
                     </option>
@@ -304,9 +304,9 @@ function Buttons({
             <select
                 name="subtitle_variant"
                 onChange={(e) => setSubtitleVariant(e.currentTarget.value)}
-                value={subtitleVariant ?? ""}
+                value={subtitleVariant}
             >
-                {subtitleVariants.filter(v => v !== null).map((v) => (
+                {subtitleVariants.map((v) => (
                     <option key={v} value={v}>
                         {v}
                     </option>

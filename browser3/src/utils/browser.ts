@@ -132,8 +132,8 @@ export function normalise_cmp(a: string, b: string): number {
  * If there are multiple variants of a song, pick sensible
  * defaults for novice users
  */
-export function preferred_variant(variants: (string | null)[]): string | null {
-    const preferences = ["Vocal", "Romaji"];
+export function preferred_variant(variants: string[]): string {
+    const preferences = ["Vocal", "Romaji", "Default"];
     for (const pref of preferences) {
         if (variants.includes(pref)) {
             return pref;
@@ -142,5 +142,5 @@ export function preferred_variant(variants: (string | null)[]): string | null {
     if (variants.length > 0) {
         return variants[0];
     }
-    return null;
+    return "Default";
 }

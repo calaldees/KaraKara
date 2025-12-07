@@ -203,10 +203,7 @@ describe("preferred_variant", () => {
             "Instrumental",
         );
     });
-    test("null", () => {
-        expect(utils.preferred_variant([null])).toEqual(null);
-    });
     test("empty list", () => {
-        expect(utils.preferred_variant([])).toEqual(null);
+        expect(utils.preferred_variant([])).toEqual("Default");
     });
 });

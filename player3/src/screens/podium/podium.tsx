@@ -55,7 +55,7 @@ function PodiumInner({
                 onAction: (result) => setLyrics(result),
             });
         }
-    }, [request, track]);
+    }, [request, track, queue_item.subtitle_variant]);
 
     useEffect(() => {
         if (lyricsEl.current) {

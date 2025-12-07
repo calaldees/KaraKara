@@ -15,8 +15,8 @@ export function Video({
     loop?: boolean;
     mute?: boolean;
     onLoadStart?: (e: any) => void;
-    videoVariant: string | null;
-    subtitleVariant: string | null;
+    videoVariant: string;
+    subtitleVariant: string;
 }) {
     return (
         <div className="videoScaler">
@@ -49,7 +49,7 @@ export function Video({
                                 kind="subtitles"
                                 src={attachment_path(a)}
                                 default={true}
-                                label={a.variant || "Default"}
+                                label={a.variant}
                                 srcLang="en"
                             />
                         ))}
