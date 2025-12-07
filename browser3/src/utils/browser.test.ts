@@ -186,3 +186,24 @@ describe("normalise_cmp", () => {
         expect(utils.normalise_cmp("B", "a")).toEqual(1);
     });
 });
+
+describe("preferred_variant", () => {
+    test("vocal preferred", () => {
+        expect(
+            utils.preferred_variant(["Instrumental", "Vocal", "Karaoke"]),
+        ).toEqual("Vocal");
+    });
+    test("romaji preferred", () => {
+        expect(
+            utils.preferred_variant(["Hiragana", "Romaji", "Hangul"]),
+        ).toEqual("Romaji");
+    });
+    test("no preferred found", () => {
+        expect(utils.preferred_variant(["Instrumental", "Karaoke"])).toEqual(
+            null,
+        );
+    });
+    test("empty list", () => {
+        expect(utils.preferred_variant([])).toEqual(null);
+    });
+});

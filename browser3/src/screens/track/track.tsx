@@ -12,7 +12,13 @@ import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import { Subtitle, Track } from "@/types";
-import { attachment_path, is_my_song, nth, unique } from "@/utils";
+import {
+    attachment_path,
+    is_my_song,
+    nth,
+    preferred_variant,
+    unique,
+} from "@/utils";
 
 import "./track.scss";
 
@@ -53,8 +59,8 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
     const videoVariants = unique(
         track.attachments.video.map((a) => a.variant).filter((v) => v !== null),
     );
-    const [videoVariant, setVideoVariant] = useState<string|null>(
-        videoVariants.length === 1 ? videoVariants[0] : null,
+    const [videoVariant, setVideoVariant] = useState<string | null>(() =>
+        preferred_variant(videoVariants),
     );
 
     const subtitleVariants = unique(
@@ -62,8 +68,8 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
             ?.map((a) => a.variant)
             .filter((v) => v !== null) ?? [],
     );
-    const [subtitleVariant, setSubtitleVariant] = useState<string|null>(
-        subtitleVariants.length === 1 ? subtitleVariants[0] : null,
+    const [subtitleVariant, setSubtitleVariant] = useState<string | null>(() =>
+        preferred_variant(subtitleVariants),
     );
 
     return (
@@ -91,15 +97,17 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
                     </Link>
                 )
             }
-            footer={<Buttons
-                track={track}
-                videoVariants={videoVariants}
-                videoVariant={videoVariant}
-                setVideoVariant={setVideoVariant}
-                subtitleVariants={subtitleVariants}
-                subtitleVariant={subtitleVariant}
-                setSubtitleVariant={setSubtitleVariant}
-            />}
+            footer={
+                <Buttons
+                    track={track}
+                    videoVariants={videoVariants}
+                    videoVariant={videoVariant}
+                    setVideoVariant={setVideoVariant}
+                    subtitleVariants={subtitleVariants}
+                    subtitleVariant={subtitleVariant}
+                    setSubtitleVariant={setSubtitleVariant}
+                />
+            }
         >
             <Preview
                 track={track}
@@ -121,15 +129,18 @@ function Preview({
     videoVariant,
     subtitleVariant,
 }: {
-    track: Track,
-    videoVariant: string|null,
-    subtitleVariant: string|null,
+    track: Track;
+    videoVariant: string | null;
+    subtitleVariant: string | null;
 }) {
     let videoAttachments = track.attachments.video.filter(
         (a) => a.variant === videoVariant,
     );
-    if (videoAttachments.length == 0) videoAttachments = track.attachments.video;
-    const imageAttachment = track.attachments.image.find(a => a.variant == videoVariant) || track.attachments.image[0];
+    if (videoAttachments.length == 0)
+        videoAttachments = track.attachments.video;
+    const imageAttachment =
+        track.attachments.image.find((a) => a.variant == videoVariant) ||
+        track.attachments.image[0];
 
     const subtitleAttachment = track.attachments.subtitle?.find(
         (a) => a.mime === "text/vtt" && a.variant === subtitleVariant,
@@ -146,13 +157,19 @@ function Preview({
             crossOrigin="anonymous"
         >
             {videoAttachments.map((videoAttachment) => (
-                <source key={videoAttachment.path} src={attachment_path(videoAttachment)} type={videoAttachment.mime} />
+                <source
+                    key={videoAttachment.path}
+                    src={attachment_path(videoAttachment)}
+                    type={videoAttachment.mime}
+                />
             ))}
-            {subtitleAttachment && <track
-                key={subtitleAttachment.path}
-                src={attachment_path(subtitleAttachment)}
-                default={true}
-            />}
+            {subtitleAttachment && (
+                <track
+                    key={subtitleAttachment.path}
+                    src={attachment_path(subtitleAttachment)}
+                    default={true}
+                />
+            )}
         </video>
     );
 }
@@ -181,8 +198,8 @@ function Lyrics({
     track,
     variant,
 }: {
-    track: Track,
-    variant: string|null,
+    track: Track;
+    variant: string | null;
 }): React.ReactElement | null {
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const { request } = useApi();
@@ -225,13 +242,13 @@ function Buttons({
     subtitleVariant,
     setSubtitleVariant,
 }: {
-    track: Track,
-    videoVariants: string[],
-    videoVariant: string|null,
-    setVideoVariant: (v: string) => void,
-    subtitleVariants: string[],
-    subtitleVariant: string|null,
-    setSubtitleVariant: (v: string) => void,
+    track: Track;
+    videoVariants: string[];
+    videoVariant: string | null;
+    setVideoVariant: (v: string) => void;
+    subtitleVariants: string[];
+    subtitleVariant: string | null;
+    setSubtitleVariant: (v: string) => void;
 }) {
     const { queue } = useContext(RoomContext);
     const {

@@ -127,3 +127,17 @@ export function normalise_name(name: string): string {
 export function normalise_cmp(a: string, b: string): number {
     return normalise_name(a) > normalise_name(b) ? 1 : -1;
 }
+
+/*
+ * If there are multiple variants of a song, pick sensible
+ * defaults for novice users
+ */
+export function preferred_variant(variants: string[]): string | null {
+    const preferences = ["Vocal", "Romaji"];
+    for (const pref of preferences) {
+        if (variants.includes(pref)) {
+            return pref;
+        }
+    }
+    return null;
+}
