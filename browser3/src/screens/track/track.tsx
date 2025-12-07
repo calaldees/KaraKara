@@ -33,28 +33,126 @@ enum TrackAction {
     ENQUEUE = 1,
 }
 
-function Preview({ track }: { track: Track }) {
+// Validate parameters and fetch track data,
+// then render inner track details component
+// with a known-good track.
+export function TrackDetails(): React.ReactElement {
+    const { trackId } = useParams();
+    const { tracks } = useContext(ServerContext);
+    if (!trackId) throw Error("Can't get here?");
+    const track = tracks[trackId];
+    if (!track) return <div>No track with ID {trackId}</div>;
+
+    return <TrackDetailsInner key={trackId} track={track} />;
+}
+
+function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
+    const { widescreen } = useContext(ClientContext);
+    const navigate = useNavigate();
+
+    const videoVariants = unique(
+        track.attachments.video.map((a) => a.variant).filter((v) => v !== null),
+    );
+    const [videoVariant, setVideoVariant] = useState<string|null>(
+        videoVariants.length === 1 ? videoVariants[0] : null,
+    );
+
+    const subtitleVariants = unique(
+        track.attachments.subtitle
+            ?.map((a) => a.variant)
+            .filter((v) => v !== null) ?? [],
+    );
+    const [subtitleVariant, setSubtitleVariant] = useState<string|null>(
+        subtitleVariants.length === 1 ? subtitleVariants[0] : null,
+    );
+
+    return (
+        <Screen
+            className={"track"}
+            navLeft={
+                <FAIcon
+                    icon={faCircleChevronLeft}
+                    className="x2"
+                    onClick={() => void navigate(-1)}
+                    data-cy="back"
+                    role="button"
+                    aria-label="Go Back"
+                />
+            }
+            title={track.tags.title[0]}
+            navRight={
+                !widescreen && (
+                    <Link
+                        to={"../queue"}
+                        data-cy="queue"
+                        aria-label="Show Queue"
+                    >
+                        <FAIcon icon={faListOl} className="x2" />
+                    </Link>
+                )
+            }
+            footer={<Buttons
+                track={track}
+                videoVariants={videoVariants}
+                videoVariant={videoVariant}
+                setVideoVariant={setVideoVariant}
+                subtitleVariants={subtitleVariants}
+                subtitleVariant={subtitleVariant}
+                setSubtitleVariant={setSubtitleVariant}
+            />}
+        >
+            <Preview
+                track={track}
+                videoVariant={videoVariant}
+                subtitleVariant={subtitleVariant}
+            />
+            <Tags track={track} />
+            <Lyrics
+                track={track}
+                key={subtitleVariant}
+                variant={subtitleVariant}
+            />
+        </Screen>
+    );
+}
+
+function Preview({
+    track,
+    videoVariant,
+    subtitleVariant,
+}: {
+    track: Track,
+    videoVariant: string|null,
+    subtitleVariant: string|null,
+}) {
+    let videoAttachments = track.attachments.video.filter(
+        (a) => a.variant === videoVariant,
+    );
+    if (videoAttachments.length == 0) videoAttachments = track.attachments.video;
+    const imageAttachment = track.attachments.image.find(a => a.variant == videoVariant) || track.attachments.image[0];
+
+    const subtitleAttachment = track.attachments.subtitle?.find(
+        (a) => a.mime === "text/vtt" && a.variant === subtitleVariant,
+    );
+
     return (
         <video
             className={"video_placeholder"}
+            key={videoVariant}
             preload={"none"}
-            poster={attachment_path(track.attachments.image.slice(-1)[0])}
+            poster={attachment_path(imageAttachment)}
             playsInline={true}
             controls={true}
             crossOrigin="anonymous"
         >
-            {track.attachments.video.map((a) => (
-                <source key={a.path} src={attachment_path(a)} type={a.mime} />
+            {videoAttachments.map((videoAttachment) => (
+                <source key={videoAttachment.path} src={attachment_path(videoAttachment)} type={videoAttachment.mime} />
             ))}
-            {track.attachments.subtitle
-                ?.filter((a) => a.mime === "text/vtt")
-                .map((a) => (
-                    <track
-                        key={a.path}
-                        src={attachment_path(a)}
-                        default={true}
-                    />
-                ))}
+            {subtitleAttachment && <track
+                key={subtitleAttachment.path}
+                src={attachment_path(subtitleAttachment)}
+                default={true}
+            />}
         </video>
     );
 }
@@ -79,13 +177,19 @@ function Tags({ track }: { track: Track }) {
     );
 }
 
-function Lyrics({ track }: { track: Track }): React.ReactElement | null {
+function Lyrics({
+    track,
+    variant,
+}: {
+    track: Track,
+    variant: string|null,
+}): React.ReactElement | null {
     const [lyrics, setLyrics] = useState<Subtitle[]>([]);
     const { request } = useApi();
 
     useEffect(() => {
         const subtitleAttachment = track.attachments.subtitle?.find(
-            (a) => a.mime === "application/json",
+            (a) => a.mime === "application/json" && a.variant === variant,
         );
         if (subtitleAttachment) {
             request({
@@ -94,7 +198,7 @@ function Lyrics({ track }: { track: Track }): React.ReactElement | null {
                 onAction: (result) => setLyrics(result),
             });
         }
-    }, [request, track]);
+    }, [request, track, variant]);
 
     if (lyrics.length === 0) {
         return null;
@@ -112,7 +216,23 @@ function Lyrics({ track }: { track: Track }): React.ReactElement | null {
     }
 }
 
-function Buttons({ track }: { track: Track }) {
+function Buttons({
+    track,
+    videoVariants,
+    videoVariant,
+    setVideoVariant,
+    subtitleVariants,
+    subtitleVariant,
+    setSubtitleVariant,
+}: {
+    track: Track,
+    videoVariants: string[],
+    videoVariant: string|null,
+    setVideoVariant: (v: string) => void,
+    subtitleVariants: string[],
+    subtitleVariant: string|null,
+    setSubtitleVariant: (v: string) => void,
+}) {
     const { queue } = useContext(RoomContext);
     const {
         bookmarks,
@@ -124,22 +244,6 @@ function Buttons({ track }: { track: Track }) {
     } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request, sessionId } = useApi();
-
-    const videoVariants = unique(
-        track.attachments.video.map((a) => a.variant).filter((v) => v !== null),
-    );
-    const [videoVariant, setVideoVariant] = useState<string>(
-        videoVariants.length === 1 ? videoVariants[0] : "",
-    );
-
-    const subtitleVariants = unique(
-        track.attachments.subtitle
-            ?.map((a) => a.variant)
-            .filter((v) => v !== null) ?? [],
-    );
-    const [subtitleVariant, setSubtitleVariant] = useState<string>(
-        subtitleVariants.length === 1 ? subtitleVariants[0] : "",
-    );
 
     function enqueue(performer_name: string, track_id: string) {
         request({
@@ -166,7 +270,7 @@ function Buttons({ track }: { track: Track }) {
             <select
                 name="video_variant"
                 onChange={(e) => setVideoVariant(e.currentTarget.value)}
-                value={videoVariant}
+                value={videoVariant ?? ""}
             >
                 {/** while the variants are different videos, the effect for the user is different audio */}
                 <option value="">Select Audio</option>
@@ -185,7 +289,7 @@ function Buttons({ track }: { track: Track }) {
             <select
                 name="subtitle_variant"
                 onChange={(e) => setSubtitleVariant(e.currentTarget.value)}
-                value={subtitleVariant}
+                value={subtitleVariant ?? ""}
             >
                 <option value={""}>Select Subtitles</option>
                 {subtitleVariants.map((v) => (
@@ -254,6 +358,7 @@ function Buttons({ track }: { track: Track }) {
                         Track is already queued
                     </div>
                 )}
+                {variantSelect}
                 <div className={"buttons"}>
                     <button
                         type="button"
@@ -316,47 +421,4 @@ function Buttons({ track }: { track: Track }) {
         );
     }
     return null;
-}
-
-export function TrackDetails(): React.ReactElement {
-    const { trackId } = useParams();
-    const { widescreen } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
-    const navigate = useNavigate();
-    if (!trackId) throw Error("Can't get here?");
-    const track = tracks[trackId];
-    if (!track) return <div>No track with ID {trackId}</div>;
-
-    return (
-        <Screen
-            className={"track"}
-            navLeft={
-                <div
-                    onClick={() => void navigate(-1)}
-                    data-cy="back"
-                    role="button"
-                    aria-label="Go Back"
-                >
-                    <FAIcon icon={faCircleChevronLeft} className="x2" />
-                </div>
-            }
-            title={track.tags.title[0]}
-            navRight={
-                !widescreen && (
-                    <Link
-                        to={"../queue"}
-                        data-cy="queue"
-                        aria-label="Show Queue"
-                    >
-                        <FAIcon icon={faListOl} className="x2" />
-                    </Link>
-                )
-            }
-            footer={<Buttons track={track} />}
-        >
-            <Preview track={track} />
-            <Tags track={track} />
-            <Lyrics track={track} />
-        </Screen>
-    );
 }
