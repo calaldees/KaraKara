@@ -13,7 +13,14 @@ def _mins_ago(minutes: int) -> datetime.datetime:
 
 def qi(name: str, duration: datetime.timedelta, session: str, performer: str, **kwargs) -> QueueItem:
     return QueueItem.model_validate(
-        {"track_id": name, "track_duration": duration, "session_id": session, "performer_name": performer} | kwargs
+        {
+            "track_id": name,
+            "track_duration": duration,
+            "session_id": session,
+            "performer_name": performer,
+            "video_variant": "Default",
+            "subtitle_variant": "Default",
+        } | kwargs
     )
 
 

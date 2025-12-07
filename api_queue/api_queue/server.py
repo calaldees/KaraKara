@@ -377,8 +377,8 @@ async def queue_json(request: Request, room_name: str):
 class QueueItemAdd(pydantic.BaseModel):
     track_id: str
     performer_name: str
-    video_variant: str | None = None
-    subtitle_variant: str | None = None
+    video_variant: str
+    subtitle_variant: str
 
 
 @room_blueprint.post("/queue.json")

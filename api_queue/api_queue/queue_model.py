@@ -19,10 +19,12 @@ class QueueItem(pydantic.BaseModel):
     ...     performer_name='test_name',
     ...     start_time=123456789.123456789,
     ...     id=123456789,
-    ...     added_time=111111111.111111111
+    ...     added_time=111111111.111111111,
+    ...     video_variant="Default",
+    ...     subtitle_variant="Default",
     ... )
     >>> qi1
-    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=TzInfo(...)), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(...)), debug_str=None, video_variant=None, subtitle_variant=None)
+    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457, tzinfo=TzInfo(...)), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(...)), debug_str=None, video_variant='Default', subtitle_variant='Default')
 
     >>> qi2 = QueueItem(
     ...     track_id='Track1',
@@ -31,15 +33,17 @@ class QueueItem(pydantic.BaseModel):
     ...     performer_name='test_name',
     ...     start_time='1973-11-29 21:33:09.123457',
     ...     id='123456789',
-    ...     added_time=111111111.111111111
+    ...     added_time=111111111.111111111,
+    ...     video_variant="Default",
+    ...     subtitle_variant="Default",
     ... )
     >>> qi2
-    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(...)), debug_str=None, video_variant=None, subtitle_variant=None)
+    QueueItem(track_id='Track1', track_duration=datetime.timedelta(seconds=60, microseconds=250000), session_id='Session1', performer_name='test_name', start_time=datetime.datetime(1973, 11, 29, 21, 33, 9, 123457), id=123456789, added_time=datetime.datetime(1973, 7, 10, 0, 11, 51, 111111, tzinfo=TzInfo(...)), debug_str=None, video_variant='Default', subtitle_variant='Default')
 
     >>> qi1.model_dump(mode="json")
-    {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None, 'video_variant': None, 'subtitle_variant': None}
+    {'track_id': 'Track1', 'track_duration': 60.25, 'session_id': 'Session1', 'performer_name': 'test_name', 'start_time': 123456789.123457, 'id': 123456789, 'added_time': 111111111.111111, 'debug_str': None, 'video_variant': 'Default', 'subtitle_variant': 'Default'}
 
-    >>> queue_item = QueueItem(track_id='', track_duration=42, session_id='', performer_name='', start_time='')
+    >>> queue_item = QueueItem(track_id='', track_duration=42, session_id='', performer_name='', start_time='', video_variant='Default', subtitle_variant='Default')
     >>> type(queue_item.track_duration)
     <class 'datetime.timedelta'>
     >>> type(queue_item.id)
@@ -54,7 +58,7 @@ class QueueItem(pydantic.BaseModel):
     def _now():
         return datetime.datetime.now(tz=datetime.timezone.utc)
 
-    @pydantic.field_validator("start_time", "video_variant", "subtitle_variant", "debug_str", mode="before")
+    @pydantic.field_validator("start_time", "debug_str", mode="before")
     @classmethod
     def empty_str_to_none(cls, v: str | None) -> str | None:
         if v == "":
@@ -74,8 +78,8 @@ class QueueItem(pydantic.BaseModel):
     id: int = pydantic.Field(default_factory=lambda: random.randint(0, 2**30))
     added_time: datetime.datetime = pydantic.Field(default_factory=_now)
     debug_str: str | None = pydantic.Field(default=None)
-    video_variant: str | None = None
-    subtitle_variant: str | None = None
+    video_variant: str
+    subtitle_variant: str
 
     @property
     def end_time(self) -> datetime.datetime | None:

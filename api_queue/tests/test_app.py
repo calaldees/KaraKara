@@ -55,6 +55,7 @@ class APIQueue:
         return response
 
     async def post(self, **kwargs) -> Response:
+        kwargs = {"video_variant": "Default", "subtitle_variant": "Default"} | kwargs
         request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 

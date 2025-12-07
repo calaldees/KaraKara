@@ -19,6 +19,8 @@ def test_queue_manager(tmp_path: Path):
                 track_duration=datetime.timedelta(seconds=60),
                 session_id="abcd-1234-ghjk-5787",
                 performer_name="test_name",
+                video_variant="Default",
+                subtitle_variant="Default",
             )
         )
     assert manager.for_json("test")[0]["session_id"] == "abcd"
