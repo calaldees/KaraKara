@@ -1,13 +1,13 @@
 import enum
-import typing as t
 import logging
 import re
+import typing as t
 from collections.abc import MutableMapping
 
-from .subtitle_processor import parse_subtitles, Subtitle
-from .tag_processor import parse_tags
 from .file_abstraction import AbstractFile
 from .kktypes import MediaMeta
+from .subtitle_processor import Subtitle, parse_subtitles
+from .tag_processor import parse_tags
 
 log = logging.getLogger()
 T = t.TypeVar("T")
@@ -36,7 +36,7 @@ class Source:
         self.cache = cache
         self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
         variant_match = re.search(r"\[(.+?)\]$", self.file.stem)
-        self.variant = variant_match.group(1) if variant_match else None
+        self.variant = variant_match.group(1) if variant_match else "Default"
 
         if not self.type:
             raise SourceTypeException(f"Can't tell what type of source {self.file.relative} is")

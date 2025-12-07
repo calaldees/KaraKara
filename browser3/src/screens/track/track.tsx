@@ -57,7 +57,7 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
     const navigate = useNavigate();
 
     const videoVariants = unique(
-        track.attachments.video.map((a) => a.variant).filter((v) => v !== null),
+        track.attachments.video.map((a) => a.variant),
     );
     const [videoVariant, setVideoVariant] = useState<string | null>(() =>
         preferred_variant(videoVariants),
@@ -65,8 +65,7 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
 
     const subtitleVariants = unique(
         track.attachments.subtitle
-            ?.map((a) => a.variant)
-            .filter((v) => v !== null) ?? [],
+            ?.map((a) => a.variant) ?? [],
     );
     const [subtitleVariant, setSubtitleVariant] = useState<string | null>(() =>
         preferred_variant(subtitleVariants),
@@ -243,10 +242,10 @@ function Buttons({
     setSubtitleVariant,
 }: {
     track: Track;
-    videoVariants: string[];
+    videoVariants: (string|null)[];
     videoVariant: string | null;
     setVideoVariant: (v: string) => void;
-    subtitleVariants: string[];
+    subtitleVariants: (string|null)[];
     subtitleVariant: string | null;
     setSubtitleVariant: (v: string) => void;
 }) {
@@ -290,8 +289,7 @@ function Buttons({
                 value={videoVariant ?? ""}
             >
                 {/** while the variants are different videos, the effect for the user is different audio */}
-                <option value="">Select Audio</option>
-                {videoVariants.map((v) => (
+                {videoVariants.filter(v => v !== null).map((v) => (
                     <option key={v} value={v}>
                         {v}
                     </option>
@@ -308,8 +306,7 @@ function Buttons({
                 onChange={(e) => setSubtitleVariant(e.currentTarget.value)}
                 value={subtitleVariant ?? ""}
             >
-                <option value={""}>Select Subtitles</option>
-                {subtitleVariants.map((v) => (
+                {subtitleVariants.filter(v => v !== null).map((v) => (
                     <option key={v} value={v}>
                         {v}
                     </option>

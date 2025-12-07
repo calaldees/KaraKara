@@ -1,18 +1,19 @@
+import copy
+import datetime
 import typing as t
 from collections import defaultdict
-import copy
 from pathlib import Path
-import datetime
+
 import dateparser
 
+from .encoders import find_appropriate_encoder
 from .kktypes import MediaType, TargetType
 from .source import Source, SourceType
 from .target import Target
-from .encoders import find_appropriate_encoder
 
 
 class TrackAttachment(t.TypedDict):
-    variant: str | None
+    variant: str
     mime: str
     path: str
 
@@ -47,7 +48,7 @@ class Track:
         # eg: sources = {"XX [Vocal].mp4", "XX [Instr].ogg", "XX [Instr].jpg", "XX.srt", "XX.txt"}
         targets: list[Target] = []
         for target_type in target_types:
-            # eg: variants = {"Vocal", "Instr", None}
+            # eg: variants = {"Vocal", "Instr"}
             for variant in {s.variant for s in sources}:
                 # For each variant, we create a set of sources:
                 #   variant_sources = ["XX [Vocal].mp4"]

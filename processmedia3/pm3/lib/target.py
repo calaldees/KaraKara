@@ -1,15 +1,14 @@
-import re
-import hashlib
 import base64
+import hashlib
 import logging
+import re
 import shutil
 import tempfile
 from pathlib import Path
 
+from .encoders import Encoder, EncoderException
 from .kktypes import TargetType
 from .source import Source
-from .encoders import Encoder, EncoderException
-
 
 log = logging.getLogger()
 
@@ -27,7 +26,7 @@ class Target:
         type: TargetType,
         encoder: Encoder,
         sources: set[Source],
-        variant: str | None = None,
+        variant: str,
     ) -> None:
         self.processed_dir = processed_dir
         self.type = type

@@ -1,6 +1,7 @@
 import unittest
+
 from pm3.cmds.export import list_changes
-from pm3.lib.track import TrackDict, MediaType
+from pm3.lib.track import MediaType, TrackDict
 
 
 class TestCreateSsa(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestCreateSsa(unittest.TestCase):
             "duration": 300,
             "attachments": {
                 MediaType.SUBTITLE: [
-                    {"mime": "text/srt", "variant": None, "path": "subs.srt"},
+                    {"mime": "text/srt", "variant": "Default", "path": "subs.srt"},
                 ],
             },
         }
@@ -22,7 +23,7 @@ class TestCreateSsa(unittest.TestCase):
             "duration": 300,
             "attachments": {
                 MediaType.SUBTITLE: [
-                    {"mime": "text/srt", "variant": None, "path": "subs.srt"},
+                    {"mime": "text/srt", "variant": "Default", "path": "subs.srt"},
                 ],
             },
         }
@@ -36,7 +37,7 @@ class TestCreateSsa(unittest.TestCase):
             "duration": 300,
             "attachments": {
                 MediaType.SUBTITLE: [
-                    {"mime": "text/srt", "variant": None, "path": "subs1.srt"},
+                    {"mime": "text/srt", "variant": "Default", "path": "subs1.srt"},
                 ],
             },
         }
@@ -46,7 +47,7 @@ class TestCreateSsa(unittest.TestCase):
             "duration": 300,
             "attachments": {
                 MediaType.SUBTITLE: [
-                    {"mime": "text/srt", "variant": None, "path": "subs2.srt"},
+                    {"mime": "text/srt", "variant": "Default", "path": "subs2.srt"},
                 ],
             },
         }

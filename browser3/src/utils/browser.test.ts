@@ -200,8 +200,11 @@ describe("preferred_variant", () => {
     });
     test("no preferred found", () => {
         expect(utils.preferred_variant(["Instrumental", "Karaoke"])).toEqual(
-            null,
+            "Instrumental",
         );
+    });
+    test("null", () => {
+        expect(utils.preferred_variant([null])).toEqual(null);
     });
     test("empty list", () => {
         expect(utils.preferred_variant([])).toEqual(null);
