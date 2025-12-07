@@ -27,4 +27,5 @@ hash_cache.pickle
 
 **/.idea
 **/.vscode
+**/.zed
 **/.mypy_cache
