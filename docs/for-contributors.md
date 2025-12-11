@@ -45,31 +45,31 @@ The majority of tracks have a tags file, a video, and a subtitle file
 ## Tag Files
 
 Mostly key:value pairs, eg:
-```
-category:game
-title:Herald of Darkness
-from:Alan Wake 2
+```yaml
+category: game
+title: Herald of Darkness
+from: Alan Wake 2
 ```
 
 Keys can be repeated, eg for multiple languages:
-```
-from:Bokusatsu Tenshi Dokuro-chan
-from:Bludgeoning Angel Dokuro-chan
+```yaml
+from: Bokusatsu Tenshi Dokuro-chan
+from: Bludgeoning Angel Dokuro-chan
 ```
 
 Can be nested if we want to group eg all the Sonic games together:
-```
-from:Sonic the Hedgehog:Sonic Forces
+```yaml
+from: Sonic the Hedgehog: Sonic Forces
 ```
 which is equivalent to
-```
-from:Sonic the Hedgehog
-Sonic the Hedgehog:Sonic Forces
+```yaml
+from: Sonic the Hedgehog
+Sonic the Hedgehog: Sonic Forces
 ```
 
 If a value needs to contain a colon, it can be quoted, eg:
-```
-source:"https://www.example.com/lyrics/song?id=1234"
+```yaml
+source: "https://www.example.com/lyrics/song?id=1234"
 ```
 
 Keys and Values should generally both be lowercase, except for proper nouns like titles and artist names.
@@ -93,21 +93,21 @@ Keys and Values should generally both be lowercase, except for proper nouns like
 * `genre` - eg `rock`, `pop`, `electronic`
 
 ### Examples
-```
-category:game
-title:Herald of Darkness (Part 1)
-from:Alan Wake 2
-artist:Old Gods of Asgard
-use:insert
-lang:en
-vocalstyle:male
-vocaltrack:on
-contributor:Shish
-length:short
-source:"https://www.youtube.com/watch?v=uxs_HYw_mLk"
-date:2023-11-27
-added:2025-06-06
-genre:rock
+```yaml
+category: game
+title: Herald of Darkness (Part 1)
+from: Alan Wake 2
+artist: Old Gods of Asgard
+use: insert
+lang: en
+vocalstyle: male
+vocaltrack: on
+contributor: Shish
+length: short
+source: "https://www.youtube.com/watch?v=uxs_HYw_mLk"
+date: 2023-11-27
+added: 2025-06-06
+genre: rock
 ```
 
 ## Subtitle Files
