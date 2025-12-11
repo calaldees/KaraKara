@@ -1,15 +1,14 @@
 import logging
 import re
-from datetime import timedelta
 import string
-from collections.abc import Sequence, Generator
+from collections.abc import Generator, Sequence
+from datetime import timedelta
 
 from tqdm.contrib.concurrent import thread_map
 
-from pm3.lib.subtitle_processor import Subtitle
 from pm3.lib.source import SourceType
+from pm3.lib.subtitle_processor import Subtitle
 from pm3.lib.track import Track
-
 
 type ErrGen = Generator[str, None, None]
 log = logging.getLogger(__name__)
@@ -91,10 +90,12 @@ def lint_track(track: Track) -> None:
                 # Commented out as there's a surprising number of tracks that are very empty
                 # lint_subtitles_big_silence(s.file.relative, s.subtitles, duration=json["duration"]),
                 lint_subtitles_random_topline(s.subtitles),
-                lint_subtitles_line_contents(s.subtitles),
                 lint_subtitles_spacing(s.subtitles),
             ]:
                 for err in err_list:
+                    log.error(f"{s.file.relative}: {err}")
+            if s.variant != "Hiragana":
+                for err in lint_subtitles_line_contents(s.subtitles):
                     log.error(f"{s.file.relative}: {err}")
 
 
@@ -258,12 +259,8 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
     for index, l in enumerate(ls):
         if "\n" in l.text:
             yield f"line {index + 1} line contains newline: {l.text}"
-        # Manunal things:
+        # Manual things:
         #   "♪" -> people adding "instrumental break" markers manually
-        # Various unicode look-alike characters (watermarking??):
-        #   "е" (\u0435) -> "e"
-        #   " " (\u2005) -> space
-        #   (and several others that I removed by hand but didn't think to list here)
         ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "áéñāōòèàóíŪú"
         for char in l.text:
             if char not in ok:

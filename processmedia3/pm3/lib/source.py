@@ -80,7 +80,10 @@ class Source:
     @_cache
     def subtitles(self) -> list[Subtitle]:
         log.info(f"Parsing subtitles from {self.file.relative}")
-        return parse_subtitles(self.file.text)
+        t = self.file.text
+        t = t.replace("\u0435", "e")
+        t = t.replace(" ", " ")
+        return parse_subtitles(t)
 
     @property
     @_cache
