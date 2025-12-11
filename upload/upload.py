@@ -90,12 +90,7 @@ async def list_wips() -> JSONResponse:
 
 @app.post("/session")
 async def begin_upload_session() -> JSONResponse:
-    """
-    Create a temporary directory for files to be uploaded to.
-    """
     session_id = str(uuid.uuid4())
-    sess_path = os.path.join(UPLOAD_ROOT, session_id)
-    os.makedirs(sess_path, exist_ok=True)
     return JSONResponse({"session_id": session_id})
 
 
@@ -155,7 +150,7 @@ async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
     while session_dir.exists():
         session_dir = UPLOAD_ROOT / f"{track_id} ({counter})"
         counter += 1
-    os.makedirs(session_dir, exist_ok=True)
+    session_dir.mkdir(parents=True, exist_ok=True)
 
     moved_files: list[str] = []
 
