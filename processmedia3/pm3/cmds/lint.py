@@ -174,9 +174,9 @@ def lint_tags_use(tags: dict[str, list[str]]) -> ErrGen:
             "opening",
             "ending",
             "insert",
-            "character song",
-            "doujin song",
-            "trailer",  # ??
+            "character",
+            "doujin",
+            "trailer",
         ]
         for use in uses:
             if use not in known_uses and re.match(r"^(op|ed)(\d+)$", use) is None:
