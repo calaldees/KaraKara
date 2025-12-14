@@ -110,7 +110,7 @@ class Track:
             raise TrackValidationException("missing tags.category")
 
         # these are internal tags for the uploader, not for end users
-        for internal in ["contact", "status", "info"]:
+        for internal in ["contact", "status", "info", "id", "rawg"]:
             if tags.get(internal):
                 del tags[internal]
 

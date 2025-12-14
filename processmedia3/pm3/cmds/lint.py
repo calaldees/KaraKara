@@ -261,7 +261,7 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
             yield f"line {index + 1} line contains newline: {l.text}"
         # Manual things:
         #   "♪" -> people adding "instrumental break" markers manually
-        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "áéñāōòèàóíŪú"
+        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "¿áéñāōòèàóíŪú"
         for char in l.text:
             if char not in ok:
                 yield f"line {index + 1} line contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
