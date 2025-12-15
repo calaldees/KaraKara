@@ -1,8 +1,21 @@
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginSass } from "@rsbuild/plugin-sass";
+import { execSync } from "child_process";
 
 const isDev = process.env.NODE_ENV !== "production";
+
+const getGitCommitHash = () => {
+    try {
+        return execSync("git rev-parse --short HEAD").toString().trim();
+    } catch {
+        return "unknown";
+    }
+};
+
+const getBuildDate = () => {
+    return new Date().toISOString();
+};
 
 export default defineConfig({
     plugins: [pluginReact(), pluginSass()],
@@ -23,6 +36,10 @@ export default defineConfig({
     source: {
         entry: {
             index: "./src/player.tsx",
+        },
+        define: {
+            __COMMIT__: JSON.stringify(getGitCommitHash()),
+            __BUILD_DATE__: JSON.stringify(getBuildDate()),
         },
     },
     output: {

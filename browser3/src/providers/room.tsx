@@ -7,7 +7,6 @@ import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import type { QueueItem, Track } from "@/types";
 import { current_and_future, normalise_cmp } from "@/utils";
-import { BUILD_DATE, COMMIT } from "@/utils/build_info";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
 import { ServerContext } from "./server";
@@ -106,7 +105,7 @@ export function RoomProvider(props: any) {
             event: "open_room",
             app: "browser3",
             dev: process.env.NODE_ENV === "development" ? true : false,
-            version: `${COMMIT} - ${BUILD_DATE}`,
+            version: `${__COMMIT__} - ${__BUILD_DATE__}`,
             admin: isAdmin,
             room: roomName,
         };
