@@ -96,7 +96,10 @@ class Track:
         if not attachments.get(MediaType.IMAGE):
             raise TrackValidationException("missing attachments.image")
         for media_type in attachments:
-            attachments[media_type].sort(key=lambda a: a["path"])
+            # sort by both path and variant to ensure deterministic output even
+            # when both vairants have the same filename (eg, vocal and instrumental
+            # tracks both have the same thumbnail)
+            attachments[media_type].sort(key=lambda a: (a["path"], a["variant"]))
 
         tag_files = self._sources_by_type({SourceType.TAGS})
         if not tag_files:
