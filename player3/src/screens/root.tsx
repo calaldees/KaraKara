@@ -105,7 +105,7 @@ function Room() {
     const errors: string[] = [];
     if (!roomName) errors.push("No Room Set");
     if (!connected) errors.push("Not Connected");
-    if (!isAdmin) errors.push("Not Admin");
+    if (podium && !isAdmin) errors.push("Not Admin");
     if (Object.keys(tracks).length === 0) errors.push("No Tracks");
 
     const css = ":root {--underscan: " + underscan + ";}";
