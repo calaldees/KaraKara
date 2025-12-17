@@ -12,6 +12,7 @@ import { ClientContext } from "@/providers/client";
 import { RoomContext, RoomProvider } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 
+import { useStabilise } from "@/hooks/stabilise";
 import { percent } from "@/utils";
 import { ConfigMenu } from "./config/config";
 import { PodiumScreen } from "./podium/podium";
@@ -63,6 +64,13 @@ function Room() {
     const { now } = useContext(ServerTimeContext);
     const { queue, isAdmin, settings } = useContext(RoomContext);
 
+    // Stabilize connection status to avoid showing errors during brief reconnection attempts
+    const stableConnection = useStabilise(
+        connected,
+        1000, // Time connection must stay up before considering it stable,
+        3000, // Time of instability before showing error,
+    );
+
     let screen = <section>Unknown state :(</section>;
 
     if (Object.keys(tracks).length === 0)
@@ -104,7 +112,7 @@ function Room() {
 
     const errors: string[] = [];
     if (!roomName) errors.push("No Room Set");
-    if (!connected) errors.push("Not Connected");
+    if (!stableConnection) errors.push("Not Connected");
     if (podium && !isAdmin) errors.push("Not Admin");
     if (Object.keys(tracks).length === 0) errors.push("No Tracks");
 
