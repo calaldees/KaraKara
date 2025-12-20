@@ -15,7 +15,7 @@
 - First, make sure you have a hard drive with enouch space (200GB and counting)
 - Download and install Syncthing: https://syncthing.net/downloads/
   - The bare tool is fairly minimal and technical, I'd advise using one of the integrations (eg syncthing-macos or syncthing-windows) from the top of the page for a happier experience
-- Run syncthing and open the GUI in your web browser, get the ID for your device from the menu -> "Actions" -> "Show ID"
+- Open syncthing, get the ID for your device from the menu -> "Actions" -> "Show ID"
 - Send your device ID to somebody with server access (eg Shish, Calaldees)
 - (Person with server access: Go to https://karakara.uk/syncthing/ , add this person's device, and share the `KaraKara-Source` folder with them)
 - At some point soon you should get a notification in the syncthing GUI saying something like "KaraKara wants to share a folder with you: KaraKara-Source [Accept / Reject]" -- if you click accept and choose a folder location on your computer, syncthing will start synchronising the files between the server and that folder.
