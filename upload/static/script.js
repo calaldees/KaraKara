@@ -62,8 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     uploadsDiv.innerHTML = "";
 
-    let sessionId = null;
-
     // 1. Collect metadata (all non-file inputs)
     const formData = new FormData(form);
     const metadata = {};
@@ -77,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     }
+    let url, body;
 
     // 2. Collect all files from any input[type="file"]
     const fileInputs = form.querySelectorAll('input[type="file"]');
@@ -85,13 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
       Array.from(input.files).forEach((f) => files.push(f));
     });
 
-    // 3. Create session only if there are files to upload
+    // 3. If there are files, do a file upload for /submit
     if (files.length > 0) {
       const res = await fetch("./session", { method: "POST" });
       const data = await res.json();
-      sessionId = data.session_id;
+      const sessionId = data.session_id;
 
-      // 4. Upload files in parallel
       const uploadPromises = files.map((file) => {
         return new Promise((resolve, reject) => {
           const row = document.createElement("div");
@@ -125,27 +123,30 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       await Promise.all(uploadPromises);
-    } else {
-      // If no files, just create a session id for metadata storage
-      const res = await fetch("./session", { method: "POST" });
-      const data = await res.json();
-      sessionId = data.session_id;
+
+      url = "./submit";
+      body = { session_id: sessionId, tags: metadata };
+    }
+    // 4. If no files, just send metadata to /request
+    else {
+      url = "./request";
+      body = { tags: metadata };
     }
 
-    // 5. Finalize metadata (and files if any)
-    const finalizePayload = {
-      session_id: sessionId,
-      tags: metadata,
-    };
-
-    const finalizeRes = await fetch("./finalize", {
+    const finalizeRes = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(finalizePayload),
+      body: JSON.stringify(body),
     });
-
-    //const finalizeData = await finalizeRes.json();
-    alert("Thank you, an admin should take a look at it soon <3");
+    const finalizeData = await finalizeRes.json();
+    if (finalizeData.ok) {
+      alert("Thank you, an admin should take a look at it soon <3");
+    } else {
+      alert(
+        "There was an error processing your submission: " +
+          (finalizeData.error || "Unknown error"),
+      );
+    }
     form.reset();
     uploadsDiv.innerHTML = "";
   });

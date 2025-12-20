@@ -117,80 +117,19 @@ def tags_to_id(tags: dict[str, t.Any]) -> str:
     return track_id.strip()
 
 
-@app.post("/finalize")
-async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
-    """
-    Expected JSON body:
-
-      {
-        "session_id": "uuid",
-        "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
-      }
-
-    Moves files from the temp dir into /uploads/<track_id>/, and writes
-    the metadata to a karakara formatted .txt file.
-    """
-    session_id: str | None = payload.get("session_id")
-    tags: dict[str, list[str]] | None = payload.get("tags")
-
-    if not session_id:
-        raise HTTPException(400, "Missing session_id")
-
-    if not tags:
-        raise HTTPException(400, "Missing tags")
-
-    for key in tags:
-        tags[key] = [v.strip() for v in tags[key] if v.strip()]
-
-    track_id = tags_to_id(tags)
-
-    # Find a unique directory name based on track_id
-    session_dir = UPLOAD_ROOT / track_id
-    counter = 2
-    while session_dir.exists():
-        session_dir = UPLOAD_ROOT / f"{track_id} ({counter})"
-        counter += 1
-    session_dir.mkdir(parents=True, exist_ok=True)
-
-    moved_files: list[str] = []
-
-    # find all files in TEMP_DIR that match the provided session ID
-    # (ideally the client would provide a list of file IDs...)
-    for info_path in TEMP_DIR.rglob("*.info"):
-        async with aiofiles.open(info_path, "r") as f:
-            info: dict[str, str] = json.loads(await f.read())["metadata"]
-        if info["session_id"] == session_id:
-            data_path = info_path.with_suffix("")
-            orig_path = Path(info["filename"])
-            targ_path = session_dir / Path(track_id).with_suffix(orig_path.suffix).name
-            while targ_path.exists():
-                targ_path = targ_path.with_stem(targ_path.stem + "_")
-            # data_path.move(fname)  # py3.14
-            shutil.move(data_path.as_posix(), targ_path.as_posix())
-            moved_files.append(orig_path.name)
-            info_path.unlink()
-
-    meta_path = session_dir / f"{track_id}.txt"
+async def write_tags_file(meta_path: Path, tags: dict[str, list[str]], status: str) -> None:
+    meta_path.parent.mkdir(parents=True, exist_ok=True)
     async with aiofiles.open(meta_path, "w") as f:
         for key, values in tags.items():
             for value in values:
                 if value:
                     await f.write(f"{key}:{value}\n")
         await f.write(f"added:{datetime.now().strftime('%Y-%m-%d')}\n")
-        if not moved_files:
-            await f.write("status:needs files, lyrics, timings\n")
-        else:
-            await f.write("status:awaiting moderator approval\n")
+        await f.write(f"status:{status}\n")
 
-    content = None
+
+def send_notification(webhook_url: str | None, content: str) -> None:
     try:
-        if moved_files:
-            webhook_url = os.getenv("DISCORD_WEBHOOK_SUBMISSIONS_URL")
-            content = f"New submission: **{track_id}**"
-        else:
-            webhook_url = os.getenv("DISCORD_WEBHOOK_REQUESTS_URL")
-            content = f"New request: **{track_id}**"
-
         if webhook_url:
             response = requests.post(
                 webhook_url,
@@ -200,13 +139,100 @@ async def finalize_upload_session(payload: dict[str, t.Any]) -> JSONResponse:
             )
             if response.status_code != 204:
                 log.error(f"Failed to call webhook: {response.status_code} {response.text}")
-
-            log.info("Sent notification via discord")
+            else:
+                log.info("Sent notification via discord")
         else:
             log.warning(f"Webhook config missing, not notifying ({content!r})")
     except Exception:
         log.exception(f"Failed to send notification ({content!r}):")
 
-    log.info(f"Finalized session {session_id!r}, track id {track_id!r}")
 
+def sanitize_tags(tags: dict[str, list[str]] | None) -> dict[str, list[str]]:
+    if not tags:
+        raise HTTPException(400, "Missing tags")
+    for key in tags:
+        tags[key] = [v.strip() for v in tags[key] if v.strip()]
+    return tags
+
+
+def get_unique_path(base_path: Path, base_name: str, suffix: str = "") -> Path:
+    """
+    Generate a unique path by appending numbers if the path already exists.
+
+    >>> import tempfile
+    >>> temp_dir = Path(tempfile.mkdtemp())
+    >>> (temp_dir / "test.txt").touch()
+    >>> get_unique_path(temp_dir, "test", ".txt")
+    PosixPath('.../test (2).txt')
+    >>> (temp_dir / "test (2).txt").touch()
+    >>> get_unique_path(temp_dir, "test", ".txt")
+    PosixPath('.../test (3).txt')
+    """
+    unique_path = base_path / f"{base_name}{suffix}"
+    counter = 2
+    while unique_path.exists():
+        unique_path = base_path / f"{base_name} ({counter}){suffix}"
+        counter += 1
+    return unique_path
+
+
+@app.post("/request")
+async def request_track(payload: dict[str, t.Any]) -> JSONResponse:
+    """
+    Expected JSON body:
+
+      {
+        "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
+      }
+    """
+    tags = sanitize_tags(payload.get("tags"))
+    track_id = tags_to_id(tags)
+    meta_path = get_unique_path(UPLOAD_ROOT / "Requests", track_id, ".txt")
+    await write_tags_file(meta_path, tags, "needs files, lyrics, timings")
+    webhook_url = os.getenv("DISCORD_WEBHOOK_REQUESTS_URL")
+    send_notification(webhook_url, f"New request: **{track_id}**")
+    log.info(f"Logged request for {track_id!r}")
+    return JSONResponse({"ok": True})
+
+
+@app.post("/submit")
+async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
+    """
+    After uploading one-or-more files via TUS, call this endpoint to
+    submit the track, moving the files from TEMP_DIR to UPLOAD_ROOT.
+
+    Expected JSON body:
+
+      {
+        "session_id": "uuid",
+        "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
+      }
+    """
+    session_id: str = payload["session_id"]
+    tags = sanitize_tags(payload.get("tags"))
+    track_id = tags_to_id(tags)
+
+    session_dir = get_unique_path(UPLOAD_ROOT / "Submissions", track_id)
+    meta_path = session_dir / f"{track_id}.txt"
+    await write_tags_file(meta_path, tags, "awaiting moderator approval")
+
+    moved_files: list[str] = []
+    for info_path in TEMP_DIR.rglob("*.info"):
+        async with aiofiles.open(info_path, "r") as f:
+            info: dict[str, str] = json.loads(await f.read())["metadata"]
+        if info["session_id"] == session_id:
+            data_path = info_path.with_suffix("")
+            orig_path = Path(info["filename"])
+            orig_filename = orig_path.name
+
+            targ_path = session_dir / Path(track_id).with_suffix(orig_path.suffix).name
+            while targ_path.exists():
+                targ_path = targ_path.with_stem(targ_path.stem + "_")
+            shutil.move(data_path.as_posix(), targ_path.as_posix())
+            moved_files.append(orig_filename)
+            info_path.unlink()
+
+    webhook_url = os.getenv("DISCORD_WEBHOOK_SUBMISSIONS_URL")
+    send_notification(webhook_url, f"New submission: **{track_id}**")
+    log.info(f"Uploaded files for {track_id!r} (session {session_id})")
     return JSONResponse({"ok": True, "moved_files": moved_files, "session_id": session_id})
