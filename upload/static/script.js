@@ -133,22 +133,26 @@ document.addEventListener("DOMContentLoaded", () => {
       body = { tags: metadata };
     }
 
-    const finalizeRes = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const finalizeData = await finalizeRes.json();
-    if (finalizeData.ok) {
-      alert("Thank you, an admin should take a look at it soon <3");
-    } else {
+    try {
+      const finalizeRes = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const finalizeData = await finalizeRes.json();
+      if (finalizeData.ok) {
+        alert("Thank you, an admin should take a look at it soon <3");
+      } else {
+        throw new Error(finalizeData.error || "Unknown error");
+      }
+      form.reset();
+    } catch (err) {
       alert(
         "There was an error processing your submission: " +
-          (finalizeData.error || "Unknown error") +
+          err.message +
           " - maybe refresh the page and try again? D:",
       );
     }
-    form.reset();
     uploadsDiv.innerHTML = "";
   });
 });
