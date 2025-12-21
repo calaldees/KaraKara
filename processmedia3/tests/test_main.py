@@ -132,6 +132,7 @@ class TestE2E(unittest.TestCase):
                     "duration": ["0m15s"],
                     "from": ["gundam"],
                     "gundam": ["gundam seed"],
+                    "id": ["imdb:tt1234567", "mal:987654"],
                     "title": ["Test2"],
                 },
             }.items():
