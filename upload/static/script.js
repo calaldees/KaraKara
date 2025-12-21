@@ -144,7 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       alert(
         "There was an error processing your submission: " +
-          (finalizeData.error || "Unknown error"),
+          (finalizeData.error || "Unknown error") +
+          " - maybe refresh the page and try again? D:",
       );
     }
     form.reset();
