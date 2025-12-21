@@ -33,6 +33,7 @@ const BLOCKED_KEYS = [
     "added",
     "new",
     "source", // TODO: figure out a nice way to display source URLs?
+    "id", // TODO: display id:imdb, id:mal, etc. nicely
 ];
 enum TrackAction {
     NONE = 0,

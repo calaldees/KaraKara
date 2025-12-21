@@ -199,6 +199,11 @@ def lint_tags_source(tags: dict[str, list[str]]) -> ErrGen:
         if "http" in tags["source"] or "https" in tags["source"]:
             yield "appears to have an unquoted URL in the source tag"
 
+    if "id" in tags:
+        for id_value in tags["id"]:
+            if ":" not in id_value:
+                yield "appears to have an unquoted ID in the id tag"
+
 
 def lint_tags_duration(tags: dict[str, list[str]], duration: float) -> ErrGen:
     if duration > 5 * 60:

@@ -4,3 +4,5 @@ artist: Mr Monkey
 from:gundam
 from:gundam:gundam seed
 contributor: contributor: ここにいくつかのテキストです。
+id:"imdb:tt1234567"
+id:"mal:987654"
