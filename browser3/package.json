@@ -35,7 +35,7 @@
         "@types/node": "^24.5.2",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
-        "cypress": "^15.6.0",
+        "cypress": "^15.8.1",
         "eslint": "^9.21.0",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-dom": "^2.3.5",
