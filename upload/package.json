@@ -1,0 +1,41 @@
+{
+    "name": "upload",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "serve": "rsbuild dev",
+        "build": "rsbuild build",
+        "format": "prettier --write .",
+        "lint": "eslint frontend"
+    },
+    "dependencies": {
+        "react": "^19.2.3",
+        "react-dom": "^19.2.3",
+        "tus-js-client": "^4.3.1",
+        "usehooks-ts": "^3.1.1"
+    },
+    "devDependencies": {
+        "@rsbuild/core": "^1.6.14",
+        "@rsbuild/plugin-react": "^1.4.2",
+        "@types/react": "^19.2.7",
+        "@types/react-dom": "^19.2.3",
+        "eslint": "^9.21.0",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-dom": "^2.3.5",
+        "eslint-plugin-react-hooks": "^7.0.1",
+        "eslint-plugin-react-refresh": "^0.4.19",
+        "eslint-plugin-react-x": "^2.3.5",
+        "prettier": "^3.6",
+        "prettier-plugin-organize-imports": "^4.3.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.24.1"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "trailingComma": "all",
+        "plugins": [
+            "prettier-plugin-organize-imports"
+        ]
+    }
+}

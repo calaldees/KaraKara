@@ -23,6 +23,9 @@ dev = [
     "types-requests ~= 2.32",
 ]
 
+[project.scripts]
+backend = "backend.upload:main"
+
 [tool.pytest]
 asyncio_mode = "auto"
 addopts = ["--doctest-modules", "-p", "no:cacheprovider"]  # --mypy # mypy slows my flow down

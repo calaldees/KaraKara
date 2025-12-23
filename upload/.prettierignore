@@ -1,0 +1,4 @@
+package-lock.json
+.mypy_cache
+.venv
+dist/

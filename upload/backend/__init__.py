@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import shutil
+import sys
 import typing as t
 import uuid
 from datetime import datetime
@@ -20,7 +21,7 @@ from tuspyserver import create_tus_router
 TEMP_DIR = Path("/tmp/kk_upload_files")
 BASE_PATH = os.environ.get("BASE_PATH", "")
 UPLOAD_ROOT = Path(os.environ.get("UPLOAD_DIR", "../media/source/WorkInProgress"))
-STATIC_DIR = Path(__file__).parent / "static"
+STATIC_DIR = Path(__file__).parent.parent / "dist" / "static"
 
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
@@ -30,7 +31,8 @@ log = logging.getLogger(__name__)
 
 app = FastAPI(title="FastAPI TUS Upload Server")
 app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix()))
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+if "--reload" not in sys.argv:
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # Hacky middleware to rewrite Location headers because tuspyserver is serving
@@ -64,7 +66,7 @@ async def health() -> JSONResponse:
 
 @app.get("/")
 async def serve_index() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html", media_type="text/html")
+    return FileResponse(STATIC_DIR / ".." / "index.html", media_type="text/html")
 
 
 @app.get("/wips")
