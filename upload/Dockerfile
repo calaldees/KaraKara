@@ -4,6 +4,13 @@ RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     pip install --no-cache-dir --group dev .
 COPY . /app
 
+FROM node:24 AS build-frontend
+COPY package.json package-lock.json rsbuild.config.ts tsconfig.json /app/
+WORKDIR /app
+RUN npm install
+COPY frontend /app/frontend
+RUN npm run build
+
 FROM base AS test
 RUN pytest
 RUN mypy .
@@ -12,4 +19,5 @@ FROM base AS production
 EXPOSE 8000
 VOLUME /logs
 VOLUME /uploads
+COPY --from=build-frontend /app/dist /app/dist/
 CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]
