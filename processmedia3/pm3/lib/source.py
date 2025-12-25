@@ -3,7 +3,6 @@ import logging
 import re
 import typing as t
 from collections.abc import MutableMapping
-from datetime import timedelta
 
 from .file_abstraction import AbstractFile
 from .kktypes import MediaMeta
@@ -80,32 +79,11 @@ class Source:
     @property
     @_cache
     def subtitles(self) -> list[Subtitle]:
-        """
-        Load subtitles and apply any opinionated fixes
-        (fixes for things which are definitely-wrong should
-        go in subtitle_processor.py)
-        """
         log.info(f"Parsing subtitles from {self.file.relative}")
-
-        # Normalise invisible encoding differences so that searching
-        # works as expected (e.g. replacing Cyrillic 'е' with Latin 'e')
         t = self.file.text
         t = t.replace("\u0435", "e")
         t = t.replace(" ", " ")
-
-        # Remove one-frame blinks between subtitles
-        lines = parse_subtitles(t)
-        for i in range(len(lines) - 1):
-            tdiff = lines[i + 1].start - lines[i].end
-            if timedelta(seconds=-0.1) < tdiff < timedelta(seconds=0.1):
-                lines[i] = Subtitle(
-                    idx=lines[i].idx,
-                    start=lines[i].start,
-                    end=lines[i + 1].start,
-                    text=lines[i].text,
-                    top=lines[i].top,
-                )
-        return lines
+        return parse_subtitles(t)
 
     @property
     @_cache
