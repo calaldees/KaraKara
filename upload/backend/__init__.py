@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 app = FastAPI(title="FastAPI TUS Upload Server")
 app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix()))
-if "--reload" not in sys.argv:
+if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
