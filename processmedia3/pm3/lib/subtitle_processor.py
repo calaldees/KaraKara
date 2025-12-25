@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 ## -*- coding: utf-8 -*-
 
-import re
-from datetime import timedelta
-from itertools import zip_longest
-import typing as t
-import logging
 import difflib
 import json
+import logging
+import re
+import typing as t
+from datetime import timedelta
+from itertools import zip_longest
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ class SubtitleFormatException(Exception):
 
 
 class Subtitle(t.NamedTuple):
+    index: int = 0
     start: timedelta = timedelta()
     end: timedelta = timedelta()
     text: str = ""
@@ -136,11 +137,12 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ...
     ... '''
     >>> _parse_srt(srt)
-    [Subtitle(start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
+    [Subtitle(index=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(index=2, start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
     """
 
     def parse_line(line: dict[str, str]) -> Subtitle:
         return Subtitle(
+            int(line["index"]),
             _parse_time(line["start"]),
             _parse_time(line["end"]),
             clean_line(line["text"]),
@@ -157,6 +159,7 @@ def _parse_srt(source: str) -> list[Subtitle]:
         tdiff = lines[i + 1].start - lines[i].end
         if timedelta(seconds=-0.010) < tdiff < timedelta(seconds=0.010):
             lines[i] = Subtitle(
+                index=lines[i].index,
                 start=lines[i].start,
                 end=lines[i + 1].start,
                 text=lines[i].text,
@@ -175,26 +178,27 @@ def _parse_ssa(source: str) -> list[Subtitle]:
     ... Dialogue: Marked=0,0:00:07.00,0:00:13.25,*Default,NTP,0000,0000,0000,!Effect,awaku saita hana no kao\N{\c&HFFFFFF&}nokoshi kisetsu wa sugimasu
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=5), text='Ishida Yoko - Towa no Hana\nAi Yori Aoshi OP', top=True), Subtitle(start=datetime.timedelta(seconds=7), end=datetime.timedelta(seconds=13, microseconds=250000), text='awaku saita hana no kao\nnokoshi kisetsu wa sugimasu', top=False)]
+    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=5), text='Ishida Yoko - Towa no Hana\nAi Yori Aoshi OP', top=True), Subtitle(index=2, start=datetime.timedelta(seconds=7), end=datetime.timedelta(seconds=13, microseconds=250000), text='awaku saita hana no kao\nnokoshi kisetsu wa sugimasu', top=False)]
 
     >>> ssa = r'''
     ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='this is, text on same line', top=False)]
+    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='this is, text on same line', top=False)]
 
     """
     lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
 
-    def parse_line(line: dict[str, str]) -> Subtitle:
+    def parse_line(line: dict[str, str], index: int) -> Subtitle:
         return Subtitle(
+            index,
             _parse_time(line["start"]),
             _parse_time(line["end"]),
             clean_line(line["text"]),
             "\\a6" in line["text"],
         )
 
-    return [parse_line(line_dict) for line_dict in lines]
+    return [parse_line(line_dict, i + 1) for i, line_dict in enumerate(lines)]
 
 
 def parse_subtitles(data: str) -> list[Subtitle]:
@@ -205,13 +209,13 @@ def parse_subtitles(data: str) -> list[Subtitle]:
     ... srt
     ... '''
     >>> parse_subtitles(srt)
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='srt', top=False)]
+    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='srt', top=False)]
 
     >>> ssa = '''
     ... Dialogue: Marked=0,0:00:00.00,0:00:01.00,*Default,NTP,0000,0000,0000,!Effect,ssa
     ... '''
     >>> parse_subtitles(ssa)
-    [Subtitle(start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='ssa', top=False)]
+    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='ssa', top=False)]
 
     >>> parse_subtitles('not real subtitles')
     []
@@ -454,6 +458,7 @@ if __name__ == "__main__":
             tdiff = lines[i + 1].start - lines[i].end
             if timedelta(seconds=-0.1) < tdiff < timedelta(seconds=0.1):
                 lines[i] = Subtitle(
+                    index=lines[i].index,
                     start=lines[i].start,
                     end=lines[i + 1].start,
                     text=lines[i].text,

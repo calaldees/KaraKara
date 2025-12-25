@@ -5,10 +5,10 @@ from datetime import timedelta
 from pathlib import Path
 
 from pm3.lib.subtitle_processor import (
+    Subtitle,
     create_srt,
     create_ssa,
     create_vtt,
-    Subtitle,
     parse_subtitles,
 )
 
@@ -17,8 +17,9 @@ class TestCreateSsa(unittest.TestCase):
     def test_create_ssa(self) -> None:
         ssa = create_ssa(
             [
-                Subtitle(timedelta(minutes=0), timedelta(minutes=1), "first"),
+                Subtitle(1, timedelta(minutes=0), timedelta(minutes=1), "first"),
                 Subtitle(
+                    2,
                     timedelta(minutes=2),
                     timedelta(minutes=3, microseconds=510000),
                     "second",
@@ -47,12 +48,14 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
             parse_subtitles(ssa),
             [
                 Subtitle(
+                    1,
                     start=timedelta(0),
                     end=timedelta(seconds=60),
                     text="first\nsecond",
                     top=False,
                 ),
                 Subtitle(
+                    2,
                     start=timedelta(seconds=120),
                     end=timedelta(seconds=180, microseconds=510000),
                     text="second",
@@ -64,7 +67,7 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
     def test_newline(self) -> None:
         ssa = create_ssa(
             [
-                Subtitle(timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),
+                Subtitle(1, timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),
             ]
         )
         self.assertIn("newline\\Ntest", ssa)
@@ -74,13 +77,14 @@ class TestCreateSrt(unittest.TestCase):
     def test_create_srt(self) -> None:
         srt = create_srt(
             [
-                Subtitle(timedelta(minutes=0), timedelta(minutes=1), "first\nfirst2"),
+                Subtitle(1, timedelta(minutes=0), timedelta(minutes=1), "first\nfirst2"),
                 Subtitle(
+                    2,
                     timedelta(minutes=2),
                     timedelta(minutes=3, microseconds=510000),
                     "second",
                 ),
-                Subtitle(timedelta(minutes=4), timedelta(minutes=5), ""),
+                Subtitle(3, timedelta(minutes=4), timedelta(minutes=5), ""),
             ]
         )
         self.assertEqual(
@@ -100,12 +104,14 @@ second
             parse_subtitles(srt),
             [
                 Subtitle(
+                    1,
                     start=timedelta(0),
                     end=timedelta(seconds=60),
                     text="first\nfirst2",
                     top=False,
                 ),
                 Subtitle(
+                    2,
                     start=timedelta(seconds=120),
                     end=timedelta(seconds=180, microseconds=510000),
                     text="second",
