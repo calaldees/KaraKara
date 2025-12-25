@@ -68,7 +68,10 @@ def lint_track(track: Track) -> None:
 
     for s in track.sources:
         if s.type in {SourceType.VIDEO, SourceType.IMAGE}:
-            if s.meta.aspect_ratio < 1 / 1:
+            # allow square-ish because some audio-only tracks have square
+            # album art, and the scan isn't precisely square, but anything
+            # tall is weird
+            if s.meta.aspect_ratio < 0.95 / 1:
                 log.error(f"{s.file.relative} has weird aspect ratio {s.meta.aspect_ratio_str}")
 
         if s.type == SourceType.TAGS:
@@ -266,7 +269,7 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
             yield f"{l.idx}: contains newline: {l.text}"
         # Manual things:
         #   "♪" -> people adding "instrumental break" markers manually
-        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "¿áéñāōòèàóíŪú"
+        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "¿áéñāōòôóèàíŪú"
         for char in l.text:
             if char not in ok:
                 yield f"{l.idx}: contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
