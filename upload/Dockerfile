@@ -9,7 +9,7 @@ COPY package.json package-lock.json rsbuild.config.ts tsconfig.json /app/
 WORKDIR /app
 RUN npm install
 COPY frontend /app/frontend
-RUN npm run build
+RUN ./node_modules/.bin/rsbuild build --base /upload
 
 FROM base AS test
 RUN pytest
