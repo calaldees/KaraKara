@@ -458,7 +458,7 @@ if __name__ == "__main__":
             tdiff = lines[i + 1].start - lines[i].end
             if timedelta(seconds=-0.1) < tdiff < timedelta(seconds=0.1):
                 lines[i] = Subtitle(
-                    index=lines[i].index,
+                    idx=lines[i].idx,
                     start=lines[i].start,
                     end=lines[i + 1].start,
                     text=lines[i].text,
