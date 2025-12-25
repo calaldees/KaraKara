@@ -263,13 +263,13 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
     """
     for l in ls:
         if "\n" in l.text:
-            yield f"{l.index}: contains newline: {l.text}"
+            yield f"{l.idx}: contains newline: {l.text}"
         # Manual things:
         #   "♪" -> people adding "instrumental break" markers manually
         ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "¿áéñāōòèàóíŪú"
         for char in l.text:
             if char not in ok:
-                yield f"{l.index}: contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
+                yield f"{l.idx}: contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
 
     # check that lines have matched brackets
     bracket_pairs = {
@@ -287,13 +287,13 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
                 stack.append(char)
             elif char in bracket_pairs.values():
                 if not stack:
-                    yield f"{l.index}: unmatched closing bracket: {l.text!r}: {char!r}"
+                    yield f"{l.idx}: unmatched closing bracket: {l.text!r}: {char!r}"
                 else:
                     open_bracket = stack.pop()
                     if bracket_pairs[open_bracket] != char:
-                        yield f"{l.index}: mismatched brackets: {l.text!r}: {open_bracket!r} / {char!r}"
+                        yield f"{l.idx}: mismatched brackets: {l.text!r}: {open_bracket!r} / {char!r}"
         if stack:
-            yield f"{l.index}: unmatched opening bracket: {l.text!r}: {stack!r}"
+            yield f"{l.idx}: unmatched opening bracket: {l.text!r}: {stack!r}"
 
 
 def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
@@ -320,12 +320,12 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
     for ls in [toplines, botlines]:
         for l1, l2, l3 in zip(ls[:-1], ls[1:], ls[2:]):
             if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
-                yield f"{l1.index}: no gap between 3+ repeats: {l1.text}"
+                yield f"{l1.idx}: no gap between 3+ repeats: {l1.text}"
         for l1, l2 in zip(ls[:-1], ls[1:]):
             if l2.start > l1.end:
                 gap = l2.start - l1.end
                 if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
-                    yield f"{l1.index}: {int(gap.microseconds / 1000)}ms blink between lines: {l1.text} / {l2.text}"
+                    yield f"{l1.idx}: {int(gap.microseconds / 1000)}ms blink between lines: {l1.text} / {l2.text}"
             elif l2.start < l1.end:
                 gap = l1.end - l2.start
-                yield f"{l1.index}: {int(gap.microseconds / 1000)}ms overlapping lines: {l1.text} / {l2.text}"
+                yield f"{l1.idx}: {int(gap.microseconds / 1000)}ms overlapping lines: {l1.text} / {l2.text}"

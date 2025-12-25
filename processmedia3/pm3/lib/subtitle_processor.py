@@ -17,7 +17,7 @@ SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 
 re_time = re.compile(r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)")
 re_srt_line = re.compile(
-    r"(?P<index>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*?)(\n\n|$)",
+    r"(?P<idx>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*?)(\n\n|$)",
     flags=re.DOTALL,
 )
 re_ssa_line = re.compile(
@@ -34,7 +34,7 @@ class SubtitleFormatException(Exception):
 
 
 class Subtitle(t.NamedTuple):
-    index: int = 0
+    idx: int = 0
     start: timedelta = timedelta()
     end: timedelta = timedelta()
     text: str = ""
@@ -137,12 +137,12 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ...
     ... '''
     >>> _parse_srt(srt)
-    [Subtitle(index=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(index=2, start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
+    [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(idx=2, start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
     """
 
     def parse_line(line: dict[str, str]) -> Subtitle:
         return Subtitle(
-            int(line["index"]),
+            int(line["idx"]),
             _parse_time(line["start"]),
             _parse_time(line["end"]),
             clean_line(line["text"]),
@@ -159,7 +159,7 @@ def _parse_srt(source: str) -> list[Subtitle]:
         tdiff = lines[i + 1].start - lines[i].end
         if timedelta(seconds=-0.010) < tdiff < timedelta(seconds=0.010):
             lines[i] = Subtitle(
-                index=lines[i].index,
+                idx=lines[i].idx,
                 start=lines[i].start,
                 end=lines[i + 1].start,
                 text=lines[i].text,
@@ -178,20 +178,20 @@ def _parse_ssa(source: str) -> list[Subtitle]:
     ... Dialogue: Marked=0,0:00:07.00,0:00:13.25,*Default,NTP,0000,0000,0000,!Effect,awaku saita hana no kao\N{\c&HFFFFFF&}nokoshi kisetsu wa sugimasu
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=5), text='Ishida Yoko - Towa no Hana\nAi Yori Aoshi OP', top=True), Subtitle(index=2, start=datetime.timedelta(seconds=7), end=datetime.timedelta(seconds=13, microseconds=250000), text='awaku saita hana no kao\nnokoshi kisetsu wa sugimasu', top=False)]
+    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=5), text='Ishida Yoko - Towa no Hana\nAi Yori Aoshi OP', top=True), Subtitle(idx=2, start=datetime.timedelta(seconds=7), end=datetime.timedelta(seconds=13, microseconds=250000), text='awaku saita hana no kao\nnokoshi kisetsu wa sugimasu', top=False)]
 
     >>> ssa = r'''
     ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
     ... '''
     >>> _parse_ssa(ssa)
-    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='this is, text on same line', top=False)]
+    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='this is, text on same line', top=False)]
 
     """
     lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
 
-    def parse_line(line: dict[str, str], index: int) -> Subtitle:
+    def parse_line(line: dict[str, str], idx: int) -> Subtitle:
         return Subtitle(
-            index,
+            idx,
             _parse_time(line["start"]),
             _parse_time(line["end"]),
             clean_line(line["text"]),
@@ -209,13 +209,13 @@ def parse_subtitles(data: str) -> list[Subtitle]:
     ... srt
     ... '''
     >>> parse_subtitles(srt)
-    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='srt', top=False)]
+    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='srt', top=False)]
 
     >>> ssa = '''
     ... Dialogue: Marked=0,0:00:00.00,0:00:01.00,*Default,NTP,0000,0000,0000,!Effect,ssa
     ... '''
     >>> parse_subtitles(ssa)
-    [Subtitle(index=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='ssa', top=False)]
+    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='ssa', top=False)]
 
     >>> parse_subtitles('not real subtitles')
     []
@@ -254,19 +254,19 @@ Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
 def create_srt(subtitles: list[Subtitle]) -> str:
     SRT_FORMAT = """\
-{index}
+{idx}
 {start} --> {end}
 {text}
 
 """
     return "".join(
         SRT_FORMAT.format(
-            index=index + 1,
+            idx=idx,
             start=_srt_time(subtitle.start),
             end=_srt_time(subtitle.end),
             text=("{\\a6}" if subtitle.top else "") + subtitle.text,
         )
-        for index, subtitle in enumerate(subtitles)
+        for idx, subtitle in enumerate(subtitles, 1)
         if subtitle.text
     )
 
@@ -297,7 +297,7 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     https://caniuse.com/?search=vtt
     """
     VTT_FORMAT = """\
-{index}
+{idx}
 {start} --> {end}{format}
 <v active>{active}
 <v next>{next}
@@ -426,14 +426,14 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     # Turn the list of (active line, next line) pairs into VTT-formated strings
     blocks = [
         VTT_FORMAT.format(
-            index=index,
+            idx=idx,
             start=_vtt_time(active.start),
             end=_vtt_time(active.end),
             format=" line:1" if active.top else "",
             active=active.text,
             next=next.text,
         )
-        for index, (active, next) in enumerate(pairs, start=1)
+        for idx, (active, next) in enumerate(pairs, start=1)
     ]
     return "WEBVTT - KaraKara Subtitle\n\n" + "".join(blocks)
 
