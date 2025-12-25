@@ -3,6 +3,7 @@ MAIN.track {
         VIDEO {
             margin-top: 1rem;
             border: 1px solid var(--list-border);
+            aspect-ratio: 16/9;
             width: 100%;
         }
         DIV.tags {
