@@ -116,31 +116,6 @@ services:
             - 22000:22000/udp # QUIC file transfers
             - 21027:21027/udp # Receive local discovery broadcasts
 
-    test_cypress:
-        profiles:
-            - cypress
-        image: cypress/included:10.8.0
-        working_dir: /tests
-        volumes:
-            # USER passthrough
-            - /etc/passwd:/etc/passwd:ro
-            - /etc/group:/etc/group:ro
-            # mount tests - readonly
-            - ${PWD}/test_cypress/cypress.config.js:/tests/cypress.config.js:ro
-            - ${PWD}/test_cypress/cypress:/tests/cypress:ro
-            # mount reports - writeable
-            - ${PWD}/test_cypress/reports:/tests/reports:rw
-        entrypoint: ["cypress"]
-        command: ["run"]
-
-        #
-        #links:
-        #    - nginx
-        #environment:
-          #- DISPLAY
-          #- CYPRESS_BASE_URL=http://client:8001/?api=http://server:8000
-        #user: ${USER}  # ummm, problems with user on cypress startup
-
     upload:
         build:
             context: ./upload

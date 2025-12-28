@@ -31,16 +31,6 @@ up: .env data/  ## run whole stack in docker compose
 deploy:  ##
 	git pull && docker compose down && docker compose up --build --detach
 
-test_cypress_run:  ## cypress browser tests
-	${_DOCKER_COMPOSE} run --rm test_cypress
-#test_cypress_cmd:
-#	${_DOCKER_COMPOSE} --file docker-compose.cypress.yml \
-#		run --rm client_test \
-#			${CYPRESS_CMD}
-#test_cypress_gui:  ## Launch local cypress from container (requires an XServer and DISPLAY env)
-#	${DOCKER_COMPOSE_TEST} run --rm --env DISPLAY test_cypress open --project .
-#	${DOCKER_COMPOSE_TEST} down
-
 
 # Example Data ----------------------------------------------------------------
 

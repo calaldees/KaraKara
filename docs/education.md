@@ -72,6 +72,5 @@ These questions are designed for a group exercise in dissecting this codebase as
         * permalink to the line that persists/writes some data/state
     * Would using a database be better? why? why not?
 * Integration Tests?
-    * There are _some_ cypress tests. What site do they test? Is this good/bad? What are your recommendations for what should be tested in future?
 * Overall
     * Is karakara multiple programs? or one program? why?
