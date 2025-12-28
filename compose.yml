@@ -86,6 +86,7 @@ services:
         build:
             context: ./processmedia3
         restart: unless-stopped
+        user: ${UID}:${GID}
         mem_limit: 8g
         env_file: .env
         volumes:
