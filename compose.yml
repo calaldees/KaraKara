@@ -89,7 +89,6 @@ services:
         mem_limit: 8g
         env_file: .env
         volumes:
-            - ${PATH_HOST_data}/logs:/logs
             - ${PATH_HOST_source}:/media/source:ro
             - ${PATH_HOST_processed}:/media/processed:rw
 

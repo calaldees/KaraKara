@@ -16,8 +16,7 @@ RUN pytest
 RUN mypy .
 
 FROM base AS production
-VOLUME /logs
 VOLUME /media/source
 VOLUME /media/processed
-ENTRYPOINT [ "python3", "main.py", "--source", "/media/source", "--processed", "/media/processed", "--log-file", "/logs/processmedia3.log" ]
+ENTRYPOINT [ "python3", "main.py", "--source", "/media/source", "--processed", "/media/processed" ]
 CMD ["all", "--loop", "600"]
