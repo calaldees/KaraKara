@@ -24,11 +24,16 @@ services:
             - browser3
             - upload
         labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.karakara.rule=Host(`${HOSTNAME}`)"
-            - "traefik.http.routers.karakara.middlewares=kkredir"
-            - "traefik.http.middlewares.kkredir.redirectregex.regex=^https://karakara.uk/$$"
-            - "traefik.http.middlewares.kkredir.redirectregex.replacement=https://karakara.uk/browser3/"
+            traefik.enable: true
+            traefik.http.routers.karakara.rule: "Host(`${HOSTNAME}`)"
+            traefik.http.routers.karakara.middlewares: "kkredir"
+            traefik.http.middlewares.kkredir.redirectregex.regex: "^https://karakara.uk/$$"
+            traefik.http.middlewares.kkredir.redirectregex.replacement: "https://karakara.uk/browser3/"
+            kissycron.job-local.backup-env.schedule: "30 3 * * *"
+            kissycron.job-local.backup-env.command: "backup ${PWD}/.env /backups/karakara/.env"
+            kissycron.job-local.backup-dat.schedule: "31 3 * * *"
+            kissycron.job-local.backup-dat.command: "backup ${PWD}/data/ /backups/karakara/data/"
+
 
     api_queue:
         build:
@@ -77,7 +82,7 @@ services:
 
     processmedia3:
         profiles:
-            - processmedia3
+            - processmedia
         build:
             context: ./processmedia3
         restart: unless-stopped
@@ -96,16 +101,12 @@ services:
         mem_limit: 1g
         cpu_count: 1
         hostname: karakara
-        environment:
-            PUID: 1002
-            PGID: 1003
-            UMASK: 002
+        env_file: .env
         volumes:
             - ${PATH_HOST_data}/syncthing:/var/syncthing
             - ${PATH_HOST_source}:/media/source
             - ${PATH_HOST_processed}:/media/processed
         ports:
-            - 127.0.0.1:8384:8384 # Web UI
             - 22000:22000/tcp # TCP file transfers
             - 22000:22000/udp # QUIC file transfers
             - 21027:21027/udp # Receive local discovery broadcasts
@@ -138,6 +139,8 @@ services:
     upload:
         build:
             context: ./upload
+        profiles:
+            - upload
         restart: unless-stopped
         mem_limit: 1g
         env_file: .env
