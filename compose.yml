@@ -12,11 +12,11 @@ services:
         ports:
             - "127.0.0.1:${PORT}:80"
         volumes:
-            - ${PATH_HOST_data}/logs:/logs
+            - ${PATH_HOST_data}/logs:/logs:rw
             - ${PATH_HOST_data}/queues:/data/queue/:ro
             - ${PATH_HOST_processed}:/media/processed:ro
             - ${PWD}/tools/:/static/tools/:ro
-            - ${PWD}/frontend/:/etc/caddy/
+            - ${PWD}/frontend/:/etc/caddy/:ro
         links:
             - api_queue
             - mqtt
@@ -52,7 +52,7 @@ services:
             - mqtt
         volumes:
             - ${PATH_HOST_processed}:/media/processed:ro
-            - ${PATH_HOST_data}/logs:/logs
+            - ${PATH_HOST_data}/logs:/logs:rw
             - ${PATH_HOST_data}/queues:/data/queue/:rw
             #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
 
@@ -61,7 +61,7 @@ services:
         restart: unless-stopped
         mem_limit: 1g
         volumes:
-            - ${PATH_HOST_data}/mqtt:/mosquitto/data
+            - ${PATH_HOST_data}/mqtt:/mosquitto/data:rw
             - ${PWD}/mqtt/:/mosquitto/config/:ro
 
     player3:
@@ -106,9 +106,9 @@ services:
             PGID: ${GID}
             UMASK: 002
         volumes:
-            - ${PATH_HOST_data}/syncthing:/var/syncthing
-            - ${PATH_HOST_source}:/media/source
-            - ${PATH_HOST_processed}:/media/processed
+            - ${PATH_HOST_data}/syncthing:/var/syncthing:rw
+            - ${PATH_HOST_source}:/media/source:rw
+            - ${PATH_HOST_processed}:/media/processed:rw
         ports:
             - 22000:22000/tcp # TCP file transfers
             - 22000:22000/udp # QUIC file transfers
