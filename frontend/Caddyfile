@@ -57,9 +57,6 @@
 	}
 
 	handle_path /syncthing/* {
-		basic_auth {
-			Shish $2a$14$WcZzlYV1bHtStIiuFpKlk.M.3aqHl40xhbo169G7P0PvqV2PpuQCy
-		}
 		reverse_proxy syncthing:8384
 	}
 
