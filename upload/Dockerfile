@@ -17,7 +17,6 @@ RUN mypy .
 
 FROM base AS production
 EXPOSE 8000
-VOLUME /logs
 VOLUME /uploads
 COPY --from=build-frontend /app/dist /app/dist/
 CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]

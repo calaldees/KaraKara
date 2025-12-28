@@ -153,4 +153,3 @@ services:
             UPLOAD_DIR: /uploads
         volumes:
             - ${PATH_HOST_source}/WorkInProgress:/uploads:rw
-            - ${PATH_HOST_data}/logs:/logs
