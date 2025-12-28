@@ -101,7 +101,10 @@ services:
         mem_limit: 1g
         cpu_count: 1
         hostname: karakara
-        env_file: .env
+        environment:
+            PUID: ${UID}
+            PGID: ${GID}
+            UMASK: 002
         volumes:
             - ${PATH_HOST_data}/syncthing:/var/syncthing
             - ${PATH_HOST_source}:/media/source
