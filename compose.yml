@@ -10,7 +10,7 @@ services:
         restart: unless-stopped
         mem_limit: 1g
         ports:
-            - "127.0.0.1:${PORT_NGINX}:80"
+            - "127.0.0.1:${PORT}:80"
         volumes:
             - ${PATH_HOST_data}/logs:/logs
             - ${PATH_HOST_data}/queues:/data/queue/:ro
