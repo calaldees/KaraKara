@@ -21,7 +21,7 @@ from pm3.cmds.encode import encode
 from pm3.cmds.export import export
 from pm3.cmds.lint import lint
 from pm3.cmds.scan import scan
-from pm3.cmds.view import view
+from pm3.cmds.status import status
 from pm3.lib.file_abstraction import AbstractFolder_from_str, LocalFile
 from pm3.lib.kktypes import TargetType
 from pm3.lib.source import Source
@@ -41,12 +41,12 @@ class PM3Args(tap.Tap):
     reencode: bool = False  # Re-encode files, even if they already exist in the processed directory
     debug: bool = False  # Super-extra verbose logging
     log_file: Path | None = None  # Where to write logs to
-    cmd: str | None = "all"  # Sub-process to run (view, encode, test-encode, export, lint, cleanup)
+    cmd: str | None = "all"  # Sub-process to run (status, encode, test-encode, export, lint, cleanup)
     match: str | None = None  # Only act upon files matching this pattern
     # fmt: on
 
     def configure(self) -> None:
-        cmds = ["all", "view", "encode", "export", "lint", "cleanup", "test-encode"]
+        cmds = ["all", "status", "encode", "export", "lint", "cleanup", "test-encode"]
         self.add_argument("cmd", nargs="?", choices=cmds)
         self.add_argument("match", nargs="?", default=None)
         self.add_argument("--log-file", type=Path, default=None)
@@ -127,8 +127,8 @@ def main(argv: Sequence[str]) -> int:
                 export(args.processed, tracks, update, args.threads)
                 if not args.match:
                     cleanup(args.processed, tracks, args.delete, args.threads)
-            elif args.cmd == "view":
-                view(tracks)
+            elif args.cmd == "status":
+                status(tracks)
             elif args.cmd == "lint":
                 lint(tracks)
             elif args.cmd == "encode":

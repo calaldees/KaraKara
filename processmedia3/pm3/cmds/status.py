@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from pm3.lib.track import Track
 
 
-def view(tracks: Sequence[Track]) -> None:
+def status(tracks: Sequence[Track]) -> None:
     """
     Print out a list of Tracks, marking whether or not each Target (ie, each
     file in the "processsed" directory) exists
