@@ -16,6 +16,7 @@ RUN pytest
 RUN mypy .
 
 FROM base AS production
+ENV TZ=Etc/UTC
 VOLUME /media/source
 VOLUME /media/processed
 ENTRYPOINT [ "python3", "main.py", "--source", "/media/source", "--processed", "/media/processed" ]

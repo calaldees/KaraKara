@@ -10,6 +10,7 @@ dependencies = [
 	"Brotli ~= 1.1",
 	"requests ~= 2.32",
 	"typed-argument-parser ~= 1.11",
+	"inotify ~= 0.2",
 ]
 
 [dependency-groups]
@@ -20,7 +21,6 @@ dev = [
 	"types-tqdm ~= 4.67",
 	"types-dateparser ~= 1.2",
 	"types-requests ~= 2.32",
-	"inotify ~= 0.2",
 ]
 
 [tool.mypy]
