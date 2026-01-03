@@ -1,18 +1,18 @@
 import itertools
 import logging
+import math
+import re
 import shlex
 import subprocess
-from pathlib import Path
 import typing as t
-from abc import abstractmethod, ABC
-import re
-import math
+from abc import ABC, abstractmethod
+from pathlib import Path
 
 import tqdm
 
+from .kktypes import MediaMeta, MediaType, TargetType
 from .source import Source, SourceType
-from .kktypes import TargetType, MediaType, MediaMeta
-from .subtitle_processor import create_vtt, create_json, parse_subtitles
+from .subtitle_processor import create_json, create_vtt, parse_subtitles
 
 log = logging.getLogger()
 
@@ -538,6 +538,30 @@ def select_best_image(paths: list[Path]) -> Path:
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
 
-    print(select_best_image(list(Path(sys.argv[1]).glob("*.bmp"))))
+    from ..cmds.encode import encode
+    from .file_abstraction import LocalFile
+    from .source import Source
+    from .track import Track
+
+    parser = argparse.ArgumentParser(description="Test encode a single file")
+    parser.add_argument("input", type=str, help="input video file to encode")
+    args = parser.parse_args()
+
+    cache: t.MutableMapping[str, t.Any] = {}
+    path = Path(args.input)
+    local_file = LocalFile(path, path.parent)
+    tracks: t.Sequence[Track] = [
+        Track(
+            local_file.root,
+            local_file.stem,
+            {Source(local_file, cache)},
+            [
+                TargetType.VIDEO_H264,
+                TargetType.VIDEO_AV1,
+                TargetType.VIDEO_H265,
+            ],
+        )
+    ]
+    encode(tracks, reencode=True, threads=1)

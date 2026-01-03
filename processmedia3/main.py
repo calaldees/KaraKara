@@ -6,10 +6,8 @@ import math
 import os
 import pickle
 import sys
-import typing as t
-from collections.abc import Generator, MutableMapping, Sequence
+from collections.abc import Generator, Sequence
 from pathlib import Path
-from this import d
 from typing import TypeVar
 
 import tap
@@ -21,10 +19,7 @@ from pm3.cmds.export import export
 from pm3.cmds.lint import lint
 from pm3.cmds.scan import scan
 from pm3.cmds.status import status
-from pm3.lib.file_abstraction import AbstractFolder, LocalFile
-from pm3.lib.kktypes import TargetType
-from pm3.lib.source import Source
-from pm3.lib.track import Track
+from pm3.lib.file_abstraction import AbstractFolder
 
 log = logging.getLogger()
 T = TypeVar("T")
@@ -40,12 +35,12 @@ class PM3Args(tap.Tap):
     reencode: bool = False  # Re-encode files, even if they already exist in the processed directory
     debug: bool = False  # Super-extra verbose logging
     log_file: Path | None = None  # Where to write logs to
-    cmd: str | None = "all"  # Sub-process to run (status, encode, test-encode, export, lint, cleanup)
+    cmd: str | None = "all"  # Sub-process to run (status, encode, export, lint, cleanup)
     match: str | None = None  # Only act upon files matching this pattern
     # fmt: on
 
     def configure(self) -> None:
-        cmds = ["all", "status", "encode", "export", "lint", "cleanup", "test-encode"]
+        cmds = ["all", "status", "encode", "export", "lint", "cleanup"]
         self.add_argument("cmd", nargs="?", choices=cmds)
         self.add_argument("match", nargs="?", default=None)
         self.add_argument("--log-file", type=Path, default=None)
@@ -95,27 +90,6 @@ def _main(args: PM3Args) -> int:
     """
     Main program logic
     """
-    if args.cmd == "test-encode":
-        if args.match is None:
-            raise ValueError("test-encode requires --match to be specified")
-        cache: MutableMapping[str, t.Any] = {}
-        path = Path(args.match)
-        local_file = LocalFile(path, path.parent)
-        tracks: Sequence[Track] = [
-            Track(
-                local_file.root,
-                local_file.stem,
-                {Source(local_file, cache)},
-                [
-                    TargetType.VIDEO_H264,
-                    TargetType.VIDEO_AV1,
-                    TargetType.VIDEO_H265,
-                ],
-            )
-        ]
-        encode(tracks, args.reencode, args.threads)
-        return 0
-
     source = AbstractFolder.from_str(args.source)
     assert source is not None, f"Could not open source folder {args.source}"
     for _ in source.watch(args.loop):

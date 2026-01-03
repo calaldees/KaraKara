@@ -107,7 +107,7 @@ tracks = [
 * Testing subtitle encoding
     * `./pm3/lib/subtitle_processor.py input.srt output.vtt`
 * Encoding a single file into various formats to test with
-    * `./main.py test-encode --reencode ~/Videos/kk-stress-test/demo.webm`
+    * `./pm3/lib/encoders.py ~/Videos/kk-stress-test/demo.webm`
 
 
 ## Dev Setup
