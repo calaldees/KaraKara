@@ -32,6 +32,10 @@ ignore_missing_imports = true
 module = "brotli.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "inotify.*"
+ignore_missing_imports = true
+
 [tool.pytest]
 strict = true
 addopts = ["--doctest-modules"]

@@ -79,11 +79,14 @@ class AbstractFile:
 class AbstractFolder:
     @classmethod
     def from_str(cls, s: str) -> AbstractFolder:
-        for c in {HttpFolder, LocalFolder}:
-            try:
-                return c.from_str(s)
-            except Exception:
-                pass
+        try:
+            return HttpFolder.from_str(s)
+        except Exception:
+            pass
+        try:
+            return LocalFolder.from_str(s)
+        except Exception:
+            pass
         raise ValueError(f"unable to identify folder type from {s}")
 
     @property

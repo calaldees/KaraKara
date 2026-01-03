@@ -22,7 +22,6 @@ from pm3.cmds.status import status
 from pm3.lib.file_abstraction import AbstractFolder
 
 log = logging.getLogger()
-T = t.TypeVar("T")
 
 
 class PM3Args(tap.Tap):
@@ -46,16 +45,16 @@ class PM3Args(tap.Tap):
 
 
 @contextlib.contextmanager
-def _pickled_var(path: Path, default: T) -> Generator[T, None, None]:
+def _pickled_var(path: Path) -> Generator[dict[str, t.Any], None, None]:
     """
     Load a variable from a file on startup,
     save the variable to file on shutdown
     """
     try:
-        var: T = pickle.loads(path.read_bytes())
+        var = pickle.loads(path.read_bytes())
     except Exception as e:
         log.debug(f"Error loading cache: {e}")
-        var = default
+        var = {}
     yield var
     try:
         path.with_suffix(".tmp").write_bytes(pickle.dumps(var))
@@ -90,7 +89,7 @@ def _main(args: PM3Args) -> int:
     Main program logic
     """
     for _ in args.source.watch(args.loop):
-        with _pickled_var(args.processed / "cache.db", {}) as cache:
+        with _pickled_var(args.processed / "cache.db") as cache:
             tracks = scan(
                 args.source,
                 args.processed,
