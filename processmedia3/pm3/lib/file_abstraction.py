@@ -78,10 +78,12 @@ class AbstractFile:
 
 class AbstractFolder:
     @classmethod
-    def from_str(cls, s: str) -> AbstractFolder | None:
+    def from_str(cls, s: str) -> AbstractFolder:
         for c in {HttpFolder, LocalFolder}:
-            if folder := c.from_str(s):
-                return folder
+            try:
+                return c.from_str(s)
+            except Exception:
+                pass
         raise ValueError(f"unable to identify folder type from {s}")
 
     @property
@@ -180,10 +182,10 @@ class LocalFolder(AbstractFolder):
 
     @override
     @classmethod
-    def from_str(cls, s: str) -> Self | None:
+    def from_str(cls, s: str) -> Self:
         if (path := Path(s)).is_dir():
             return cls(path)
-        return None
+        raise ValueError(f"not a local folder: {s}")
 
     @property
     @override
@@ -420,11 +422,11 @@ class HttpFolder(AbstractFolder):
 
     @override
     @classmethod
-    def from_str(cls, s: str) -> Self | None:
+    def from_str(cls, s: str) -> Self:
         url = urlparse(s)
         if "http" in url.scheme and url.path.endswith("/"):
             return cls(s)
-        return None
+        raise ValueError(f"not an http folder: {s}")
 
     class FileItem(TypedDict):
         name: str

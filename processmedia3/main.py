@@ -6,9 +6,9 @@ import math
 import os
 import pickle
 import sys
+import typing as t
 from collections.abc import Generator, Sequence
 from pathlib import Path
-from typing import TypeVar
 
 import tap
 from tqdm.contrib.logging import logging_redirect_tqdm
@@ -22,28 +22,27 @@ from pm3.cmds.status import status
 from pm3.lib.file_abstraction import AbstractFolder
 
 log = logging.getLogger()
-T = TypeVar("T")
+T = t.TypeVar("T")
 
 
 class PM3Args(tap.Tap):
     # fmt: off
-    source: str = "/media/source"  # Where to find source files (can be local path or http path)
-    processed: Path = Path("/media/processed")  # Where to place output files
+    source: AbstractFolder  # Where to find source files (can be local path or http path)
+    processed: Path  # Where to place output files
     threads: int = math.ceil((os.cpu_count() or 1) / 4)  # How many encodes to run in parallel
     loop: int | None = None  # Run forever, polling for changes in the source directory this often (in seconds)
     delete: bool = False  # Actually delete files for-real during cleanup
     reencode: bool = False  # Re-encode files, even if they already exist in the processed directory
     debug: bool = False  # Super-extra verbose logging
     log_file: Path | None = None  # Where to write logs to
-    cmd: str | None = "all"  # Sub-process to run (status, encode, export, lint, cleanup)
+    cmd: t.Literal["all", "status", "encode", "export", "lint", "cleanup"] = "all"  # Sub-process to run
     match: str | None = None  # Only act upon files matching this pattern
     # fmt: on
 
     def configure(self) -> None:
-        cmds = ["all", "status", "encode", "export", "lint", "cleanup"]
-        self.add_argument("cmd", nargs="?", choices=cmds)
-        self.add_argument("match", nargs="?", default=None)
-        self.add_argument("--log-file", type=Path, default=None)
+        self.add_argument("cmd", nargs="?")
+        self.add_argument("match", nargs="?")
+        self.add_argument("--source", type=AbstractFolder.from_str)
 
 
 @contextlib.contextmanager
@@ -90,12 +89,10 @@ def _main(args: PM3Args) -> int:
     """
     Main program logic
     """
-    source = AbstractFolder.from_str(args.source)
-    assert source is not None, f"Could not open source folder {args.source}"
-    for _ in source.watch(args.loop):
+    for _ in args.source.watch(args.loop):
         with _pickled_var(args.processed / "cache.db", {}) as cache:
             tracks = scan(
-                source,
+                args.source,
                 args.processed,
                 args.match,
                 cache,
