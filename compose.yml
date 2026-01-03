@@ -1,3 +1,5 @@
+x-require-env: ${EXTERNAL_NETWORK:?Missing .env file - copy from .env.example and update settings as appropriate}
+
 networks:
     default:
         name: karakara_default
