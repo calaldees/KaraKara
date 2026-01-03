@@ -1,22 +1,25 @@
-from datetime import datetime
-from base64 import b64encode
-from pathlib import Path
-from typing import override, TypedDict, NamedTuple
-from functools import cached_property
-from abc import abstractmethod
-from typing import Self, cast
-from collections.abc import Mapping, Generator, Iterable
-from os import stat_result
-from io import BytesIO
 import gzip
-
-import dateparser
-
+import logging
+from abc import abstractmethod
+from base64 import b64encode
+from collections.abc import Generator, Iterable, Mapping
+from datetime import datetime
+from functools import cached_property
 
 # Hash -------------------------------------------------------------------------
-
 # from zlib import adler32
 from hashlib import sha256
+from io import BytesIO
+from os import stat_result
+from pathlib import Path
+from time import sleep
+from typing import NamedTuple, Self, TypedDict, cast, override
+
+import dateparser
+import inotify.constants
+from inotify.adapters import InotifyTree
+
+log = logging.getLogger()
 
 
 def hash_bytes(data: bytes) -> bytes:
@@ -74,12 +77,19 @@ class AbstractFile:
 
 
 class AbstractFolder:
+    @classmethod
+    def from_str(cls, s: str) -> AbstractFolder | None:
+        for c in {HttpFolder, LocalFolder}:
+            if folder := c.from_str(s):
+                return folder
+        raise ValueError(f"unable to identify folder type from {s}")
+
     @property
     @abstractmethod
     def files(self) -> Generator[AbstractFile]: ...
 
-    @classmethod
-    def from_str(cls, s: str) -> Self | None: ...
+    @abstractmethod
+    def watch(self, timeout: int | None) -> Generator[None, None, None]: ...
 
 
 class AbstractFileException(Exception):
@@ -162,7 +172,7 @@ class LocalFile(AbstractFile):
             return bytes_io.getvalue()
 
 
-class LocalPath(AbstractFolder):
+class LocalFolder(AbstractFolder):
     def __init__(self, root: Path):
         if not root.is_dir():
             raise NotADirectoryError(root)
@@ -183,13 +193,37 @@ class LocalPath(AbstractFolder):
             if path.is_file():
                 yield LocalFile(path, root=self.root)
 
+    @override
+    def watch(self, timeout: int | None) -> Generator[None, None, None]:
+        # run once immediately
+        yield
+
+        # if no loop interval is set, just run once
+        if timeout is None or timeout <= 0:
+            return
+
+        # if loop interval is set, watch for changes with a timeout
+        watcher = InotifyTree(
+            str(self.root),
+            mask=inotify.constants.IN_CLOSE_WRITE | inotify.constants.IN_MOVED_TO,
+        )
+
+        while True:
+            for event in watcher.event_gen(yield_nones=False, timeout_s=timeout):
+                _, action, dir, file = event
+                log.info(f"File event detected: {action} / {file}")
+                break
+            else:
+                log.debug("Timeout reached, re-scanning...")
+            yield
+
 
 # Remote/HTTP/Url --------------------------------------------------------------
 
-import re
 import json
+import re
 import urllib.request  # TODO: use http2 client. (http1 involves LOTS of https handshaking)
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 # from http.client import HTTPResponse, HTTPMessage
 
@@ -467,17 +501,19 @@ class HttpFolder(AbstractFolder):
                     size_str=file_dict["size"],
                 )
 
+    @override
+    def watch(self, timeout: int | None) -> Generator[None, None, None]:
+        # run once immediately
+        yield
 
-# Factory ----------------------------------------------------------------------
+        # if no loop interval is set, just run once
+        if timeout is None or timeout <= 0:
+            return
 
-FolderTypes = (HttpFolder, LocalPath)
-
-
-def AbstractFolder_from_str(s: str) -> AbstractFolder:
-    for cls in FolderTypes:
-        if folder := cls.from_str(s):
-            return folder
-    raise ValueError(f"unable to identify folder type from {s}")
+        # if loop interval is set, poll for changes with a sleep
+        while True:
+            sleep(timeout)
+            yield
 
 
 # Example ----------------------------------------------------------------------

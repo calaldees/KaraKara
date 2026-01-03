@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import contextlib
 import logging
 import logging.handlers
@@ -7,10 +6,10 @@ import math
 import os
 import pickle
 import sys
-import time
 import typing as t
 from collections.abc import Generator, MutableMapping, Sequence
 from pathlib import Path
+from this import d
 from typing import TypeVar
 
 import tap
@@ -22,7 +21,7 @@ from pm3.cmds.export import export
 from pm3.cmds.lint import lint
 from pm3.cmds.scan import scan
 from pm3.cmds.status import status
-from pm3.lib.file_abstraction import AbstractFolder_from_str, LocalFile
+from pm3.lib.file_abstraction import AbstractFolder, LocalFile
 from pm3.lib.kktypes import TargetType
 from pm3.lib.source import Source
 from pm3.lib.track import Track
@@ -72,45 +71,57 @@ def _pickled_var(path: Path, default: T) -> Generator[T, None, None]:
 
 
 def main(argv: Sequence[str]) -> int:
-    args = PM3Args().parse_args(argv[1:])
+    """
+    Argument parsing / logging / setup / error handling
+    """
+    try:
+        args = PM3Args().parse_args(argv[1:])
 
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format="%(asctime)s %(message)s",
-    )
-    if args.log_file:
-        handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
-        logging.getLogger().addHandler(handler)
+        logging.basicConfig(
+            level=logging.DEBUG if args.debug else logging.INFO,
+            format="%(asctime)s %(message)s",
+        )
+        if args.log_file:
+            handler = logging.handlers.RotatingFileHandler(args.log_file, maxBytes=65535, backupCount=3)
+            logging.getLogger().addHandler(handler)
 
-    if args.cmd == "test-encode":
         with logging_redirect_tqdm():
-            if args.match is None:
-                raise ValueError("test-encode requires --match to be specified")
-            cache: MutableMapping[str, t.Any] = {}
-            path = Path(args.match)
-            local_file = LocalFile(path, path.parent)
-            tracks: Sequence[Track] = [
-                Track(
-                    local_file.root,
-                    local_file.stem,
-                    {Source(local_file, cache)},
-                    [
-                        TargetType.VIDEO_H264,
-                        TargetType.VIDEO_AV1,
-                        TargetType.VIDEO_H265,
-                    ],
-                )
-            ]
-            encode(tracks, args.reencode, args.threads)
-            return 0
+            return _main(args)
+    except KeyboardInterrupt:
+        return 130
 
-    while True:
-        with (
-            _pickled_var(args.processed / "cache.db", {}) as cache,
-            logging_redirect_tqdm(),
-        ):
+
+def _main(args: PM3Args) -> int:
+    """
+    Main program logic
+    """
+    if args.cmd == "test-encode":
+        if args.match is None:
+            raise ValueError("test-encode requires --match to be specified")
+        cache: MutableMapping[str, t.Any] = {}
+        path = Path(args.match)
+        local_file = LocalFile(path, path.parent)
+        tracks: Sequence[Track] = [
+            Track(
+                local_file.root,
+                local_file.stem,
+                {Source(local_file, cache)},
+                [
+                    TargetType.VIDEO_H264,
+                    TargetType.VIDEO_AV1,
+                    TargetType.VIDEO_H265,
+                ],
+            )
+        ]
+        encode(tracks, args.reencode, args.threads)
+        return 0
+
+    source = AbstractFolder.from_str(args.source)
+    assert source is not None, f"Could not open source folder {args.source}"
+    for _ in source.watch(args.loop):
+        with _pickled_var(args.processed / "cache.db", {}) as cache:
             tracks = scan(
-                AbstractFolder_from_str(args.source),
+                source,
                 args.processed,
                 args.match,
                 cache,
@@ -139,12 +150,6 @@ def main(argv: Sequence[str]) -> int:
                 if args.match:
                     raise ValueError("Can't use cleanup with --match")
                 cleanup(args.processed, tracks, args.delete, args.threads)
-
-        if args.loop:
-            log.info(f"Sleeping for {args.loop}s before checking for new inputs")
-            time.sleep(args.loop)
-        else:
-            break
 
     return 0
 

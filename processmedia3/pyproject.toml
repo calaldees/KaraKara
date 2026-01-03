@@ -20,6 +20,7 @@ dev = [
 	"types-tqdm ~= 4.67",
 	"types-dateparser ~= 1.2",
 	"types-requests ~= 2.32",
+	"inotify ~= 0.2",
 ]
 
 [tool.mypy]
