@@ -216,7 +216,7 @@ class LocalFolder(AbstractFolder):
         while True:
             for event in watcher.event_gen(yield_nones=False, timeout_s=timeout):
                 _, action, dir, file = event
-                log.info(f"File event detected: {action} / {file}")
+                log.info(f"File event detected: {'|'.join(action)} {dir}/{file}")
                 break
             else:
                 log.debug("Timeout reached, re-scanning...")
