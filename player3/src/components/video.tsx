@@ -1,5 +1,6 @@
 import type { Attachment, Track } from "@/types";
 import { attachment_path } from "@/utils";
+import { ViewTransition } from "react";
 
 export function Video({
     track,
@@ -19,41 +20,43 @@ export function Video({
     subtitleVariant: string;
 }) {
     return (
-        <div className="videoScaler">
-            <video
-                autoPlay={true}
-                poster={attachment_path(track.attachments.image[0])}
-                // ensure the video element gets re-created when <source> changes
-                key={track.id}
-                crossOrigin="anonymous"
-                loop={loop}
-                muted={mute}
-                onLoadStart={onLoadStart}
-            >
-                {track.attachments.video
-                    .filter((a) => a.variant === videoVariant)
-                    .map((a: Attachment) => (
-                        <source
-                            key={a.path}
-                            src={attachment_path(a)}
-                            type={a.mime}
-                        />
-                    ))}
-                {subs &&
-                    track.attachments.subtitle
-                        ?.filter((a) => a.mime === "text/vtt")
-                        .filter((a) => a.variant === subtitleVariant)
+        <ViewTransition name="video" default="my-animation">
+            <div className="videoScaler">
+                <video
+                    autoPlay={true}
+                    poster={attachment_path(track.attachments.image[0])}
+                    // ensure the video element gets re-created when <source> changes
+                    key={track.id}
+                    crossOrigin="anonymous"
+                    loop={loop}
+                    muted={mute}
+                    onLoadStart={onLoadStart}
+                >
+                    {track.attachments.video
+                        .filter((a) => a.variant === videoVariant)
                         .map((a: Attachment) => (
-                            <track
+                            <source
                                 key={a.path}
-                                kind="subtitles"
                                 src={attachment_path(a)}
-                                default={true}
-                                label={a.variant}
-                                srcLang="en"
+                                type={a.mime}
                             />
                         ))}
-            </video>
-        </div>
+                    {subs &&
+                        track.attachments.subtitle
+                            ?.filter((a) => a.mime === "text/vtt")
+                            .filter((a) => a.variant === subtitleVariant)
+                            .map((a: Attachment) => (
+                                <track
+                                    key={a.path}
+                                    kind="subtitles"
+                                    src={attachment_path(a)}
+                                    default={true}
+                                    label={a.variant}
+                                    srcLang="en"
+                                />
+                            ))}
+                </video>
+            </div>
+        </ViewTransition>
     );
 }
