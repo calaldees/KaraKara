@@ -7,6 +7,7 @@
         "module": "ESNext",
         "skipLibCheck": true,
         "paths": { "@/*": ["./src/*"] },
+        "types": ["node", "react/canary"],
 
         /* Bundler mode */
         "moduleResolution": "bundler",
