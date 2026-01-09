@@ -25,10 +25,6 @@ dev = [
 
 [tool.mypy]
 [[tool.mypy.overrides]]
-module = "mypy-tqdm.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
 module = "brotli.*"
 ignore_missing_imports = true
 
