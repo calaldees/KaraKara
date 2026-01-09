@@ -1,6 +1,6 @@
 import { useSubscription } from "@shish2k/react-mqtt";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, startTransition, useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useApi } from "@/hooks/api";
@@ -35,7 +35,13 @@ export function RoomProvider(props: any) {
     // ignore eslint warning - we don't actually care if newQueue
     // changes, we only care if the _value_ changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const queue = useMemo(() => newQueue, [JSON.stringify(newQueue)]);
+    const [queue, setQueue] = useState<QueueItem[]>([]);
+
+   useEffect(() => {
+       startTransition(() => {
+           setQueue(newQueue);
+       })
+   }, [JSON.stringify(newQueue)])
 
     useSubscription(`room/${roomName}/queue`, (pkt) => {
         console.groupCollapsed(`mqtt_msg(${pkt.topic})`);
