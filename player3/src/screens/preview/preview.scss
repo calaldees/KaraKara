@@ -1,3 +1,29 @@
+@keyframes slide-from-left {
+    0% {
+        transform: translateX(-200cqw);
+    }
+    100% {
+        transform: translateX(0cqw);
+    }
+}
+@keyframes slide-to-left {
+    0% {
+        transform: translateX(0cqw);
+    }
+    100% {
+        transform: translateX(-200cqw);
+    }
+}
+
+::view-transition-new(.slide-from-left) {
+    animation-name: slide-from-left;
+    animation-duration: 1s;
+}
+::view-transition-old(.slide-to-left) {
+    animation-name: slide-to-left;
+    animation-duration: 1s;
+}
+
 .theme-metalghosts .screen_preview {
     grid-template:
         "header header header header" min-content
@@ -11,14 +37,6 @@
         / 1cqw 6fr 4fr 1cqw;
 
     /* main blocks */
-    @keyframes slideright {
-        0% {
-            transform: translateX(-200cqw);
-        }
-        100% {
-            transform: translateX(0cqw);
-        }
-    }
     /* playlist detail */
     .item {
         border: var(--border);
@@ -29,8 +47,6 @@
             "performer title" 2fr
             "time      from " 1fr
             / 1fr 2fr;
-        animation-name: slideright;
-        animation-duration: 1s;
         padding: 1cqh 1.5cqw;
         container-type: size;
 
@@ -70,40 +86,19 @@
         }
     }
     .n1 {
-        animation-delay: 0s;
         grid-area: n1;
     }
     .n2 {
-        animation-delay: 0.2s;
         grid-area: n2;
     }
     .n3 {
-        animation-delay: 0.3s;
         grid-area: n3;
     }
     .n4 {
-        animation-delay: 0.4s;
         grid-area: n4;
     }
     .n5 {
-        animation-delay: 0.5s;
         grid-area: n5;
-    }
-    .n6 {
-        animation-delay: 0.6s;
-        grid-area: n6;
-    }
-    .n7 {
-        animation-delay: 0.7s;
-        grid-area: n7;
-    }
-    .n8 {
-        animation-delay: 0.8s;
-        grid-area: n8;
-    }
-    .n9 {
-        animation-delay: 0.9s;
-        grid-area: n9;
     }
 
     .n1 .time {
@@ -117,14 +112,7 @@
         color: #aa0;
     }
 
-    @keyframes slideleft {
-        0% {
-            transform: translateX(200cqw);
-        }
-        100% {
-            transform: translateX(0cqw);
-        }
-    }
+
     #playlist_obscured {
         display: none;
     }
@@ -136,9 +124,6 @@
         background: var(--background);
         grid-area: n_more;
         display: grid;
-        animation-name: slideleft;
-        animation-duration: 1s;
-        animation-delay: 0.6s;
         color: #777;
         container-type: size;
 
@@ -154,9 +139,6 @@
 
     .videoScaler {
         grid-area: video;
-        animation-name: slideleft;
-        animation-duration: 1s;
-        animation-delay: 0s;
         width: 100%;
         height: 100%;
         padding: var(--padding);
