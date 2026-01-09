@@ -61,7 +61,9 @@ export function ConfigMenu() {
                                         autoCorrect="off"
                                         autoCapitalize="none"
                                         onChange={(e) =>
-                                            setRoomNameEdit(e.currentTarget.value)
+                                            setRoomNameEdit(
+                                                e.currentTarget.value,
+                                            )
                                         }
                                         required={true}
                                     />
@@ -78,7 +80,9 @@ export function ConfigMenu() {
                                         autoCapitalize="none"
                                         className="fakePassword"
                                         onChange={(e) =>
-                                            setRoomPasswordEdit(e.currentTarget.value)
+                                            setRoomPasswordEdit(
+                                                e.currentTarget.value,
+                                            )
                                         }
                                         required={true}
                                     />

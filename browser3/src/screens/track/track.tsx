@@ -57,16 +57,13 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
     const { widescreen } = useContext(ClientContext);
     const navigate = useNavigate();
 
-    const videoVariants = unique(
-        track.attachments.video.map((a) => a.variant),
-    );
+    const videoVariants = unique(track.attachments.video.map((a) => a.variant));
     const [videoVariant, setVideoVariant] = useState<string>(() =>
         preferred_variant(videoVariants),
     );
 
     const subtitleVariants = unique(
-        track.attachments.subtitle
-            ?.map((a) => a.variant) ?? [],
+        track.attachments.subtitle?.map((a) => a.variant) ?? [],
     );
     const [subtitleVariant, setSubtitleVariant] = useState<string>(() =>
         preferred_variant(subtitleVariants),

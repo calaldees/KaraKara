@@ -16,11 +16,13 @@ export function PodiumScreen({
     queue_item: QueueItem;
 }) {
     // Use key= to force reset of all state when track changes
-    return <PodiumInner
-        track={track}
-        queue_item={queue_item}
-        key={queue_item.id}
-    />;
+    return (
+        <PodiumInner
+            track={track}
+            queue_item={queue_item}
+            key={queue_item.id}
+        />
+    );
 }
 
 function PodiumInner({
@@ -46,7 +48,9 @@ function PodiumInner({
 
     useEffect(() => {
         const subtitleAttachment = track.attachments.subtitle?.find(
-            (a) => a.mime === "application/json" && a.variant === queue_item.subtitle_variant,
+            (a) =>
+                a.mime === "application/json" &&
+                a.variant === queue_item.subtitle_variant,
         );
         if (subtitleAttachment) {
             request({
@@ -99,7 +103,10 @@ function PodiumInner({
                     })}
                 </ul>
             ) : (
-                <div className="lyrics">(Hard-subbed song, please check the projector for lyrics ;( )</div>
+                <div className="lyrics">
+                    (Hard-subbed song, please check the projector for lyrics ;(
+                    )
+                </div>
             )}
 
             {starting ? (
