@@ -4,7 +4,6 @@ import reactDom from "eslint-plugin-react-dom";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import reactX from "eslint-plugin-react-x";
-import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -19,7 +18,6 @@ export default tseslint.config(
         files: ["**/*.{ts,tsx}"],
         languageOptions: {
             ecmaVersion: 2020,
-            globals: globals.browser,
             parserOptions: {
                 project: ["./tsconfig.json"],
                 tsconfigRootDir: import.meta.dirname,
