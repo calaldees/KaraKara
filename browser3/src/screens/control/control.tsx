@@ -39,12 +39,19 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
         setDropTarget(dst_id);
     }
     function onDragLeave(e: any) {
+        // prevent firing when moving between child elements
+        if (e.currentTarget.contains(e.relatedTarget)) return;
         e.preventDefault();
         setDropTarget(null);
     }
     function onDrop(e: any, dst_id: number | null) {
         e.preventDefault();
         moveTrack(dropSource, dst_id);
+    }
+    function onDragEnd(e: any) {
+        e.preventDefault();
+        setDropSource(null);
+        setDropTarget(null);
     }
 
     function onTouchStart(e: TouchEvent, src_id: number) {
@@ -162,12 +169,13 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                         className={dict2css({
                             queue_item: true,
                             drop_source: dropSource === item.id,
-                            drop_target: dropTarget === item.id,
+                            drop_target: dropTarget === item.id && dropSource !== item.id,
                             public: !booth && n <= 5,
                         })}
                         draggable={true}
                         onDragStart={(e) => onDragStart(e, item.id)}
                         onDragOver={(e) => onDragOver(e, item.id)}
+                        onDragEnd={(e) => onDragEnd(e)}
                         onDrop={(e) => onDrop(e, item.id)}
                     >
                         <Thumb
