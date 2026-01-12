@@ -31,10 +31,8 @@ services:
             traefik.http.routers.karakara.middlewares: "kkredir"
             traefik.http.middlewares.kkredir.redirectregex.regex: "^https://karakara.uk/$$"
             traefik.http.middlewares.kkredir.redirectregex.replacement: "https://karakara.uk/browser3/"
-            kissycron.job-local.backup-env.schedule: "30 3 * * *"
-            kissycron.job-local.backup-env.command: "backup ${PWD}/.env /backups/karakara/.env"
-            kissycron.job-local.backup-dat.schedule: "31 3 * * *"
-            kissycron.job-local.backup-dat.command: "backup ${PWD}/data/ /backups/karakara/data/"
+            kissycron.job-local.backup.schedule: "31 3 * * *"
+            kissycron.job-local.backup.command: "backup ${PWD}/.env ${PWD}/data /backups/karakara/"
 
 
     api_queue:
