@@ -69,6 +69,13 @@ async def serve_index() -> FileResponse:
     return FileResponse(STATIC_DIR / ".." / "index.html", media_type="text/html")
 
 
+# favicon needs its own route because it isn't in the /static/ folder
+# (can we make it go in the static folder?)
+@app.get("/favicon.svg")
+async def serve_favicon() -> FileResponse:
+    return FileResponse(STATIC_DIR / ".." / "favicon.svg", media_type="image/svg+xml")
+
+
 @app.get("/wips")
 async def list_wips() -> JSONResponse:
     """
