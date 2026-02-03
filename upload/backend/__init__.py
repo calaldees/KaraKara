@@ -3,7 +3,6 @@ import logging
 import os
 import re
 import shutil
-import sys
 import typing as t
 import uuid
 from datetime import datetime
@@ -13,7 +12,7 @@ from pathlib import Path
 import aiofiles
 import requests
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from tuspyserver import create_tus_router
@@ -21,7 +20,7 @@ from tuspyserver import create_tus_router
 TEMP_DIR = Path("/tmp/kk_upload_files")
 BASE_PATH = os.environ.get("BASE_PATH", "")
 UPLOAD_ROOT = Path(os.environ.get("UPLOAD_DIR", "../media/source/WorkInProgress"))
-STATIC_DIR = Path(__file__).parent.parent / "dist" / "static"
+DIST_DIR = Path(__file__).parent.parent / "dist"
 
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
@@ -31,8 +30,6 @@ log = logging.getLogger(__name__)
 
 app = FastAPI(title="FastAPI TUS Upload Server")
 app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix(), prefix="api/files"))
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # Hacky middleware to rewrite Location headers because tuspyserver is serving
@@ -62,18 +59,6 @@ async def health() -> JSONResponse:
     b'{"status":"ok"}'
     """
     return JSONResponse({"status": "ok"})
-
-
-@app.get("/")
-async def serve_index() -> FileResponse:
-    return FileResponse(STATIC_DIR / ".." / "index.html", media_type="text/html")
-
-
-# favicon needs its own route because it isn't in the /static/ folder
-# (can we make it go in the static folder?)
-@app.get("/favicon.svg")
-async def serve_favicon() -> FileResponse:
-    return FileResponse(STATIC_DIR / ".." / "favicon.svg", media_type="image/svg+xml")
 
 
 @app.get("/api/wips")
@@ -252,3 +237,8 @@ async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
     send_notification(webhook_url, f"New submission: **{track_id}**{contributor}")
     log.info(f"Uploaded files for {track_id!r} (session {session_id})")
     return JSONResponse({"ok": True, "moved_files": moved_files, "session_id": session_id})
+
+
+# Mount static files and serve SPA
+if DIST_DIR.exists():
+    app.mount("/", StaticFiles(directory=DIST_DIR, html=True), name="spa")
