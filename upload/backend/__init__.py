@@ -187,7 +187,8 @@ async def request_track(payload: dict[str, t.Any]) -> JSONResponse:
     """
     tags = sanitize_tags(payload.get("tags"))
     track_id = tags_to_id(tags)
-    meta_path = get_unique_path(UPLOAD_ROOT / "Requests", track_id, ".txt")
+    track_dir = get_unique_path(UPLOAD_ROOT, track_id)
+    meta_path = track_dir / f"{track_id}.txt"
     await write_tags_file(meta_path, tags, "needs files, lyrics, timings")
     webhook_url = os.getenv("DISCORD_WEBHOOK_REQUESTS_URL")
     send_notification(webhook_url, f"New request: **{track_id}**")
@@ -212,7 +213,7 @@ async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
     tags = sanitize_tags(payload.get("tags"))
     track_id = tags_to_id(tags)
 
-    session_dir = get_unique_path(UPLOAD_ROOT / "Submissions", track_id)
+    session_dir = get_unique_path(UPLOAD_ROOT, track_id)
     meta_path = session_dir / f"{track_id}.txt"
     await write_tags_file(meta_path, tags, "awaiting moderator approval")
 
