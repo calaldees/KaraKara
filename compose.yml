@@ -16,7 +16,7 @@ services:
         volumes:
             - ${PATH_HOST_data}/logs:/logs:rw
             - ${PATH_HOST_data}/queues:/data/queue/:ro
-            - ${PATH_HOST_processed}:/media/processed:ro
+            - ${PATH_HOST_media}/processed:/media/processed:ro
             - ${PWD}/tools/:/static/tools/:ro
             - ${PWD}/frontend/:/etc/caddy/:ro
         links:
@@ -51,7 +51,7 @@ services:
         links:
             - mqtt
         volumes:
-            - ${PATH_HOST_processed}:/media/processed:ro
+            - ${PATH_HOST_media}/processed:/media/processed:ro
             - ${PATH_HOST_data}/logs:/logs:rw
             - ${PATH_HOST_data}/queues:/data/queue/:rw
             #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
@@ -90,8 +90,8 @@ services:
         mem_limit: 8g
         env_file: .env
         volumes:
-            - ${PATH_HOST_source}:/media/source:ro
-            - ${PATH_HOST_processed}:/media/processed:rw
+            - ${PATH_HOST_media}/source:/media/source:ro
+            - ${PATH_HOST_media}/processed:/media/processed:rw
 
     syncthing:
         profiles:
@@ -107,8 +107,9 @@ services:
             UMASK: 002
         volumes:
             - ${PATH_HOST_data}/syncthing:/var/syncthing:rw
-            - ${PATH_HOST_source}:/media/source:rw
-            - ${PATH_HOST_processed}:/media/processed:rw
+            - ${PATH_HOST_media}/source:/media/source:rw
+            - ${PATH_HOST_media}/processed:/media/processed:rw
+            - ${PATH_HOST_media}/wip:/media/wip:rw
         ports:
             - 22000:22000/tcp # TCP file transfers
             - 22000:22000/udp # QUIC file transfers
@@ -127,4 +128,4 @@ services:
             BASE_PATH: /upload
             UPLOAD_DIR: /uploads
         volumes:
-            - ${PATH_HOST_source}/WorkInProgress:/uploads:rw
+            - ${PATH_HOST_media}/wip:/uploads:rw
