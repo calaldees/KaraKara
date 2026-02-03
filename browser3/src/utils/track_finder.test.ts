@@ -15,6 +15,11 @@ describe("apply_tags", () => {
         expect(finder.apply_tags(tracks, []).map((track) => track.id)).toEqual([
             "track_id_1",
             "track_id_2",
+            "track_1990",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
         ]);
     });
     test("query for a tag returns tracks matching that tag", () => {
@@ -38,12 +43,20 @@ describe("apply_search", () => {
     test("empty query returns full list", () => {
         expect(
             finder.apply_search(tracks, "").map((track) => track.id),
-        ).toEqual(["track_id_1", "track_id_2"]);
+        ).toEqual([
+            "track_id_1",
+            "track_id_2",
+            "track_1990",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
+        ]);
     });
     test("query for a string returns tracks matching that string", () => {
         expect(
             finder.apply_search(tracks, "Love").map((track) => track.id),
-        ).toEqual(["track_id_1"]);
+        ).toEqual(["track_id_1", "track_2000"]);
     });
     test("query for a non-existing string returns nothing", () => {
         expect(
@@ -56,24 +69,46 @@ describe("apply_hidden", () => {
     test("empty query returns full list", () => {
         expect(
             finder.apply_hidden(tracks, []).map((track) => track.id),
-        ).toEqual(["track_id_1", "track_id_2"]);
+        ).toEqual([
+            "track_id_1",
+            "track_id_2",
+            "track_1990",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
+        ]);
     });
     test("hidden top-level tag hides a track, even if it has other top-level tags", () => {
         expect(
             finder.apply_hidden(tracks, ["retro"]).map((track) => track.id),
-        ).toEqual(["track_id_2"]);
+        ).toEqual([
+            "track_id_2",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
+        ]);
     });
     test("invalid hidden top-level tag does nothing", () => {
         expect(
             finder.apply_hidden(tracks, ["asdfasd"]).map((track) => track.id),
-        ).toEqual(["track_id_1", "track_id_2"]);
+        ).toEqual([
+            "track_id_1",
+            "track_id_2",
+            "track_1990",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
+        ]);
     });
     test("hidden sub-tag doesn't hide a track with other tags", () => {
         expect(
             finder
                 .apply_hidden(tracks, ["category:anime"])
                 .map((track) => track.id),
-        ).toEqual(["track_id_2"]);
+        ).toEqual(["track_id_2", "track_2010", "track_2020"]);
     });
     test("multiple hidden sub-tags hide tracks with all those tags but no others", () => {
         expect(
@@ -87,14 +122,30 @@ describe("apply_hidden", () => {
             finder
                 .apply_hidden(tracks, ["asdfasd:anime"])
                 .map((track) => track.id),
-        ).toEqual(["track_id_1", "track_id_2"]);
+        ).toEqual([
+            "track_id_1",
+            "track_id_2",
+            "track_1990",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
+        ]);
     });
     test("invalid hidden sub-tag value does nothing", () => {
         expect(
             finder
                 .apply_hidden(tracks, ["category:asdfasd"])
                 .map((track) => track.id),
-        ).toEqual(["track_id_1", "track_id_2"]);
+        ).toEqual([
+            "track_id_1",
+            "track_id_2",
+            "track_1990",
+            "track_2000",
+            "track_2010",
+            "track_2020",
+            "track_no_year",
+        ]);
     });
 });
 
@@ -130,6 +181,7 @@ describe("find_tracks", () => {
                 title: ["Test Track " + i],
                 from: ["Macross"],
                 category: ["anime"],
+                year: [String(1980 + (i % 50))],
                 "": ["retro"],
             },
             attachments: {

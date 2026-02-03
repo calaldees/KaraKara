@@ -9,6 +9,7 @@
             "length": ["short"],
             "category": ["anime"],
             "artist": ["alice"],
+            "year": ["1984"],
             "": ["retro", "minami"]
         },
         "duration": 231.4,
@@ -32,9 +33,95 @@
             "use": ["opening", "op2"],
             "category": ["anime", "jpop"],
             "artist": ["alice", "bob"],
-            "length": ["short"]
+            "length": ["short"],
+            "year": ["2005"]
         },
         "duration": 231.4,
+        "attachments": {
+            "video": [],
+            "image": [],
+            "subtitle": []
+        }
+    },
+    "track_1990": {
+        "id": "track_1990",
+        "tags": {
+            "title": ["Old Track"],
+            "from": ["Ranma"],
+            "use": ["ending"],
+            "category": ["anime"],
+            "artist": ["carol"],
+            "year": ["1990"],
+            "": ["retro"]
+        },
+        "duration": 180.0,
+        "attachments": {
+            "video": [],
+            "image": [],
+            "subtitle": []
+        }
+    },
+    "track_2000": {
+        "id": "track_2000",
+        "tags": {
+            "title": ["Y2K Track"],
+            "from": ["Love Hina"],
+            "use": ["opening"],
+            "category": ["anime"],
+            "artist": ["dave"],
+            "year": ["2000"]
+        },
+        "duration": 210.0,
+        "attachments": {
+            "video": [],
+            "image": [],
+            "subtitle": []
+        }
+    },
+    "track_2010": {
+        "id": "track_2010",
+        "tags": {
+            "title": ["Modern Track"],
+            "from": ["K-On!"],
+            "use": ["insert"],
+            "category": ["jpop"],
+            "artist": ["eve"],
+            "year": ["2010"]
+        },
+        "duration": 195.0,
+        "attachments": {
+            "video": [],
+            "image": [],
+            "subtitle": []
+        }
+    },
+    "track_2020": {
+        "id": "track_2020",
+        "tags": {
+            "title": ["Recent Track"],
+            "from": ["Demon Slayer"],
+            "use": ["opening", "op1"],
+            "category": ["jpop"],
+            "artist": ["frank"],
+            "year": ["2020"]
+        },
+        "duration": 240.0,
+        "attachments": {
+            "video": [],
+            "image": [],
+            "subtitle": []
+        }
+    },
+    "track_no_year": {
+        "id": "track_no_year",
+        "tags": {
+            "title": ["Track Without Year"],
+            "from": ["Unknown"],
+            "use": ["opening"],
+            "category": ["anime"],
+            "artist": ["grace"]
+        },
+        "duration": 220.0,
         "attachments": {
             "video": [],
             "image": [],

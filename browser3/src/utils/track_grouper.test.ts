@@ -14,30 +14,50 @@ describe("summarise_tags", () => {
         expect(grouper.summarise_tags(Object.values(track_dict))).toEqual({
             "": {
                 minami: 1,
-                retro: 1,
+                retro: 2,
             },
             from: {
-                Macross: 1,
+                "Demon Slayer": 1,
                 Gundam: 1,
+                "K-On!": 1,
+                "Love Hina": 1,
+                Macross: 1,
+                Ranma: 1,
+                Unknown: 1,
             },
             length: {
                 short: 2,
             },
             use: {
-                op1: 1,
+                ending: 1,
+                insert: 1,
+                op1: 2,
                 op2: 1,
-                opening: 2,
+                opening: 5,
             },
             Macross: {
                 "Do You Remember Love?": 1,
             },
             category: {
-                anime: 2,
-                jpop: 1,
+                anime: 5,
+                jpop: 3,
             },
             artist: {
                 alice: 2,
                 bob: 1,
+                carol: 1,
+                dave: 1,
+                eve: 1,
+                frank: 1,
+                grace: 1,
+            },
+            year: {
+                "1984": 1,
+                "1990": 1,
+                "2000": 1,
+                "2005": 1,
+                "2010": 1,
+                "2020": 1,
             },
         });
     });
