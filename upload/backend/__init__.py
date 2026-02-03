@@ -30,7 +30,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 app = FastAPI(title="FastAPI TUS Upload Server")
-app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix()))
+app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix(), prefix="api/files"))
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -43,7 +43,7 @@ class PrefixLocationMiddleware(BaseHTTPMiddleware):
         if BASE_PATH:
             if "location" in response.headers:
                 loc = response.headers["location"]
-                loc = loc.replace("/files/", BASE_PATH + "/files/")
+                loc = loc.replace("/api/files/", BASE_PATH + "/api/files/")
                 loc = loc.replace("http://", "https://")
                 response.headers["location"] = loc
         return response
@@ -52,7 +52,7 @@ class PrefixLocationMiddleware(BaseHTTPMiddleware):
 app.add_middleware(PrefixLocationMiddleware)
 
 
-@app.get("/health")
+@app.get("/api/health")
 async def health() -> JSONResponse:
     """
     Simple test just so that `pytest` doesn't complain about no tests.
@@ -76,7 +76,7 @@ async def serve_favicon() -> FileResponse:
     return FileResponse(STATIC_DIR / ".." / "favicon.svg", media_type="image/svg+xml")
 
 
-@app.get("/wips")
+@app.get("/api/wips")
 async def list_wips() -> JSONResponse:
     """
     List any .txt files in the upload folder, to give any progress updates.
@@ -97,7 +97,7 @@ async def list_wips() -> JSONResponse:
     return JSONResponse({"wips": metas})
 
 
-@app.post("/session")
+@app.post("/api/session")
 async def begin_upload_session() -> JSONResponse:
     session_id = str(uuid.uuid4())
     return JSONResponse({"session_id": session_id})
@@ -191,7 +191,7 @@ def get_unique_path(base_path: Path, base_name: str, suffix: str = "") -> Path:
     return unique_path
 
 
-@app.post("/request")
+@app.post("/api/request")
 async def request_track(payload: dict[str, t.Any]) -> JSONResponse:
     """
     Expected JSON body:
@@ -210,7 +210,7 @@ async def request_track(payload: dict[str, t.Any]) -> JSONResponse:
     return JSONResponse({"ok": True})
 
 
-@app.post("/submit")
+@app.post("/api/submit")
 async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
     """
     After uploading one-or-more files via TUS, call this endpoint to

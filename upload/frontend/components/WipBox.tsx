@@ -11,7 +11,7 @@ export const WipBox = () => {
     const [wips, setWips] = useState<Wip[] | null>(null);
 
     useEffect(() => {
-        fetch("./wips")
+        fetch("./api/wips")
             .then((res) => res.json())
             .then((data) => {
                 if (Array.isArray(data.wips)) {

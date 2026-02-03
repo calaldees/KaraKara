@@ -519,7 +519,7 @@ export const UploadForm = () => {
 
             // 3. If there are files, do a file upload for /submit
             if (files.length > 0) {
-                const res = await fetch("./session", { method: "POST" });
+                const res = await fetch("./api/session", { method: "POST" });
                 const data = await res.json();
                 const sessionId = data.session_id;
 
@@ -529,7 +529,7 @@ export const UploadForm = () => {
                 const uploadPromises = files.map((file, index) => {
                     return new Promise<void>((resolve, reject) => {
                         const upload = new tus.Upload(file, {
-                            endpoint: "./files/",
+                            endpoint: "./api/files/",
                             metadata: {
                                 filename: file.name,
                                 session_id: sessionId,
@@ -566,12 +566,12 @@ export const UploadForm = () => {
 
                 await Promise.all(uploadPromises);
 
-                url = "./submit";
+                url = "./api/submit";
                 body = { session_id: sessionId, tags: metadata };
             }
             // 4. If no files, just send metadata to /request
             else {
-                url = "./request";
+                url = "./api/request";
                 body = { tags: metadata };
             }
 

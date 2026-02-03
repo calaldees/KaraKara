@@ -15,12 +15,7 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/health": { target: backend },
-            "/wips": { target: backend },
-            "/session": { target: backend },
-            "/files": { target: backend },
-            "/request": { target: backend },
-            "/submit": { target: backend },
+            "/api": { target: backend },
         },
     },
 });
