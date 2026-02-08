@@ -234,7 +234,7 @@ async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
             info_path.unlink()
 
     webhook_url = os.getenv("DISCORD_WEBHOOK_SUBMISSIONS_URL")
-    contributor = f" ({tags['contributor'][0]}" if "contributor" in tags else ""
+    contributor = f" ({tags['contributor'][0]})" if "contributor" in tags else ""
     send_notification(webhook_url, f"New submission: **{track_id}**{contributor}")
     log.info(f"Uploaded files for {track_id!r} (session {session_id})")
     return JSONResponse({"ok": True, "moved_files": moved_files, "session_id": session_id})
