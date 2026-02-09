@@ -148,7 +148,7 @@ export function Globe() {
     const { tracks } = useContext(ServerContext);
     return (
         <div id={"splash"}>
-            <Canvas>
+            <Canvas dpr={1}>
                 <MyScene />
             </Canvas>
             <div className="html3d">
