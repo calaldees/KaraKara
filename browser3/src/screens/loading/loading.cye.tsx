@@ -5,7 +5,7 @@ export {};
 describe("Loading Screen", () => {
     beforeEach(function () {
         cy.intercept("GET", "/time.json", { body: 1234 });
-        cy.intercept("GET", "/files/tracks.json", {
+        cy.intercept("GET", "/files/tracks.json?ver=*", {
             fixture: "tracks.json",
             throttleKbps: 500,
         }).as("tracks");
@@ -25,7 +25,7 @@ describe("Loading Screen", () => {
         cy.contains("Explore Tracks").should("exist");
     });
     it("Room should show loading screen and then room", () => {
-        cy.visit("/demo");
+        cy.visit("/test");
         cy.contains("Loading...").should("exist");
         cy.contains("Explore Tracks").should("not.exist");
 

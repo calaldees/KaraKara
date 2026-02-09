@@ -10,7 +10,7 @@ describe("Admin Login", () => {
         });
         cy.viewport(1000, 600);
     });
-    it("Correct admin login brings us to remote control", () => {
+    it("Correct admin login brings us to Remote Control", () => {
         cy.intercept("GET", "/room/test/login.json", {
             body: { is_admin: true },
         });
@@ -19,7 +19,7 @@ describe("Admin Login", () => {
         cy.contains("Room Settings").should("exist");
         cy.contains("Now Playing").should("not.exist");
     });
-    it("Incorrect admin login brings us to now playing", () => {
+    it("Incorrect admin login brings us to Now Playing", () => {
         cy.intercept("GET", "/room/test/login.json", {
             body: { is_admin: false },
         });
@@ -27,7 +27,7 @@ describe("Admin Login", () => {
         cy.contains("Now Playing").should("exist");
         cy.contains("Remote Control").should("not.exist");
     });
-    it("Admin login in booth mode doesn't show room settings", () => {
+    it("Admin login in booth mode doesn't show Room Settings", () => {
         cy.intercept("GET", "/room/test/login.json", {
             body: { is_admin: true },
         });

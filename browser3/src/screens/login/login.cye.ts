@@ -5,7 +5,7 @@ export {};
 describe("Login Screen", () => {
     beforeEach(function () {
         cy.intercept("GET", "/time.json", { body: 1234 });
-        cy.intercept("GET", "/files/tracks.json", {
+        cy.intercept("GET", "/files/tracks.json?ver=*", {
             fixture: "small_tracks.json",
         }).as("tracks");
     });

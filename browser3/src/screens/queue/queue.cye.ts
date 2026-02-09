@@ -23,7 +23,7 @@ describe("Queue Screen", () => {
         cy.get('input[name="performer_name"]').type("Test User");
         cy.contains("Confirm").click();
         cy.contains("is up now!").should("exist");
-        cy.get("[data-cy='remove']").click();
+        cy.get("[data-cy='remove']").first().click();
         cy.contains("is up now!").should("not.exist");
     });
 });
