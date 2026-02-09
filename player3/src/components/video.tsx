@@ -32,6 +32,7 @@ export function Video({
             >
                 {track.attachments.video
                     .filter((a) => a.variant === videoVariant)
+                    .filter((a) => a.mime.startsWith("video/webm"))
                     .map((a: Attachment) => (
                         <source
                             key={a.path}
