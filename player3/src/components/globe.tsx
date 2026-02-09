@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { useContext, useMemo, useRef } from "react";
+import { useContext, useRef, memo } from "react";
 import * as THREE from "three";
 import { Group, TextureLoader } from "three";
 import { useMediaQuery } from "usehooks-ts";
@@ -17,19 +17,18 @@ import "./globe.scss";
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
     // computing stats only takes ~10ms, but we don't want that to happen
     // in the middle of rendering the globe
-    const stats = useMemo(() => {
-        const ts = Object.values(tracks);
-        return {
-            tracks: ts.length,
-            artists: new Set(ts.map((t) => t.tags.artist?.[0])).size,
-            shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
-            hours: Math.floor(
-                ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) /
-                    60 /
-                    60,
-            ),
-        };
-    }, [tracks]);
+    const ts = Object.values(tracks);
+    const stats = {
+        tracks: ts.length,
+        artists: new Set(ts.map((t) => t.tags.artist?.[0])).size,
+        shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
+        hours: Math.floor(
+            ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) /
+                60 /
+                60,
+        ),
+    };
+
     return (
         <table>
             <tbody>
@@ -143,7 +142,7 @@ function MyScene() {
     );
 }
 
-export function Globe() {
+function GlobeInternal() {
     const { settings } = useContext(RoomContext);
     const { tracks } = useContext(ServerContext);
     return (
@@ -160,3 +159,7 @@ export function Globe() {
         </div>
     );
 }
+
+// Avoid re-initialising the 3D scene and recalculating track statistics unless
+// the underlying data changes, since both of those can be expensive operations
+export const Globe = memo(GlobeInternal);
