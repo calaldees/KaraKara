@@ -171,6 +171,27 @@ function Preview({
     );
 }
 
+function Tag({ name, values }: { name: string; values: string[] }) {
+    let view: React.ReactNode[] = [];
+    if (["artist", "contributor"].indexOf(name) !== -1) {
+        view = values.map((v) => (
+            <Link key={v} to={`../?filters=${name}:${v}`}>
+                {v}
+            </Link>
+        ));
+    } else {
+        view = values;
+    }
+    return (
+        <div className={"tag"}>
+            <div className={"tag_key"}>{name}</div>
+            <div className={"tag_value"}>
+                {view.reduce((prev, curr) => [prev, ", ", curr])}
+            </div>
+        </div>
+    );
+}
+
 function Tags({ track }: { track: Track }) {
     return (
         <>
@@ -179,12 +200,7 @@ function Tags({ track }: { track: Track }) {
                 {Object.keys(track.tags)
                     .filter((key) => !BLOCKED_KEYS.includes(key))
                     .map((key) => (
-                        <div key={key} className={"tag"}>
-                            <div className={"tag_key"}>{key}</div>
-                            <div className={"tag_value"}>
-                                {track.tags[key]?.join(", ")}
-                            </div>
-                        </div>
+                        <Tag key={key} name={key} values={track.tags[key]!} />
                     ))}
             </div>
         </>
