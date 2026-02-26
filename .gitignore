@@ -29,3 +29,6 @@ hash_cache.pickle
 **/.vscode
 **/.zed
 **/.mypy_cache
+
+analytics.json
+tracks.json
