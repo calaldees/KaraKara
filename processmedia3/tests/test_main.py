@@ -93,6 +93,8 @@ class TestE2E(unittest.TestCase):
                     "duration": ["0m30s"],
                     "from": ["test series T"],
                     "title": ["Test1"],
+                    "date": ["2024-06-01"],
+                    "year": ["2024"],
                 },
             }.items():
                 self.assertEqual(v, tracks_json["Test1"][k])
@@ -134,6 +136,9 @@ class TestE2E(unittest.TestCase):
                     "gundam": ["gundam seed"],
                     "id": ["imdb:tt1234567", "mal:987654"],
                     "title": ["Test2"],
+                    "date": ["1952-03-15"],
+                    "year": ["1952"],
+                    "": ["retro"],
                 },
             }.items():
                 self.assertEqual(v, tracks_json["Test2"][k])

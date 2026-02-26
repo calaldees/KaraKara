@@ -6,3 +6,4 @@ from:gundam:gundam seed
 contributor: contributor: ここにいくつかのテキストです。
 id:"imdb:tt1234567"
 id:"mal:987654"
+date: 1952-03-15

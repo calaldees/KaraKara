@@ -3,3 +3,4 @@ category: anime
 artist: Artipie
 from: test series T
 contributor: ここにいくつかのテキストです。
+date: 2024-06-01

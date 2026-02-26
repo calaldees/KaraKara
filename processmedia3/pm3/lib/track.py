@@ -143,6 +143,14 @@ class Track:
         if tags.get("date"):
             tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["date"]]
 
+        # if year is sufficiently old, add "retro" tag
+        if tags.get("year"):
+            years = {int(y) for y in tags["year"]}
+            if max(years) <= 2000:
+                if "" not in tags:
+                    tags[""] = []
+                tags[""].append("retro")
+
         # Add "category:new" tag for any track added in the last year
         # and a bit (so that if a convention is held eg Jan 5th 2020,
         # then we get a request to add a track on Jan 6th 2020, it's
