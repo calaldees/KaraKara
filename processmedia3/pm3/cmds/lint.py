@@ -325,10 +325,6 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
             if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
                 yield f"{l1.idx}: no gap between 3+ repeats: {l1.text}"
         for l1, l2 in zip(ls[:-1], ls[1:]):
-            if l2.start > l1.end:
-                gap = l2.start - l1.end
-                if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
-                    yield f"{l1.idx}: {int(gap.microseconds / 1000)}ms blink between lines: {l1.text} / {l2.text}"
-            elif l2.start < l1.end:
+            if l2.start < l1.end:
                 gap = l1.end - l2.start
                 yield f"{l1.idx}: {int(gap.microseconds / 1000)}ms overlapping lines: {l1.text} / {l2.text}"
