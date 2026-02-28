@@ -50,7 +50,11 @@ def lint_library(tracks: Sequence[Track]) -> None:
 
 
 def lint_track(track: Track) -> None:
-    json = track.to_json()
+    try:
+        json = track.to_json()
+    except Exception as e:
+        log.error(f"{track.id} failed to convert to json: {e}")
+        return
 
     # Check for a bug where a 3 minute track was reported as 92 minutes
     if json["duration"] > 10 * 60:
@@ -61,6 +65,16 @@ def lint_track(track: Track) -> None:
         log.error(f"{track.id} has Vocal variant but no vocaltrack:on tag")
     if "Instrumental" in variants and "off" not in json["tags"]["vocaltrack"]:
         log.error(f"{track.id} has Instrumental variant but no vocaltrack:off tag")
+
+    # Check if hardsubs tag requires video source
+    if "hardsubs" in json["tags"].get("", []):
+        has_video = any(s.type == SourceType.VIDEO for s in track.sources)
+        if not has_video:
+            log.error(f"{track.id} has hardsubs tag but no video source")
+    # Check for no subtitles source but missing hardsubs tag
+    if not any(s.type == SourceType.SUBTITLES for s in track.sources):
+        if "hardsubs" not in json["tags"].get("", []):
+            log.error(f"{track.id} has no subtitles source but also no hardsubs tag")
 
     # for t in track.targets:
     #    if not t.path.exists():
@@ -269,7 +283,7 @@ def lint_subtitles_line_contents(ls: list[Subtitle]) -> ErrGen:
             yield f"{l.idx}: contains newline: {l.text}"
         # Manual things:
         #   "♪" -> people adding "instrumental break" markers manually
-        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "¿áéñāōòôóèàíŪú"
+        ok = string.ascii_letters + string.digits + " ,.'\"[]!?()~-—–:/+’*;&\n" + "¿áéñāīōòôóèàíŪú"
         for char in l.text:
             if char not in ok:
                 yield f"{l.idx}: contains non-alphanumeric: {l.text!r}: {char!r} ({ascii(char)})"
