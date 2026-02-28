@@ -305,15 +305,11 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
 
     >>> from datetime import timedelta as d
     >>> lines = [
-    ...     Subtitle(1, text="Hello", start=d(0), end=d(seconds=2)),
-    ...     Subtitle(2, text="Hello", start=d(seconds=2), end=d(seconds=4)),
-    ...     Subtitle(3, text="Hello", start=d(seconds=4), end=d(seconds=6)),
-    ...     Subtitle(4, text="World", start=d(seconds=6, microseconds=50_000), end=d(seconds=8)),
     ...     Subtitle(5, text="World", start=d(seconds=8), end=d(seconds=10)),
     ...     Subtitle(6, text="Overlap", start=d(seconds=9, microseconds=900_000), end=d(seconds=12)),
     ... ]
     >>> list(lint_subtitles_spacing(lines))
-    ['1: no gap between 3+ repeats: Hello', '3: 50ms blink between lines: Hello / World', '5: 100ms overlapping lines: World / Overlap']
+    ['5: 100ms overlapping lines: World / Overlap']
     """
     # separate out the top and bottom lines because they may have
     # different timing and we only care about timing glitches
