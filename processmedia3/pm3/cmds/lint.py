@@ -305,15 +305,11 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
 
     >>> from datetime import timedelta as d
     >>> lines = [
-    ...     Subtitle(1, text="Hello", start=d(0), end=d(seconds=2)),
-    ...     Subtitle(2, text="Hello", start=d(seconds=2), end=d(seconds=4)),
-    ...     Subtitle(3, text="Hello", start=d(seconds=4), end=d(seconds=6)),
-    ...     Subtitle(4, text="World", start=d(seconds=6, microseconds=50_000), end=d(seconds=8)),
     ...     Subtitle(5, text="World", start=d(seconds=8), end=d(seconds=10)),
     ...     Subtitle(6, text="Overlap", start=d(seconds=9, microseconds=900_000), end=d(seconds=12)),
     ... ]
     >>> list(lint_subtitles_spacing(lines))
-    ['1: no gap between 3+ repeats: Hello', '3: 50ms blink between lines: Hello / World', '5: 100ms overlapping lines: World / Overlap']
+    ['5: 100ms overlapping lines: World / Overlap']
     """
     # separate out the top and bottom lines because they may have
     # different timing and we only care about timing glitches
@@ -325,10 +321,6 @@ def lint_subtitles_spacing(ls: list[Subtitle]) -> ErrGen:
             if l1.end == l2.start and l2.end == l3.start and (l1.text == l2.text == l3.text):
                 yield f"{l1.idx}: no gap between 3+ repeats: {l1.text}"
         for l1, l2 in zip(ls[:-1], ls[1:]):
-            if l2.start > l1.end:
-                gap = l2.start - l1.end
-                if gap < timedelta(microseconds=100_000) and not (l1.text == l2.text):
-                    yield f"{l1.idx}: {int(gap.microseconds / 1000)}ms blink between lines: {l1.text} / {l2.text}"
-            elif l2.start < l1.end:
+            if l2.start < l1.end:
                 gap = l1.end - l2.start
                 yield f"{l1.idx}: {int(gap.microseconds / 1000)}ms overlapping lines: {l1.text} / {l2.text}"

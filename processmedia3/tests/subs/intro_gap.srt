@@ -4,5 +4,4 @@ With a long empty intro, we should display the first line
 
 2
 00:01:10,000 --> 00:01:20,000
-in the "coming soon" colour 5 seconds before it is sung
-
+in the "coming soon" colour shortly before it is sung
