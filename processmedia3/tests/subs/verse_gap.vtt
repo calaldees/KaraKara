@@ -2,12 +2,12 @@ WEBVTT - KaraKara Subtitle
 
 1
 00:00:00.000 --> 00:00:02.500
-<v active>If there is a long gap in between two verses, we should show
-<v next>the "coming next" line 5 seconds before the second verse starts
+<v active>If there is a long gap in between two verses,
+<v next>we should show an animated progress bar
 
 2
 00:00:02.500 --> 00:00:05.000
-<v active>the "coming next" line 5 seconds before the second verse starts
+<v active>we should show an animated progress bar
 <v next>[ ♫&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]
 
 3

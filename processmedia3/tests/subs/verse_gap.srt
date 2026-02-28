@@ -1,10 +1,10 @@
 1
 00:00:00,000 --> 00:00:02,500
-If there is a long gap in between two verses, we should show
+If there is a long gap in between two verses,
 
 2
 00:00:02,500 --> 00:00:05,000
-the "coming next" line 5 seconds before the second verse starts
+we should show an animated progress bar
 
 3
 00:00:25,000 --> 00:00:27,500
@@ -13,4 +13,3 @@ Verse 2 line 1
 4
 00:00:27,500 --> 00:00:30,000
 Verse 2 line 2
-
