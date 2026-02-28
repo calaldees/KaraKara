@@ -303,14 +303,22 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
 <v next>{next}
 
 """
-    BLINK_GAP = timedelta(seconds=0.100)
+    # remove gaps smaller than this
+    UNBLINK_GAP = timedelta(seconds=0.250)
+    # if the same line of lyrics appears twice in a row
+    # back-to-back, insert a gap of this length
+    REPEAT_GAP = timedelta(seconds=0.100)
+    # if there's a gap larger than this between lines,
+    # show a progress bar as well as the upcoming line
     BIG_GAP = timedelta(seconds=5)
+    # if there's a gap bigger than BIG_GAP at the start, show
+    # upcoming-line this early before it becomes current-line
     BIG_GAP_PREVIEW = timedelta(seconds=3)
 
     # Remove small (100ms) gaps between lines, which are distractingly blinky
     for i in range(len(subtitles) - 1):
         tdiff = subtitles[i + 1].start - subtitles[i].end
-        if -BLINK_GAP < tdiff < BLINK_GAP:
+        if tdiff < UNBLINK_GAP:
             subtitles[i] = Subtitle(
                 idx=subtitles[i].idx,
                 start=subtitles[i].start,
@@ -326,7 +334,7 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
             subtitles[i] = Subtitle(
                 idx=subtitles[i].idx,
                 start=subtitles[i].start,
-                end=subtitles[i + 1].start - BLINK_GAP,
+                end=subtitles[i + 1].start - REPEAT_GAP,
                 text=subtitles[i].text,
                 top=subtitles[i].top,
             )
