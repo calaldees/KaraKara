@@ -14,26 +14,18 @@ for my_id, my_track in data.items():
     my_title = my_track["tags"]["title"][0]
     my_year = None
     if "year" in my_track["tags"]:
-        try:
-            my_year = int(my_track["tags"]["year"][0])
-        except Exception:
-            pass
+        my_year = max(int(y) for y in my_track["tags"]["year"])
     if my_year and my_year < 2000 and "retro" not in my_track["tags"]:
         print(my_id, my_title, my_year)
 
 # %%
-# Check for tracks with the "retro" tag, but don't have a year or date field
+# Check for tracks with the "retro" tag, but don't have a year
 
 for my_id, my_track in data.items():
     my_title = my_track["tags"]["title"][0]
-    my_year = None
-    if "year" in my_track["tags"]:
-        try:
-            my_year = int(my_track["tags"]["year"][0])
-        except Exception:
-            pass
     has_retro = "retro" in my_track["tags"]
-    if has_retro and not my_year and "date" not in my_track["tags"]:
+    has_year = "year" in my_track["tags"]
+    if has_retro and not has_year:
         print(my_id, my_title)
 
 # %%
@@ -46,7 +38,7 @@ for my_id, my_track in data.items():
     try:
         my_subs = my_track["attachments"]["subtitle"][0]["path"]
         if my_subs in sub2track:
-            print(sub2track[my_subs], my_id)
+            print(sub2track[my_subs], " = ", my_id)
         else:
             sub2track[my_subs] = my_id
     except Exception:
