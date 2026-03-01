@@ -1,5 +1,5 @@
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { useContext } from "react";
+import { useContext, ViewTransition } from "react";
 
 import { EventInfo } from "@/components/eventinfo";
 import { JoinInfo } from "@/components/joininfo";
@@ -28,22 +28,30 @@ function QueueItem({
     now: number;
 }) {
     return (
-        <div className={"item n" + (idx + 1)} key={item.id}>
-            <p className="title">{track.tags.title[0]}</p>
-            <p className="from">
-                {track.tags.from?.[0] ?? track.tags.artist?.join(", ") ?? ""}
-            </p>
-            <p className="performer">
-                <span className="n">{idx + 1}</span> {item.performer_name}
-            </p>
-            <p className="time">
-                <span>
-                    {time_until(now, item.start_time) ||
-                        (idx === 0 && "You're up!") ||
-                        (idx === 1 && "Nearly there!")}
-                </span>
-            </p>
-        </div>
+        <ViewTransition
+            enter={"slide-from-left tn" + (idx + 1)}
+            exit="slide-to-left"
+            name={"queue_item_" + item.id}
+        >
+            <div className={"item n" + (idx + 1)} key={item.id}>
+                <p className="title">{track.tags.title[0]}</p>
+                <p className="from">
+                    {track.tags.from?.[0] ??
+                        track.tags.artist?.join(", ") ??
+                        ""}
+                </p>
+                <p className="performer">
+                    <span className="n">{idx + 1}</span> {item.performer_name}
+                </p>
+                <p className="time">
+                    <span>
+                        {time_until(now, item.start_time) ||
+                            (idx === 0 && "You're up!") ||
+                            (idx === 1 && "Nearly there!")}
+                    </span>
+                </p>
+            </div>
+        </ViewTransition>
     );
 }
 

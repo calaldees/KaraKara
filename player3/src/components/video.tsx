@@ -1,5 +1,6 @@
 import type { Attachment, Track } from "@/types";
 import { attachment_path } from "@/utils";
+import { ViewTransition } from "react";
 
 export function Video({
     track,
@@ -19,6 +20,7 @@ export function Video({
     subtitleVariant: string;
 }) {
     return (
+        <ViewTransition name="video">
         <div className="videoScaler">
             <video
                 autoPlay={true}
@@ -56,5 +58,6 @@ export function Video({
                         ))}
             </video>
         </div>
+        </ViewTransition>
     );
 }
