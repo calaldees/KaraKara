@@ -241,7 +241,7 @@ def get_audio_codec(video_path: Path) -> Optional[str]:
 def get_audio_extension(codec_name: str) -> str:
     """Map audio codec name to file extension."""
     codec_to_ext = {
-        "aac": "aac",
+        "aac": "m4a",
         "mp3": "mp3",
         "vorbis": "ogg",
         "opus": "opus",
@@ -504,6 +504,197 @@ def find_videos(path: Path, recursive: bool = True) -> Generator[Path, None, Non
                 yield video_path
 
 
+def parse_threshold(threshold_str: str) -> Tuple[float, float]:
+    """Parse threshold string into min and max values.
+
+    Args:
+        threshold_str: Either a single number (e.g., "90") or a range (e.g., "80-90")
+
+    Returns:
+        Tuple of (min_threshold, max_threshold)
+        For single value "90", returns (90, 100)
+        For range "80-90", returns (80, 90)
+    """
+    if "-" in threshold_str:
+        parts = threshold_str.split("-")
+        if len(parts) != 2:
+            raise ValueError(f"Invalid threshold range format: {threshold_str}")
+        min_val = float(parts[0])
+        max_val = float(parts[1])
+        if min_val >= max_val:
+            raise ValueError(
+                f"Invalid threshold range: min ({min_val}) must be less than max ({max_val})"
+            )
+        if min_val < 0 or max_val > 100:
+            raise ValueError(f"Threshold values must be between 0 and 100")
+        return min_val, max_val
+    else:
+        val = float(threshold_str)
+        if val < 0 or val > 100:
+            raise ValueError(f"Threshold value must be between 0 and 100")
+        return val, 100.0
+
+
+def interactive_convert_videos(
+    folder: Path,
+    threshold_min: float = 95.0,
+    threshold_max: float = 100.0,
+    use_cache: bool = True,
+) -> None:
+    """Interactive mode to manually review and convert videos detected as static
+
+    Args:
+        folder: Directory to scan for videos
+        threshold_min: Minimum frozen frame percentage threshold (0-100)
+        threshold_max: Maximum frozen frame percentage threshold (0-100)
+        use_cache: Whether to use cached motion detection results
+    """
+    folder = folder.expanduser()
+
+    if not folder.exists():
+        print(f"Error: Folder not found: {folder}")
+        return
+
+    video_extensions = [".mkv", ".mp4", ".avi", ".mov", ".webm", ".flv", ".wmv", ".m4v"]
+    video_files = []
+
+    # Find all video files
+    print(f"Scanning for videos in: {folder}")
+    for ext in video_extensions:
+        video_files.extend(folder.rglob(f"*{ext}"))
+
+    if not video_files:
+        print(f"No video files found in {folder}")
+        return
+
+    print(f"\nFound {len(video_files)} video file(s)")
+    if threshold_min == threshold_max:
+        print(f"Analyzing videos for motion (threshold: {threshold_min}% frozen)...")
+    else:
+        print(
+            f"Analyzing videos for motion (threshold: {threshold_min}-{threshold_max}% frozen)..."
+        )
+    print("=" * 60)
+
+    # First pass: detect which videos are static
+    static_videos = []
+    for video_path in tqdm(
+        sorted(video_files), desc="Detecting static videos", unit="video"
+    ):
+        try:
+            relative_path = video_path.relative_to(folder)
+        except ValueError:
+            relative_path = video_path
+
+        # Check if audio+image already exist
+        if False:
+            audio_codec = get_audio_codec(video_path)
+            if audio_codec:
+                audio_ext = get_audio_extension(audio_codec)
+                audio_path = video_path.with_suffix(f".{audio_ext}")
+            else:
+                audio_path = video_path.with_suffix(".opus")
+            image_path = video_path.with_suffix(".jpg")
+
+            if audio_path.exists() and image_path.exists():
+                continue
+
+        # Check if video is static
+        try:
+            frozen_percentage = calculate_frozen_percentage(
+                video_path, verbose=False, use_cache=use_cache
+            )
+            if threshold_min <= frozen_percentage <= threshold_max:
+                static_videos.append((video_path, frozen_percentage))
+        except Exception as e:
+            tqdm.write(f"Error analyzing {relative_path}: {e}")
+            continue
+
+    if not static_videos:
+        if threshold_min == threshold_max:
+            print(f"\nNo static videos found (threshold: {threshold_min}%)")
+        else:
+            print(
+                f"\nNo static videos found (threshold: {threshold_min}-{threshold_max}%)"
+            )
+        return
+
+    print(f"\nFound {len(static_videos)} static video(s) to review")
+    print("=" * 60)
+
+    converted_count = 0
+    skipped_count = 0
+
+    for idx, (video_path, frozen_percentage) in enumerate(static_videos, 1):
+        try:
+            relative_path = video_path.relative_to(folder)
+        except ValueError:
+            relative_path = video_path
+
+        print(f"\n[{idx}/{len(static_videos)}] {relative_path}")
+        print(f"  Static score: {frozen_percentage:.1f}% frozen")
+
+        # Play the video with mpv
+        print("  Playing video with mpv (press 'q' to close)...")
+        try:
+            subprocess.run(["mpv", str(video_path), "--loop=no"], check=False)
+        except KeyboardInterrupt:
+            print("\n\nInterrupted by user")
+            print(f"Converted: {converted_count}, Skipped: {skipped_count}")
+            return
+
+        # Ask user what to do
+        while True:
+            response = (
+                input("\n  Convert to audio+image and delete video? [y/n/q]: ")
+                .strip()
+                .lower()
+            )
+
+            if response == "q":
+                print("\nExiting interactive mode")
+                print(f"Converted: {converted_count}, Skipped: {skipped_count}")
+                return
+            elif response == "n":
+                print("  → Keeping video as-is")
+                skipped_count += 1
+                break
+            elif response == "y":
+                # Extract audio and image
+                print("  Extracting audio and image...")
+                audio_str, image_str = extract_audio_and_image(
+                    video_path, output_dir=None, dry_run=False, verbose=True
+                )
+
+                if audio_str is not None and image_str is not None:
+                    # Convert strings to Path objects and verify files were created successfully
+                    audio_path_extracted = Path(audio_str)
+                    image_path_extracted = Path(image_str)
+                    if audio_path_extracted.exists() and image_path_extracted.exists():
+                        # Delete original video
+                        # try:
+                        #    video_path.unlink()
+                        #    print(f"  ✓ Converted and deleted original video")
+                        # except Exception as e:
+                        #    print(f"  ✗ Error deleting video: {e}")
+                        #    print(f"    Audio and image were created successfully")
+                        converted_count += 1
+                    else:
+                        print(f"  ✗ Extraction failed - files not created")
+                        skipped_count += 1
+                else:
+                    print(f"  ✗ Extraction failed")
+                    skipped_count += 1
+                break
+            else:
+                print("  Invalid response. Please enter 'y', 'n', or 'q'")
+
+    print("\n" + "=" * 60)
+    print(f"Conversion complete!")
+    print(f"Converted: {converted_count}")
+    print(f"Skipped: {skipped_count}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Detect videos with no motion and optionally extract audio + image"
@@ -563,9 +754,9 @@ def main() -> None:
     parser.add_argument(
         "-t",
         "--threshold",
-        type=float,
-        default=95.0,
-        help="Frozen frame percentage threshold (0-100). Videos frozen for more than this percentage are considered static",
+        type=str,
+        default="95",
+        help="Frozen frame percentage threshold. Can be a single value (e.g., '90' for >=90%%) or a range (e.g., '80-90' for 80-90%%). Default: 95",
     )
     parser.add_argument(
         "-f",
@@ -587,6 +778,12 @@ def main() -> None:
         "--cache-info",
         action="store_true",
         help="Show cache information and exit",
+    )
+    parser.add_argument(
+        "--interactive",
+        "-i",
+        action="store_true",
+        help="Interactive mode: manually review each video and decide whether to convert",
     )
 
     args = parser.parse_args()
@@ -617,6 +814,38 @@ def main() -> None:
                 )
         sys.exit(0)
 
+    # Interactive mode
+    if args.interactive:
+        if not args.path:
+            print(
+                "Error: path argument is required for interactive mode", file=sys.stderr
+            )
+            sys.exit(1)
+
+        # Check dependencies
+        if not check_ffmpeg_installed():
+            sys.exit(1)
+
+        path = Path(args.path)
+        if not path.exists():
+            print(f"Error: Path does not exist: {path}", file=sys.stderr)
+            sys.exit(1)
+
+        # Initialize cache database if needed
+        use_cache = not args.no_cache
+        if use_cache:
+            init_cache_db()
+
+        # Parse threshold
+        try:
+            threshold_min, threshold_max = parse_threshold(args.threshold)
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+        interactive_convert_videos(path, threshold_min, threshold_max, use_cache)
+        sys.exit(0)
+
     # Validate path is provided for non-cache commands
     if not args.path:
         print("Error: path argument is required", file=sys.stderr)
@@ -630,6 +859,13 @@ def main() -> None:
     path = Path(args.path)
     if not path.exists():
         print(f"Error: Path does not exist: {path}", file=sys.stderr)
+        sys.exit(1)
+
+    # Parse threshold
+    try:
+        threshold_min, threshold_max = parse_threshold(args.threshold)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
     # Initialize cache database
@@ -646,7 +882,10 @@ def main() -> None:
     print(f"Scanning for videos in: {path}")
     if args.verbose:
         print(f"Recursive: {args.recursive}")
-        print(f"Frozen threshold: {args.threshold}%")
+        if threshold_min == threshold_max:
+            print(f"Frozen threshold: {threshold_min}%")
+        else:
+            print(f"Frozen threshold: {threshold_min}-{threshold_max}%")
         if use_cache:
             stats = get_cache_stats()
             print(f"Cache: enabled ({stats['count']} entries)")
@@ -710,7 +949,7 @@ def main() -> None:
                 tqdm.write(f"{video_path_rel} [ERROR: {e}]")
             continue
 
-        is_static = frozen_percentage >= args.threshold
+        is_static = threshold_min <= frozen_percentage <= threshold_max
 
         if is_static:
             if args.verbose:
