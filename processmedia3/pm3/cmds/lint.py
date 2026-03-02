@@ -76,6 +76,23 @@ def lint_track(track: Track) -> None:
         if "hardsubs" not in json["tags"].get("", []):
             log.error(f"{track.id} has no subtitles source but also no hardsubs tag")
 
+    # Check for redundant audio sources when video exists for the same variant
+    video_variants = {s.variant for s in track.sources if s.type == SourceType.VIDEO}
+    audio_variants = {s.variant for s in track.sources if s.type == SourceType.AUDIO}
+    redundant_variants = video_variants & audio_variants
+    if redundant_variants:
+        for variant in redundant_variants:
+            audio_files = [
+                s.file.relative for s in track.sources if s.type == SourceType.AUDIO and s.variant == variant
+            ]
+            video_files = [
+                s.file.relative for s in track.sources if s.type == SourceType.VIDEO and s.variant == variant
+            ]
+            log.error(
+                f"{track.id} has redundant audio source for variant '{variant}': "
+                f"audio={audio_files}, video={video_files} (video already contains audio)"
+            )
+
     # for t in track.targets:
     #    if not t.path.exists():
     #        log.error(f"{t.friendly} missing (Sources: {[s.file.relative for s in t.sources]!r})")
