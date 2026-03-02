@@ -7,7 +7,7 @@ import "./config.scss";
 
 export function ConfigMenu(): React.ReactElement {
     const { roomName } = useParams();
-    const { roomPassword, setRoomPassword, booth, setBooth, setShowSettings } =
+    const { roomPassword, setRoomPassword, booth, setBooth, setShowSettings, fullscreen, setFullscreen } =
         useContext(ClientContext);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
@@ -87,6 +87,25 @@ export function ConfigMenu(): React.ReactElement {
                                     />
                                 </td>
                             </tr>
+                            {document.body.requestFullscreen && (
+                                <tr>
+                                    <td>Fullscreen</td>
+                                    <td>
+                                        <input
+                                            checked={fullscreen}
+                                            type={"checkbox"}
+                                            onChange={(_) => {
+                                                if (fullscreen) {
+                                                    void document.exitFullscreen();
+                                                } else {
+                                                    void document.body.requestFullscreen();
+                                                }
+                                                setFullscreen(!fullscreen);
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                            )}
                             <tr>
                                 <td colSpan={2}>
                                     <button type="submit" data-cy="save-button">
