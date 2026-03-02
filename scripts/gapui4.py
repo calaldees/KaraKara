@@ -16,7 +16,6 @@ import argparse
 import re
 import sqlite3
 import subprocess
-import sys
 import tkinter as tk
 from datetime import timedelta
 from pathlib import Path
@@ -76,7 +75,7 @@ class GapViewerApp:
         """Scan the folder for SRT files and update the database with new gaps"""
         if not self.folder.exists():
             messagebox.showwarning("Warning", f"Folder not found: {self.folder}")
-            return
+            return 0
 
         conn = self.get_db_connection()
         cursor = conn.cursor()
@@ -373,7 +372,7 @@ class GapViewerApp:
         base_name_without_brackets = re.sub(r"\s*\[.*?\]\s*", " ", base_name).strip()
         parent_dir = srt.parent
 
-        video_exts = [".mkv", ".mp4", ".avi", ".mov"]
+        video_exts = [".mkv", ".mp4", ".avi", ".mov", ".webm"]
         audio_exts = [".mp3", ".m4a", ".ogg", ".flac", ".wav", ".opus"]
         image_exts = [".jpg", ".jpeg", ".png", ".bmp", ".webp"]
 
