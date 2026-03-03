@@ -315,7 +315,10 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     # upcoming-line this early before it becomes current-line
     BIG_GAP_PREVIEW = timedelta(seconds=3)
 
-    # Remove small (100ms) gaps between lines, which are distractingly blinky
+    # Remove tiny gaps between lines, which are distractingly blinky
+    #   AAAAA-BBBBB-CCCCC
+    # becomes
+    #   AAAAAABBBBBBCCCCC
     for i in range(len(subtitles) - 1):
         tdiff = subtitles[i + 1].start - subtitles[i].end
         if tdiff < UNBLINK_GAP:
@@ -327,8 +330,12 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
                 top=subtitles[i].top,
             )
 
-    # If the same line of lyrics appears twice in a row, insert a gap between
-    # them so that it's clear when the line is changing
+    # If the same line of lyrics appears twice in a row, insert a
+    # gap between them so that it's clear when the line is changing,
+    # the blink is useful in this one specific case
+    #   AAAAAAAAAAAAAAAAA
+    # becomes
+    #   AAAAA-AAAAA-AAAAA
     for i in range(len(subtitles) - 1):
         if subtitles[i].text == subtitles[i + 1].text and subtitles[i].end == subtitles[i + 1].start:
             subtitles[i] = Subtitle(
@@ -350,6 +357,13 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
             # until {first line time - $PREVIEW} seconds. At that point, show
             # a blank string as "active" (which causes the first line of the
             # lyrics to be shown as "next")
+            #
+            # so
+            #   ---------AAAA-BBBB-CCCC
+            #   ---------BBBB-CCCC-DDDD
+            # becomes
+            #   ----    -AAAA-BBBB-CCCC
+            #   ----AAAA-BBBB-CCCC-DDDD
             if last_end == timedelta(0):
                 padded_lines.append(
                     Subtitle(
@@ -374,6 +388,13 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
             #
             #   active: [   ♫      ]               <-- animated
             #   next: {first line of next verse}   <-- never actually shown as "active"
+            #
+            # so
+            #   AAAA------BBBB
+            #   BBBB------CCCC
+            # becomes
+            #   AAAA-[..]-BBBB
+            #   BBBB-BBBB-CCCC
             else:
                 parts = 50
                 for n in range(0, parts):
@@ -421,6 +442,13 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
         #
         #   active: line 2
         #   next: line 3
+        #
+        # so
+        #   AAAA--BBBB <-- nothing displayed during the gap
+        #   BBBB--CCCC
+        # becomes
+        #   AAAA  BBBB <-- empty string displayed as "active" (so that the next
+        #   BBBBBBCCCC     line of the lyrics is shown as "next") during the gap
         elif gap > timedelta(seconds=0):
             padded_lines.append(
                 Subtitle(

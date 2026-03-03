@@ -129,7 +129,7 @@ My Track [Kanji].srt
   * Adding new formats is easy - if you have a file in a different format, please ask us to add that format to the list rather than converting it
 
 ## Audio Files
-* Currently supported formats: `.mp3`, `.flac`, `.ogg`, `.aac`
+* Currently supported formats: `.mp3`, `.flac`, `.ogg`, `.m4a`
   * Adding new formats is easy - if you have a file in a different format, please ask us to add that format to the list rather than converting it
 
 ## Image Files
