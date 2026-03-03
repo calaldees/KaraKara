@@ -1,5 +1,29 @@
 # Get Started Adding Tracks
 
+## tl;dr
+
+* If you just want to request or upload a track and have somebody else quality-check / approve it, use https://karakara.uk/upload/
+
+## Overview
+
+- The track database is a collection of files stored in a pair of shared folders (One for work-in-progress tracks, one for finished tracks), currently using Syncthing to synchronise between contributors and the server (Conceptually similar to Dropbox or Google Drive - syncthing is a little fiddlier to set up but gives us a lot more control)
+- https://karakara.uk/upload/ will write files into the work-in-progress folder
+  - "requests" are uploaded as just a tag file (`.txt`) containing track metadata like title and artist, supplied by the person requesting the track
+  - "submissions" are uploaded as a complete set of files for a track (eg `.txt` + `.mp4` + `.srt`)
+- A moderator reviews the requests and submissions, edits them if needed, deletes any spam or inappropriate uploads, and moves finished tracks from the "work in progress" folder to the "source" folder (from where the system will automatically pick it up, encode into various formats, and add it to the live database)
+
+## Syncthing Setup
+
+- First, make sure you have a hard drive with enouch space
+  - The "Work in Progress" folder rarely goes over 1-2GB, as any finished tracks get moved to Source
+  - The "Source" folder is currently around 250GB and growing
+- Download and install Syncthing: https://syncthing.net/downloads/
+  - The bare tool is fairly minimal and technical, I'd advise using one of the integrations (eg syncthing-macos or syncthing-windows) from the top of the page for a happier experience
+- Open syncthing, get the ID for your device from the menu -> "Actions" -> "Show ID"
+- Send your device ID to somebody with server access (eg Shish, Calaldees)
+- (Person with server access: Go to https://karakara.uk/syncthing/ , add this person's device, and share the `KaraKara - Work in Progress` folder with them)
+- At some point soon you should get a notification in the syncthing GUI saying something like "KaraKara wants to share a folder with you: KaraKara-Source [Accept / Reject]" -- if you click accept and choose a folder on your computer, syncthing will start synchronising the files between the server and that folder.
+
 ## The Goal
 
 Each track in the database is built from a set of files:
@@ -9,11 +33,6 @@ Each track in the database is built from a set of files:
 * `Track Name.mkv` - a video + audio file (optional if there's an image + audio)
 * `Track Name.ogg` - an audio-only file (optional if there's a video + audio)
 * `Track Name.jpg` - an image to show while playing audio-only files (optional if there's a video)
-
-The files are generally named `(category)/(source or artist) - (use) - (title)`, eg:
-
-* `Anime/Your Name - OP - Yume Tourou.txt`
-* `JPop/YUI - Rolling Star.txt`
 
 ### Variants
 
@@ -25,7 +44,7 @@ If you have multiple versions of a track, eg different languages or vocal styles
 * `Track Name [Romaji].srt`
 * `Track Name [Kanji].srt`
 
-Note that the different versions need to be compatible (eg, the different audios need to be the same length, don't mix tv-size and full-length edits). If you have multiple incompatible versions of a track, please add them as separate tracks, eg:
+Note that the different versions need to be compatible (eg, the different audios need to be the same length, don't mix tv-size and full-length edits). If you have multiple incompatible versions of a track, please add them as separate tracks using round brackets, eg:
 
 * `Track Name (TV-Size).txt`
 * `Track Name (TV-Size).mkv`
@@ -57,14 +76,9 @@ from: Bokusatsu Tenshi Dokuro-chan
 from: Bludgeoning Angel Dokuro-chan
 ```
 
-Can be nested if we want to group eg all the Sonic games together:
+Keys can be nested, eg for video game franchises:
 ```yaml
 from: Sonic the Hedgehog: Sonic Forces
-```
-which is equivalent to
-```yaml
-from: Sonic the Hedgehog
-Sonic the Hedgehog: Sonic Forces
 ```
 
 If a value needs to contain a colon, it can be quoted, eg:
@@ -89,8 +103,12 @@ Keys and Values should generally both be lowercase, except for proper nouns like
 * `length` - the version of the track, eg most anime openings or endings are 1m30s, but full versions are often 4m or longer, so we can use `short` for the TV-size version, and `full` for the full-length version
 * `source` - a URL where the track can be found, eg a YouTube link
 * `date` - the date the track was released, in YYYY-MM-DD format
-* `added` - the date the track was added to the database, in YYYY-MM-DD
+* `added` - the date the track was added to the database, in YYYY-MM-DD format
 * `genre` - eg `rock`, `pop`, `electronic`
+* `id` - a reference to an external database, eg a MyAnimeList ID for an anime song
+  * `id: "mal:12345"` - anime
+  * `id: "rawg:1234"` - video game
+  * `id: "imdb:tt1234567"` - movie
 
 ### Examples
 ```yaml
@@ -125,14 +143,10 @@ My Track [Kanji].srt
 * Should avoid having baked-in subtitles
 * Should avoid having watermarks
 * DVD / Bluray "special features" often include creditless OPs/EDs - these are ideal
-* Currently supported formats: `.mp4`, `.mkv`, `.avi`, `.mpg`, `.webm`
-  * Adding new formats is easy - if you have a file in a different format, please ask us to add that format to the list rather than converting it
 
 ## Audio Files
-* Currently supported formats: `.mp3`, `.flac`, `.ogg`, `.m4a`
-  * Adding new formats is easy - if you have a file in a different format, please ask us to add that format to the list rather than converting it
+* Should be clean (ie if the track comes from a TV show, we don't want to have the voice acting or sound effects in the background)
 
 ## Image Files
 * If there's no video file, an image file is required to show while playing audio-only tracks
 * If there's a video file, an image file is optional - if provided, it will be used as a thumbnail in the track browser, which is useful if the "automatically generate a thumbnail by picking a random frame from the video" algorithm selects a bad frame
-* Currently supported formats: `.jpg`, `.png`, `.webp`, `.avif`
