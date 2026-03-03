@@ -2,15 +2,14 @@ import gzip
 import json
 import logging
 import os
-from pathlib import Path
 from collections.abc import Sequence
+from pathlib import Path
 
 import brotli
 import requests
 from tqdm.contrib.concurrent import thread_map
 
 from pm3.lib.track import Track, TrackDict, TrackValidationException
-
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ def export(
             log.exception(f"Error exporting {track.id}")
             return None
 
-    json_list: list[TrackDict] = thread_map(_export, tracks, max_workers=threads, desc="export ", unit="track")
+    json_list: list[TrackDict | None] = thread_map(_export, tracks, max_workers=threads, desc="export ", unit="track")
 
     # Export in alphabetic order
     json_dict: dict[str, TrackDict] = dict(sorted((t["id"], t) for t in json_list if t))
