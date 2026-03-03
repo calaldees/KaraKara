@@ -17,7 +17,7 @@ SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 
 re_time = re.compile(r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)")
 re_srt_line = re.compile(
-    r"(?P<idx>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*?)(\n\n|$)",
+    r"(?P<idx>\d+)\n(?P<start>[\d:,\.]+) --> (?P<end>[\d:,\.]+)\n(?P<text>.*?)(\n\n|$)",
     flags=re.DOTALL,
 )
 re_ssa_line = re.compile(
@@ -138,6 +138,15 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ... '''
     >>> _parse_srt(srt)
     [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(idx=2, start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
+
+    Test with period as decimal separator (non-standard, but some software with some locale settings does it...):
+    >>> srt_period = r'''
+    ... 1
+    ... 00:00:13.500 --> 00:00:22.343
+    ... test with periods
+    ... '''
+    >>> _parse_srt(srt_period)
+    [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text='test with periods', top=False)]
     """
 
     def parse_line(line: dict[str, str]) -> Subtitle:
@@ -315,7 +324,10 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     # upcoming-line this early before it becomes current-line
     BIG_GAP_PREVIEW = timedelta(seconds=3)
 
-    # Remove small (100ms) gaps between lines, which are distractingly blinky
+    # Remove tiny gaps between lines, which are distractingly blinky
+    #   AAAAA-BBBBB-CCCCC
+    # becomes
+    #   AAAAAABBBBBBCCCCC
     for i in range(len(subtitles) - 1):
         tdiff = subtitles[i + 1].start - subtitles[i].end
         if tdiff < UNBLINK_GAP:
@@ -327,8 +339,12 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
                 top=subtitles[i].top,
             )
 
-    # If the same line of lyrics appears twice in a row, insert a gap between
-    # them so that it's clear when the line is changing
+    # If the same line of lyrics appears twice in a row, insert a
+    # gap between them so that it's clear when the line is changing,
+    # the blink is useful in this one specific case
+    #   AAAAAAAAAAAAAAAAA
+    # becomes
+    #   AAAAA-AAAAA-AAAAA
     for i in range(len(subtitles) - 1):
         if subtitles[i].text == subtitles[i + 1].text and subtitles[i].end == subtitles[i + 1].start:
             subtitles[i] = Subtitle(
@@ -350,6 +366,13 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
             # until {first line time - $PREVIEW} seconds. At that point, show
             # a blank string as "active" (which causes the first line of the
             # lyrics to be shown as "next")
+            #
+            # so
+            #   ---------AAAA-BBBB-CCCC
+            #   ---------BBBB-CCCC-DDDD
+            # becomes
+            #   ----    -AAAA-BBBB-CCCC
+            #   ----AAAA-BBBB-CCCC-DDDD
             if last_end == timedelta(0):
                 padded_lines.append(
                     Subtitle(
@@ -374,6 +397,13 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
             #
             #   active: [   ♫      ]               <-- animated
             #   next: {first line of next verse}   <-- never actually shown as "active"
+            #
+            # so
+            #   AAAA------BBBB
+            #   BBBB------CCCC
+            # becomes
+            #   AAAA-[..]-BBBB
+            #   BBBB-BBBB-CCCC
             else:
                 parts = 50
                 for n in range(0, parts):
@@ -421,6 +451,13 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
         #
         #   active: line 2
         #   next: line 3
+        #
+        # so
+        #   AAAA--BBBB <-- nothing displayed during the gap
+        #   BBBB--CCCC
+        # becomes
+        #   AAAA  BBBB <-- empty string displayed as "active" (so that the next
+        #   BBBBBBCCCC     line of the lyrics is shown as "next") during the gap
         elif gap > timedelta(seconds=0):
             padded_lines.append(
                 Subtitle(
