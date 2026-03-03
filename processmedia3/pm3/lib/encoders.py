@@ -537,7 +537,7 @@ def select_best_image(paths: list[Path]) -> Path:
     return sorted(scored_paths, reverse=True)[0][1]
 
 
-if __name__ == "__main__":
+def main() -> None:
     import argparse
 
     from ..cmds.encode import encode
@@ -565,3 +565,7 @@ if __name__ == "__main__":
         )
     ]
     encode(tracks, reencode=True, threads=1)
+
+
+if __name__ == "__main__":
+    main()

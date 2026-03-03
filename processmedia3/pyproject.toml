@@ -13,6 +13,14 @@ dependencies = [
 	"inotify ~= 0.2",
 ]
 
+[tool.uv]
+package = true
+
+[project.scripts]
+pm3 = "pm3.__main__:entry_point"
+pm3-subtitle-processor = "pm3.lib.subtitle_processor:main"
+pm3-encoder = "pm3.lib.encoders:main"
+
 [dependency-groups]
 dev = [
 	"mypy ~= 1.15",

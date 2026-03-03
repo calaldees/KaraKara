@@ -508,7 +508,7 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     return "WEBVTT - KaraKara Subtitle\n\n" + "".join(blocks)
 
 
-if __name__ == "__main__":
+def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(description="Convert between subtitle formats")
@@ -556,3 +556,7 @@ if __name__ == "__main__":
         print("".join(linediff))
     with open(args.output, "w") as f:
         f.write(outdata)
+
+
+if __name__ == "__main__":
+    main()

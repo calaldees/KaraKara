@@ -17,7 +17,7 @@ shell: logs
 logs:
 	mkdir logs
 run_in_container:
-	python3 main.py --source /media/source --processed /media/processed --log-file /logs/processmedia3.log --debug
+	python3 -m pm3 --source /media/source --processed /media/processed --log-file /logs/processmedia3.log --debug
 
 .PHONY: cloc
 cloc:

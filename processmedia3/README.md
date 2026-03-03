@@ -100,20 +100,17 @@ tracks = [
 
 ## Debugging Tools
 
-* Raw python: `./main.py <command>`
+* Raw python: `uv run pm3 <command>`
     * You'll need to make sure the `--source` / `--processed` flags are set appropriately
 * In docker: `docker compose run --rm -ti processmedia3 <command>`
     * Docker automatically sets the `--source` / `--processed` flags based on `.env`
 * Testing subtitle encoding
-    * `./pm3/lib/subtitle_processor.py input.srt output.vtt`
+    * `uv run pm3-subtitle-processor input.srt output.vtt`
 * Encoding a single file into various formats to test with
-    * `./pm3/lib/encoders.py ~/Videos/kk-stress-test/demo.webm`
+    * `uv run pm3-encoder ~/Videos/kk-stress-test/demo.webm`
 
 
 ## Dev Setup
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --group dev .
-./main.py --help
+uv run pm3 --help
 ```
