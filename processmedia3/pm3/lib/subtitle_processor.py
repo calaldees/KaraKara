@@ -17,7 +17,7 @@ SSA_NEXT_COLOR = "{\\c&HFFFFFF&}"
 
 re_time = re.compile(r"(?P<hours>\d{1,2}):(?P<minutes>\d{2}):(?P<seconds>\d{2}[\.,]\d+)")
 re_srt_line = re.compile(
-    r"(?P<idx>\d+)\n(?P<start>[\d:,]+) --> (?P<end>[\d:,]+)\n(?P<text>.*?)(\n\n|$)",
+    r"(?P<idx>\d+)\n(?P<start>[\d:,\.]+) --> (?P<end>[\d:,\.]+)\n(?P<text>.*?)(\n\n|$)",
     flags=re.DOTALL,
 )
 re_ssa_line = re.compile(
@@ -138,6 +138,15 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ... '''
     >>> _parse_srt(srt)
     [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(idx=2, start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
+
+    Test with period as decimal separator (non-standard, but some software with some locale settings does it...):
+    >>> srt_period = r'''
+    ... 1
+    ... 00:00:13.500 --> 00:00:22.343
+    ... test with periods
+    ... '''
+    >>> _parse_srt(srt_period)
+    [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text='test with periods', top=False)]
     """
 
     def parse_line(line: dict[str, str]) -> Subtitle:
