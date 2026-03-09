@@ -16,7 +16,6 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 from .cmds.cleanup import cleanup
 from .cmds.encode import encode
 from .cmds.export import export
-from .cmds.lint import lint
 from .cmds.scan import scan
 from .cmds.status import status
 from .lib.file_abstraction import AbstractFolder
@@ -34,7 +33,7 @@ class PM3Args(tap.Tap):
     reencode: bool = False  # Re-encode files, even if they already exist in the processed directory
     debug: bool = False  # Super-extra verbose logging
     log_file: Path | None = None  # Where to write logs to
-    cmd: t.Literal["all", "status", "encode", "export", "lint", "cleanup"] = "all"  # Sub-process to run
+    cmd: t.Literal["all", "status", "encode", "export", "cleanup"] = "all"  # Sub-process to run
     match: str | None = None  # Only act upon files matching this pattern
     # fmt: on
 
@@ -110,8 +109,6 @@ def _main(args: PM3Args) -> int:
                     cleanup(args.processed, tracks, args.delete, args.threads)
             elif args.cmd == "status":
                 status(tracks)
-            elif args.cmd == "lint":
-                lint(tracks)
             elif args.cmd == "encode":
                 encode(tracks, args.reencode, args.threads)
             elif args.cmd == "export":

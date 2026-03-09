@@ -88,7 +88,6 @@ tracks = [
 - `encode()` iterates over each Track, and makes sure that each `Target` file exists, calling `target.encode()` to create it if needed
 - `export()` iterates over each Track, converts it to JSON, and writes `tracks.json`
 - `cleanup()` iterates over each Track, collecs a list of all Target filenames, and deletes any file in the output directory that we aren't expecting to exist
-- `lint()` iterates over all the sources and checks for various common mistakes like typos in tag names or overlapping subtitles
 
 `pm3/lib/` has classes for `Source` / `Target` / `Track`
 
