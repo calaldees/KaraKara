@@ -5,6 +5,7 @@ COPY src ./src
 RUN cargo build --release
 
 FROM builder AS test
+RUN rustup component add rustfmt clippy
 RUN cargo fmt -- --check
 RUN cargo clippy -- -D warnings
 RUN cargo test

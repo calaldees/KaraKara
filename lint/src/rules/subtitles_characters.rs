@@ -25,9 +25,9 @@ pub fn lint_subtitles_characters(track_id: &str, subs: &[Subtitle]) -> Vec<LintE
     for (idx, sub) in subs.iter().enumerate() {
         for ch in sub.text.chars() {
             if ch == ' '
-                || 'a' <= ch && ch <= 'z'
-                || 'A' <= ch && ch <= 'Z'
-                || '0' <= ch && ch <= '9'
+                || ch.is_ascii_lowercase()
+                || ch.is_ascii_uppercase()
+                || ch.is_ascii_digit()
             {
                 continue; // Alphanumeric is always fine
             }
