@@ -129,3 +129,11 @@ services:
             UPLOAD_DIR: /uploads
         volumes:
             - ${PATH_HOST_media}/wip:/uploads:rw
+
+    lint:
+        build: ./lint
+        restart: unless-stopped
+        mem_limit: 1g
+        command: serve --host 0.0.0.0 --port 3000
+        volumes:
+            - ${PATH_HOST_media}/processed:/media/processed:ro

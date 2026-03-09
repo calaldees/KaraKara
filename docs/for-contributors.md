@@ -138,6 +138,9 @@ My Track [Romaji].srt
 My Track [Kanji].srt
 ```
 * Currently supported formats: `.srt` is strongly recommended, `.ssa` and `.ass` are supported but often contain extra formatting which will break things
+* Try to avoid ambiguous punctuation, eg instead of `Me + You` use `Me and You` (Or `Me plus You` if that's what the singer _actually_ sings)
+* Background singer parts can generally be left out, but if it's particularly relevant (eg for an audience sing-along) use round brackets, eg `Let me hear you say Motto Motto! (Motto Motto!)`
+* While the subs should generally only contain things to be sung and remove all other information, _sometimes_ it can be useful to add extra bits, eg a fast-paced duet might benefit from having the character names at the start of each line, we use square brackets for this, eg `[Pentious] Egg Boiz, kill that vandal!` / `[Cherri] Hope you like your minions scrambled!`
 
 ## Video Files
 * Should avoid having baked-in subtitles
