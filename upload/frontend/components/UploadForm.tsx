@@ -259,12 +259,12 @@ const VocalTrackSection = () => (
         <ul className="check">
             <li>
                 <label>
-                    <input type="radio" name="vocaltrack" value="on" /> Vocal
+                    <input type="checkbox" name="vocaltrack" value="on" /> Vocal
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="radio" name="vocaltrack" value="off" />{" "}
+                    <input type="checkbox" name="vocaltrack" value="off" />{" "}
                     Instrumental
                 </label>
             </li>
@@ -438,6 +438,21 @@ export const UploadForm = () => {
                         metadata[key] = [value as string];
                     }
                 }
+            }
+
+            const required = ["title", "category", "vocaltrack", "lang", "vocalstyle"];
+            const missing = [];
+            for (const field of required) {
+                if (!metadata[field] || metadata[field].length === 0 || metadata[field][0].trim() === "") {
+                    missing.push(field);
+                }
+            }
+            if (missing.length > 0) {
+                alert(
+                    "Please fill in the required fields: " +
+                        missing.join(", "),
+                );
+                return;
             }
 
             // 2. Collect all files from any input[type="file"]
