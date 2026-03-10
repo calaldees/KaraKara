@@ -27,7 +27,7 @@ export function RoomProvider(props: any) {
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
     const [settings, setSettings] = useState<Record<string, any>>({});
-    const { request } = useApi();
+    const { request, sessionId } = useApi();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),
         [now, fullQueue],
@@ -65,6 +65,26 @@ export function RoomProvider(props: any) {
             },
         });
     }, [roomName, roomPassword, request]);
+
+    useEffect(() => {
+        if (!sessionId) return;
+        const an = {
+            event: "open_room",
+            app: "player3",
+            dev: process.env.NODE_ENV === "development" ? true : false,
+            version: __BUILD_DATE__,
+            admin: isAdmin,
+            room: roomName,
+        };
+        request({
+            url: `/api/analytics.json`,
+            options: {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(an),
+            },
+        });
+    }, [request, roomName, isAdmin, sessionId]);
 
     // This component re-renders every time "now" changes, but
     // we don't want that to cause re-renders in the consumers

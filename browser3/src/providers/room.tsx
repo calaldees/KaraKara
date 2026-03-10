@@ -105,7 +105,7 @@ export function RoomProvider(props: any) {
             event: "open_room",
             app: "browser3",
             dev: process.env.NODE_ENV === "development" ? true : false,
-            version: `${__COMMIT__} - ${__BUILD_DATE__}`,
+            version: __BUILD_DATE__,
             admin: isAdmin,
             room: roomName,
         };
