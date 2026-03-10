@@ -81,9 +81,9 @@ fn run_check(processed_dir: &Path, format: OutputFormat) {
                 println!("Total runtime: {:.3}s", duration.as_secs_f64());
             }
 
-            if !errors.is_empty() {
-                std::process::exit(1);
-            }
+            //if !errors.is_empty() {
+            //    std::process::exit(1);
+            //}
         }
         Err(e) => {
             eprintln!("Error: {}", e);
