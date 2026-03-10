@@ -3,7 +3,7 @@ use phf::{phf_ordered_set, OrderedSet};
 use std::collections::HashMap;
 
 static REQUIRED_TAG_KEYS: OrderedSet<&'static str> = phf_ordered_set! {
-    "title", "category", "vocaltrack", "lang"
+    "title", "category", "vocaltrack", "lang", "vocalstyle"
 };
 
 pub fn lint_tags_required(track_id: &str, tags: &HashMap<String, Vec<String>>) -> Vec<LintError> {
@@ -16,16 +16,6 @@ pub fn lint_tags_required(track_id: &str, tags: &HashMap<String, Vec<String>>) -
                 format!("no {} tag", key),
             ));
         }
-    }
-
-    // Tracks with vocals should have a vocalstyle
-    if tags.get("vocaltrack") == Some(&vec!["on".to_string()])
-        && tags.get("vocalstyle").is_none_or(|v| v.is_empty())
-    {
-        errors.push(LintError::new(
-            track_id.to_string(),
-            "vocaltrack:on but no vocalstyle".to_string(),
-        ));
     }
 
     errors

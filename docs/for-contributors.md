@@ -92,13 +92,13 @@ Keys and Values should generally both be lowercase, except for proper nouns like
 * `category` - eg `anime`, `game`, `jpop`, `oddballs`. Try to use existing categories if possible, if there's no suitable category, stick it in `oddballs` for now, and then we can create a new category later if there are multiple tracks within `oddballs` with the same theme.
 * `title` - the name of the track
 * `vocaltrack` - whether the audio track has vocals (as opposed to being an instrumental karaoke-edit): `on`, `off`
+* `vocalstyle` - the vocal style of the track, eg `male`, `female`, `group`, `duet`
+* `lang` - the language of the track, using two-character codes, eg `en`, `jp`
 
 ### Recommended Tags
 * `from` - where the track is known from, eg the anime or game it appears in
 * `artist` - the performer of the track
 * `use` - how the track is intended to be used, eg `insert`, `opening`, `ending`
-* `lang` - the language of the track, using two-character codes, eg `en`, `jp`
-* `vocalstyle` - the vocal style of the track, eg `male`, `female`, `group`, `duet`
 * `contributor` - your name or nickname, so we can credit you for adding the track
 * `length` - the version of the track, eg most anime openings or endings are 1m30s, but full versions are often 4m or longer, so we can use `short` for the TV-size version, and `full` for the full-length version
 * `source` - a URL where the track can be found, eg a YouTube link
