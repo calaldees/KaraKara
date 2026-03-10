@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
 import type { FormEvent } from "react";
-import * as tus from 'tus-js-client';
+import { useRef, useState } from "react";
+import * as tus from "tus-js-client";
 import { useLocalStorage } from "usehooks-ts";
 
 interface UploadProgress {
@@ -9,7 +9,7 @@ interface UploadProgress {
 }
 
 const ContactInfoSection = () => {
-    const [contact, setContact] = useLocalStorage('karakara_contact_info', '');
+    const [contact, setContact] = useLocalStorage("karakara_contact_info", "");
 
     return (
         <section>
@@ -69,87 +69,51 @@ const CategorySection = () => (
         <ul className="check cols3">
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="anime"
-                    />{" "}
+                    <input type="checkbox" name="category" value="anime" />{" "}
                     Anime
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="cartoon"
-                    />{" "}
+                    <input type="checkbox" name="category" value="cartoon" />{" "}
                     Cartoon
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="game"
-                    />{" "}
-                    Game
+                    <input type="checkbox" name="category" value="game" /> Game
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="jpop"
-                    />{" "}
-                    JPop
+                    <input type="checkbox" name="category" value="jpop" /> JPop
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="kpop"
-                    />{" "}
-                    KPop
+                    <input type="checkbox" name="category" value="kpop" /> KPop
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="tokusatsu"
-                    />{" "}
+                    <input type="checkbox" name="category" value="tokusatsu" />{" "}
                     Tokusatsu
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="category" value="tv" />{" "}
-                    TV
+                    <input type="checkbox" name="category" value="tv" /> TV
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="vocaloid"
-                    />{" "}
+                    <input type="checkbox" name="category" value="vocaloid" />{" "}
                     Vocaloid
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="category"
-                        value="oddballs"
-                    />{" "}
+                    <input type="checkbox" name="category" value="oddballs" />{" "}
                     Other
                 </label>
             </li>
@@ -179,42 +143,34 @@ const UseSection = () => (
         <ul className="check cols3">
             <li>
                 <label>
-                    <input type="checkbox" name="use" value="opening" />{" "}
-                    Opening
+                    <input type="checkbox" name="use" value="opening" /> Opening
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="use" value="ending" />{" "}
-                    Ending
+                    <input type="checkbox" name="use" value="ending" /> Ending
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="use" value="insert" />{" "}
-                    Insert
+                    <input type="checkbox" name="use" value="insert" /> Insert
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="use"
-                        value="character"
-                    />{" "}
+                    <input type="checkbox" name="use" value="character" />{" "}
                     Character Song
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="use" value="doujin" />{" "}
-                    Doujin / Fan-Song
+                    <input type="checkbox" name="use" value="doujin" /> Doujin /
+                    Fan-Song
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="use" value="trailer" />{" "}
-                    Trailer
+                    <input type="checkbox" name="use" value="trailer" /> Trailer
                 </label>
             </li>
             <li>
@@ -232,20 +188,17 @@ const LanguageSection = () => (
         <ul className="check cols2">
             <li>
                 <label>
-                    <input type="checkbox" name="lang" value="en" />{" "}
-                    English
+                    <input type="checkbox" name="lang" value="en" /> English
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="lang" value="jp" />{" "}
-                    Japanese
+                    <input type="checkbox" name="lang" value="jp" /> Japanese
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" name="lang" value="kr" />{" "}
-                    Korean
+                    <input type="checkbox" name="lang" value="kr" /> Korean
                 </label>
             </li>
             <li>
@@ -263,41 +216,25 @@ const VocalStyleSection = () => (
         <ul className="check cols2">
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="vocalstyle"
-                        value="male"
-                    />{" "}
+                    <input type="checkbox" name="vocalstyle" value="male" />{" "}
                     Male
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="vocalstyle"
-                        value="female"
-                    />{" "}
+                    <input type="checkbox" name="vocalstyle" value="female" />{" "}
                     Female
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="vocalstyle"
-                        value="duet"
-                    />{" "}
+                    <input type="checkbox" name="vocalstyle" value="duet" />{" "}
                     Duet
                 </label>
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="vocalstyle"
-                        value="group"
-                    />{" "}
+                    <input type="checkbox" name="vocalstyle" value="group" />{" "}
                     Group
                 </label>
             </li>
@@ -316,14 +253,13 @@ const VocalTrackSection = () => (
     <section>
         <h3>Vocal or Instrumental</h3>
         <p>
-            (Note that it's considerably easier to add an instrumental
-            if we already have the vocal version in our database)
+            (Note that it's considerably easier to add an instrumental if we
+            already have the vocal version in our database)
         </p>
         <ul className="check">
             <li>
                 <label>
-                    <input type="radio" name="vocaltrack" value="on" />{" "}
-                    Vocal
+                    <input type="radio" name="vocaltrack" value="on" /> Vocal
                 </label>
             </li>
             <li>
@@ -351,24 +287,23 @@ const VideoFileSection = () => (
         <ul>
             <li>Without baked-in subtitles or watermarks</li>
             <li>
-                DVD / Bluray "special features" often include creditless
-                OPs/EDs - these are ideal
+                DVD / Bluray "special features" often include creditless OPs/EDs
+                - these are ideal
             </li>
             <li>
-                If the video is just a static image, then uploading
-                audio file + image is preferred over uploading a video
-                file
+                If the video is just a static image, then uploading audio file +
+                image is preferred over uploading a video file
             </li>
             <li>
-                Pretty much any video format is fine as input; it'll all
-                get re-encoded to optimised files for iphones / androids
-                / projectors
+                Pretty much any video format is fine as input; it'll all get
+                re-encoded to optimised files for iphones / androids /
+                projectors
             </li>
             <li>
-                If the video doesn't have clean audio (eg characters are
-                talking over the top of an insert song), we'd want a
-                different copy of the audio (eg from a soundtrack album)
-                which can be spliced together
+                If the video doesn't have clean audio (eg characters are talking
+                over the top of an insert song), we'd want a different copy of
+                the audio (eg from a soundtrack album) which can be spliced
+                together
             </li>
         </ul>
         <input multiple type="file" accept="video/*, audio/*" />
@@ -380,14 +315,13 @@ const ImageSection = () => (
         <h3>Image</h3>
         <ul>
             <li>
-                Required if you're uploading an audio file, optional
-                otherwise
+                Required if you're uploading an audio file, optional otherwise
             </li>
             <li>
                 If the video has a particularly good moment to use as a
-                thumbnail, take a screenshot and upload that (otherwise
-                the system will pick a random moment from the video to
-                use as a thumbnail)
+                thumbnail, take a screenshot and upload that (otherwise the
+                system will pick a random moment from the video to use as a
+                thumbnail)
             </li>
         </ul>
         <input type="file" accept="image/*" />
@@ -399,23 +333,22 @@ const SubtitlesSection = () => (
         <h3>Subtitles</h3>
         <ul>
             <li>
-                The end goal is to get a .srt subtitle file with
-                accurate timings; if you have this, it'll save a lot of
-                work :) Personally I'm making these with Aegisub but
-                anything which outputs SRT files should work.
+                The end goal is to get a .srt subtitle file with accurate
+                timings; if you have this, it'll save a lot of work :)
+                Personally I'm making these with Aegisub but anything which
+                outputs SRT files should work.
             </li>
             <li>
-                Don't do anything fancy - no formatting, no mid-line
-                timings, no "[instrumental break]" markers, no preview
-                of the next line &mdash; the input .srt file should{" "}
-                <em>only</em> contain the timings for the lyrics at the
-                moment that they are being sung, and the system will
-                take care of the rest automatically
+                Don't do anything fancy - no formatting, no mid-line timings, no
+                "[instrumental break]" markers, no preview of the next line
+                &mdash; the input .srt file should <em>only</em> contain the
+                timings for the lyrics at the moment that they are being sung,
+                and the system will take care of the rest automatically
             </li>
             <li>
                 Western alphabet (eg, english or romaji) required, other
-                alphabets (eg hiragana or hangul) can optionally be
-                added as extras
+                alphabets (eg hiragana or hangul) can optionally be added as
+                extras
             </li>
         </ul>
         <input type="file" id="textFiles" multiple accept=".srt" />
@@ -427,8 +360,8 @@ const ContributorSection = () => (
         <label>
             <h3>Contributor(s)</h3>
             <p>
-                If you've done the subtitling / editing work yourself,
-                what name would you like to be credited as?
+                If you've done the subtitling / editing work yourself, what name
+                would you like to be credited as?
             </p>
             <input type="text" name="contributor" />
         </label>
@@ -440,19 +373,19 @@ const LinksInfoSection = () => (
         <h3>Links / any other info</h3>
         <ul>
             <li>
-                If you don't have a subtitle file, a link to a website
-                with the lyrics is helpful
+                If you don't have a subtitle file, a link to a website with the
+                lyrics is helpful
             </li>
             <li>
-                If you don't have a video file, specifying the season /
-                episode number can help to track one down
+                If you don't have a video file, specifying the season / episode
+                number can help to track one down
             </li>
             <li>
-                Youtube links are helpful to make sure we've got the
-                right version of the right song, but rarely work well as
-                sources (frequent watermarks, extra "like and subscribe
-                for more!!!" clips tacked onto the beginning or end,
-                weird cropping, inconsistent volumes...)
+                Youtube links are helpful to make sure we've got the right
+                version of the right song, but rarely work well as sources
+                (frequent watermarks, extra "like and subscribe for more!!!"
+                clips tacked onto the beginning or end, weird cropping,
+                inconsistent volumes...)
             </li>
         </ul>
         <textarea name="info" rows={4}></textarea>
@@ -467,7 +400,8 @@ export const UploadForm = () => {
 
     const updateButtonLabel = () => {
         if (!formRef.current) return;
-        const fileInputs = formRef.current.querySelectorAll('input[type="file"]');
+        const fileInputs =
+            formRef.current.querySelectorAll('input[type="file"]');
         let foundFiles = false;
         fileInputs.forEach((input) => {
             const fileInput = input as HTMLInputElement;
@@ -494,7 +428,9 @@ export const UploadForm = () => {
             const metadata: Record<string, string[]> = {};
 
             for (const [key, value] of formData.entries()) {
-                const el = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+                const el = form.querySelector(
+                    `[name="${key}"]`,
+                ) as HTMLInputElement;
                 if (!el || el.type !== "file") {
                     if (metadata[key]) {
                         metadata[key].push(value as string);
@@ -524,7 +460,9 @@ export const UploadForm = () => {
                 const sessionId = data.session_id;
 
                 // Initialize upload progress state
-                setUploads(files.map(file => ({ filename: file.name, progress: 0 })));
+                setUploads(
+                    files.map((file) => ({ filename: file.name, progress: 0 })),
+                );
 
                 const uploadPromises = files.map((file, index) => {
                     return new Promise<void>((resolve, reject) => {
@@ -538,11 +476,18 @@ export const UploadForm = () => {
                             chunkSize: 5 * 1024 * 1024, // 5MB
                             storeFingerprintForResuming: true,
                             onProgress(bytesSent: number, bytesTotal: number) {
-                                console.log(`${file.name}: ${bytesSent}/${bytesTotal}`);
-                                const progress = Math.round((bytesSent / bytesTotal) * 100);
-                                setUploads(prev => {
+                                console.log(
+                                    `${file.name}: ${bytesSent}/${bytesTotal}`,
+                                );
+                                const progress = Math.round(
+                                    (bytesSent / bytesTotal) * 100,
+                                );
+                                setUploads((prev) => {
                                     const newUploads = [...prev];
-                                    newUploads[index] = { filename: file.name, progress };
+                                    newUploads[index] = {
+                                        filename: file.name,
+                                        progress,
+                                    };
                                     return newUploads;
                                 });
                             },
@@ -552,9 +497,12 @@ export const UploadForm = () => {
                             },
                             onSuccess() {
                                 console.log(`${file.name} upload complete`);
-                                setUploads(prev => {
+                                setUploads((prev) => {
                                     const newUploads = [...prev];
-                                    newUploads[index] = { filename: file.name, progress: 100 };
+                                    newUploads[index] = {
+                                        filename: file.name,
+                                        progress: 100,
+                                    };
                                     return newUploads;
                                 });
                                 resolve();
@@ -590,11 +538,12 @@ export const UploadForm = () => {
                 throw new Error(finalizeData.error || "Unknown error");
             }
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : String(err);
+            const errorMessage =
+                err instanceof Error ? err.message : String(err);
             alert(
                 "There was an error processing your submission: " +
                     errorMessage +
-                    " - maybe refresh the page and try again? D:"
+                    " - maybe refresh the page and try again? D:",
             );
         } finally {
             setIsSubmitting(false);
@@ -603,7 +552,12 @@ export const UploadForm = () => {
     };
 
     return (
-        <form id="upload-form" ref={formRef} onChange={updateButtonLabel} onSubmit={handleSubmit}>
+        <form
+            id="upload-form"
+            ref={formRef}
+            onChange={updateButtonLabel}
+            onSubmit={handleSubmit}
+        >
             <ContactInfoSection />
             <TrackTitleSection />
             <ArtistsSection />
@@ -625,7 +579,11 @@ export const UploadForm = () => {
                     {uploads.map((upload, index) => (
                         <div key={index} className="file-row">
                             <strong>{upload.filename}</strong>
-                            <progress className="bar" value={upload.progress} max="100" />
+                            <progress
+                                className="bar"
+                                value={upload.progress}
+                                max="100"
+                            />
                         </div>
                     ))}
                 </section>
@@ -635,9 +593,8 @@ export const UploadForm = () => {
                 {isSubmitting
                     ? "Processing..."
                     : hasFiles
-                        ? "Start Upload"
-                        : "Send Suggestion"
-                }
+                      ? "Start Upload"
+                      : "Send Suggestion"}
             </button>
         </form>
     );
