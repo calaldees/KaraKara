@@ -31,6 +31,10 @@ enum Commands {
         /// Output format
         #[arg(short, long, default_value = "text")]
         format: OutputFormat,
+
+        /// Re-run N times
+        #[arg(short, long, default_value = "1")]
+        bench: usize,
     },
     /// Run as web server
     #[cfg(feature = "server")]
@@ -49,8 +53,13 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Check { format } => {
-            run_check(&cli.processed, format);
+        Commands::Check { format, bench } => {
+            for i in 0..bench {
+                if bench > 1 {
+                    println!("Run {}/{}:", i + 1, bench);
+                }
+                run_check(&cli.processed, format);
+            }
         }
         #[cfg(feature = "server")]
         Commands::Serve { port, host } => {
