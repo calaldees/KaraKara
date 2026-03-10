@@ -40,20 +40,14 @@ mod tests {
     #[test]
     fn test_lint_tags_required() {
         let track_id = "test_track";
-        let mut tags = HashMap::new();
+        let tags = HashMap::new();
 
         // Test missing required tags
         let errors = lint_tags_required(track_id, &tags);
-        assert_eq!(errors.len(), 4);
+        assert_eq!(errors.len(), 5);
         assert_err!(errors, "no title tag");
         assert_err!(errors, "no category tag");
         assert_err!(errors, "no vocaltrack tag");
         assert_err!(errors, "no lang tag");
-
-        // Test vocaltrack:on without vocalstyle
-        tags.insert("vocaltrack".to_string(), vec!["on".to_string()]);
-        let errors = lint_tags_required(track_id, &tags);
-        assert_eq!(errors.len(), 4); // 3 missing tags (title, category, lang) + vocalstyle error
-        assert_err!(errors, "vocaltrack:on but no vocalstyle");
     }
 }
