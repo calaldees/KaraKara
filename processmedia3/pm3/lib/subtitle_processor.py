@@ -8,6 +8,7 @@ import re
 import typing as t
 from datetime import timedelta
 from itertools import zip_longest
+from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -541,15 +542,14 @@ def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(description="Convert between subtitle formats")
-    parser.add_argument("input", type=str, help="input subtitle file")
-    parser.add_argument("output", type=str, help="output subtitle file", nargs="?")
+    parser.add_argument("input", type=Path, help="input subtitle file")
+    parser.add_argument("output", type=Path, help="output subtitle file", nargs="?")
     args = parser.parse_args()
     if args.output is None:
         args.output = args.input
 
-    with open(args.input, "r") as f:
-        indata = f.read()
-        subfile = SubFile(indata)
+    indata = args.input.read_text()
+    subfile = SubFile(indata)
 
     if args.output.endswith(".vtt"):
         outdata = subfile.create_vtt()
@@ -570,8 +570,7 @@ def main() -> None:
             tofile=args.output,
         )
         print("".join(linediff))
-    with open(args.output, "w") as f:
-        f.write(outdata)
+    args.output.write_text(outdata)
 
 
 if __name__ == "__main__":
