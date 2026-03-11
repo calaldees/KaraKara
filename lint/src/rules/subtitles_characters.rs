@@ -16,7 +16,8 @@ static OK_SUBTITLE_CHARS: Set<char> = phf_set! {
     'ō', 'ò', 'ô', 'ó',
     'Ū', 'ú',
     'ñ',
-    '\u{2018}', '\u{2019}'
+    '\u{2018}', '\u{2019}',
+    '\n', // newline isn't allowed, but we have a dedicated rule for that
 };
 
 pub fn lint_subtitles_characters(track_id: &str, subs: &[Subtitle]) -> Vec<LintError> {
