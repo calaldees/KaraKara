@@ -514,7 +514,6 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Convert between subtitle formats")
     parser.add_argument("input", type=str, help="input subtitle file")
     parser.add_argument("output", type=str, help="output subtitle file", nargs="?")
-    parser.add_argument("--unblink", action="store_true", help="remove blinking subtitles")
     args = parser.parse_args()
     if args.output is None:
         args.output = args.input
@@ -522,18 +521,6 @@ def main() -> None:
     with open(args.input, "r") as f:
         indata = f.read()
         lines = parse_subtitles(indata)
-
-    if args.unblink:
-        for i in range(len(lines) - 1):
-            tdiff = lines[i + 1].start - lines[i].end
-            if timedelta(seconds=-0.1) < tdiff < timedelta(seconds=0.1):
-                lines[i] = Subtitle(
-                    idx=lines[i].idx,
-                    start=lines[i].start,
-                    end=lines[i + 1].start,
-                    text=lines[i].text,
-                    top=lines[i].top,
-                )
 
     if args.output.endswith(".vtt"):
         outdata = create_vtt(lines)
