@@ -33,89 +33,112 @@ class SubtitleFormatException(Exception):
     pass
 
 
+class SubTime(timedelta):
+    @classmethod
+    def from_str(cls, time_str: str) -> SubTime:
+        """
+        >>> SubTime.from_str('  1:23:45.6700  ')
+        SubTime(seconds=5025, microseconds=670000)
+        >>> SubTime.from_str('1:23:45,67')
+        SubTime(seconds=5025, microseconds=670000)
+        >>> SubTime.from_str('1:02:03.05')
+        SubTime(seconds=3723, microseconds=50000)
+        >>> SubTime.from_str('1:02:03.05').ssa
+        '1:02:03.05'
+        >>> SubTime.from_str('0:00:60.50')
+        SubTime(seconds=60, microseconds=500000)
+        >>> SubTime.from_str('0:59:60.1000001')
+        SubTime(seconds=3600, microseconds=100000)
+        """
+        match = re_time.search(time_str)
+        if not match:
+            raise SubtitleParseException(f"Can't parse time: {time_str}")
+        time_dict = match.groupdict()
+        return cls(
+            hours=int(time_dict["hours"]),
+            minutes=int(time_dict["minutes"]),
+            seconds=float(time_dict["seconds"].replace(",", ".")),
+        )
+
+    def __add__(self, other: timedelta, /) -> SubTime:
+        return SubTime(seconds=super().__add__(other).total_seconds())
+
+    def __sub__(self, other: timedelta, /) -> SubTime:
+        return SubTime(seconds=super().__sub__(other).total_seconds())
+
+    def __mul__(self, other: int | float, /) -> SubTime:
+        return SubTime(seconds=super().__mul__(other).total_seconds())
+
+    @t.overload
+    def __truediv__(self, value: timedelta, /) -> float: ...
+
+    @t.overload
+    def __truediv__(self, value: int | float, /) -> SubTime: ...
+
+    def __truediv__(self, value: timedelta | int | float, /) -> SubTime | float:
+        result = super().__truediv__(value)
+        if isinstance(result, float) or isinstance(result, int):
+            return result
+        return SubTime(seconds=result.total_seconds())
+
+    @property
+    def srt(self) -> str:
+        """
+        >>> SubTime(hours=1, minutes=23, seconds=45, microseconds=671000).srt
+        '01:23:45,671'
+        >>> SubTime(hours=0, minutes=0, seconds=0, microseconds=0).srt
+        '00:00:00,000'
+        >>> SubTime(hours=1, minutes=2, seconds=3, microseconds=50000).srt
+        '01:02:03,050'
+        """
+        return "{:02d}:{:02d}:{:06.03f}".format(
+            self.seconds // 60 // 60,
+            (self.seconds % (60 * 60)) // 60,
+            self.seconds % 60 + self.microseconds / 1000000,
+        ).replace(".", ",")
+
+    @property
+    def ssa(self) -> str:
+        """
+        >>> SubTime(hours=1, minutes=23, seconds=45, microseconds=671000).ssa
+        '1:23:45.67'
+        >>> SubTime(hours=0, minutes=0, seconds=0, microseconds=0).ssa
+        '0:00:00.00'
+        >>> SubTime(hours=1, minutes=2, seconds=3, microseconds=50000).ssa
+        '1:02:03.05'
+        """
+        return "{}:{:02d}:{:05.02f}".format(
+            self.seconds // 60 // 60,
+            (self.seconds % (60 * 60)) // 60,
+            self.seconds % 60 + self.microseconds / 1000000,
+        )
+
+    @property
+    def vtt(self) -> str:
+        """
+        >>> SubTime(hours=1, minutes=23, seconds=45, microseconds=671000).vtt
+        '01:23:45.671'
+        >>> SubTime(hours=0, minutes=0, seconds=0, microseconds=0).vtt
+        '00:00:00.000'
+        >>> SubTime(hours=1, minutes=2, seconds=3, microseconds=50000).vtt
+        '01:02:03.050'
+        """
+        return "{:02d}:{:02d}:{:06.03f}".format(
+            self.seconds // 60 // 60,
+            (self.seconds % (60 * 60)) // 60,
+            self.seconds % 60 + self.microseconds / 1000000,
+        )
+
+
 class Subtitle(t.NamedTuple):
     idx: int = 0
-    start: timedelta = timedelta()
-    end: timedelta = timedelta()
+    start: SubTime = SubTime()
+    end: SubTime = SubTime()
     text: str = ""
     top: bool = False
 
     def __str__(self) -> str:
         return f"{self.idx}: {self.start} -> {self.end}: {self.text.replace('\n', '\\N')}{' (top)' if self.top else ''}".strip()
-
-
-def _ssa_time(t: timedelta) -> str:
-    """
-    >>> _ssa_time(timedelta(hours=1, minutes=23, seconds=45, microseconds=671000))
-    '1:23:45.67'
-    >>> _ssa_time(timedelta(hours=0, minutes=0, seconds=0, microseconds=0))
-    '0:00:00.00'
-    >>> _ssa_time(timedelta(hours=1, minutes=2, seconds=3, microseconds=50000))
-    '1:02:03.05'
-    """
-    return "{}:{:02d}:{:05.02f}".format(
-        t.seconds // 60 // 60,
-        (t.seconds % (60 * 60)) // 60,
-        t.seconds % 60 + t.microseconds / 1000000,
-    )
-
-
-def _srt_time(t: timedelta) -> str:
-    """
-    >>> _srt_time(timedelta(hours=1, minutes=23, seconds=45, microseconds=671000))
-    '01:23:45,671'
-    >>> _srt_time(timedelta(hours=0, minutes=0, seconds=0, microseconds=0))
-    '00:00:00,000'
-    >>> _srt_time(timedelta(hours=1, minutes=2, seconds=3, microseconds=50000))
-    '01:02:03,050'
-    """
-    return "{:02d}:{:02d}:{:06.03f}".format(
-        t.seconds // 60 // 60,
-        (t.seconds % (60 * 60)) // 60,
-        t.seconds % 60 + t.microseconds / 1000000,
-    ).replace(".", ",")
-
-
-def _vtt_time(t: timedelta) -> str:
-    """
-    >>> _vtt_time(timedelta(hours=1, minutes=23, seconds=45, microseconds=671000))
-    '01:23:45.671'
-    >>> _vtt_time(timedelta(hours=0, minutes=0, seconds=0, microseconds=0))
-    '00:00:00.000'
-    >>> _vtt_time(timedelta(hours=1, minutes=2, seconds=3, microseconds=50000))
-    '01:02:03.050'
-    """
-    return "{:02d}:{:02d}:{:06.03f}".format(
-        t.seconds // 60 // 60,
-        (t.seconds % (60 * 60)) // 60,
-        t.seconds % 60 + t.microseconds / 1000000,
-    )
-
-
-def _parse_time(time_str: str) -> timedelta:
-    """
-    >>> _parse_time('  1:23:45.6700  ')
-    datetime.timedelta(seconds=5025, microseconds=670000)
-    >>> _parse_time('1:23:45,67')
-    datetime.timedelta(seconds=5025, microseconds=670000)
-    >>> _parse_time('1:02:03.05')
-    datetime.timedelta(seconds=3723, microseconds=50000)
-    >>> _ssa_time(_parse_time('1:02:03.05'))
-    '1:02:03.05'
-    >>> _parse_time('0:00:60.50')
-    datetime.timedelta(seconds=60, microseconds=500000)
-    >>> _parse_time('0:59:60.1000001')
-    datetime.timedelta(seconds=3600, microseconds=100000)
-    """
-    match = re_time.search(time_str)
-    if not match:
-        raise SubtitleParseException(f"Can't parse time: {time_str}")
-    time_dict = match.groupdict()
-    return timedelta(
-        hours=int(time_dict["hours"]),
-        minutes=int(time_dict["minutes"]),
-        seconds=float(time_dict["seconds"].replace(",", ".")),
-    )
 
 
 def clean_line(text: str) -> str:
@@ -167,8 +190,8 @@ def _parse_srt(source: str) -> list[Subtitle]:
     def parse_line(line: dict[str, str]) -> Subtitle:
         return Subtitle(
             int(line["idx"]),
-            _parse_time(line["start"]),
-            _parse_time(line["end"]),
+            SubTime.from_str(line["start"]),
+            SubTime.from_str(line["end"]),
             clean_line(line["text"]),
             "\\a6" in line["text"],
         )
@@ -216,8 +239,8 @@ def _parse_ssa(source: str) -> list[Subtitle]:
     def parse_line(line: dict[str, str], idx: int) -> Subtitle:
         return Subtitle(
             idx,
-            _parse_time(line["start"]),
-            _parse_time(line["end"]),
+            SubTime.from_str(line["start"]),
+            SubTime.from_str(line["end"]),
             clean_line(line["text"]),
             "\\a6" in line["text"],
         )
@@ -271,7 +294,9 @@ Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             if subtitle_next
             else subtitle.text
         ).replace("\n", SSA_NEWLINE)
-        data += f"Dialogue: Marked=0,{_ssa_time(subtitle.start)},{_ssa_time(subtitle.end)},*Default,NTP,0000,0000,0000,!Effect,{text}\n"
+        data += (
+            f"Dialogue: Marked=0,{subtitle.start.ssa},{subtitle.end.ssa},*Default,NTP,0000,0000,0000,!Effect,{text}\n"
+        )
     return data
 
 
@@ -285,8 +310,8 @@ def create_srt(subtitles: list[Subtitle]) -> str:
     return "".join(
         SRT_FORMAT.format(
             idx=idx,
-            start=_srt_time(subtitle.start),
-            end=_srt_time(subtitle.end),
+            start=subtitle.start.srt,
+            end=subtitle.end.srt,
             text=("{\\a6}" if subtitle.top else "") + subtitle.text,
         )
         for idx, subtitle in enumerate(subtitles, 1)
@@ -369,7 +394,7 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
                 top=subtitles[i].top,
             )
 
-    last_end = timedelta(0)
+    last_end = SubTime(0)
     padded_lines: list[Subtitle] = []
     # Turn each line of source text into one or more lines of output text
     # by inserting blank lines or progress bars as needed
@@ -511,8 +536,8 @@ def create_vtt(subtitles: list[Subtitle]) -> str:
     blocks = [
         VTT_FORMAT.format(
             idx=idx,
-            start=_vtt_time(active.start),
-            end=_vtt_time(active.end),
+            start=active.start.vtt,
+            end=active.end.vtt,
             format=" line:1" if active.top else "",
             active=active.text,
             next=next.text,
