@@ -1,31 +1,29 @@
 ## -*- coding: utf-8 -*-
 
 import unittest
-from datetime import timedelta
 from pathlib import Path
 
 from pm3.lib.subtitle_processor import (
+    SubFile,
+    SubTime,
     Subtitle,
-    create_srt,
-    create_ssa,
-    create_vtt,
-    parse_subtitles,
 )
 
 
 class TestCreateSsa(unittest.TestCase):
     def test_create_ssa(self) -> None:
-        ssa = create_ssa(
-            [
-                Subtitle(1, timedelta(minutes=0), timedelta(minutes=1), "first"),
-                Subtitle(
-                    2,
-                    timedelta(minutes=2),
-                    timedelta(minutes=3, microseconds=510000),
-                    "second",
-                ),
-            ]
-        )
+        # Create a temporary SRT to parse into SubFile
+        srt = """1
+00:00:00,000 --> 00:01:00,000
+first
+
+2
+00:02:00,000 --> 00:03:00,510
+second
+
+"""
+        subfile = SubFile(srt)
+        ssa = subfile.create_ssa()
         self.assertEqual(
             ssa,
             r"""[Script Info]
@@ -45,19 +43,19 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
         )
 
         self.assertEqual(
-            parse_subtitles(ssa),
+            SubFile(ssa).subtitles,
             [
                 Subtitle(
                     1,
-                    start=timedelta(0),
-                    end=timedelta(seconds=60),
+                    start=SubTime(0),
+                    end=SubTime(seconds=60),
                     text="first\nsecond",
                     top=False,
                 ),
                 Subtitle(
                     2,
-                    start=timedelta(seconds=120),
-                    end=timedelta(seconds=180, microseconds=510000),
+                    start=SubTime(seconds=120),
+                    end=SubTime(seconds=180, microseconds=510000),
                     text="second",
                     top=False,
                 ),
@@ -65,28 +63,35 @@ Dialogue: Marked=0,0:02:00.00,0:03:00.51,*Default,NTP,0000,0000,0000,!Effect,sec
         )
 
     def test_newline(self) -> None:
-        ssa = create_ssa(
-            [
-                Subtitle(1, timedelta(minutes=0), timedelta(minutes=1), "newline\ntest"),
-            ]
-        )
+        srt = """1
+00:00:00,000 --> 00:01:00,000
+newline
+test
+
+"""
+        subfile = SubFile(srt)
+        ssa = subfile.create_ssa()
         self.assertIn("newline\\Ntest", ssa)
 
 
 class TestCreateSrt(unittest.TestCase):
     def test_create_srt(self) -> None:
-        srt = create_srt(
-            [
-                Subtitle(1, timedelta(minutes=0), timedelta(minutes=1), "first\nfirst2"),
-                Subtitle(
-                    2,
-                    timedelta(minutes=2),
-                    timedelta(minutes=3, microseconds=510000),
-                    "second",
-                ),
-                Subtitle(3, timedelta(minutes=4), timedelta(minutes=5), ""),
-            ]
-        )
+        srt_input = """1
+00:00:00,000 --> 00:01:00,000
+first
+first2
+
+2
+00:02:00,000 --> 00:03:00,510
+second
+
+3
+00:04:00,000 --> 00:05:00,000
+
+
+"""
+        subfile = SubFile(srt_input)
+        srt = subfile.create_srt()
         self.assertEqual(
             srt,
             """1
@@ -101,19 +106,19 @@ second
 """,
         )
         self.assertEqual(
-            parse_subtitles(srt),
+            SubFile(srt).subtitles,
             [
                 Subtitle(
                     1,
-                    start=timedelta(0),
-                    end=timedelta(seconds=60),
+                    start=SubTime(0),
+                    end=SubTime(seconds=60),
                     text="first\nfirst2",
                     top=False,
                 ),
                 Subtitle(
                     2,
-                    start=timedelta(seconds=120),
-                    end=timedelta(seconds=180, microseconds=510000),
+                    start=SubTime(seconds=120),
+                    end=SubTime(seconds=180, microseconds=510000),
                     text="second",
                     top=False,
                 ),
@@ -128,4 +133,4 @@ class TestCreateVtt(unittest.TestCase):
             with self.subTest(case.stem):
                 srt_data = case.read_text()
                 vtt_data = case.with_suffix(".vtt").read_text()
-                self.assertEqual(vtt_data, create_vtt(parse_subtitles(srt_data)))
+                self.assertEqual(vtt_data, SubFile(srt_data).create_vtt())

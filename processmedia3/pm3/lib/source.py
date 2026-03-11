@@ -6,7 +6,6 @@ from collections.abc import MutableMapping
 
 from .file_abstraction import AbstractFile
 from .kktypes import MediaMeta
-from .subtitle_processor import Subtitle, parse_subtitles
 from .tag_processor import parse_tags
 
 log = logging.getLogger()
@@ -75,15 +74,6 @@ class Source:
     def meta(self) -> MediaMeta:
         log.info(f"Parsing meta from {self.file.relative}")
         return MediaMeta.from_uri(self.file.absolute)
-
-    @property
-    @_cache
-    def subtitles(self) -> list[Subtitle]:
-        log.info(f"Parsing subtitles from {self.file.relative}")
-        t = self.file.text
-        t = t.replace("\u0435", "e")
-        t = t.replace(" ", " ")
-        return parse_subtitles(t)
 
     @property
     @_cache
