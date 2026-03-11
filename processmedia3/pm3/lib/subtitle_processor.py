@@ -737,9 +737,10 @@ class SubFile:
         subtitles = SubFilters.fill_large_gaps(subtitles, BIG_GAP)
         subtitles = SubFilters.fill_small_gaps(subtitles, BIG_GAP)
 
-        tops, bots = SubFilters.split_top_bottom(subtitles)
-        pairs = SubFilters.get_pairs(tops) + SubFilters.get_pairs(bots)
-        pairs = sorted(pairs, key=lambda pair: pair[0].start)
+        pairs = SubFilters.get_pairs(subtitles)
+        # tops, bots = SubFilters.split_top_bottom(subtitles)
+        # pairs = SubFilters.get_pairs(tops) + SubFilters.get_pairs(bots)
+        # pairs = sorted(pairs, key=lambda pair: pair[0].start)
 
         # Turn the list of (active line, next line) pairs into VTT-formated strings
         VTT_FORMAT = dedent("""\
