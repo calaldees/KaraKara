@@ -511,6 +511,14 @@ class SubFilters:
         """
         return sorted(lines, key=lambda line: line.start)
 
+    @staticmethod
+    def split_top_bottom(lines: list[Subtitle]) -> tuple[list[Subtitle], list[Subtitle]]:
+        return ([line for line in lines if line.top], [line for line in lines if not line.top])
+
+    @staticmethod
+    def merge_top_bottom(tops: list[Subtitle], bots: list[Subtitle]) -> list[Subtitle]:
+        return sorted(tops + bots, key=lambda line: line.start)
+
 
 class SubFile:
     """A class representing a subtitle file with methods for manipulating and exporting subtitles."""
@@ -717,12 +725,21 @@ class SubFile:
 
         subtitles = list(self.subtitles)  # Make a copy to avoid modifying the original
         subtitles = SubFilters.sort_lines(subtitles)
-        subtitles = SubFilters.remove_tiny_gaps(subtitles, UNBLINK_GAP)
-        subtitles = SubFilters.distinguish_repeats(subtitles, REPEAT_GAP)
+
+        tops, bots = SubFilters.split_top_bottom(subtitles)
+        tops = SubFilters.remove_tiny_gaps(tops, UNBLINK_GAP)
+        bots = SubFilters.remove_tiny_gaps(bots, UNBLINK_GAP)
+        tops = SubFilters.distinguish_repeats(tops, REPEAT_GAP)
+        bots = SubFilters.distinguish_repeats(bots, REPEAT_GAP)
+        subtitles = SubFilters.merge_top_bottom(tops, bots)
+
         subtitles = SubFilters.preview_first_line(subtitles, BIG_GAP, BIG_GAP_PREVIEW)
         subtitles = SubFilters.fill_large_gaps(subtitles, BIG_GAP)
         subtitles = SubFilters.fill_small_gaps(subtitles, BIG_GAP)
-        pairs = SubFilters.get_pairs(subtitles)
+
+        tops, bots = SubFilters.split_top_bottom(subtitles)
+        pairs = SubFilters.get_pairs(tops) + SubFilters.get_pairs(bots)
+        pairs = sorted(pairs, key=lambda pair: pair[0].start)
 
         # Turn the list of (active line, next line) pairs into VTT-formated strings
         VTT_FORMAT = dedent("""\
