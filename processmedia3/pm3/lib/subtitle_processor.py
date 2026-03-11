@@ -40,6 +40,9 @@ class Subtitle(t.NamedTuple):
     text: str = ""
     top: bool = False
 
+    def __str__(self) -> str:
+        return f"{self.idx}: {self.start} -> {self.end}: {self.text.replace('\n', '\\N')}{' (top)' if self.top else ''}".strip()
+
 
 def _ssa_time(t: timedelta) -> str:
     """
@@ -120,8 +123,13 @@ def clean_line(text: str) -> str:
     return "\n".join(l.strip() for l in text.split("\\N"))
 
 
+def _debug_subs(subtitles: list[Subtitle]) -> None:
+    for subtitle in subtitles:
+        print(subtitle)
+
+
 def _parse_srt(source: str) -> list[Subtitle]:
-    r"""
+    """
     >>> srt = r'''
     ... 1
     ... 00:00:13,500 --> 00:00:22,343
@@ -129,15 +137,16 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ...
     ... 2
     ... 00:00:22,343 --> 00:00:25,792
-    ... {\a6}second {\c&HFFFF80&}coloured bit
+    ... {\\a6}second {\\c&HFFFF80&}coloured bit
     ...
     ... 3
     ... 00:00:30,000 --> 00:00:40,000
     ...
     ...
     ... '''
-    >>> _parse_srt(srt)
-    [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text="test, it's, キ", top=False), Subtitle(idx=2, start=datetime.timedelta(seconds=22, microseconds=343000), end=datetime.timedelta(seconds=25, microseconds=792000), text='second coloured bit', top=True)]
+    >>> _debug_subs(_parse_srt(srt))
+    1: 0:00:13.500000 -> 0:00:22.343000: test, it's, キ
+    2: 0:00:22.343000 -> 0:00:25.792000: second coloured bit (top)
 
     Test with period as decimal separator (non-standard, but some software with some locale settings does it...):
     >>> srt_period = r'''
@@ -145,8 +154,8 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ... 00:00:13.500 --> 00:00:22.343
     ... test with periods
     ... '''
-    >>> _parse_srt(srt_period)
-    [Subtitle(idx=1, start=datetime.timedelta(seconds=13, microseconds=500000), end=datetime.timedelta(seconds=22, microseconds=343000), text='test with periods', top=False)]
+    >>> _debug_subs(_parse_srt(srt_period))
+    1: 0:00:13.500000 -> 0:00:22.343000: test with periods
     """
 
     def parse_line(line: dict[str, str]) -> Subtitle:
@@ -179,22 +188,22 @@ def _parse_srt(source: str) -> list[Subtitle]:
 
 
 def _parse_ssa(source: str) -> list[Subtitle]:
-    r"""
+    """
     >>> ssa = r'''
     ... [Events]
     ... Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-    ... Dialogue: Marked=0,0:00:00.00,0:00:05.00,*Default,NTP,0000,0000,0000,!Effect,{\a6}Ishida Yoko - {\c&HFFFF00&}Towa no Hana{\c&HFFFF&}\N{\c&HFFFFFF&}{\c&H8080FF&}Ai Yori Aoshi OP
-    ... Dialogue: Marked=0,0:00:07.00,0:00:13.25,*Default,NTP,0000,0000,0000,!Effect,awaku saita hana no kao\N{\c&HFFFFFF&}nokoshi kisetsu wa sugimasu
+    ... Dialogue: Marked=0,0:00:00.00,0:00:05.00,*Default,NTP,0000,0000,0000,!Effect,{\\a6}Ishida Yoko - {\\c&HFFFF00&}Towa no Hana{\\c&HFFFF&}\\N{\\c&HFFFFFF&}{\\c&H8080FF&}Ai Yori Aoshi OP
+    ... Dialogue: Marked=0,0:00:07.00,0:00:13.25,*Default,NTP,0000,0000,0000,!Effect,awaku saita hana no kao\\N{\\c&HFFFFFF&}nokoshi kisetsu wa sugimasu
     ... '''
-    >>> _parse_ssa(ssa)
-    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=5), text='Ishida Yoko - Towa no Hana\nAi Yori Aoshi OP', top=True), Subtitle(idx=2, start=datetime.timedelta(seconds=7), end=datetime.timedelta(seconds=13, microseconds=250000), text='awaku saita hana no kao\nnokoshi kisetsu wa sugimasu', top=False)]
+    >>> _debug_subs(_parse_ssa(ssa))
+    1: 0:00:00 -> 0:00:05: Ishida Yoko - Towa no Hana\\NAi Yori Aoshi OP (top)
+    2: 0:00:07 -> 0:00:13.250000: awaku saita hana no kao\\Nnokoshi kisetsu wa sugimasu
 
     >>> ssa = r'''
     ... Dialogue: ,0:00:00.00,0:00:01.00,,,,,,,this is, text on same line
     ... '''
-    >>> _parse_ssa(ssa)
-    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='this is, text on same line', top=False)]
-
+    >>> _debug_subs(_parse_ssa(ssa))
+    1: 0:00:00 -> 0:00:01: this is, text on same line
     """
     lines = [line_match.groupdict() for line_match in re_ssa_line.finditer(source)]
 
@@ -217,17 +226,16 @@ def parse_subtitles(data: str) -> list[Subtitle]:
     ... 00:00:00,000 --> 00:00:01,000
     ... srt
     ... '''
-    >>> parse_subtitles(srt)
-    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='srt', top=False)]
+    >>> _debug_subs(parse_subtitles(srt))
+    1: 0:00:00 -> 0:00:01: srt
 
     >>> ssa = '''
     ... Dialogue: Marked=0,0:00:00.00,0:00:01.00,*Default,NTP,0000,0000,0000,!Effect,ssa
     ... '''
-    >>> parse_subtitles(ssa)
-    [Subtitle(idx=1, start=datetime.timedelta(0), end=datetime.timedelta(seconds=1), text='ssa', top=False)]
+    >>> _debug_subs(parse_subtitles(ssa))
+    1: 0:00:00 -> 0:00:01: ssa
 
-    >>> parse_subtitles('not real subtitles')
-    []
+    >>> _debug_subs(parse_subtitles('not real subtitles'))
     """
     return _parse_srt(data) or _parse_ssa(data)
 
