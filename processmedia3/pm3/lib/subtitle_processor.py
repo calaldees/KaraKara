@@ -166,7 +166,7 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ...
     ... 2
     ... 00:00:22,343 --> 00:00:25,792
-    ... {\\a6}second {\\c&HFFFF80&}coloured bit
+    ... ^second bit
     ...
     ... 3
     ... 00:00:30,000 --> 00:00:40,000
@@ -175,7 +175,7 @@ def _parse_srt(source: str) -> list[Subtitle]:
     ... '''
     >>> _debug_subs(_parse_srt(srt))
     1: 0:00:13.500000 -> 0:00:22.343000: test, it's, キ
-    2: 0:00:22.343000 -> 0:00:25.792000: second coloured bit (top)
+    2: 0:00:22.343000 -> 0:00:25.792000: second bit (top)
 
     Test with period as decimal separator (non-standard, but some software with some locale settings does it...):
     >>> srt_period = r'''
@@ -192,8 +192,8 @@ def _parse_srt(source: str) -> list[Subtitle]:
             int(line["idx"]),
             SubTime.from_str(line["start"]),
             SubTime.from_str(line["end"]),
-            clean_line(line["text"]),
-            "\\a6" in line["text"],
+            line["text"].lstrip("^"),
+            line["text"].startswith("^"),
         )
 
     lines = [parse_line(line_match.groupdict()) for line_match in re_srt_line.finditer(source)]
