@@ -116,6 +116,12 @@ def _parse_time(time_str: str) -> timedelta:
 
 
 def clean_line(text: str) -> str:
+    """
+    >>> clean_line(r"test, it's, キ")
+    "test, it's, キ"
+    >>> clean_line(r'{\\a6}second {\\c&HFFFF80&}coloured bit')
+    'second coloured bit'
+    """
     text = re.sub(r"{.*?}", "", text)
     return "\n".join(l.strip() for l in text.split("\\N"))
 
