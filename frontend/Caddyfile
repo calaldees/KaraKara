@@ -60,6 +60,10 @@
 		reverse_proxy syncthing:8384
 	}
 
+	handle_path /lint/* {
+		reverse_proxy lint:3000
+	}
+
 	handle_path /* {
 		@needsSlash {
 			path_regexp top ^/[^/]+$

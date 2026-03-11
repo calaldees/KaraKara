@@ -6,7 +6,6 @@ RUN apk add --no-cache \
 RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     pip install -e .
 COPY ./pm3 ./pm3
-COPY ./main.py .
 
 FROM base AS test
 COPY pyproject.toml ./
@@ -19,5 +18,5 @@ FROM base AS production
 ENV TZ=Etc/UTC
 VOLUME /media/source
 VOLUME /media/processed
-ENTRYPOINT [ "python3", "main.py", "--source", "/media/source", "--processed", "/media/processed" ]
+ENTRYPOINT [ "python3", "-m", "pm3", "--source", "/media/source", "--processed", "/media/processed" ]
 CMD ["all", "--loop", "600"]

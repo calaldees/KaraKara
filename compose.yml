@@ -24,7 +24,6 @@ services:
             - mqtt
             - player3
             - browser3
-            - upload
         labels:
             traefik.enable: true
             traefik.http.routers.karakara.rule: "Host(`${HOSTNAME}`)"
@@ -36,8 +35,7 @@ services:
 
 
     api_queue:
-        build:
-            context: ./api_queue
+        build: ./api_queue
         restart: unless-stopped
         mem_limit: 1g
         environment:
@@ -65,26 +63,19 @@ services:
             - ${PWD}/mqtt/:/mosquitto/config/:ro
 
     player3:
-        build:
-            context: ./player3
-            additional_contexts:
-                root: .
+        build: ./player3
         restart: unless-stopped
         mem_limit: 1g
 
     browser3:
-        build:
-            context: ./browser3
-            additional_contexts:
-                root: .
+        build: ./browser3
         restart: unless-stopped
         mem_limit: 1g
 
     processmedia3:
         profiles:
             - processmedia
-        build:
-            context: ./processmedia3
+        build: ./processmedia3
         restart: unless-stopped
         user: ${UID}:${GID}
         mem_limit: 8g
@@ -116,10 +107,9 @@ services:
             - 21027:21027/udp # Receive local discovery broadcasts
 
     upload:
-        build:
-            context: ./upload
         profiles:
             - upload
+        build: ./upload
         restart: unless-stopped
         user: ${UID}:${GID}
         mem_limit: 1g
@@ -129,3 +119,11 @@ services:
             UPLOAD_DIR: /uploads
         volumes:
             - ${PATH_HOST_media}/wip:/uploads:rw
+
+    lint:
+        build: ./lint
+        restart: unless-stopped
+        mem_limit: 1g
+        command: serve --host 0.0.0.0 --port 3000
+        volumes:
+            - ${PATH_HOST_media}/processed:/media/processed:ro

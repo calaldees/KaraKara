@@ -88,7 +88,6 @@ tracks = [
 - `encode()` iterates over each Track, and makes sure that each `Target` file exists, calling `target.encode()` to create it if needed
 - `export()` iterates over each Track, converts it to JSON, and writes `tracks.json`
 - `cleanup()` iterates over each Track, collecs a list of all Target filenames, and deletes any file in the output directory that we aren't expecting to exist
-- `lint()` iterates over all the sources and checks for various common mistakes like typos in tag names or overlapping subtitles
 
 `pm3/lib/` has classes for `Source` / `Target` / `Track`
 
@@ -100,20 +99,17 @@ tracks = [
 
 ## Debugging Tools
 
-* Raw python: `./main.py <command>`
+* Raw python: `uv run pm3 <command>`
     * You'll need to make sure the `--source` / `--processed` flags are set appropriately
 * In docker: `docker compose run --rm -ti processmedia3 <command>`
     * Docker automatically sets the `--source` / `--processed` flags based on `.env`
 * Testing subtitle encoding
-    * `./pm3/lib/subtitle_processor.py input.srt output.vtt`
+    * `uv run pm3-subtitle-processor input.srt output.vtt`
 * Encoding a single file into various formats to test with
-    * `./pm3/lib/encoders.py ~/Videos/kk-stress-test/demo.webm`
+    * `uv run pm3-encoder ~/Videos/kk-stress-test/demo.webm`
 
 
 ## Dev Setup
 ```
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --group dev .
-./main.py --help
+uv run pm3 --help
 ```

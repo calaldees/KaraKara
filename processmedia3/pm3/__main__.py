@@ -13,13 +13,12 @@ from pathlib import Path
 import tap
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from pm3.cmds.cleanup import cleanup
-from pm3.cmds.encode import encode
-from pm3.cmds.export import export
-from pm3.cmds.lint import lint
-from pm3.cmds.scan import scan
-from pm3.cmds.status import status
-from pm3.lib.file_abstraction import AbstractFolder
+from .cmds.cleanup import cleanup
+from .cmds.encode import encode
+from .cmds.export import export
+from .cmds.scan import scan
+from .cmds.status import status
+from .lib.file_abstraction import AbstractFolder
 
 log = logging.getLogger()
 
@@ -34,7 +33,7 @@ class PM3Args(tap.Tap):
     reencode: bool = False  # Re-encode files, even if they already exist in the processed directory
     debug: bool = False  # Super-extra verbose logging
     log_file: Path | None = None  # Where to write logs to
-    cmd: t.Literal["all", "status", "encode", "export", "lint", "cleanup"] = "all"  # Sub-process to run
+    cmd: t.Literal["all", "status", "encode", "export", "cleanup"] = "all"  # Sub-process to run
     match: str | None = None  # Only act upon files matching this pattern
     # fmt: on
 
@@ -110,8 +109,6 @@ def _main(args: PM3Args) -> int:
                     cleanup(args.processed, tracks, args.delete, args.threads)
             elif args.cmd == "status":
                 status(tracks)
-            elif args.cmd == "lint":
-                lint(tracks)
             elif args.cmd == "encode":
                 encode(tracks, args.reencode, args.threads)
             elif args.cmd == "export":
@@ -122,6 +119,11 @@ def _main(args: PM3Args) -> int:
                 cleanup(args.processed, tracks, args.delete, args.threads)
 
     return 0
+
+
+def entry_point() -> int:
+    """Entry point for console script."""
+    return main(sys.argv)
 
 
 if __name__ == "__main__":

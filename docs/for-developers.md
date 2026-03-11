@@ -16,7 +16,7 @@ cd KaraKara
 ```bash
 python3 processmedia3/get_example_media.py
 cp .env.example .env
-docker compose up --detach --build
+docker compose up --detach --build --pull=always
 docker compose logs
 ```
 * see encoding progress in docker terminal
@@ -38,11 +38,6 @@ processmedia
 browser
 player
 api_queue
-
-logs[(/logs/)]
-frontend ..-> logs
-processmedia ..-> logs
-api_queue ..-> logs
 
 /data/queue/[(/data/queue/)]
 
@@ -66,9 +61,10 @@ syncthing --> /media/source/
 ## Develop
 
 * Edit code in your IDE
-* Rebuild and rerun with `docker compose up --detach --build`
+* Rebuild and rerun with `docker compose up --detach --build --pull=always`
 * Note that while docker is the simplest and most reliable way to get up and running, it can be slow to rebuild
 * For faster iteration, you can run components directly on your host machine - the process for this is different for each component, and will be documented in each component's README file
+  * [upload](../upload/README.md)
   * [processmedia3](../processmedia3/README.md)
   * [browser3](../browser3/README.md)
   * [api_queue](../api_queue/README.md)

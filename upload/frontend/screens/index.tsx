@@ -1,6 +1,6 @@
 import { InfoBox } from "../components/InfoBox";
-import { WipBox } from "../components/WipBox";
 import { UploadForm } from "../components/UploadForm";
+import { WipBox } from "../components/WipBox";
 
 export function Index() {
     return (
@@ -19,4 +19,4 @@ export function Index() {
             </div>
         </main>
     );
-};
+}
