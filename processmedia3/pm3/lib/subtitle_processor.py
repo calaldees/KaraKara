@@ -9,6 +9,7 @@ import typing as t
 from datetime import timedelta
 from itertools import zip_longest
 from pathlib import Path
+from textwrap import dedent
 
 log = logging.getLogger(__name__)
 
@@ -264,18 +265,19 @@ class SubFile:
         return [parse_line(line_dict, i + 1) for i, line_dict in enumerate(lines)]
 
     def create_ssa(self) -> str:
-        data = """[Script Info]
-Title: <untitled>
-Original Script: <unknown>
-ScriptType: v4.00
+        data = dedent("""\
+            [Script Info]
+            Title: <untitled>
+            Original Script: <unknown>
+            ScriptType: v4.00
 
-[V4 Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
-Style: Default,Arial,14,65535,16777215,16777215,0,-1,0,3,1,1,2,14,14,14,0,128
+            [V4 Styles]
+            Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, TertiaryColour, BackColour, Bold, Italic, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding
+            Style: Default,Arial,14,65535,16777215,16777215,0,-1,0,3,1,1,2,14,14,14,0,128
 
-[Events]
-Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-"""
+            [Events]
+            Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+            """)
 
         for subtitle, subtitle_next in zip_longest(self.subtitles, self.subtitles[1:]):
             text = (
@@ -292,12 +294,12 @@ Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         return data
 
     def create_srt(self) -> str:
-        SRT_FORMAT = """\
-{idx}
-{start} --> {end}
-{text}
+        SRT_FORMAT = dedent("""\
+            {idx}
+            {start} --> {end}
+            {text}
 
-"""
+            """)
         return "".join(
             SRT_FORMAT.format(
                 idx=idx,
@@ -333,13 +335,13 @@ Format: Marked, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         https://w3c.github.io/webvtt/
         https://caniuse.com/?search=vtt
         """
-        VTT_FORMAT = """\
-{idx}
-{start} --> {end}{format}
-<v active>{active}
-<v next>{next}
+        VTT_FORMAT = dedent("""\
+            {idx}
+            {start} --> {end}{format}
+            <v active>{active}
+            <v next>{next}
 
-"""
+            """)
         # remove gaps smaller than this
         UNBLINK_GAP = timedelta(seconds=0.250)
         # if the same line of lyrics appears twice in a row
