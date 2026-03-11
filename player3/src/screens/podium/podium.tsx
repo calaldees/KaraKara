@@ -4,7 +4,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
 import type { QueueItem, Subtitle, Track } from "@/types";
-import { attachment_path, parse_duration, percent, s_to_mns } from "@/utils";
+import { add_dot_dot_dots, attachment_path, parse_duration, percent, s_to_mns } from "@/utils";
 
 import "./podium.scss";
 
@@ -56,7 +56,7 @@ function PodiumInner({
             request({
                 url: attachment_path(subtitleAttachment),
                 options: { credentials: "omit" },
-                onAction: (result) => setLyrics(result),
+                onAction: (result) => setLyrics(add_dot_dot_dots(result)),
             });
         }
     }, [request, track, queue_item.subtitle_variant]);
