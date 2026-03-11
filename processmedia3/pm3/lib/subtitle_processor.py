@@ -688,6 +688,7 @@ class SubFile:
         )
 
     def create_json(self) -> str:
+        subtitles = SubFilters.sort_lines(self.subtitles)
         return (
             json.dumps(
                 [
@@ -697,7 +698,7 @@ class SubFile:
                         "text": subtitle.text,
                         "top": subtitle.top,
                     }
-                    for subtitle in self.subtitles
+                    for subtitle in subtitles
                 ],
                 indent=2,
                 ensure_ascii=False,
