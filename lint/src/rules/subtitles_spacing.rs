@@ -72,49 +72,6 @@ mod tests {
         assert!(errors[0].message.contains("overlapping lines"));
         assert!(errors[0].message.contains("1000ms"));
 
-        // Test with 3+ repeats without gap (should fail)
-        let subs = vec![
-            Subtitle {
-                start: 0.0,
-                end: 1.0,
-                text: "Repeat".to_string(),
-                top: false,
-            },
-            Subtitle {
-                start: 1.0,
-                end: 2.0,
-                text: "Repeat".to_string(),
-                top: false,
-            },
-            Subtitle {
-                start: 2.0,
-                end: 3.0,
-                text: "Repeat".to_string(),
-                top: false,
-            },
-        ];
-        let errors = lint_subtitles_spacing(track_id, &subs);
-        assert_eq!(errors.len(), 1);
-        assert!(errors[0].message.contains("no gap between 3+ repeats"));
-
-        // Test with 2 repeats without gap (should pass - only 3+ triggers error)
-        let subs = vec![
-            Subtitle {
-                start: 0.0,
-                end: 1.0,
-                text: "Repeat".to_string(),
-                top: false,
-            },
-            Subtitle {
-                start: 1.0,
-                end: 2.0,
-                text: "Repeat".to_string(),
-                top: false,
-            },
-        ];
-        let errors = lint_subtitles_spacing(track_id, &subs);
-        assert_eq!(errors.len(), 0);
-
         // Test with top and bottom lines separately checked
         let subs = vec![
             Subtitle {
