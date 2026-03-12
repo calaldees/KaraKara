@@ -8,21 +8,6 @@ pub fn lint_subtitles_spacing(track_id: &str, subs: &[Subtitle]) -> Vec<LintErro
     let botlines: Vec<_> = subs.iter().filter(|s| !s.top).collect();
 
     for lines in [toplines, botlines] {
-        // Check for 3+ repeats with no gap
-        for i in 0..lines.len().saturating_sub(2) {
-            let l1 = lines[i];
-            let l2 = lines[i + 1];
-            let l3 = lines[i + 2];
-
-            if l1.end == l2.start && l2.end == l3.start && l1.text == l2.text && l2.text == l3.text
-            {
-                errors.push(LintError::new(
-                    track_id.to_string(),
-                    format!("no gap between 3+ repeats: {}", l1.text),
-                ));
-            }
-        }
-
         // Check for overlapping lines
         for i in 0..lines.len().saturating_sub(1) {
             let l1 = lines[i];

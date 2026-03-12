@@ -7,6 +7,7 @@ use std::sync::{Arc, Mutex};
 mod library_capitalisation;
 mod subtitles_brackets;
 mod subtitles_characters;
+mod subtitles_chronological;
 mod subtitles_exists;
 mod subtitles_newlines;
 mod subtitles_random_topline;
@@ -27,6 +28,7 @@ mod track_vocaltrack;
 use library_capitalisation::lint_library_capitalisation;
 use subtitles_brackets::lint_subtitles_brackets;
 use subtitles_characters::lint_subtitles_characters;
+use subtitles_chronological::lint_subtitles_chronological;
 use subtitles_exists::lint_subtitles_exists;
 use subtitles_newlines::lint_subtitles_newlines;
 use subtitles_random_topline::lint_subtitles_random_topline;
@@ -153,6 +155,7 @@ fn lint_track(track: &Track, processed_dir: &Path) -> Vec<LintError> {
                         errors.extend(lint_subtitles_exists(&track.id, &subtitles));
                         errors.extend(lint_subtitles_random_topline(&track.id, &subtitles));
                         errors.extend(lint_subtitles_spacing(&track.id, &subtitles));
+                        errors.extend(lint_subtitles_chronological(&track.id, &subtitles));
 
                         // Only check line contents for non-Hiragana variants
                         if attachment.variant != "Hiragana" {
