@@ -26,3 +26,8 @@ path = "src/main.rs"
 [lib]
 name = "kk_lint"
 path = "src/lib.rs"
+
+[lints.clippy]
+dbg_macro = "deny"
+#unwrap_used = "deny"
+expect_used = "deny"
