@@ -6,8 +6,8 @@ import { JoinInfo } from "@/components/joininfo";
 import { Video } from "@/components/video";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-import type { QueueItem, Track } from "@/types";
-import { time_until } from "@/utils";
+import type { Attachment, QueueItem, Track } from "@/types";
+import { time_until, attachment_path } from "@/utils";
 
 import "./preview.scss";
 
@@ -29,6 +29,12 @@ function QueueItem({
 }) {
     return (
         <div className={"item n" + (idx + 1)} key={item.id}>
+            {track.attachments.video
+                .filter((a) => a.variant === item.video_variant)
+                .filter((a) => a.mime.startsWith("video/webm"))
+                .map((a: Attachment) => (
+                    <link key={a.path} rel="prefetch" as="video" href={attachment_path(a)} />
+                ))}
             <p className="title">{track.tags.title[0]}</p>
             <p className="from">
                 {track.tags.from?.[0] ?? track.tags.artist?.join(", ") ?? ""}
