@@ -44,13 +44,15 @@ export function percent(a: number, b: number): string {
 
 /*
  * Given a list of all tracks in the queue, find which ones are in-progress
- * now or queued for the future
+ * now or queued for the future (+1 second buffer to account for the video
+ * taking a moment to start)
  */
 export function current_and_future(
     now: number,
     queue: QueueItem[],
 ): QueueItem[] {
     return queue.filter(
-        (t) => t.start_time == null || t.start_time + t.track_duration > now,
+        (t) =>
+            t.start_time == null || t.start_time + t.track_duration + 1 > now,
     );
 }
