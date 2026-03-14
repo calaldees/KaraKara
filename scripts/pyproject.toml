@@ -9,3 +9,10 @@ dependencies = [
     "requests>=2.32.5",
     "tqdm>=4.67.3",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+]
