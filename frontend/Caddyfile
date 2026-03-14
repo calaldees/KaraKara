@@ -18,7 +18,7 @@
 		file_server {
 			precompressed
 		}
-		header Cache-Control "public, max-age=21600, immutable"
+		header Cache-Control "public, max-age=604800, immutable"
 	}
 
 	handle_path /logs/* {
