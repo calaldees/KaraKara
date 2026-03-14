@@ -80,6 +80,13 @@ function MyScene() {
         );
     }, [tracks]);
 
+    const invalidate = useThree((state) => state.invalidate)
+
+    useEffect(() => {
+      const id = setInterval(() => invalidate(), 1000 / 30) // 30 FPS
+      return () => clearInterval(id)
+    }, [])
+
     useThree((state) => {
         // these debug functions can randomly take ~100ms
         // on raspberry pi (less on more powerful machines),
@@ -147,7 +154,7 @@ function GlobeInternal() {
     const { tracks } = useContext(ServerContext);
     return (
         <div id={"splash"}>
-            <Canvas dpr={1}>
+            <Canvas dpr={1} frameloop="demand">
                 <MyScene />
             </Canvas>
             <div className="html3d">
