@@ -17,6 +17,12 @@ Each screen has its own specific state and rendering functions in `src/screens/`
 
 Global state (eg track list, queue, server time) is set in `src/providers/`
 
+## Browser compatibility
+
+- Should _basically_ work in any modern browser
+- Coloured subtitles only work in Chrome and Safari
+- Track pre-fetching only works in Chrome and Firefox
+
 ## Dev Setup
 
 Depending on whether you prefer Docker or Node:
