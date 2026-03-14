@@ -12,7 +12,7 @@ Karaoke Event System - hosted at [karakara.uk](http://karakara.uk/)
 
 Quickstart Guides
 -----------------
-* [For people running events](docs/for-admins.md)
+* [For people running events](docs/for-event-runners.md)
 * [For people adding tracks to the database](docs/for-contributors.md)
 * [For people developing the software](docs/for-developers.md)
 
