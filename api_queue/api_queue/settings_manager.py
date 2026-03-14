@@ -31,6 +31,7 @@ OptionalDatetime = t.Annotated[
 
 class QueueSettings(pydantic.BaseModel):
     track_space: TimeDelta = datetime.timedelta(seconds=15)
+    track_padding: TimeDelta = datetime.timedelta(seconds=1)
     hidden_tags: ct.Sequence[Tag] = ("red:duplicate",)
     forced_tags: ct.Sequence[Tag] = ()
     title: str = "KaraKara"
