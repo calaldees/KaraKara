@@ -150,3 +150,7 @@ input[type="submit"]:hover {
 progress {
     width: 100%;
 }
+.subtle {
+    font-size: 0.75rem;
+    color: var(--input-fg);
+}

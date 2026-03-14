@@ -2,7 +2,7 @@ export const InfoBox = () => {
     return (
         <section className="info-box">
             <p>
-                Suggesting tracks to be added to karakara.uk (Making a
+                Suggest tracks to be added to the KaraKara database (Making a
                 suggestion is no guarantee of a track being added - some
                 companies have very grumpy lawyers, etc.)
             </p>
@@ -21,6 +21,11 @@ export const InfoBox = () => {
             </p>
 
             <p>Happy singing! &mdash; The KaraKara Volunteers ❤️</p>
+
+            <p className="subtle">
+                (PS. Interested in contributing multiple tracks or running events?
+                Check out our <a href="https://discord.gg/tXZkDsxS8u">discord</a> 👀)
+            </p>
         </section>
     );
 };

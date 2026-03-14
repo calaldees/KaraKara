@@ -8,7 +8,7 @@ Dev:
 
 ```
 uv run uvicorn backend:app --reload     # run backend with hot-reload
-npm run dev                             # run frontend with hot-reload
+npm run serve                           # run frontend with hot-reload
 ```
 
 Prod:
