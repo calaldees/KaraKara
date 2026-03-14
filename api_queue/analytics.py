@@ -1,13 +1,39 @@
 #!/usr/bin/env python3
 
-import sys
 import json
 from ua_parser import parse
-import re
 from collections import defaultdict
 import argparse
 from tqdm import tqdm
 import dateparser
+import typing as t
+
+
+family_to_browserslist = {
+    "Chrome": "chrome",
+    "Chrome Mobile": "and_chr",
+    "Chrome Mobile iOS": "ios_chr",   # ??
+    "Edge": "edge",
+    "Facebook": "facebook", # ??
+    "Firefox": "firefox",
+    "Firefox Mobile": "and_ff",
+    "Mobile Safari": "ios_saf",
+    "Phantom": "phantom",  # ??
+    "Safari": "safari",
+    "Samsung Internet": "samsung",
+    #and_qq
+    #and_uc
+    #android
+    #baidu
+    #bb
+    #ie
+    #ie_mob
+    #kaios
+    #op_mini
+    #op_mob
+    #opera
+}
+
 
 def boolean_flag(parser, name, default=None, help=None):
     group = parser.add_mutually_exclusive_group()
@@ -33,44 +59,37 @@ def parse_args():
     boolean_flag(p, "admin", help="Only show admins (--no-admin to exclude admins)")
     boolean_flag(p, "test", help="Only show 'test' room (--no-test to exclude 'test' room)")
     p.add_argument("--room", help="Only show stats for the given room")
-    p.add_argument("--event", help="Only show stats for the given event")
     p.add_argument("--date-from", help="Only show stats from this date (YYYY-MM-DD)", type=dateparser.parse)
     p.add_argument("--date-to", help="Only show stats up to this date (YYYY-MM-DD)", type=dateparser.parse)
     p.add_argument("--dedupe", default=False, action="store_true", help="Only count each session / IP address once")
     return p.parse_args()
 
 
-def main():
-    args = parse_args()
-    bs = defaultdict(lambda: defaultdict(int))
+def filter_excludes(args: argparse.Namespace, d: dict) -> bool:
+    if args.dev is not None:
+        if d.get("dev") != args.dev:
+            return True
+    if args.admin is not None:
+        if d.get("admin") != args.admin:
+            return True
+    if args.test is not None:
+        if (d.get("room") == "test") != args.test:
+            return True
+    if args.room is not None:
+        if d.get("room") != args.room:
+            return True
+    date = dateparser.parse(d["time"])
+    if args.date_from is not None:
+        if date < args.date_from:
+            return True
+    if args.date_to is not None:
+        if date > args.date_to:
+            return True
+    return False
+
+
+def get_all_lines(args: argparse.Namespace) -> t.Generator[dict, None, None]:
     ips = set()
-    total = 0
-
-    family_to_browserslist = {
-        "Chrome": "chrome",
-        "Chrome Mobile": "and_chr",
-        "Chrome Mobile iOS": "ios_chr",   # ??
-        "Edge": "edge",
-        "Facebook": "facebook", # ??
-        "Firefox": "firefox",
-        "Firefox Mobile": "and_ff",
-        "Mobile Safari": "ios_saf",
-        "Phantom": "phantom",  # ??
-        "Safari": "safari",
-        "Samsung Internet": "samsung",
-        #and_qq
-        #and_uc
-        #android
-        #baidu
-        #bb
-        #ie
-        #ie_mob
-        #kaios
-        #op_mini
-        #op_mob
-        #opera
-    }
-
     for fn in args.inputs:
         with open(fn) as fp:
             lines = fp.readlines()
@@ -83,49 +102,23 @@ def main():
                     continue
                 ips.add(ip)
 
-            # analytics.json
-            if "user_agent" in d:
-                if args.dev is not None:
-                    if d.get("dev") != args.dev:
-                        continue
-                if args.admin is not None:
-                    if d.get("admin") != args.admin:
-                        continue
-                if args.test is not None:
-                    if (d.get("room") == "test") != args.test:
-                        continue
-                if args.room is not None:
-                    if d.get("room") != args.room:
-                        continue
-                ua = parse(d["user_agent"])
-                date = dateparser.parse(d["time"])
+            if filter_excludes(args, d):
+                continue
 
-            # nginx-access.json
-            elif "http_user_agent" in d:
-                if "/login.json" not in d["request"]:
-                    continue
-                if args.room and f"/room/{args.room}/login.json" not in d["request"]:
-                    continue
-                ua = parse(d["http_user_agent"])
-                date = dateparser.parse(d["time_local"])
+            yield d
 
-            # unknown
-            else:
-                ua = None
-                date = None
 
-            if date and args.date_from is not None:
-                if date < args.date_from:
-                    continue
-            if date and args.date_to is not None:
-                if date > args.date_to:
-                    continue
+def main():
+    args = parse_args()
 
-            if ua and ua.user_agent and ua.user_agent.family and ua.user_agent.major:
-                bs[ua.user_agent.family][ua.user_agent.major] += 1
-                total += 1
-            #else:
-            #    print(ua)
+    bs = defaultdict(lambda: defaultdict(int))
+    total = 0
+
+    for d in get_all_lines(args):
+        ua = parse(d["user_agent"])
+        if ua and ua.user_agent and ua.user_agent.family and ua.user_agent.major:
+            bs[ua.user_agent.family][ua.user_agent.major] += 1
+            total += 1
 
     print(f"{total} results")
     for family in sorted(bs.keys()):
@@ -134,7 +127,6 @@ def main():
             n = vers[ver]
             bl = family_to_browserslist.get(family, "_" + family)
             print(f"{bl:15s} {ver:3s} : {n/total*100:5.2f}% ({n})")
-    #print(json.dumps(bs, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":
