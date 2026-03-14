@@ -133,7 +133,7 @@ def main():
         for ver in sorted(vers.keys()):
             n = vers[ver]
             bl = family_to_browserslist.get(family, "_" + family)
-            print(f"{bl:10s} {ver:3s} : {n/total*100:5.2f}%")
+            print(f"{bl:15s} {ver:3s} : {n/total*100:5.2f}% ({n})")
     #print(json.dumps(bs, indent=2, sort_keys=True))
 
 
