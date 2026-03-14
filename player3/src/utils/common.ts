@@ -49,8 +49,11 @@ export function percent(a: number, b: number): string {
 export function current_and_future(
     now: number,
     queue: QueueItem[],
+    padding: number = 0,
 ): QueueItem[] {
     return queue.filter(
-        (t) => t.start_time == null || t.start_time + t.track_duration > now,
+        (t) =>
+            t.start_time == null ||
+            t.start_time + t.track_duration + padding > now,
     );
 }

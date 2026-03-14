@@ -29,8 +29,8 @@ export function RoomProvider(props: any) {
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request, sessionId } = useApi();
     const newQueue = useMemo(
-        () => current_and_future(now, fullQueue),
-        [now, fullQueue],
+        () => current_and_future(now, fullQueue, settings["track_padding"] || 0),
+        [now, fullQueue, settings],
     );
     // ignore eslint warning - we don't actually care if newQueue
     // changes, we only care if the _value_ changes
