@@ -222,7 +222,7 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                         <FAIcon
                             icon={faCircleXmark}
                             className={"go_arrow"}
-                            onClick={(_) => removeTrack(item.id)}
+                            onClick={(_) => confirm(`Delete ${item.performer_name}'s track?`) && removeTrack(item.id)}
                         />
                     </li>
                 ))}
