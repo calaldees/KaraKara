@@ -21,6 +21,8 @@ import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
 import { dict2css, nth, time_until } from "@/utils";
 
+import "./control.scss";
+
 function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
@@ -330,7 +332,7 @@ function ProgressBar({
 }) {
     const eventDuration = endTime - startTime;
     return (
-        <div className="progress_bar">
+        <div className="event_progress">
             <div
                 className="played"
                 style={{ width: `${((now - startTime) / eventDuration) * 100}%` }}
