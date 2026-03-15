@@ -11,7 +11,7 @@ import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useContext, useState } from "react";
 import type { DragEvent, TouchEvent } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { BackToExplore, Screen, Thumb } from "@/components";
 import { useApi } from "@/hooks/api";
@@ -29,6 +29,8 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     const { request } = useApi();
+    const navigate = useNavigate();
+    const { roomName } = useParams();
 
     function onDragStart(e: DragEvent, src_id: number) {
         if (e.dataTransfer && e.currentTarget) {
@@ -205,7 +207,14 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                             />
                         </Thumb>
                         <span className={"text queue_info"}>
-                            <span className={"title"}>
+                            <span
+                                className={"title"}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    void navigate(`/${roomName}/tracks/${item.track_id}`);
+                                }}
+                                style={{ cursor: "pointer" }}
+                            >
                                 {tracks[item.track_id]?.tags.title[0] ??
                                     `<${item.track_id} not found>`}
                             </span>
