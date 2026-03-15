@@ -19,11 +19,6 @@ services:
             - ${PATH_HOST_media}/processed:/media/processed:ro
             - ${PWD}/tools/:/static/tools/:ro
             - ${PWD}/frontend/:/etc/caddy/:ro
-        links:
-            - api_queue
-            - mqtt
-            - player3
-            - browser3
         labels:
             traefik.enable: true
             traefik.http.routers.karakara.rule: "Host(`${HOSTNAME}`)"
@@ -46,8 +41,6 @@ services:
             SANIC_REAL_IP_HEADER: x-real-ip
         #ports:  # for local dev
         #    - 8000:8000
-        links:
-            - mqtt
         volumes:
             - ${PATH_HOST_media}/processed:/media/processed:ro
             - ${PATH_HOST_data}/logs:/logs:rw
