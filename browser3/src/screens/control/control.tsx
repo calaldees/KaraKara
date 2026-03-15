@@ -10,6 +10,7 @@ import {
 import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useContext, useState } from "react";
+import type { DragEvent, TouchEvent } from "react";
 import { useParams } from "react-router-dom";
 
 import { BackToExplore, Screen, Thumb } from "@/components";
@@ -29,26 +30,37 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     const { request } = useApi();
 
-    function onDragStart(e: any, src_id: number) {
-        if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
+    function onDragStart(e: DragEvent, src_id: number) {
+        if (e.dataTransfer && e.currentTarget) {
+            e.dataTransfer.dropEffect = "move";
+            // Set the drag ghost to the entire list item, even though
+            // the drag events are fired on the thumbnail
+            const listItem = (e.target as HTMLElement).closest('li');
+            if (listItem) {
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                e.dataTransfer.setDragImage(listItem, rect.width / 2, rect.height);
+            }
+        }
         setDropSource(src_id);
         setDropTarget(src_id);
     }
-    function onDragOver(e: any, dst_id: number) {
+    function onDragOver(e: DragEvent, dst_id: number) {
         e.preventDefault();
         setDropTarget(dst_id);
     }
-    function onDragLeave(e: any) {
+    function onDragLeave(e: DragEvent) {
         // prevent firing when moving between child elements
-        if (e.currentTarget.contains(e.relatedTarget)) return;
+        const li = (e.currentTarget as HTMLElement);
+        const handle = (e.relatedTarget as HTMLElement);
+        if (li.contains(handle)) return;
         e.preventDefault();
         setDropTarget(null);
     }
-    function onDrop(e: any, dst_id: number | null) {
+    function onDrop(e: DragEvent, dst_id: number | null) {
         e.preventDefault();
         moveTrack(dropSource, dst_id);
     }
-    function onDragEnd(e: any) {
+    function onDragEnd(e: DragEvent) {
         e.preventDefault();
         setDropSource(null);
         setDropTarget(null);
@@ -172,14 +184,14 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                             drop_target: dropTarget === item.id && dropSource !== item.id,
                             public: !booth && n <= 5,
                         })}
-                        draggable={true}
-                        onDragStart={(e) => onDragStart(e, item.id)}
-                        onDragOver={(e) => onDragOver(e, item.id)}
-                        onDragEnd={(e) => onDragEnd(e)}
-                        onDrop={(e) => onDrop(e, item.id)}
+                        onDragOver={(e: DragEvent) => onDragOver(e, item.id)}
+                        onDrop={(e: DragEvent) => onDrop(e, item.id)}
                     >
                         <Thumb
                             track={tracks[item.track_id]}
+                            draggable={true}
+                            onDragStart={(e: DragEvent) => onDragStart(e, item.id)}
+                            onDragEnd={(e: DragEvent) => onDragEnd(e)}
                             onTouchStart={(e: TouchEvent) =>
                                 onTouchStart(e, item.id)
                             }
