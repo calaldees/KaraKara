@@ -274,7 +274,7 @@ function ControlButtons(): React.ReactElement {
     );
 }
 
-function ProgressBar({
+function MaybeProgressBar({
     queue,
     startDateTime,
     endDateTime,
@@ -282,37 +282,54 @@ function ProgressBar({
     queue: QueueItem[];
     startDateTime: string;
     endDateTime: string;
-}) {
+}): React.ReactElement | null {
     const { now } = useContext(ServerTimeContext);
     if (!queue.length) return null;
-    const queue_last = queue[queue.length - 1];
-    if (!queue_last.start_time) return null;
-    const start = Date.parse(startDateTime) / 1000;
-    const current = now - start;
-    const queue_end = queue_last.start_time + queue_last.track_duration - start;
-    const end = Date.parse(endDateTime) / 1000 - start;
+    const queueLast = queue[queue.length - 1];
+    if (!queueLast.start_time) return null;
+    if (!startDateTime || !endDateTime) return null;
+
+    return (
+        <ProgressBar
+            startTime={Date.parse(startDateTime) / 1000}
+            queueEnd={queueLast.start_time + queueLast.track_duration}
+            now={now}
+            endTime={Date.parse(endDateTime) / 1000}
+        />
+    );
+}
+
+/**
+ * All times in seconds since epoch
+ */
+function ProgressBar({
+    startTime,
+    now,
+    queueEnd,
+    endTime,
+}: {
+    startTime: number;
+    now: number;
+    queueEnd: number;
+    endTime: number;
+}) {
+    const eventDuration = endTime - startTime;
     return (
         <div className="progress_bar">
             <div
                 className="played"
-                style={{ width: `${(current / end) * 100}%` }}
-                title={`Played until ${new Date(
-                    start + current,
-                ).toLocaleString()}`}
+                style={{ width: `${((now - startTime) / eventDuration) * 100}%` }}
+                title={`Played until ${new Date(now * 1000).toLocaleString()}`}
             />
             <div
                 className="queued"
-                style={{ width: `${((queue_end - current) / end) * 100}%` }}
-                title={`Queued until ${new Date(
-                    start + queue_end,
-                ).toLocaleString()}`}
+                style={{ width: `${((queueEnd - now) / eventDuration) * 100}%` }}
+                title={`Queued until ${new Date(queueEnd * 1000).toLocaleString()}`}
             />
             <div
                 className="space"
-                style={{ width: `${((end - queue_end) / end) * 100}%` }}
-                title={`Remaining time ${Math.floor(
-                    (end - queue_end) / 60000,
-                )} minutes`}
+                style={{ width: `${((endTime - queueEnd) / eventDuration) * 100}%` }}
+                title={`Remaining time ${Math.floor((endTime - queueEnd) / 60)} minutes`}
             />
         </div>
     );
@@ -358,19 +375,15 @@ export function Control(): React.ReactElement {
                 </div>
             ) : (
                 <>
-                    {fullQueue.length > 0 &&
-                        settings["validation_event_start_datetime"] &&
-                        settings["validation_event_end_datetime"] && (
-                            <ProgressBar
-                                queue={fullQueue}
-                                startDateTime={
-                                    settings["validation_event_start_datetime"]
-                                }
-                                endDateTime={
-                                    settings["validation_event_end_datetime"]
-                                }
-                            />
-                        )}
+                    <MaybeProgressBar
+                        queue={fullQueue}
+                        startDateTime={
+                            settings["validation_event_start_datetime"]
+                        }
+                        endDateTime={
+                            settings["validation_event_end_datetime"]
+                        }
+                    />
                     <Playlist queue={queue} />
                 </>
             )}
