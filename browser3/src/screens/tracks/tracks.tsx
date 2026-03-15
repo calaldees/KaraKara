@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { ReactElement, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { Screen, Thumb } from "@/components";
 import { useMemoArr } from "@/hooks/memo";
@@ -214,13 +214,14 @@ function Bookmarks({
 }
 
 function AdminButtons(): React.ReactElement {
+    const { roomName } = useParams();
     return (
         <footer>
             <div className={"buttons"}>
-                <Link to="settings" className="button">
+                <Link to={`/${roomName}/settings`} className="button">
                     Room Settings
                 </Link>
-                <Link to="printable" className="button">
+                <Link to={`/${roomName}/printable`} className="button">
                     Printable QR Code
                 </Link>
             </div>
@@ -357,6 +358,7 @@ function TrackListInternal(): ReactElement {
     const { isAdmin } = useContext(RoomContext);
     const { booth, widescreen } = useContext(ClientContext);
     const { filters, setFilters } = useContext(ExploreContext);
+    const { roomName } = useParams();
 
     return (
         <Screen
@@ -374,7 +376,7 @@ function TrackListInternal(): ReactElement {
             title={"Explore Tracks"}
             navRight={
                 !widescreen && (
-                    <Link to="queue" data-cy="queue">
+                    <Link to={`/${roomName}/queue`} data-cy="queue">
                         <FAIcon icon={faListOl} className="x2" />
                     </Link>
                 )
