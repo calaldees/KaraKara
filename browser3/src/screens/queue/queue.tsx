@@ -68,7 +68,7 @@ function QueueItemRender({
                     icon={faCircleXmark}
                     data-cy="remove"
                     className={"go_arrow"}
-                    onClick={(_) => removeTrack(item.id)}
+                    onClick={(_) => confirm(`Remove ${track.tags.title[0]} from the queue?`) && removeTrack(item.id)}
                 />
             )}
         </li>
