@@ -1,7 +1,7 @@
 .theme-metalghosts .screen_podium {
     grid-template:
         "header header header" min-content
-        "  .    video    .   " 1fr
+        "  .    lyrics   .   " 1fr
         "footer footer footer" min-content
         / 1cqw 1fr 1cqw;
 
@@ -19,16 +19,24 @@
     }
 
     .lyrics {
+        grid-area: lyrics;
+        padding: var(--padding);
+        border: var(--border);
+        border-radius: var(--border-radius);
+        height: 100%;
+        width: 100%;
+
         list-style: none;
         overflow-y: hidden;
         font-size: 8vh;
         background: var(--background);
+        container: lyrics / size;
 
         LI:first-child {
-            margin-top: 50vh;
+            margin-top: 50cqh;
         }
         LI:last-child {
-            margin-bottom: 50vh;
+            margin-bottom: 50cqh;
         }
         LI {
             color: grey;
@@ -38,15 +46,6 @@
             color: white;
             transition: color 1s ease;
         }
-    }
-    .lyrics,
-    .videoScaler {
-        grid-area: video;
-        padding: var(--padding);
-        border: var(--border);
-        border-radius: var(--border-radius);
-        height: 100%;
-        width: 100%;
     }
 
     DIV.startButton,
