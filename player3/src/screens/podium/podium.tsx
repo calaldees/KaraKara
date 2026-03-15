@@ -1,5 +1,7 @@
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { FAIcon } from "@shish2k/react-faicon";
+import { faFaceFrown } from "@fortawesome/free-solid-svg-icons";
 
 import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
@@ -104,8 +106,7 @@ function PodiumInner({
                 </ul>
             ) : (
                 <div className="lyrics">
-                    (Hard-subbed song, please check the projector for lyrics ;(
-                    )
+                    Hard-subbed song, check the projector for lyrics <FAIcon icon={faFaceFrown} />
                 </div>
             )}
 
