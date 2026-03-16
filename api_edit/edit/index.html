@@ -1,0 +1,123 @@
+<!DOCTYPE html><html>
+<head>
+	<meta charset="utf-8" />
+	<link id="favicon" rel="shortcut icon" type="image/png" href="data:image/png;base64,....==" />
+	<title>Edit</title>
+	<style>
+		html, body {
+			font-family: sans-serif;
+			padding: 0;
+			margin: 0;
+			overflow: hidden;
+		}
+
+		.flex_container {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			grid-template-rows: 1fr;
+			grid-column-gap: 0;
+		}
+		.flex_container > div {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: start;
+			width: 50vw;
+		}
+
+		#file_list {
+			overflow-y: scroll;
+			height: 100vh;
+		}
+		#file_content textarea {
+			width: 100%;
+			height: 100%;
+		}
+
+		.error {
+			background-color: red;
+		}
+	</style>
+</head>
+<body>
+<div class="flex_container">
+	<div id="file_list">Loading ...</div>
+	<div id="file_content">
+		<h2>No file selected</h2>
+		<textarea></textarea>
+		<button>Save</button>
+	</div>
+</div>
+<script type="module">
+
+const hasIterationProtocol = variable => variable !== null && Symbol.iterator in Object(variable)
+function h(type, params, children) {
+    const el = document.createElement(type)
+    for (let [k,v] of Object.entries(params)) {el.setAttribute(k,v)}
+    if      (["string","number"].indexOf(typeof(children))>=0) {el.appendChild(document.createTextNode(children))}
+    else if (hasIterationProtocol(children)) {for (let c of children) {el.append(c)}}
+    else if (children                      ) {el.appendChild(children)}
+    return el
+}
+
+const $file_list = document.getElementById('file_list')
+const $file_title = document.getElementsByTagName('h2')[0]
+const $file_content = document.getElementsByTagName('textarea')[0]
+const $button_save = document.getElementsByTagName('button')[0]
+
+function getFileContents(event) {
+	const file = event.target.dataset.file
+	console.debug(file)
+	$button_save.dataset.file = file
+	$file_title.textContent = file
+	$file_content.value = `Loading ${file}`
+	fetch(`/file/${file}`)
+		.then(response => response.text())
+		.then((text)=>{
+			$file_content.value = text
+			$file_content.classList.remove('error')
+		})
+	.catch(err => console.error(err));
+}
+
+function postFileContents(event) {
+	const file = event.target.dataset.file
+	if (!file) {
+		$file_content.classList.add('error')
+		console.warn('no file selected');
+		return
+	}
+	console.log('save', file, $file_content.value)
+	fetch(`/file/${file}`, {
+		method: "POST",
+		body: JSON.stringify({content: $file_content.value})
+	})
+		.then(response => {
+			if (response.status != 201) {
+				$file_content.classList.add('error')
+				return
+			}
+			$file_content.classList.remove('error')
+			console.debug('saved', response)
+		})
+	.catch(err => console.error(err));
+}
+$button_save.addEventListener('click', postFileContents)
+
+function renderFiles(data) {
+	$file_list.innerHTML = ''
+	$file_list.appendChild(h('ul',{},data.map((file)=>{
+		const $link = h('a',{'data-file':file,href:'javascript:void(0)'},file)
+		$link.addEventListener('click', getFileContents)
+		return h('li',{},$link)
+	})))
+}
+
+fetch(`/files.json`)
+    .then(response => response.json())
+    .then(renderFiles)
+.catch(err => console.error(err));
+
+</script>
+</body>
+</html>

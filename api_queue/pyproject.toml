@@ -47,9 +47,10 @@ ignore_missing_imports = true
 module = "pytimeparse2.*"
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
+
+[tool.pytest]
+addopts = ["--doctest-modules"]  #  "--mypy", "--ruff", "--ruff-format"
 asyncio_mode = "auto"
-addopts = ["--doctest-modules", "-p", "no:cacheprovider"]  # --mypy # mypy slows my flow down
 filterwarnings = [
 	"ignore:The `schema` method is deprecated.*",
 	"ignore:Pydantic serializer warnings",
