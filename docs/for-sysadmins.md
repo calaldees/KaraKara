@@ -1,7 +1,7 @@
 # Get Started Hosting KaraKara
 
 ```
-git clone https://github.com/calaldees/karakara
+git clone https://github.com/shish/karakara
 cd karakara
 cp .env.example .env
 vim .env

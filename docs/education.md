@@ -37,13 +37,13 @@ These questions are designed for a group exercise in dissecting this codebase as
     * permalink to a line that defines a clients state object
     * Look at `Dockerfile`
         * See the pattern of building, copying and serving with nginx. How big is the image that is created?
-* Look at contributions over time https://github.com/calaldees/KaraKara/graphs/contributors
+* Look at contributions over time https://github.com/shish/karakara/graphs/contributors
     * Who is the biggest contributor?
-    * Look at https://github.com/calaldees/KaraKara/blame/master/browser3/package-lock.json
+    * Look at https://github.com/shish/karakara/blame/master/browser3/package-lock.json
         * Look how many lies this file is?
         * Question: are these "lines of code?"
         * Should these lines be counted as contributions? why? why not?
-* https://github.com/calaldees/KaraKara/commit/e6b91a17e4f292f3851c7aac9d2a10e8a13b4e3d
+* https://github.com/shish/karakara/commit/e6b91a17e4f292f3851c7aac9d2a10e8a13b4e3d
     * What is happening in this commit? is this good or bad? why?
 * With Code IDE
     * looking in `/media`

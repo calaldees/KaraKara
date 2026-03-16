@@ -3,12 +3,12 @@
 ## Install Locally or in the Cloud
 
 ### Cloud
-* https://codespaces.new/calaldees/KaraKara?quickstart=1
-* https://gitpod.io/#https://github.com/calaldees/KaraKara
+* https://codespaces.new/shish/karakara?quickstart=1
+* https://gitpod.io/#https://github.com/shish/karakara
 
 ### Local
 ```bash
-git clone https://github.com/calaldees/KaraKara.git
+git clone https://github.com/shish/karakara.git
 cd KaraKara
 ```
 
