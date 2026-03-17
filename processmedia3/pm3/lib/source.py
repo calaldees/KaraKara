@@ -4,6 +4,8 @@ import re
 import typing as t
 from collections.abc import MutableMapping
 
+import tomlkit
+
 from .file_abstraction import AbstractFile
 from .kktypes import MediaMeta
 from .tag_processor import parse_tags
@@ -16,7 +18,7 @@ class SourceType(enum.Enum):
     VIDEO = frozenset({".mp4", ".mkv", ".avi", ".mpg", ".webm"})
     AUDIO = frozenset({".mp3", ".flac", ".ogg", ".m4a", ".opus"})
     IMAGE = frozenset({".jpg", ".png", ".webp", ".avif"})
-    TAGS = frozenset({".txt"})
+    TAGS = frozenset({".txt", ".toml"})
     SUBTITLES = frozenset({".srt", ".ssa", ".ass"})
 
 
@@ -79,4 +81,7 @@ class Source:
     @_cache
     def tags(self) -> dict[str, list[str]]:
         log.info(f"Parsing tags from {self.file.relative}")
-        return parse_tags(self.file.text)
+        if self.file.suffix == ".toml":
+            return dict(tomlkit.loads(self.file.text).items())
+        else:
+            return parse_tags(self.file.text)
