@@ -1,6 +1,11 @@
-from itertools import pairwise
-from io import StringIO
+import argparse
 import csv
+import sys
+from io import StringIO
+from itertools import pairwise
+from pathlib import Path
+
+import tomlkit
 
 
 def parse_tags(data: str) -> dict[str, list[str]]:
@@ -39,3 +44,46 @@ def parse_tags(data: str) -> dict[str, list[str]]:
                 tags_values.setdefault(parent, []).append(tag)
 
     return dict((k, sorted(set(v))) for k, v in tags_values.items())
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Process tag files in .txt format and convert to TOML")
+    parser.add_argument("files", nargs="+", type=Path, metavar="FILE", help="Input .txt files to process")
+    parser.add_argument(
+        "-o",
+        "--output",
+        action="store_true",
+        help="Write output to disk instead of printing to stdout",
+    )
+
+    args = parser.parse_args()
+
+    for input_file in args.files:
+        try:
+            data = input_file.read_text(encoding="utf-8")
+            tags = parse_tags(data)
+
+            doc = tomlkit.document()
+            for key, values in tags.items():
+                doc[key] = values
+            toml_output = tomlkit.dumps(doc)
+
+            if args.output:
+                output_file = input_file.with_suffix(".toml")
+                output_file.write_text(toml_output, encoding="utf-8")
+                print(f"Wrote {output_file}", file=sys.stderr)
+            else:
+                if len(args.files) > 1:
+                    print(f"# {input_file}")
+                print(toml_output)
+
+        except FileNotFoundError:
+            print(f"Error: File not found: {input_file}", file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"Error processing {input_file}: {e}", file=sys.stderr)
+            sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
