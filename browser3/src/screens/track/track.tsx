@@ -245,6 +245,45 @@ function BookmarkButton({ trackId }: { trackId: string }) {
     );
 }
 
+function QueueHogWarning({ trackId }: { trackId: string }) {
+    const { queue } = useContext(RoomContext);
+    const { performerName, booth } = useContext(ClientContext);
+    const { sessionId } = useApi();
+
+    const isQueued = queue.find((i) => i.track_id === trackId) !== undefined;
+
+    const myTracks = queue.filter((item) =>
+        is_my_song(item, sessionId, performerName),
+    );
+    const otherPeoplesTracks = queue.filter(
+        (item) => !is_my_song(item, sessionId, performerName),
+    );
+    const averageTracksPerPerformer =
+        otherPeoplesTracks.length > 0
+            ? otherPeoplesTracks.length /
+              unique(otherPeoplesTracks.map((item) => item.performer_name))
+                  .length
+            : 0;
+    const averageTracksPerPerformerStr = averageTracksPerPerformer.toFixed(1);
+    const myTrackCount = myTracks.length + 1;
+    if (
+        !isQueued &&
+        !booth &&
+        queue.length > 3 &&
+        myTrackCount > averageTracksPerPerformer * 2
+    ) {
+        return (
+            <div className="warning" style={{ textAlign: "center" }}>
+                The average person has {averageTracksPerPerformerStr}{" "}
+                {averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"} in
+                the queue, this will be your {nth(myTrackCount)} — please make
+                sure everybody gets a chance to sing ❤️
+            </div>
+        );
+    }
+    return null;
+}
+
 function Buttons({
     track,
     videoVariants,
@@ -263,10 +302,12 @@ function Buttons({
     setSubtitleVariant: (v: string) => void;
 }) {
     const { queue } = useContext(RoomContext);
-    const { performerName, setPerformerName, booth } =
+    const { performerName, setPerformerName } =
         useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request, sessionId } = useApi();
+
+    const isQueued = queue.find((i) => i.track_id === track.id) !== undefined;
 
     function enqueue(performer_name: string, track_id: string) {
         request({
@@ -337,8 +378,6 @@ function Buttons({
         (videoVariants.length === 0 || videoVariant !== "") &&
         (subtitleVariants.length === 0 || subtitleVariant !== "");
 
-    const isQueued = queue.find((i) => i.track_id === track.id) !== undefined;
-
     const myTracks = queue.filter((item) =>
         is_my_song(item, sessionId, performerName),
     );
@@ -373,7 +412,7 @@ function Buttons({
     if (action === TrackAction.NONE) {
         return (
             <footer>
-                {warning}
+                <QueueHogWarning trackId={track.id} />
                 {isQueued && (
                     <div className={"already_queued"}>
                         Track is already queued
@@ -396,8 +435,8 @@ function Buttons({
     if (action === TrackAction.ENQUEUE) {
         return (
             <footer>
+                <QueueHogWarning trackId={track.id} />
                 {variantSelect}
-                {warning}
                 <input
                     type="text"
                     name="performer_name"
