@@ -1,4 +1,4 @@
-MAIN.queue ARTICLE {
+MAIN.control ARTICLE {
     .readme {
         H1 {
             text-align: center;
@@ -33,6 +33,9 @@ MAIN.queue ARTICLE {
     }
 
     UL LI {
+        // give list-item a specific background so that it
+        // doesn't show up as transparent when dragged
+        background: var(--list-bg);
         &.drop_source {
             opacity: 0.5;
         }

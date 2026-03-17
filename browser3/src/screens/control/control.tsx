@@ -381,7 +381,7 @@ export function Control(): React.ReactElement {
     const root = window.location.protocol + "//" + window.location.host;
     return (
         <Screen
-            className={"queue"}
+            className={"control"}
             navLeft={!widescreen && <BackToExplore />}
             title={"Remote Control"}
             // navRight={}
