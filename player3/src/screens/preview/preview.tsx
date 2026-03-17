@@ -7,7 +7,7 @@ import { Video } from "@/components/video";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { Attachment, QueueItem, Track } from "@/types";
-import { time_until, attachment_path } from "@/utils";
+import { attachment_path, time_until } from "@/utils";
 
 import "./preview.scss";
 
@@ -33,7 +33,12 @@ function QueueItem({
                 .filter((a) => a.variant === item.video_variant)
                 .filter((a) => a.mime.startsWith("video/webm"))
                 .map((a: Attachment) => (
-                    <link key={a.path} rel="prefetch" as="video" href={attachment_path(a)} />
+                    <link
+                        key={a.path}
+                        rel="prefetch"
+                        as="video"
+                        href={attachment_path(a)}
+                    />
                 ))}
             <p className="title">{track.tags.title[0]}</p>
             <p className="from">

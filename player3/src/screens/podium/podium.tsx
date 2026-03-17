@@ -1,12 +1,18 @@
+import { faFaceFrown } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { FAIcon } from "@shish2k/react-faicon";
-import { faFaceFrown } from "@fortawesome/free-solid-svg-icons";
 
 import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
 import type { QueueItem, Subtitle, Track } from "@/types";
-import { add_dot_dot_dots, attachment_path, parse_duration, percent, s_to_mns } from "@/utils";
+import {
+    add_dot_dot_dots,
+    attachment_path,
+    parse_duration,
+    percent,
+    s_to_mns,
+} from "@/utils";
 
 import "./podium.scss";
 
@@ -106,7 +112,8 @@ function PodiumInner({
                 </ul>
             ) : (
                 <div className="lyrics">
-                    Hard-subbed song, check the projector for lyrics <FAIcon icon={faFaceFrown} />
+                    Hard-subbed song, check the projector for lyrics{" "}
+                    <FAIcon icon={faFaceFrown} />
                 </div>
             )}
 

@@ -1,6 +1,6 @@
-import { useContext } from "react";
-import { FAIcon } from "@shish2k/react-faicon";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
+import { useContext } from "react";
 
 import { RoomContext } from "@/providers/room";
 import { short_date } from "@/utils";
@@ -16,8 +16,14 @@ export function EventInfo() {
                         {short_date(settings["validation_event_end_datetime"])}
                     </strong>
                 </span>
-            ) : (queue[0] && queue[0].start_time === null) ? (
-                <span>Click <strong><FAIcon icon={faPlay} /></strong> on the control panel to start</span>
+            ) : queue[0] && queue[0].start_time === null ? (
+                <span>
+                    Click{" "}
+                    <strong>
+                        <FAIcon icon={faPlay} />
+                    </strong>{" "}
+                    on the control panel to start
+                </span>
             ) : null}
         </div>
     );

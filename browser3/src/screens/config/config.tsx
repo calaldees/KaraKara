@@ -7,8 +7,15 @@ import "./config.scss";
 
 export function ConfigMenu(): React.ReactElement {
     const { roomName } = useParams();
-    const { roomPassword, setRoomPassword, booth, setBooth, setShowSettings, fullscreen, setFullscreen } =
-        useContext(ClientContext);
+    const {
+        roomPassword,
+        setRoomPassword,
+        booth,
+        setBooth,
+        setShowSettings,
+        fullscreen,
+        setFullscreen,
+    } = useContext(ClientContext);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();

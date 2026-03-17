@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { useContext, useRef, memo } from "react";
+import { memo, useContext, useRef } from "react";
 import * as THREE from "three";
 import { Group, TextureLoader } from "three";
 import { useMediaQuery } from "usehooks-ts";
@@ -23,9 +23,7 @@ function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
         artists: new Set(ts.map((t) => t.tags.artist?.[0])).size,
         shows: new Set(ts.map((t) => t.tags.from?.[0])).size,
         hours: Math.floor(
-            ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) /
-                60 /
-                60,
+            ts.map((t) => t.duration).reduce((sum, n) => sum + n, 0) / 60 / 60,
         ),
     };
 

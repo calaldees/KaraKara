@@ -9,8 +9,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { useContext, useState } from "react";
 import type { DragEvent, TouchEvent } from "react";
+import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { BackToExplore, Screen, Thumb } from "@/components";
@@ -38,10 +38,16 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
             e.dataTransfer.dropEffect = "move";
             // Set the drag ghost to the entire list item, even though
             // the drag events are fired on the thumbnail
-            const listItem = (e.target as HTMLElement).closest('li');
+            const listItem = (e.target as HTMLElement).closest("li");
             if (listItem) {
-                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                e.dataTransfer.setDragImage(listItem, rect.width / 2, rect.height);
+                const rect = (
+                    e.currentTarget as HTMLElement
+                ).getBoundingClientRect();
+                e.dataTransfer.setDragImage(
+                    listItem,
+                    rect.width / 2,
+                    rect.height,
+                );
             }
         }
         setDropSource(src_id);
@@ -53,8 +59,8 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
     }
     function onDragLeave(e: DragEvent) {
         // prevent firing when moving between child elements
-        const li = (e.currentTarget as HTMLElement);
-        const handle = (e.relatedTarget as HTMLElement);
+        const li = e.currentTarget as HTMLElement;
+        const handle = e.relatedTarget as HTMLElement;
         if (li.contains(handle)) return;
         e.preventDefault();
         setDropTarget(null);
@@ -184,7 +190,9 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                         className={dict2css({
                             queue_item: true,
                             drop_source: dropSource === item.id,
-                            drop_target: dropTarget === item.id && dropSource !== item.id,
+                            drop_target:
+                                dropTarget === item.id &&
+                                dropSource !== item.id,
                             public: !booth && n <= 5,
                         })}
                         onDragOver={(e: DragEvent) => onDragOver(e, item.id)}
@@ -193,7 +201,9 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                         <Thumb
                             track={tracks[item.track_id]}
                             draggable={true}
-                            onDragStart={(e: DragEvent) => onDragStart(e, item.id)}
+                            onDragStart={(e: DragEvent) =>
+                                onDragStart(e, item.id)
+                            }
                             onDragEnd={(e: DragEvent) => onDragEnd(e)}
                             onTouchStart={(e: TouchEvent) =>
                                 onTouchStart(e, item.id)
@@ -208,7 +218,8 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                             />
                         </Thumb>
                         <span className={"text queue_info"}>
-                            <Link to={`/${roomName}/tracks/${item.track_id}`}
+                            <Link
+                                to={`/${roomName}/tracks/${item.track_id}`}
                                 className={"title"}
                             >
                                 {tracks[item.track_id]?.tags.title[0] ??
@@ -239,7 +250,11 @@ function Playlist({ queue }: { queue: QueueItem[] }): React.ReactElement {
                         <FAIcon
                             icon={faCircleXmark}
                             className={"go_arrow"}
-                            onClick={(_) => confirm(`Delete ${item.performer_name}'s track?`) && removeTrack(item.id)}
+                            onClick={(_) =>
+                                confirm(
+                                    `Delete ${item.performer_name}'s track?`,
+                                ) && removeTrack(item.id)
+                            }
                         />
                     </li>
                 ))}
@@ -335,17 +350,23 @@ function ProgressBar({
         <div className="event_progress">
             <div
                 className="played"
-                style={{ width: `${((now - startTime) / eventDuration) * 100}%` }}
+                style={{
+                    width: `${((now - startTime) / eventDuration) * 100}%`,
+                }}
                 title={`Played until ${new Date(now * 1000).toLocaleString()}`}
             />
             <div
                 className="queued"
-                style={{ width: `${((queueEnd - now) / eventDuration) * 100}%` }}
+                style={{
+                    width: `${((queueEnd - now) / eventDuration) * 100}%`,
+                }}
                 title={`Queued until ${new Date(queueEnd * 1000).toLocaleString()}`}
             />
             <div
                 className="space"
-                style={{ width: `${((endTime - queueEnd) / eventDuration) * 100}%` }}
+                style={{
+                    width: `${((endTime - queueEnd) / eventDuration) * 100}%`,
+                }}
                 title={`Remaining time ${Math.floor((endTime - queueEnd) / 60)} minutes`}
             />
         </div>
@@ -397,9 +418,7 @@ export function Control(): React.ReactElement {
                         startDateTime={
                             settings["validation_event_start_datetime"]
                         }
-                        endDateTime={
-                            settings["validation_event_end_datetime"]
-                        }
+                        endDateTime={settings["validation_event_end_datetime"]}
                     />
                     <Playlist queue={queue} />
                 </>

@@ -4,7 +4,13 @@ import { Link, useParams } from "react-router-dom";
 
 export function BackToExplore(): React.ReactElement {
     const { roomName } = useParams();
-    return <Link to={`/${roomName}`} data-cy="back" aria-label="Back to Track List">
-        <FAIcon icon={faCircleChevronLeft} className="x2" />
-    </Link>;
-};
+    return (
+        <Link
+            to={`/${roomName}`}
+            data-cy="back"
+            aria-label="Back to Track List"
+        >
+            <FAIcon icon={faCircleChevronLeft} className="x2" />
+        </Link>
+    );
+}
