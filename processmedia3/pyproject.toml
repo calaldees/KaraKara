@@ -11,6 +11,7 @@ dependencies = [
 	"requests ~= 2.32",
 	"typed-argument-parser ~= 1.11",
 	"inotify ~= 0.2",
+	"pyyaml ~= 6.0",
 ]
 
 [tool.uv]
@@ -20,6 +21,7 @@ package = true
 pm3 = "pm3.__main__:entry_point"
 pm3-subtitle-processor = "pm3.lib.subtitle_processor:main"
 pm3-encoder = "pm3.lib.encoders:main"
+pm3-tag-processor = "pm3.lib.tag_processor:main"
 
 [dependency-groups]
 dev = [
