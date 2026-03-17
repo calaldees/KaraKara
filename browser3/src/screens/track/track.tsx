@@ -106,13 +106,13 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
                 />
             }
         >
-            <Preview
+            <VideoPreview
                 track={track}
                 videoVariant={videoVariant}
                 subtitleVariant={subtitleVariant}
             />
-            <Tags track={track} />
-            <Lyrics
+            <TagViewer track={track} />
+            <LyricViewer
                 track={track}
                 key={subtitleVariant}
                 variant={subtitleVariant}
@@ -121,7 +121,7 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
     );
 }
 
-function Preview({
+function VideoPreview({
     track,
     videoVariant,
     subtitleVariant,
@@ -171,7 +171,7 @@ function Preview({
     );
 }
 
-function Tags({ track }: { track: Track }) {
+function TagViewer({ track }: { track: Track }) {
     return (
         <>
             <h2>Tags</h2>
@@ -191,7 +191,7 @@ function Tags({ track }: { track: Track }) {
     );
 }
 
-function Lyrics({
+function LyricViewer({
     track,
     variant,
 }: {
