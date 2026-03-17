@@ -230,6 +230,21 @@ function Lyrics({
     }
 }
 
+function BookmarkButton({ trackId }: { trackId: string }) {
+    const { bookmarks, addBookmark, removeBookmark } =
+        useContext(ClientContext);
+
+    return bookmarks.includes(trackId) ? (
+        <button type="button" onClick={(_) => removeBookmark(trackId)}>
+            Un-Bookmark
+        </button>
+    ) : (
+        <button type="button" onClick={(_) => addBookmark(trackId)}>
+            Bookmark
+        </button>
+    );
+}
+
 function Buttons({
     track,
     videoVariants,
@@ -248,14 +263,8 @@ function Buttons({
     setSubtitleVariant: (v: string) => void;
 }) {
     const { queue } = useContext(RoomContext);
-    const {
-        bookmarks,
-        addBookmark,
-        removeBookmark,
-        performerName,
-        setPerformerName,
-        booth,
-    } = useContext(ClientContext);
+    const { performerName, setPerformerName, booth } =
+        useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request, sessionId } = useApi();
 
@@ -379,21 +388,7 @@ function Buttons({
                     >
                         Enqueue
                     </button>
-                    {bookmarks.includes(track.id) ? (
-                        <button
-                            type="button"
-                            onClick={(_) => removeBookmark(track.id)}
-                        >
-                            Un-Bookmark
-                        </button>
-                    ) : (
-                        <button
-                            type="button"
-                            onClick={(_) => addBookmark(track.id)}
-                        >
-                            Bookmark
-                        </button>
-                    )}
+                    <BookmarkButton trackId={track.id} />
                 </div>
             </footer>
         );
