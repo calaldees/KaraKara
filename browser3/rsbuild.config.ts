@@ -1,6 +1,7 @@
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginSass } from "@rsbuild/plugin-sass";
+import path from "path";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -10,6 +11,19 @@ const getBuildDate = () => {
 
 export default defineConfig({
     plugins: [pluginReact(), pluginSass()],
+    source: {
+        entry: {
+            index: "./src/browser.tsx",
+        },
+        define: {
+            __BUILD_DATE__: JSON.stringify(getBuildDate()),
+        },
+    },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "./src"),
+        },
+    },
     html: {
         template: "./src/static/index.html",
         title: "KaraKara",
@@ -44,14 +58,6 @@ export default defineConfig({
     performance: {
         chunkSplit: {
             strategy: "all-in-one",
-        },
-    },
-    source: {
-        entry: {
-            index: "./src/browser.tsx",
-        },
-        define: {
-            __BUILD_DATE__: JSON.stringify(getBuildDate()),
         },
     },
     output: {

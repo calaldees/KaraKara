@@ -11,7 +11,9 @@
         "preview": "rsbuild preview",
         "lint": "eslint src",
         "test": "vitest",
-        "test-once": "vitest run"
+        "test-once": "vitest run",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build"
     },
     "dependencies": {
         "@fortawesome/free-solid-svg-icons": "^7.0.1",
@@ -46,7 +48,10 @@
         "prettier-plugin-organize-imports": "^4.3.0",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.24.1",
-        "vitest": "^4.0.8"
+        "vitest": "^4.0.8",
+        "storybook": "^10.2.19",
+        "storybook-react-rsbuild": "^3.3.2",
+        "eslint-plugin-storybook": "^10.2.19"
     },
     "prettier": {
         "tabWidth": 4,
