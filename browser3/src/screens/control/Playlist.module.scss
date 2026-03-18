@@ -1,0 +1,52 @@
+.queueItem {
+    // give list-item a specific background so that it
+    // doesn't show up as transparent when dragged
+    background: var(--list-bg);
+
+    &.dropSource {
+        opacity: 0.5;
+    }
+
+    &.dropTarget {
+        border-top: 5px solid var(--drop-target);
+    }
+
+    &.dropLast {
+        text-align: center;
+        padding: 1em;
+    }
+
+    &.public {
+        background: var(--notification-warning);
+    }
+}
+
+.text {
+    flex: 1 1 auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-right: 0.4em;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.info {
+    font-weight: normal;
+}
+
+.count {
+    flex: 0 0 auto;
+    margin-right: 0.5em;
+    border: 1px solid var(--list-border);
+    background: var(--page-bg);
+    font-size: 0.75em;
+    padding: 0.2em 0.4em;
+    border-radius: 0.2em;
+}
+
+.goArrow {
+    flex: 0 0 auto;
+}

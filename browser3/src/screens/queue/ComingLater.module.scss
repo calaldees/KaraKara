@@ -1,0 +1,11 @@
+.comingLater {
+    text-align: center;
+
+    span::after {
+        content: ", ";
+    }
+
+    span:last-child::after {
+        content: "";
+    }
+}

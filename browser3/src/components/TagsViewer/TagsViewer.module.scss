@@ -1,0 +1,19 @@
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.tag {
+    flex: 0 0 30%;
+    justify-content: space-between;
+    margin-bottom: 1em;
+}
+
+.tagKey {
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.tagValue {
+    padding-left: 0.5em;
+}

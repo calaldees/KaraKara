@@ -1,0 +1,26 @@
+.search {
+    margin-top: 1em;
+}
+
+.activeFilterList {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0.5em 0;
+}
+
+.activeFilter {
+    border: 1px solid var(--list-border);
+    background-color: var(--list-bg);
+    border-radius: 1em;
+    padding: 0.5em;
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
+    max-width: 10em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove {
+    margin-right: 0.3em;
+}

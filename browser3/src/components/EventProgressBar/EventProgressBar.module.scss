@@ -1,0 +1,24 @@
+.eventProgress {
+    margin: 1em 0em 1em 0em;
+    height: 1em;
+    border: 1px solid #444;
+    overflow: hidden;
+    white-space: nowrap;
+
+    div {
+        display: inline-block;
+        height: 100%;
+    }
+
+    .played {
+        background: var(--notification-error);
+    }
+
+    .queued {
+        background: var(--notification-warning);
+    }
+
+    .space {
+        background: var(--notification-ok);
+    }
+}

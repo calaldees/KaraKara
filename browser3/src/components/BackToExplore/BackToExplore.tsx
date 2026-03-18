@@ -10,7 +10,7 @@ export function BackToExplore(): React.ReactElement {
             data-cy="back"
             aria-label="Back to Track List"
         >
-            <FAIcon icon={faCircleChevronLeft} className="x2" />
+            <FAIcon icon={faCircleChevronLeft} />
         </Link>
     );
 }

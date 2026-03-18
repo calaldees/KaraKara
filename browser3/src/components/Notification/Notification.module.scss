@@ -1,0 +1,32 @@
+.notification {
+    position: absolute;
+    left: 2em;
+    right: 2em;
+    top: 4em;
+    display: flex;
+    align-items: center;
+    border-radius: 1em;
+    padding: 1em;
+    // For some reason even though the notification appears over
+    // the top of the video, clicks act as if the video is on top?
+    // z-index appears to fix it...
+    z-index: 2;
+    SPAN {
+        flex: 1 1 auto;
+    }
+    I {
+        padding: 0em 0.5em;
+    }
+    &:global(.ok) {
+        background-color: var(--notification-ok);
+        border: 1px solid var(--notification-ok-border);
+    }
+    &:global(.warning) {
+        background-color: var(--notification-warning);
+        border: 1px solid var(--notification-warning-border);
+    }
+    &:global(.error) {
+        background-color: var(--notification-error);
+        border: 1px solid var(--notification-error-border);
+    }
+}

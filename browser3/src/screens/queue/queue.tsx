@@ -1,120 +1,15 @@
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { FAIcon } from "@shish2k/react-faicon";
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 
-import { BackToExplore, Screen, Thumb } from "@/components";
-import { useApi } from "@/hooks/api";
+import { BackToExplore, Screen } from "@/components";
 import { ClientContext } from "@/providers/client";
-import { RoomContext } from "@/providers/room";
-import { ServerContext } from "@/providers/server";
-import type { QueueItem, Subtitle, Track } from "@/types";
-import {
-    attachment_path,
-    dict2css,
-    is_my_song,
-    sorted,
-    time_until,
-    unique,
-} from "@/utils";
 
-import "./queue.scss";
-
-function QueueItemRender({
-    item,
-    show_time,
-    track,
-}: {
-    item: QueueItem;
-    show_time: boolean;
-    track: Track;
-}): React.ReactElement {
-    const { now } = useContext(ServerTimeContext);
-    const { performerName } = useContext(ClientContext);
-    const { request, sessionId } = useApi();
-
-    function removeTrack(queue_item_id: number) {
-        request({
-            notify: "Removing track...",
-            notify_ok: "Track removed!",
-            function: "queue/" + queue_item_id.toString(),
-            options: {
-                method: "DELETE",
-            },
-        });
-    }
-
-    return (
-        <li
-            className={dict2css({
-                queue_item: true,
-                me: is_my_song(item, sessionId, performerName),
-            })}
-        >
-            <Thumb track={track} />
-            <span className={"text queue_info"}>
-                <span className={"title"}>{track.tags.title[0]}</span>
-                <br />
-                <span className={"performer"}>{item.performer_name}</span>
-            </span>
-            {show_time && item.start_time && (
-                <span className={"count"}>
-                    {time_until(now, item.start_time)}
-                </span>
-            )}
-
-            {is_my_song(item, sessionId) && (
-                <FAIcon
-                    icon={faCircleXmark}
-                    data-cy="remove"
-                    className={"go_arrow"}
-                    onClick={(_) =>
-                        confirm(
-                            `Remove ${track.tags.title[0]} from the queue?`,
-                        ) && removeTrack(item.id)
-                    }
-                />
-            )}
-        </li>
-    );
-}
-
-function Lyrics({ track }: { track: Track }) {
-    const { request } = useApi();
-
-    const [lyrics, setLyrics] = useState<Subtitle[]>([]);
-    useEffect(() => {
-        const subtitleAttachment = track?.attachments.subtitle?.find(
-            (a) => a.mime === "application/json",
-        );
-        if (subtitleAttachment) {
-            request({
-                url: attachment_path(subtitleAttachment),
-                options: { credentials: "omit" },
-                onAction: (result) => setLyrics(result),
-            });
-        }
-    }, [request, track]);
-    if (lyrics.length > 0) {
-        return (
-            <li>
-                <span className={"lyrics"}>
-                    {lyrics.map((line, n) => (
-                        <div key={n}>{line.text}</div>
-                    ))}
-                </span>
-            </li>
-        );
-    } else {
-        return null;
-    }
-}
+import { ComingLater } from "./ComingLater";
+import { ComingSoon } from "./ComingSoon";
+import { MyEntries } from "./MyEntries";
+import { NowPlaying } from "./NowPlaying";
 
 export function Queue(): React.ReactElement {
     const { widescreen } = useContext(ClientContext);
-    const { tracks } = useContext(ServerContext);
-    const { queue, settings } = useContext(RoomContext);
-    const { sessionId } = useApi();
 
     return (
         <Screen
@@ -122,83 +17,10 @@ export function Queue(): React.ReactElement {
             navLeft={!widescreen && <BackToExplore />}
             title={"Now Playing"}
         >
-            {/* No items */}
-            {queue.length === 0 && <h2>Queue Empty</h2>}
-
-            {/* At least one item */}
-            {queue.length > 0 && (
-                <section>
-                    <ul>
-                        <QueueItemRender
-                            item={queue[0]}
-                            show_time={true}
-                            track={tracks[queue[0].track_id]}
-                        />
-                        <Lyrics
-                            key={queue[0].track_id}
-                            track={tracks[queue[0].track_id]}
-                        />
-                    </ul>
-                </section>
-            )}
-
-            {/* Some items */}
-            {queue.length > 1 && settings["coming_soon_track_count"] && (
-                <section>
-                    <h2>Coming Soon</h2>
-                    <ul>
-                        {queue
-                            .slice(1, 1 + settings["coming_soon_track_count"])
-                            .map((item) => (
-                                <QueueItemRender
-                                    key={item.id}
-                                    item={item}
-                                    show_time={true}
-                                    track={tracks[item.track_id]}
-                                />
-                            ))}
-                    </ul>
-                </section>
-            )}
-
-            {/* Many items */}
-            {queue.length > 1 + settings["coming_soon_track_count"] && (
-                <section>
-                    <h2>Coming Later</h2>
-                    <div className={"coming_later"}>
-                        {sorted(
-                            unique(
-                                queue
-                                    .slice(
-                                        1 + settings["coming_soon_track_count"],
-                                    )
-                                    .map((item) => item.performer_name),
-                            ),
-                        ).map((name) => (
-                            <span key={name}>{name}</span>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {/* My Stuff */}
-            {queue.filter((item) => is_my_song(item, sessionId)).length > 0 && (
-                <section>
-                    <h2>My Entries</h2>
-                    <ul>
-                        {queue
-                            .filter((item) => is_my_song(item, sessionId))
-                            .map((item) => (
-                                <QueueItemRender
-                                    key={item.id}
-                                    item={item}
-                                    show_time={false}
-                                    track={tracks[item.track_id]}
-                                />
-                            ))}
-                    </ul>
-                </section>
-            )}
+            <NowPlaying />
+            <ComingSoon />
+            <ComingLater />
+            <MyEntries />
         </Screen>
     );
 }

@@ -1,0 +1,44 @@
+UL.list {
+    border: 1px solid var(--list-border);
+    background-color: var(--list-bg);
+    margin: 0.5em 0;
+    border-radius: 0.5em;
+    overflow: hidden;
+    box-shadow: var(--list-shadow) 2px 2px 4px;
+    padding: 0;
+    LI {
+        display: flex;
+        border-bottom: 1px solid var(--list-border);
+        padding: 0.75em;
+        font-weight: bold;
+        align-items: center;
+        SPAN.text {
+            flex: 1 1 auto;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            padding-right: 0.4em;
+        }
+        SPAN.title {
+            font-weight: bold;
+        }
+        SPAN.info {
+            font-weight: normal;
+        }
+        SPAN.count {
+            flex: 0 0 auto;
+            margin-right: 0.5em;
+            border: 1px solid var(--list-border);
+            background: var(--page-bg);
+            font-size: 0.75em;
+            padding: 0.2em 0.4em;
+            border-radius: 0.2em;
+        }
+        SPAN.goArrow {
+            flex: 0 0 auto;
+        }
+    }
+    LI:last-child {
+        border-bottom: 0;
+    }
+}

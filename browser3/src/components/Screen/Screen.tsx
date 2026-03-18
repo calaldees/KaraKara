@@ -1,10 +1,9 @@
 import { useContext, useRef } from "react";
 
+import { Notification, YoureNext } from "@/components";
 import { useScrollRestoration } from "@/hooks/scrollrestoration";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import { Notification } from "./Notification";
-import { YoureNext } from "./YoureNext";
 
 const EmptyHeaderLink = (): React.ReactElement => <div />;
 
@@ -38,7 +37,7 @@ export function Screen({
             <Notification />
             {queue && <YoureNext queue={queue} />}
             <article ref={scroller}>{children}</article>
-            {footer}
+            {footer && <footer>{footer}</footer>}
         </main>
     );
 }

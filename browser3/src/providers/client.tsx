@@ -4,7 +4,7 @@ import { useMemoObj } from "../hooks/memo";
 
 type Notification = {
     text: string;
-    style: string;
+    style: "ok" | "warning" | "error";
 } | null;
 
 export interface ClientContextType {

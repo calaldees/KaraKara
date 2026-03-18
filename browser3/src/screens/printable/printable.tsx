@@ -3,26 +3,9 @@ import { useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 
-import { BackToExplore, Screen } from "@/components";
+import { BackToExplore, ButtonRow, Screen } from "@/components";
 
 import "./printable.scss";
-
-///////////////////////////////////////////////////////////////////////
-// Views
-
-const PrintButtons = ({
-    callback,
-}: {
-    callback: () => void;
-}): React.ReactElement => (
-    <footer>
-        <div className={"buttons"}>
-            <button type="button" onClick={callback}>
-                Print
-            </button>
-        </div>
-    </footer>
-);
 
 export function Printable(): React.ReactElement {
     const { roomName } = useParams();
@@ -31,13 +14,21 @@ export function Printable(): React.ReactElement {
     const reactToPrintFn = useReactToPrint({ contentRef });
 
     const root = window.location.protocol + "//" + window.location.host;
+    const buttons = (
+        <ButtonRow>
+            <button type="button" onClick={reactToPrintFn}>
+                Print
+            </button>
+        </ButtonRow>
+    );
+
     return (
         <Screen
             className={"printable"}
             navLeft={<BackToExplore />}
             title={"Track List"}
             //navRight={}
-            footer={<PrintButtons callback={reactToPrintFn} />}
+            footer={buttons}
         >
             <div ref={contentRef} className="printableContent">
                 <p>

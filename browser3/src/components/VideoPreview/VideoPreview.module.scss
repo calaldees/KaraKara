@@ -1,0 +1,23 @@
+.video {
+    margin-top: 1rem;
+    border: 1px solid var(--list-border);
+    aspect-ratio: 16/9;
+    width: 100%;
+}
+
+/* subtitle wibbling */
+::cue(v[voice="active"]) {
+    color: yellow;
+}
+::cue(v[voice="next"]) {
+    color: white;
+}
+::cue {
+    // font-family: metalghosts, sans-serif;
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    font-size: 1.5em;
+}

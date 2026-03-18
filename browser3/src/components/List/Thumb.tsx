@@ -1,17 +1,21 @@
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
+import { faGripVertical } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
+
+import styles from "./Thumb.module.scss";
 
 export function Thumb({
     track,
-    children,
+    dragHandle = false,
     ...kwargs
 }: {
     track: Track | undefined;
-    children?: any;
+    dragHandle?: boolean;
     [Key: string]: any;
 }): React.ReactElement {
     return (
-        <div className={"thumb"} {...kwargs}>
+        <div className={styles.thumb} {...kwargs}>
             <img
                 alt=""
                 draggable="false"
@@ -20,7 +24,9 @@ export function Thumb({
                     attachment_path(track.attachments.image[0])
                 }
             />
-            {children}
+            {dragHandle && (
+                <FAIcon icon={faGripVertical} className={styles.dragHandle} />
+            )}
         </div>
     );
 }

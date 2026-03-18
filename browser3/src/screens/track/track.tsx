@@ -3,42 +3,18 @@ import {
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { Screen } from "@/components";
-import { useApi } from "@/hooks/api";
+import { LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
 import { ClientContext } from "@/providers/client";
-import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-import { Subtitle, Track } from "@/types";
-import {
-    attachment_path,
-    is_my_song,
-    nth,
-    preferred_variant,
-    unique,
-} from "@/utils";
+import { Track } from "@/types";
+import { preferred_variant, unique } from "@/utils";
 
-import "./track.scss";
+import { TrackButtons } from "./TrackButtons";
 
-const BLOCKED_KEYS = [
-    "",
-    "title",
-    "from",
-    "source_type",
-    "subs",
-    "aspect_ratio",
-    "date",
-    "added",
-    "new",
-    "source", // TODO: figure out a nice way to display source URLs?
-    "id", // TODO: display id:imdb, id:mal, etc. nicely
-];
-enum TrackAction {
-    NONE = 0,
-    ENQUEUE = 1,
-}
+import styles from "./track.module.scss";
 
 // Validate parameters and fetch track data,
 // then render inner track details component
@@ -50,10 +26,10 @@ export function TrackDetails(): React.ReactElement {
     const track = tracks[trackId];
     if (!track) return <div>No track with ID {trackId}</div>;
 
-    return <TrackDetailsInner key={trackId} track={track} />;
+    return <TrackDetailsInternal key={trackId} track={track} />;
 }
 
-function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
+function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
     const { widescreen } = useContext(ClientContext);
     const navigate = useNavigate();
 
@@ -71,11 +47,10 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
 
     return (
         <Screen
-            className={"track"}
+            className={styles.track}
             navLeft={
                 <FAIcon
                     icon={faCircleChevronLeft}
-                    className="x2"
                     onClick={() => void navigate(-1)}
                     data-cy="back"
                     role="button"
@@ -90,12 +65,12 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
                         data-cy="queue"
                         aria-label="Show Queue"
                     >
-                        <FAIcon icon={faListOl} className="x2" />
+                        <FAIcon icon={faListOl} />
                     </Link>
                 )
             }
             footer={
-                <Buttons
+                <TrackButtons
                     track={track}
                     videoVariants={videoVariants}
                     videoVariant={videoVariant}
@@ -111,329 +86,12 @@ function TrackDetailsInner({ track }: { track: Track }): React.ReactElement {
                 videoVariant={videoVariant}
                 subtitleVariant={subtitleVariant}
             />
-            <TagViewer track={track} />
-            <LyricViewer
+            <TagsViewer track={track} />
+            <LyricsViewer
                 track={track}
                 key={subtitleVariant}
                 variant={subtitleVariant}
             />
         </Screen>
     );
-}
-
-function VideoPreview({
-    track,
-    videoVariant,
-    subtitleVariant,
-}: {
-    track: Track;
-    videoVariant: string | null;
-    subtitleVariant: string | null;
-}) {
-    let videoAttachments = track.attachments.video.filter(
-        (a) => a.variant === videoVariant,
-    );
-    if (videoAttachments.length == 0)
-        videoAttachments = track.attachments.video;
-    const imageAttachment =
-        track.attachments.image.find((a) => a.variant == videoVariant) ||
-        track.attachments.image[0];
-
-    const subtitleAttachment = track.attachments.subtitle?.find(
-        (a) => a.mime === "text/vtt" && a.variant === subtitleVariant,
-    );
-
-    return (
-        <video
-            className={"video_placeholder"}
-            key={videoVariant}
-            preload={"none"}
-            poster={attachment_path(imageAttachment)}
-            playsInline={true}
-            controls={true}
-            crossOrigin="anonymous"
-        >
-            {videoAttachments.map((videoAttachment) => (
-                <source
-                    key={videoAttachment.path}
-                    src={attachment_path(videoAttachment)}
-                    type={videoAttachment.mime}
-                />
-            ))}
-            {subtitleAttachment && (
-                <track
-                    key={subtitleAttachment.path}
-                    src={attachment_path(subtitleAttachment)}
-                    default={true}
-                />
-            )}
-        </video>
-    );
-}
-
-function TagViewer({ track }: { track: Track }) {
-    return (
-        <>
-            <h2>Tags</h2>
-            <div className={"tags"}>
-                {Object.keys(track.tags)
-                    .filter((key) => !BLOCKED_KEYS.includes(key))
-                    .map((key) => (
-                        <div key={key} className={"tag"}>
-                            <div className={"tag_key"}>{key}</div>
-                            <div className={"tag_value"}>
-                                {track.tags[key]?.join(", ")}
-                            </div>
-                        </div>
-                    ))}
-            </div>
-        </>
-    );
-}
-
-function LyricViewer({
-    track,
-    variant,
-}: {
-    track: Track;
-    variant: string | null;
-}): React.ReactElement | null {
-    const [lyrics, setLyrics] = useState<Subtitle[]>([]);
-    const { request } = useApi();
-
-    useEffect(() => {
-        const subtitleAttachment = track.attachments.subtitle?.find(
-            (a) => a.mime === "application/json" && a.variant === variant,
-        );
-        if (subtitleAttachment) {
-            request({
-                url: attachment_path(subtitleAttachment),
-                options: { credentials: "omit" },
-                onAction: (result) => setLyrics(result),
-            });
-        }
-    }, [request, track, variant]);
-
-    if (lyrics.length === 0) {
-        return null;
-    } else {
-        return (
-            <>
-                <h2>Lyrics</h2>
-                <div className={"lyrics"}>
-                    {lyrics.map((item, n) => (
-                        <div key={n}>{item.text}</div>
-                    ))}
-                </div>
-            </>
-        );
-    }
-}
-
-function BookmarkButton({ trackId }: { trackId: string }) {
-    const { bookmarks, addBookmark, removeBookmark } =
-        useContext(ClientContext);
-
-    return bookmarks.includes(trackId) ? (
-        <button type="button" onClick={(_) => removeBookmark(trackId)}>
-            Un-Bookmark
-        </button>
-    ) : (
-        <button type="button" onClick={(_) => addBookmark(trackId)}>
-            Bookmark
-        </button>
-    );
-}
-
-function QueueHogWarning({ trackId }: { trackId: string }) {
-    const { queue } = useContext(RoomContext);
-    const { performerName, booth } = useContext(ClientContext);
-    const { sessionId } = useApi();
-
-    const isQueued = queue.find((i) => i.track_id === trackId) !== undefined;
-
-    const myTracks = queue.filter((item) =>
-        is_my_song(item, sessionId, performerName),
-    );
-    const otherPeoplesTracks = queue.filter(
-        (item) => !is_my_song(item, sessionId, performerName),
-    );
-    const averageTracksPerPerformer =
-        otherPeoplesTracks.length > 0
-            ? otherPeoplesTracks.length /
-              unique(otherPeoplesTracks.map((item) => item.performer_name))
-                  .length
-            : 0;
-    const averageTracksPerPerformerStr = averageTracksPerPerformer.toFixed(1);
-    const myTrackCount = myTracks.length + 1;
-    if (
-        !isQueued &&
-        !booth &&
-        queue.length > 3 &&
-        myTrackCount > averageTracksPerPerformer * 2
-    ) {
-        return (
-            <div className="warning" style={{ textAlign: "center" }}>
-                The average person has {averageTracksPerPerformerStr}{" "}
-                {averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"} in
-                the queue, this will be your {nth(myTrackCount)} — please make
-                sure everybody gets a chance to sing ❤️
-            </div>
-        );
-    }
-    return null;
-}
-
-function Buttons({
-    track,
-    videoVariants,
-    videoVariant,
-    setVideoVariant,
-    subtitleVariants,
-    subtitleVariant,
-    setSubtitleVariant,
-}: {
-    track: Track;
-    videoVariants: string[];
-    videoVariant: string;
-    setVideoVariant: (v: string) => void;
-    subtitleVariants: string[];
-    subtitleVariant: string;
-    setSubtitleVariant: (v: string) => void;
-}) {
-    const { queue } = useContext(RoomContext);
-    const { performerName, setPerformerName } =
-        useContext(ClientContext);
-    const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
-    const { request } = useApi();
-
-    const isQueued = queue.find((i) => i.track_id === track.id) !== undefined;
-
-    function enqueue(performer_name: string, track_id: string) {
-        request({
-            notify: "Adding to queue...",
-            notify_ok: "Added to queue!",
-            function: "queue",
-            options: {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    track_id: track_id,
-                    performer_name: performer_name.trim(),
-                    video_variant: videoVariant,
-                    subtitle_variant: subtitleVariant,
-                }),
-            },
-            onAction: () => setAction(TrackAction.NONE),
-        });
-    }
-
-    let videoSelect = null;
-    if (videoVariants.length > 1) {
-        videoSelect = (
-            <select
-                name="video_variant"
-                onChange={(e) => setVideoVariant(e.currentTarget.value)}
-                value={videoVariant}
-            >
-                {/** while the variants are different videos, the effect for the user is different audio */}
-                {videoVariants.map((v) => (
-                    <option key={v} value={v}>
-                        {v}
-                    </option>
-                ))}
-            </select>
-        );
-    }
-
-    let subtitleSelect = null;
-    if (subtitleVariants.length > 1) {
-        subtitleSelect = (
-            <select
-                name="subtitle_variant"
-                onChange={(e) => setSubtitleVariant(e.currentTarget.value)}
-                value={subtitleVariant}
-            >
-                {subtitleVariants.map((v) => (
-                    <option key={v} value={v}>
-                        {v}
-                    </option>
-                ))}
-            </select>
-        );
-    }
-
-    let variantSelect = null;
-    if (videoSelect || subtitleSelect) {
-        variantSelect = (
-            <div className="buttons">
-                {videoSelect}
-                {subtitleSelect}
-            </div>
-        );
-    }
-
-    const validInputs =
-        performerName.trim().length >= 0 &&
-        (videoVariants.length === 0 || videoVariant !== "") &&
-        (subtitleVariants.length === 0 || subtitleVariant !== "");
-
-    if (action === TrackAction.NONE) {
-        return (
-            <footer>
-                <QueueHogWarning trackId={track.id} />
-                {isQueued && (
-                    <div className={"already_queued"}>
-                        Track is already queued
-                    </div>
-                )}
-                {variantSelect}
-                <div className={"buttons"}>
-                    <button
-                        type="button"
-                        onClick={(_) => setAction(TrackAction.ENQUEUE)}
-                        disabled={isQueued}
-                    >
-                        Enqueue
-                    </button>
-                    <BookmarkButton trackId={track.id} />
-                </div>
-            </footer>
-        );
-    }
-    if (action === TrackAction.ENQUEUE) {
-        return (
-            <footer>
-                <QueueHogWarning trackId={track.id} />
-                {variantSelect}
-                <input
-                    type="text"
-                    name="performer_name"
-                    value={performerName}
-                    placeholder={"Enter Name"}
-                    required={true}
-                    autoFocus={performerName.trim().length === 0}
-                    enterKeyHint="done"
-                    onChange={(e) => setPerformerName(e.currentTarget.value)}
-                />
-                <div className={"buttons"}>
-                    <button
-                        type="button"
-                        onClick={(_) => setAction(TrackAction.NONE)}
-                        autoFocus={performerName.trim().length > 0}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        onClick={(_) => enqueue(performerName, track.id)}
-                        disabled={!validInputs}
-                    >
-                        Confirm
-                    </button>
-                </div>
-            </footer>
-        );
-    }
-    return null;
 }

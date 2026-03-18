@@ -1,6 +1,6 @@
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { FormEvent, useCallback, useState } from "react";
+import { SubmitEvent, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Screen } from "@/components";
@@ -11,9 +11,9 @@ export function Login(): React.ReactElement {
     const [roomNameEdit, setRoomNameEdit] = useState("");
     const navigate = useNavigate();
     const onSubmit = useCallback(
-        (e: FormEvent) => {
+        (e: SubmitEvent) => {
             e.preventDefault();
-            void navigate(roomNameEdit.toLowerCase());
+            void navigate("/" + roomNameEdit.toLowerCase());
         },
         [navigate, roomNameEdit],
     );

@@ -6,6 +6,8 @@ import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
 import { is_my_song } from "@/utils";
 
+import styles from "./YoureNext.module.scss";
+
 export function YoureNext({
     queue,
 }: {
@@ -18,13 +20,13 @@ export function YoureNext({
     return (
         <>
             {(is_my_song(queue[0], sessionId, performerName) && (
-                <h2 className="main-only upnext">
+                <h2 className={`main-only ${styles.upnext}`}>
                     Your song "{tracks[queue[0].track_id]?.tags.title[0]}" is up
                     now!
                 </h2>
             )) ||
                 (is_my_song(queue[1], sessionId, performerName) && (
-                    <h2 className="main-only upnext">
+                    <h2 className={`main-only ${styles.upnext}`}>
                         Your song "{tracks[queue[1].track_id]?.tags.title[0]}"
                         is up next!
                     </h2>

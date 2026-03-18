@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useContext, useState } from "react";
+import { SubmitEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ClientContext } from "@/providers/client";
@@ -21,7 +21,7 @@ export function ConfigMenu(): React.ReactElement {
     const navigate = useNavigate();
 
     const onSubmit = useCallback(
-        (e: FormEvent) => {
+        (e: SubmitEvent) => {
             e.preventDefault();
             if (roomNameEdit !== roomName) {
                 void navigate("/" + roomNameEdit);
