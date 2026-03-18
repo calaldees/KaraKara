@@ -14,8 +14,8 @@
     SPAN {
         flex: 1 1 auto;
     }
-    I {
-        padding: 0em 0.5em;
+    svg {
+        padding-left: 1em;
     }
     &:global(.ok) {
         background-color: var(--notification-ok);

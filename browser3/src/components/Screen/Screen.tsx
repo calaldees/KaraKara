@@ -25,7 +25,7 @@ export function Screen({
     const { setShowSettings } = useContext(ClientContext);
     const { queue } = useContext(RoomContext);
     const scroller = useRef<HTMLElement | null>(null);
-    useScrollRestoration(scroller);
+    //useScrollRestoration(scroller);
 
     return (
         <main className={className}>

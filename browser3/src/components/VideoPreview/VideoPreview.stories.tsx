@@ -15,115 +15,96 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const mockTrack: Track = {
-    id: "track-1",
-    duration: 213,
-    tags: {
-        title: ["Big Buck Bunny"],
-        category: ["Animation"],
-    },
+    id: "Bad_Apple",
+    duration: 219.1,
     attachments: {
         video: [
             {
-                variant: "default",
-                mime: "video/mp4",
-                path: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                variant: "Instrumental",
+                mime: "video/webm; codecs=av01.0.05M.08,opus",
+                path: "8/879pGGQNP9J.webm",
+            },
+            {
+                variant: "Vocal",
+                mime: "video/webm; codecs=av01.0.05M.08,opus",
+                path: "a/A4u4GAwwyfZ.webm",
+            },
+            {
+                variant: "Instrumental",
+                mime: "video/mp4; codecs=avc1.4D401E,mp4a.40.2",
+                path: "j/j0KzEi2Vb_b.mp4",
+            },
+            {
+                variant: "Vocal",
+                mime: "video/mp4; codecs=avc1.4D401E,mp4a.40.2",
+                path: "x/x_ac4YGd_3W.mp4",
             },
         ],
         image: [
             {
-                variant: "default",
-                mime: "image/jpeg",
-                path: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+                variant: "Instrumental",
+                mime: "image/avif",
+                path: "i/Ib0f3UwSS58.avif",
+            },
+            {
+                variant: "Vocal",
+                mime: "image/avif",
+                path: "v/VxY3lrigg2F.avif",
             },
         ],
         subtitle: [
             {
-                variant: "english",
-                mime: "text/vtt",
-                path: "https://example.com/subtitles.vtt",
+                variant: "Japanese",
+                mime: "application/json",
+                path: "w/WD2EV9q98n9.json",
             },
+            {
+                variant: "Japanese",
+                mime: "text/vtt",
+                path: "w/WD2EV9q98n9.vtt",
+            },
+            {
+                variant: "English",
+                mime: "application/json",
+                path: "y/YciKFWK3xWQ.json",
+            },
+            { variant: "English", mime: "text/vtt", path: "y/YciKFWK3xWQ.vtt" },
         ],
     },
+    tags: {
+        category: ["game"],
+        from: ["Touhou"],
+        Touhou: ["Gensoukyou ~ Lotus Land Story"],
+        title: ["Bad Apple"],
+        artist: ["Nomico", "ZUN"],
+        use: ["doujin"],
+        vocaltrack: ["off", "on"],
+        length: ["full"],
+        lang: ["jp"],
+        vocalstyle: ["female"],
+        genre: ["dance", "pop"],
+        contributor: ["choco"],
+        date: ["2007-05-20"],
+        subs: ["soft"],
+        source_type: ["video"],
+        aspect_ratio: ["4:3"],
+        duration: ["3m39s"],
+        year: ["2007"],
+    },
 };
 
-export const Default: Story = {
+export const VocalEnglish: Story = {
     args: {
         track: mockTrack,
-        videoVariant: "default",
-        subtitleVariant: "english",
+        videoVariant: "Vocal",
+        subtitleVariant: "English",
     },
 };
 
-export const WithoutSubtitles: Story = {
+export const InstrumentalJapanese: Story = {
     args: {
         track: mockTrack,
-        videoVariant: "default",
-        subtitleVariant: null,
-    },
-};
-
-export const NoSubtitleVariant: Story = {
-    args: {
-        track: mockTrack,
-        videoVariant: "default",
-        subtitleVariant: null,
-    },
-};
-
-export const MultipleVideoVariants: Story = {
-    args: {
-        track: {
-            ...mockTrack,
-            attachments: {
-                ...mockTrack.attachments,
-                video: [
-                    {
-                        variant: "sd",
-                        mime: "video/mp4",
-                        path: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                    },
-                    {
-                        variant: "hd",
-                        mime: "video/mp4",
-                        path: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                    },
-                    {
-                        variant: "default",
-                        mime: "video/webm",
-                        path: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                    },
-                ],
-            },
-        },
-        videoVariant: "hd",
-        subtitleVariant: "english",
-    },
-};
-
-export const NullVideoVariant: Story = {
-    args: {
-        track: mockTrack,
-        videoVariant: null,
-        subtitleVariant: "english",
-    },
-};
-
-export const WithPoster: Story = {
-    args: {
-        track: {
-            ...mockTrack,
-            attachments: {
-                ...mockTrack.attachments,
-                image: [
-                    {
-                        variant: "default",
-                        mime: "image/jpeg",
-                        path: "https://via.placeholder.com/640x360/0066cc/ffffff?text=Video+Poster",
-                    },
-                ],
-            },
-        },
-        videoVariant: "default",
-        subtitleVariant: null,
+        videoVariant: "Instrumental",
+        subtitleVariant: "Japanese",
     },
 };

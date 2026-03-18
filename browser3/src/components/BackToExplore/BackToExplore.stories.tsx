@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { BackToExplore } from "./BackToExplore";
 
 const meta = {

@@ -14,27 +14,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Info: Story = {
-    decorators: [
-        (Story) => (
-            <ClientContext
-                value={
-                    {
-                        notification: {
-                            text: "This is an informational message",
-                            style: "ok",
-                        },
-                        setNotification: () => {},
-                    } as any
-                }
-            >
-                <Story />
-            </ClientContext>
-        ),
-    ],
-};
-
-export const Success: Story = {
+export const Ok: Story = {
     decorators: [
         (Story) => (
             <ClientContext

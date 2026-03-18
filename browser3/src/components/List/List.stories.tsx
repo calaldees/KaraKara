@@ -1,9 +1,9 @@
+import { faEllipsisVertical, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { List } from "./List";
 import { ListItem } from "./ListItem";
 import { Thumb } from "./Thumb";
-import { FAIcon } from "@shish2k/react-faicon";
-import { faPlay, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 
 const meta = {
     title: "Components/List",

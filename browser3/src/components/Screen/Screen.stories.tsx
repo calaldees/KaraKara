@@ -1,14 +1,17 @@
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import { faArrowLeft, faEllipsisVertical, faCog } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 import { BrowserRouter } from "react-router-dom";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { Screen } from "./Screen";
+import { ButtonRow } from "../ButtonRow/ButtonRow";
 
 const meta = {
     title: "Components/Screen",
     component: Screen,
     parameters: {
-        layout: "fullwidth",
+        layout: "padded",
     },
     tags: ["autodocs"],
     decorators: [
@@ -56,8 +59,8 @@ export const Default: Story = {
 export const WithNavigation: Story = {
     args: {
         title: "Track Details",
-        navLeft: <button>← Back</button>,
-        navRight: <button>⋮</button>,
+        navLeft: <FAIcon icon={faArrowLeft} />,
+        navRight: <FAIcon icon={faEllipsisVertical} />,
         children: (
             <div>
                 <h2>Track Information</h2>
@@ -71,17 +74,11 @@ export const WithFooter: Story = {
     args: {
         title: "Queue Manager",
         footer: (
-            <div
-                style={{
-                    display: "flex",
-                    gap: "1rem",
-                    justifyContent: "center",
-                }}
-            >
+            <ButtonRow>
                 <button>Add to Queue</button>
                 <button>Clear Queue</button>
                 <button>Save</button>
-            </div>
+            </ButtonRow>
         ),
         children: (
             <div>
@@ -112,13 +109,13 @@ export const CompleteExample: Story = {
     args: {
         title: "Complete Screen Example",
         className: "example-screen",
-        navLeft: <button>← Back to List</button>,
-        navRight: <button>Settings ⚙</button>,
+        navLeft: <FAIcon icon={faArrowLeft} />,
+        navRight: <FAIcon icon={faCog} />,
         footer: (
-            <div style={{ display: "flex", gap: "0.5rem", padding: "1rem" }}>
+            <ButtonRow>
                 <button style={{ flex: 1 }}>Cancel</button>
                 <button style={{ flex: 1 }}>Save</button>
-            </div>
+            </ButtonRow>
         ),
         children: (
             <div>

@@ -1,6 +1,52 @@
+import { List } from "@/components";
 import type { Subtitle, Track } from "@/types";
+import { createMockFetch } from "@/utils";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { LyricsViewer } from "./LyricsViewer";
+
+const mockTrack: Track = {
+    id: "track-1",
+    duration: 180,
+    tags: {
+        title: ["Test Track"],
+        category: ["Pop"],
+    },
+    attachments: {
+        video: [],
+        image: [],
+        subtitle: [
+            {
+                variant: "Japanese",
+                mime: "application/json",
+                path: "w/WD2EV9q98n9.json",
+            },
+            {
+                variant: "Japanese",
+                mime: "text/vtt",
+                path: "w/WD2EV9q98n9.vtt",
+            },
+            {
+                variant: "English",
+                mime: "application/json",
+                path: "y/YciKFWK3xWQ.json",
+            },
+            { variant: "English", mime: "text/vtt", path: "y/YciKFWK3xWQ.vtt" },
+        ],
+    },
+};
+const mockEnglishLyrics: Subtitle[] = [
+    { start: 0, end: 5, text: "And a one", top: false },
+    { start: 5, end: 10, text: "And a two", top: false },
+    { start: 10, end: 15, text: "And a one", top: false },
+    { start: 15, end: 20, text: "Two three four", top: false },
+];
+const mockJapaneseLyrics: Subtitle[] = [
+    { start: 0, end: 5, text: "いち", top: false },
+    { start: 5, end: 10, text: "にい", top: false },
+    { start: 10, end: 15, text: "さん", top: false },
+    { start: 15, end: 20, text: "はい！", top: false },
+];
+
 
 const meta = {
     title: "Components/LyricsViewer",
@@ -9,119 +55,59 @@ const meta = {
         layout: "padded",
     },
     tags: ["autodocs"],
+    argTypes: {
+        variant: {
+            control: "select",
+            options: [...new Set(mockTrack.attachments.subtitle?.map(s => s.variant))],
+            description: "Subtitle variant to display",
+        },
+    },
 } satisfies Meta<typeof LyricsViewer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockTrack: Track = {
-    id: "track-1",
-    duration: 180,
-    tags: {
-        title: ["Never Gonna Give You Up"],
-        category: ["Pop"],
-    },
-    attachments: {
-        video: [],
-        image: [],
-        subtitle: [
-            {
-                variant: "english",
-                mime: "application/json",
-                path: "/lyrics.json",
-            },
-        ],
-    },
-};
-
-const mockLyrics: Subtitle[] = [
-    { start: 0, end: 5, text: "We're no strangers to love", top: false },
-    { start: 5, end: 10, text: "You know the rules and so do I", top: false },
-    {
-        start: 10,
-        end: 15,
-        text: "A full commitment's what I'm thinking of",
-        top: false,
-    },
-    {
-        start: 15,
-        end: 20,
-        text: "You wouldn't get this from any other guy",
-        top: false,
-    },
-    {
-        start: 20,
-        end: 25,
-        text: "I just wanna tell you how I'm feeling",
-        top: false,
-    },
-    { start: 25, end: 30, text: "Gotta make you understand", top: false },
-    { start: 30, end: 35, text: "Never gonna give you up", top: true },
-    { start: 35, end: 40, text: "Never gonna let you down", top: true },
-    {
-        start: 40,
-        end: 45,
-        text: "Never gonna run around and desert you",
-        top: true,
-    },
-];
-
 export const Default: Story = {
     args: {
         track: mockTrack,
-        variant: "english",
+        variant: "Japanese",
         listItem: false,
     },
-    decorators: [
-        (Story) => {
-            // Mock fetch for lyrics
-            const originalFetch = global.fetch;
-            global.fetch = () => {
-                return Promise.resolve({
-                    json: () => Promise.resolve(mockLyrics),
-                } as Response);
-            };
-
-            document.cookie = "kksid=session-123";
-
-            const result = <Story />;
-
-            // Restore fetch
-            global.fetch = originalFetch;
-
-            return result;
-        },
-    ],
+    beforeEach: () => {
+        const originalFetch = window.fetch;
+        window.fetch = createMockFetch({
+            "w/WD2EV9q98n9.json": mockJapaneseLyrics,
+            "y/YciKFWK3xWQ.json": mockEnglishLyrics,
+        });
+        return () => {
+            window.fetch = originalFetch;
+        };
+    },
 };
 
 export const AsListItem: Story = {
     args: {
         track: mockTrack,
-        variant: "english",
+        variant: "English",
         listItem: true,
     },
     decorators: [
-        (Story) => {
-            const originalFetch = global.fetch;
-            global.fetch = () => {
-                return Promise.resolve({
-                    json: () => Promise.resolve(mockLyrics),
-                } as Response);
-            };
-
-            document.cookie = "kksid=session-123";
-
-            const result = (
-                <ul>
-                    <Story />
-                </ul>
-            );
-
-            global.fetch = originalFetch;
-
-            return result;
-        },
+        (Story) => (
+            <List>
+                <Story />
+            </List>
+        ),
     ],
+    beforeEach: () => {
+        const originalFetch = window.fetch;
+        window.fetch = createMockFetch({
+            "w/WD2EV9q98n9.json": mockJapaneseLyrics,
+            "y/YciKFWK3xWQ.json": mockEnglishLyrics,
+        });
+        return () => {
+            window.fetch = originalFetch;
+        };
+    },
 };
 
 export const NoLyrics: Story = {
@@ -133,13 +119,7 @@ export const NoLyrics: Story = {
                 subtitle: [],
             },
         },
-        variant: "english",
+        variant: "English",
         listItem: false,
     },
-    decorators: [
-        (Story) => {
-            document.cookie = "kksid=session-123";
-            return <Story />;
-        },
-    ],
 };

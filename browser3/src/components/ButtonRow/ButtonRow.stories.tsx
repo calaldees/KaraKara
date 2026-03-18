@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
-import { ButtonRow } from "./ButtonRow";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import { ButtonRow } from "./ButtonRow";
 
 const meta = {
     title: "Components/ButtonRow",
@@ -27,7 +27,9 @@ export const ManyButtons: Story = {
             <>
                 <button>Action 1</button>
                 <a className="button">Action 2</a>
-                <button><FAIcon icon={faPlay} /></button>
+                <button>
+                    <FAIcon icon={faPlay} />
+                </button>
                 <button>Action 4</button>
                 <button disabled={true}>Action 5</button>
             </>

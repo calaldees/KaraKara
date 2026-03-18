@@ -9,8 +9,8 @@ export function VideoPreview({
     subtitleVariant,
 }: {
     track: Track;
-    videoVariant: string | null;
-    subtitleVariant: string | null;
+    videoVariant: string;
+    subtitleVariant: string;
 }) {
     let videoAttachments = track.attachments.video.filter(
         (a) => a.variant === videoVariant,

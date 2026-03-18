@@ -6,6 +6,12 @@ import type { Attachment, QueueItem } from "@/types";
  * eg attachment_path(attachment) -> /files/asdfasdfa.mp4
  */
 export function attachment_path(attachment: Attachment): string {
+    if (
+        attachment.path.startsWith("http://") ||
+        attachment.path.startsWith("https://")
+    ) {
+        return attachment.path;
+    }
     return "/files/" + attachment.path;
 }
 
@@ -53,4 +59,58 @@ export function current_and_future(
     return queue.filter(
         (t) => t.start_time == null || t.start_time + t.track_duration > now,
     );
+}
+
+/**
+ * Create a mock fetch function for testing/storybook that returns mock data
+ * based on the requested path
+ *
+ * @param pathMap - Map of path patterns to content to return
+ * @returns Mock fetch function
+ */
+export function createMockFetch(pathMap: Record<string, any>): typeof fetch {
+    return ((url: string | URL | Request, init?: RequestInit) => {
+        const urlString =
+            typeof url === "string"
+                ? url
+                : url instanceof URL
+                  ? url.toString()
+                  : url.url;
+        console.log("Mock fetch called with:", urlString, init);
+
+        // Find matching path in the map
+        let responseData = null;
+        for (const [pattern, content] of Object.entries(pathMap)) {
+            if (
+                urlString.includes(pattern) ||
+                new RegExp(pattern).test(urlString)
+            ) {
+                responseData = content;
+                break;
+            }
+        }
+
+        if (responseData === null) {
+            console.warn(`No mock data found for URL: ${urlString}`);
+            responseData = [];
+        }
+
+        // Create a proper ReadableStream with the mock data
+        const encoder = new TextEncoder();
+        const data = encoder.encode(JSON.stringify(responseData));
+
+        const stream = new ReadableStream({
+            start(controller) {
+                controller.enqueue(data);
+                controller.close();
+            },
+        });
+
+        return Promise.resolve(
+            new Response(stream, {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            }),
+        );
+    }) as typeof fetch;
 }
