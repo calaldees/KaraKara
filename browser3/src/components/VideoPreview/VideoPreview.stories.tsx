@@ -1,5 +1,5 @@
 import type { Track } from "@/types";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { VideoPreview } from "./VideoPreview";
 
 const meta = {

@@ -1,5 +1,5 @@
 import { ClientContext } from "@/providers/client";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { Notification } from "./Notification";
 
 const meta = {

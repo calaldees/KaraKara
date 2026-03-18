@@ -1,7 +1,7 @@
 import { ClientContext } from "@/providers/client";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem, Track } from "@/types";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { YoureNext } from "./YoureNext";
 
 const meta = {
@@ -84,13 +84,13 @@ export const YourSongIsUpNow: Story = {
             // Mock the useApi hook by setting the session cookie
             document.cookie = "kksid=session-123";
             return (
-                <ServerContext.Provider value={{ tracks: mockTracks } as any}>
-                    <ClientContext.Provider
+                <ServerContext value={{ tracks: mockTracks } as any}>
+                    <ClientContext
                         value={{ performerName: "Current User" } as any}
                     >
                         <Story />
-                    </ClientContext.Provider>
-                </ServerContext.Provider>
+                    </ClientContext>
+                </ServerContext>
             );
         },
     ],
@@ -108,13 +108,13 @@ export const YourSongIsUpNext: Story = {
         (Story) => {
             document.cookie = "kksid=session-123";
             return (
-                <ServerContext.Provider value={{ tracks: mockTracks } as any}>
-                    <ClientContext.Provider
+                <ServerContext value={{ tracks: mockTracks } as any}>
+                    <ClientContext
                         value={{ performerName: "Current User" } as any}
                     >
                         <Story />
-                    </ClientContext.Provider>
-                </ServerContext.Provider>
+                    </ClientContext>
+                </ServerContext>
             );
         },
     ],
@@ -131,13 +131,13 @@ export const NoUserSongs: Story = {
         (Story) => {
             document.cookie = "kksid=session-123";
             return (
-                <ServerContext.Provider value={{ tracks: mockTracks } as any}>
-                    <ClientContext.Provider
+                <ServerContext value={{ tracks: mockTracks } as any}>
+                    <ClientContext
                         value={{ performerName: "Current User" } as any}
                     >
                         <Story />
-                    </ClientContext.Provider>
-                </ServerContext.Provider>
+                    </ClientContext>
+                </ServerContext>
             );
         },
     ],
@@ -151,13 +151,13 @@ export const EmptyQueue: Story = {
         (Story) => {
             document.cookie = "kksid=session-123";
             return (
-                <ServerContext.Provider value={{ tracks: mockTracks } as any}>
-                    <ClientContext.Provider
+                <ServerContext value={{ tracks: mockTracks } as any}>
+                    <ClientContext
                         value={{ performerName: "Current User" } as any}
                     >
                         <Story />
-                    </ClientContext.Provider>
-                </ServerContext.Provider>
+                    </ClientContext>
+                </ServerContext>
             );
         },
     ],
@@ -175,13 +175,13 @@ export const MatchByPerformerName: Story = {
         (Story) => {
             document.cookie = "kksid=session-123";
             return (
-                <ServerContext.Provider value={{ tracks: mockTracks } as any}>
-                    <ClientContext.Provider
+                <ServerContext value={{ tracks: mockTracks } as any}>
+                    <ClientContext
                         value={{ performerName: "Current User" } as any}
                     >
                         <Story />
-                    </ClientContext.Provider>
-                </ServerContext.Provider>
+                    </ClientContext>
+                </ServerContext>
             );
         },
     ],

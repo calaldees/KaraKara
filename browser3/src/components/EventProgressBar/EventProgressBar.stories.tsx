@@ -1,7 +1,7 @@
 import { RoomContext } from "@/providers/room";
 import type { QueueItem } from "@/types";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { EventProgressBar } from "./EventProgressBar";
 
 const meta = {
@@ -38,7 +38,7 @@ const endTime = new Date("2024-01-01T22:00:00Z").getTime() / 1000;
 export const Default: Story = {
     decorators: [
         (Story) => (
-            <RoomContext.Provider
+            <RoomContext
                 value={
                     {
                         fullQueue: [
@@ -60,7 +60,7 @@ export const Default: Story = {
                     } as any
                 }
             >
-                <ServerTimeContext.Provider
+                <ServerTimeContext
                     value={{
                         now: nowTime,
                         offset: 0,
@@ -69,8 +69,8 @@ export const Default: Story = {
                     }}
                 >
                     <Story />
-                </ServerTimeContext.Provider>
-            </RoomContext.Provider>
+                </ServerTimeContext>
+            </RoomContext>
         ),
     ],
 };
@@ -78,7 +78,7 @@ export const Default: Story = {
 export const EventAlmostOver: Story = {
     decorators: [
         (Story) => (
-            <RoomContext.Provider
+            <RoomContext
                 value={
                     {
                         fullQueue: [
@@ -100,7 +100,7 @@ export const EventAlmostOver: Story = {
                     } as any
                 }
             >
-                <ServerTimeContext.Provider
+                <ServerTimeContext
                     value={{
                         now: nowTime,
                         offset: 0,
@@ -109,8 +109,8 @@ export const EventAlmostOver: Story = {
                     }}
                 >
                     <Story />
-                </ServerTimeContext.Provider>
-            </RoomContext.Provider>
+                </ServerTimeContext>
+            </RoomContext>
         ),
     ],
 };
@@ -118,7 +118,7 @@ export const EventAlmostOver: Story = {
 export const EventJustStarted: Story = {
     decorators: [
         (Story) => (
-            <RoomContext.Provider
+            <RoomContext
                 value={
                     {
                         fullQueue: [
@@ -140,7 +140,7 @@ export const EventJustStarted: Story = {
                     } as any
                 }
             >
-                <ServerTimeContext.Provider
+                <ServerTimeContext
                     value={{
                         now: nowTime,
                         offset: 0,
@@ -149,8 +149,8 @@ export const EventJustStarted: Story = {
                     }}
                 >
                     <Story />
-                </ServerTimeContext.Provider>
-            </RoomContext.Provider>
+                </ServerTimeContext>
+            </RoomContext>
         ),
     ],
 };

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { List } from "./List";
 import { ListItem } from "./ListItem";
 import { Thumb } from "./Thumb";

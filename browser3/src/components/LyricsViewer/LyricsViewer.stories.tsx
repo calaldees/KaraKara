@@ -1,5 +1,5 @@
 import type { Subtitle, Track } from "@/types";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { LyricsViewer } from "./LyricsViewer";
 
 const meta = {
@@ -76,10 +76,10 @@ export const Default: Story = {
         (Story) => {
             // Mock fetch for lyrics
             const originalFetch = global.fetch;
-            global.fetch = async () => {
-                return {
-                    json: async () => mockLyrics,
-                } as Response;
+            global.fetch = () => {
+                return Promise.resolve({
+                    json: () => Promise.resolve(mockLyrics),
+                } as Response);
             };
 
             document.cookie = "kksid=session-123";
@@ -103,10 +103,10 @@ export const AsListItem: Story = {
     decorators: [
         (Story) => {
             const originalFetch = global.fetch;
-            global.fetch = async () => {
-                return {
-                    json: async () => mockLyrics,
-                } as Response;
+            global.fetch = () => {
+                return Promise.resolve({
+                    json: () => Promise.resolve(mockLyrics),
+                } as Response);
             };
 
             document.cookie = "kksid=session-123";

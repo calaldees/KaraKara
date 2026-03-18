@@ -1,6 +1,6 @@
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { BrowserRouter } from "react-router-dom";
 import { Screen } from "./Screen";
 
@@ -14,7 +14,7 @@ const meta = {
     decorators: [
         (Story) => (
             <BrowserRouter>
-                <ClientContext.Provider
+                <ClientContext
                     value={
                         {
                             notification: null,
@@ -23,7 +23,7 @@ const meta = {
                         } as any
                     }
                 >
-                    <RoomContext.Provider
+                    <RoomContext
                         value={
                             {
                                 queue: null,
@@ -31,8 +31,8 @@ const meta = {
                         }
                     >
                         <Story />
-                    </RoomContext.Provider>
-                </ClientContext.Provider>
+                    </RoomContext>
+                </ClientContext>
             </BrowserRouter>
         ),
     ],
