@@ -1,0 +1,10 @@
+<!-- firefox-esr bug workaround -->
+<style>
+    @-moz-document url-prefix() {
+        iframe[title="storybook-preview-iframe"] {
+            position: static !important;
+            width: 100% !important;
+            height: 100vh !important;
+        }
+    }
+</style>
