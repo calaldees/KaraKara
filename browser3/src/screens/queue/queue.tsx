@@ -1,7 +1,5 @@
-import { useContext } from "react";
-
 import { BackToExplore, Screen } from "@/components";
-import { ClientContext } from "@/providers/client";
+import { useWidescreen } from "@/hooks/widescreen";
 
 import { ComingLater } from "./ComingLater";
 import { ComingSoon } from "./ComingSoon";
@@ -9,7 +7,7 @@ import { MyEntries } from "./MyEntries";
 import { NowPlaying } from "./NowPlaying";
 
 export function Queue(): React.ReactElement {
-    const { widescreen } = useContext(ClientContext);
+    const widescreen = useWidescreen();
 
     return (
         <Screen

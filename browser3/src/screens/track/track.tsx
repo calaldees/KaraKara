@@ -7,7 +7,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
-import { ClientContext } from "@/providers/client";
+import { useWidescreen } from "@/hooks/widescreen";
 import { ServerContext } from "@/providers/server";
 import { Track } from "@/types";
 import { preferred_variant, unique } from "@/utils";
@@ -30,7 +30,7 @@ export function TrackDetails(): React.ReactElement {
 }
 
 function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
-    const { widescreen } = useContext(ClientContext);
+    const widescreen = useWidescreen();
     const navigate = useNavigate();
 
     const videoVariants = unique(track.attachments.video.map((a) => a.variant));

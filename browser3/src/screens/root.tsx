@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import { ConfigMenu } from "../components";
+import { useWidescreen } from "../hooks/widescreen";
 import { ClientContext } from "../providers/client";
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ServerContext } from "../providers/server";
@@ -58,7 +59,7 @@ function Page() {
 }
 function Room() {
     const { roomName } = useParams();
-    const { widescreen } = useContext(ClientContext);
+    const widescreen = useWidescreen();
     const { tracks } = useContext(ServerContext);
 
     return (
@@ -80,7 +81,7 @@ function Room() {
 }
 
 function TracksOrQueueOrControl(): React.ReactElement {
-    const { widescreen } = useContext(ClientContext);
+    const widescreen = useWidescreen();
     return widescreen ? <TrackList /> : <QueueOrControl />;
 }
 

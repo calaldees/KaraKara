@@ -75,7 +75,6 @@ function TestHarness(props: TestProps) {
         setShowSettings: () => {},
         booth: false,
         setBooth: () => {},
-        widescreen: false,
         performerName: "",
         setPerformerName: () => {},
         bookmarks: [],

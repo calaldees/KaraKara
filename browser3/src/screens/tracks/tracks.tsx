@@ -7,6 +7,7 @@ import { ReactElement, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Screen } from "@/components";
+import { useWidescreen } from "@/hooks/widescreen";
 import { ClientContext } from "@/providers/client";
 import { ExploreContext, ExploreProvider } from "@/providers/explore";
 import { RoomContext } from "@/providers/room";
@@ -24,7 +25,8 @@ export function TrackList(): ReactElement {
 
 function TrackListInternal(): ReactElement {
     const { isAdmin } = useContext(RoomContext);
-    const { booth, widescreen } = useContext(ClientContext);
+    const { booth } = useContext(ClientContext);
+    const widescreen = useWidescreen();
     const { filters, setFilters } = useContext(ExploreContext);
     const { roomName } = useParams();
 

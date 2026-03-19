@@ -1,5 +1,5 @@
 import { createContext, useCallback, useState } from "react";
-import { useLocalStorage, useMediaQuery } from "usehooks-ts";
+import { useLocalStorage } from "usehooks-ts";
 import { useMemoObj } from "../hooks/memo";
 
 type Notification = {
@@ -14,7 +14,6 @@ export interface ClientContextType {
     setShowSettings: (_: boolean) => void;
     booth: boolean;
     setBooth: (_: boolean) => void;
-    widescreen: boolean;
     performerName: string;
     setPerformerName: (_: string) => void;
     bookmarks: string[];
@@ -38,9 +37,6 @@ export function ClientProvider(props: any) {
     );
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [booth, setBooth] = useLocalStorage<boolean>("booth", false);
-    const widescreen = useMediaQuery(
-        "(min-width: 780px) and (min-aspect-ratio: 1/1)",
-    );
     const [bookmarks, setBookmarks] = useLocalStorage<string[]>(
         "bookmarks",
         [],
@@ -75,7 +71,6 @@ export function ClientProvider(props: any) {
         setShowSettings,
         booth,
         setBooth,
-        widescreen,
         performerName,
         setPerformerName,
         bookmarks,
