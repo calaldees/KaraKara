@@ -35,8 +35,6 @@ export const Default: Story = {
                         booth: false,
                         setBooth: () => {},
                         setShowSettings: () => {},
-                        fullscreen: false,
-                        setFullscreen: () => {},
                     } as any
                 }
             >
@@ -57,8 +55,6 @@ export const WithPassword: Story = {
                         booth: false,
                         setBooth: () => {},
                         setShowSettings: () => {},
-                        fullscreen: false,
-                        setFullscreen: () => {},
                     } as any
                 }
             >
@@ -79,8 +75,6 @@ export const BoothMode: Story = {
                         booth: true,
                         setBooth: () => {},
                         setShowSettings: () => {},
-                        fullscreen: false,
-                        setFullscreen: () => {},
                     } as any
                 }
             >
@@ -101,8 +95,6 @@ export const Fullscreen: Story = {
                         booth: false,
                         setBooth: () => {},
                         setShowSettings: () => {},
-                        fullscreen: true,
-                        setFullscreen: () => {},
                     } as any
                 }
             >
@@ -123,8 +115,6 @@ export const AllOptionsEnabled: Story = {
                         booth: true,
                         setBooth: () => {},
                         setShowSettings: () => {},
-                        fullscreen: true,
-                        setFullscreen: () => {},
                     } as any
                 }
             >

@@ -1,3 +1,4 @@
+import { useFullscreen } from "@mantine/hooks";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { SubmitEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,12 +15,11 @@ export function ConfigMenu() {
         podium,
         setPodium,
         setShowSettings,
-        fullscreen,
-        setFullscreen,
         wakeLock,
         underscan,
         setUnderscan,
     } = useContext(ClientContext);
+    const { toggle: toggleFullscreen, fullscreen } = useFullscreen();
     const { now, offset } = useContext(ServerTimeContext);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
@@ -98,21 +98,14 @@ export function ConfigMenu() {
                                     />
                                 </td>
                             </tr>
-                            {document.body.requestFullscreen && (
+                            {"requestFullscreen" in document.body && (
                                 <tr>
                                     <td>Fullscreen</td>
                                     <td>
                                         <input
                                             checked={fullscreen}
                                             type={"checkbox"}
-                                            onChange={(_) => {
-                                                if (fullscreen) {
-                                                    void document.exitFullscreen();
-                                                } else {
-                                                    void document.body.requestFullscreen();
-                                                }
-                                                setFullscreen(!fullscreen);
-                                            }}
+                                            onChange={() => void toggleFullscreen()}
                                         />
                                     </td>
                                 </tr>

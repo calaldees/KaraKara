@@ -82,8 +82,6 @@ function TestHarness(props: TestProps) {
         removeBookmark: () => {},
         notification: null,
         setNotification: () => {},
-        fullscreen: false,
-        setFullscreen: () => {},
         ...props.client,
     };
     const sc = {
