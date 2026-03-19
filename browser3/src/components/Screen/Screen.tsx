@@ -1,7 +1,6 @@
 import { useContext, useRef } from "react";
 
 import { Notification, YoureNext } from "@/components";
-//import { useScrollRestoration } from "@/hooks/scrollrestoration";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 
@@ -24,8 +23,6 @@ export function Screen({
 }): React.ReactElement {
     const { setShowSettings } = useContext(ClientContext);
     const { queue } = useContext(RoomContext);
-    const scroller = useRef<HTMLElement | null>(null);
-    //useScrollRestoration(scroller);
 
     return (
         <main className={className}>
@@ -36,7 +33,7 @@ export function Screen({
             </header>
             <Notification />
             {queue && <YoureNext queue={queue} />}
-            <article ref={scroller}>{children}</article>
+            <article>{children}</article>
             {footer && <footer>{footer}</footer>}
         </main>
     );

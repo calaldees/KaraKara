@@ -1,6 +1,6 @@
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 import { useMemoArr } from "@/hooks/memo";
 import { ClientContext } from "@/providers/client";
@@ -30,8 +30,17 @@ export function Explorer(): React.ReactElement {
         [trackList, search, filters],
     );
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const article = containerRef.current?.closest("article");
+        if (article) {
+            article.scrollTo(0, 0);
+        }
+    }, [filters]);
+
     return (
-        <>
+        <div ref={containerRef}>
             {/* Full-text search */}
             <input
                 className={styles.search}
@@ -132,6 +141,6 @@ export function Explorer(): React.ReactElement {
                     trackList={trackList}
                 />
             )}
-        </>
+        </div>
     );
 }
