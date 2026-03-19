@@ -1,5 +1,6 @@
 export { BackToExplore } from "./BackToExplore/BackToExplore";
 export { ButtonRow } from "./ButtonRow/ButtonRow";
+export { ConfigMenu } from "./ConfigMenu/ConfigMenu";
 export { EventProgressBar } from "./EventProgressBar/EventProgressBar";
 export { List } from "./List/List";
 export { ListItem } from "./List/ListItem";

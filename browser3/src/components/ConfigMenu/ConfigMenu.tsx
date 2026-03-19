@@ -1,32 +1,27 @@
-import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { FormEvent, useCallback, useContext, useState } from "react";
+import { SubmitEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ClientContext } from "@/providers/client";
 
-import "./config.scss";
+import styles from "./ConfigMenu.module.scss";
 
-export function ConfigMenu() {
+export function ConfigMenu(): React.ReactElement {
     const { roomName } = useParams();
     const {
         roomPassword,
         setRoomPassword,
-        podium,
-        setPodium,
+        booth,
+        setBooth,
         setShowSettings,
         fullscreen,
         setFullscreen,
-        wakeLock,
-        underscan,
-        setUnderscan,
     } = useContext(ClientContext);
-    const { now, offset } = useContext(ServerTimeContext);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
 
     const onSubmit = useCallback(
-        (e: FormEvent) => {
+        (e: SubmitEvent) => {
             e.preventDefault();
             if (roomNameEdit !== roomName) {
                 void navigate("/" + roomNameEdit);
@@ -35,17 +30,17 @@ export function ConfigMenu() {
             setShowSettings(false);
         },
         [
-            navigate,
-            roomName,
             roomNameEdit,
-            roomPasswordEdit,
+            roomName,
+            navigate,
             setRoomPassword,
+            roomPasswordEdit,
             setShowSettings,
         ],
     );
 
     return (
-        <div className={"config"}>
+        <div className={styles.config}>
             <div>
                 <h2>App Config</h2>
                 <form onSubmit={onSubmit}>
@@ -60,12 +55,12 @@ export function ConfigMenu() {
                                         autoComplete="off"
                                         autoCorrect="off"
                                         autoCapitalize="none"
+                                        data-cy="room-input"
                                         onChange={(e) =>
                                             setRoomNameEdit(
                                                 e.currentTarget.value,
                                             )
                                         }
-                                        required={true}
                                     />
                                 </td>
                             </tr>
@@ -78,23 +73,24 @@ export function ConfigMenu() {
                                         autoComplete="off"
                                         autoCorrect="off"
                                         autoCapitalize="none"
-                                        className="fakePassword"
+                                        className={styles.fakePassword}
+                                        data-cy="password-input"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(
                                                 e.currentTarget.value,
                                             )
                                         }
-                                        required={true}
                                     />
                                 </td>
                             </tr>
                             <tr>
-                                <td>Podium Mode</td>
+                                <td>Booth Mode</td>
                                 <td>
                                     <input
-                                        checked={podium}
+                                        checked={booth}
                                         type={"checkbox"}
-                                        onChange={(_) => setPodium(!podium)}
+                                        data-cy="booth-input"
+                                        onChange={(_) => setBooth(!booth)}
                                     />
                                 </td>
                             </tr>
@@ -118,49 +114,10 @@ export function ConfigMenu() {
                                 </tr>
                             )}
                             <tr>
-                                <td
-                                    style={{
-                                        background: [
-                                            "red",
-                                            "green",
-                                            "yellow",
-                                            "purple",
-                                            "orange",
-                                            "blue",
-                                        ][Math.round(now) % 6],
-                                    }}
-                                >
-                                    Sync
-                                </td>
-                                <td>
-                                    <input
-                                        disabled={true}
-                                        value={`${now.toFixed(
-                                            3,
-                                        )} (${offset.toFixed(3)})`}
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>WakeLock</td>
-                                <td>
-                                    <input disabled={true} value={wakeLock} />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Underscan</td>
-                                <td>
-                                    <input
-                                        value={underscan}
-                                        onChange={(e) =>
-                                            setUnderscan(e.currentTarget.value)
-                                        }
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
                                 <td colSpan={2}>
-                                    <button type="submit">Close</button>
+                                    <button type="submit" data-cy="save-button">
+                                        Close
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>

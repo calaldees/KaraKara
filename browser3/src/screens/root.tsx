@@ -8,10 +8,10 @@ import {
     useParams,
 } from "react-router-dom";
 
+import { ConfigMenu } from "../components";
 import { ClientContext } from "../providers/client";
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ServerContext } from "../providers/server";
-import { ConfigMenu } from "./config/config";
 import { Control } from "./control/control";
 import { Loading } from "./loading/loading";
 import { Login } from "./login/login";

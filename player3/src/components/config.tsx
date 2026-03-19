@@ -1,3 +1,4 @@
+import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { SubmitEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -5,17 +6,21 @@ import { ClientContext } from "@/providers/client";
 
 import "./config.scss";
 
-export function ConfigMenu(): React.ReactElement {
+export function ConfigMenu() {
     const { roomName } = useParams();
     const {
         roomPassword,
         setRoomPassword,
-        booth,
-        setBooth,
+        podium,
+        setPodium,
         setShowSettings,
         fullscreen,
         setFullscreen,
+        wakeLock,
+        underscan,
+        setUnderscan,
     } = useContext(ClientContext);
+    const { now, offset } = useContext(ServerTimeContext);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
     const navigate = useNavigate();
@@ -30,11 +35,11 @@ export function ConfigMenu(): React.ReactElement {
             setShowSettings(false);
         },
         [
-            roomNameEdit,
-            roomName,
             navigate,
-            setRoomPassword,
+            roomName,
+            roomNameEdit,
             roomPasswordEdit,
+            setRoomPassword,
             setShowSettings,
         ],
     );
@@ -55,12 +60,12 @@ export function ConfigMenu(): React.ReactElement {
                                         autoComplete="off"
                                         autoCorrect="off"
                                         autoCapitalize="none"
-                                        data-cy="room-input"
                                         onChange={(e) =>
                                             setRoomNameEdit(
                                                 e.currentTarget.value,
                                             )
                                         }
+                                        required={true}
                                     />
                                 </td>
                             </tr>
@@ -74,23 +79,22 @@ export function ConfigMenu(): React.ReactElement {
                                         autoCorrect="off"
                                         autoCapitalize="none"
                                         className="fakePassword"
-                                        data-cy="password-input"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(
                                                 e.currentTarget.value,
                                             )
                                         }
+                                        required={true}
                                     />
                                 </td>
                             </tr>
                             <tr>
-                                <td>Booth Mode</td>
+                                <td>Podium Mode</td>
                                 <td>
                                     <input
-                                        checked={booth}
+                                        checked={podium}
                                         type={"checkbox"}
-                                        data-cy="booth-input"
-                                        onChange={(_) => setBooth(!booth)}
+                                        onChange={(_) => setPodium(!podium)}
                                     />
                                 </td>
                             </tr>
@@ -114,10 +118,49 @@ export function ConfigMenu(): React.ReactElement {
                                 </tr>
                             )}
                             <tr>
+                                <td
+                                    style={{
+                                        background: [
+                                            "red",
+                                            "green",
+                                            "yellow",
+                                            "purple",
+                                            "orange",
+                                            "blue",
+                                        ][Math.round(now) % 6],
+                                    }}
+                                >
+                                    Sync
+                                </td>
+                                <td>
+                                    <input
+                                        disabled={true}
+                                        value={`${now.toFixed(
+                                            3,
+                                        )} (${offset.toFixed(3)})`}
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WakeLock</td>
+                                <td>
+                                    <input disabled={true} value={wakeLock} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Underscan</td>
+                                <td>
+                                    <input
+                                        value={underscan}
+                                        onChange={(e) =>
+                                            setUnderscan(e.currentTarget.value)
+                                        }
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
                                 <td colSpan={2}>
-                                    <button type="submit" data-cy="save-button">
-                                        Close
-                                    </button>
+                                    <button type="submit">Close</button>
                                 </td>
                             </tr>
                         </tbody>
