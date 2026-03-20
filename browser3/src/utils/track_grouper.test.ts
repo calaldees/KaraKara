@@ -75,6 +75,7 @@ describe("suggest_next_filters", () => {
     };
     test("when not searching for any tag, return default suggestions", () => {
         expect(grouper.suggest_next_filters([], summary)).toEqual([
+            "_new",
             "category",
             "vocalstyle",
             "vocaltrack",
