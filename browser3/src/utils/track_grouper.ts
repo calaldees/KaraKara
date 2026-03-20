@@ -27,7 +27,7 @@ export function suggest_next_filters(
 
     // if no search, show a sensible selection
     if (last_filter === undefined) {
-        return ["category", "vocalstyle", "vocaltrack", "lang"];
+        return ["_new", "category", "vocalstyle", "vocaltrack", "lang"];
     }
 
     // if we have an explicit map for "you searched for 'anime',

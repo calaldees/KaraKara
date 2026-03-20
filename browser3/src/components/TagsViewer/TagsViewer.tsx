@@ -22,6 +22,7 @@ export function TagsViewer({ track }: { track: Track }) {
             <h2>Tags</h2>
             <div className={styles.tags}>
                 {Object.keys(track.tags)
+                    .filter((key) => !key.startsWith("_"))
                     .filter((key) => !BLOCKED_KEYS.includes(key))
                     .map((key) => (
                         <div key={key} className={styles.tag}>

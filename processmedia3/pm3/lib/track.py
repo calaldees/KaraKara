@@ -160,12 +160,12 @@ class Track:
         if tags.get("added"):
             added_date = self._parse_date(tags["added"][0])
             today_date = datetime.date.today()
-            if added_date > today_date - datetime.timedelta(days=30):
-                tags["category"].append("new")
-                tags["new"] = [added_date.strftime("%Y-%m-%d")]
-            elif added_date > today_date - datetime.timedelta(days=380):
-                tags["category"].append("new")
-                tags["new"] = [added_date.strftime("%Y-%m")]
+            if added_date > today_date - datetime.timedelta(days=380):
+                tags["_new"] = ["new"]
+                if added_date > today_date - datetime.timedelta(days=30):
+                    tags["new"] = [added_date.strftime("%Y-%m-%d")]
+                else:
+                    tags["new"] = [added_date.strftime("%Y-%m")]
 
         # Sort all the tags' values because some of our input files are
         # processed in a non-deterministic order but we want the output
