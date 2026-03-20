@@ -207,3 +207,76 @@ describe("preferred_variant", () => {
         expect(utils.preferred_variant([])).toEqual("Default");
     });
 });
+
+describe("is_queue_hog", () => {
+    // Helper function to create queue items more concisely
+    const _qi = (
+        session_id: string,
+        performer_name: string,
+        track_duration: number,
+    ) => ({
+        session_id,
+        performer_name,
+        track_duration,
+    });
+    test("returns null when queue is short", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess2", "Bob", 200),
+            _qi("sess1", "Alice", 220),
+        ];
+        expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
+    });
+
+    test("returns null when user has average number of tracks", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess2", "Bob", 200),
+            _qi("sess2", "Bob", 210),
+            _qi("sess3", "Charlie", 220),
+            _qi("sess3", "Charlie", 190),
+        ];
+        // Alice has 1, adding another would give her 2
+        // Bob has 2, Charlie has 2, average is 2.0
+        expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
+    });
+
+    test("returns warning when user would have far above average tracks", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess1", "Alice", 190),
+            _qi("sess1", "Alice", 200),
+            _qi("sess2", "Bob", 210),
+            _qi("sess2", "Bob", 210),
+            _qi("sess3", "Charlie", 220),
+        ];
+        // Alice has 3, adding another would give her 4
+        // Bob has 2, Charlie has 1, average is 1.5
+        const result = utils.is_queue_hog(queue, "Alice", "sess1-1234");
+        expect(result).toContain("The average person has 1.5 tracks");
+        expect(result).toContain("this will be your 4th");
+    });
+
+    test("matches by sessionId OR name", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sessX", "Alice", 190),
+            _qi("sess1", "Alice Changed Name", 200),
+            _qi("sess2", "Bob", 210),
+        ];
+        // sess1/Alice has 3, adding another would give it 4
+        // Bob has 1, average is 1.0
+        const result = utils.is_queue_hog(queue, "Alice", "sess1-1234");
+        expect(result).toContain("this will be your 4th");
+    });
+
+    test("handles empty queue of other people gracefully", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess1", "Alice", 190),
+            _qi("sess1", "Alice", 200),
+            _qi("sess1", "Alice", 210),
+        ];
+        expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
+    });
+});

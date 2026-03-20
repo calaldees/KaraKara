@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import { is_my_song, nth, unique } from "@/utils";
+import { is_queue_hog } from "@/utils";
 
 import styles from "./QueueHogWarning.module.scss";
 
@@ -12,36 +12,17 @@ export function QueueHogWarning({ trackId }: { trackId: string }) {
     const { performerName, booth } = useContext(ClientContext);
     const { sessionId } = useApi();
 
-    const isQueued = queue.find((i) => i.track_id === trackId) !== undefined;
+    // The admin control panel is shared by many people
+    if (booth) return null;
 
-    const myTracks = queue.filter((item) =>
-        is_my_song(item, sessionId, performerName),
-    );
-    const otherPeoplesTracks = queue.filter(
-        (item) => !is_my_song(item, sessionId, performerName),
-    );
-    const averageTracksPerPerformer =
-        otherPeoplesTracks.length > 0
-            ? otherPeoplesTracks.length /
-              unique(otherPeoplesTracks.map((item) => item.performer_name))
-                  .length
-            : 0;
-    const averageTracksPerPerformerStr = averageTracksPerPerformer.toFixed(1);
-    const myTrackCount = myTracks.length + 1;
-    if (
-        !isQueued &&
-        !booth &&
-        queue.length > 3 &&
-        myTrackCount > averageTracksPerPerformer * 2
-    ) {
-        return (
-            <div className={styles.warning}>
-                The average person has {averageTracksPerPerformerStr}{" "}
-                {averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"} in
-                the queue, this will be your {nth(myTrackCount)} — please make
-                sure everybody gets a chance to sing ❤️
-            </div>
-        );
+    // If this track is already in the queue, no need to
+    // warn about adding it to the queue
+    const isQueued = queue.find((i) => i.track_id === trackId) !== undefined;
+    if (isQueued) return null;
+
+    const warningMessage = is_queue_hog(queue, performerName, sessionId);
+    if (warningMessage) {
+        return <div className={styles.warning}>{warningMessage}</div>;
     }
     return null;
 }
