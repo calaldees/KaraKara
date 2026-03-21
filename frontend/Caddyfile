@@ -29,7 +29,7 @@
 		header Cache-Control "public, max-age=604800, immutable"
 	}
 
-	handle_path /mqtt {
+	handle_path /api/mqtt {
 		reverse_proxy mqtt:9001
 	}
 

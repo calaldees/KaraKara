@@ -35,7 +35,7 @@ export function time_until(now: number, time: number | null): string {
  */
 export function mqtt_url(): string {
     const proto = window.location.protocol == "https:" ? "wss:" : "ws:";
-    return proto + "//" + window.location.host + "/mqtt";
+    return proto + "//" + window.location.host + "/api/mqtt";
 }
 
 export function percent(a: number, b: number): string {

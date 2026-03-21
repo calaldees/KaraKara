@@ -34,9 +34,8 @@ export default defineConfig({
         host: "127.0.0.1",
         port: 1237,
         proxy: {
-            "/api": "https://karakara.uk",
             "/files": "https://karakara.uk",
-            "/mqtt": {
+            "/api": {
                 target: "https://karakara.uk",
                 ws: true,
             },
