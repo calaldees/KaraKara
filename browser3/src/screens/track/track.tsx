@@ -1,12 +1,9 @@
-import {
-    faCircleChevronLeft,
-    faListOl,
-} from "@fortawesome/free-solid-svg-icons";
+import { faListOl } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-import { LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
+import { BackToExplore, LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
 import { useWidescreen } from "@/hooks/widescreen";
 import { ServerContext } from "@/providers/server";
 import { Track } from "@/types";
@@ -30,8 +27,8 @@ export function TrackDetails(): React.ReactElement {
 }
 
 function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
+    const { roomName } = useParams();
     const widescreen = useWidescreen();
-    const navigate = useNavigate();
 
     const videoVariants = unique(track.attachments.video.map((a) => a.variant));
     const [videoVariant, setVideoVariant] = useState<string>(() =>
@@ -48,20 +45,12 @@ function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
     return (
         <Screen
             className={styles.track}
-            navLeft={
-                <FAIcon
-                    icon={faCircleChevronLeft}
-                    onClick={() => void navigate(-1)}
-                    data-cy="back"
-                    role="button"
-                    aria-label="Go Back"
-                />
-            }
+            navLeft={<BackToExplore />}
             title={track.tags.title[0]}
             navRight={
                 !widescreen && (
                     <Link
-                        to={"../queue"}
+                        to={`/${roomName}/queue`}
                         data-cy="queue"
                         aria-label="Show Queue"
                     >
