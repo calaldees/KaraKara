@@ -280,3 +280,69 @@ describe("is_queue_hog", () => {
         expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
     });
 });
+
+describe("sort_tag_keys", () => {
+    test("should sort priority tags in correct order", () => {
+        const input = ["use", "title", "artist", "from", "category"];
+        const expected = ["title", "from", "artist", "category", "use"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should sort all priority tags in full order", () => {
+        const input = [
+            "vocalstyle",
+            "lang",
+            "use",
+            "category",
+            "artist",
+            "from",
+            "title",
+            "vocaltrack",
+        ];
+        const expected = [
+            "title",
+            "from",
+            "artist",
+            "category",
+            "use",
+            "lang",
+            "vocaltrack",
+            "vocalstyle",
+        ];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should place non-priority tags at the end, sorted alphabetically", () => {
+        const input = ["title", "zebra", "from", "alpha", "beta"];
+        const expected = ["title", "from", "alpha", "beta", "zebra"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should sort only non-priority tags alphabetically", () => {
+        const input = ["zebra", "charlie", "alpha", "beta"];
+        const expected = ["alpha", "beta", "charlie", "zebra"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should handle empty array", () => {
+        expect(utils.sort_tag_keys([])).toEqual([]);
+    });
+
+    test("should handle single element", () => {
+        expect(utils.sort_tag_keys(["title"])).toEqual(["title"]);
+        expect(utils.sort_tag_keys(["random"])).toEqual(["random"]);
+    });
+
+    test("should not modify the original array", () => {
+        const input = ["use", "title", "artist"];
+        const original = [...input];
+        utils.sort_tag_keys(input);
+        expect(input).toEqual(original);
+    });
+
+    test("should handle mixed priority and non-priority tags", () => {
+        const input = ["length", "title", "subs", "from", "artist", "date"];
+        const expected = ["title", "from", "artist", "date", "length", "subs"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+});

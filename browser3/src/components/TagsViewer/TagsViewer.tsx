@@ -1,4 +1,5 @@
 import { Track } from "@/types";
+import { sort_tag_keys } from "@/utils/browser";
 
 import styles from "./TagsViewer.module.scss";
 
@@ -21,7 +22,7 @@ export function TagsViewer({ track }: { track: Track }) {
         <>
             <h2>Tags</h2>
             <div className={styles.tags}>
-                {Object.keys(track.tags)
+                {sort_tag_keys(Object.keys(track.tags))
                     .filter((key) => !key.startsWith("_"))
                     .filter((key) => !BLOCKED_KEYS.includes(key))
                     .map((key) => (

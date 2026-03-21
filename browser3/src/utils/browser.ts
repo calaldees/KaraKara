@@ -133,7 +133,7 @@ export function normalise_cmp(a: string, b: string): number {
  * defaults for novice users
  */
 export function preferred_variant(variants: string[]): string {
-    const preferences = ["Vocal", "Romaji", "Default"];
+    const preferences = ["Vocal", "Romaji", "Simple", "Default"];
     for (const pref of preferences) {
         if (variants.includes(pref)) {
             return pref;
@@ -184,4 +184,41 @@ export function is_queue_hog(
         } in the queue, this will be your ${nth(myTrackCount)} — please make sure everybody gets a chance to sing ❤️`;
     }
     return null;
+}
+
+/**
+ * Sort tag keys by importance.
+ * Priority order: title, from, artist, category, use, lang, vocaltrack, vocalstyle,
+ * then any other tags at the end
+ */
+export function sort_tag_keys(tagKeys: string[]): string[] {
+    const priority = [
+        "title",
+        "from",
+        "artist",
+        "category",
+        "use",
+        "lang",
+        "vocaltrack",
+        "vocalstyle",
+    ];
+
+    return tagKeys.slice().sort((a, b) => {
+        const aIndex = priority.indexOf(a);
+        const bIndex = priority.indexOf(b);
+
+        // If both are in priority list, sort by their position
+        if (aIndex !== -1 && bIndex !== -1) {
+            return aIndex - bIndex;
+        }
+
+        // If only a is in priority list, it comes first
+        if (aIndex !== -1) return -1;
+
+        // If only b is in priority list, it comes first
+        if (bIndex !== -1) return 1;
+
+        // If neither is in priority list, sort alphabetically
+        return a.localeCompare(b);
+    });
 }
