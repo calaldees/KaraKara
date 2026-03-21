@@ -9,6 +9,7 @@ export function BackToExplore(): React.ReactElement {
             to={`/${roomName}`}
             data-cy="back"
             aria-label="Back to Track List"
+            role="button"
         >
             <FAIcon icon={faCircleChevronLeft} />
         </Link>

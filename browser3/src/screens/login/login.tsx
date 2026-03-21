@@ -30,6 +30,7 @@ export function Login(): React.ReactElement {
                         onChange={(e) => setRoomNameEdit(e.currentTarget.value)}
                         required={true}
                         autoFocus={true}
+                        maxLength={10}
                     />
                     <button type="submit" disabled={!roomNameEdit.trim()}>
                         Enter Room <FAIcon icon={faRightToBracket} />

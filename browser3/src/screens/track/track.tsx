@@ -6,7 +6,7 @@ import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
+import { BackToExplore, LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
 import { useWidescreen } from "@/hooks/widescreen";
 import { ServerContext } from "@/providers/server";
 import { Track } from "@/types";
@@ -31,7 +31,6 @@ export function TrackDetails(): React.ReactElement {
 
 function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
     const widescreen = useWidescreen();
-    const navigate = useNavigate();
 
     const videoVariants = unique(track.attachments.video.map((a) => a.variant));
     const [videoVariant, setVideoVariant] = useState<string>(() =>
@@ -49,13 +48,7 @@ function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
         <Screen
             className={styles.track}
             navLeft={
-                <FAIcon
-                    icon={faCircleChevronLeft}
-                    onClick={() => void navigate(-1)}
-                    data-cy="back"
-                    role="button"
-                    aria-label="Go Back"
-                />
+                <BackToExplore />
             }
             title={track.tags.title[0]}
             navRight={
