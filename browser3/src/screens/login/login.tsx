@@ -27,9 +27,12 @@ export function Login(): React.ReactElement {
                         placeholder={"Room Name"}
                         value={roomNameEdit}
                         enterKeyHint="go"
-                        onChange={(e) => setRoomNameEdit(e.currentTarget.value)}
                         required={true}
                         autoFocus={true}
+                        maxLength={16}
+                        onChange={(e) => {
+                            setRoomNameEdit(e.currentTarget.value.toLowerCase().replace(/[^a-z0-9]/g, ''))
+                        }}
                     />
                     <button type="submit" disabled={!roomNameEdit.trim()}>
                         Enter Room <FAIcon icon={faRightToBracket} />
