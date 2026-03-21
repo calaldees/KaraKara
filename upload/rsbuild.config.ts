@@ -11,7 +11,6 @@ export default defineConfig({
     html: {
         title: "KaraKara Uploader",
         favicon: "frontend/static/favicon.svg",
-        //template: "frontend/static/index.html",
     },
     server: {
         proxy: {

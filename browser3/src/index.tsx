@@ -1,4 +1,4 @@
-/// <reference types='./browser.d.ts'/>
+/// <reference types='./index.d.ts'/>
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
