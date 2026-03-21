@@ -19,9 +19,9 @@ export function ConfigMenu(): React.ReactElement {
         (e: SubmitEvent) => {
             e.preventDefault();
             if (roomNameEdit !== roomName) {
-                void navigate("/" + roomNameEdit);
+                void navigate("/" + roomNameEdit.toLowerCase());
             }
-            setRoomPassword(roomPasswordEdit);
+            setRoomPassword(roomPasswordEdit.toLowerCase());
             setShowSettings(false);
         },
         [
@@ -47,15 +47,19 @@ export function ConfigMenu(): React.ReactElement {
                                     <input
                                         value={roomNameEdit}
                                         type={"text"}
+                                        maxLength={16}
+                                        pattern={"[a-z0-9]+"}
                                         autoComplete="off"
                                         autoCorrect="off"
                                         autoCapitalize="none"
                                         data-cy="room-input"
-                                        onChange={(e) =>
-                                            setRoomNameEdit(
-                                                e.currentTarget.value,
-                                            )
-                                        }
+                                        onInvalid={(e) => {
+                                            e.currentTarget.setCustomValidity("Room name must be a-z, 0-9");
+                                        }}
+                                        onChange={(e) => {
+                                            e.currentTarget.setCustomValidity("");
+                                            setRoomNameEdit(e.currentTarget.value.toLowerCase())
+                                        }}
                                     />
                                 </td>
                             </tr>
