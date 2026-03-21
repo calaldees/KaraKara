@@ -10,6 +10,12 @@ pub fn lint_tags_banned(track_id: &str, tags: &HashMap<String, Vec<String>>) -> 
             "Put track in WorkInProgress folder instead of using 'red' tag".to_string(),
         ));
     }
+    if tags.contains_key("date") {
+        errors.push(LintError::new(
+            track_id.to_string(),
+            "Use 'released' instead of 'date' tag".to_string(),
+        ));
+    }
 
     errors
 }

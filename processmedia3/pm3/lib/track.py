@@ -139,9 +139,9 @@ class Track:
         if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 
-        # date can be a full date, but years are more useful for searching
-        if tags.get("date"):
-            tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["date"]]
+        # released can be a full date, but years are more useful for searching
+        if tags.get("released"):
+            tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["released"]]
 
         # if year is sufficiently old, add "retro" tag
         if tags.get("year"):
