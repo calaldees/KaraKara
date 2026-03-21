@@ -28,6 +28,11 @@ INPUT[type="password"] {
     border-color: var(--input-shade) var(--input-light) var(--input-light)
         var(--input-shade);
 }
+INPUT[type="text"]:disabled,
+INPUT[type="search"]:disabled,
+INPUT[type="password"]:disabled {
+    color: var(--input-fg-disabled);
+}
 SELECT,
 BUTTON,
 .button {
