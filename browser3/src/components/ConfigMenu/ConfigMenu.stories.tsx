@@ -1,6 +1,6 @@
 import { ClientContext } from "@/providers/client";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ConfigMenu } from "./ConfigMenu";
 
 const meta = {

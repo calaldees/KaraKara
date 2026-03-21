@@ -127,7 +127,9 @@ export function Explorer(): React.ReactElement {
                 }
                 return (
                     <div key={heading}>
-                        {heading && !heading.startsWith("_") && <h2>{heading}</h2>}
+                        {heading && !heading.startsWith("_") && (
+                            <h2>{heading}</h2>
+                        )}
                         {body}
                     </div>
                 );

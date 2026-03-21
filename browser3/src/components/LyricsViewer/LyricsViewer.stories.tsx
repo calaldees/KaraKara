@@ -47,7 +47,6 @@ const mockJapaneseLyrics: Subtitle[] = [
     { start: 15, end: 20, text: "はい！", top: false },
 ];
 
-
 const meta = {
     title: "Components/LyricsViewer",
     component: LyricsViewer,
@@ -58,7 +57,11 @@ const meta = {
     argTypes: {
         variant: {
             control: "select",
-            options: [...new Set(mockTrack.attachments.subtitle?.map(s => s.variant))],
+            options: [
+                ...new Set(
+                    mockTrack.attachments.subtitle?.map((s) => s.variant),
+                ),
+            ],
             description: "Subtitle variant to display",
         },
     },

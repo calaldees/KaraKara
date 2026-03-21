@@ -8,13 +8,8 @@ import styles from "./ConfigMenu.module.scss";
 
 export function ConfigMenu(): React.ReactElement {
     const { roomName } = useParams();
-    const {
-        roomPassword,
-        setRoomPassword,
-        booth,
-        setBooth,
-        setShowSettings,
-    } = useContext(ClientContext);
+    const { roomPassword, setRoomPassword, booth, setBooth, setShowSettings } =
+        useContext(ClientContext);
     const { toggle: toggleFullscreen, fullscreen } = useFullscreen();
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
@@ -101,7 +96,9 @@ export function ConfigMenu(): React.ReactElement {
                                         <input
                                             checked={fullscreen}
                                             type={"checkbox"}
-                                            onChange={() => void toggleFullscreen()}
+                                            onChange={() =>
+                                                void toggleFullscreen()
+                                            }
                                         />
                                     </td>
                                 </tr>

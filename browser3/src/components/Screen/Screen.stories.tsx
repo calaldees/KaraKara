@@ -1,11 +1,15 @@
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import { faArrowLeft, faEllipsisVertical, faCog } from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowLeft,
+    faCog,
+    faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { BrowserRouter } from "react-router-dom";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
-import { Screen } from "./Screen";
 import { ButtonRow } from "../ButtonRow/ButtonRow";
+import { Screen } from "./Screen";
 
 const meta = {
     title: "Components/Screen",
