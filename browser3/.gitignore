@@ -28,3 +28,6 @@ cypress/videos
 cypress/fixtures/queue.json
 cypress/fixtures/settings.json
 cypress/fixtures/tracks.json
+
+*storybook.log
+storybook-static

@@ -1,24 +1,3 @@
-.x2 {
-    font-size: 2em;
-}
-
-/* subtitle wibbling */
-::cue(v[voice="active"]) {
-    color: yellow;
-}
-::cue(v[voice="next"]) {
-    color: white;
-}
-::cue {
-    // font-family: metalghosts, sans-serif;
-    text-shadow:
-        -1px -1px 0 #000,
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000;
-    font-size: 1.5em;
-}
-
 /* Overall Layout */
 * {
     box-sizing: border-box;
@@ -90,43 +69,8 @@ MAIN {
             white-space: nowrap;
             overflow: hidden;
         }
-    }
-    .upnext {
-        background: var(--notification-warning);
-        border-bottom: 1px solid var(--notification-warning-border);
-        padding: 1em;
-        margin: 0;
-    }
-    .notification {
-        position: absolute;
-        left: 2em;
-        right: 2em;
-        top: 4em;
-        display: flex;
-        align-items: center;
-        border-radius: 1em;
-        padding: 1em;
-        // For some reason even though the notification appears over
-        // the top of the video, clicks act as if the video is on top?
-        // z-index appears to fix it...
-        z-index: 2;
-        SPAN {
-            flex: 1 1 auto;
-        }
-        I {
-            padding: 0em 0.5em;
-        }
-        &.ok {
-            background-color: var(--notification-ok);
-            border: 1px solid var(--notification-ok-border);
-        }
-        &.warning {
-            background-color: var(--notification-warning);
-            border: 1px solid var(--notification-warning-border);
-        }
-        &.error {
-            background-color: var(--notification-error);
-            border: 1px solid var(--notification-error-border);
+        svg {
+            font-size: 2em;
         }
     }
     ARTICLE {
@@ -143,17 +87,6 @@ MAIN {
         border-top: 1px solid var(--header-border);
         background-color: var(--header-bg);
         padding-top: 0.5em;
-
-        .buttons {
-            display: flex;
-            flex-flow: row;
-            gap: 0.5em;
-            justify-content: space-between;
-
-            & > * {
-                flex: 1 0;
-            }
-        }
     }
 }
 
@@ -168,71 +101,6 @@ H2 {
     text-align: center;
     margin-bottom: 0.5em;
     font-size: 1.2em;
-}
-UL {
-    border: 1px solid var(--list-border);
-    background-color: var(--list-bg);
-    margin: 0.5em 0;
-    border-radius: 0.5em;
-    overflow: hidden;
-    box-shadow: var(--list-shadow) 2px 2px 4px;
-    padding: 0;
-    LI {
-        display: flex;
-        border-bottom: 1px solid var(--list-border);
-        padding: 0.75em;
-        font-weight: bold;
-        align-items: center;
-        .thumb {
-            height: 4em;
-            width: 6em;
-            flex: 0 0 auto;
-            margin: -0.75em;
-            margin-right: 0.75em;
-            border-right: 1px solid var(--list-border);
-            position: relative;
-            IMG {
-                object-fit: cover;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-            .drag-handle {
-                position: absolute;
-                top: 1em;
-                left: 0;
-                bottom: 1em;
-                background: var(--drag-handle-bg);
-                border: 1px solid var(--list-border);
-                border-radius: 0 0.5em 0.5em 0;
-                padding: 0.4em 0.4em 0.5em 0.2em;
-            }
-        }
-        SPAN.text {
-            flex: 1 1 auto;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            padding-right: 0.4em;
-        }
-        SPAN.count {
-            flex: 0 0 auto;
-            margin-right: 0.5em;
-            border: 1px solid var(--list-border);
-            background: var(--page-bg);
-            font-size: 0.75em;
-            padding: 0.2em 0.4em;
-            border-radius: 0.2em;
-        }
-        SPAN.go_arrow {
-            flex: 0 0 auto;
-        }
-    }
-    LI:last-child {
-        border-bottom: 0;
-    }
 }
 /* Don't put stuff in iPhone's weird rounded corners */
 MAIN {

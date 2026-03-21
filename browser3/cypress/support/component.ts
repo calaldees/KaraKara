@@ -75,7 +75,6 @@ function TestHarness(props: TestProps) {
         setShowSettings: () => {},
         booth: false,
         setBooth: () => {},
-        widescreen: false,
         performerName: "",
         setPerformerName: () => {},
         bookmarks: [],
@@ -83,8 +82,6 @@ function TestHarness(props: TestProps) {
         removeBookmark: () => {},
         notification: null,
         setNotification: () => {},
-        fullscreen: false,
-        setFullscreen: () => {},
         ...props.client,
     };
     const sc = {

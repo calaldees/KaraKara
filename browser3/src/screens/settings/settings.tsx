@@ -1,6 +1,6 @@
 import { useCallback, useContext, useState } from "react";
 
-import { BackToExplore, Screen } from "@/components";
+import { BackToExplore, ButtonRow, Screen } from "@/components";
 import { useApi } from "@/hooks/api";
 import { RoomContext } from "@/providers/room";
 import { copy_type } from "@/utils";
@@ -75,18 +75,16 @@ function RoomSettingsInternal({
     );
 
     const buttons = (
-        <footer>
-            <div className={"buttons"}>
-                <button
-                    onClick={saveSettings}
-                    type="button"
-                    data-cy="save-settings-button"
-                    disabled={loading}
-                >
-                    Save
-                </button>
-            </div>
-        </footer>
+        <ButtonRow>
+            <button
+                onClick={saveSettings}
+                type="button"
+                data-cy="save-settings-button"
+                disabled={loading}
+            >
+                Save
+            </button>
+        </ButtonRow>
     );
 
     return (

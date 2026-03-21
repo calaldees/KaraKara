@@ -133,7 +133,7 @@ export function normalise_cmp(a: string, b: string): number {
  * defaults for novice users
  */
 export function preferred_variant(variants: string[]): string {
-    const preferences = ["Vocal", "Romaji", "Default"];
+    const preferences = ["Vocal", "Romaji", "Simple", "Default"];
     for (const pref of preferences) {
         if (variants.includes(pref)) {
             return pref;
@@ -143,4 +143,82 @@ export function preferred_variant(variants: string[]): string {
         return variants[0];
     }
     return "Default";
+}
+
+/**
+ * Check if adding a track would make the user a queue hog.
+ * Returns a warning message if the user would have significantly more tracks
+ * than the average performer, or null if it's okay to add the track.
+ */
+export function is_queue_hog(
+    queue: Pick<
+        QueueItem,
+        "session_id" | "performer_name" | "track_duration"
+    >[],
+    performerName: string | null | undefined,
+    sessionId: string | null | undefined,
+): string | null {
+    // If queue is short, not enough data
+    if (queue.length <= 3) return null;
+
+    // Figure out if this track would give the user significantly
+    // more air-time than other performers, and if so, return a warning
+    const myTracks = queue.filter((item) =>
+        is_my_song(item, sessionId, performerName),
+    );
+    const otherPeoplesTracks = queue.filter(
+        (item) => !is_my_song(item, sessionId, performerName),
+    );
+
+    // If there are no other people's tracks, can't be hogging the queue
+    if (otherPeoplesTracks.length === 0) return null;
+
+    const averageTracksPerPerformer =
+        otherPeoplesTracks.length /
+        unique(otherPeoplesTracks.map((item) => item.performer_name)).length;
+    const averageTracksPerPerformerStr = averageTracksPerPerformer.toFixed(1);
+    const myTrackCount = myTracks.length + 1;
+    if (myTrackCount > averageTracksPerPerformer * 2) {
+        return `The average person has ${averageTracksPerPerformerStr} ${
+            averageTracksPerPerformerStr !== "1.0" ? "tracks" : "track"
+        } in the queue, this will be your ${nth(myTrackCount)} — please make sure everybody gets a chance to sing ❤️`;
+    }
+    return null;
+}
+
+/**
+ * Sort tag keys by importance.
+ * Priority order: title, from, artist, category, use, lang, vocaltrack, vocalstyle,
+ * then any other tags at the end
+ */
+export function sort_tag_keys(tagKeys: string[]): string[] {
+    const priority = [
+        "title",
+        "from",
+        "artist",
+        "category",
+        "use",
+        "lang",
+        "vocaltrack",
+        "vocalstyle",
+    ];
+
+    return tagKeys.slice().sort((a, b) => {
+        const aIndex = priority.indexOf(a);
+        const bIndex = priority.indexOf(b);
+
+        // If both are in priority list, sort by their position
+        if (aIndex !== -1 && bIndex !== -1) {
+            return aIndex - bIndex;
+        }
+
+        // If only a is in priority list, it comes first
+        if (aIndex !== -1) return -1;
+
+        // If only b is in priority list, it comes first
+        if (bIndex !== -1) return 1;
+
+        // If neither is in priority list, sort alphabetically
+        return a.localeCompare(b);
+    });
 }

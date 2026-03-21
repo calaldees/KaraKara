@@ -139,9 +139,9 @@ class Track:
         if max(ds) - min(ds) > 5:
             raise TrackValidationException(f"inconsistent durations: {ds}")
 
-        # date can be a full date, but years are more useful for searching
-        if tags.get("date"):
-            tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["date"]]
+        # released can be a full date, but years are more useful for searching
+        if tags.get("released"):
+            tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["released"]]
 
         # if year is sufficiently old, add "retro" tag
         if tags.get("year"):
@@ -160,12 +160,12 @@ class Track:
         if tags.get("added"):
             added_date = self._parse_date(tags["added"][0])
             today_date = datetime.date.today()
-            if added_date > today_date - datetime.timedelta(days=30):
-                tags["category"].append("new")
-                tags["new"] = [added_date.strftime("%Y-%m-%d")]
-            elif added_date > today_date - datetime.timedelta(days=380):
-                tags["category"].append("new")
-                tags["new"] = [added_date.strftime("%Y-%m")]
+            if added_date > today_date - datetime.timedelta(days=380):
+                tags["_new"] = ["new"]
+                if added_date > today_date - datetime.timedelta(days=30):
+                    tags["new"] = [added_date.strftime("%Y-%m-%d")]
+                else:
+                    tags["new"] = [added_date.strftime("%Y-%m")]
 
         # Sort all the tags' values because some of our input files are
         # processed in a non-deterministic order but we want the output

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-For each "vocaloid" track in the database, if the "date" field is missing,
+For each "vocaloid" track in the database, if the "released" field is missing,
 open a wiki page for the track title in Firefox.
 """
 
@@ -34,7 +34,7 @@ def main():
     for path in sys.argv[1:]:
         path = Path(path)
         meta = parse_metadata(path)
-        if "date" in meta:
+        if "released" in meta:
             continue
         if meta.get("category") == "vocaloid" and meta.get("title"):
             url = title_to_wiki_url(meta["title"])

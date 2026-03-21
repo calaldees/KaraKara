@@ -14,7 +14,7 @@ import { ServerContext } from "@/providers/server";
 
 import { useStabilise } from "@/hooks/stabilise";
 import { percent } from "@/utils";
-import { ConfigMenu } from "./config/config";
+import { ConfigMenu } from "@/components/config";
 import { PodiumScreen } from "./podium/podium";
 import { PreviewScreen } from "./preview/preview";
 import { TitleScreen } from "./title/title";

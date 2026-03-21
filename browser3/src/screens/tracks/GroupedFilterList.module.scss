@@ -1,0 +1,17 @@
+.filterListGroup {
+    border-bottom: 1px solid var(--list-border);
+    background: var(--list-shadow);
+
+    LI {
+        background: var(--list-bg);
+    }
+
+    UL {
+        margin: 0em 0em 0 1em;
+        border-radius: 0;
+        border-top: 0;
+        border-bottom: 0;
+        border-right: 0;
+        box-shadow: none;
+    }
+}

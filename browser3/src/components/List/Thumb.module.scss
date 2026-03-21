@@ -1,0 +1,27 @@
+.thumb {
+    height: 4em;
+    width: 6em;
+    flex: 0 0 auto;
+    margin: -0.75em;
+    margin-right: 0.75em;
+    border-right: 1px solid var(--list-border);
+    position: relative;
+    IMG {
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .dragHandle {
+        position: absolute;
+        top: 1em;
+        left: 0;
+        bottom: 1em;
+        background: var(--drag-handle-bg);
+        border: 1px solid var(--list-border);
+        border-radius: 0 0.5em 0.5em 0;
+        padding: 0.4em 0.4em 0.5em 0.2em;
+    }
+}

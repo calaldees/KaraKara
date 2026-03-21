@@ -1,122 +1,120 @@
 x-require-env: ${EXTERNAL_NETWORK:?Missing .env file - copy from .env.example and update settings as appropriate}
 
 networks:
-    default:
-        name: karakara_default
-        external: ${EXTERNAL_NETWORK}
+  default:
+    name: karakara_default
+    external: ${EXTERNAL_NETWORK}
 
 services:
+  frontend:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    mem_limit: 1g
+    ports:
+      - "127.0.0.1:${PORT}:80"
+    volumes:
+      - ${PATH_HOST_data}/logs:/logs:rw
+      - ${PATH_HOST_data}/queues:/data/queue/:ro
+      - ${PATH_HOST_media}/processed:/media/processed:ro
+      - ${PWD}/tools/:/static/tools/:ro
+      - ${PWD}/frontend/:/etc/caddy/:ro
+    labels:
+      traefik.enable: true
+      traefik.http.routers.karakara.rule: "Host(`${HOSTNAME}`)"
+      traefik.http.routers.karakara.middlewares: "kkredir"
+      traefik.http.middlewares.kkredir.redirectregex.regex: "^https://karakara.uk/$$"
+      traefik.http.middlewares.kkredir.redirectregex.replacement: "https://karakara.uk/browser3/"
+      kissycron.job-local.backup.schedule: "31 3 * * *"
+      kissycron.job-local.backup.command: "backup ${PWD}/.env ${PWD}/data /backups/karakara/"
 
-    frontend:
-        image: caddy:2-alpine
-        restart: unless-stopped
-        mem_limit: 1g
-        ports:
-            - "127.0.0.1:${PORT}:80"
-        volumes:
-            - ${PATH_HOST_data}/logs:/logs:rw
-            - ${PATH_HOST_data}/queues:/data/queue/:ro
-            - ${PATH_HOST_media}/processed:/media/processed:ro
-            - ${PWD}/tools/:/static/tools/:ro
-            - ${PWD}/frontend/:/etc/caddy/:ro
-        labels:
-            traefik.enable: true
-            traefik.http.routers.karakara.rule: "Host(`${HOSTNAME}`)"
-            traefik.http.routers.karakara.middlewares: "kkredir"
-            traefik.http.middlewares.kkredir.redirectregex.regex: "^https://karakara.uk/$$"
-            traefik.http.middlewares.kkredir.redirectregex.replacement: "https://karakara.uk/browser3/"
-            kissycron.job-local.backup.schedule: "31 3 * * *"
-            kissycron.job-local.backup.command: "backup ${PWD}/.env ${PWD}/data /backups/karakara/"
+  api_queue:
+    build: ./api_queue
+    restart: unless-stopped
+    mem_limit: 1g
+    environment:
+      SANIC_MQTT: mqtt
+      SANIC_PATH_TRACKS: /media/processed/tracks.json # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
+      SANIC_PATH_QUEUE: /data/queue/ # See volumes below
+      SANIC_PROXIES_COUNT: 1
+      SANIC_REAL_IP_HEADER: x-real-ip
+    #ports:  # for local dev
+    #    - 8000:8000
+    volumes:
+      - ${PATH_HOST_media}/processed:/media/processed:ro
+      - ${PATH_HOST_data}/logs:/logs:rw
+      - ${PATH_HOST_data}/queues:/data/queue/:rw
+      #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
 
+  mqtt:
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    mem_limit: 1g
+    volumes:
+      - ${PATH_HOST_data}/mqtt:/mosquitto/data:rw
+      - ${PWD}/mqtt/:/mosquitto/config/:ro
 
-    api_queue:
-        build: ./api_queue
-        restart: unless-stopped
-        mem_limit: 1g
-        environment:
-            SANIC_MQTT: mqtt
-            SANIC_PATH_TRACKS: /media/processed/tracks.json  # TODO: same as `processmedia2/config.docker.json` - consider from ENV?
-            SANIC_PATH_QUEUE: /data/queue/   # See volumes below
-            SANIC_PROXIES_COUNT: 1
-            SANIC_REAL_IP_HEADER: x-real-ip
-        #ports:  # for local dev
-        #    - 8000:8000
-        volumes:
-            - ${PATH_HOST_media}/processed:/media/processed:ro
-            - ${PATH_HOST_data}/logs:/logs:rw
-            - ${PATH_HOST_data}/queues:/data/queue/:rw
-            #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
+  player3:
+    build: ./player3
+    restart: unless-stopped
+    mem_limit: 1g
 
-    mqtt:
-        image: eclipse-mosquitto
-        restart: unless-stopped
-        mem_limit: 1g
-        volumes:
-            - ${PATH_HOST_data}/mqtt:/mosquitto/data:rw
-            - ${PWD}/mqtt/:/mosquitto/config/:ro
+  browser3:
+    build: ./browser3
+    restart: unless-stopped
+    mem_limit: 1g
 
-    player3:
-        build: ./player3
-        restart: unless-stopped
-        mem_limit: 1g
+  processmedia3:
+    profiles:
+      - processmedia
+    build: ./processmedia3
+    restart: unless-stopped
+    user: ${UID}:${GID}
+    mem_limit: 8g
+    env_file: .env
+    volumes:
+      - ${PATH_HOST_media}/source:/media/source:ro
+      - ${PATH_HOST_media}/processed:/media/processed:rw
 
-    browser3:
-        build: ./browser3
-        restart: unless-stopped
-        mem_limit: 1g
+  syncthing:
+    profiles:
+      - syncthing
+    image: syncthing/syncthing
+    restart: unless-stopped
+    mem_limit: 1g
+    cpu_count: 1
+    hostname: karakara
+    environment:
+      PUID: ${UID}
+      PGID: ${GID}
+      UMASK: 002
+    volumes:
+      - ${PATH_HOST_data}/syncthing:/var/syncthing:rw
+      - ${PATH_HOST_media}/source:/media/source:rw
+      - ${PATH_HOST_media}/processed:/media/processed:rw
+      - ${PATH_HOST_media}/wip:/media/wip:rw
+    ports:
+      - 22000:22000/tcp # TCP file transfers
+      - 22000:22000/udp # QUIC file transfers
+      - 21027:21027/udp # Receive local discovery broadcasts
 
-    processmedia3:
-        profiles:
-            - processmedia
-        build: ./processmedia3
-        restart: unless-stopped
-        user: ${UID}:${GID}
-        mem_limit: 8g
-        env_file: .env
-        volumes:
-            - ${PATH_HOST_media}/source:/media/source:ro
-            - ${PATH_HOST_media}/processed:/media/processed:rw
+  upload:
+    profiles:
+      - upload
+    build: ./upload
+    restart: unless-stopped
+    user: ${UID}:${GID}
+    mem_limit: 1g
+    env_file: .env
+    environment:
+      BASE_PATH: /upload
+      UPLOAD_DIR: /uploads
+    volumes:
+      - ${PATH_HOST_media}/wip:/uploads:rw
 
-    syncthing:
-        profiles:
-            - syncthing
-        image: syncthing/syncthing
-        restart: unless-stopped
-        mem_limit: 1g
-        cpu_count: 1
-        hostname: karakara
-        environment:
-            PUID: ${UID}
-            PGID: ${GID}
-            UMASK: 002
-        volumes:
-            - ${PATH_HOST_data}/syncthing:/var/syncthing:rw
-            - ${PATH_HOST_media}/source:/media/source:rw
-            - ${PATH_HOST_media}/processed:/media/processed:rw
-            - ${PATH_HOST_media}/wip:/media/wip:rw
-        ports:
-            - 22000:22000/tcp # TCP file transfers
-            - 22000:22000/udp # QUIC file transfers
-            - 21027:21027/udp # Receive local discovery broadcasts
-
-    upload:
-        profiles:
-            - upload
-        build: ./upload
-        restart: unless-stopped
-        user: ${UID}:${GID}
-        mem_limit: 1g
-        env_file: .env
-        environment:
-            BASE_PATH: /upload
-            UPLOAD_DIR: /uploads
-        volumes:
-            - ${PATH_HOST_media}/wip:/uploads:rw
-
-    lint:
-        build: ./lint
-        restart: unless-stopped
-        mem_limit: 1g
-        command: serve --host 0.0.0.0 --port 3000
-        volumes:
-            - ${PATH_HOST_media}/processed:/media/processed:ro
+  lint:
+    build: ./lint
+    restart: unless-stopped
+    mem_limit: 1g
+    command: serve --host 0.0.0.0 --port 3000
+    volumes:
+      - ${PATH_HOST_media}/processed:/media/processed:ro

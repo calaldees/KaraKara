@@ -1,0 +1,40 @@
+import { useContext } from "react";
+
+import { Notification, YoureNext } from "@/components";
+import { ClientContext } from "@/providers/client";
+import { RoomContext } from "@/providers/room";
+
+const EmptyHeaderLink = (): React.ReactElement => <div />;
+
+export function Screen({
+    title,
+    className = undefined,
+    footer = null,
+    navLeft = null,
+    navRight = null,
+    children = null,
+}: {
+    title: string;
+    className?: string | undefined;
+    footer?: React.ReactElement | null | false;
+    navLeft?: React.ReactElement | null | false;
+    navRight?: React.ReactElement | null | false;
+    children?: React.ReactNode;
+}): React.ReactElement {
+    const { setShowSettings } = useContext(ClientContext);
+    const { queue } = useContext(RoomContext);
+
+    return (
+        <main className={className}>
+            <header>
+                {navLeft || <EmptyHeaderLink />}
+                <h1 onDoubleClick={(_) => setShowSettings(true)}>{title}</h1>
+                {navRight || <EmptyHeaderLink />}
+            </header>
+            <Notification />
+            {queue && <YoureNext queue={queue} />}
+            <article>{children}</article>
+            {footer && <footer>{footer}</footer>}
+        </main>
+    );
+}

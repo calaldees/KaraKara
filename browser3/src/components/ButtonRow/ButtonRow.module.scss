@@ -1,0 +1,10 @@
+.buttonRow {
+    display: flex;
+    flex-flow: row;
+    gap: 0.5em;
+    justify-content: space-between;
+
+    & > * {
+        flex: 1 0;
+    }
+}

@@ -207,3 +207,149 @@ describe("preferred_variant", () => {
         expect(utils.preferred_variant([])).toEqual("Default");
     });
 });
+
+describe("is_queue_hog", () => {
+    // Helper function to create queue items more concisely
+    const _qi = (
+        session_id: string,
+        performer_name: string,
+        track_duration: number,
+    ) => ({
+        session_id,
+        performer_name,
+        track_duration,
+    });
+    test("returns null when queue is short", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess2", "Bob", 200),
+            _qi("sess1", "Alice", 220),
+        ];
+        expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
+    });
+
+    test("returns null when user has average number of tracks", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess2", "Bob", 200),
+            _qi("sess2", "Bob", 210),
+            _qi("sess3", "Charlie", 220),
+            _qi("sess3", "Charlie", 190),
+        ];
+        // Alice has 1, adding another would give her 2
+        // Bob has 2, Charlie has 2, average is 2.0
+        expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
+    });
+
+    test("returns warning when user would have far above average tracks", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess1", "Alice", 190),
+            _qi("sess1", "Alice", 200),
+            _qi("sess2", "Bob", 210),
+            _qi("sess2", "Bob", 210),
+            _qi("sess3", "Charlie", 220),
+        ];
+        // Alice has 3, adding another would give her 4
+        // Bob has 2, Charlie has 1, average is 1.5
+        const result = utils.is_queue_hog(queue, "Alice", "sess1-1234");
+        expect(result).toContain("The average person has 1.5 tracks");
+        expect(result).toContain("this will be your 4th");
+    });
+
+    test("matches by sessionId OR name", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sessX", "Alice", 190),
+            _qi("sess1", "Alice Changed Name", 200),
+            _qi("sess2", "Bob", 210),
+        ];
+        // sess1/Alice has 3, adding another would give it 4
+        // Bob has 1, average is 1.0
+        const result = utils.is_queue_hog(queue, "Alice", "sess1-1234");
+        expect(result).toContain("this will be your 4th");
+    });
+
+    test("handles empty queue of other people gracefully", () => {
+        const queue = [
+            _qi("sess1", "Alice", 180),
+            _qi("sess1", "Alice", 190),
+            _qi("sess1", "Alice", 200),
+            _qi("sess1", "Alice", 210),
+        ];
+        expect(utils.is_queue_hog(queue, "Alice", "sess1-1234")).toBeNull();
+    });
+});
+
+describe("sort_tag_keys", () => {
+    test("should sort priority tags in correct order", () => {
+        const input = ["use", "title", "artist", "from", "category"];
+        const expected = ["title", "from", "artist", "category", "use"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should sort all priority tags in full order", () => {
+        const input = [
+            "vocalstyle",
+            "lang",
+            "use",
+            "category",
+            "artist",
+            "from",
+            "title",
+            "vocaltrack",
+        ];
+        const expected = [
+            "title",
+            "from",
+            "artist",
+            "category",
+            "use",
+            "lang",
+            "vocaltrack",
+            "vocalstyle",
+        ];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should place non-priority tags at the end, sorted alphabetically", () => {
+        const input = ["title", "zebra", "from", "alpha", "beta"];
+        const expected = ["title", "from", "alpha", "beta", "zebra"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should sort only non-priority tags alphabetically", () => {
+        const input = ["zebra", "charlie", "alpha", "beta"];
+        const expected = ["alpha", "beta", "charlie", "zebra"];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+
+    test("should handle empty array", () => {
+        expect(utils.sort_tag_keys([])).toEqual([]);
+    });
+
+    test("should handle single element", () => {
+        expect(utils.sort_tag_keys(["title"])).toEqual(["title"]);
+        expect(utils.sort_tag_keys(["random"])).toEqual(["random"]);
+    });
+
+    test("should not modify the original array", () => {
+        const input = ["use", "title", "artist"];
+        const original = [...input];
+        utils.sort_tag_keys(input);
+        expect(input).toEqual(original);
+    });
+
+    test("should handle mixed priority and non-priority tags", () => {
+        const input = ["length", "title", "subs", "from", "artist", "released"];
+        const expected = [
+            "title",
+            "from",
+            "artist",
+            "released",
+            "length",
+            "subs",
+        ];
+        expect(utils.sort_tag_keys(input)).toEqual(expected);
+    });
+});

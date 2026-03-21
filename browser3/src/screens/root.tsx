@@ -8,10 +8,11 @@ import {
     useParams,
 } from "react-router-dom";
 
+import { ConfigMenu } from "../components";
+import { useWidescreen } from "../hooks/widescreen";
 import { ClientContext } from "../providers/client";
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ServerContext } from "../providers/server";
-import { ConfigMenu } from "./config/config";
 import { Control } from "./control/control";
 import { Loading } from "./loading/loading";
 import { Login } from "./login/login";
@@ -21,18 +22,9 @@ import { RoomSettings } from "./settings/settings";
 import { TrackDetails } from "./track/track";
 import { TrackList } from "./tracks/tracks";
 
-// the null loader here is just to ensure that useNavigation() has
-// a "loading" phase, so that we can react to the navigation before
-// it happens (ie, saving scroll position). Buuuut, using loaders
-// triggers a code-path that uses signals, which aren't supported
-// in iOS 12. So if we don't have signals, give up on scrolling...
 const router = createBrowserRouter(
     createRoutesFromElements(
-        <Route
-            path="/"
-            element={<Page />}
-            loader={new Request("").signal ? () => null : undefined}
-        >
+        <Route path="/" element={<Page />}>
             <Route index element={<Login />} />
             <Route path=":roomName" element={<Room />}>
                 <Route index element={<TrackList />} />
@@ -58,7 +50,7 @@ function Page() {
 }
 function Room() {
     const { roomName } = useParams();
-    const { widescreen } = useContext(ClientContext);
+    const widescreen = useWidescreen();
     const { tracks } = useContext(ServerContext);
 
     return (
@@ -80,7 +72,7 @@ function Room() {
 }
 
 function TracksOrQueueOrControl(): React.ReactElement {
-    const { widescreen } = useContext(ClientContext);
+    const widescreen = useWidescreen();
     return widescreen ? <TrackList /> : <QueueOrControl />;
 }
 
