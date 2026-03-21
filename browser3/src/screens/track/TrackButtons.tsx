@@ -133,7 +133,7 @@ export function TrackButtons({
     }
     if (action === TrackAction.ENQUEUE) {
         return (
-            <footer>
+            <>
                 <QueueHogWarning trackId={track.id} />
                 {variantSelect}
                 <input
@@ -162,7 +162,7 @@ export function TrackButtons({
                         Confirm
                     </button>
                 </ButtonRow>
-            </footer>
+            </>
         );
     }
     return null;
