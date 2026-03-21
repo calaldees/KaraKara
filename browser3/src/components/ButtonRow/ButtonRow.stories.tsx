@@ -36,3 +36,17 @@ export const ManyButtons: Story = {
         ),
     },
 };
+
+export const OneLongItem: Story = {
+    args: {
+        children: (
+            <>
+                <button>One button with several words</button>
+                <a className="button">LongWoooooooooooooord</a>
+                <button>
+                    <FAIcon icon={faPlay} />
+                </button>
+            </>
+        ),
+    },
+};
