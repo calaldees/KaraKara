@@ -111,7 +111,9 @@ def tags_to_id(tags: dict[str, t.Any]) -> str:
     return track_id.strip()
 
 
-async def write_tags_file(meta_path: Path, tags: dict[str, list[str]], status: str) -> None:
+async def write_tags_file(
+    meta_path: Path, tags: dict[str, list[str]], status: str
+) -> None:
     meta_path.parent.mkdir(parents=True, exist_ok=True)
     async with aiofiles.open(meta_path, "w") as f:
         for key, values in tags.items():
@@ -132,7 +134,9 @@ def send_notification(webhook_url: str | None, content: str) -> None:
                 },
             )
             if response.status_code != 204:
-                log.error(f"Failed to call webhook: {response.status_code} {response.text}")
+                log.error(
+                    f"Failed to call webhook: {response.status_code} {response.text}"
+                )
             else:
                 log.info("Sent notification via discord")
         else:
@@ -182,7 +186,7 @@ async def request_track(payload: dict[str, t.Any]) -> JSONResponse:
     Expected JSON body:
 
       {
-        "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
+        "tags": { "title": ["..."], "artist": ["..."], "released": ["..."] },
       }
     """
     tags = sanitize_tags(payload.get("tags"))
@@ -206,7 +210,7 @@ async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
 
       {
         "session_id": "uuid",
-        "tags": { "title": ["..."], "artist": ["..."], "date": ["..."] },
+        "tags": { "title": ["..."], "artist": ["..."], "released": ["..."] },
       }
     """
     session_id: str = payload["session_id"]
@@ -237,7 +241,9 @@ async def submit_track(payload: dict[str, t.Any]) -> JSONResponse:
     contributor = f" ({tags['contributor'][0]})" if "contributor" in tags else ""
     send_notification(webhook_url, f"New submission: **{track_id}**{contributor}")
     log.info(f"Uploaded files for {track_id!r} (session {session_id})")
-    return JSONResponse({"ok": True, "moved_files": moved_files, "session_id": session_id})
+    return JSONResponse(
+        {"ok": True, "moved_files": moved_files, "session_id": session_id}
+    )
 
 
 # Mount static files and serve SPA

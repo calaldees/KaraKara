@@ -341,8 +341,15 @@ describe("sort_tag_keys", () => {
     });
 
     test("should handle mixed priority and non-priority tags", () => {
-        const input = ["length", "title", "subs", "from", "artist", "date"];
-        const expected = ["title", "from", "artist", "date", "length", "subs"];
+        const input = ["length", "title", "subs", "from", "artist", "released"];
+        const expected = [
+            "title",
+            "from",
+            "released",
+            "artist",
+            "length",
+            "subs",
+        ];
         expect(utils.sort_tag_keys(input)).toEqual(expected);
     });
 });

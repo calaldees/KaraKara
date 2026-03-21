@@ -13,19 +13,9 @@ def get_year_from_track(track_data):
     """
     tags = track_data.get("tags", {})
 
-    # Try to get year from 'year' field first
-    if "year" in tags and tags["year"]:
-        year_values = tags["year"]
-        if isinstance(year_values, list) and year_values:
-            try:
-                year = int(year_values[0])
-                return year, tags
-            except ValueError:
-                pass
-
-    # Try to get year from 'date' field
-    if "date" in tags and tags["date"]:
-        date_values = tags["date"]
+    # Try to get year from 'released' field
+    if "released" in tags and tags["released"]:
+        date_values = tags["released"]
         if isinstance(date_values, list) and date_values:
             date_str = date_values[0]
             # Extract year from date (assumes format like YYYY-MM-DD or YYYY)

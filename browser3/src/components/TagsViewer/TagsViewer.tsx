@@ -10,8 +10,9 @@ const BLOCKED_KEYS = [
     "source_type",
     "subs",
     "aspect_ratio",
-    "date",
+    "released",
     "added",
+    "updated",
     "new",
     "source", // TODO: figure out a nice way to display source URLs?
     "id", // TODO: display id:imdb, id:mal, etc. nicely

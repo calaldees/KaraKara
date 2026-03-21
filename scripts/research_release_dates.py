@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-For each file given as argument, if the "date" field is missing, try to find it
+For each file given as argument, if the "released" field is missing, try to find it
 using online APIs based on the "category" and "from" metadata fields, and append it
 to the file.
 """
@@ -28,14 +28,14 @@ def parse_metadata(text):
 
 
 def has_date(text):
-    return any(line.lower().startswith("date:") for line in text.splitlines())
+    return any(line.lower().startswith("released:") for line in text.splitlines())
 
 
 def append_date(path, date, id=None):
     text = path.read_text(encoding="utf-8")
     sep = "" if text.endswith("\n") else "\n"
 
-    text = text + f"{sep}date:{date}\n"
+    text = text + f"{sep}released:{date}\n"
     if id:
         text += f"id:{id}\n"
     path.write_text(text, encoding="utf-8")
@@ -153,7 +153,7 @@ def search_recordings(title, artist):
 def get_release_candidates(recording):
     dates = []
     for rel in recording.get("releases", []):
-        date = rel.get("date")
+        date = rel.get("released")
         title = rel.get("title")
         if date:
             dates.append((date, title))

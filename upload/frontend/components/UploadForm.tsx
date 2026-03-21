@@ -276,7 +276,7 @@ const ReleaseDateSection = () => (
     <section>
         <label>
             <h3>Release date</h3>
-            <input type="date" name="date" />
+            <input type="date" name="released" />
         </label>
     </section>
 );

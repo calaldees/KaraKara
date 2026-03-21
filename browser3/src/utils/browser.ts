@@ -195,9 +195,12 @@ export function sort_tag_keys(tagKeys: string[]): string[] {
     const priority = [
         "title",
         "from",
+        "released",
         "artist",
         "category",
         "use",
+        "opening",
+        "ending",
         "lang",
         "vocaltrack",
         "vocalstyle",
