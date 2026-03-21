@@ -12,9 +12,6 @@ const getBuildDate = () => {
 export default defineConfig({
     plugins: [pluginReact(), pluginSass()],
     source: {
-        entry: {
-            index: "./src/browser.tsx",
-        },
         define: {
             __BUILD_DATE__: JSON.stringify(getBuildDate()),
         },
@@ -55,16 +52,7 @@ export default defineConfig({
             ],
         },
     },
-    performance: {
-        chunkSplit: {
-            strategy: "all-in-one",
-        },
-    },
     output: {
-        target: "web",
-        distPath: {
-            root: "dist",
-        },
         assetPrefix: "/browser3/",
         sourceMap: isDev,
         polyfill: "usage",
@@ -79,16 +67,6 @@ export default defineConfig({
             "/mqtt": {
                 target: "https://karakara.uk",
                 ws: true,
-            },
-        },
-    },
-    dev: {
-        assetPrefix: "/",
-    },
-    tools: {
-        rspack: {
-            experiments: {
-                css: true,
             },
         },
     },

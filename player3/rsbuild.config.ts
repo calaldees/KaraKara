@@ -11,35 +11,20 @@ const getBuildDate = () => {
 export default defineConfig({
     plugins: [pluginReact(), pluginSass()],
     html: {
-        template: "./src/static/index.html",
         title: "KaraKara Player",
         favicon: "./src/static/favicon.svg",
         meta: {
-            description: "KaraKara Player",
             viewport: ["width=device-width", "initial-scale=1"].join(", "),
         },
     },
-    performance: {
-        chunkSplit: {
-            strategy: "all-in-one",
-        },
-    },
     source: {
-        entry: {
-            index: "./src/player.tsx",
-        },
         define: {
             __BUILD_DATE__: JSON.stringify(getBuildDate()),
         },
     },
     output: {
-        target: "web",
-        distPath: {
-            root: "dist",
-        },
         assetPrefix: "/player3/",
         sourceMap: isDev,
-        polyfill: "usage",
         overrideBrowserslist: [
             // Only chrome supports styled subs
             "Chrome >= 121",
@@ -54,16 +39,6 @@ export default defineConfig({
             "/mqtt": {
                 target: "https://karakara.uk",
                 ws: true,
-            },
-        },
-    },
-    dev: {
-        assetPrefix: "/",
-    },
-    tools: {
-        rspack: {
-            experiments: {
-                css: true,
             },
         },
     },
