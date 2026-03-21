@@ -3,7 +3,13 @@ import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { BackToExplore, LyricsViewer, Screen, TagsViewer, VideoPreview } from "@/components";
+import {
+    BackToExplore,
+    LyricsViewer,
+    Screen,
+    TagsViewer,
+    VideoPreview,
+} from "@/components";
 import { useWidescreen } from "@/hooks/widescreen";
 import { ServerContext } from "@/providers/server";
 import { Track } from "@/types";

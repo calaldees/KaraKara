@@ -29,9 +29,9 @@ export function ConfigMenu() {
         (e: SubmitEvent) => {
             e.preventDefault();
             if (roomNameEdit !== roomName) {
-                void navigate("/" + roomNameEdit);
+                void navigate("/" + roomNameEdit.toLowerCase());
             }
-            setRoomPassword(roomPasswordEdit);
+            setRoomPassword(roomPasswordEdit.toLowerCase());
             setShowSettings(false);
         },
         [
@@ -57,14 +57,14 @@ export function ConfigMenu() {
                                     <input
                                         value={roomNameEdit}
                                         type={"text"}
+                                        maxLength={16}
+                                        pattern={"[a-z0-9]+"}
                                         autoComplete="off"
                                         autoCorrect="off"
                                         autoCapitalize="none"
-                                        onChange={(e) =>
-                                            setRoomNameEdit(
-                                                e.currentTarget.value,
-                                            )
-                                        }
+                                        onChange={(e) => {
+                                            setRoomNameEdit(e.currentTarget.value.toLowerCase().replace(/[^a-z0-9]/g, ''))
+                                        }}
                                         required={true}
                                     />
                                 </td>

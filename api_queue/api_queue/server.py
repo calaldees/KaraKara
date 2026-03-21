@@ -222,7 +222,7 @@ def log_user_action(fields: list[str] | None = None):
 
 # Queue -----------------------------------------------------------------------
 
-room_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/room/<room_name:([A-Za-z0-9_-]{1,32})>")
+room_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/room/<room_name:([a-z0-9]{1,16})>")
 app.blueprint(room_blueprint)
 
 
