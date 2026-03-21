@@ -54,7 +54,11 @@ export function ConfigMenu(): React.ReactElement {
                                         autoCapitalize="none"
                                         data-cy="room-input"
                                         onChange={(e) => {
-                                            setRoomNameEdit(e.currentTarget.value.toLowerCase().replace(/[^a-z0-9]/g, ''))
+                                            setRoomNameEdit(
+                                                e.currentTarget.value
+                                                    .toLowerCase()
+                                                    .replace(/[^a-z0-9]/g, ""),
+                                            );
                                         }}
                                     />
                                 </td>

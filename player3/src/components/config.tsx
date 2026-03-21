@@ -63,7 +63,11 @@ export function ConfigMenu() {
                                         autoCorrect="off"
                                         autoCapitalize="none"
                                         onChange={(e) => {
-                                            setRoomNameEdit(e.currentTarget.value.toLowerCase().replace(/[^a-z0-9]/g, ''))
+                                            setRoomNameEdit(
+                                                e.currentTarget.value
+                                                    .toLowerCase()
+                                                    .replace(/[^a-z0-9]/g, ""),
+                                            );
                                         }}
                                         required={true}
                                     />
@@ -105,7 +109,9 @@ export function ConfigMenu() {
                                         <input
                                             checked={fullscreen}
                                             type={"checkbox"}
-                                            onChange={() => void toggleFullscreen()}
+                                            onChange={() =>
+                                                void toggleFullscreen()
+                                            }
                                         />
                                     </td>
                                 </tr>

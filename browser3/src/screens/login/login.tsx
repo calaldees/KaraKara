@@ -31,7 +31,11 @@ export function Login(): React.ReactElement {
                         autoFocus={true}
                         maxLength={16}
                         onChange={(e) => {
-                            setRoomNameEdit(e.currentTarget.value.toLowerCase().replace(/[^a-z0-9]/g, ''))
+                            setRoomNameEdit(
+                                e.currentTarget.value
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9]/g, ""),
+                            );
                         }}
                     />
                     <button type="submit" disabled={!roomNameEdit.trim()}>

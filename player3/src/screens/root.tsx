@@ -12,9 +12,9 @@ import { ClientContext } from "@/providers/client";
 import { RoomContext, RoomProvider } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 
+import { ConfigMenu } from "@/components/config";
 import { useStabilise } from "@/hooks/stabilise";
 import { percent } from "@/utils";
-import { ConfigMenu } from "@/components/config";
 import { PodiumScreen } from "./podium/podium";
 import { PreviewScreen } from "./preview/preview";
 import { TitleScreen } from "./title/title";
