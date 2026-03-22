@@ -470,7 +470,7 @@ export const UploadForm = () => {
 
             // 3. If there are files, do a file upload for /submit
             if (files.length > 0) {
-                const res = await fetch("./api/session", { method: "POST" });
+                const res = await fetch("/api/upload/session", { method: "POST" });
                 const data = await res.json();
                 const sessionId = data.session_id;
 
