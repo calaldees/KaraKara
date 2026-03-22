@@ -3,11 +3,12 @@ import { FAIcon } from "@shish2k/react-faicon";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import type { DragEvent, TouchEvent } from "react";
 import { useContext, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { ListItem, Thumb } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
+import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
@@ -28,7 +29,7 @@ export function Playlist({
     const [dropSource, setDropSource] = useState<number | null>(null);
     const [dropTarget, setDropTarget] = useState<number | null>(null);
     const { request } = useApi();
-    const { roomName } = useParams();
+    const { roomName } = useContext(PageContext);
 
     function onDragStart(e: DragEvent, src_id: number) {
         if (e.dataTransfer && e.currentTarget) {

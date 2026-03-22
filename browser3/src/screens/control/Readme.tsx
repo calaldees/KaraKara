@@ -1,11 +1,12 @@
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { useParams } from "react-router-dom";
+import { useContext } from "react";
 
+import { PageContext } from "@/providers/page";
 import styles from "./Readme.module.scss";
 
 export function Readme(): React.ReactElement {
-    const { roomName } = useParams();
+    const { roomName } = useContext(PageContext);
     const root = window.location.protocol + "//" + window.location.host;
 
     return (

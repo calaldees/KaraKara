@@ -1,7 +1,8 @@
 import { useContext } from "react";
 
-import { BackToExplore, EventProgressBar, Screen } from "@/components";
+import { BackOr, EventProgressBar, Screen } from "@/components";
 import { useWidescreen } from "@/hooks/widescreen";
+import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
 
 import { ControlButtons } from "./ControlButtons";
@@ -10,12 +11,13 @@ import { Readme } from "./Readme";
 
 export function Control(): React.ReactElement {
     const widescreen = useWidescreen();
+    const { roomName } = useContext(PageContext);
     const { queue } = useContext(RoomContext);
 
     return (
         <Screen
             className={"control"}
-            navLeft={!widescreen && <BackToExplore />}
+            navLeft={!widescreen && <BackOr to={`/${roomName}`} />}
             title={"Remote Control"}
             footer={<ControlButtons />}
         >

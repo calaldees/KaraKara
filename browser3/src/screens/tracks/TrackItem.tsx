@@ -1,8 +1,9 @@
 import { faCircleChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { useNavigate, useParams } from "react-router-dom";
+import { useContext } from "react";
 
 import { ListItem, Thumb } from "@/components";
+import { PageContext } from "@/providers/page";
 import type { Track } from "@/types";
 import { track_info } from "@/utils";
 
@@ -13,8 +14,7 @@ export function TrackItem({
     track: Track;
     filters: string[];
 }): React.ReactElement {
-    const navigate = useNavigate();
-    const { roomName } = useParams();
+    const { roomName, navigate } = useContext(PageContext);
 
     let extra = "";
     if (

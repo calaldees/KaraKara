@@ -1,14 +1,14 @@
 import { QRCodeSVG } from "qrcode.react";
-import { useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useContext, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
-import { BackToExplore, ButtonRow, Screen } from "@/components";
+import { BackOr, ButtonRow, Screen } from "@/components";
+import { PageContext } from "@/providers/page";
 
 import "./printable.scss";
 
 export function Printable(): React.ReactElement {
-    const { roomName } = useParams();
+    const { roomName } = useContext(PageContext);
 
     const contentRef = useRef<HTMLDivElement>(null);
     const reactToPrintFn = useReactToPrint({ contentRef });
@@ -25,7 +25,7 @@ export function Printable(): React.ReactElement {
     return (
         <Screen
             className={"printable"}
-            navLeft={<BackToExplore />}
+            navLeft={<BackOr to={`/${roomName}`} />}
             title={"Track List"}
             //navRight={}
             footer={buttons}

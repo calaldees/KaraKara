@@ -1,7 +1,8 @@
 import { useCallback, useContext, useState } from "react";
 
-import { BackToExplore, ButtonRow, Screen } from "@/components";
+import { BackOr, ButtonRow, Screen } from "@/components";
 import { useApi } from "@/hooks/api";
+import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
 import { copy_type } from "@/utils";
 
@@ -32,6 +33,7 @@ function RoomSettingsInternal({
 }: {
     roomSettings: Record<string, any>;
 }) {
+    const { roomName } = useContext(PageContext);
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
         Record<string, string>
     >(() => removeTypes(roomSettings));
@@ -90,7 +92,7 @@ function RoomSettingsInternal({
     return (
         <Screen
             className={"settings"}
-            navLeft={<BackToExplore />}
+            navLeft={<BackOr to={`/${roomName}`} />}
             title={"Room Settings"}
             //navRight={}
             footer={buttons}

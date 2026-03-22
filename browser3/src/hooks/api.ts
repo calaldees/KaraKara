@@ -1,7 +1,7 @@
 import { useCallback, useContext, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import { ClientContext } from "@/providers/client";
+import { PageContext } from "@/providers/page";
 
 type CommonRequestProps = {
     options?: Record<string, any>;
@@ -22,7 +22,7 @@ type UrlRequestProps = CommonRequestProps & {
 type ApiRequestProps = FunctionRequestProps | UrlRequestProps;
 
 export function useApi() {
-    const { roomName } = useParams();
+    const { roomName } = useContext(PageContext);
     const { setNotification } = useContext(ClientContext);
     const [loading, setLoading] = useState(false);
 

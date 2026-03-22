@@ -29,9 +29,9 @@ export function ConfigMenu() {
         (e: SubmitEvent) => {
             e.preventDefault();
             if (roomNameEdit !== roomName) {
-                void navigate("/" + roomNameEdit.toLowerCase());
+                void navigate(`/${roomNameEdit}`);
             }
-            setRoomPassword(roomPasswordEdit.toLowerCase());
+            setRoomPassword(roomPasswordEdit);
             setShowSettings(false);
         },
         [
@@ -85,7 +85,7 @@ export function ConfigMenu() {
                                         className="fakePassword"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(
-                                                e.currentTarget.value,
+                                                e.currentTarget.value.toLowerCase(),
                                             )
                                         }
                                         required={true}

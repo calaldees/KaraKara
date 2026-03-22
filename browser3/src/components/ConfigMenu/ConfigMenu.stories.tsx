@@ -1,5 +1,5 @@
 import { ClientContext } from "@/providers/client";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { PageContext } from "@/providers/page";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ConfigMenu } from "./ConfigMenu";
 
@@ -10,15 +10,6 @@ const meta = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    decorators: [
-        (Story) => (
-            <MemoryRouter initialEntries={["/test-room"]}>
-                <Routes>
-                    <Route path="/:roomName" element={<Story />} />
-                </Routes>
-            </MemoryRouter>
-        ),
-    ],
 } satisfies Meta<typeof ConfigMenu>;
 
 export default meta;
@@ -27,19 +18,27 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
     decorators: [
         (Story) => (
-            <ClientContext
-                value={
-                    {
-                        roomPassword: "",
-                        setRoomPassword: () => {},
-                        booth: false,
-                        setBooth: () => {},
-                        setShowSettings: () => {},
-                    } as any
-                }
+            <PageContext
+                value={{
+                    roomName: "test-room",
+                    hasBack: false,
+                    navigate: (() => {}) as any,
+                }}
             >
-                <Story />
-            </ClientContext>
+                <ClientContext
+                    value={
+                        {
+                            roomPassword: "",
+                            setRoomPassword: () => {},
+                            booth: false,
+                            setBooth: () => {},
+                            setShowSettings: () => {},
+                        } as any
+                    }
+                >
+                    <Story />
+                </ClientContext>
+            </PageContext>
         ),
     ],
 };
@@ -47,19 +46,27 @@ export const Default: Story = {
 export const WithPassword: Story = {
     decorators: [
         (Story) => (
-            <ClientContext
-                value={
-                    {
-                        roomPassword: "secret123",
-                        setRoomPassword: () => {},
-                        booth: false,
-                        setBooth: () => {},
-                        setShowSettings: () => {},
-                    } as any
-                }
+            <PageContext
+                value={{
+                    roomName: "test-room",
+                    hasBack: false,
+                    navigate: (() => {}) as any,
+                }}
             >
-                <Story />
-            </ClientContext>
+                <ClientContext
+                    value={
+                        {
+                            roomPassword: "secret123",
+                            setRoomPassword: () => {},
+                            booth: false,
+                            setBooth: () => {},
+                            setShowSettings: () => {},
+                        } as any
+                    }
+                >
+                    <Story />
+                </ClientContext>
+            </PageContext>
         ),
     ],
 };
@@ -67,19 +74,27 @@ export const WithPassword: Story = {
 export const BoothMode: Story = {
     decorators: [
         (Story) => (
-            <ClientContext
-                value={
-                    {
-                        roomPassword: "",
-                        setRoomPassword: () => {},
-                        booth: true,
-                        setBooth: () => {},
-                        setShowSettings: () => {},
-                    } as any
-                }
+            <PageContext
+                value={{
+                    roomName: "test-room",
+                    hasBack: false,
+                    navigate: (() => {}) as any,
+                }}
             >
-                <Story />
-            </ClientContext>
+                <ClientContext
+                    value={
+                        {
+                            roomPassword: "",
+                            setRoomPassword: () => {},
+                            booth: true,
+                            setBooth: () => {},
+                            setShowSettings: () => {},
+                        } as any
+                    }
+                >
+                    <Story />
+                </ClientContext>
+            </PageContext>
         ),
     ],
 };
@@ -87,19 +102,27 @@ export const BoothMode: Story = {
 export const Fullscreen: Story = {
     decorators: [
         (Story) => (
-            <ClientContext
-                value={
-                    {
-                        roomPassword: "",
-                        setRoomPassword: () => {},
-                        booth: false,
-                        setBooth: () => {},
-                        setShowSettings: () => {},
-                    } as any
-                }
+            <PageContext
+                value={{
+                    roomName: "test-room",
+                    hasBack: false,
+                    navigate: (() => {}) as any,
+                }}
             >
-                <Story />
-            </ClientContext>
+                <ClientContext
+                    value={
+                        {
+                            roomPassword: "",
+                            setRoomPassword: () => {},
+                            booth: false,
+                            setBooth: () => {},
+                            setShowSettings: () => {},
+                        } as any
+                    }
+                >
+                    <Story />
+                </ClientContext>
+            </PageContext>
         ),
     ],
 };
@@ -107,19 +130,27 @@ export const Fullscreen: Story = {
 export const AllOptionsEnabled: Story = {
     decorators: [
         (Story) => (
-            <ClientContext
-                value={
-                    {
-                        roomPassword: "mypassword",
-                        setRoomPassword: () => {},
-                        booth: true,
-                        setBooth: () => {},
-                        setShowSettings: () => {},
-                    } as any
-                }
+            <PageContext
+                value={{
+                    roomName: "test-room",
+                    hasBack: false,
+                    navigate: (() => {}) as any,
+                }}
             >
-                <Story />
-            </ClientContext>
+                <ClientContext
+                    value={
+                        {
+                            roomPassword: "mypassword",
+                            setRoomPassword: () => {},
+                            booth: true,
+                            setBooth: () => {},
+                            setShowSettings: () => {},
+                        } as any
+                    }
+                >
+                    <Story />
+                </ClientContext>
+            </PageContext>
         ),
     ],
 };

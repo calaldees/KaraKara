@@ -3,8 +3,10 @@ import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { PageContext } from "@/providers/page";
+
 import {
-    BackToExplore,
+    BackOr,
     LyricsViewer,
     Screen,
     TagsViewer,
@@ -33,7 +35,7 @@ export function TrackDetails(): React.ReactElement {
 }
 
 function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
-    const { roomName } = useParams();
+    const { roomName } = useContext(PageContext);
     const widescreen = useWidescreen();
 
     const videoVariants = unique(track.attachments.video.map((a) => a.variant));
@@ -51,7 +53,7 @@ function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
     return (
         <Screen
             className={styles.track}
-            navLeft={<BackToExplore />}
+            navLeft={<BackOr to={`/${roomName}`} />}
             title={track.tags.title[0]}
             navRight={
                 !widescreen && (

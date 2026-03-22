@@ -1,4 +1,4 @@
-export { BackToExplore } from "./BackToExplore/BackToExplore";
+export { BackOr } from "./BackOr/BackOr";
 export { ButtonRow } from "./ButtonRow/ButtonRow";
 export { ConfigMenu } from "./ConfigMenu/ConfigMenu";
 export { EventProgressBar } from "./EventProgressBar/EventProgressBar";

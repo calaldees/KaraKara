@@ -1,27 +1,26 @@
 import { useFullscreen } from "@mantine/hooks";
 import { SubmitEvent, useCallback, useContext, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 
 import { ClientContext } from "@/providers/client";
+import { PageContext } from "@/providers/page";
 
 import styles from "./ConfigMenu.module.scss";
 
 export function ConfigMenu(): React.ReactElement {
-    const { roomName } = useParams();
+    const { roomName, navigate } = useContext(PageContext);
     const { roomPassword, setRoomPassword, booth, setBooth, setShowSettings } =
         useContext(ClientContext);
     const { toggle: toggleFullscreen, fullscreen } = useFullscreen();
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
-    const navigate = useNavigate();
 
     const onSubmit = useCallback(
         (e: SubmitEvent) => {
             e.preventDefault();
             if (roomNameEdit !== roomName) {
-                void navigate("/" + roomNameEdit.toLowerCase());
+                void navigate(`/${roomNameEdit}`);
             }
-            setRoomPassword(roomPasswordEdit.toLowerCase());
+            setRoomPassword(roomPasswordEdit);
             setShowSettings(false);
         },
         [
@@ -76,7 +75,7 @@ export function ConfigMenu(): React.ReactElement {
                                         data-cy="password-input"
                                         onChange={(e) =>
                                             setRoomPasswordEdit(
-                                                e.currentTarget.value,
+                                                e.currentTarget.value.toLowerCase(),
                                             )
                                         }
                                     />

@@ -11,6 +11,7 @@ import {
 import { ConfigMenu } from "../components";
 import { useWidescreen } from "../hooks/widescreen";
 import { ClientContext } from "../providers/client";
+import { PageProvider } from "../providers/page";
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ServerContext } from "../providers/server";
 import { Control } from "./control/control";
@@ -42,10 +43,10 @@ function Page() {
     const { showSettings } = useContext(ClientContext);
 
     return (
-        <>
+        <PageProvider>
             <Outlet />
             {showSettings && <ConfigMenu />}
-        </>
+        </PageProvider>
     );
 }
 function Room() {

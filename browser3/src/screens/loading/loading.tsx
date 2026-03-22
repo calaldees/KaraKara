@@ -1,15 +1,15 @@
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { useContext } from "react";
-import { useParams } from "react-router-dom";
 
 import { Screen } from "@/components";
+import { PageContext } from "@/providers/page";
 import { ServerContext } from "@/providers/server";
 import { percent } from "@/utils";
 
 export function Loading(): React.ReactElement {
     const { downloadDone, downloadSize } = useContext(ServerContext);
-    const { roomName } = useParams();
+    const { roomName } = useContext(PageContext);
 
     return (
         <Screen className={"loadingPage"} title={"Loading..."}>

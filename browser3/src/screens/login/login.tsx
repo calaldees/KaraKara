@@ -13,7 +13,7 @@ export function Login(): React.ReactElement {
     const onSubmit = useCallback(
         (e: SubmitEvent) => {
             e.preventDefault();
-            void navigate("/" + roomNameEdit.toLowerCase());
+            void navigate(`/${roomNameEdit}`);
         },
         [navigate, roomNameEdit],
     );

@@ -1,7 +1,6 @@
 import { useSubscription } from "@shish2k/react-mqtt";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
@@ -9,6 +8,7 @@ import type { QueueItem, Track } from "@/types";
 import { current_and_future, normalise_cmp } from "@/utils";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
+import { PageContext } from "./page";
 import { ServerContext } from "./server";
 
 export interface RoomContextType {
@@ -26,7 +26,7 @@ export const RoomContext = createContext<RoomContextType>(
 );
 
 export function RoomProvider(props: any) {
-    const { roomName } = useParams();
+    const { roomName, navigate } = useContext(PageContext);
     const { roomPassword } = useContext(ClientContext);
     const { tracks } = useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
@@ -37,7 +37,6 @@ export function RoomProvider(props: any) {
     );
     const [settings, setSettings] = useState<Record<string, any>>({});
     const { request, sessionId } = useApi();
-    const navigate = useNavigate();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),
         [now, fullQueue],
