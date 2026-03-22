@@ -77,7 +77,7 @@ export function RoomProvider(props: any) {
             room: roomName,
         };
         request({
-            url: `/api/analytics.json`,
+            url: `/api/misc/analytics.json`,
             options: {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
