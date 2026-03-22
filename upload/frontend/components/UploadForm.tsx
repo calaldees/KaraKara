@@ -482,7 +482,7 @@ export const UploadForm = () => {
                 const uploadPromises = files.map((file, index) => {
                     return new Promise<void>((resolve, reject) => {
                         const upload = new tus.Upload(file, {
-                            endpoint: "./api/files/",
+                            endpoint: "/api/upload/files/",
                             metadata: {
                                 filename: file.name,
                                 session_id: sessionId,
@@ -529,12 +529,12 @@ export const UploadForm = () => {
 
                 await Promise.all(uploadPromises);
 
-                url = "./api/submit";
+                url = "/api/upload/submit";
                 body = { session_id: sessionId, tags: metadata };
             }
             // 4. If no files, just send metadata to /request
             else {
-                url = "./api/request";
+                url = "/api/upload/request";
                 body = { tags: metadata };
             }
 

@@ -14,7 +14,7 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/api": { target: backend },
+            "/api/upload": { target: backend },
         },
     },
 });

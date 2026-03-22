@@ -150,15 +150,10 @@ async def push_settings_to_mqtt(app: App, room_name: str) -> AsyncGenerator[None
 # Routes -----------------------------------------------------------------------
 
 
-@app.get("/")
-@openapi.definition(
-    response=openapi.definitions.Response("redirect to openapi spec", status=302),
-)
-async def root(request: Request):
-    return sanic.response.redirect("/api/docs")
+misc_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/api/misc")
+app.blueprint(misc_blueprint)
 
-
-@app.get("/time.json")
+@misc_blueprint.get("/time.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": float}),
 )
@@ -180,7 +175,7 @@ async def write_analytics_log(request: Request, data: dict) -> bool:
     return False
 
 
-@app.post("/analytics.json")
+@misc_blueprint.post("/analytics.json")
 @openapi.definition(
     response=openapi.definitions.Response({"application/json": bool}),
 )
@@ -222,7 +217,7 @@ def log_user_action(fields: list[str] | None = None):
 
 # Queue -----------------------------------------------------------------------
 
-room_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/room/<room_name:([a-z0-9]{1,16})>")
+room_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/api/room/<room_name:([a-z0-9]{1,16})>")
 app.blueprint(room_blueprint)
 
 
