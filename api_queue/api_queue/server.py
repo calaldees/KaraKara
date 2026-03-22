@@ -150,7 +150,7 @@ async def push_settings_to_mqtt(app: App, room_name: str) -> AsyncGenerator[None
 # Routes -----------------------------------------------------------------------
 
 
-misc_blueprint = sanic.blueprints.Blueprint("room", url_prefix="/api/misc")
+misc_blueprint = sanic.blueprints.Blueprint("misc", url_prefix="/api/misc")
 app.blueprint(misc_blueprint)
 
 @misc_blueprint.get("/time.json")
