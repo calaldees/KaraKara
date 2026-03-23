@@ -1,12 +1,9 @@
-import { ClientContext } from "@/providers/client";
-import { RoomContext } from "@/providers/room";
 import {
     faArrowLeft,
     faCog,
     faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { BrowserRouter } from "react-router-dom";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ButtonRow } from "../ButtonRow/ButtonRow";
 import { Screen } from "./Screen";
@@ -18,31 +15,6 @@ const meta = {
         layout: "padded",
     },
     tags: ["autodocs"],
-    decorators: [
-        (Story) => (
-            <BrowserRouter>
-                <ClientContext
-                    value={
-                        {
-                            notification: null,
-                            setNotification: () => {},
-                            setShowSettings: () => {},
-                        } as any
-                    }
-                >
-                    <RoomContext
-                        value={
-                            {
-                                queue: null,
-                            } as any
-                        }
-                    >
-                        <Story />
-                    </RoomContext>
-                </ClientContext>
-            </BrowserRouter>
-        ),
-    ],
 } satisfies Meta<typeof Screen>;
 
 export default meta;

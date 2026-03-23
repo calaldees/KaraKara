@@ -12,8 +12,7 @@
         "lint": "eslint src",
         "test": "vitest",
         "test-once": "vitest run",
-        "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build"
+        "storybook": "storybook dev -p 6006 --no-open"
     },
     "dependencies": {
         "@fortawesome/free-solid-svg-icons": "^7.0.1",
