@@ -23,7 +23,6 @@ export default defineConfig({
         },
     },
     output: {
-        assetPrefix: "/player3/",
         sourceMap: isDev,
         overrideBrowserslist: [
             // Only chrome supports styled subs
