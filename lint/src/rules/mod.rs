@@ -118,7 +118,7 @@ fn lint_library(tracks: &HashMap<String, Track>) -> Vec<LintError> {
     errors
 }
 
-fn lint_track(track: &Track, processed_dir: &Path) -> Vec<LintError> {
+pub fn lint_track(track: &Track, processed_dir: &Path) -> Vec<LintError> {
     let mut errors = Vec::new();
 
     // Track-level linting

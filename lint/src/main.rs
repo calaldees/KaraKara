@@ -157,6 +157,7 @@ fn run_server(processed_dir: PathBuf, port: u16, host: String) {
 
     let app = Router::new()
         .route("/api/lint/lint", get(get_lint))
+        .route("/api/lint/lint/:trackId", get(get_lint_for_track))
         .route("/api/lint/health", get(health_check))
         .layer(CorsLayer::permissive())
         .with_state(state);
@@ -177,6 +178,43 @@ fn run_server(processed_dir: PathBuf, port: u16, host: String) {
                 eprintln!("Error loading and linting: {}", e);
                 Vec::new()
             });
+        Json(errors)
+    }
+
+    async fn get_lint_for_track(
+        State(state): State<AppState>,
+        axum::extract::Path(track_id): axum::extract::Path<String>,
+    ) -> Json<Vec<LintError>> {
+        let tracks_path = state.processed_dir.join("tracks.json");
+
+        // Load tracks data
+        let content = match std::fs::read_to_string(&tracks_path) {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("Error reading tracks.json: {}", e);
+                return Json(Vec::new());
+            }
+        };
+
+        let tracks_data: TracksData = match serde_json::from_str(&content) {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("Error parsing tracks.json: {}", e);
+                return Json(Vec::new());
+            }
+        };
+
+        // Find the specific track
+        let track = match tracks_data.tracks.get(&track_id) {
+            Some(t) => t,
+            None => {
+                // Track not found, return empty array
+                return Json(Vec::new());
+            }
+        };
+
+        // Lint just this track
+        let errors = rules::lint_track(track, &state.processed_dir);
         Json(errors)
     }
 
