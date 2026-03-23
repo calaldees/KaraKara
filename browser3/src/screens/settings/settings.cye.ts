@@ -1,4 +1,5 @@
 /// <reference types="cypress" />
+/// <reference path="../../../cypress/support/commands.ts" />
 
 export {};
 

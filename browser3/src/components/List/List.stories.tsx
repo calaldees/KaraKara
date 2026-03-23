@@ -5,6 +5,8 @@ import { List } from "./List";
 import { ListItem } from "./ListItem";
 import { Thumb } from "./Thumb";
 
+import tracks from "../../../.storybook/files/small_tracks.json";
+
 const meta = {
     title: "Components/List",
     component: List,
@@ -46,12 +48,12 @@ export const WithThumbs: Story = {
         children: (
             <>
                 <ListItem
-                    thumb={<Thumb track={undefined} />}
+                    thumb={<Thumb track={tracks["track_id_1"]} />}
                     title="Track with thumbnail"
                     info="Artist Name"
                 />
                 <ListItem
-                    thumb={<Thumb track={undefined} />}
+                    thumb={<Thumb track={tracks["track_id_2"]} />}
                     title="Another track"
                     info="Another artist"
                 />
@@ -89,21 +91,21 @@ export const ComplexListItems: Story = {
         children: (
             <>
                 <ListItem
-                    thumb={<Thumb track={undefined} dragHandle={true} />}
+                    thumb={<Thumb track={tracks["track_id_1"]} dragHandle={true} />}
                     title="Never Gonna Give You Up"
                     info="Rick Astley • Whenever You Need Somebody"
                     count="3:33"
                     action={<FAIcon icon={faEllipsisVertical} />}
                 />
                 <ListItem
-                    thumb={<Thumb track={undefined} dragHandle={true} />}
+                    thumb={<Thumb track={tracks["track_id_2"]} dragHandle={true} />}
                     title="Bohemian Rhapsody"
                     info="Queen • A Night at the Opera"
                     count="5:55"
                     action={<FAIcon icon={faEllipsisVertical} />}
                 />
                 <ListItem
-                    thumb={<Thumb track={undefined} dragHandle={true} />}
+                    thumb={<Thumb track={tracks["track_1990"]} dragHandle={true} />}
                     title="Don't Stop Believin'"
                     info="Journey • Escape"
                     count="4:09"
