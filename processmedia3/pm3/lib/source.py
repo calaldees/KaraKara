@@ -5,7 +5,7 @@ import typing as t
 from collections.abc import MutableMapping
 
 from .file_abstraction import AbstractFile
-from .kktypes import MediaMeta
+from .media_meta import MediaMeta
 from .tag_processor import parse_tags
 
 log = logging.getLogger()

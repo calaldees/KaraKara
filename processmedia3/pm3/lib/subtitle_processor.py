@@ -126,7 +126,7 @@ class Subtitle(t.NamedTuple):
     top: bool = False
 
     @staticmethod
-    def _mk(idx: int, start: float, end: float, text: str, top: bool = False) -> Subtitle:
+    def _mk(idx: int, start: float, end: float, text: str, top: bool = False) -> "Subtitle":
         return Subtitle(idx=idx, start=SubTime(seconds=start), end=SubTime(seconds=end), text=text, top=top)
 
     def __str__(self) -> str:

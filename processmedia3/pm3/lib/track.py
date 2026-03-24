@@ -1,28 +1,15 @@
 import copy
 import datetime
-import typing as t
 from collections import defaultdict
 from pathlib import Path
 
 import dateparser
 
-from .encoders import find_appropriate_encoder
-from .kktypes import MediaType, TargetType
+from .encoders import MediaType, TargetType, find_appropriate_encoder
 from .source import Source, SourceType
 from .target import Target
-
-
-class TrackAttachment(t.TypedDict):
-    variant: str
-    mime: str
-    path: str
-
-
-class TrackDict(t.TypedDict):
-    id: str
-    duration: float
-    attachments: dict[MediaType, list[TrackAttachment]]
-    tags: dict[str, list[str]]
+from .types import Attachment, Attachments, Tags
+from .types import Track as TrackDict
 
 
 class TrackValidationException(Exception): ...
@@ -80,15 +67,13 @@ class Track:
         from any set of inputs; this method is where we enforce the specific
         requirements of KaraKara (ie, the assumptions of Browser / Player).
         """
-        attachments: dict[MediaType, list[TrackAttachment]] = defaultdict(list)
+        attachments: dict[MediaType, list[Attachment]] = defaultdict(list)
         for target in self.targets:
             attachments[target.encoder.category].append(
-                TrackAttachment(
-                    {
-                        "variant": target.variant,
-                        "mime": target.encoder.mime,
-                        "path": str(target.path.relative_to(target.processed_dir)),
-                    }
+                Attachment(
+                    variant=target.variant,
+                    mime=target.encoder.mime,
+                    path=str(target.path.relative_to(target.processed_dir)),
                 )
             )
         if not attachments.get(MediaType.VIDEO):
@@ -106,7 +91,7 @@ class Track:
             raise TrackValidationException("missing tag file")
         if len(tag_files) > 1:
             raise TrackValidationException("multiple tag files found")
-        tags: dict[str, list[str]] = copy.deepcopy(tag_files[0].tags)
+        tags: Tags = copy.deepcopy(tag_files[0].tags)
         if tags.get("title") is None:
             raise TrackValidationException("missing tags.title")
         if tags.get("category") is None:
@@ -181,6 +166,10 @@ class Track:
         return TrackDict(
             id=self.id,
             duration=round(max(ds), 1),
-            attachments=attachments,
+            attachments=Attachments(
+                video=attachments[MediaType.VIDEO],
+                subtitle=attachments[MediaType.SUBTITLE],
+                image=attachments[MediaType.IMAGE],
+            ),
             tags=tags,
         )

@@ -6,8 +6,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from .encoders import Encoder, EncoderException
-from .kktypes import TargetType
+from .encoders import Encoder, EncoderException, TargetType
 from .source import Source
 
 log = logging.getLogger()

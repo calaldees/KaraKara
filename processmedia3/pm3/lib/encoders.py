@@ -1,3 +1,4 @@
+import enum
 import itertools
 import logging
 import math
@@ -10,7 +11,7 @@ from pathlib import Path
 
 import tqdm
 
-from .kktypes import MediaMeta, MediaType, TargetType
+from .media_meta import MediaMeta
 from .source import Source, SourceType
 from .subtitle_processor import SubFile
 
@@ -51,6 +52,23 @@ ACODEC_OPUS = ["-acodec", "libopus"]
 ACODEC_AAC = ["-acodec", "aac"]
 ACODEC_MP3 = ["-acodec", "mp3"]
 # fmt: on
+
+
+class MediaType(enum.StrEnum):
+    VIDEO = enum.auto()
+    SUBTITLE = enum.auto()
+    IMAGE = enum.auto()
+
+
+class TargetType(enum.Enum):
+    VIDEO_H264 = 10
+    VIDEO_AV1 = 11
+    VIDEO_H265 = 12
+    IMAGE_WEBP = 30
+    IMAGE_AVIF = 31
+    IMAGE_JPEG = 32
+    SUBTITLES_VTT = 40
+    SUBTITLES_JSON = 41
 
 
 class EncoderException(Exception):

@@ -11,8 +11,8 @@ import pm3.cmds.cleanup as cleanup
 import pm3.cmds.encode as encode
 import pm3.cmds.export as export
 import pm3.cmds.scan as scan
+from pm3.lib.encoders import TargetType
 from pm3.lib.file_abstraction import AbstractFolder
-from pm3.lib.kktypes import TargetType
 from pm3.lib.source import SourceType
 
 # disable progress bars in unit tests

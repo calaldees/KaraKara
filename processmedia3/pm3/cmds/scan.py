@@ -2,15 +2,15 @@ import logging
 import re
 import typing as t
 from collections import defaultdict
+from collections.abc import MutableMapping, Sequence
 from pathlib import Path
-from collections.abc import Sequence, MutableMapping
 
 from tqdm.contrib.concurrent import thread_map
 
-from pm3.lib.kktypes import TargetType
+from pm3.lib.encoders import TargetType
+from pm3.lib.file_abstraction import AbstractFile, AbstractFolder
 from pm3.lib.source import Source
 from pm3.lib.track import Track
-from pm3.lib.file_abstraction import AbstractFolder, AbstractFile
 
 TARGET_TYPES = [
     # TargetType.VIDEO_H264,
