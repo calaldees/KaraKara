@@ -12,6 +12,7 @@
         "lint": "eslint src",
         "test": "vitest",
         "test-once": "vitest run",
+        "bench": "vitest bench",
         "storybook": "storybook dev -p 6006 --no-open"
     },
     "dependencies": {

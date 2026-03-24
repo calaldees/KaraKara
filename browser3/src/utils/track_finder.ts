@@ -51,6 +51,8 @@ export function apply_hidden(tracks: Track[], hidden_tags: string[]): Track[] {
  *   track.tags["from"].includes("macross")
  */
 export function apply_tags(tracks: Track[], tags: string[]): Track[] {
+    if (tags.length === 0) return tracks;
+
     // convert "retro" to ["", "retro"] and "from:Macross" to ["from", "Macross"]
     const tag_pairs = tags.map((x) =>
         (x.includes(":") ? x : ":" + x).split(":"),

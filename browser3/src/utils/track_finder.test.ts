@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 
-import type { Track } from "@/types";
 import { tracks as track_dict } from "./test_data";
 
 import * as finder from "./track_finder";
@@ -161,42 +160,5 @@ describe("text_to_filters", () => {
             ["foo:bar"],
             "",
         ]);
-    });
-});
-
-// find_tracks = apply_hidden + apply_tags(forced) + apply_tags(user) + apply_search
-// I want one function which does it all for performance testing
-describe("find_tracks", () => {
-    // generate a large dataset, but do it outside of the test
-    // so that it doesn't contribute to the test's performance
-    const big_tracks: Record<string, Track> = {};
-    for (let i = 0; i < 10000; i++) {
-        big_tracks["track_id_" + i] = {
-            id: "track_id_" + i,
-            duration: 123,
-            tags: {
-                title: ["Test Track " + i],
-                from: ["Macross"],
-                category: ["anime"],
-                year: [String(1980 + (i % 50))],
-                "": ["retro"],
-            },
-            attachments: {
-                video: [],
-                image: [],
-                subtitle: [],
-            },
-        };
-    }
-    test("searching 10,000 tracks with every kind of filter performs ok", () => {
-        // check that even though we have all the types of filters, and
-        // none of them are narrowing down the list at all, we're still
-        // doing ok
-        const tracks = finder.find_tracks(
-            Object.values(big_tracks),
-            ["category:anime", "from:Macross"],
-            "mac",
-        );
-        expect(tracks.length).toEqual(10000);
     });
 });
