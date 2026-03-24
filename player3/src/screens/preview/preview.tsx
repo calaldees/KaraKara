@@ -7,7 +7,7 @@ import { Video } from "@/components/video";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { Attachment, QueueItem, Track } from "@/types";
-import { attachment_path, time_until } from "@/utils";
+import { attachment_path, time_until, track_title } from "@/utils";
 
 import "./preview.scss";
 
@@ -40,7 +40,7 @@ function QueueItem({
                         href={attachment_path(a)}
                     />
                 ))}
-            <p className="title">{track.tags.title[0]}</p>
+            <p className="title">{track_title(track)}</p>
             <p className="from">
                 {track.tags.from?.[0] ?? track.tags.artist?.join(", ") ?? ""}
             </p>

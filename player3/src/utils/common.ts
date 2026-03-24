@@ -1,4 +1,4 @@
-import type { Attachment, QueueItem } from "@/types";
+import type { Attachment, QueueItem, Track } from "@/types";
 
 /**
  * Looking at an Attachment, get the full URL
@@ -61,4 +61,16 @@ export function current_and_future(
         (t) =>
             t.start_time == null || t.start_time + t.track_duration + 1 > now,
     );
+}
+
+export function track_title(
+    track: Pick<Track, "tags" | "id"> | undefined,
+): string {
+    if (!track) {
+        return "(invalid track)";
+    }
+    if (track.tags.title && track.tags.title[0]) {
+        return track.tags.title[0];
+    }
+    return track.id;
 }

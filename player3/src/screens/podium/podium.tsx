@@ -12,6 +12,7 @@ import {
     parse_duration,
     percent,
     s_to_mns,
+    track_title,
 } from "@/utils";
 
 import "./podium.scss";
@@ -58,7 +59,7 @@ function PodiumTitle({
 }) {
     return (
         <h1>
-            {track.tags.title[0]}
+            {track_title(track)}
             <br />
             Performed by <strong>{queue_item.performer_name}</strong>
         </h1>

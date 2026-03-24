@@ -15,9 +15,6 @@ export interface Track {
     id: string;
     duration: number;
     tags: {
-        title: string[];
-        category?: string[];
-        vocaltrack?: string[];
         [x: string]: string[] | undefined;
     };
     attachments: {
