@@ -1,8 +1,10 @@
 INPUT[type="text"],
+INPUT[type="number"],
 INPUT[type="search"],
 INPUT[type="password"],
 SELECT,
 BUTTON,
+TEXTAREA,
 .button {
     font-size: 1rem;
     width: 100%;
@@ -17,7 +19,9 @@ A.button {
 INPUT[type="checkbox"] {
     margin: 0.5rem;
 }
+TEXTAREA,
 INPUT[type="text"],
+INPUT[type="number"],
 INPUT[type="search"],
 INPUT[type="password"] {
     color: var(--input-fg);
@@ -27,11 +31,12 @@ INPUT[type="password"] {
     border: 1px solid;
     border-color: var(--input-shade) var(--input-light) var(--input-light)
         var(--input-shade);
-}
-INPUT[type="text"]:disabled,
-INPUT[type="search"]:disabled,
-INPUT[type="password"]:disabled {
-    color: var(--input-fg-disabled);
+
+    &:disabled {
+        color: var(--input-fg-disabled);
+        //background: var(--input-bg-disabled);
+        //border-color: var(--input-bg-disabled);
+    }
 }
 SELECT,
 BUTTON,
