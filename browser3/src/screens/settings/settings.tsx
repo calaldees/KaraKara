@@ -5,9 +5,10 @@ import { useApi } from "@/hooks/api";
 import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
 import { copy_type } from "@/utils";
+import type { Settings } from "@/types";
 
 function removeTypes(
-    roomSettings: Record<string, any>,
+    roomSettings: Settings,
 ): Record<string, string> {
     const roomSettingsUntyped: Record<string, string> = {};
     for (const key of Object.keys(roomSettings)) {
@@ -31,7 +32,7 @@ export function RoomSettings(): React.ReactElement {
 function RoomSettingsInternal({
     roomSettings,
 }: {
-    roomSettings: Record<string, any>;
+    roomSettings: Settings;
 }) {
     const { roomName } = useContext(PageContext);
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
@@ -53,7 +54,7 @@ function RoomSettingsInternal({
     const saveSettings = useCallback(
         (event: any) => {
             event.preventDefault();
-            const roomSettingsTyped: Record<string, any> = {};
+            const roomSettingsTyped: Settings = {};
             for (const key of Object.keys(roomSettings)) {
                 roomSettingsTyped[key] = copy_type(
                     roomSettings[key],

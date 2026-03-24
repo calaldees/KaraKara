@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
-import type { QueueItem, Track } from "@/types";
+import type { QueueItem, Track, Settings } from "@/types";
 import { current_and_future, normalise_cmp } from "@/utils";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
@@ -17,7 +17,7 @@ export interface RoomContextType {
     queue: QueueItem[];
     fullQueue: QueueItem[];
     setOptimisticQueue: (q: QueueItem[] | null) => void;
-    settings: Record<string, any>;
+    settings: Settings;
 }
 
 /* eslint-disable react-refresh/only-export-components */
@@ -35,7 +35,7 @@ export function RoomProvider(props: any) {
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
     );
-    const [settings, setSettings] = useState<Record<string, any>>({});
+    const [settings, setSettings] = useState<Settings>({});
     const { request, sessionId } = useApi();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),

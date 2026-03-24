@@ -1,6 +1,6 @@
 import { QueueItem, Track } from "@/types";
 
-export function dict2css(d: Record<string, any>) {
+export function dict2css(d: Record<string, boolean>) {
     return Object.entries(d)
         .filter(([_, v]) => v)
         .map(([k, _]) => k)
