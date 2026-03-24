@@ -1,0 +1,192 @@
+openapi: 3.0.3
+info:
+  title: KaraKara Queue API
+  version: 0.0.0
+  description: |
+    API for managing karaoke queues, tracks, settings, and playback commands.
+
+    The API is organized around rooms - each room has its own queue, settings, and user sessions.
+
+components:
+  schemas:
+    Track:
+      type: object
+      required:
+        - id
+        - duration
+        - tags
+        - attachments
+      properties:
+        id:
+          type: string
+          description: Unique track identifier
+        duration:
+          type: number
+          format: float
+          description: Track duration in seconds
+        tags:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Key-value tags for the track
+        attachments:
+          type: object
+          required:
+            - video
+            - image
+            - subtitle
+          properties:
+            video:
+              type: array
+              items:
+                $ref: "#/components/schemas/Attachment"
+            image:
+              type: array
+              items:
+                $ref: "#/components/schemas/Attachment"
+            subtitle:
+              type: array
+              items:
+                $ref: "#/components/schemas/Attachment"
+
+    Attachment:
+      type: object
+      required:
+        - variant
+        - mime
+        - path
+      properties:
+        variant:
+          type: string
+          description: Attachment variant name
+        mime:
+          type: string
+          description: MIME type of the attachment
+        path:
+          type: string
+          description: Path to the attachment file
+
+    Subtitle:
+      type: object
+      required:
+        - start
+        - end
+        - text
+        - top
+      properties:
+        start:
+          type: number
+          format: float
+          description: Start time in seconds
+        end:
+          type: number
+          format: float
+          description: End time in seconds
+        text:
+          type: string
+          description: Subtitle text content
+        top:
+          type: boolean
+          description: Whether subtitle appears at top of screen
+          default: false
+
+    QueueItem:
+      type: object
+      required:
+        - id
+        - track_id
+        - start_time
+        - track_duration
+        - session_id
+        - performer_name
+        - video_variant
+        - subtitle_variant
+      properties:
+        id:
+          type: integer
+          description: Unique queue item identifier
+        track_id:
+          type: string
+          description: ID of the track in the queue
+        track_duration:
+          type: number
+          format: float
+          description: Track duration in seconds
+        session_id:
+          type: string
+          description: Session ID of the user who added this item
+        performer_name:
+          type: string
+          description: Name of the performer
+        start_time:
+          type: number
+          format: float
+          nullable: true
+          description: Unix timestamp when the track starts playing (null if not yet scheduled)
+        video_variant:
+          type: string
+          description: Selected video variant
+        subtitle_variant:
+          type: string
+          description: Selected subtitle variant
+
+    Settings:
+      type: object
+      properties:
+        track_space:
+          type: number
+          format: float
+          description: Gap between tracks in seconds
+          default: 15
+        hidden_tags:
+          type: array
+          items:
+            type: string
+          description: Tags to hide from display
+          default: ["red:duplicate"]
+        forced_tags:
+          type: array
+          items:
+            type: string
+          description: Tags that must be present
+          default: []
+        title:
+          type: string
+          description: Room title
+          default: "KaraKara"
+        preview_volume:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Preview playback volume
+          default: 0.1
+        coming_soon_track_count:
+          type: integer
+          minimum: 1
+          maximum: 9
+          description: Number of upcoming tracks to show
+          default: 5
+        validation_event_start_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Event start time for validation
+        validation_event_end_datetime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Event end time for validation
+        validation_performer_names:
+          type: array
+          items:
+            type: string
+          description: List of valid performer names
+          default: []
+        auto_reorder_queue:
+          type: boolean
+          description: Whether to automatically reorder the queue
+          default: false
+

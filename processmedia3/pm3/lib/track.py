@@ -8,7 +8,7 @@ import dateparser
 from .encoders import MediaType, TargetType, find_appropriate_encoder
 from .source import Source, SourceType
 from .target import Target
-from .types import Attachment, Attachments, Tags
+from .types import Attachment, Attachments
 from .types import Track as TrackDict
 
 
@@ -91,7 +91,7 @@ class Track:
             raise TrackValidationException("missing tag file")
         if len(tag_files) > 1:
             raise TrackValidationException("multiple tag files found")
-        tags: Tags = copy.deepcopy(tag_files[0].tags)
+        tags: dict[str, list[str]] = copy.deepcopy(tag_files[0].tags)
         if tags.get("title") is None:
             raise TrackValidationException("missing tags.title")
         if tags.get("category") is None:

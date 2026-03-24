@@ -29,6 +29,7 @@ dev = [
 	"types-tqdm ~= 4.67",
 	"types-dateparser ~= 1.2",
 	"types-requests ~= 2.32",
+	"datamodel-code-generator ~= 0.25",
 ]
 
 [tool.mypy]
@@ -52,3 +53,17 @@ line-length = 120
 
 [tool.pyright]
 reportUnusedCallResult = false
+
+[tool.datamodel-codegen]
+input = "../openapi/openapi.yaml"
+input-file-type = "openapi"
+output = "pm3/lib/types.py"
+output-model-type = "typing.TypedDict"
+use-standard-collections = true
+use-schema-description = true
+snake-case-field = true
+target-python-version = "3.14"
+field-constraints = true
+collapse-root-models = true
+disable-timestamp = true
+formatters = ["ruff-check", "ruff-format"]
