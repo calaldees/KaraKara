@@ -29,10 +29,10 @@ class QueueItem(TypedDict):
 
 
 class Settings(TypedDict):
+    title: NotRequired[str]
     track_space: NotRequired[float]
     hidden_tags: NotRequired[list[str]]
     forced_tags: NotRequired[list[str]]
-    title: NotRequired[str]
     preview_volume: NotRequired[float]
     coming_soon_track_count: NotRequired[int]
     validation_event_start_datetime: NotRequired[str | None]

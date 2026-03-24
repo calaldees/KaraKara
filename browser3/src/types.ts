@@ -75,8 +75,13 @@ export interface components {
         };
         Settings: {
             /**
+             * @description Room title
+             * @default KaraKara
+             */
+            title: string;
+            /**
              * Format: float
-             * @description Gap between tracks in seconds
+             * @description Gap between tracks (seconds)
              * @default 15
              */
             track_space: number;
@@ -93,24 +98,19 @@ export interface components {
              */
             forced_tags: string[];
             /**
-             * @description Room title
-             * @default KaraKara
-             */
-            title: string;
-            /**
              * Format: float
-             * @description Preview playback volume
+             * @description Preview playback volume (0.0 - 1.0)
              * @default 0.1
              */
             preview_volume: number;
             /**
-             * @description Number of upcoming tracks to show
+             * @description Number of upcoming tracks to show publicly
              * @default 5
              */
             coming_soon_track_count: number;
-            /** @description Event start time for validation */
+            /** @description Event start time */
             validation_event_start_datetime?: string | null;
-            /** @description Event end time for validation */
+            /** @description Event end time */
             validation_event_end_datetime?: string | null;
             /**
              * @description List of valid performer names

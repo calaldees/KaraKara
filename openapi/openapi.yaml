@@ -143,10 +143,14 @@ components:
     Settings:
       type: object
       properties:
+        title:
+          type: string
+          description: Room title
+          default: "KaraKara"
         track_space:
           type: number
           format: float
-          description: Gap between tracks in seconds
+          description: Gap between tracks (seconds)
           default: 15
         hidden_tags:
           type: array
@@ -160,35 +164,31 @@ components:
             type: string
           description: Tags that must be present
           default: []
-        title:
-          type: string
-          description: Room title
-          default: "KaraKara"
         preview_volume:
           type: number
           format: float
           minimum: 0
           maximum: 1
-          description: Preview playback volume
+          description: Preview playback volume (0.0 - 1.0)
           default: 0.1
         coming_soon_track_count:
           type: integer
           minimum: 1
           maximum: 9
-          description: Number of upcoming tracks to show
+          description: Number of upcoming tracks to show publicly
           default: 5
         validation_event_start_datetime:
           anyOf:
             - type: string
               format: date-time
             - type: "null"
-          description: Event start time for validation
+          description: Event start time
         validation_event_end_datetime:
           anyOf:
             - type: string
               format: date-time
             - type: "null"
-          description: Event end time for validation
+          description: Event end time
         validation_performer_names:
           type: array
           items:
