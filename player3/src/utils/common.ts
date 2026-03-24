@@ -6,6 +6,12 @@ import type { Attachment, QueueItem } from "@/types";
  * eg attachment_path(attachment) -> /files/asdfasdfa.mp4
  */
 export function attachment_path(attachment: Attachment): string {
+    if (
+        attachment.path.startsWith("http://") ||
+        attachment.path.startsWith("https://")
+    ) {
+        return attachment.path;
+    }
     return "/files/" + attachment.path;
 }
 
