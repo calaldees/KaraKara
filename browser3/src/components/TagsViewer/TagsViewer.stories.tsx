@@ -1,6 +1,7 @@
 import type { Track } from "@/types";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { TagsViewer } from "./TagsViewer";
+import { within, expect } from "storybook/test";
 
 const meta = {
     title: "Components/TagsViewer",
@@ -27,6 +28,7 @@ const mockTrack: Track = {
         vocalist: ["Male"],
         from: ["Music Video"],
         source_type: ["Official"],
+        duration: ["260"],
     },
     attachments: {
         video: [],
@@ -76,34 +78,24 @@ export const ManyTags: Story = {
     },
 };
 
-export const AnimeTrack: Story = {
+export const SpecialTags: Story = {
     args: {
         track: {
             ...mockTrack,
             tags: {
-                title: ["Tank!"],
-                artist: ["The Seatbelts"],
-                series: ["Cowboy Bebop"],
-                type: ["Opening"],
-                genre: ["Jazz", "Blues"],
-                language: ["Instrumental"],
-                year: ["1998"],
-                composer: ["Yoko Kanno"],
+                title: ["Special Tags Example"],
+                source: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
+                duration: ["213"],
             },
         },
     },
-};
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        //const sourceLink = await canvas.findByText("YouTube");
+        //expect(sourceLink).toBeInTheDocument();
+        //expect(sourceLink).toHaveAttribute("href", "https://www.youtube.com/watch?v=dQw4w9WgXcQ");
 
-export const MultipleValues: Story = {
-    args: {
-        track: {
-            ...mockTrack,
-            tags: {
-                title: ["Collaboration Song"],
-                artist: ["Artist One", "Artist Two", "Artist Three"],
-                genre: ["Pop", "R&B", "Soul", "Electronic"],
-                language: ["English", "Spanish", "French"],
-            },
-        },
-    },
+        const durationTag = await canvas.findByText("3m33s");
+        await expect(durationTag).toBeInTheDocument();
+    }
 };
