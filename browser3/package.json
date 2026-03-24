@@ -4,6 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
+        "generate-types": "openapi-typescript ../openapi/openapi.yaml -o src/types.ts --root-types --root-types-no-schema-prefix",
         "serve": "rsbuild dev",
         "build": "tsc -b && rsbuild build",
         "cypress": "npx cypress open",
@@ -46,6 +47,7 @@
         "eslint-plugin-react-refresh": "^0.4.19",
         "eslint-plugin-react-x": "^2.3.5",
         "eslint-plugin-storybook": "^10.2.19",
+        "openapi-typescript": "^7.4.4",
         "prettier": "^3.6",
         "prettier-plugin-organize-imports": "^4.3.0",
         "storybook": "^10.2.19",
