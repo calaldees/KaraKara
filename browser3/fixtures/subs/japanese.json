@@ -1,0 +1,6 @@
+[
+    { "start": 0, "end": 5, "text": "いち", "top": false },
+    { "start": 5, "end": 10, "text": "にい", "top": false },
+    { "start": 10, "end": 15, "text": "さん", "top": false },
+    { "start": 15, "end": 20, "text": "はい！", "top": false }
+]

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
-import type { QueueItem, Track, Settings } from "@/types";
+import type { QueueItem, Settings, Track } from "@/types";
 import { current_and_future, normalise_cmp } from "@/utils";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";

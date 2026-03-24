@@ -6,9 +6,7 @@ import { useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import type { Decorator } from "storybook-react-rsbuild";
 
-import queue from "../cypress/fixtures/small_queue.json";
-import settings from "../cypress/fixtures/small_settings.json";
-import tracks from "../cypress/fixtures/small_tracks.json";
+import { queue, settings, tracks } from "../src/utils/test_data";
 
 import { ClientContext, ClientContextType } from "../src/providers/client";
 import { PageContext, PageContextType } from "../src/providers/page";

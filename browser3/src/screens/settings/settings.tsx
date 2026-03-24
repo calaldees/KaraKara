@@ -4,12 +4,10 @@ import { BackOr, ButtonRow, Screen } from "@/components";
 import { useApi } from "@/hooks/api";
 import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
-import { copy_type } from "@/utils";
 import type { Settings } from "@/types";
+import { copy_type } from "@/utils";
 
-function removeTypes(
-    roomSettings: Settings,
-): Record<string, string> {
+function removeTypes(roomSettings: Settings): Record<string, string> {
     const roomSettingsUntyped: Record<string, string> = {};
     for (const key of Object.keys(roomSettings)) {
         roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
@@ -29,11 +27,7 @@ export function RoomSettings(): React.ReactElement {
     );
 }
 
-function RoomSettingsInternal({
-    roomSettings,
-}: {
-    roomSettings: Settings;
-}) {
+function RoomSettingsInternal({ roomSettings }: { roomSettings: Settings }) {
     const { roomName } = useContext(PageContext);
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
         Record<string, string>

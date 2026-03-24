@@ -24,11 +24,32 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_id_1.png",
+                    "path": "thumbs/0.png",
                     "mime": "image/png"
                 }
             ],
-            "subtitle": []
+            "subtitle": [
+                {
+                    "variant": "Japanese",
+                    "mime": "application/json",
+                    "path": "subs/japanese.json"
+                },
+                {
+                    "variant": "Japanese",
+                    "mime": "text/vtt",
+                    "path": "subs/japanese.vtt"
+                },
+                {
+                    "variant": "English",
+                    "mime": "application/json",
+                    "path": "subs/english.json"
+                },
+                {
+                    "variant": "English",
+                    "mime": "text/vtt",
+                    "path": "subs/english.vtt"
+                }
+            ]
         }
     },
     "track_id_2": {
@@ -48,7 +69,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_id_2.png",
+                    "path": "thumbs/1.png",
                     "mime": "image/png"
                 }
             ],
@@ -72,7 +93,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_1990.png",
+                    "path": "thumbs/2.png",
                     "mime": "image/png"
                 }
             ],
@@ -95,7 +116,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_2000.png",
+                    "path": "thumbs/3.png",
                     "mime": "image/png"
                 }
             ],
@@ -118,7 +139,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_2010.png",
+                    "path": "thumbs/4.png",
                     "mime": "image/png"
                 }
             ],
@@ -141,7 +162,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_2020.png",
+                    "path": "thumbs/5.png",
                     "mime": "image/png"
                 }
             ],
@@ -163,7 +184,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_no_year.png",
+                    "path": "thumbs/6.png",
                     "mime": "image/png"
                 }
             ],
