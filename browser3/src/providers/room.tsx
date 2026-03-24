@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import type { QueueItem, Settings, Track } from "@/types";
-import { current_and_future, normalise_cmp } from "@/utils";
+import { current_and_future, normalise_cmp, track_title } from "@/utils";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
 import { PageContext } from "./page";
@@ -71,7 +71,7 @@ export function RoomProvider(props: any) {
         if (hiddenTags) trackList = apply_hidden(trackList, hiddenTags);
         if (forcedTags) trackList = apply_tags(trackList, forcedTags);
         trackList = trackList.sort((a, b) =>
-            normalise_cmp(a.tags.title[0], b.tags.title[0]),
+            normalise_cmp(track_title(a), track_title(b)),
         );
         return trackList;
     }, [tracks, hiddenTags, forcedTags]);

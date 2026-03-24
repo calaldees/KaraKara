@@ -7,7 +7,7 @@ import { ListItem, Thumb } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import type { QueueItem, Track } from "@/types";
-import { dict2css, is_my_song, time_until } from "@/utils";
+import { dict2css, is_my_song, time_until, track_title } from "@/utils";
 
 import styles from "./QueueItemRender.module.scss";
 
@@ -41,7 +41,7 @@ export function QueueItemRender({
                 [styles.me]: is_my_song(item, sessionId, performerName),
             })}
             thumb={<Thumb track={track} />}
-            title={track.tags.title[0]}
+            title={track_title(track)}
             info={item.performer_name}
             count={
                 show_time && item.start_time
@@ -55,7 +55,7 @@ export function QueueItemRender({
                         data-cy="remove"
                         onClick={(_) =>
                             confirm(
-                                `Remove ${track.tags.title[0]} from the queue?`,
+                                `Remove ${track_title(track)} from the queue?`,
                             ) && removeTrack(item.id)
                         }
                     />

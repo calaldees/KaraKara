@@ -79,6 +79,7 @@ describe("track_info", () => {
     test("should basically work", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     category: ["fake"],
@@ -94,6 +95,7 @@ describe("track_info", () => {
     test("searching for a series should avoid showing that series", () => {
         expect(
             utils.track_info(["from:Macross"], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     category: ["fake"],
@@ -109,6 +111,7 @@ describe("track_info", () => {
     test("avoid duplicating the title in the info", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     category: ["fake"],
@@ -123,6 +126,7 @@ describe("track_info", () => {
     test("some categories have specific rules", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     artist: ["Billy Rock"],
@@ -135,6 +139,7 @@ describe("track_info", () => {
     test("unrecognised categories should use default rules", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     from: ["Macross"],

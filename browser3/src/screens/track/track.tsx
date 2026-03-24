@@ -15,7 +15,7 @@ import {
 import { useWidescreen } from "@/hooks/widescreen";
 import { ServerContext } from "@/providers/server";
 import { Track } from "@/types";
-import { preferred_variant, unique } from "@/utils";
+import { preferred_variant, unique, track_title } from "@/utils";
 
 import { TrackButtons } from "./TrackButtons";
 
@@ -54,7 +54,7 @@ function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
         <Screen
             className={styles.track}
             navLeft={<BackOr to={`/${roomName}`} />}
-            title={track.tags.title[0]}
+            title={track_title(track)}
             navRight={
                 !widescreen && (
                     <Link

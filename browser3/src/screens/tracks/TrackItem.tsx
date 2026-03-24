@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { ListItem, Thumb } from "@/components";
 import { PageContext } from "@/providers/page";
 import type { Track } from "@/types";
-import { track_info } from "@/utils";
+import { track_info, track_title } from "@/utils";
 
 export function TrackItem({
     track,
@@ -29,7 +29,7 @@ export function TrackItem({
     return (
         <ListItem
             thumb={<Thumb track={track} />}
-            title={`${track.tags.title[0]}${extra}`}
+            title={`${track_title(track)}${extra}`}
             info={track_info(filters, track)}
             action={<FAIcon icon={faCircleChevronRight} />}
             onClick={(_) => void navigate(`/${roomName}/tracks/${track.id}`)}

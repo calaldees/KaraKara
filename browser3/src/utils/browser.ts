@@ -1,4 +1,5 @@
 import { QueueItem, Track } from "@/types";
+import { track_title } from "./common";
 
 export function dict2css(d: Record<string, boolean>) {
     return Object.entries(d)
@@ -86,7 +87,7 @@ const title_tags_for_category: Record<string, string[]> = {
 };
 export function track_info(
     filters: string[],
-    track: Pick<Track, "tags">,
+    track: Pick<Track, "tags" | "id">,
 ): string {
     const info_tags =
         title_tags_for_category[track.tags.category?.[0] ?? "DEFAULT"] ||
@@ -101,7 +102,7 @@ export function track_info(
         // Ignore undefined tags
         .filter((x) => Object.prototype.hasOwnProperty.call(track_tags, x))
         // We always display track title, so ignore any tags which duplicate that
-        .filter((x) => track_tags[x][0] !== track.tags.title[0])
+        .filter((x) => track_tags[x][0] !== track_title(track))
         // If we've searched for "from:naruto", don't prefix every track title with "this is from naruto"
         .filter((x) => x !== "from" || !search_from.includes(track_tags[x][0]))
         // Format a list of tags
