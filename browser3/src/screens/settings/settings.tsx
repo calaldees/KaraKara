@@ -10,7 +10,7 @@ import { copy_type } from "@/utils";
 function removeTypes(roomSettings: Settings): Record<string, string> {
     const roomSettingsUntyped: Record<string, string> = {};
     for (const key of Object.keys(roomSettings)) {
-        roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
+        roomSettingsUntyped[key] = "" + ((roomSettings as any)[key] ?? "");
     }
     return roomSettingsUntyped;
 }
@@ -48,10 +48,10 @@ function RoomSettingsInternal({ roomSettings }: { roomSettings: Settings }) {
     const saveSettings = useCallback(
         (event: any) => {
             event.preventDefault();
-            const roomSettingsTyped: Settings = {};
+            const roomSettingsTyped: any = {};
             for (const key of Object.keys(roomSettings)) {
                 roomSettingsTyped[key] = copy_type(
-                    roomSettings[key],
+                    (roomSettings as any)[key],
                     roomSettingsEdit[key],
                 );
             }

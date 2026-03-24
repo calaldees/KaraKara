@@ -81,10 +81,12 @@ describe("track_info", () => {
             utils.track_info([], {
                 tags: {
                     title: ["Fake Track Name"],
+                    category: ["fake"],
                     from: ["Macross"],
                     Macross: ["Do You Remember Love?"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("Macross - opening, op1 - short");
@@ -94,10 +96,12 @@ describe("track_info", () => {
             utils.track_info(["from:Macross"], {
                 tags: {
                     title: ["Fake Track Name"],
+                    category: ["fake"],
                     from: ["Macross"],
                     Macross: ["Do You Remember Love?"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("opening, op1 - short");
@@ -107,9 +111,11 @@ describe("track_info", () => {
             utils.track_info([], {
                 tags: {
                     title: ["Fake Track Name"],
+                    category: ["fake"],
                     from: ["Fake Track Name"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("opening, op1 - short");
@@ -121,6 +127,7 @@ describe("track_info", () => {
                     title: ["Fake Track Name"],
                     artist: ["Billy Rock"],
                     category: ["jpop"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("Billy Rock");
@@ -134,6 +141,7 @@ describe("track_info", () => {
                     category: ["example"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("Macross - opening, op1 - short");

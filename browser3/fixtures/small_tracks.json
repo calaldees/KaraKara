@@ -10,7 +10,8 @@
             "category": ["anime"],
             "artist": ["alice"],
             "year": ["1984"],
-            "": ["retro", "minami"]
+            "": ["retro", "minami"],
+            "vocaltrack": ["on"]
         },
         "duration": 231.4,
         "attachments": {
@@ -61,7 +62,8 @@
             "category": ["anime", "jpop"],
             "artist": ["alice", "bob"],
             "length": ["short"],
-            "year": ["2005"]
+            "year": ["2005"],
+            "vocaltrack": ["on"]
         },
         "duration": 231.4,
         "attachments": {
@@ -85,7 +87,8 @@
             "category": ["anime"],
             "artist": ["carol"],
             "year": ["1990"],
-            "": ["retro"]
+            "": ["retro"],
+            "vocaltrack": ["on"]
         },
         "duration": 180.0,
         "attachments": {
@@ -108,7 +111,8 @@
             "use": ["opening"],
             "category": ["anime"],
             "artist": ["dave"],
-            "year": ["2000"]
+            "year": ["2000"],
+            "vocaltrack": ["on"]
         },
         "duration": 210.0,
         "attachments": {
@@ -131,7 +135,8 @@
             "use": ["insert"],
             "category": ["jpop"],
             "artist": ["eve"],
-            "year": ["2010"]
+            "year": ["2010"],
+            "vocaltrack": ["on"]
         },
         "duration": 195.0,
         "attachments": {
@@ -154,7 +159,8 @@
             "use": ["opening", "op1"],
             "category": ["jpop"],
             "artist": ["frank"],
-            "year": ["2020"]
+            "year": ["2020"],
+            "vocaltrack": ["on"]
         },
         "duration": 240.0,
         "attachments": {
@@ -176,7 +182,8 @@
             "from": ["Unknown"],
             "use": ["opening"],
             "category": ["anime"],
-            "artist": ["grace"]
+            "artist": ["grace"],
+            "vocaltrack": ["on"]
         },
         "duration": 220.0,
         "attachments": {

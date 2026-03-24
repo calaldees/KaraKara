@@ -35,7 +35,7 @@ export function RoomProvider(props: any) {
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
     );
-    const [settings, setSettings] = useState<Settings>({});
+    const [settings, setSettings] = useState<Settings>({} as Settings);
     const { request, sessionId } = useApi();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),

@@ -20,6 +20,8 @@ const mockTrack: Track = {
     duration: 213,
     tags: {
         title: ["Never Gonna Give You Up"],
+        category: ["Pop"],
+        vocaltrack: ["on"],
         artist: ["Rick Astley"],
         album: ["Whenever You Need Somebody"],
         year: ["1987"],
@@ -33,6 +35,7 @@ const mockTrack: Track = {
     attachments: {
         video: [],
         image: [],
+        subtitle: [],
     },
 };
 
@@ -48,6 +51,8 @@ export const MinimalTags: Story = {
             ...mockTrack,
             tags: {
                 title: ["Simple Song"],
+                category: ["Pop"],
+                vocaltrack: ["on"],
                 artist: ["Unknown Artist"],
             },
         },
@@ -60,6 +65,8 @@ export const ManyTags: Story = {
             ...mockTrack,
             tags: {
                 title: ["Complex Track With Many Tags"],
+                category: ["Pop"],
+                vocaltrack: ["on"],
                 artist: ["Artist Name"],
                 album: ["Album Name"],
                 year: ["2024"],
@@ -84,6 +91,8 @@ export const SpecialTags: Story = {
             ...mockTrack,
             tags: {
                 title: ["Special Tags Example"],
+                category: ["Pop"],
+                vocaltrack: ["on"],
                 source: ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
                 duration: ["213"],
             },
