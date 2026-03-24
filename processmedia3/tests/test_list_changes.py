@@ -1,28 +1,42 @@
 import unittest
 
 from pm3.cmds.export import list_changes
-from pm3.lib.track import MediaType, TrackDict
+from pm3.lib.track import TrackDict
 
 
-class TestCreateSsa(unittest.TestCase):
+class TestListChanges(unittest.TestCase):
     def test_same(self) -> None:
         # identical tracks
         t1: TrackDict = {
             "id": "track1",
-            "tags": {"title": ["Song A"], "artist": ["Artist A"]},
+            "tags": {
+                "title": ["Song A"],
+                "category": ["test"],
+                "vocaltrack": ["on"],
+                "artist": ["Artist A"],
+            },
             "duration": 300,
             "attachments": {
-                MediaType.SUBTITLE: [
+                "video": [],
+                "image": [],
+                "subtitle": [
                     {"mime": "text/srt", "variant": "Default", "path": "subs.srt"},
                 ],
             },
         }
         t2: TrackDict = {
             "id": "track1",
-            "tags": {"title": ["Song A"], "artist": ["Artist A"]},
+            "tags": {
+                "title": ["Song A"],
+                "category": ["test"],
+                "vocaltrack": ["on"],
+                "artist": ["Artist A"],
+            },
             "duration": 300,
             "attachments": {
-                MediaType.SUBTITLE: [
+                "video": [],
+                "image": [],
+                "subtitle": [
                     {"mime": "text/srt", "variant": "Default", "path": "subs.srt"},
                 ],
             },
@@ -33,20 +47,34 @@ class TestCreateSsa(unittest.TestCase):
         # tag changes
         t1: TrackDict = {
             "id": "track1",
-            "tags": {"title": ["Snog A"], "artist": ["Artist A"]},
+            "tags": {
+                "title": ["Snog A"],
+                "category": ["test"],
+                "vocaltrack": ["on"],
+                "artist": ["Artist A"],
+            },
             "duration": 300,
             "attachments": {
-                MediaType.SUBTITLE: [
+                "video": [],
+                "image": [],
+                "subtitle": [
                     {"mime": "text/srt", "variant": "Default", "path": "subs1.srt"},
                 ],
             },
         }
         t2: TrackDict = {
             "id": "track1",
-            "tags": {"title": ["Song A"], "artist": ["Artistee"]},
+            "tags": {
+                "title": ["Song A"],
+                "category": ["test"],
+                "vocaltrack": ["on"],
+                "artist": ["Artistee"],
+            },
             "duration": 300,
             "attachments": {
-                MediaType.SUBTITLE: [
+                "video": [],
+                "image": [],
+                "subtitle": [
                     {"mime": "text/srt", "variant": "Default", "path": "subs2.srt"},
                 ],
             },
@@ -59,11 +87,17 @@ class TestCreateSsa(unittest.TestCase):
             "tags": {
                 "title": ["Song A"],
                 "artist": ["Artist A"],
-                "category": ["anime", "new"],
+                "category": ["anime"],
+                "vocaltrack": ["on"],
+                "_new": ["new"],
                 "new": ["2020-04-16"],
             },
             "duration": 300,
-            "attachments": {},
+            "attachments": {
+                "video": [],
+                "image": [],
+                "subtitle": [],
+            },
         }
         t2: TrackDict = {
             "id": "track1",
@@ -71,8 +105,13 @@ class TestCreateSsa(unittest.TestCase):
                 "title": ["Song A"],
                 "artist": ["Artist A"],
                 "category": ["anime"],
+                "vocaltrack": ["on"],
             },
             "duration": 300,
-            "attachments": {},
+            "attachments": {
+                "video": [],
+                "image": [],
+                "subtitle": [],
+            },
         }
         self.assertEqual(list_changes(t1, t2), None)

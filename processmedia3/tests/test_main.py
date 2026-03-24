@@ -11,8 +11,8 @@ import pm3.cmds.cleanup as cleanup
 import pm3.cmds.encode as encode
 import pm3.cmds.export as export
 import pm3.cmds.scan as scan
+from pm3.lib.encoders import TargetType
 from pm3.lib.file_abstraction import AbstractFolder
-from pm3.lib.kktypes import TargetType
 from pm3.lib.source import SourceType
 
 # disable progress bars in unit tests
@@ -90,7 +90,7 @@ class TestE2E(unittest.TestCase):
                     "artist": ["Artipie"],
                     "category": ["anime"],
                     "contributor": ["ここにいくつかのテキストです。"],
-                    "duration": ["0m30s"],
+                    "duration": ["30"],
                     "from": ["test series T"],
                     "title": ["Test1"],
                     "released": ["2024-06-01"],
@@ -131,7 +131,7 @@ class TestE2E(unittest.TestCase):
                     "artist": ["Mr Monkey"],
                     "category": ["anime"],
                     "contributor": ["contributor", "ここにいくつかのテキストです。"],
-                    "duration": ["0m15s"],
+                    "duration": ["15"],
                     "from": ["gundam"],
                     "gundam": ["gundam seed"],
                     "id": ["imdb:tt1234567", "mal:987654"],

@@ -12,7 +12,7 @@ import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
-import { dict2css, nth, time_until } from "@/utils";
+import { dict2css, nth, time_until, track_title } from "@/utils";
 
 import { List } from "@/components";
 import styles from "./Playlist.module.scss";
@@ -219,8 +219,7 @@ export function Playlist({
                                 to={`/${roomName}/tracks/${item.track_id}`}
                                 className={styles.title}
                             >
-                                {tracks[item.track_id]?.tags.title[0] ??
-                                    `<${item.track_id} not found>`}
+                                {track_title(tracks[item.track_id])}
                             </Link>
                         }
                         info={

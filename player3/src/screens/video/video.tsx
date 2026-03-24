@@ -5,7 +5,7 @@ import { EventInfo } from "@/components/eventinfo";
 import { JoinInfo } from "@/components/joininfo";
 import { Video } from "@/components/video";
 import type { QueueItem, Track } from "@/types";
-import { percent } from "@/utils";
+import { percent, track_title } from "@/utils";
 
 import "./video.scss";
 
@@ -40,7 +40,7 @@ export function VideoScreen({
                 KaraKara
             </div>
             <div id="pimpsong" className="pimp">
-                {track.tags.title[0]}
+                {track_title(track)}
                 <br />
                 Performed by {queue_item.performer_name}
             </div>

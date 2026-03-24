@@ -9,7 +9,7 @@ const config: StorybookConfig = {
     stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
     addons: [],
     framework: "storybook-react-rsbuild",
-    staticDirs: [{ from: "./files", to: "/files" }],
+    staticDirs: [{ from: "../fixtures", to: "/files" }],
     rsbuildFinal: async (config) => {
         config.resolve = config.resolve || {};
         config.resolve.alias = {

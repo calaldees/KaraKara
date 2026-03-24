@@ -4,14 +4,13 @@ import { BackOr, ButtonRow, Screen } from "@/components";
 import { useApi } from "@/hooks/api";
 import { PageContext } from "@/providers/page";
 import { RoomContext } from "@/providers/room";
+import type { Settings } from "@/types";
 import { copy_type } from "@/utils";
 
-function removeTypes(
-    roomSettings: Record<string, any>,
-): Record<string, string> {
+function removeTypes(roomSettings: Settings): Record<string, string> {
     const roomSettingsUntyped: Record<string, string> = {};
     for (const key of Object.keys(roomSettings)) {
-        roomSettingsUntyped[key] = "" + (roomSettings[key] ?? "");
+        roomSettingsUntyped[key] = "" + ((roomSettings as any)[key] ?? "");
     }
     return roomSettingsUntyped;
 }
@@ -28,11 +27,7 @@ export function RoomSettings(): React.ReactElement {
     );
 }
 
-function RoomSettingsInternal({
-    roomSettings,
-}: {
-    roomSettings: Record<string, any>;
-}) {
+function RoomSettingsInternal({ roomSettings }: { roomSettings: Settings }) {
     const { roomName } = useContext(PageContext);
     const [roomSettingsEdit, setRoomSettingsEdit] = useState<
         Record<string, string>
@@ -53,10 +48,10 @@ function RoomSettingsInternal({
     const saveSettings = useCallback(
         (event: any) => {
             event.preventDefault();
-            const roomSettingsTyped: Record<string, any> = {};
+            const roomSettingsTyped: any = {};
             for (const key of Object.keys(roomSettings)) {
                 roomSettingsTyped[key] = copy_type(
-                    roomSettings[key],
+                    (roomSettings as any)[key],
                     roomSettingsEdit[key],
                 );
             }

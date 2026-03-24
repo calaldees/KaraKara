@@ -22,11 +22,14 @@ const mockTracks: Record<string, Track> = {
         duration: 213,
         tags: {
             title: ["Never Gonna Give You Up"],
+            category: ["Pop"],
+            vocaltrack: ["on"],
             artist: ["Rick Astley"],
         },
         attachments: {
             video: [],
             image: [],
+            subtitle: [],
         },
     },
     "track-2": {
@@ -34,11 +37,14 @@ const mockTracks: Record<string, Track> = {
         duration: 180,
         tags: {
             title: ["Bohemian Rhapsody"],
+            category: ["Pop"],
+            vocaltrack: ["on"],
             artist: ["Queen"],
         },
         attachments: {
             video: [],
             image: [],
+            subtitle: [],
         },
     },
     "track-3": {
@@ -46,11 +52,14 @@ const mockTracks: Record<string, Track> = {
         duration: 195,
         tags: {
             title: ["Take On Me"],
+            category: ["Pop"],
+            vocaltrack: ["on"],
             artist: ["a-ha"],
         },
         attachments: {
             video: [],
             image: [],
+            subtitle: [],
         },
     },
 };

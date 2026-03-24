@@ -62,7 +62,7 @@ function Room() {
     const { tracks, downloadSize, downloadDone, connected } =
         useContext(ServerContext);
     const { now } = useContext(ServerTimeContext);
-    const { queue, isAdmin, settings } = useContext(RoomContext);
+    const { queue, isAdmin } = useContext(RoomContext);
 
     // Stabilize connection status to avoid showing errors during brief reconnection attempts
     const stableConnection = useStabilise(
@@ -123,7 +123,7 @@ function Room() {
             onDoubleClick={(_) => setShowSettings(true)}
         >
             <style>{css}</style>
-            <main className={"theme-" + (settings["theme"] ?? "metalghosts")}>
+            <main className={"theme-metalghosts"}>
                 {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
                 {screen}
             </main>

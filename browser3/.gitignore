@@ -25,9 +25,9 @@ dist-ssr
 
 cypress/screenshots
 cypress/videos
-cypress/fixtures/queue.json
-cypress/fixtures/settings.json
-cypress/fixtures/tracks.json
+fixtures/queue.json
+fixtures/settings.json
+fixtures/tracks.json
 
 *storybook.log
 storybook-static

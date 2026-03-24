@@ -79,28 +79,7 @@ def announce(
     old_tracklist: dict[str, TrackDict],
     new_tracklist: dict[str, TrackDict],
 ) -> None:
-    added: list[str] = []
-    updated: list[str] = []
-    removed: list[str] = []
-    track_base_url = "https://karakara.uk/browser3/test/tracks"
-    for track_id in new_tracklist:
-        if track_id not in old_tracklist:
-            title = new_tracklist[track_id]["tags"]["title"][0]
-            text = f"* [{title}]({track_base_url}/{track_id})"
-            if "contributor" in new_tracklist[track_id]["tags"]:
-                contributors = new_tracklist[track_id]["tags"]["contributor"]
-                text += " (contributed by " + ", ".join(contributors) + ")"
-            added.append(text)
-        elif new_tracklist[track_id] != old_tracklist[track_id]:
-            new_track = new_tracklist[track_id]
-            old_track = old_tracklist[track_id]
-            title = new_track["tags"]["title"][0]
-            if what_changed := list_changes(old_track, new_track):
-                updated.append(f"* [{title}]({track_base_url}/{track_id}) - {what_changed}")
-    for track_id in old_tracklist:
-        if track_id not in new_tracklist:
-            title = old_tracklist[track_id]["tags"]["title"][0]
-            removed.append(f"* {title}")
+    added, updated, removed = calc_changes(old_tracklist, new_tracklist)
     if not (added or updated or removed):
         return
 
@@ -127,6 +106,34 @@ def announce(
             log.warning("Webhook config missing, not sending notification")
     except Exception:
         log.exception("Failed to send notification:")
+
+
+def calc_changes(
+    old_tracklist: dict[str, TrackDict],
+    new_tracklist: dict[str, TrackDict],
+) -> tuple[list[str], list[str], list[str]]:
+    added: list[str] = []
+    updated: list[str] = []
+    removed: list[str] = []
+    track_base_url = "https://karakara.uk/browser3/test/tracks"
+    for track_id in new_tracklist:
+        if track_id not in old_tracklist:
+            title = new_tracklist[track_id]["tags"]["title"][0]
+            text = f"* [{title}]({track_base_url}/{track_id})"
+            if contributors := new_tracklist[track_id]["tags"].get("contributor", []):
+                text += " (contributed by " + ", ".join(contributors) + ")"
+            added.append(text)
+        elif new_tracklist[track_id] != old_tracklist[track_id]:
+            new_track = new_tracklist[track_id]
+            old_track = old_tracklist[track_id]
+            title = new_track["tags"]["title"][0]
+            if what_changed := list_changes(old_track, new_track):
+                updated.append(f"* [{title}]({track_base_url}/{track_id}) - {what_changed}")
+    for track_id in old_tracklist:
+        if track_id not in new_tracklist:
+            title = old_tracklist[track_id]["tags"]["title"][0]
+            removed.append(f"* {title}")
+    return added, updated, removed
 
 
 def list_changes(old_track: TrackDict, new_track: TrackDict) -> str | None:

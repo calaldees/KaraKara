@@ -1,34 +1,11 @@
+import json
 import logging
 import subprocess
-import enum
 import typing as t
-import json
-from fractions import Fraction
 from datetime import timedelta
+from fractions import Fraction
 
 log = logging.getLogger()
-T = t.TypeVar("T")
-
-
-class TargetType(enum.Enum):
-    VIDEO_H264 = 10
-    VIDEO_AV1 = 11
-    VIDEO_H265 = 12
-    PREVIEW_H264 = 20
-    PREVIEW_AV1 = 21
-    PREVIEW_H265 = 22
-    IMAGE_WEBP = 30
-    IMAGE_AVIF = 31
-    IMAGE_JPEG = 32
-    SUBTITLES_VTT = 40
-    SUBTITLES_JSON = 41
-
-
-class MediaType(enum.StrEnum):
-    VIDEO = enum.auto()
-    PREVIEW = enum.auto()
-    SUBTITLE = enum.auto()
-    IMAGE = enum.auto()
 
 
 class MediaMeta(t.NamedTuple):

@@ -1,15 +1,11 @@
-import * as fs from "fs";
 import { describe, expect, test } from "vitest";
 
 import type { QueueItem } from "@/types";
 import * as utils from "./common";
-
-const track_dict = JSON.parse(
-    fs.readFileSync("./cypress/fixtures/small_tracks.json", "utf8"),
-);
+import { tracks } from "./test_data";
 
 describe("attachment_path", () => {
-    const attachment = track_dict["track_id_1"].attachments.video[0];
+    const attachment = tracks["track_id_1"].attachments.video[0];
     test("should basically work", () => {
         expect(utils.attachment_path(attachment)).toEqual("/files/f/foo.mp4");
     });

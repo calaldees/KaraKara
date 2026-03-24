@@ -79,12 +79,15 @@ describe("track_info", () => {
     test("should basically work", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
+                    category: ["fake"],
                     from: ["Macross"],
                     Macross: ["Do You Remember Love?"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("Macross - opening, op1 - short");
@@ -92,12 +95,15 @@ describe("track_info", () => {
     test("searching for a series should avoid showing that series", () => {
         expect(
             utils.track_info(["from:Macross"], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
+                    category: ["fake"],
                     from: ["Macross"],
                     Macross: ["Do You Remember Love?"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("opening, op1 - short");
@@ -105,11 +111,14 @@ describe("track_info", () => {
     test("avoid duplicating the title in the info", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
+                    category: ["fake"],
                     from: ["Fake Track Name"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("opening, op1 - short");
@@ -117,10 +126,12 @@ describe("track_info", () => {
     test("some categories have specific rules", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     artist: ["Billy Rock"],
                     category: ["jpop"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("Billy Rock");
@@ -128,12 +139,14 @@ describe("track_info", () => {
     test("unrecognised categories should use default rules", () => {
         expect(
             utils.track_info([], {
+                id: "test_track",
                 tags: {
                     title: ["Fake Track Name"],
                     from: ["Macross"],
                     category: ["example"],
                     use: ["opening", "op1"],
                     length: ["short"],
+                    vocaltrack: ["on"],
                 },
             }),
         ).toEqual("Macross - opening, op1 - short");

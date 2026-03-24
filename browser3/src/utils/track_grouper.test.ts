@@ -1,17 +1,13 @@
-import * as fs from "fs";
 import { describe, expect, test } from "vitest";
 
 import type { Track } from "@/types";
+import { tracks } from "./test_data";
 
 import * as grouper from "./track_grouper";
 
-const track_dict = JSON.parse(
-    fs.readFileSync("./cypress/fixtures/small_tracks.json", "utf8"),
-);
-
 describe("summarise_tags", () => {
     test("should basically work", () => {
-        expect(grouper.summarise_tags(Object.values(track_dict))).toEqual({
+        expect(grouper.summarise_tags(Object.values(tracks))).toEqual({
             "": {
                 minami: 1,
                 retro: 2,
@@ -50,6 +46,9 @@ describe("summarise_tags", () => {
                 eve: 1,
                 frank: 1,
                 grace: 1,
+            },
+            vocaltrack: {
+                on: 7,
             },
             year: {
                 "1984": 1,
@@ -101,26 +100,26 @@ describe("suggest_next_filters", () => {
 
 describe("group_tracks", () => {
     describe("with no tracks", () => {
-        const tracks: Track[] = [];
+        const track_list: Track[] = [];
 
         test("show 'No Results'", () => {
-            const results = grouper.group_tracks([], tracks);
+            const results = grouper.group_tracks([], track_list);
             expect(results.length).toEqual(1);
             expect(results[0][0]).toEqual("No Results");
         });
     });
 
     describe("with a few tracks", () => {
-        const tracks = [track_dict["track_id_1"], track_dict["track_id_2"]];
+        const track_list = [tracks["track_id_1"], tracks["track_id_2"]];
 
         test("with no filters, just list them", () => {
-            const results = grouper.group_tracks([], tracks);
+            const results = grouper.group_tracks([], track_list);
             expect(results.length).toEqual(1);
             expect(results[0][0]).toEqual("");
             expect(results[0][1].tracks).toBeDefined();
         });
         test("use filters to figure out relevant subheadings", () => {
-            const results = grouper.group_tracks(["from:Macross"], tracks);
+            const results = grouper.group_tracks(["from:Macross"], track_list);
             expect(results.length).toEqual(2);
             expect(results[0][0]).toEqual("Do You Remember Love?");
             expect(results[0][1].tracks).toBeDefined();
@@ -128,7 +127,7 @@ describe("group_tracks", () => {
             expect(results[1][1].tracks).toBeDefined();
         });
         test("if there are no relevant headings, show leftovers under a blank heading", () => {
-            const results = grouper.group_tracks(["from:Gundam"], tracks);
+            const results = grouper.group_tracks(["from:Gundam"], track_list);
             expect(results.length).toEqual(1);
             expect(results[0][0]).toEqual("");
             expect(results[0][1].tracks).toBeDefined();
@@ -138,9 +137,9 @@ describe("group_tracks", () => {
     describe("with many tracks", () => {
         let many_tracks: Track[] = [];
         for (let i = 0; i < 1000; i++) {
-            many_tracks.push(track_dict["track_id_1"]);
+            many_tracks.push(tracks["track_id_1"]);
         }
-        many_tracks.push(track_dict["track_id_2"]);
+        many_tracks.push(tracks["track_id_2"]);
         // Generate a track list with a lot of "from:..." variants, but none
         // of them containing a "T", "W", or "Z" (because we want to manually
         // insert data which uses those letters)

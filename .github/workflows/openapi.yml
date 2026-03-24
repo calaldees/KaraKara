@@ -1,0 +1,52 @@
+name: OpenAPI
+
+on:
+  push:
+    paths:
+      - "openapi/**"
+      - "browser3/src/types.ts"
+      - "player3/src/types.ts"
+      - "processmedia3/pm3/lib/types.py"
+      - ".github/workflows/openapi.yml"
+
+jobs:
+  validate:
+    name: Validate OpenAPI types are in sync
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install browser3 dependencies
+        run: npm ci
+        working-directory: browser3
+
+      - name: Install player3 dependencies
+        run: npm ci
+        working-directory: player3
+
+      - name: Generate types
+        run: make
+        working-directory: openapi
+
+      - name: Check for differences
+        run: |
+          if ! git diff --exit-code ; then
+            echo "Error: Generated types do not match committed files!"
+            echo "Please run 'make' in the openapi directory to regenerate types and commit the changes."
+            exit 1
+          fi
+          echo "All generated types are in sync with the OpenAPI spec."

@@ -5,7 +5,7 @@ import typing as t
 from collections.abc import MutableMapping
 
 from .file_abstraction import AbstractFile
-from .kktypes import MediaMeta
+from .media_meta import MediaMeta
 from .tag_processor import parse_tags
 
 log = logging.getLogger()
@@ -53,8 +53,9 @@ class Source:
         def inner(self: "Source") -> T:
             # Normalise mtime to accuracy of 1min. This enables remote and local timestamps to match
             # Technically there is a possibility of an update that is missed, but it's pretty edge case for our usecase
+            funcname = getattr(func, "__name__", repr(func))
             mtime = int(self.file.mtime.replace(second=0, microsecond=0).timestamp())
-            key = f"{self.file.relative}-{mtime}-{func.__name__}"
+            key = f"{self.file.relative}-{mtime}-{funcname}"
             cached = self.cache.get(key)
             if not cached:
                 cached = func(self)

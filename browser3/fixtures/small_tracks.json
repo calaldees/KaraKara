@@ -10,7 +10,8 @@
             "category": ["anime"],
             "artist": ["alice"],
             "year": ["1984"],
-            "": ["retro", "minami"]
+            "": ["retro", "minami"],
+            "vocaltrack": ["on"]
         },
         "duration": 231.4,
         "attachments": {
@@ -24,11 +25,32 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_id_1.png",
+                    "path": "thumbs/0.png",
                     "mime": "image/png"
                 }
             ],
-            "subtitle": []
+            "subtitle": [
+                {
+                    "variant": "Japanese",
+                    "mime": "application/json",
+                    "path": "subs/japanese.json"
+                },
+                {
+                    "variant": "Japanese",
+                    "mime": "text/vtt",
+                    "path": "subs/japanese.vtt"
+                },
+                {
+                    "variant": "English",
+                    "mime": "application/json",
+                    "path": "subs/english.json"
+                },
+                {
+                    "variant": "English",
+                    "mime": "text/vtt",
+                    "path": "subs/english.vtt"
+                }
+            ]
         }
     },
     "track_id_2": {
@@ -40,7 +62,8 @@
             "category": ["anime", "jpop"],
             "artist": ["alice", "bob"],
             "length": ["short"],
-            "year": ["2005"]
+            "year": ["2005"],
+            "vocaltrack": ["on"]
         },
         "duration": 231.4,
         "attachments": {
@@ -48,7 +71,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_id_2.png",
+                    "path": "thumbs/1.png",
                     "mime": "image/png"
                 }
             ],
@@ -64,7 +87,8 @@
             "category": ["anime"],
             "artist": ["carol"],
             "year": ["1990"],
-            "": ["retro"]
+            "": ["retro"],
+            "vocaltrack": ["on"]
         },
         "duration": 180.0,
         "attachments": {
@@ -72,7 +96,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_1990.png",
+                    "path": "thumbs/2.png",
                     "mime": "image/png"
                 }
             ],
@@ -87,7 +111,8 @@
             "use": ["opening"],
             "category": ["anime"],
             "artist": ["dave"],
-            "year": ["2000"]
+            "year": ["2000"],
+            "vocaltrack": ["on"]
         },
         "duration": 210.0,
         "attachments": {
@@ -95,7 +120,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_2000.png",
+                    "path": "thumbs/3.png",
                     "mime": "image/png"
                 }
             ],
@@ -110,7 +135,8 @@
             "use": ["insert"],
             "category": ["jpop"],
             "artist": ["eve"],
-            "year": ["2010"]
+            "year": ["2010"],
+            "vocaltrack": ["on"]
         },
         "duration": 195.0,
         "attachments": {
@@ -118,7 +144,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_2010.png",
+                    "path": "thumbs/4.png",
                     "mime": "image/png"
                 }
             ],
@@ -133,7 +159,8 @@
             "use": ["opening", "op1"],
             "category": ["jpop"],
             "artist": ["frank"],
-            "year": ["2020"]
+            "year": ["2020"],
+            "vocaltrack": ["on"]
         },
         "duration": 240.0,
         "attachments": {
@@ -141,7 +168,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_2020.png",
+                    "path": "thumbs/5.png",
                     "mime": "image/png"
                 }
             ],
@@ -155,7 +182,8 @@
             "from": ["Unknown"],
             "use": ["opening"],
             "category": ["anime"],
-            "artist": ["grace"]
+            "artist": ["grace"],
+            "vocaltrack": ["on"]
         },
         "duration": 220.0,
         "attachments": {
@@ -163,7 +191,7 @@
             "image": [
                 {
                     "variant": "Default",
-                    "path": "thumbs/track_no_year.png",
+                    "path": "thumbs/6.png",
                     "mime": "image/png"
                 }
             ],
