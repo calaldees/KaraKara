@@ -148,7 +148,6 @@ async def test_queue_settings_change_invalid(api_queue: APIQueue, mock_mqtt):
         "validation_event_end_datetime",
         "preview_volume",
         "coming_soon_track_count",
-        "validation_performer_names",
         "auto_reorder_queue",
     ),
 )
@@ -302,19 +301,19 @@ async def test_queue_command(api_queue: APIQueue, mock_mqtt):
 @pytest.mark.asyncio
 async def test_queue_updated_actions(api_queue: APIQueue):
     await api_queue.login()
-    response = await api_queue.settings_put(payload={"validation_performer_names": ["valid_name1", "valid_name2"]})
+    response = await api_queue.settings_put(payload={"validation_event_end_datetime": "2023-03-12 01:00"})
     assert response.status == 200
     await api_queue.logout()
 
     settings = await api_queue.settings
-    assert settings["validation_performer_names"] == ["valid_name1", "valid_name2"]
+    assert settings["validation_event_end_datetime"] == "2023-03-12T01:00:00Z"
 
     response = await api_queue.post(
         track_id="KAT_TUN_Your_side_Instrumental",
         performer_name="invalid_name",
     )
     assert response.status == 400
-    assert "invalid_name" in str(response.json)
+    assert "Queue is full" in str(response.json)
 
 
 @pytest.mark.asyncio

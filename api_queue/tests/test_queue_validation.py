@@ -45,13 +45,6 @@ def test_end_time(qu: Queue):
         validate_queue(qu)
 
 
-def test_performer_names(qu: Queue):
-    qu.settings.validation_performer_names = ["TTT"]
-    qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name"))
-    with pytest.raises(QueueValidationError, match="test_name"):
-        validate_queue(qu)
-
-
 @pytest.mark.xfail(raises=NotImplementedError)
 def test_duplicate_performer(qu: Queue):
     qu.add(qi("Track1", ONE_MINUTE, "TestSession1", "test_name1"))

@@ -41,7 +41,6 @@ class QueueSettings(pydantic.BaseModel):
     validation_event_end_datetime: OptionalDatetime = None
     # validation_duplicate_performer_timedelta: Timedelta | None = None  # Not implemented
     # validation_duplicate_track_timedelta: Timedelta | None = None  # Not implemented
-    validation_performer_names: ct.Sequence[str] = ()
     auto_reorder_queue: bool = False
 
 

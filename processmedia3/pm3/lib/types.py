@@ -37,7 +37,6 @@ class Settings(TypedDict):
     coming_soon_track_count: NotRequired[int]
     validation_event_start_datetime: NotRequired[str | None]
     validation_event_end_datetime: NotRequired[str | None]
-    validation_performer_names: NotRequired[list[str]]
     auto_reorder_queue: NotRequired[bool]
 
 

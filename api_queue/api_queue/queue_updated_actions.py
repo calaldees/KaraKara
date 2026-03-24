@@ -36,10 +36,6 @@ def validate_queue(queue: Queue):
     if not queue_last:
         return  # No tracks to validate - no need to proceed with further validation
 
-    if _valid_performer_names := queue.settings.validation_performer_names:
-        if queue_last.performer_name not in _valid_performer_names:
-            raise QueueValidationError(f"{queue_last.performer_name} is not a valid performer_name for this event")
-
     if _performer_timedelta := None:  # queue.settings.validation_duplicate_performer_timedelta
         raise NotImplementedError("TODO: finish this feature")
         epoch = queue.now - _performer_timedelta

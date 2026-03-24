@@ -189,12 +189,6 @@ components:
               format: date-time
             - type: "null"
           description: Event end time
-        validation_performer_names:
-          type: array
-          items:
-            type: string
-          description: List of valid performer names
-          default: []
         auto_reorder_queue:
           type: boolean
           description: Whether to automatically reorder the queue

@@ -47,7 +47,6 @@ def test_settings_custom():
         coming_soon_track_count=3,
         validation_event_start_datetime=datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc),
         validation_event_end_datetime=datetime.datetime(2024, 12, 31, 23, 59, 59, tzinfo=datetime.timezone.utc),
-        validation_performer_names=["Alice", "Bob"],
         auto_reorder_queue=True,
     )
     assert qs.title == "Custom Room"
@@ -66,7 +65,6 @@ def test_settings_custom_json():
         coming_soon_track_count=3,
         validation_event_start_datetime="2024-01-01T00:00:00Z",  # pyright: ignore[reportArgumentType]
         validation_event_end_datetime="2024-12-31T23:59:59Z",  # pyright: ignore[reportArgumentType]
-        validation_performer_names=["Alice", "Bob"],
         auto_reorder_queue=True,
     )
     assert qs.title == "Custom Room"

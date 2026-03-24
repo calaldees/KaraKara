@@ -113,11 +113,6 @@ export interface components {
             /** @description Event end time */
             validation_event_end_datetime?: string | null;
             /**
-             * @description List of valid performer names
-             * @default []
-             */
-            validation_performer_names: string[];
-            /**
              * @description Whether to automatically reorder the queue
              * @default false
              */

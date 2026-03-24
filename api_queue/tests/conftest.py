@@ -44,7 +44,6 @@ def qu() -> Queue:
         validation_event_end_datetime=datetime.datetime(2022, 1, 1, 10, 10, tzinfo=datetime.timezone.utc),
         # validation_duplicate_performer_timedelta = datetime.timedelta(minutes=4),
         # validation_duplicate_track_timedelta = datetime.timedelta(minutes=4),
-        validation_performer_names=[],
         coming_soon_track_count=3,
     )
     qu = Queue([], settings=settings)
