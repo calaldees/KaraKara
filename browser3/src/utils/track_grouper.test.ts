@@ -47,6 +47,9 @@ describe("summarise_tags", () => {
                 frank: 1,
                 grace: 1,
             },
+            vocaltrack: {
+                on: 7,
+            },
             year: {
                 "1984": 1,
                 "1990": 1,
