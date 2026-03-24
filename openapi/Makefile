@@ -1,5 +1,8 @@
 all: ../browser3/src/types.ts ../player3/src/types.ts ../processmedia3/pm3/lib/types.py
 
+lint:
+	npx @redocly/cli lint openapi.yaml --skip-rule no-unused-components
+
 ../browser3/src/types.ts: openapi.yaml
 	cd ../browser3 && npm run generate-types
 

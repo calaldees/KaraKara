@@ -23,7 +23,7 @@ class QueueItem(TypedDict):
     track_duration: float
     session_id: str
     performer_name: str
-    start_time: float
+    start_time: float | None
     video_variant: str
     subtitle_variant: str
 
@@ -35,8 +35,8 @@ class Settings(TypedDict):
     title: NotRequired[str]
     preview_volume: NotRequired[float]
     coming_soon_track_count: NotRequired[int]
-    validation_event_start_datetime: NotRequired[str]
-    validation_event_end_datetime: NotRequired[str]
+    validation_event_start_datetime: NotRequired[str | None]
+    validation_event_end_datetime: NotRequired[str | None]
     validation_performer_names: NotRequired[list[str]]
     auto_reorder_queue: NotRequired[bool]
 

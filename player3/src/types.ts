@@ -66,10 +66,7 @@ export interface components {
             session_id: string;
             /** @description Name of the performer */
             performer_name: string;
-            /**
-             * Format: float
-             * @description Unix timestamp when the track starts playing (null if not yet scheduled)
-             */
+            /** @description Unix timestamp when the track starts playing (null if not yet scheduled) */
             start_time: number | null;
             /** @description Selected video variant */
             video_variant: string;
@@ -111,15 +108,9 @@ export interface components {
              * @default 5
              */
             coming_soon_track_count: number;
-            /**
-             * Format: date-time
-             * @description Event start time for validation
-             */
+            /** @description Event start time for validation */
             validation_event_start_datetime?: string | null;
-            /**
-             * Format: date-time
-             * @description Event end time for validation
-             */
+            /** @description Event end time for validation */
             validation_event_end_datetime?: string | null;
             /**
              * @description List of valid performer names
