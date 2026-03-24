@@ -5,7 +5,7 @@ import * as grouper from "./track_grouper";
 
 describe("summarise_tags", () => {
     const tracks = Object.values(generateTracks(10000));
-    const subset = tracks.slice(0, 100);
+    const subset = tracks.slice(0, 1000);
 
     bench("full library", () => {
         grouper.summarise_tags(tracks);
@@ -59,6 +59,7 @@ describe("suggest_next_filters", () => {
 
 describe("group_tracks", () => {
     const tracks = Object.values(generateTracks(10000));
+    const subset = tracks.slice(0, 1000);
 
     bench("no filters", () => {
         grouper.group_tracks([], tracks);
@@ -72,7 +73,11 @@ describe("group_tracks", () => {
         grouper.group_tracks(["category:anime", "vocaltrack:on"], tracks);
     });
 
-    bench("category:new filter", () => {
+    bench("category:new", () => {
         grouper.group_tracks(["category:new"], tracks);
+    });
+
+    bench("subset", () => {
+        grouper.group_tracks(["category:anime", "vocaltrack:on"], subset);
     });
 });
