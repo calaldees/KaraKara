@@ -37,3 +37,5 @@ export interface QueueItem {
     video_variant: string;
     subtitle_variant: string;
 }
+
+export type Settings = Record<string, any>;

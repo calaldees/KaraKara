@@ -5,14 +5,14 @@ import { useParams } from "react-router-dom";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
-import type { QueueItem } from "@/types";
+import type { QueueItem, Settings } from "@/types";
 import { current_and_future } from "@/utils";
 import { ClientContext } from "./client";
 
 export interface RoomContextType {
     isAdmin: boolean;
     queue: QueueItem[];
-    settings: Record<string, any>;
+    settings: Settings;
 }
 
 /* eslint-disable react-refresh/only-export-components */
@@ -26,7 +26,7 @@ export function RoomProvider(props: any) {
     const { now } = useContext(ServerTimeContext);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [fullQueue, setFullQueue] = useState<QueueItem[]>([]);
-    const [settings, setSettings] = useState<Record<string, any>>({});
+    const [settings, setSettings] = useState<Settings>({});
     const { request, sessionId } = useApi();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),
