@@ -87,8 +87,7 @@ def announce(
         if track_id not in old_tracklist:
             title = new_tracklist[track_id]["tags"]["title"][0]
             text = f"* [{title}]({track_base_url}/{track_id})"
-            if "contributor" in new_tracklist[track_id]["tags"]:
-                contributors = new_tracklist[track_id]["tags"]["contributor"]
+            if contributors := new_tracklist[track_id]["tags"].get("contributor", []):
                 text += " (contributed by " + ", ".join(contributors) + ")"
             added.append(text)
         elif new_tracklist[track_id] != old_tracklist[track_id]:
