@@ -24,7 +24,6 @@ IMAGE_WIDTH = 256
 # and make sure that everything is a multiple of 2
 _RATIO = "force_original_aspect_ratio=decrease:force_divisible_by=2"
 SCALE_VIDEO = ["-vf", f"scale=w='min(iw,1280)':h='min(ih,720)':{_RATIO}"]
-SCALE_PREVIEW = ["-vf", f"scale=w='min(iw,320)':h='min(ih,240)':{_RATIO}"]
 
 NORMALIZE_AUDIO = ["-af", "loudnorm=I=-23:LRA=1:dual_mono=true:tp=-1", "-ac", "2"]
 
@@ -113,11 +112,6 @@ class Encoder(ABC):
 
 #######################################################################
 # Video to Video
-
-
-class _Preview(Encoder, ABC):
-    category = MediaType.PREVIEW
-    conf_video = SCALE_PREVIEW
 
 
 class _BaseVideoToVideo(Encoder):
@@ -237,10 +231,6 @@ class VideoToAV1(_BaseVideoToVideo):
         return ["-crf", str(crf), "-preset", str(preset)]
 
 
-class VideoToAV1Preview(_Preview, VideoToAV1):
-    target = TargetType.PREVIEW_AV1
-
-
 class VideoToH265(_BaseVideoToVideo):
     target = TargetType.VIDEO_H265
     ext = "mp4"
@@ -249,20 +239,12 @@ class VideoToH265(_BaseVideoToVideo):
     conf_acodec = ACODEC_AAC
 
 
-class VideoToH265Preview(_Preview, VideoToH265):
-    target = TargetType.PREVIEW_H265
-
-
 class VideoToH264(_BaseVideoToVideo):
     target = TargetType.VIDEO_H264
     ext = "mp4"
     mime = "video/mp4"
     conf_vcodec = VCODEC_H264
     conf_acodec = ACODEC_MP3
-
-
-class VideoToH264Preview(_Preview, VideoToH264):
-    target = TargetType.PREVIEW_H264
 
 
 #######################################################################
@@ -306,10 +288,6 @@ class ImageToAV1(_BaseImageToVideo):
     conf_acodec = ACODEC_OPUS
 
 
-class ImageToAV1Preview(_Preview, ImageToAV1):
-    target = TargetType.PREVIEW_AV1
-
-
 class ImageToH265(_BaseImageToVideo):
     target = TargetType.VIDEO_H265
     ext = "mp4"
@@ -319,10 +297,6 @@ class ImageToH265(_BaseImageToVideo):
     conf_acodec = ACODEC_AAC
 
 
-class ImageToH265Preview(_Preview, ImageToH265):
-    target = TargetType.PREVIEW_H265
-
-
 class ImageToH264(_BaseImageToVideo):
     target = TargetType.VIDEO_H264
     ext = "mp4"
@@ -330,10 +304,6 @@ class ImageToH264(_BaseImageToVideo):
     conf_container = CONTINER_MP4
     conf_vcodec = VCODEC_H264
     conf_acodec = ACODEC_MP3
-
-
-class ImageToH264Preview(_Preview, ImageToH264):
-    target = TargetType.PREVIEW_H264
 
 
 #######################################################################
