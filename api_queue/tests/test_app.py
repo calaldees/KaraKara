@@ -16,59 +16,59 @@ class APIQueue:
 
     async def login(self) -> None:
         request, response = await self.app.asgi_client.post(
-            f"/room/{self._queue}/login.json", data=json.dumps(dict(password=self._queue, create=True))
+            f"/api/room/{self._queue}/login.json", data=json.dumps(dict(password=self._queue, create=True))
         )
         assert response.status == 200
         assert response.json["is_admin"] is True
 
     async def logout(self) -> None:
         request, response = await self.app.asgi_client.post(
-            f"/room/{self._queue}/login.json", data=json.dumps(dict(password=""))
+            f"/api/room/{self._queue}/login.json", data=json.dumps(dict(password=""))
         )
         assert response.status == 200
         assert response.json["is_admin"] is False
 
     @property
     async def queue_csv(self) -> str:
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.csv")
+        request, response = await self.app.asgi_client.get(f"/api/room/{self._queue}/queue.csv")
         return response.text
 
     @property
     async def queue(self) -> ct.Sequence[ct.Mapping[str, t.Any]]:
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/queue.json")
+        request, response = await self.app.asgi_client.get(f"/api/room/{self._queue}/queue.json")
         return response.json
 
     @property
     async def tracks(self) -> ct.Mapping[str, ct.Mapping[str, t.Any]]:
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/tracks.json")
+        request, response = await self.app.asgi_client.get(f"/api/room/{self._queue}/tracks.json")
         return response.json
 
     @property
     async def settings(self) -> ct.Mapping[str, t.Any]:
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/settings.json")
+        request, response = await self.app.asgi_client.get(f"/api/room/{self._queue}/settings.json")
         return response.json
 
     async def settings_put(self, payload: ct.Mapping[str, t.Any]) -> Response:
         request, response = await self.app.asgi_client.put(
-            f"/room/{self._queue}/settings.json", data=json.dumps(payload)
+            f"/api/room/{self._queue}/settings.json", data=json.dumps(payload)
         )
         return response
 
     async def post(self, **kwargs) -> Response:
         kwargs = {"video_variant": "Default", "subtitle_variant": "Default"} | kwargs
-        request, response = await self.app.asgi_client.post(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
+        request, response = await self.app.asgi_client.post(f"/api/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
     async def delete(self, queue_item_id: int) -> Response:
-        request, response = await self.app.asgi_client.delete(f"/room/{self._queue}/queue/{queue_item_id}.json")
+        request, response = await self.app.asgi_client.delete(f"/api/room/{self._queue}/queue/{queue_item_id}.json")
         return response
 
     async def put(self, **kwargs) -> Response:
-        request, response = await self.app.asgi_client.put(f"/room/{self._queue}/queue.json", data=json.dumps(kwargs))
+        request, response = await self.app.asgi_client.put(f"/api/room/{self._queue}/queue.json", data=json.dumps(kwargs))
         return response
 
     async def command(self, command: str) -> Response:
-        request, response = await self.app.asgi_client.get(f"/room/{self._queue}/command/{command}.json")
+        request, response = await self.app.asgi_client.get(f"/api/room/{self._queue}/command/{command}.json")
         return response
 
 
@@ -81,20 +81,14 @@ async def api_queue(app: App):
 
 
 @pytest.mark.asyncio
-async def test_root(app: App):
-    request, response = await app.asgi_client.get("/")
-    assert response.status == 302
-
-
-@pytest.mark.asyncio
 async def test_queue_invalid_name(app: App):
-    request, response = await app.asgi_client.get("/room/キ/queue.json")
+    request, response = await app.asgi_client.get("/api/room/キ/queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get("/room/ /queue.json")
+    request, response = await app.asgi_client.get("/api/room/ /queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get("/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
+    request, response = await app.asgi_client.get("/api/room/queueNameIsFarFarFarFarFarFarToLong/queue.json")
     assert response.status == 404
-    request, response = await app.asgi_client.get("/room/キ/queue.csv")
+    request, response = await app.asgi_client.get("/api/room/キ/queue.csv")
     assert response.status == 404
 
 
