@@ -9,7 +9,7 @@ import { ControlButtons } from "./ControlButtons";
 import { Playlist } from "./Playlist";
 import { Readme } from "./Readme";
 
-export function Control(): React.ReactElement {
+function Control(): React.ReactElement {
     const widescreen = useWidescreen();
     const { roomName } = useContext(PageContext);
     const { queue } = useContext(RoomContext);
@@ -32,3 +32,5 @@ export function Control(): React.ReactElement {
         </Screen>
     );
 }
+
+export default Control;

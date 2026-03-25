@@ -7,7 +7,7 @@ import { Screen } from "@/components";
 
 import "./login.scss";
 
-export function Login(): React.ReactElement {
+function Login(): React.ReactElement {
     const [roomNameEdit, setRoomNameEdit] = useState("");
     const navigate = useNavigate();
     const onSubmit = useCallback(
@@ -46,3 +46,5 @@ export function Login(): React.ReactElement {
         </Screen>
     );
 }
+
+export default Login;

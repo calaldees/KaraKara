@@ -1,10 +1,9 @@
 import { useContext, useEffect } from "react";
 import {
-    createBrowserRouter,
-    createRoutesFromElements,
+    BrowserRouter,
     Outlet,
     Route,
-    RouterProvider,
+    Routes,
     useParams,
 } from "react-router-dom";
 
@@ -14,32 +13,15 @@ import { ClientContext } from "../providers/client";
 import { PageProvider } from "../providers/page";
 import { RoomContext, RoomProvider } from "../providers/room";
 import { ServerContext } from "../providers/server";
-import { Control } from "./control/control";
-import { Loading } from "./loading/loading";
-import { Login } from "./login/login";
-import { Printable } from "./printable/printable";
-import { Queue } from "./queue/queue";
-import { RoomSettings } from "./settings/settings";
-import { TrackDetails } from "./track/track";
-import { TrackList } from "./tracks/tracks";
+import Control from "./control/control";
+import Loading from "./loading/loading";
+import Login from "./login/login";
+import Printable from "./printable/printable";
+import Queue from "./queue/queue";
+import TrackDetails from "./track/track";
+import TrackList from "./tracks/tracks";
 
-const router = createBrowserRouter(
-    createRoutesFromElements(
-        <Route path="/" element={<Page />}>
-            <Route index element={<Login />} />
-            <Route path=":roomName" element={<Room />}>
-                <Route index element={<TrackList />} />
-                <Route path="tracks/:trackId" element={<TrackDetails />} />
-                <Route path="queue" element={<TracksOrQueueOrControl />} />
-                <Route path="settings" element={<RoomSettings />} />
-                <Route path="printable" element={<Printable />} />
-            </Route>
-        </Route>,
-    ),
-    { basename: process.env.NODE_ENV === "development" ? "/" : "/browser3" },
-);
-
-function Page() {
+function PageWrapper() {
     const { showSettings } = useContext(ClientContext);
 
     return (
@@ -49,7 +31,8 @@ function Page() {
         </PageProvider>
     );
 }
-function Room() {
+
+function RoomWrapper() {
     const { roomName } = useParams();
     const widescreen = useWidescreen();
     const { tracks } = useContext(ServerContext);
@@ -83,8 +66,6 @@ function QueueOrControl(): React.ReactElement {
 }
 
 export function Root(): React.ReactElement {
-    //const { root } = useContext(ClientContext);
-
     // Refresh the app if it has been open for more than
     // 12 hours to avoid stale API clients
     useEffect(() => {
@@ -96,5 +77,27 @@ export function Root(): React.ReactElement {
         return () => clearInterval(interval);
     }, []);
 
-    return <RouterProvider router={router} />;
+    const basename = process.env.NODE_ENV === "development" ? "/" : "/browser3";
+    return (
+        <BrowserRouter basename={basename}>
+            <Routes>
+                <Route path="/" element={<PageWrapper />}>
+                    <Route index element={<Login />} />
+                    <Route path=":roomName" element={<RoomWrapper />}>
+                        <Route index element={<TrackList />} />
+                        <Route
+                            path="tracks/:trackId"
+                            element={<TrackDetails />}
+                        />
+                        <Route
+                            path="queue"
+                            element={<TracksOrQueueOrControl />}
+                        />
+                        <Route path="settings" element={<RoomSettings />} />
+                        <Route path="printable" element={<Printable />} />
+                    </Route>
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 }

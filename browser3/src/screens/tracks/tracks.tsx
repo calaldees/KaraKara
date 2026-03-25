@@ -15,13 +15,15 @@ import { RoomContext } from "@/providers/room";
 import { AdminButtons } from "./AdminButtons";
 import { Explorer } from "./Explorer";
 
-export function TrackList(): ReactElement {
+function TrackList(): ReactElement {
     return (
         <ExploreProvider>
             <TrackListInternal />
         </ExploreProvider>
     );
 }
+
+export default TrackList;
 
 function TrackListInternal(): ReactElement {
     const { isAdmin } = useContext(RoomContext);

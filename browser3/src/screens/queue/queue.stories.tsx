@@ -1,7 +1,7 @@
 import { queue, settings } from "@/utils/test_data";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { expect, within } from "storybook/test";
-import { Queue } from "./queue";
+import Queue from "./queue";
 
 const meta = {
     title: "Screens/Queue",

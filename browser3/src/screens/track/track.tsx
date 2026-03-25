@@ -24,7 +24,7 @@ import styles from "./track.module.scss";
 // Validate parameters and fetch track data,
 // then render inner track details component
 // with a known-good track.
-export function TrackDetails(): React.ReactElement {
+function TrackDetails(): React.ReactElement {
     const { trackId } = useParams();
     const { tracks } = useContext(ServerContext);
     if (!trackId) throw Error("Can't get here?");
@@ -33,6 +33,8 @@ export function TrackDetails(): React.ReactElement {
 
     return <TrackDetailsInternal key={trackId} track={track} />;
 }
+
+export default TrackDetails;
 
 function TrackDetailsInternal({ track }: { track: Track }): React.ReactElement {
     const { roomName } = useContext(PageContext);

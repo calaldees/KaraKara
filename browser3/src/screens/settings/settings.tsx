@@ -15,7 +15,7 @@ function removeTypes(roomSettings: Settings): Record<string, string> {
     return roomSettingsUntyped;
 }
 
-export function RoomSettings(): React.ReactElement {
+function RoomSettings(): React.ReactElement {
     const { settings: roomSettings } = useContext(RoomContext);
     // Whenever server-side settings change, change the key,
     // which will totally reset the edit state.
@@ -26,6 +26,8 @@ export function RoomSettings(): React.ReactElement {
         />
     );
 }
+
+export default RoomSettings;
 
 function RoomSettingsInternal({ roomSettings }: { roomSettings: Settings }) {
     const { roomName } = useContext(PageContext);

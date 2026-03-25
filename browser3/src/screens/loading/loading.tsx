@@ -7,7 +7,7 @@ import { PageContext } from "@/providers/page";
 import { ServerContext } from "@/providers/server";
 import { percent } from "@/utils";
 
-export function Loading(): React.ReactElement {
+function Loading(): React.ReactElement {
     const { downloadDone, downloadSize } = useContext(ServerContext);
     const { roomName } = useContext(PageContext);
 
@@ -27,3 +27,5 @@ export function Loading(): React.ReactElement {
         </Screen>
     );
 }
+
+export default Loading;

@@ -8,7 +8,7 @@ import { ComingSoon } from "./ComingSoon";
 import { MyEntries } from "./MyEntries";
 import { NowPlaying } from "./NowPlaying";
 
-export function Queue(): React.ReactElement {
+function Queue(): React.ReactElement {
     const widescreen = useWidescreen();
     const { roomName } = useContext(PageContext);
 
@@ -25,3 +25,5 @@ export function Queue(): React.ReactElement {
         </Screen>
     );
 }
+
+export default Queue;

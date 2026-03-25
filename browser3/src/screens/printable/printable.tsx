@@ -7,7 +7,7 @@ import { PageContext } from "@/providers/page";
 
 import "./printable.scss";
 
-export function Printable(): React.ReactElement {
+function Printable(): React.ReactElement {
     const { roomName } = useContext(PageContext);
 
     const contentRef = useRef<HTMLDivElement>(null);
@@ -45,3 +45,5 @@ export function Printable(): React.ReactElement {
         </Screen>
     );
 }
+
+export default Printable;
