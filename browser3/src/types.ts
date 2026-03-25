@@ -108,10 +108,16 @@ export interface components {
              * @default 5
              */
             coming_soon_track_count: number;
-            /** @description Event start time */
-            validation_event_start_datetime?: string | null;
-            /** @description Event end time */
-            validation_event_end_datetime?: string | null;
+            /**
+             * @description Event start time
+             * @default null
+             */
+            validation_event_start_datetime: string | null;
+            /**
+             * @description Event end time
+             * @default null
+             */
+            validation_event_end_datetime: string | null;
             /**
              * @description Whether to automatically reorder the queue
              * @default false

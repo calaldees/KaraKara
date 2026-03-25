@@ -230,7 +230,8 @@ export const SettingsSchema = {
           "type": "null"
         }
       ],
-      "description": "Event start time"
+      "description": "Event start time",
+      "default": null
     },
     "validation_event_end_datetime": {
       "anyOf": [
@@ -242,7 +243,8 @@ export const SettingsSchema = {
           "type": "null"
         }
       ],
-      "description": "Event end time"
+      "description": "Event end time",
+      "default": null
     },
     "auto_reorder_queue": {
       "type": "boolean",

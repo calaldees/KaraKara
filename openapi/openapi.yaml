@@ -183,12 +183,14 @@ components:
               format: date-time
             - type: "null"
           description: Event start time
+          default: null
         validation_event_end_datetime:
           anyOf:
             - type: string
               format: date-time
             - type: "null"
           description: Event end time
+          default: null
         auto_reorder_queue:
           type: boolean
           description: Whether to automatically reorder the queue
