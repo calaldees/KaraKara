@@ -1,7 +1,7 @@
 import type { Track } from "@/types";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import { expect, within } from "storybook/test";
 import { TagsViewer } from "./TagsViewer";
-import { within, expect } from "storybook/test";
 
 const meta = {
     title: "Components/TagsViewer",
@@ -106,5 +106,5 @@ export const SpecialTags: Story = {
 
         const durationTag = await canvas.findByText("3m33s");
         await expect(durationTag).toBeInTheDocument();
-    }
+    },
 };

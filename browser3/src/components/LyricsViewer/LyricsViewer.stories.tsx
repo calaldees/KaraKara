@@ -1,8 +1,8 @@
 import { List } from "@/components";
 import type { Track } from "@/types";
+import { tracks } from "@/utils/test_data";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { LyricsViewer } from "./LyricsViewer";
-import { tracks } from "@/utils/test_data";
 
 const mockTrack: Track = tracks["track_id_1"];
 

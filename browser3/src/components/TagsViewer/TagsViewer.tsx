@@ -25,13 +25,18 @@ const TAG_RENDERERS: Record<string, TagRenderFunc> = {
         const seconds = parseFloat(values[0]);
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes}m${remainingSeconds.toString().padStart(2, '0')}s`;
+        return `${minutes}m${remainingSeconds.toString().padStart(2, "0")}s`;
     },
     source: (values: string[]) => {
         return values.map((url, index) => {
-            if (url.includes('youtu.be') || url.includes('youtube.com')) {
+            if (url.includes("youtu.be") || url.includes("youtube.com")) {
                 return (
-                    <a key={index} href={url} target="_blank" rel="noopener noreferrer">
+                    <a
+                        key={index}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         YouTube
                     </a>
                 );

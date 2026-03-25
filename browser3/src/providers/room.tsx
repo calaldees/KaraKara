@@ -5,7 +5,12 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
 import type { QueueItem, Settings, Track } from "@/types";
-import { current_and_future, normalise_cmp, track_title, get_default_settings } from "@/utils";
+import {
+    current_and_future,
+    get_default_settings,
+    normalise_cmp,
+    track_title,
+} from "@/utils";
 import { apply_hidden, apply_tags } from "@/utils/track_finder";
 import { ClientContext } from "./client";
 import { PageContext } from "./page";
@@ -35,7 +40,9 @@ export function RoomProvider(props: any) {
     const [optimisticQueue, setOptimisticQueue] = useState<QueueItem[] | null>(
         null,
     );
-    const [settings, setSettings] = useState<Settings>(() => get_default_settings());
+    const [settings, setSettings] = useState<Settings>(() =>
+        get_default_settings(),
+    );
     const { request, sessionId } = useApi();
     const newQueue = useMemo(
         () => current_and_future(now, fullQueue),

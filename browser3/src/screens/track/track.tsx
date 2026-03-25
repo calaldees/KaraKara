@@ -15,7 +15,7 @@ import {
 import { useWidescreen } from "@/hooks/widescreen";
 import { ServerContext } from "@/providers/server";
 import { Track } from "@/types";
-import { preferred_variant, unique, track_title } from "@/utils";
+import { preferred_variant, track_title, unique } from "@/utils";
 
 import { TrackButtons } from "./TrackButtons";
 

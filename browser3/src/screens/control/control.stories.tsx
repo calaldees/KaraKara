@@ -1,6 +1,6 @@
+import { queue } from "@/utils/test_data";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { expect, userEvent, within } from "storybook/test";
-import { queue } from "@/utils/test_data";
 import { Control } from "./control";
 
 const meta = {
