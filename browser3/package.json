@@ -20,6 +20,9 @@
     "dependencies": {
         "@fortawesome/free-solid-svg-icons": "^7.0.1",
         "@mantine/hooks": "^8.3.18",
+        "@rjsf/core": "^6.4.1",
+        "@rjsf/utils": "^6.4.1",
+        "@rjsf/validator-ajv8": "^6.4.1",
         "@shish2k/react-faicon": "^0.0.1",
         "@shish2k/react-mqtt": "^0.0.5",
         "@shish2k/react-use-servertime": "^0.0.6",

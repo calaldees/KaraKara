@@ -14,19 +14,25 @@ describe("Room Settings Screen", () => {
         cy.login();
         cy.contains("Room Settings").click();
         cy.contains("Room Settings").should("exist");
-        cy.contains("title:").should("exist");
+        cy.get("#root_title").should("exist");
     });
-    it.skip("Save settings", () => {
+    it("Save settings", () => {
         cy.login();
         cy.contains("Room Settings").click();
         cy.contains("Room Settings").should("exist");
-        cy.contains("title:").should("exist");
-        cy.get("[name=title]").should("exist");
-        cy.get("[name=title]").clear().type("test title");
+        cy.get("#root_title").should("exist");
+        cy.get("#root_title").clear().type("test title");
         cy.get("[data-cy=save-settings-button]").click();
         cy.contains("Settings saved").should("exist");
     });
-    it.skip("Reject invalid settings", () => {
-        // FIXME: test saving
+    it("Reject invalid settings", () => {
+        cy.login();
+        cy.contains("Room Settings").click();
+        cy.contains("Room Settings").should("exist");
+        cy.get("#root_coming_soon_track_count").should("exist");
+        cy.get("#root_coming_soon_track_count").clear().type("99");
+        cy.get("[data-cy=save-settings-button]").click();
+        // RJSF should show validation error for max value of 9
+        cy.get(".field-error").should("exist");
     });
 });

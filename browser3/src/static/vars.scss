@@ -33,6 +33,7 @@
     --settings-color: #000;
 
     --drop-target: #f00;
+    --validation-error: #d00;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -71,5 +72,6 @@
         --settings-border: #444;
 
         --drop-target: #600;
+        --validation-error: #C44;
     }
 }
