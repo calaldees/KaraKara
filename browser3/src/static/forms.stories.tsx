@@ -42,8 +42,18 @@ const TextInputs = () => (
             <input
                 id="text-input-disabled"
                 type="text"
+                placeholder="Disabled Placeholder"
+                disabled
+            />
+        </div>
+
+        <div>
+            <label htmlFor="text-input-disabled">Text Input (disabled with value)</label>
+            <input
+                id="text-input-disabled"
+                type="text"
                 placeholder="Disabled"
-                value="Disabled"
+                value="Disabled Value"
                 disabled
             />
         </div>
@@ -375,7 +385,6 @@ const OtherElements = () => (
 
         <fieldset style={{ border: "1px solid #ccc", padding: "1rem" }}>
             <legend>Fieldset with Legend</legend>
-            <p>This is a fieldset element that groups related form controls.</p>
             <label htmlFor="inside-fieldset">Input inside fieldset</label>
             <input id="inside-fieldset" type="text" placeholder="Text input" />
         </fieldset>

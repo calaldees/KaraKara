@@ -1,31 +1,21 @@
-INPUT[type="text"],
-INPUT[type="number"],
-INPUT[type="search"],
-INPUT[type="password"],
-SELECT,
-BUTTON,
-TEXTAREA,
-.button {
+@mixin form-font {
     font-size: 1rem;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: sans-serif;
+}
+
+@mixin form-wide {
     width: 100%;
+}
+
+@mixin form-border {
     border-radius: 5px;
     padding: 0.5rem;
 }
-A.button {
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-}
-INPUT[type="checkbox"] {
-    margin: 0.5rem;
-}
-TEXTAREA,
-INPUT[type="text"],
-INPUT[type="number"],
-INPUT[type="search"],
-INPUT[type="password"] {
+
+@mixin form-input-style {
     color: var(--input-fg);
-    font-weight: bold;
     background: var(--input-bg);
     box-shadow: var(--input-shade) 0px 1px 3px 0px inset;
     border: 1px solid;
@@ -33,27 +23,94 @@ INPUT[type="password"] {
         var(--input-shade);
 
     &:disabled {
-        color: var(--input-fg-disabled);
-        //background: var(--input-bg-disabled);
-        //border-color: var(--input-bg-disabled);
+        color: var(--input-fg);
+        background: color-mix(in srgb, var(--input-bg) 80%, var(--input-fg) 20%);
     }
 }
-SELECT,
-BUTTON,
-.button {
+
+@mixin form-button-style {
     color: var(--button-fg);
-    font-weight: bold;
     background: var(--button-bg);
     border: 1px solid;
-    border-color: var(--input-light) var(--input-shade) var(--input-shade)
-        var(--input-light);
+    border-color: var(--button-light) var(--button-shade) var(--button-shade)
+        var(--button-light);
 
-    &:active {
-        background: var(--button-bg-active);
-        border-color: var(--input-shade) var(--input-light) var(--input-light)
-            var(--input-shade);
+    &:active:not(:disabled) {
+        background: color-mix(in srgb, var(--button-bg) 80%, black 20%);
+        border-color: var(--button-shade) var(--button-light) var(--button-light)
+            var(--button-shade);
     }
     &:disabled {
-        color: var(--input-fg-disabled);
+        color: color-mix(in srgb, var(--button-fg) 20%, var(--button-bg) 80%);
+        background: var(--button-bg);
     }
+}
+
+
+INPUT[type="text"],
+INPUT[type="email"],
+INPUT[type="password"],
+INPUT[type="tel"],
+INPUT[type="url"],
+INPUT[type="search"],
+INPUT[type="number"],
+INPUT[type="date"],
+INPUT[type="datetime-local"],
+INPUT[type="time"],
+INPUT[type="month"],
+INPUT[type="week"],
+TEXTAREA {
+    @include form-font;
+    @include form-wide;
+    @include form-border;
+    @include form-input-style;
+}
+
+INPUT[type="file"] {
+    @include form-wide;
+}
+
+INPUT[type="color"] {
+    @include form-wide;
+    @include form-border;
+    @include form-input-style;
+    padding: 0.1rem;
+}
+
+METER,
+PROGRESS,
+OUTPUT,
+INPUT[type="range"] {
+    display: block;
+    @include form-wide;
+}
+
+SELECT:not([multiple]) {
+    @include form-font;
+    @include form-wide;
+    @include form-border;
+    @include form-button-style;
+}
+SELECT[multiple] {
+    @include form-font;
+    @include form-wide;
+    @include form-border;
+    @include form-input-style;
+}
+
+INPUT[type="submit"],
+INPUT[type="reset"],
+INPUT[type="button"],
+BUTTON,
+.button {
+    @include form-font;
+    @include form-wide;
+    @include form-border;
+    @include form-button-style;
+    text-align: center;
+}
+
+INPUT[type="checkbox"],
+INPUT[type="radio"] {
+    margin-right: 0.5rem;
 }
