@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { lazy, useContext, useEffect } from "react";
 import {
     BrowserRouter,
     Outlet,
@@ -20,7 +20,7 @@ import Printable from "./printable/printable";
 import Queue from "./queue/queue";
 import TrackDetails from "./track/track";
 import TrackList from "./tracks/tracks";
-import RoomSettings from "./settings/settings";
+const RoomSettings = lazy(() => import("./settings/settings"));
 
 function PageWrapper() {
     const { showSettings } = useContext(ClientContext);
