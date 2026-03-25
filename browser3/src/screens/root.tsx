@@ -20,6 +20,7 @@ import Printable from "./printable/printable";
 import Queue from "./queue/queue";
 import TrackDetails from "./track/track";
 import TrackList from "./tracks/tracks";
+import RoomSettings from "./settings/settings";
 
 function PageWrapper() {
     const { showSettings } = useContext(ClientContext);
