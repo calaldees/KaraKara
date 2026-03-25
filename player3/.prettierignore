@@ -1,2 +1,4 @@
 package-lock.json
+src/types.ts
+src/schema.ts
 dist/
