@@ -66,7 +66,10 @@ export interface components {
             session_id: string;
             /** @description Name of the performer */
             performer_name: string;
-            /** @description Unix timestamp when the track starts playing (null if not yet scheduled) */
+            /**
+             * Format: float
+             * @description Unix timestamp when the track starts playing (null if not yet scheduled)
+             */
             start_time: number | null;
             /** @description Selected video variant */
             video_variant: string;
@@ -75,51 +78,53 @@ export interface components {
         };
         Settings: {
             /**
-             * @description Room title
+             * Room title
              * @default KaraKara
              */
             title: string;
             /**
+             * Gap between tracks (seconds)
              * Format: float
-             * @description Gap between tracks (seconds)
              * @default 15
              */
             track_space: number;
             /**
-             * @description Tags to hide from display
+             * Tags to hide from display
              * @default [
              *       "red:duplicate"
              *     ]
              */
             hidden_tags: string[];
             /**
-             * @description Tags that must be present
+             * Tags that must be present
              * @default []
              */
             forced_tags: string[];
             /**
+             * Preview playback volume
              * Format: float
-             * @description Preview playback volume (0.0 - 1.0)
              * @default 0.1
              */
             preview_volume: number;
             /**
-             * @description Number of upcoming tracks to show publicly
+             * Number of upcoming tracks to show publicly
              * @default 5
              */
             coming_soon_track_count: number;
             /**
-             * @description Event start time
+             * Event start time
+             * Format: date-time
              * @default null
              */
             validation_event_start_datetime: string | null;
             /**
-             * @description Event end time
+             * Event end time
+             * Format: date-time
              * @default null
              */
             validation_event_end_datetime: string | null;
             /**
-             * @description Whether to automatically reorder the queue
+             * Auto-Reorder Queue
              * @default false
              */
             auto_reorder_queue: boolean;

@@ -151,15 +151,11 @@ export const QueueItemSchema = {
       "description": "Name of the performer"
     },
     "start_time": {
-      "anyOf": [
-        {
-          "type": "number",
-          "format": "float"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "number",
+        "null"
       ],
+      "format": "float",
       "description": "Unix timestamp when the track starts playing (null if not yet scheduled)"
     },
     "video_variant": {
@@ -177,78 +173,77 @@ export const SettingsSchema = {
   "type": "object",
   "properties": {
     "title": {
+      "title": "Room title",
       "type": "string",
-      "description": "Room title",
-      "default": "KaraKara"
+      "default": "KaraKara",
+      "minLength": 1,
+      "maxLength": 16
     },
     "track_space": {
+      "title": "Gap between tracks (seconds)",
       "type": "number",
       "format": "float",
-      "description": "Gap between tracks (seconds)",
-      "default": 15
+      "default": 15,
+      "minimum": 0,
+      "maximum": 60
     },
     "hidden_tags": {
+      "title": "Tags to hide from display",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       },
-      "description": "Tags to hide from display",
       "default": [
         "red:duplicate"
       ]
     },
     "forced_tags": {
+      "title": "Tags that must be present",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       },
-      "description": "Tags that must be present",
       "default": []
     },
     "preview_volume": {
+      "title": "Preview playback volume",
       "type": "number",
       "format": "float",
       "minimum": 0,
       "maximum": 1,
-      "description": "Preview playback volume (0.0 - 1.0)",
+      "multipleOf": 0.01,
       "default": 0.1
     },
     "coming_soon_track_count": {
+      "title": "Number of upcoming tracks to show publicly",
       "type": "integer",
       "minimum": 1,
-      "maximum": 9,
-      "description": "Number of upcoming tracks to show publicly",
-      "default": 5
+      "default": 5,
+      "maximum": 9
     },
     "validation_event_start_datetime": {
-      "anyOf": [
-        {
-          "type": "string",
-          "format": "date-time"
-        },
-        {
-          "type": "null"
-        }
+      "title": "Event start time",
+      "type": [
+        "string",
+        "null"
       ],
-      "description": "Event start time",
+      "format": "date-time",
       "default": null
     },
     "validation_event_end_datetime": {
-      "anyOf": [
-        {
-          "type": "string",
-          "format": "date-time"
-        },
-        {
-          "type": "null"
-        }
+      "title": "Event end time",
+      "type": [
+        "string",
+        "null"
       ],
-      "description": "Event end time",
+      "format": "date-time",
       "default": null
     },
     "auto_reorder_queue": {
+      "title": "Auto-Reorder Queue",
       "type": "boolean",
-      "description": "Whether to automatically reorder the queue",
       "default": false
     }
   }
