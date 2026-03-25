@@ -1,4 +1,5 @@
-import type { Attachment, QueueItem, Track } from "@/types";
+import { SettingsSchema } from "@/schemas";
+import type { Attachment, QueueItem, Settings, Track } from "@/types";
 
 /**
  * Looking at an Attachment, get the full URL
@@ -73,4 +74,30 @@ export function track_title(
         return track.tags.title[0];
     }
     return track.id;
+}
+
+/**
+ * Extracts default values from a JSON schema
+ */
+export function get_defaults_from_schema(schema: any): Record<string, any> {
+    const defaults: Record<string, any> = {};
+
+    if (schema.properties) {
+        Object.entries(schema.properties).forEach(
+            ([key, prop]: [string, any]) => {
+                if (prop.default !== undefined) {
+                    defaults[key] = prop.default;
+                }
+            },
+        );
+    }
+
+    return defaults;
+}
+
+/**
+ * Get default settings for a room
+ */
+export function get_default_settings(): Settings {
+    return get_defaults_from_schema(SettingsSchema) as Settings;
 }
