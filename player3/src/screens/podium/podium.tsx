@@ -218,8 +218,7 @@ function PodiumButton({
             <span>
                 Tap Here to Start
                 <small>
-                    Track autoplays in{" "}
-                    {s_to_mns(queue_item.start_time - now)}
+                    Track autoplays in {s_to_mns(queue_item.start_time - now)}
                 </small>
             </span>
         </div>

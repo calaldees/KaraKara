@@ -48,7 +48,9 @@ const TextInputs = () => (
         </div>
 
         <div>
-            <label htmlFor="text-input-disabled">Text Input (disabled with value)</label>
+            <label htmlFor="text-input-disabled">
+                Text Input (disabled with value)
+            </label>
             <input
                 id="text-input-disabled"
                 type="text"

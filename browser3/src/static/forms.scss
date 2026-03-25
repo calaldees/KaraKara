@@ -24,7 +24,11 @@
 
     &:disabled {
         color: var(--input-fg);
-        background: color-mix(in srgb, var(--input-bg) 80%, var(--input-fg) 20%);
+        background: color-mix(
+            in srgb,
+            var(--input-bg) 80%,
+            var(--input-fg) 20%
+        );
     }
 }
 
@@ -37,15 +41,14 @@
 
     &:active:not(:disabled) {
         background: color-mix(in srgb, var(--button-bg) 80%, black 20%);
-        border-color: var(--button-shade) var(--button-light) var(--button-light)
-            var(--button-shade);
+        border-color: var(--button-shade) var(--button-light)
+            var(--button-light) var(--button-shade);
     }
     &:disabled {
         color: color-mix(in srgb, var(--button-fg) 20%, var(--button-bg) 80%);
         background: var(--button-bg);
     }
 }
-
 
 INPUT[type="text"],
 INPUT[type="email"],
