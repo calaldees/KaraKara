@@ -1,5 +1,5 @@
-import { SettingsSchema } from "@/schemas";
 import type { Attachment, QueueItem, Settings, Track } from "@/types";
+import { SettingsSchema } from "../schemas";
 
 /**
  * Looking at an Attachment, get the full URL
