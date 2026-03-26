@@ -5,7 +5,9 @@ on:
     paths:
       - "openapi/**"
       - "browser3/src/types.ts"
+      - "browser3/src/schemas.ts"
       - "player3/src/types.ts"
+      - "player3/src/schemas.ts"
       - "processmedia3/pm3/lib/types.py"
       - ".github/workflows/openapi.yml"
 
