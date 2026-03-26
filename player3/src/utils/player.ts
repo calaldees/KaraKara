@@ -1,5 +1,4 @@
 import { Subtitle } from "@/types";
-import { parse as parse_iso_duration } from "tinyduration";
 
 /**
  * turn seconds into {MM}:{SS}
@@ -45,19 +44,6 @@ export function add_dot_dot_dots(subtitles: Subtitle[]): Subtitle[] {
         last_end = subtitle.end;
     }
     return out;
-}
-
-export function parse_duration(inp: string | number): number {
-    if (typeof inp === "number") {
-        return inp;
-    } else {
-        const parsed = parse_iso_duration(inp);
-        return (
-            (parsed.hours ?? 0) * 3600 +
-            (parsed.minutes ?? 0) * 60 +
-            (parsed.seconds ?? 0)
-        );
-    }
 }
 
 export async function canAutoplayWithSound() {

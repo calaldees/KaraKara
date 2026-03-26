@@ -42,6 +42,9 @@ export function mqtt_url(): string {
 }
 
 export function percent(a: number, b: number): string {
+    if (b === 0) {
+        return "100%";
+    }
     return Math.round((a / b) * 100) + "%";
 }
 

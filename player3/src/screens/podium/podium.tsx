@@ -9,7 +9,6 @@ import type { QueueItem, Subtitle, Track } from "@/types";
 import {
     add_dot_dot_dots,
     attachment_path,
-    parse_duration,
     percent,
     s_to_mns,
     track_title,
@@ -211,7 +210,7 @@ function PodiumButton({
             style={{
                 backgroundPosition: percent(
                     queue_item.start_time - now,
-                    parse_duration(settings["track_space"]),
+                    settings["track_space"],
                 ),
             }}
         >
