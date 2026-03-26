@@ -1,3 +1,4 @@
+import { ButtonRow } from "@/components";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 // Shared container style
@@ -211,13 +212,7 @@ const CheckboxesRadios = () => (
             </label>
         </div>
 
-        <fieldset
-            style={{
-                border: "1px solid #ccc",
-                padding: "1rem",
-                marginTop: "1rem",
-            }}
-        >
+        <fieldset>
             <legend>Radio Group</legend>
             <div
                 style={{
@@ -385,7 +380,7 @@ const OtherElements = () => (
             </datalist>
         </div>
 
-        <fieldset style={{ border: "1px solid #ccc", padding: "1rem" }}>
+        <fieldset>
             <legend>Fieldset with Legend</legend>
             <label htmlFor="inside-fieldset">Input inside fieldset</label>
             <input id="inside-fieldset" type="text" placeholder="Text input" />
@@ -431,8 +426,6 @@ const CompleteForm = () => (
                 display: "flex",
                 flexDirection: "column",
                 gap: "1rem",
-                border: "1px solid #ccc",
-                padding: "1rem",
             }}
         >
             <div>
@@ -481,10 +474,10 @@ const CompleteForm = () => (
                 </label>
             </div>
 
-            <div style={{ display: "flex", gap: "1rem" }}>
+            <ButtonRow>
                 <button type="submit">Submit</button>
                 <button type="reset">Reset</button>
-            </div>
+            </ButtonRow>
         </form>
     </Container>
 );
@@ -529,6 +522,11 @@ const meta: Meta = {
 export default meta;
 
 // Stories
+export const Form: StoryObj = {
+    name: "Complete Form",
+    render: () => <CompleteForm />,
+};
+
 export const All: StoryObj = {
     render: () => <AllFormElements />,
 };
@@ -576,9 +574,4 @@ export const ButtonsStory: StoryObj = {
 export const Other: StoryObj = {
     name: "Other Elements",
     render: () => <OtherElements />,
-};
-
-export const Form: StoryObj = {
-    name: "Complete Form",
-    render: () => <CompleteForm />,
 };

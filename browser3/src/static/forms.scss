@@ -10,7 +10,7 @@
 }
 
 @mixin form-border {
-    border-radius: 5px;
+    border-radius: 0.25rem;
     padding: 0.5rem;
 }
 
@@ -116,4 +116,9 @@ BUTTON,
 INPUT[type="checkbox"],
 INPUT[type="radio"] {
     margin-right: 0.5rem;
+}
+
+FIELDSET {
+    @include form-border;
+    border: 1px solid var(--input-light);
 }
