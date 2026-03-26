@@ -5,9 +5,38 @@ import * as utils from "./common";
 import { tracks } from "./test_data";
 
 describe("attachment_path", () => {
-    const attachment = tracks["track_id_1"].attachments.video[0];
-    test("should basically work", () => {
-        expect(utils.attachment_path(attachment)).toEqual("/files/f/foo.mp4");
+    test("relative path - same origin", () => {
+        expect(utils.attachment_path({ path: "f/foo.mp4" })).toEqual(
+            "/files/f/foo.mp4",
+        );
+    });
+
+    test("absolute path - same origin", () => {
+        expect(utils.attachment_path({ path: "/files/f/bar.mp4" })).toEqual(
+            "/files/f/bar.mp4",
+        );
+    });
+
+    test("absolute URL - same origin", () => {
+        expect(
+            utils.attachment_path({
+                path: "http://localhost:3000/files/f/baz.mp4",
+            }),
+        ).toEqual("/files/f/baz.mp4");
+    });
+
+    test("absolute URL - different origin", () => {
+        expect(
+            utils.attachment_path({
+                path: "https://cdn.example.com/files/f/external.mp4",
+            }),
+        ).toEqual("https://cdn.example.com/files/f/external.mp4");
+    });
+
+    test("fixture data works", () => {
+        expect(
+            utils.attachment_path(tracks["track_id_1"].attachments.video[0]),
+        ).toEqual("/files/f/foo.mp4");
     });
 });
 

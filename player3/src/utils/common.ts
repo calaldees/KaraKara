@@ -6,14 +6,10 @@ import { SettingsSchema } from "../schemas";
  *
  * eg attachment_path(attachment) -> /files/asdfasdfa.mp4
  */
-export function attachment_path(attachment: Attachment): string {
-    if (
-        attachment.path.startsWith("http://") ||
-        attachment.path.startsWith("https://")
-    ) {
-        return attachment.path;
-    }
-    return "/files/" + attachment.path;
+export function attachment_path(attachment: Pick<Attachment, "path">): string {
+    const files = new URL("/files/", window.location.origin);
+    const url = new URL(attachment.path, files);
+    return url.origin === window.location.origin ? url.pathname : url.href;
 }
 
 /**
