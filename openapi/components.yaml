@@ -154,20 +154,11 @@ components:
           default: 15
           minimum: 0
           maximum: 60
-        hidden_tags:
-          title: Tags to hide from display
-          type: array
-          items:
-            type: string
-            minLength: 1
-          default: ["red:duplicate"]
-        forced_tags:
-          title: Tags that must be present
-          type: array
-          items:
-            type: string
-            minLength: 1
-          default: []
+        track_query:
+          title: Tracks query
+          description: Which tracks to include, eg `category=anime or (category=tv and year<2010)`
+          type: ["string", "null"]
+          default: null
         preview_volume:
           title: Preview playback volume
           type: number

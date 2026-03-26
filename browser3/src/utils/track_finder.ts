@@ -1,52 +1,6 @@
 import type { Track } from "@/types";
 
 /**
- * If track has a 'hidden' tag, then skip it, UNLESS it also has
- * other non-hidden tags with the same parent. Consider top-level
- * tags to have different parents.
- */
-export function apply_hidden(tracks: Track[], hidden_tags: string[]): Track[] {
-    // Translate
-    //   hidden=category:anime,category:retro,broken
-    // into
-    //   {"category": ["anime", "retro"], "broken": []}
-    const hidden: Record<string, string[]> = {};
-    hidden_tags.forEach((x) => {
-        const [k, v] = x.split(":");
-        if (!hidden[k]) hidden[k] = [];
-        if (v) hidden[k].push(v);
-    });
-
-    return tracks.filter((track) => {
-        return Object.entries(hidden).every(([hidden_key, hidden_values]) => {
-            // If
-            //   hidden = {"category": ["anime", "cartoon"]}
-            // then keep any track where:
-            //   tags["category"].length == 0 ||
-            //   tags["category"] - {"anime", "cartoon"} != set()
-            if (hidden_values.length > 0) {
-                const values = track.tags[hidden_key];
-                // track["category"] needs to be both defined *and*
-                // empty-after-removing-hidden-subtags. If it's not
-                // defined, we don't care.
-                return (
-                    !values ||
-                    values.filter((x) => !hidden_values.includes(x)).length
-                );
-            }
-
-            // If
-            //   hidden = {"broken": []}
-            // then keep any track where:
-            //   !tags[""].includes("broken")
-            else {
-                return !track.tags[""]?.includes(hidden_key);
-            }
-        });
-    });
-}
-
-/**
  * If user filters for from:macross, then check
  *   track.tags["from"].includes("macross")
  */

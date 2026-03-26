@@ -41,8 +41,6 @@ def test_settings_custom():
     qs = QueueSettings(
         title="Custom Room",
         track_space=datetime.timedelta(seconds=60),
-        hidden_tags=["red:duplicate", "blue:test"],
-        forced_tags=["green:forced"],
         preview_volume=0.5,
         coming_soon_track_count=3,
         validation_event_start_datetime=datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc),
@@ -59,8 +57,6 @@ def test_settings_custom_json():
     qs = QueueSettings(
         title="Custom Room",
         track_space=60,  # pyright: ignore[reportArgumentType]
-        hidden_tags=["red:duplicate", "blue:test"],
-        forced_tags=["green:forced"],
         preview_volume=0.5,
         coming_soon_track_count=3,
         validation_event_start_datetime="2024-01-01T00:00:00Z",  # pyright: ignore[reportArgumentType]
