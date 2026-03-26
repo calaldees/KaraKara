@@ -52,7 +52,6 @@ MAIN {
         align-items: center;
         background-color: var(--header-bg);
         border-bottom: 1px solid var(--header-border);
-        padding: 0 5%;
         & > A,
         & > DIV {
             display: block;
@@ -77,8 +76,6 @@ MAIN {
         flex: 1 1 auto;
         overflow-x: hidden;
         overflow-y: auto;
-        padding-left: 5%;
-        padding-right: 5%;
     }
     FOOTER {
         display: flex;
@@ -107,8 +104,8 @@ MAIN {
     HEADER,
     ARTICLE,
     FOOTER {
-        padding-left: max(5%, env(safe-area-inset-left));
-        padding-right: max(5%, env(safe-area-inset-right));
+        padding-left: max(1em, env(safe-area-inset-left));
+        padding-right: max(1em, env(safe-area-inset-right));
     }
     HEADER {
         padding-top: env(safe-area-inset-top);
