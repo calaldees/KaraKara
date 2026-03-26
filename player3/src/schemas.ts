@@ -1,5 +1,5 @@
 /**
- * This file was auto-generated from openapi.yaml
+ * This file was auto-generated from components.yaml
  * Do not make direct changes to the file.
  */
 

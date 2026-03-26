@@ -55,7 +55,7 @@ line-length = 120
 reportUnusedCallResult = false
 
 [tool.datamodel-codegen]
-input = "../openapi/openapi.yaml"
+input = "../openapi/components.yaml"
 input-file-type = "openapi"
 output = "pm3/lib/types.py"
 output-model-type = "typing.TypedDict"

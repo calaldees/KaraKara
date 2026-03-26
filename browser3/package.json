@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "generate-types": "openapi-typescript ../openapi/openapi.yaml -o src/types.ts --root-types --root-types-no-schema-prefix",
+        "generate-types": "openapi-typescript ../openapi/components.yaml -o src/types.ts --root-types --root-types-no-schema-prefix",
         "generate-schemas": "node ../openapi/extract-schemas.js",
         "serve": "rsbuild dev",
         "build": "tsc -b && rsbuild build",
