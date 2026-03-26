@@ -1,3 +1,8 @@
+@mixin notification-colors($color-var) {
+    background-color: var($color-var);
+    border: 1px solid color-mix(in srgb, var($color-var) 60%, var(--page-fg));
+}
+
 .notification {
     position: absolute;
     left: 2em;
@@ -18,15 +23,12 @@
         padding-left: 1em;
     }
     &:global(.ok) {
-        background-color: var(--notification-ok);
-        border: 1px solid var(--notification-ok-border);
+        @include notification-colors(--notification-ok);
     }
     &:global(.warning) {
-        background-color: var(--notification-warning);
-        border: 1px solid var(--notification-warning-border);
+        @include notification-colors(--notification-warning);
     }
     &:global(.error) {
-        background-color: var(--notification-error);
-        border: 1px solid var(--notification-error-border);
+        @include notification-colors(--notification-error);
     }
 }
