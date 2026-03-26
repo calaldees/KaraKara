@@ -39,13 +39,13 @@ describe("summarise_tags", () => {
                 jpop: 3,
             },
             artist: {
+                "Smile :)": 1,
                 alice: 2,
                 bob: 1,
                 carol: 1,
                 dave: 1,
                 eve: 1,
                 frank: 1,
-                grace: 1,
             },
             vocaltrack: {
                 on: 7,

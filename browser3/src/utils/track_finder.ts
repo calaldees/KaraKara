@@ -53,10 +53,15 @@ export function apply_hidden(tracks: Track[], hidden_tags: string[]): Track[] {
 export function apply_tags(tracks: Track[], tags: string[]): Track[] {
     if (tags.length === 0) return tracks;
 
-    // convert "retro" to ["", "retro"] and "from:Macross" to ["from", "Macross"]
-    const tag_pairs = tags.map((x) =>
-        (x.includes(":") ? x : ":" + x).split(":"),
-    );
+    // convert
+    //   - "retro" to ["", "retro"]
+    //   - "from:Macross" to ["from", "Macross"]
+    //   - "from:Macross:Plus" to ["from", "Macross:Plus"]
+    const tag_pairs = tags.map((x) => {
+        const idx = x.indexOf(":");
+        if (idx === -1) return ["", x];
+        return [x.slice(0, idx), x.slice(idx + 1)];
+    });
 
     // keep tracks where ...
     return tracks.filter(

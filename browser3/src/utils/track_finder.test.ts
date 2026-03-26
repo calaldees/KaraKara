@@ -33,6 +33,13 @@ describe("apply_tags", () => {
             finder.apply_tags(tracks, ["from:asdfa"]).map((track) => track.id),
         ).toEqual([]);
     });
+    test("Can search for tags with colons in the value", () => {
+        expect(
+            finder
+                .apply_tags(tracks, ["artist:Smile :)"])
+                .map((track) => track.id),
+        ).toEqual(["track_no_year"]);
+    });
 });
 
 describe("apply_search", () => {
