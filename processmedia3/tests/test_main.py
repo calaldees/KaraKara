@@ -129,7 +129,7 @@ class TestE2E(unittest.TestCase):
                     "source_type": ["image"],
                     "subs": ["soft"],
                     "artist": ["Mr Monkey"],
-                    "category": ["anime"],
+                    "category": ["anime", "retro"],
                     "contributor": ["contributor", "ここにいくつかのテキストです。"],
                     "duration": ["15"],
                     "from": ["gundam"],
@@ -138,7 +138,6 @@ class TestE2E(unittest.TestCase):
                     "title": ["Test2"],
                     "released": ["1952-03-15"],
                     "year": ["1952"],
-                    "": ["retro"],
                 },
             }.items():
                 self.assertEqual(v, tracks_json["Test2"][k])

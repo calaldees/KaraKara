@@ -91,10 +91,11 @@ class Track:
             raise TrackValidationException("missing tag file")
         if len(tag_files) > 1:
             raise TrackValidationException("multiple tag files found")
-        tags: dict[str, list[str]] = copy.deepcopy(tag_files[0].tags)
-        if tags.get("title") is None:
+        tags: dict[str, list[str]] = defaultdict(list)
+        tags.update(copy.deepcopy(tag_files[0].tags))
+        if not tags["title"]:
             raise TrackValidationException("missing tags.title")
-        if tags.get("category") is None:
+        if not tags["category"]:
             raise TrackValidationException("missing tags.category")
 
         # these are internal tags for the uploader, not for end users
@@ -104,14 +105,15 @@ class Track:
 
         # not-hard-subs + image + 16:9 = good for splash screen
         if self._sources_by_type({SourceType.SUBTITLES}):
-            tags["subs"] = ["soft"]
+            tags["subs"].append("soft")
         else:
-            tags["subs"] = ["hard"]
-        tags["source_type"] = []
+            tags["subs"].append("hard")
+
         if self._sources_by_type({SourceType.IMAGE}):
             tags["source_type"].append("image")
         if self._sources_by_type({SourceType.VIDEO}):
             tags["source_type"].append("video")
+
         pixel_sources = self._sources_by_type({SourceType.VIDEO, SourceType.IMAGE})
         tags["aspect_ratio"] = sorted({s.meta.aspect_ratio_str for s in pixel_sources})
 
@@ -126,17 +128,15 @@ class Track:
 
         # released can be a full date, but years are more useful for searching
         if tags.get("released"):
-            tags["year"] = [self._parse_date(d).strftime("%Y") for d in tags["released"]]
+            tags["year"].extend(self._parse_date(d).strftime("%Y") for d in tags["released"])
 
         # if year is sufficiently old, add "retro" tag
         if tags.get("year"):
             years = {int(y) for y in tags["year"]}
             if max(years) <= 2000:
-                if "" not in tags:
-                    tags[""] = []
-                tags[""].append("retro")
+                tags["category"].append("retro")
 
-        # Add "category:new" tag for any track added in the last year
+        # Add "_new:new" tag for any track added in the last year
         # and a bit (so that if a convention is held eg Jan 5th 2020,
         # then we get a request to add a track on Jan 6th 2020, it's
         # still "new" when the next convention happens on Jan 12th 2021).
@@ -146,11 +146,11 @@ class Track:
             added_date = self._parse_date(tags["added"][0])
             today_date = datetime.date.today()
             if added_date > today_date - datetime.timedelta(days=380):
-                tags["_new"] = ["new"]
+                tags["_new"].append("new")
                 if added_date > today_date - datetime.timedelta(days=30):
-                    tags["new"] = [added_date.strftime("%Y-%m-%d")]
+                    tags["new"].append(added_date.strftime("%Y-%m-%d"))
                 else:
-                    tags["new"] = [added_date.strftime("%Y-%m")]
+                    tags["new"].append(added_date.strftime("%Y-%m"))
 
         # Sort all the tags' values because some of our input files are
         # processed in a non-deterministic order but we want the output

@@ -16,6 +16,12 @@ pub fn lint_tags_banned(track_id: &str, tags: &HashMap<String, Vec<String>>) -> 
             "Use 'released' instead of 'date' tag".to_string(),
         ));
     }
+    if tags.contains_key("") {
+        errors.push(LintError::new(
+            track_id.to_string(),
+            "Avoid empty tag keys. retro->category:retro, hardsubs->subs:hard".to_string(),
+        ));
+    }
 
     errors
 }
