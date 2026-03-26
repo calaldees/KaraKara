@@ -1,4 +1,10 @@
 .readme {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 3em;
+
     h1 {
         text-align: center;
         font-size: max(6vw, 2em);
