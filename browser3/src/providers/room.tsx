@@ -67,8 +67,8 @@ export function RoomProvider(props: any) {
         setSettings(pkt.json());
     });
 
-    const hiddenTags = settings["hidden_tags"];
-    const forcedTags = settings["forced_tags"];
+    const hiddenTags = settings.hidden_tags;
+    const forcedTags = settings.forced_tags;
     const trackList = useMemo(() => {
         // going from a dict of "all tracks known to the system" to a list of
         // "all tracks active for this room, sorted alphabetically" takes 15ms,
@@ -110,7 +110,7 @@ export function RoomProvider(props: any) {
         const an = {
             event: "open_room",
             app: "browser3",
-            dev: process.env.NODE_ENV === "development" ? true : false,
+            dev: process.env.NODE_ENV === "development",
             version: __BUILD_DATE__,
             admin: isAdmin,
             room: roomName,

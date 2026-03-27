@@ -10,7 +10,7 @@ export function ComingSoon(): React.ReactElement | null {
     const { tracks } = useContext(ServerContext);
     const { queue, settings } = useContext(RoomContext);
 
-    if (queue.length <= 1 || !settings["coming_soon_track_count"]) {
+    if (queue.length <= 1 || !settings.coming_soon_track_count) {
         return null;
     }
 
@@ -19,7 +19,7 @@ export function ComingSoon(): React.ReactElement | null {
             <h2>Coming Soon</h2>
             <List>
                 {queue
-                    .slice(1, 1 + settings["coming_soon_track_count"])
+                    .slice(1, 1 + settings.coming_soon_track_count)
                     .map((item) => (
                         <QueueItemRender
                             key={item.id}

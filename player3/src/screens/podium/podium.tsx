@@ -210,7 +210,7 @@ function PodiumButton({
             style={{
                 backgroundPosition: percent(
                     queue_item.start_time - now,
-                    settings["track_space"],
+                    settings.track_space,
                 ),
             }}
         >

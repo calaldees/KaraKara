@@ -73,7 +73,7 @@ export function RoomProvider(props: any) {
         const an = {
             event: "open_room",
             app: "player3",
-            dev: process.env.NODE_ENV === "development" ? true : false,
+            dev: process.env.NODE_ENV === "development",
             version: __BUILD_DATE__,
             admin: isAdmin,
             room: roomName,

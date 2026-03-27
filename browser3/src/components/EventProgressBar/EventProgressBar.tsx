@@ -10,8 +10,8 @@ export function EventProgressBar(): React.ReactElement | null {
     const { now } = useContext(ServerTimeContext);
 
     const queue = fullQueue;
-    const startDateTime = settings["validation_event_start_datetime"];
-    const endDateTime = settings["validation_event_end_datetime"];
+    const startDateTime = settings.validation_event_start_datetime;
+    const endDateTime = settings.validation_event_end_datetime;
 
     if (!queue.length) return null;
     const queueLast = queue[queue.length - 1];

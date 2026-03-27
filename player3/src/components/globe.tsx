@@ -149,7 +149,7 @@ function GlobeInternal() {
                 <MyScene />
             </Canvas>
             <div className="html3d">
-                <h1>{settings["title"]}</h1>
+                <h1>{settings.title}</h1>
                 <h2>
                     <StatsTable tracks={tracks} />
                 </h2>

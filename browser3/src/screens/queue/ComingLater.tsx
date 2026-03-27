@@ -8,7 +8,7 @@ import styles from "./ComingLater.module.scss";
 export function ComingLater(): React.ReactElement | null {
     const { queue, settings } = useContext(RoomContext);
 
-    if (queue.length <= 1 + settings["coming_soon_track_count"]) {
+    if (queue.length <= 1 + settings.coming_soon_track_count) {
         return null;
     }
 
@@ -19,7 +19,7 @@ export function ComingLater(): React.ReactElement | null {
                 {sorted(
                     unique(
                         queue
-                            .slice(1 + settings["coming_soon_track_count"])
+                            .slice(1 + settings.coming_soon_track_count)
                             .map((item) => item.performer_name),
                     ),
                 ).map((name) => (

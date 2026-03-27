@@ -37,7 +37,7 @@ export function time_until(now: number, time: number | null): string {
  * Get the URL, username, and password to be passed to MQTTSubscribe or MQTTPublish
  */
 export function mqtt_url(): string {
-    const proto = window.location.protocol == "https:" ? "wss:" : "ws:";
+    const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
     return proto + "//" + window.location.host + "/api/mqtt";
 }
 
