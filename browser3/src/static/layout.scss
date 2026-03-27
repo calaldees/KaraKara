@@ -23,7 +23,7 @@ A {
     display: flex;
     flex-flow: row;
     gap: 4px;
-    background: black;
+    background: var(--page-divider);
 }
 
 // If there are multiple MAIN elements, only show "main-only"

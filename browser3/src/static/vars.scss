@@ -1,6 +1,7 @@
 :root {
     --page-fg: #000;
     --page-bg: #f9f9f9;
+    --page-divider: #bbb;
 
     --header-bg: #e9e9e9;
     --header-border: #ddd;
@@ -21,9 +22,9 @@
 
     --drag-handle-bg: #f9f9f9a0;
 
-    --notification-ok: #afa;
-    --notification-warning: #ffa;
-    --notification-error: #faa;
+    --notification-ok: oklch(0.95 0.1 145);
+    --notification-warning: oklch(0.98 0.1 110);
+    --notification-error: oklch(0.82 0.1 20);
 
     --settings-bg: #fff;
     --settings-border: #000;
@@ -31,17 +32,16 @@
 
     --drop-target: #f00;
     --validation-error: #d00;
-}
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --page-bg: #111;
+    @media (prefers-color-scheme: dark) {
+        --page-bg: #080808;
         --page-fg: #fff;
+        --page-divider: #222;
 
         --header-bg: #333;
         --header-border: #222;
 
-        --input-bg: #000;
+        --input-bg: #222;
         --input-fg: #ddd;
         --input-light: #666;
         --input-shade: #333;
@@ -57,9 +57,9 @@
 
         --drag-handle-bg: #444;
 
-        --notification-ok: #060;
-        --notification-warning: #762;
-        --notification-error: #600;
+        --notification-ok: oklch(0.4 0.1 150);
+        --notification-warning: oklch(0.5 0.1 95);
+        --notification-error: oklch(0.4 0.1 20);
 
         --settings-bg: #222;
         --settings-fg: #fff;

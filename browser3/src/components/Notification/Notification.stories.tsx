@@ -39,10 +39,16 @@ export const ColourTest: Story = {
                 <div style={testStyles} className={`${styles.notification} ok`}>
                     OK Notification
                 </div>
-                <div style={testStyles} className={`${styles.notification} warning`}>
+                <div
+                    style={testStyles}
+                    className={`${styles.notification} warning`}
+                >
                     Warning Notification
                 </div>
-                <div style={testStyles} className={`${styles.notification} error`}>
+                <div
+                    style={testStyles}
+                    className={`${styles.notification} error`}
+                >
                     Error Notification
                 </div>
             </Screen>

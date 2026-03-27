@@ -1,7 +1,6 @@
 import {
     faArrowLeft,
     faCog,
-    faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
@@ -28,55 +27,6 @@ export const Default: Story = {
             <div>
                 <p>This is the main content area of the screen.</p>
                 <p>It can contain any components or elements.</p>
-            </div>
-        ),
-    },
-};
-
-export const WithNavigation: Story = {
-    args: {
-        title: "Track Details",
-        navLeft: <FAIcon icon={faArrowLeft} />,
-        navRight: <FAIcon icon={faEllipsisVertical} />,
-        children: (
-            <div>
-                <h2>Track Information</h2>
-                <p>Details about the selected track would appear here.</p>
-            </div>
-        ),
-    },
-};
-
-export const WithFooter: Story = {
-    args: {
-        title: "Queue Manager",
-        footer: (
-            <ButtonRow>
-                <button>Add to Queue</button>
-                <button>Clear Queue</button>
-                <button>Save</button>
-            </ButtonRow>
-        ),
-        children: (
-            <div>
-                <p>Queue items would be listed here.</p>
-                <ul>
-                    <li>Track 1</li>
-                    <li>Track 2</li>
-                    <li>Track 3</li>
-                </ul>
-            </div>
-        ),
-    },
-};
-
-export const WithCustomClassName: Story = {
-    args: {
-        title: "Custom Styled Screen",
-        className: "custom-screen-class",
-        children: (
-            <div>
-                <p>This screen has a custom className applied.</p>
             </div>
         ),
     },
@@ -113,9 +63,26 @@ export const CompleteExample: Story = {
     },
 };
 
-export const MinimalScreen: Story = {
-    args: {
-        title: "Minimal",
-        children: <p>Just a title and content.</p>,
-    },
+export const PairedScreenExample: Story = {
+    args: {},
+    render: () => (
+        <div id="page">
+            <Screen title="Left Screen">
+                <p>This is the left screen content.</p>
+            </Screen>
+            <Screen
+                title="Right Screen"
+                navLeft={<FAIcon icon={faArrowLeft} />}
+                navRight={<FAIcon icon={faCog} />}
+                footer={
+                    <ButtonRow>
+                        <button>Cancel</button>
+                        <button>Save</button>
+                    </ButtonRow>
+                }
+            >
+                <p>This is the right screen content.</p>
+            </Screen>
+        </div>
+    ),
 };

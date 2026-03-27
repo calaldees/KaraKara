@@ -1,4 +1,4 @@
-import { ButtonRow } from "@/components";
+import { ButtonRow, Screen } from "@/components";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 // Shared container style
@@ -21,8 +21,6 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 // Text Inputs Component
 const TextInputs = () => (
     <Container>
-        <h2>Text Inputs</h2>
-
         <div>
             <label htmlFor="text-input">Text Input</label>
             <input id="text-input" type="text" placeholder="Enter text..." />
@@ -99,8 +97,6 @@ const TextInputs = () => (
 // Number & Range Inputs Component
 const NumberRangeInputs = () => (
     <Container>
-        <h2>Number & Range Inputs</h2>
-
         <div>
             <label htmlFor="number-input">Number Input</label>
             <input
@@ -128,8 +124,6 @@ const NumberRangeInputs = () => (
 // Date & Time Inputs Component
 const DateTimeInputs = () => (
     <Container>
-        <h2>Date & Time Inputs</h2>
-
         <div>
             <label htmlFor="date-input">Date Input</label>
             <input id="date-input" type="date" />
@@ -160,8 +154,6 @@ const DateTimeInputs = () => (
 // Color & File Inputs Component
 const ColorFileInputs = () => (
     <Container>
-        <h2>Color & File Inputs</h2>
-
         <div>
             <label htmlFor="color-input">Color Input</label>
             <input id="color-input" type="color" defaultValue="#ff0000" />
@@ -182,8 +174,6 @@ const ColorFileInputs = () => (
 // Checkboxes & Radio Buttons Component
 const CheckboxesRadios = () => (
     <Container>
-        <h2>Checkboxes & Radio Buttons</h2>
-
         <div>
             <label>
                 <input type="checkbox" />
@@ -255,8 +245,6 @@ const CheckboxesRadios = () => (
 // Select Dropdowns Component
 const Selects = () => (
     <Container>
-        <h2>Select Dropdowns</h2>
-
         <div>
             <label htmlFor="select-single">Single Select</label>
             <select id="select-single">
@@ -304,8 +292,6 @@ const Selects = () => (
 // Textareas Component
 const Textareas = () => (
     <Container>
-        <h2>Textarea</h2>
-
         <div>
             <label htmlFor="textarea">Textarea</label>
             <textarea
@@ -339,8 +325,6 @@ const Textareas = () => (
 // Buttons Component
 const Buttons = () => (
     <Container>
-        <h2>Buttons</h2>
-
         <button type="button">Button</button>
         <button type="submit">Submit Button</button>
         <button type="reset">Reset Button</button>
@@ -362,8 +346,6 @@ const Buttons = () => (
 // Other Elements Component
 const OtherElements = () => (
     <Container>
-        <h2>Other Elements</h2>
-
         <div>
             <label htmlFor="datalist-input">Input with Datalist</label>
             <input
@@ -420,7 +402,6 @@ const OtherElements = () => (
 // Complete Form Example Component
 const CompleteForm = () => (
     <Container>
-        <h2>Complete Form Example</h2>
         <form
             style={{
                 display: "flex",
@@ -492,7 +473,6 @@ const AllFormElements = () => (
         }}
     >
         <Container>
-            <h1>HTML Form Elements</h1>
             <p>
                 A comprehensive showcase of all HTML form elements with current
                 styling.
@@ -515,8 +495,24 @@ const AllFormElements = () => (
 const meta: Meta = {
     title: "Static/Forms",
     parameters: {
+        kkFullscreen: true,
         layout: "fullscreen",
     },
+    decorators: [
+        (Story) => (
+            <Screen
+                title="Test"
+                footer={<>
+                    <input type="text" placeholder="Footer input" />
+                    <ButtonRow>
+                        <button>Double-Submit</button>
+                        <button>Double-Reset</button>
+                    </ButtonRow>
+                </>}>
+                <Story />
+            </Screen>
+        ),
+    ],
 };
 
 export default meta;
