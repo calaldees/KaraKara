@@ -477,7 +477,7 @@ export const UploadForm = () => {
             });
 
             let url: string;
-            let body: any;
+            let body: { session_id?: string; tags: Record<string, string[]> };
 
             // 3. If there are files, do a file upload for /submit
             if (files.length > 0) {
@@ -604,8 +604,8 @@ export const UploadForm = () => {
 
             {uploads.length > 0 && (
                 <section id="uploads">
-                    {uploads.map((upload, index) => (
-                        <div key={index} className="file-row">
+                    {uploads.map((upload) => (
+                        <div key={upload.filename} className="file-row">
                             <strong>{upload.filename}</strong>
                             <progress
                                 className="bar"

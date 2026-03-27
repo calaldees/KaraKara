@@ -70,6 +70,7 @@ async def list_wips() -> JSONResponse:
         meta: dict[str, str] = {}
         async with aiofiles.open(fn, "r") as f:
             contents = await f.read()
+        meta["id"] = Path(fn).stem
         for line in contents.splitlines():
             parts = line.split(":", 1)
             if len(parts) == 2:

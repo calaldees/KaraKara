@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 interface Wip {
+    id: string;
     title: string;
     artist?: string;
     from?: string;
@@ -20,7 +21,9 @@ export const WipBox = () => {
             })
             .catch((err) => {
                 console.log(err);
-                setWips([{ title: "Failed to load work-in-progress tracks" }]);
+                setWips([
+                    { id: "", title: "Failed to load work-in-progress tracks" },
+                ]);
             });
     }, []);
 
@@ -33,8 +36,8 @@ export const WipBox = () => {
                 ) : wips.length === 0 ? (
                     <li>The queue is empty /o/</li>
                 ) : (
-                    wips.map((wip, idx) => (
-                        <li key={idx}>
+                    wips.map((wip) => (
+                        <li key={wip.id}>
                             <strong>{wip.title}</strong>
                             {wip.artist && (
                                 <>
