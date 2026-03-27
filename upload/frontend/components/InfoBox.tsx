@@ -23,8 +23,9 @@ export const InfoBox = () => {
             <p>Happy singing! &mdash; The KaraKara Volunteers ❤️</p>
 
             <p className="subtle">
-                (PS. Interested in contributing multiple tracks or running events?
-                Check out our <a href="https://discord.gg/tXZkDsxS8u">discord</a> 👀)
+                (PS. Interested in contributing multiple tracks or running
+                events? Check out our{" "}
+                <a href="https://discord.gg/tXZkDsxS8u">discord</a> 👀)
             </p>
         </section>
     );

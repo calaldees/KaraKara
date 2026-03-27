@@ -8,10 +8,10 @@ import type { Decorator } from "storybook-react-rsbuild";
 
 import { queue, settings, tracks } from "../src/utils/test_data";
 
-import { ClientContext, ClientContextType } from "../src/providers/client";
-import { PageContext, PageContextType } from "../src/providers/page";
-import { RoomContext, RoomContextType } from "../src/providers/room";
-import { ServerContext, ServerContextType } from "../src/providers/server";
+import { ClientContext, type ClientContextType } from "../src/providers/client";
+import { PageContext, type PageContextType } from "../src/providers/page";
+import { RoomContext, type RoomContextType } from "../src/providers/room";
+import { ServerContext, type ServerContextType } from "../src/providers/server";
 
 import type { QueueItem } from "../src/types";
 

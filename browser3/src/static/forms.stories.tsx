@@ -502,13 +502,16 @@ const meta: Meta = {
         (Story) => (
             <Screen
                 title="Test"
-                footer={<>
-                    <input type="text" placeholder="Footer input" />
-                    <ButtonRow>
-                        <button>Double-Submit</button>
-                        <button>Double-Reset</button>
-                    </ButtonRow>
-                </>}>
+                footer={
+                    <>
+                        <input type="text" placeholder="Footer input" />
+                        <ButtonRow>
+                            <button>Double-Submit</button>
+                            <button>Double-Reset</button>
+                        </ButtonRow>
+                    </>
+                }
+            >
                 <Story />
             </Screen>
         ),

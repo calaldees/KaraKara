@@ -1,7 +1,4 @@
-import {
-    faArrowLeft,
-    faCog,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faCog } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ButtonRow } from "../ButtonRow/ButtonRow";

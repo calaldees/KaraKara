@@ -1,8 +1,8 @@
+import { Screen } from "@/components";
 import { ClientContext } from "@/providers/client";
 import { PageContext } from "@/providers/page";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ConfigMenu } from "./ConfigMenu";
-import { Screen } from "@/components";
 
 const meta = {
     title: "Components/ConfigMenu",

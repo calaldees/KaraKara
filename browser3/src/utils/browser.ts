@@ -14,7 +14,7 @@ export function dict2css(d: Record<string, boolean>) {
  */
 export function shuffle<T>(array: T[]): T[] {
     let currentIndex = array.length;
-    let temporaryValue, randomIndex;
+    let temporaryValue: T, randomIndex: number;
 
     // While there remain elements to shuffle...
     while (0 !== currentIndex) {
@@ -68,7 +68,7 @@ export function is_my_song(
 export function copy_type(original: any, value: any) {
     if (Array.isArray(original)) {
         return value.split(",").filter((x: any) => x);
-    } else if (typeof original == "number") {
+    } else if (typeof original === "number") {
         return parseFloat(value);
     } else {
         return value;

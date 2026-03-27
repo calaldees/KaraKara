@@ -440,17 +440,26 @@ export const UploadForm = () => {
                 }
             }
 
-            const required = ["title", "category", "vocaltrack", "lang", "vocalstyle"];
+            const required = [
+                "title",
+                "category",
+                "vocaltrack",
+                "lang",
+                "vocalstyle",
+            ];
             const missing = [];
             for (const field of required) {
-                if (!metadata[field] || metadata[field].length === 0 || metadata[field][0].trim() === "") {
+                if (
+                    !metadata[field] ||
+                    metadata[field].length === 0 ||
+                    metadata[field][0].trim() === ""
+                ) {
                     missing.push(field);
                 }
             }
             if (missing.length > 0) {
                 alert(
-                    "Please fill in the required fields: " +
-                        missing.join(", "),
+                    `Please fill in the required fields: ${missing.join(", ")}`,
                 );
                 return;
             }
@@ -461,7 +470,9 @@ export const UploadForm = () => {
             fileInputs.forEach((input) => {
                 const fileInput = input as HTMLInputElement;
                 if (fileInput.files) {
-                    Array.from(fileInput.files).forEach((f) => files.push(f));
+                    Array.from(fileInput.files).forEach(
+                        (f) => void files.push(f),
+                    );
                 }
             });
 
@@ -470,7 +481,9 @@ export const UploadForm = () => {
 
             // 3. If there are files, do a file upload for /submit
             if (files.length > 0) {
-                const res = await fetch("/api/upload/session", { method: "POST" });
+                const res = await fetch("/api/upload/session", {
+                    method: "POST",
+                });
                 const data = await res.json();
                 const sessionId = data.session_id;
 

@@ -96,7 +96,8 @@ export const Warning: Story = {
     ],
 };
 
-export const Error: Story = {
+export const Error_: Story = {
+    name: "Error",
     decorators: [
         (Story) => (
             <ClientContext

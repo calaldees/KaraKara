@@ -16,7 +16,7 @@ const show_tracks = 5;
 ///////////////////////////////////////////////////////////////////////
 // Views
 
-function QueueItem({
+function QueueItemEl({
     item,
     track,
     idx,
@@ -84,7 +84,7 @@ export function PreviewScreen({ queue }: { queue: QueueItem[] }) {
                     track: tracks[item.track_id],
                 }))
                 .map(({ item, track }, idx) => (
-                    <QueueItem
+                    <QueueItemEl
                         item={item}
                         track={track}
                         idx={idx}

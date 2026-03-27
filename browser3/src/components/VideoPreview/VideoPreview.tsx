@@ -15,10 +15,10 @@ export function VideoPreview({
     let videoAttachments = track.attachments.video.filter(
         (a) => a.variant === videoVariant,
     );
-    if (videoAttachments.length == 0)
+    if (videoAttachments.length === 0)
         videoAttachments = track.attachments.video;
     const imageAttachment =
-        track.attachments.image.find((a) => a.variant == videoVariant) ||
+        track.attachments.image.find((a) => a.variant === videoVariant) ||
         track.attachments.image[0];
 
     const subtitleAttachment = track.attachments.subtitle?.find(
