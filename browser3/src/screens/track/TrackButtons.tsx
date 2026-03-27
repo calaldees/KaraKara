@@ -5,6 +5,7 @@ import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
 import { Track } from "@/types";
+import { is_my_song } from "@/utils";
 
 import { BookmarkButton } from "./BookmarkButton";
 import { QueueHogWarning } from "./QueueHogWarning";
@@ -35,9 +36,15 @@ export function TrackButtons({
     const { queue } = useContext(RoomContext);
     const { performerName, setPerformerName } = useContext(ClientContext);
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
-    const { request } = useApi();
+    const { request, sessionId } = useApi();
 
-    const isQueued = queue.find((i) => i.track_id === track.id) !== undefined;
+    const queuedItem = queue.find((i) => i.track_id === track.id);
+    const isQueued = queuedItem !== undefined;
+    const isQueuedByCurrentUser = is_my_song(
+        queuedItem,
+        sessionId,
+        performerName,
+    );
 
     function enqueue(performer_name: string, track_id: string) {
         request({
@@ -105,8 +112,8 @@ export function TrackButtons({
 
     const validInputs =
         performerName.trim().length >= 0 &&
-        (videoVariants.length === 0 || videoVariant !== "") &&
-        (subtitleVariants.length === 0 || subtitleVariant !== "");
+        videoVariant !== "" &&
+        subtitleVariant !== "";
 
     if (action === TrackAction.NONE) {
         return (
@@ -114,7 +121,9 @@ export function TrackButtons({
                 <QueueHogWarning trackId={track.id} />
                 {isQueued && (
                     <div className={styles.alreadyQueued}>
-                        Track is already queued
+                        {isQueuedByCurrentUser
+                            ? "You have queued this song"
+                            : "Track is already queued"}
                     </div>
                 )}
                 {variantSelect}
