@@ -1,12 +1,10 @@
-import { Subtitle } from "@/types";
+import type { Subtitle } from "@/types";
 
 /**
  * turn seconds into {MM}:{SS}
  */
 export function s_to_mns(t: number): string {
-    return (
-        Math.floor(t / 60) + ":" + (Math.floor(t % 60) + "").padStart(2, "0")
-    );
+    return `${Math.floor(t / 60)}:${(`${Math.floor(t % 60)}`).padStart(2, "0")}`;
 }
 
 /**

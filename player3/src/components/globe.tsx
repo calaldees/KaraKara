@@ -2,16 +2,15 @@ import { useTexture } from "@react-three/drei";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { memo, useContext, useRef } from "react";
 import * as THREE from "three";
-import { Group, TextureLoader } from "three";
+import { type Group, TextureLoader } from "three";
 import { useMediaQuery } from "usehooks-ts";
 
 import { useMemoArr } from "@/hooks/memo";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
+import world from "@/static/world.svg";
 import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
-
-import world from "@/static/world.svg";
 import "./globe.scss";
 
 function StatsTable({ tracks }: { tracks: Record<string, Track> }) {
@@ -127,7 +126,7 @@ function MyScene() {
                         />
                     </mesh>
                     {thumbs.map((thumb, n) => (
-                        <group key={n} rotation={[0, -0.314 * n, 0]}>
+                        <group key={thumb} rotation={[0, -0.314 * n, 0]}>
                             <mesh position={[0, 0, 3.5]}>
                                 <planeGeometry args={[1, 9 / 16]} />
                                 <PlaneMaterial thumb={thumb} />

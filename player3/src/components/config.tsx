@@ -1,6 +1,6 @@
 import { useFullscreen } from "@mantine/hooks";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
-import { SubmitEvent, useCallback, useContext, useState } from "react";
+import { type SubmitEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ClientContext } from "@/providers/client";

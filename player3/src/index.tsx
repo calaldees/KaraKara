@@ -11,6 +11,7 @@ import { Root } from "./screens/root";
 import "./static/metalghosts.scss";
 import "./static/style.scss";
 
+// biome-ignore lint: root will exist
 const root = createRoot(document.getElementById("root")!);
 root.render(
     <StrictMode>

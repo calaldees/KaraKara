@@ -7,13 +7,11 @@ import {
     RouterProvider,
     useParams,
 } from "react-router-dom";
-
+import { ConfigMenu } from "@/components/config";
+import { useStabilise } from "@/hooks/stabilise";
 import { ClientContext } from "@/providers/client";
 import { RoomContext, RoomProvider } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-
-import { ConfigMenu } from "@/components/config";
-import { useStabilise } from "@/hooks/stabilise";
 import { percent } from "@/utils";
 import { PodiumScreen } from "./podium/podium";
 import { PreviewScreen } from "./preview/preview";
@@ -116,7 +114,7 @@ function Room() {
     if (podium && !isAdmin) errors.push("Not Admin");
     if (Object.keys(tracks).length === 0) errors.push("No Tracks");
 
-    const css = ":root {--underscan: " + underscan + ";}";
+    const css = `:root {--underscan: ${underscan};}`;
     return (
         <div
             onClick={(_) => setAudioAllowed(true)}

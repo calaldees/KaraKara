@@ -1,8 +1,8 @@
-import { useMemoObj } from "@/hooks/memo";
-import { canAutoplayWithSound } from "@/utils";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { useWakeLock } from "react-screen-wake-lock";
 import { useLocalStorage, useSessionStorage } from "usehooks-ts";
+import { useMemoObj } from "@/hooks/memo";
+import { canAutoplayWithSound } from "@/utils";
 
 export interface ClientContextType {
     roomPassword: string;
@@ -40,7 +40,7 @@ export function ClientProvider(props: any) {
 
     const { isSupported, request } = useWakeLock({
         onRequest: () => setWakeLock("Requested"),
-        onError: (error: Error) => setWakeLock("Error: " + error.message),
+        onError: (error: Error) => setWakeLock(`Error: ${error.message}`),
         onRelease: () => setWakeLock("Released"),
     });
     useEffect(() => {

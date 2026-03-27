@@ -28,7 +28,7 @@ function QueueItemEl({
     now: number;
 }) {
     return (
-        <div className={"item n" + (idx + 1)} key={item.id}>
+        <div className={`item n${idx + 1}`} key={item.id}>
             {track.attachments.video
                 .filter((a) => a.variant === item.video_variant)
                 .filter((a) => a.mime.startsWith("video/webm"))
