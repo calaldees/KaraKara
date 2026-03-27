@@ -1,7 +1,7 @@
-import type { Track } from "@/types";
-import { attachment_path } from "@/utils";
 import { faGripVertical } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
+import type { Track } from "@/types";
+import { attachment_path } from "@/utils";
 
 import styles from "./Thumb.module.scss";
 

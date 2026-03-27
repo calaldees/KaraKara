@@ -4,7 +4,7 @@ import { ButtonRow } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { RoomContext } from "@/providers/room";
-import { Track } from "@/types";
+import type { Track } from "@/types";
 import { is_my_song } from "@/utils";
 
 import { BookmarkButton } from "./BookmarkButton";

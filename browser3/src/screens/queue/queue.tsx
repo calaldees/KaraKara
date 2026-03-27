@@ -1,7 +1,7 @@
+import { useContext } from "react";
 import { BackOr, Screen } from "@/components";
 import { useWidescreen } from "@/hooks/widescreen";
 import { PageContext } from "@/providers/page";
-import { useContext } from "react";
 
 import { ComingLater } from "./ComingLater";
 import { ComingSoon } from "./ComingSoon";

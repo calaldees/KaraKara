@@ -3,7 +3,7 @@
 export {};
 
 describe("Loading Screen", () => {
-    beforeEach(function () {
+    beforeEach(() => {
         cy.intercept("GET", "/time.json", { body: 1234 });
         cy.intercept("GET", "/files/tracks.json?ver=*", {
             fixture: "tracks.json",

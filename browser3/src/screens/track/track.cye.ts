@@ -3,7 +3,7 @@
 export {};
 
 describe("Bookmarks", () => {
-    beforeEach(function () {
+    beforeEach(() => {
         cy.intercept("GET", "/time.json", { body: 1234 });
         cy.intercept("GET", "/files/tracks.json", { fixture: "tracks.json" });
         cy.visit("/test");
@@ -27,7 +27,7 @@ describe("Bookmarks", () => {
     });
 });
 describe("Metadata", () => {
-    beforeEach(function () {
+    beforeEach(() => {
         cy.intercept("GET", "/time.json", { body: 1234 });
         cy.intercept("GET", "/files/tracks.json", { fixture: "tracks.json" });
         cy.visit("/test");

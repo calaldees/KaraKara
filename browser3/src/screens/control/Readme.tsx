@@ -7,7 +7,7 @@ import styles from "./Readme.module.scss";
 
 export function Readme(): React.ReactElement {
     const { roomName } = useContext(PageContext);
-    const root = window.location.protocol + "//" + window.location.host;
+    const root = `${window.location.protocol}//${window.location.host}`;
 
     return (
         <div className={styles.readme}>

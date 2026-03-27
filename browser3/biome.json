@@ -1,0 +1,70 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.9/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "a11y": {
+                "noAutofocus": "off",
+                "useMediaCaption": "off",
+                "useKeyWithClickEvents": "off",
+                "noStaticElementInteractions": "off"
+            },
+            "suspicious": {
+                "noArrayIndexKey": "off",
+                "noExplicitAny": "off",
+                "noExportsInTest": "off",
+                "noDocumentCookie": "off",
+                "noPrototypeBuiltins": "off"
+            },
+            "complexity": {
+                "noImportantStyles": "off",
+                "useLiteralKeys": "off"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "off"
+            }
+        }
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineEnding": "lf"
+    },
+    "javascript": {
+        "formatter": {
+            "trailingCommas": "all",
+            "quoteStyle": "double"
+        }
+    },
+    "files": {
+        "ignoreUnknown": true
+    },
+    "overrides": [
+        {
+            "includes": ["src/types.ts", "src/schemas.ts"],
+            "linter": {
+                "enabled": false
+            },
+            "formatter": {
+                "enabled": false
+            }
+        },
+        {
+            "includes": ["src/**/*.stories.tsx"],
+            "linter": {
+                "rules": {
+                    "a11y": {
+                        "recommended": false
+                    }
+                }
+            }
+        }
+    ]
+}

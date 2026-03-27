@@ -163,7 +163,7 @@ export function group_tracks(
             // like ["Delta", "Frontier", "Plus"], and we want to
             // add one [section title, track list] pair into the
             // sections list for each of those.
-            tag_children.forEach(function (tag_child) {
+            tag_children.forEach((tag_child) => {
                 const tracks_in_this_section = tracks.filter((t) =>
                     t.tags[tag_key]?.includes(tag_child),
                 );
@@ -206,7 +206,7 @@ export function group_tracks(
         // Remove any suggestions which would give 0 results
         next_filters = next_filters.filter((tag_key) => tag_key in all_tags);
         // For each section, either add a filter list, or a grouped filter list
-        next_filters.forEach(function (tag_key) {
+        next_filters.forEach((tag_key) => {
             // Look at our all_tags table to see what children we have
             const tag_children = find_children(all_tags, tag_key);
             // If a tag has a lot of children (eg artist=...) then show
@@ -216,7 +216,7 @@ export function group_tracks(
                     string,
                     Record<string, number>
                 > = {};
-                tag_children.forEach(function (tag_child) {
+                tag_children.forEach((tag_child) => {
                     // Group by first alphabetic character
                     let initial = normalise_name(tag_child)[0];
                     if (grouped_groups[initial] === undefined)

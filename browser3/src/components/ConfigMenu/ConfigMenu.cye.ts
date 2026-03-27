@@ -3,7 +3,7 @@
 export {};
 
 describe("Admin Login", () => {
-    beforeEach(function () {
+    beforeEach(() => {
         cy.intercept("GET", "/time.json", { body: 1234 });
         cy.intercept("GET", "/files/tracks.json", {
             fixture: "small_tracks.json",

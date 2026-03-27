@@ -38,11 +38,11 @@ export function time_until(now: number, time: number | null): string {
  */
 export function mqtt_url(): string {
     const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
-    return proto + "//" + window.location.host + "/api/mqtt";
+    return `${proto}//${window.location.host}/api/mqtt`;
 }
 
 export function percent(a: number, b: number): string {
-    return Math.round((a / b) * 100) + "%";
+    return `${Math.round((a / b) * 100)}%`;
 }
 
 /*
@@ -66,7 +66,7 @@ export function track_title(
     if (!track) {
         return "(invalid track)";
     }
-    if (track.tags.title && track.tags.title[0]) {
+    if (track.tags.title?.[0]) {
         return track.tags.title[0];
     }
     return track.id;

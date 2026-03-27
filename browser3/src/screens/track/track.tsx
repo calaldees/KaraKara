@@ -2,9 +2,6 @@ import { faListOl } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-
-import { PageContext } from "@/providers/page";
-
 import {
     BackOr,
     LyricsViewer,
@@ -13,8 +10,9 @@ import {
     VideoPreview,
 } from "@/components";
 import { useWidescreen } from "@/hooks/widescreen";
+import { PageContext } from "@/providers/page";
 import { ServerContext } from "@/providers/server";
-import { Track } from "@/types";
+import type { Track } from "@/types";
 import { preferred_variant, track_title, unique } from "@/utils";
 
 import { TrackButtons } from "./TrackButtons";

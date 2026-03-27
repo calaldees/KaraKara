@@ -1,6 +1,5 @@
-import type React from "react";
-
 import type { FAIcon } from "@shish2k/react-faicon";
+import type React from "react";
 import styles from "./List.module.scss";
 import type { Thumb } from "./Thumb";
 

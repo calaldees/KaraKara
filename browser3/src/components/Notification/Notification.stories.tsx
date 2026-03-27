@@ -1,6 +1,6 @@
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ButtonRow, Screen } from "@/components";
 import { ClientContext } from "@/providers/client";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { Notification } from "./Notification";
 
 import styles from "./Notification.module.scss";

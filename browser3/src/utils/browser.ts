@@ -1,4 +1,4 @@
-import { QueueItem, Track } from "@/types";
+import type { QueueItem, Track } from "@/types";
 import { track_title } from "./common";
 
 export function dict2css(d: Record<string, boolean>) {

@@ -1,6 +1,6 @@
-import type { Track } from "@/types";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { expect, within } from "storybook/test";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Track } from "@/types";
 import { TagsViewer } from "./TagsViewer";
 
 const meta = {

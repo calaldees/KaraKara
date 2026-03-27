@@ -1,6 +1,6 @@
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { SubmitEvent, useCallback, useState } from "react";
+import { type SubmitEvent, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Screen } from "@/components";

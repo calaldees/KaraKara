@@ -43,7 +43,7 @@ export function FilterList({
                             setExpanded(null);
                             setFilters((fs: string[]) => [
                                 ...fs,
-                                heading + ":" + unThe(child),
+                                `${heading}:${unThe(child)}`,
                             ]);
                         }}
                     />

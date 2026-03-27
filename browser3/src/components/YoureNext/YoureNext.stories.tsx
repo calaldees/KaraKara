@@ -1,7 +1,7 @@
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ClientContext } from "@/providers/client";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem, Track } from "@/types";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { YoureNext } from "./YoureNext";
 
 const meta = {

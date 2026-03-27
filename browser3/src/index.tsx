@@ -31,6 +31,7 @@ class ChunkErrorBoundary extends Component<{ children: React.ReactNode }> {
     }
 }
 
+// biome-ignore lint: root will exist
 const root = createRoot(document.getElementById("root")!);
 root.render(
     <StrictMode>

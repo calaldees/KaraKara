@@ -6,10 +6,8 @@ import {
     faStop,
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-
-import { useApi } from "@/hooks/api";
-
 import { ButtonRow } from "@/components";
+import { useApi } from "@/hooks/api";
 
 export function ControlButtons(): React.ReactElement {
     const { sendCommand, loading } = useApi();

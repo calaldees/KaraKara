@@ -1,5 +1,5 @@
 import { useFullscreen } from "@mantine/hooks";
-import { SubmitEvent, useCallback, useContext, useState } from "react";
+import { type SubmitEvent, useCallback, useContext, useState } from "react";
 
 import { ClientContext } from "@/providers/client";
 import { PageContext } from "@/providers/page";

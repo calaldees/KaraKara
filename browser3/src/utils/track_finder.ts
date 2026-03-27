@@ -90,8 +90,7 @@ export function apply_search(tracks: Track[], search: string): Track[] {
         return Object.values(track.tags).some(
             // ... has any value ...
             (tag_values) =>
-                tag_values &&
-                tag_values.some(
+                tag_values?.some(
                     // ... which contains the text we're looking for
                     (value) => value.toLowerCase().includes(search),
                 ),

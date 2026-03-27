@@ -3,7 +3,7 @@ import {
     faListOl,
 } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
-import { ReactElement, useContext } from "react";
+import { type ReactElement, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Screen } from "@/components";

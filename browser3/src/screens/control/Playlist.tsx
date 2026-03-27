@@ -4,8 +4,7 @@ import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import type { DragEvent, TouchEvent } from "react";
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-
-import { ListItem, Thumb } from "@/components";
+import { List, ListItem, Thumb } from "@/components";
 import { useApi } from "@/hooks/api";
 import { ClientContext } from "@/providers/client";
 import { PageContext } from "@/providers/page";
@@ -13,8 +12,6 @@ import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import type { QueueItem } from "@/types";
 import { dict2css, nth, time_until, track_title } from "@/utils";
-
-import { List } from "@/components";
 import styles from "./Playlist.module.scss";
 
 export function Playlist({
@@ -88,7 +85,7 @@ export function Playlist({
         const x = e.touches[0].clientX,
             y = e.touches[0].clientY;
         let tgt_id = null;
-        ul.querySelectorAll("LI").forEach(function (el, key) {
+        ul.querySelectorAll("LI").forEach((el, key) => {
             const r = el.getBoundingClientRect();
             if (x > r.left && x < r.right && y > r.top && y < r.bottom) {
                 tgt_id = queue[key].id;
@@ -154,7 +151,7 @@ export function Playlist({
         request({
             notify: "Removing track...",
             notify_ok: "Track removed!",
-            function: "queue/" + queue_item_id.toString(),
+            function: `queue/${queue_item_id.toString()}`,
             options: {
                 method: "DELETE",
             },

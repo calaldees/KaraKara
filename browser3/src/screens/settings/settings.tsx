@@ -5,7 +5,7 @@ import {
     faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import Form from "@rjsf/core";
-import { IconButtonProps, RJSFSchema } from "@rjsf/utils";
+import type { IconButtonProps, RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import { FAIcon } from "@shish2k/react-faicon";
 import { useCallback, useContext } from "react";

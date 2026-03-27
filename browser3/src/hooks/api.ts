@@ -28,11 +28,11 @@ export function useApi() {
 
     const c = document.cookie.match(/kksid=([a-z0-9-]+)/);
     const [sessionId, setSessionId] = useState<string | null>(
-        c && c[1] ? c[1] : null,
+        c?.[1] ? c[1] : null,
     );
 
     const request = useCallback(
-        function (props_: ApiRequestProps) {
+        (props_: ApiRequestProps) => {
             const props = {
                 response: "json",
                 url:
@@ -54,7 +54,7 @@ export function useApi() {
                     // so let's check for a cookie manually after every
                     // API request...
                     const c = document.cookie.match(/kksid=([a-z0-9-]+)/);
-                    if (c && c[1] && c[1] !== sessionId) {
+                    if (c?.[1] && c[1] !== sessionId) {
                         setSessionId(c[1]);
                     }
 
@@ -103,7 +103,7 @@ export function useApi() {
                         headers: { "Content-Type": "text/json" },
                     }).json();
                 })
-                .then(function (result) {
+                .then((result) => {
                     if (result.status >= 400) {
                         throw result;
                     }
@@ -124,7 +124,7 @@ export function useApi() {
                         props.onAction(result);
                     }
                 })
-                .catch(function (error) {
+                .catch((error) => {
                     console.groupCollapsed(`api_request(${props.url}) [error]`);
                     console.log(error);
                     console.groupEnd();
@@ -137,7 +137,7 @@ export function useApi() {
                                 : "Internal Error: " +
                                   (error.message ?? "unknown") +
                                   (error.context
-                                      ? ": " + JSON.stringify(error.context)
+                                      ? `: ${JSON.stringify(error.context)}`
                                       : ""),
                         style: "error",
                     });
@@ -151,12 +151,11 @@ export function useApi() {
     );
 
     const sendCommand = useCallback(
-        function (command: string) {
-            return request({
+        (command: string) =>
+            request({
                 function: `command/${command}`,
                 options: {},
-            });
-        },
+            }),
         [request],
     );
 

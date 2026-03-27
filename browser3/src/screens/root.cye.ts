@@ -3,7 +3,7 @@
 export {};
 
 describe("Portrait vs Landscape", () => {
-    beforeEach(function () {
+    beforeEach(() => {
         cy.intercept("GET", "/time.json", '"1234"');
         cy.intercept("GET", "/files/tracks.json", {
             fixture: "small_tracks.json",

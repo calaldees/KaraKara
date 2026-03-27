@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useApi } from "@/hooks/api";
-import { Subtitle, Track } from "@/types";
+import type { Subtitle, Track } from "@/types";
 import { attachment_path } from "@/utils";
 
 import styles from "./LyricsViewer.module.scss";

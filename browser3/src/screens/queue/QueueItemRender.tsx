@@ -28,7 +28,7 @@ export function QueueItemRender({
         request({
             notify: "Removing track...",
             notify_ok: "Track removed!",
-            function: "queue/" + queue_item_id.toString(),
+            function: `queue/${queue_item_id.toString()}`,
             options: {
                 method: "DELETE",
             },

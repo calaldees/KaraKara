@@ -1,7 +1,7 @@
-import { RoomContext } from "@/providers/room";
-import type { QueueItem } from "@/types";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import { RoomContext } from "@/providers/room";
+import type { QueueItem } from "@/types";
 import { EventProgressBar } from "./EventProgressBar";
 
 const meta = {

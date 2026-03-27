@@ -1,7 +1,7 @@
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
 import { useContext, useEffect, useRef } from "react";
-
+import { List } from "@/components";
 import { useMemoArr } from "@/hooks/memo";
 import { ClientContext } from "@/providers/client";
 import { ExploreContext } from "@/providers/explore";
@@ -9,14 +9,11 @@ import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
 import { find_tracks } from "@/utils/track_finder";
 import { group_tracks } from "@/utils/track_grouper";
-
 import { Bookmarks } from "./Bookmarks";
+import styles from "./Explorer.module.scss";
 import { FilterList } from "./FilterList";
 import { GroupedFilterList } from "./GroupedFilterList";
 import { TrackItem } from "./TrackItem";
-
-import { List } from "@/components";
-import styles from "./Explorer.module.scss";
 
 export function Explorer(): React.ReactElement {
     const { tracks } = useContext(ServerContext);

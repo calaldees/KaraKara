@@ -1,12 +1,8 @@
 import { useContext } from "react";
-
-import { LyricsViewer } from "@/components";
+import { List, LyricsViewer } from "@/components";
 import { RoomContext } from "@/providers/room";
 import { ServerContext } from "@/providers/server";
-
 import { QueueItemRender } from "./QueueItemRender";
-
-import { List } from "@/components";
 
 export function NowPlaying(): React.ReactElement {
     const { tracks } = useContext(ServerContext);

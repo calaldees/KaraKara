@@ -1,4 +1,4 @@
-import { Track } from "@/types";
+import type { Track } from "@/types";
 import { attachment_path } from "@/utils";
 
 import styles from "./VideoPreview.module.scss";

@@ -13,7 +13,7 @@ function Printable(): React.ReactElement {
     const contentRef = useRef<HTMLDivElement>(null);
     const reactToPrintFn = useReactToPrint({ contentRef });
 
-    const root = window.location.protocol + "//" + window.location.host;
+    const root = `${window.location.protocol}//${window.location.host}`;
     const buttons = (
         <ButtonRow>
             <button type="button" onClick={reactToPrintFn}>

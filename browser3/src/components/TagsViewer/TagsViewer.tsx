@@ -1,4 +1,4 @@
-import { Track } from "@/types";
+import type { Track } from "@/types";
 import { sort_tag_keys } from "@/utils/browser";
 
 import styles from "./TagsViewer.module.scss";
