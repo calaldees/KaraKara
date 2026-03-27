@@ -28,11 +28,8 @@ A {
 
 // If there are multiple MAIN elements, only show "main-only"
 // content (eg notifications) in the last one
-.main-only {
+MAIN:not(:last-of-type) .main-only {
     display: none;
-}
-MAIN:last-of-type .main-only {
-    display: block;
 }
 
 MAIN {

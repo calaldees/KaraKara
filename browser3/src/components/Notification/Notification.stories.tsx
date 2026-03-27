@@ -9,6 +9,7 @@ const meta = {
     title: "Components/Notification",
     component: Notification,
     parameters: {
+        kkFullscreen: true,
         layout: "padded",
     },
     tags: ["autodocs"],
