@@ -7,6 +7,7 @@ const meta = {
     title: "Screens/Queue",
     component: Queue,
     parameters: {
+        kkFullscreen: true,
         layout: "fullscreen",
     },
     tags: ["autodocs"],

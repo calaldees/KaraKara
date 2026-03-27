@@ -16,33 +16,30 @@ BODY {
 A {
     color: inherit;
 }
-.widescreen {
-    background: black;
+
+#page {
     position: fixed;
     inset: 0;
     display: flex;
-    MAIN:nth-child(1) {
-        position: relative;
-        flex: 0 0 50%;
-        max-width: 50%;
-        border-right: 2px solid black;
-        .main-only {
-            display: none;
-        }
-    }
-    MAIN:nth-child(2) {
-        position: relative;
-        flex: 0 0 50%;
-        max-width: 50%;
-        border-left: 2px solid black;
-    }
+    flex-flow: row;
+    gap: 4px;
+    background: black;
 }
-MAIN {
-    position: fixed;
-    inset: 0;
 
+// If there are multiple MAIN elements, only show "main-only"
+// content (eg notifications) in the last one
+.main-only {
+    display: none;
+}
+MAIN:last-of-type .main-only {
+    display: block;
+}
+
+MAIN {
+    flex: 1;
     display: flex;
     flex-flow: column;
+    min-width: 0;
     justify-content: flex-start;
 
     background: var(--page-bg);

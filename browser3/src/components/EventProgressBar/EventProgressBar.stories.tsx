@@ -9,9 +9,6 @@ const meta = {
     component: EventProgressBar,
     parameters: {
         layout: "padded",
-        parameters: {
-            layout: "padded",
-        },
     },
     tags: ["autodocs"],
 } satisfies Meta<typeof EventProgressBar>;

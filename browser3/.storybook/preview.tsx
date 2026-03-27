@@ -12,8 +12,20 @@ const preview: Preview = {
                 date: /Date$/i,
             },
         },
+        kkFullscreen: false,
     },
-    decorators: [withTestHarness],
+    decorators: [
+        withTestHarness,
+        (Story, { parameters }) => {
+            if (parameters.kkFullscreen)
+                return (
+                    <div id="page">
+                        <Story />
+                    </div>
+                );
+            return <Story />;
+        },
+    ],
 };
 
 export default preview;

@@ -27,8 +27,10 @@ function PageWrapper() {
 
     return (
         <PageProvider>
-            <Outlet />
-            {showSettings && <ConfigMenu />}
+            <div id="page">
+                <Outlet />
+                {showSettings && <ConfigMenu />}
+            </div>
         </PageProvider>
     );
 }
@@ -42,10 +44,10 @@ function RoomWrapper() {
         <RoomProvider key={roomName}>
             {Object.keys(tracks).length > 0 ? (
                 widescreen ? (
-                    <div className={"widescreen"}>
+                    <>
                         <QueueOrControl />
                         <Outlet />
-                    </div>
+                    </>
                 ) : (
                     <Outlet />
                 )

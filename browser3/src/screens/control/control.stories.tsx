@@ -7,6 +7,7 @@ const meta = {
     title: "Screens/Control",
     component: Control,
     parameters: {
+        kkFullscreen: true,
         layout: "fullscreen",
     },
     tags: ["autodocs"],

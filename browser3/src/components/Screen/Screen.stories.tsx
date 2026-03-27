@@ -12,7 +12,8 @@ const meta = {
     title: "Components/Screen",
     component: Screen,
     parameters: {
-        layout: "padded",
+        kkFullscreen: true,
+        layout: "fullscreen",
     },
     tags: ["autodocs"],
 } satisfies Meta<typeof Screen>;
