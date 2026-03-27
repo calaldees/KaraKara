@@ -64,7 +64,9 @@ export const CompleteExample: Story = {
 };
 
 export const PairedScreenExample: Story = {
-    args: {},
+    args: {
+        title: "moo",
+    },
     render: () => (
         <div id="page">
             <Screen title="Left Screen">
