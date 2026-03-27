@@ -7,11 +7,10 @@
     DIV {
         text-align: center;
         z-index: 9999;
-        color: var(--settings-fg);
-        background: var(--settings-bg);
-        border: 2px solid var(--settings-border);
+        background: var(--header-bg);
+        border: 2px solid var(--header-border);
         border-radius: 1em;
-        box-shadow: var(--settings-border) 0 0 1em;
+        box-shadow: var(--header-border) 0 0 1em;
         padding: 1em;
         H2 {
             margin: 0;

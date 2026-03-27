@@ -2,6 +2,7 @@ import { ClientContext } from "@/providers/client";
 import { PageContext } from "@/providers/page";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { ConfigMenu } from "./ConfigMenu";
+import { Screen } from "@/components";
 
 const meta = {
     title: "Components/ConfigMenu",
@@ -16,6 +17,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+    parameters: {
+        kkFullscreen: true,
+        layout: "fullscreen",
+    },
     decorators: [
         (Story) => (
             <PageContext
@@ -36,6 +41,7 @@ export const Default: Story = {
                         } as any
                     }
                 >
+                    <Screen title="test"></Screen>
                     <Story />
                 </ClientContext>
             </PageContext>

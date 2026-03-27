@@ -22,8 +22,8 @@ A {
     inset: 0;
     display: flex;
     flex-flow: row;
-    gap: 4px;
-    background: var(--page-divider);
+    gap: 1px;
+    background: var(--header-border);
 }
 
 // If there are multiple MAIN elements, only show "main-only"
