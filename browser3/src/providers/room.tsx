@@ -11,7 +11,7 @@ import {
     normalise_cmp,
     track_title,
 } from "@/utils";
-import { apply_hidden, apply_tags } from "@/utils/track_finder";
+import { query_tracks } from "@/utils/track_query";
 import { ClientContext } from "./client";
 import { PageContext } from "./page";
 import { ServerContext } from "./server";
@@ -67,21 +67,19 @@ export function RoomProvider(props: any) {
         setSettings(pkt.json());
     });
 
-    const hiddenTags = settings.hidden_tags;
-    const forcedTags = settings.forced_tags;
+    const trackQuery = settings.track_query || "";
     const trackList = useMemo(() => {
         // going from a dict of "all tracks known to the system" to a list of
         // "all tracks active for this room, sorted alphabetically" takes 15ms,
         // so let's do that and cache the results, and then the user can search
         // within this pre-filtered / pre-sorted list (which takes 1ms)
         let trackList = Object.values(tracks);
-        if (hiddenTags) trackList = apply_hidden(trackList, hiddenTags);
-        if (forcedTags) trackList = apply_tags(trackList, forcedTags);
+        if (trackQuery) trackList = query_tracks(trackList, trackQuery);
         trackList = trackList.sort((a, b) =>
             normalise_cmp(track_title(a), track_title(b)),
         );
         return trackList;
-    }, [tracks, hiddenTags, forcedTags]);
+    }, [tracks, trackQuery]);
 
     useEffect(() => {
         request({

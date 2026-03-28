@@ -89,17 +89,11 @@ export interface components {
              */
             track_space: number;
             /**
-             * Tags to hide from display
-             * @default [
-             *       "red:duplicate"
-             *     ]
+             * Tracks query
+             * @description Which tracks to include, eg `category=anime or (category=tv and year<2010)`
+             * @default null
              */
-            hidden_tags: string[];
-            /**
-             * Tags that must be present
-             * @default []
-             */
-            forced_tags: string[];
+            track_query: string | null;
             /**
              * Preview playback volume
              * Format: float
