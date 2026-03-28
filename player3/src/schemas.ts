@@ -171,6 +171,17 @@ export const QueueItemSchema = {
 
 export const SettingsSchema = {
   "type": "object",
+  "required": [
+    "title",
+    "track_space",
+    "hidden_tags",
+    "forced_tags",
+    "preview_volume",
+    "coming_soon_track_count",
+    "validation_event_start_datetime",
+    "validation_event_end_datetime",
+    "auto_reorder_queue"
+  ],
   "properties": {
     "title": {
       "title": "Room title",
@@ -191,8 +202,7 @@ export const SettingsSchema = {
       "title": "Tags to hide from display",
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1
+        "type": "string"
       },
       "default": [
         "red:duplicate"
@@ -202,8 +212,7 @@ export const SettingsSchema = {
       "title": "Tags that must be present",
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1
+        "type": "string"
       },
       "default": []
     },
