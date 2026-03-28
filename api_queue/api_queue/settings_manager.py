@@ -31,8 +31,7 @@ OptionalDatetime = t.Annotated[
 
 class QueueSettings(pydantic.BaseModel):
     track_space: TimeDelta = datetime.timedelta(seconds=15)
-    hidden_tags: ct.Sequence[Tag] = ("red:duplicate",)
-    forced_tags: ct.Sequence[Tag] = ()
+    track_query: str = ""
     title: str = "KaraKara"
     # theme: Theme = Theme.METALGHOSTS
     preview_volume: t.Annotated[float, annotated_types.Ge(0), annotated_types.Le(1)] = 0.1

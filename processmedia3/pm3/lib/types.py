@@ -31,8 +31,7 @@ class QueueItem(TypedDict):
 class Settings(TypedDict):
     title: str
     track_space: float
-    hidden_tags: list[str]
-    forced_tags: list[str]
+    track_query: str
     preview_volume: float
     coming_soon_track_count: int
     validation_event_start_datetime: str | None
