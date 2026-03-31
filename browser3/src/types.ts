@@ -129,6 +129,14 @@ export interface components {
              */
             auto_reorder_queue: boolean;
         };
+        LintError: {
+            /** @description ID of the track with an error */
+            track_id: string;
+            /** @description File path related to the error */
+            file?: string | null;
+            /** @description Error message */
+            message: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -141,5 +149,6 @@ export type Attachment = components['schemas']['Attachment'];
 export type Subtitle = components['schemas']['Subtitle'];
 export type QueueItem = components['schemas']['QueueItem'];
 export type Settings = components['schemas']['Settings'];
+export type LintError = components['schemas']['LintError'];
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

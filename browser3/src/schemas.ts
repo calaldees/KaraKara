@@ -228,7 +228,7 @@ export const SettingsSchema = {
     "coming_soon_track_count": {
       "title": "Number of upcoming tracks to show publicly",
       "type": "integer",
-      "minimum": 1,
+      "minimum": 0,
       "default": 5,
       "maximum": 9
     },
@@ -258,10 +258,36 @@ export const SettingsSchema = {
   }
 } as const;
 
+export const LintErrorSchema = {
+  "type": "object",
+  "required": [
+    "track_id",
+    "message"
+  ],
+  "properties": {
+    "track_id": {
+      "type": "string",
+      "description": "ID of the track with an error"
+    },
+    "file": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "File path related to the error"
+    },
+    "message": {
+      "type": "string",
+      "description": "Error message"
+    }
+  }
+} as const;
+
 export const schemas = {
   Track: TrackSchema,
   Attachment: AttachmentSchema,
   Subtitle: SubtitleSchema,
   QueueItem: QueueItemSchema,
   Settings: SettingsSchema,
+  LintError: LintErrorSchema,
 } as const;
