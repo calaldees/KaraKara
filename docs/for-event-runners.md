@@ -1,6 +1,6 @@
 # Get Started Running Events
 
-## Types of Event
+## Hardware Setup
 
 ### Big Hall Mode
 Hundreds of people in a convention hall, with a projector screen and a microphone on stage.
@@ -32,7 +32,7 @@ Suggested Hardware:
   * eg [Link](https://www.amazon.co.uk/Portable-Karaoke-Microphone-Wireless-Amplifier/dp/B07GRKXKC3) - This got used to run MinamiCon's booth room -- laptop and microphones both connected to the mixer, mixer connected to the TV
 
 
-## Event Setup
+## Software Setup
 
 ### Load the Track Browser
 * On a phone or laptop - https://karakara.uk/
@@ -40,16 +40,7 @@ Suggested Hardware:
 * Double-click title banner for settings, and to switch to admin-mode
   * room: test, password: test
 * "Booth mode" is useful to leave running on an unattended karaoke kiosk -- it gives people some admin features (eg. stopping and starting the playback) but not all of them (eg. editing room settings)
-
-### Set Settings
-* With the browser in admin-mode, from the main screen ("Explore Tracks") click "Room Settings"
-  * track space: the time between finishing one track and playing the next, to give people time to get on and off stage
-  * hidden tags: tracks with these tags won't be visible for users to select
-  * forced tags: only tracks with these tags will be visible for users to select
-  * title: the event name, shown on the projector while waiting for the first track
-  * preview volume: the volume of the player preview in-between tracks
-  * coming soon track count: show the exact order for the next N tracks, and obfuscate the rest of the queue to give admins more leeway to reorder the queue
-  * event start and end time: prevent users from adding tracks that would finish after the event ends
+* With the browser in admin-mode, from the main screen ("Explore Tracks"), you can use "Room Settings" to change things like the event name and duration
 
 ### Load the Queue Player
 * On a laptop connected to TV or projector screen - https://karakara.uk/player3/
@@ -57,7 +48,7 @@ Suggested Hardware:
   * Set laptop to do-not-disturb mode to avoid notifications making beeps or showing up on screen
   * Close other apps to minimise the chances of interrupting the show
   * Test in-advance to make sure the laptop has enough CPU power to play 720p AV1 videos
-* double click anywhere for settings
+* Double click anywhere for player settings
   * room: test, password: test
   * "Podium mode" shows just the lyrics - useful to stick on a tablet on a podium for singers to see their lyrics while facing the audience (otherwise singers tend to sing while facing the projector screen)
   * "Sync" shows how in-sync the projector-view and podium-view are. Ideally the label should be changing to the same colour at the same moment on both screens. If they are out-of-sync by more than a fraction of a second, having the lyrics appear at the wrong time is disorienting for singers.
@@ -66,31 +57,3 @@ Suggested Hardware:
     * This setting is a CSS "padding" command, so you can use values like:
       * `5%` - make the screen 5% smaller on all sides
       * `10px 20px` - make the screen 10 pixels smaller top and bottom, 20 pixels smaller left and right
-
-
-## Component Diagram
-
-```mermaid
-graph TD
-
-users{{users}}
-browser_u["browser<br>(user mode)"]
-browser_a["browser<br>(admin mode)"]
-users --"open on<br>phone"---> browser_u
-browser_u --"fetch track list"--> processed
-browser_u --"request add<br>to queue"--> api_queue
-browser_a --"commands to<br>stop / start /<br>edit the queue"--> api_queue
-api_queue --"publish queue"--> player
-
-admins{{admins}}
-admins --"open on<br>projector"---> player
-admins --"open on<br>laptop"---> browser_a
-player --"fetch videos<br>for display"--> processed
-
-contributors{{contributors}}
-contributors --"upload files"--> syncthing
-syncthing --"download files"--> source
-source[(Source Videos +<br>Subtitles + Metadata)]
-processed[(Encoded Videos +<br>Track List)]
-source --> processmedia --> processed
-```
