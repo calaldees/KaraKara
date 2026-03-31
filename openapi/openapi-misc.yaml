@@ -1,0 +1,91 @@
+openapi: 3.1.1
+info:
+  title: KaraKara Misc API
+  version: 0.0.0
+  license:
+    name: GPL-3.0-or-later
+    url: https://opensource.org/licenses/GPL-3.0
+  description: |
+    Miscellaneous utility endpoints for KaraKara.
+
+servers:
+  - url: https://karakara.uk
+    description: Live service
+
+components:
+  schemas:
+    AnalyticsEvent:
+      type: object
+      required:
+        - event
+      properties:
+        event:
+          type: string
+          description: Event name
+          examples:
+            - open_room
+            - update_settings
+            - queue_command
+        app:
+          type: string
+          description: Application name
+          examples:
+            - api_queue
+            - browser3
+        dev:
+          type: boolean
+          description: Whether this is a development environment
+        version:
+          type: string
+          description: Application version or build date
+        admin:
+          type: boolean
+          description: Whether the user is an admin
+        room:
+          type: string
+          description: Room name
+      additionalProperties: true
+
+paths:
+  /api/misc/time.json:
+    get:
+      summary: Get current server time
+      tags:
+        - Misc
+      security: []
+      responses:
+        "200":
+          description: Current server time as Unix timestamp
+          content:
+            application/json:
+              schema:
+                type: number
+                format: float
+
+  /api/misc/analytics.json:
+    post:
+      summary: Log analytics event
+      description: |
+        Logs an analytics event to the server. The event data is written to the analytics log
+        with additional metadata (timestamp, user agent, session ID, remote address).
+      tags:
+        - Misc
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyticsEvent"
+      responses:
+        "200":
+          description: Analytics event logged successfully
+          content:
+            application/json:
+              schema:
+                type: boolean
+                description: Whether the event was successfully logged
+
+tags:
+  - name: Misc
+    description: Miscellaneous utilities

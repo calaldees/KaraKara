@@ -1,0 +1,80 @@
+openapi: 3.1.1
+info:
+  title: KaraKara Lint API
+  version: 0.0.0
+  license:
+    name: GPL-3.0-or-later
+    url: https://opensource.org/licenses/GPL-3.0
+  description: |
+    Media file validation and linting service for KaraKara.
+
+servers:
+  - url: https://karakara.uk
+    description: Live service
+
+components:
+  schemas:
+    LintError:
+      $ref: "./components.yaml#/components/schemas/LintError"
+
+    Track:
+      $ref: "./components.yaml#/components/schemas/Track"
+
+paths:
+  /api/lint/lint:
+    get:
+      summary: Get all lint errors
+      tags:
+        - Lint
+      security: []
+      responses:
+        "200":
+          description: List of all lint errors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LintError"
+
+  /api/lint/lint/{trackId}:
+    get:
+      summary: Get lint errors for specific track
+      tags:
+        - Lint
+      security: []
+      parameters:
+        - name: trackId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the track to check
+      responses:
+        "200":
+          description: List of lint errors for the track (empty array if no errors or track not found)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LintError"
+
+  /api/lint/health:
+    get:
+      summary: Health check endpoint
+      tags:
+        - Lint
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+tags:
+  - name: Lint
+    description: Media file validation and linting

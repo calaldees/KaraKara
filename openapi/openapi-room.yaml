@@ -1,0 +1,449 @@
+openapi: 3.1.1
+info:
+  title: KaraKara Room API
+  version: 0.0.0
+  license:
+    name: GPL-3.0-or-later
+    url: https://opensource.org/licenses/GPL-3.0
+  description: |
+    Room management, queue operations, and playback control for KaraKara.
+
+servers:
+  - url: https://karakara.uk
+    description: Live service
+
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: "./components.yaml#/components/securitySchemes/cookieAuth"
+
+  schemas:
+    Track:
+      $ref: "./components.yaml#/components/schemas/Track"
+
+    QueueItem:
+      $ref: "./components.yaml#/components/schemas/QueueItem"
+
+    QueueItemAdd:
+      type: object
+      required:
+        - track_id
+        - performer_name
+        - video_variant
+        - subtitle_variant
+      properties:
+        track_id:
+          type: string
+          description: ID of the track to add to the queue
+        performer_name:
+          type: string
+          description: Name of the performer
+        video_variant:
+          type: string
+          description: Selected video variant
+        subtitle_variant:
+          type: string
+          description: Selected subtitle variant
+
+    QueueItemMove:
+      type: object
+      required:
+        - source
+        - target
+      properties:
+        source:
+          type: integer
+          description: Source position (queue item ID)
+        target:
+          type: integer
+          description: Target position (queue item ID)
+
+    Settings:
+      $ref: "./components.yaml#/components/schemas/Settings"
+
+    User:
+      type: object
+      required:
+        - is_admin
+      properties:
+        is_admin:
+          type: boolean
+          description: Whether the user has admin privileges
+          default: false
+
+    LoginRequest:
+      type: object
+      required:
+        - password
+      properties:
+        create:
+          type: boolean
+          description: Whether to create a new room if it doesn't exist
+          default: false
+        password:
+          type: string
+          description: Room password
+
+    CommandResponse:
+      type: object
+      required:
+        - is_playing
+      properties:
+        is_playing:
+          type: boolean
+          description: Whether playback is currently active
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+        context:
+          type: object
+          additionalProperties: true
+          description: Additional error context
+
+paths:
+  /api/room/{room_name}/login.json:
+    post:
+      summary: Login to a room
+      tags:
+        - Authentication
+      security: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: kksid=abc123; SameSite=Strict; Secure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/room/{room_name}/tracks.json:
+    get:
+      summary: Get all tracks
+      description: |
+        Returns a map of track IDs to track objects containing metadata and attachments.
+      tags:
+        - Tracks
+      security: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      responses:
+        "200":
+          description: Track data
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/Track"
+
+  /api/room/{room_name}/settings.json:
+    get:
+      summary: Get room settings
+      description: |
+        Returns the current settings for the room.
+      tags:
+        - Settings
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      responses:
+        "200":
+          description: Room settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
+    put:
+      summary: Update room settings
+      tags:
+        - Settings
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Settings"
+      responses:
+        "200":
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        "403":
+          description: Only admins can update settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/room/{room_name}/queue.json:
+    get:
+      summary: Get queue items
+      description: |
+        Returns all items in the room's queue, ordered by play time.
+      tags:
+        - Queue
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      responses:
+        "200":
+          description: List of queue items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QueueItem"
+
+    post:
+      summary: Add item to queue
+      tags:
+        - Queue
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueueItemAdd"
+      responses:
+        "200":
+          description: Queue item added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueueItem"
+        "400":
+          description: Invalid request (missing fields, invalid track_id, queue validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    put:
+      summary: Move queue item
+      tags:
+        - Queue
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QueueItemMove"
+      responses:
+        "200":
+          description: Queue item moved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        "403":
+          description: Only admins can reorder queue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/room/{room_name}/queue/{queue_item_id}.json:
+    delete:
+      summary: Delete queue item
+      tags:
+        - Queue
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+        - name: queue_item_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the queue item to delete
+      responses:
+        "200":
+          description: Queue item deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResponse"
+        "403":
+          description: Can only delete own items unless admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Queue item not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/room/{room_name}/queue.csv:
+    get:
+      summary: Get queue as CSV
+      description: |
+        Returns the queue in CSV format for export or analysis.
+      tags:
+        - Queue
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+      responses:
+        "200":
+          description: Queue data in CSV format
+          content:
+            text/csv:
+              schema:
+                type: string
+        "404":
+          description: Queue not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/room/{room_name}/command/{command}.json:
+    get:
+      summary: Execute playback command
+      description: |
+        Execute playback control commands like play, pause, skip, etc.
+      tags:
+        - Playback
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: room_name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Name of the room
+        - name: command
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - play
+              - pause
+              - stop
+              - skip_current
+              - skip_all
+              - play_next
+          description: Command to execute
+      responses:
+        "200":
+          description: Command executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResponse"
+        "400":
+          description: Invalid command
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Only admins can execute commands
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Tracks
+    description: Track information and metadata
+  - name: Settings
+    description: Room settings management
+  - name: Queue
+    description: Queue management operations
+  - name: Playback
+    description: Playback control commands
