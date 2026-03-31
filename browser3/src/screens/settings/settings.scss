@@ -23,6 +23,15 @@
         }
     }
 
+    .control-label,
+   LEGEND {
+        font-weight: bold;
+
+        // everything is required
+        .required {
+            display: none;
+        }
+    }
     .range-view {
         display: none;
     }

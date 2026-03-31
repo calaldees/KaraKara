@@ -185,6 +185,7 @@ export const SettingsSchema = {
   "properties": {
     "title": {
       "title": "Room title",
+      "description": "What to show on the splash screen while waiting for people to queue some tracks",
       "type": "string",
       "default": "KaraKara",
       "minLength": 1,
@@ -192,6 +193,7 @@ export const SettingsSchema = {
     },
     "track_space": {
       "title": "Gap between tracks (seconds)",
+      "description": "The time between finishing one track and auto-playing the next, to give people time to get on and off stage",
       "type": "number",
       "format": "float",
       "default": 15,
@@ -200,16 +202,16 @@ export const SettingsSchema = {
     },
     "hidden_tags": {
       "title": "Tags to hide from display",
+      "description": "Tracks with these tags won't be visible for users to select, unless there are other tags (eg if a track is tagged both \"anime\" and \"cartoon\", hiding the \"anime\" tag will still show the track in the \"cartoon\" category)",
       "type": "array",
       "items": {
         "type": "string"
       },
-      "default": [
-        "red:duplicate"
-      ]
+      "default": []
     },
     "forced_tags": {
       "title": "Tags that must be present",
+      "description": "Only tracks with these tags will be visible for the users to select",
       "type": "array",
       "items": {
         "type": "string"
@@ -217,7 +219,8 @@ export const SettingsSchema = {
       "default": []
     },
     "preview_volume": {
-      "title": "Preview playback volume",
+      "title": "Preview volume",
+      "description": "The volume of the screen in-between tracks",
       "type": "number",
       "format": "float",
       "minimum": 0,
@@ -226,7 +229,8 @@ export const SettingsSchema = {
       "default": 0.1
     },
     "coming_soon_track_count": {
-      "title": "Number of upcoming tracks to show publicly",
+      "title": "\"Coming soon\" track count",
+      "description": "Show the exact order for the next N tracks, and obfuscate the rest of the queue to give admins more leeway to re-order the queue",
       "type": "integer",
       "minimum": 0,
       "default": 5,
@@ -234,6 +238,7 @@ export const SettingsSchema = {
     },
     "validation_event_start_datetime": {
       "title": "Event start time",
+      "description": "Prevent users from adding tracks until this time",
       "type": [
         "string",
         "null"
@@ -243,6 +248,7 @@ export const SettingsSchema = {
     },
     "validation_event_end_datetime": {
       "title": "Event end time",
+      "description": "Prevent users from adding tracks after this time",
       "type": [
         "string",
         "null"
@@ -252,6 +258,7 @@ export const SettingsSchema = {
     },
     "auto_reorder_queue": {
       "title": "Auto-Reorder Queue",
+      "description": "Balance the queue by giving priority to first-time singers",
       "type": "boolean",
       "default": false
     }

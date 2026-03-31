@@ -79,52 +79,59 @@ export interface components {
         Settings: {
             /**
              * Room title
+             * @description What to show on the splash screen while waiting for people to queue some tracks
              * @default KaraKara
              */
             title: string;
             /**
              * Gap between tracks (seconds)
              * Format: float
+             * @description The time between finishing one track and auto-playing the next, to give people time to get on and off stage
              * @default 15
              */
             track_space: number;
             /**
              * Tags to hide from display
-             * @default [
-             *       "red:duplicate"
-             *     ]
+             * @description Tracks with these tags won't be visible for users to select, unless there are other tags (eg if a track is tagged both "anime" and "cartoon", hiding the "anime" tag will still show the track in the "cartoon" category)
+             * @default []
              */
             hidden_tags: string[];
             /**
              * Tags that must be present
+             * @description Only tracks with these tags will be visible for the users to select
              * @default []
              */
             forced_tags: string[];
             /**
-             * Preview playback volume
+             * Preview volume
              * Format: float
+             * @description The volume of the screen in-between tracks
              * @default 0.1
              */
             preview_volume: number;
             /**
-             * Number of upcoming tracks to show publicly
+             * "Coming soon" track count
+             * @description Show the exact order for the next N tracks, and obfuscate the rest of the queue to give admins more leeway to re-order the queue
              * @default 5
              */
             coming_soon_track_count: number;
             /**
              * Event start time
              * Format: date-time
+             * @description Prevent users from adding tracks until this time
              * @default null
              */
             validation_event_start_datetime: string | null;
             /**
              * Event end time
              * Format: date-time
+             * @description Prevent users from adding tracks after this time
              * @default null
              */
             validation_event_end_datetime: string | null;
             /**
              * Auto-Reorder Queue
+             * @description Balance the queue by giving priority to first-time singers
              * @default false
              */
             auto_reorder_queue: boolean;
