@@ -50,7 +50,6 @@ Suggested Hardware:
   * preview volume: the volume of the player preview in-between tracks
   * coming soon track count: show the exact order for the next N tracks, and obfuscate the rest of the queue to give admins more leeway to reorder the queue
   * event start and end time: prevent users from adding tracks that would finish after the event ends
-  * performer names: if set, users can only add tracks with these performer names (eg to make sure each track is associated with somebody from the convention signup list)
 
 ### Load the Queue Player
 * On a laptop connected to TV or projector screen - https://karakara.uk/player3/
