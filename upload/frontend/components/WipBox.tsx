@@ -36,7 +36,7 @@ export const WipBox = () => {
                 ) : wips.length === 0 ? (
                     <li>The queue is empty /o/</li>
                 ) : (
-                    wips.map((wip) => (
+                    wips.sort((a, b) => a.title.localeCompare(b.title)).map((wip) => (
                         <li key={wip.id}>
                             <strong>{wip.title}</strong>
                             {wip.artist && (
@@ -52,10 +52,9 @@ export const WipBox = () => {
                                 </>
                             )}
                             {wip.status && (
-                                <>
-                                    {" "}
-                                    &mdash; <em>{wip.status}</em>
-                                </>
+                                <ul>
+                                    <li><em>{wip.status}</em></li>
+                                </ul>
                             )}
                         </li>
                     ))
