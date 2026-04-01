@@ -229,3 +229,13 @@ components:
         message:
           type: string
           description: Error message
+
+    User:
+      type: object
+      required:
+        - is_admin
+      properties:
+        is_admin:
+          type: boolean
+          description: Whether the user has admin privileges
+          default: false

@@ -46,6 +46,10 @@ class LintError(TypedDict):
     message: str
 
 
+class User(TypedDict):
+    is_admin: bool
+
+
 class Attachments(TypedDict):
     video: list[Attachment]
     image: list[Attachment]

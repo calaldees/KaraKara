@@ -290,6 +290,20 @@ export const LintErrorSchema = {
   }
 } as const;
 
+export const UserSchema = {
+  "type": "object",
+  "required": [
+    "is_admin"
+  ],
+  "properties": {
+    "is_admin": {
+      "type": "boolean",
+      "description": "Whether the user has admin privileges",
+      "default": false
+    }
+  }
+} as const;
+
 export const schemas = {
   Track: TrackSchema,
   Attachment: AttachmentSchema,
@@ -297,4 +311,5 @@ export const schemas = {
   QueueItem: QueueItemSchema,
   Settings: SettingsSchema,
   LintError: LintErrorSchema,
+  User: UserSchema,
 } as const;

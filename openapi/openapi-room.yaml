@@ -62,14 +62,7 @@ components:
       $ref: "./components.yaml#/components/schemas/Settings"
 
     User:
-      type: object
-      required:
-        - is_admin
-      properties:
-        is_admin:
-          type: boolean
-          description: Whether the user has admin privileges
-          default: false
+      $ref: "./components.yaml#/components/schemas/User"
 
     LoginRequest:
       type: object

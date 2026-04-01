@@ -144,6 +144,13 @@ export interface components {
             /** @description Error message */
             message: string;
         };
+        User: {
+            /**
+             * @description Whether the user has admin privileges
+             * @default false
+             */
+            is_admin: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -157,5 +164,6 @@ export type Subtitle = components['schemas']['Subtitle'];
 export type QueueItem = components['schemas']['QueueItem'];
 export type Settings = components['schemas']['Settings'];
 export type LintError = components['schemas']['LintError'];
+export type User = components['schemas']['User'];
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;
