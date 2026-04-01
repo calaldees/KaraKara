@@ -23,7 +23,7 @@ export function LyricsViewer({
             (a) => a.mime === "application/json" && a.variant === variant,
         );
         if (subtitleAttachment) {
-            request({
+            request<Subtitle[]>({
                 url: attachment_path(subtitleAttachment),
                 options: { credentials: "omit" },
                 onAction: (result) => setLyrics(result),

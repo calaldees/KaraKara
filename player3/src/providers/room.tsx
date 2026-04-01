@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
-import type { QueueItem, Settings } from "@/types";
+import type { QueueItem, Settings, User } from "@/types";
 import { current_and_future, get_default_settings } from "@/utils";
 import { ClientContext } from "./client";
 
@@ -53,7 +53,7 @@ export function RoomProvider(props: any) {
     });
 
     useEffect(() => {
-        request({
+        request<User>({
             function: "login",
             options: {
                 method: "POST",

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { useApi } from "@/hooks/api";
 import { useMemoObj } from "@/hooks/memo";
-import type { QueueItem, Settings, Track } from "@/types";
+import type { QueueItem, Settings, Track, User } from "@/types";
 import {
     current_and_future,
     get_default_settings,
@@ -84,7 +84,7 @@ export function RoomProvider(props: any) {
     }, [tracks, hiddenTags, forcedTags]);
 
     useEffect(() => {
-        request({
+        request<User>({
             function: "login",
             options: {
                 method: "POST",

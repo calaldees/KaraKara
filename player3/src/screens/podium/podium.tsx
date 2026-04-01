@@ -86,7 +86,7 @@ function PodiumLyrics({
                 a.variant === queue_item.subtitle_variant,
         );
         if (subtitleAttachment) {
-            request({
+            request<Subtitle[]>({
                 url: attachment_path(subtitleAttachment),
                 options: { credentials: "omit" },
                 onAction: (result) => setLyrics(add_dot_dot_dots(result)),

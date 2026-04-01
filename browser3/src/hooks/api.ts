@@ -3,23 +3,23 @@ import { useCallback, useContext, useState } from "react";
 import { ClientContext } from "@/providers/client";
 import { PageContext } from "@/providers/page";
 
-type CommonRequestProps = {
+type CommonRequestProps<T = any> = {
     options?: Record<string, any>;
     notify?: string;
     notify_ok?: string;
     onProgress?: ({ done, size }: { done: number; size: number }) => void;
-    onAction?: (result: any) => void;
+    onAction?: (result: T) => void;
     onException?: () => void;
 };
-type FunctionRequestProps = CommonRequestProps & {
+type FunctionRequestProps<T = any> = CommonRequestProps<T> & {
     function: string;
     url?: never;
 };
-type UrlRequestProps = CommonRequestProps & {
+type UrlRequestProps<T = any> = CommonRequestProps<T> & {
     function?: never;
     url: string;
 };
-type ApiRequestProps = FunctionRequestProps | UrlRequestProps;
+type ApiRequestProps<T = any> = FunctionRequestProps<T> | UrlRequestProps<T>;
 
 export function useApi() {
     const { roomName } = useContext(PageContext);
@@ -32,7 +32,7 @@ export function useApi() {
     );
 
     const request = useCallback(
-        (props_: ApiRequestProps) => {
+        <T>(props_: ApiRequestProps<T>) => {
             const props = {
                 response: "json",
                 url:

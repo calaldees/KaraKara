@@ -36,7 +36,7 @@ function InternalServerProvider(props: any) {
         setTracksUpdated(pkt.json()["tracks_json_mtime"]);
     });
     useEffect(() => {
-        request({
+        request<Record<string, Track>>({
             url: `/files/tracks.json?ver=${tracksUpdated}`,
             options: { credentials: "omit" },
             onAction: (result) => setTracks(result),
