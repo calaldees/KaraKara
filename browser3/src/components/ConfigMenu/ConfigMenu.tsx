@@ -1,4 +1,4 @@
-import { useFullscreen } from "@mantine/hooks";
+import { useFullscreenDocument } from "@mantine/hooks";
 import { type SubmitEvent, useCallback, useContext, useState } from "react";
 
 import { ClientContext } from "@/providers/client";
@@ -10,7 +10,7 @@ export function ConfigMenu(): React.ReactElement {
     const { roomName, navigate } = useContext(PageContext);
     const { roomPassword, setRoomPassword, booth, setBooth, setShowSettings } =
         useContext(ClientContext);
-    const { toggle: toggleFullscreen, fullscreen } = useFullscreen();
+    const { toggle: toggleFullscreen, fullscreen } = useFullscreenDocument();
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
 
