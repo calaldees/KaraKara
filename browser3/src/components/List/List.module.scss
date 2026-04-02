@@ -6,6 +6,22 @@ UL.list {
     overflow: hidden;
     box-shadow: var(--list-shadow) 2px 2px 4px;
     padding: 0;
+    
+    &.twoColumn {
+        @media (min-width: 768px) {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            
+            LI:nth-last-child(2):nth-child(odd) {
+                border-bottom: 0;
+            }
+            
+            LI:nth-child(odd) {
+                border-right: 1px solid var(--list-border);
+            }
+        }
+    }
+    
     LI {
         display: flex;
         border-bottom: 1px solid var(--list-border);

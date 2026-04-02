@@ -1,4 +1,4 @@
-import { useFullscreen } from "@mantine/hooks";
+import { useFullscreenDocument } from "@mantine/hooks";
 import { ServerTimeContext } from "@shish2k/react-use-servertime";
 import { type SubmitEvent, useCallback, useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,7 +19,7 @@ export function ConfigMenu() {
         underscan,
         setUnderscan,
     } = useContext(ClientContext);
-    const { toggle: toggleFullscreen, fullscreen } = useFullscreen();
+    const { toggle: toggleFullscreen, fullscreen } = useFullscreenDocument();
     const { now, offset } = useContext(ServerTimeContext);
     const [roomNameEdit, setRoomNameEdit] = useState(roomName ?? "");
     const [roomPasswordEdit, setRoomPasswordEdit] = useState(roomPassword);
