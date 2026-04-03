@@ -1,15 +1,12 @@
+import { useState, useEffect } from "react";
 import type { Attachment, Track } from "@/types";
 import { attachment_path } from "@/utils";
+import { faWifi } from "@fortawesome/free-solid-svg-icons";
+import { FAIcon } from "@shish2k/react-faicon";
 
-export function Video({
-    track,
-    subs = true,
-    loop = false,
-    mute = false,
-    onLoadStart = undefined,
-    videoVariant,
-    subtitleVariant,
-}: {
+import "./video.scss";
+
+type VideoProps = {
     track: Track;
     subs?: boolean;
     loop?: boolean;
@@ -17,18 +14,55 @@ export function Video({
     onLoadStart?: (e: any) => void;
     videoVariant: string;
     subtitleVariant: string;
-}) {
+};
+
+export function Video(props: VideoProps) {
+    return <VideoInternal key={props.track.id} {...props} />;
+}
+
+function VideoInternal({
+    track,
+    subs = true,
+    loop = false,
+    mute = false,
+    onLoadStart = undefined,
+    videoVariant,
+    subtitleVariant,
+}: VideoProps) {
+    const [isBuffering, setIsBuffering] = useState<boolean | null>(null);
+
+    // Set buffering to true after 1 second if it hasn't been set yet
+    useEffect(() => {
+        if (isBuffering === null) {
+            console.log("Setting timeout");
+            const timeout = setTimeout(() => {
+                console.log("Setting buffering to true");
+                setIsBuffering(true);
+            }, 1000);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [isBuffering]);
+
     return (
         <div className="videoScaler">
+            {isBuffering === true && (
+                <FAIcon
+                    icon={faWifi}
+                    className="buffering-indicator"
+                />
+            )}
             <video
                 autoPlay={true}
                 poster={attachment_path(track.attachments.image[0])}
-                // ensure the video element gets re-created when <source> changes
-                key={track.id}
                 crossOrigin="anonymous"
                 loop={loop}
                 muted={mute}
                 onLoadStart={onLoadStart}
+                onCanPlayThrough={() => setIsBuffering(false)}
+                onWaiting={() => setIsBuffering(true) }
+                //onStalled={() => console.log("stalled")}
+                //onSuspend={() => console.log("suspend")}
             >
                 {track.attachments.video
                     .filter((a) => a.variant === videoVariant)
