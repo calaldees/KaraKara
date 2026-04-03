@@ -29,17 +29,6 @@ function QueueItemEl({
 }) {
     return (
         <div className={`item n${idx + 1}`} key={item.id}>
-            {track.attachments.video
-                .filter((a) => a.variant === item.video_variant)
-                .filter((a) => a.mime.startsWith("video/webm"))
-                .map((a: Attachment) => (
-                    <link
-                        key={a.path}
-                        rel="prefetch"
-                        as="video"
-                        href={attachment_path(a)}
-                    />
-                ))}
             <p className="title">{track_title(track)}</p>
             <p className="from">
                 {track.tags.from?.[0] ?? track.tags.artist?.join(", ") ?? ""}

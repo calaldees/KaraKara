@@ -8,6 +8,7 @@ import {
     useParams,
 } from "react-router-dom";
 import { ConfigMenu } from "@/components/config";
+import { Precache } from "@/components/precache";
 import { useStabilise } from "@/hooks/stabilise";
 import { ClientContext } from "@/providers/client";
 import { RoomContext, RoomProvider } from "@/providers/room";
@@ -120,6 +121,7 @@ function Room() {
             onClick={(_) => setAudioAllowed(true)}
             onDoubleClick={(_) => setShowSettings(true)}
         >
+            <Precache queue={queue} tracks={tracks} count={3} />
             <style>{css}</style>
             <main className={"theme-metalghosts"}>
                 {errors.length > 0 && <h1 id={"error"}>{errors.join(", ")}</h1>}
