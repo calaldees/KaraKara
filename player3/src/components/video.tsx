@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import type { Attachment, Track } from "@/types";
-import { attachment_path } from "@/utils";
 import { faWifi } from "@fortawesome/free-solid-svg-icons";
 import { FAIcon } from "@shish2k/react-faicon";
+import { useEffect, useState } from "react";
+import type { Attachment, Track } from "@/types";
+import { attachment_path } from "@/utils";
 
 import "./video.scss";
 
@@ -47,10 +47,7 @@ function VideoInternal({
     return (
         <div className="videoScaler">
             {isBuffering === true && (
-                <FAIcon
-                    icon={faWifi}
-                    className="buffering-indicator"
-                />
+                <FAIcon icon={faWifi} className="buffering-indicator" />
             )}
             <video
                 autoPlay={true}
@@ -60,7 +57,7 @@ function VideoInternal({
                 muted={mute}
                 onLoadStart={onLoadStart}
                 onCanPlayThrough={() => setIsBuffering(false)}
-                onWaiting={() => setIsBuffering(true) }
+                onWaiting={() => setIsBuffering(true)}
                 //onStalled={() => console.log("stalled")}
                 //onSuspend={() => console.log("suspend")}
             >

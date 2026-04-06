@@ -36,28 +36,32 @@ export const WipBox = () => {
                 ) : wips.length === 0 ? (
                     <li>The queue is empty /o/</li>
                 ) : (
-                    wips.sort((a, b) => a.title.localeCompare(b.title)).map((wip) => (
-                        <li key={wip.id}>
-                            <strong>{wip.title}</strong>
-                            {wip.artist && (
-                                <>
-                                    {" "}
-                                    &mdash; <span>{wip.artist}</span>
-                                </>
-                            )}
-                            {wip.from && (
-                                <>
-                                    {" "}
-                                    (<span>{wip.from}</span>)
-                                </>
-                            )}
-                            {wip.status && (
-                                <ul>
-                                    <li><em>{wip.status}</em></li>
-                                </ul>
-                            )}
-                        </li>
-                    ))
+                    wips
+                        .sort((a, b) => a.title.localeCompare(b.title))
+                        .map((wip) => (
+                            <li key={wip.id}>
+                                <strong>{wip.title}</strong>
+                                {wip.artist && (
+                                    <>
+                                        {" "}
+                                        &mdash; <span>{wip.artist}</span>
+                                    </>
+                                )}
+                                {wip.from && (
+                                    <>
+                                        {" "}
+                                        (<span>{wip.from}</span>)
+                                    </>
+                                )}
+                                {wip.status && (
+                                    <ul>
+                                        <li>
+                                            <em>{wip.status}</em>
+                                        </li>
+                                    </ul>
+                                )}
+                            </li>
+                        ))
                 )}
             </ul>
         </section>
