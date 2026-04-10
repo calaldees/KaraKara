@@ -1,8 +1,11 @@
+import pathlib
 from collections.abc import AsyncIterator, Generator, Sequence
 
 import litestar
 import litestar.testing
 import pytest
+
+from edit.config import AppConfig
 
 
 @pytest.fixture
@@ -20,10 +23,11 @@ def route_handlers() -> Sequence[litestar.types.ControllerRouterHandler]:
         root,
     )
 
-    return (
-        root,
-    )
+    return (root,)
 
+
+async def provide_config() -> AppConfig:
+    return AppConfig(path_source=pathlib.Path())
 
 
 @pytest.fixture
@@ -33,6 +37,7 @@ async def client(
     async with litestar.testing.create_async_test_client(
         route_handlers=route_handlers,
         dependencies={
+            "config": litestar.di.Provide(provide_config),
         },
     ) as client:
         yield client
