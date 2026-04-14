@@ -1,10 +1,10 @@
-name: ApiQueue
+name: ApiEdit
 
 on:
   push:
     paths:
-      - "api_queue/**"
-      - ".github/workflows/api_queue.yml"
+      - "api_edit/**"
+      - ".github/workflows/api_edit.yml"
 
 jobs:
   publish:
@@ -14,8 +14,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Test
-        working-directory: api_queue
+        working-directory: api_edit
         run: docker build --target test .
       - name: Build
+        working-directory: api_edit
         run: docker build --target production .
-        working-directory: api_queue
