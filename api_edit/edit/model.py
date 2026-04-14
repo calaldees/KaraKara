@@ -1,6 +1,11 @@
+import logging
 from collections.abc import Iterable
 from pathlib import Path
 from typing import Generator
+
+logger = logging.getLogger(__file__)
+
+FILE_EXTS = (".txt", ".srt")
 
 
 class FileModel:
@@ -15,7 +20,7 @@ class FileModel:
             for root, dirs, files in path.walk(follow_symlinks=False):
                 for file_str in files:
                     file = root.joinpath(file_str)
-                    if file.suffix not in (".txt", ".srt"):
+                    if file.suffix not in FILE_EXTS:
                         continue
                     yield file.relative_to(path)
 
@@ -28,18 +33,28 @@ class FileModel:
         return file_path
 
     def _get_file_backup(self, path: Path) -> Path:
-        # TODO: This is a weak strategy - consider some form of rotation
-        for backup_number in range(99):
-            backup_path = path.with_name(path.name + f".{backup_number}.old")
-            if not backup_path.exists():
-                return backup_path
-        raise Exception("all backup slots taken")
+        return next(
+            iter(
+                sorted(
+                    (
+                        path.with_name(path.name + f".{backup_number}.old")
+                        for backup_number in range(3)
+                    ),
+                    key=lambda path: path.stat().st_mtime if path.exists() else 0,
+                )
+            )
+        )
 
     def file_read(self, path: Path) -> str:
+        logger.debug('file_read - %s', path)
         return self._get_file(path).read_text()
 
     def file_write(self, path: Path, data: str) -> None:
+        if self.file_read(path) == data:
+            logger.debug('File content unchanged - abort save - %s', path)
+            return
         file_path = self._get_file(path)
         file_path_backup = self._get_file_backup(file_path)
         file_path.copy(file_path_backup)
         file_path.write_text(data)
+        logger.debug('file_write - %s', path)

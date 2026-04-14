@@ -16,8 +16,6 @@
 			grid-template-columns: 1fr 1fr 1fr;
 			grid-template-rows: 1fr;
 			grid-column-gap: 0;
-			/*justify-content: center;
-			height: 100vh;*/
 		}
 		.flex_container > div {
 			display: flex;
@@ -36,6 +34,9 @@
 			height: 100%;
 		}
 
+		.error {
+			background-color: red;
+		}
 	</style>
 </head>
 <body>
@@ -82,6 +83,11 @@ function postFileContents(event) {
 		body: JSON.stringify({content: $file_content.value})
 	})
 		.then(response => {
+			if (response.status != 201) {
+				$file_content.classList.add('error')
+				return
+			}
+			$file_content.classList.remove('error')
 			console.debug('saved', response)
 		})
 	.catch(err => console.error(err));
