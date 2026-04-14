@@ -15,11 +15,11 @@ class FileModel:
             for root, dirs, files in path.walk(follow_symlinks=False):
                 for file_str in files:
                     file = root.joinpath(file_str)
-                    if file.suffix not in (".txt", ".str"):
+                    if file.suffix not in (".txt", ".srt"):
                         continue
                     yield file.relative_to(path)
 
-        return tuple(_text_files(self.path_source))
+        return sorted(_text_files(self.path_source))
 
     def _get_file(self, path: Path) -> Path:
         file_path = self.path_source.joinpath(path)

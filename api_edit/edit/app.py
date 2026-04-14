@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import os
 import textwrap
@@ -13,24 +14,26 @@ from .model import FileModel
 
 logger = logging.getLogger(__name__)
 
-type FilesResponse = Iterable[Path]
-type FileContentResponse = str
-
-
-@litestar.get(
-    path="/favicon.ico",
-    tags=("Public",),
-    summary="favicon",
-    description=textwrap.dedent("""Suppress the errors"""),
-    cache=CACHE_FOREVER,
-    cache_control=litestar.datastructures.CacheControlHeader(max_age=360, public=True),
-)
-async def favicon() -> str:
-    return ""
+INDEX = Path(__file__).parent.joinpath("index.html").read_text()
 
 
 @litestar.get(
     path="/",
+    tags=("Public",),
+    summary="Mini HTML frontend",
+    description=textwrap.dedent("""
+        Renders `index.html`
+    """),
+    media_type=litestar.MediaType.HTML,
+    cache=CACHE_FOREVER,
+    cache_control=litestar.datastructures.CacheControlHeader(max_age=360, public=True),
+)
+async def index() -> str:
+    return INDEX
+
+
+@litestar.get(
+    path="/files.json",
     tags=("Public",),
     summary="files",
     description=textwrap.dedent("""
@@ -38,31 +41,36 @@ async def favicon() -> str:
     # cache=, TODO
     cache_control=litestar.datastructures.CacheControlHeader(max_age=360, public=True),
 )
-async def files(file_model: FileModel) -> FilesResponse:
+async def files(file_model: FileModel) -> Iterable[Path]:
     return file_model.files
 
 
 @litestar.get(
-    path="/file/{file_path:str}",
+    path="/file/{file_path:path}",
     tags=("Public",),
     summary="Single File Contents",
     description=textwrap.dedent("""
     """),
     media_type=litestar.MediaType.TEXT,
 )
-async def file_read(file_model: FileModel, file_path: str) -> FileContentResponse:
-    return file_model.file_read(Path(file_path))
+async def file_read(file_model: FileModel, file_path: str) -> str:
+    return file_model.file_read(Path(file_path.lstrip("/")))
+
+
+@dataclasses.dataclass
+class FileContents:
+    content: str
 
 
 @litestar.post(
-    path="/file/{file_path:str}",
+    path="/file/{file_path:path}",
     tags=("Public",),
     summary="Save File Contents",
     description=textwrap.dedent("""
     """),
 )
-async def file_write(file_model: FileModel, file_path: str, data: str) -> None:
-    file_model.file_write(Path(file_path), data)
+async def file_write(file_model: FileModel, file_path: str, data: FileContents) -> None:
+    file_model.file_write(Path(file_path.lstrip("/")), data.content)
 
 
 def init_file_model(app: litestar.Litestar) -> None:
@@ -76,7 +84,7 @@ async def provide_file_model(request: litestar.Request) -> FileModel:
 
 def create_app() -> litestar.Litestar:
     app = litestar.Litestar(
-        route_handlers=(favicon, files, file_read, file_write),
+        route_handlers=(index, files, file_read, file_write),
         on_startup=(init_file_model,),
         dependencies={"file_model": litestar.di.Provide(provide_file_model)},
         openapi_config=OpenAPIConfig(
