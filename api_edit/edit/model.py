@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Generator
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 FILE_EXTS = (".txt", ".srt")
 
@@ -33,17 +33,15 @@ class FileModel:
         return file_path
 
     def _get_file_backup(self, path: Path) -> Path:
-        return next(
-            iter(
-                sorted(
-                    (
-                        path.with_name(path.name + f".{backup_number}.old")
-                        for backup_number in range(3)
-                    ),
-                    key=lambda path: path.stat().st_mtime if path.exists() else 0,
-                )
+        return next(iter(
+            sorted(
+                (
+                    path.with_name(path.name + f".{backup_number}.old")
+                    for backup_number in range(3)
+                ),
+                key=lambda path: path.stat().st_mtime if path.exists() else 0,
             )
-        )
+        ))
 
     def file_read(self, path: Path) -> str:
         logger.debug('file_read - %s', path)
