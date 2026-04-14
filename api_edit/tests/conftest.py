@@ -19,9 +19,9 @@ def app() -> Generator[litestar.Litestar]:
 
 @pytest.fixture
 def route_handlers() -> Sequence[litestar.types.ControllerRouterHandler]:
-    from edit.app import file_read, file_write, files
+    from edit.app import file_read, file_write, files, index
 
-    return (files, file_read, file_write)
+    return (index, files, file_read, file_write)
 
 
 async def provide_file_model() -> FileModel:

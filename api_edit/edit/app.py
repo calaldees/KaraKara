@@ -74,7 +74,7 @@ async def file_write(file_model: FileModel, file_path: str, data: FileContents) 
 
 
 def init_file_model(app: litestar.Litestar) -> None:
-    path_source = Path(os.getenv("PATH_HOST_media", "")).joinpath("source")
+    path_source = Path(os.getenv("PATH_SOURCE", ""))
     app.state.file_model = FileModel(path_source)
 
 

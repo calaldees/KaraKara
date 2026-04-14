@@ -10,6 +10,8 @@ FROM astral/uv:python3.14-alpine AS base
     ENV LITESTAR_HOST=0.0.0.0
 
     WORKDIR /app/
+    ENV PATH_SOURCE=/media/source
+    EXPOSE 8000
 
 FROM base AS dependencies
     COPY pyproject.toml uv.lock ./

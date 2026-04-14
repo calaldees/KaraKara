@@ -91,11 +91,9 @@ $button_save.addEventListener('click', postFileContents)
 function renderFiles(data) {
 	$file_list.innerHTML = ''
 	$file_list.appendChild(h('ul',{},data.map((file)=>{
-		const $link = h('a',{'data-file':file,href:'javascript:javascript:void(0)'},file)
+		const $link = h('a',{'data-file':file,href:'javascript:void(0)'},file)
 		$link.addEventListener('click', getFileContents)
-		return h('li',{},[
-			$link,  //h('a',{href:`/file/${file}`},file)
-		])
+		return h('li',{},$link)
 	})))
 }
 

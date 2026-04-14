@@ -45,6 +45,15 @@ services:
       - ${PATH_HOST_data}/queues:/data/queue/:rw
       #- ${PWD}/api_queue/:/app/:ro   # local dev testing only
 
+  api_edit:
+    build: ./api_edit
+    restart: unless-stopped
+    mem_limit: 1g
+    environment:
+      PATH_SOURCE: /media/source
+    volumes:
+      - ${PATH_HOST_media}/source:/media/source:rw
+
   mqtt:
     image: eclipse-mosquitto
     restart: unless-stopped
