@@ -9,10 +9,11 @@ FROM astral/uv:python3.14-alpine AS base
     WORKDIR /app/
 
 FROM base AS dependencies
-    COPY pyproject.toml uv.lock ./
+    #uv.lock
+    COPY pyproject.toml ./
     RUN UV_NO_SYNC=False uv sync --no-dev
 FROM dependencies AS test_dependencies
-    RUN UV_NO_SYNC=False uv sync
+    RUN UV_NO_SYNC=False uv sync --all-extras
 
 FROM dependencies AS code
     COPY ./api_queue ./api_queue
@@ -20,8 +21,9 @@ FROM dependencies AS code
 
 FROM test_dependencies AS test
     COPY --from=code /app .
-    RUN uv run mypy .
+    COPY ./tests .
     RUN uv run pytest
+    RUN uv run mypy .
     #CMD [ "uv", "run", "litestar", "run" ]
 FROM code AS production
     VOLUME /logs

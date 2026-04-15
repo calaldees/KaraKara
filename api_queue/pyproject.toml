@@ -28,7 +28,7 @@ dev = [
 	"types-dateparser ~= 1.2",
 ]
 
-[project.optional-dependencies]
+#[project.optional-dependencies]
 analytics = [
     "ua_parser ~= 1.0.1",
 	"tqdm ~= 4.67",
@@ -47,9 +47,13 @@ ignore_missing_imports = true
 module = "pytimeparse2.*"
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
+
+[tool.pytest]
+addopts = ["--doctest-modules"]  #  "--mypy", "--ruff", "--ruff-format"
+testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = ["--doctest-modules", "-p", "no:cacheprovider"]  # --mypy # mypy slows my flow down
+pythonpath = ["."]
+cache_dir = "../.pytest_cache"
 filterwarnings = [
 	"ignore:The `schema` method is deprecated.*",
 	"ignore:Pydantic serializer warnings",
