@@ -43,6 +43,7 @@
 <div class="flex_container">
 	<div id="file_list">Loading ...</div>
 	<div id="file_content">
+		<h2>No file selected</h2>
 		<textarea></textarea>
 		<button>Save</button>
 	</div>
@@ -60,6 +61,7 @@ function h(type, params, children) {
 }
 
 const $file_list = document.getElementById('file_list')
+const $file_title = document.getElementsByTagName('h2')[0]
 const $file_content = document.getElementsByTagName('textarea')[0]
 const $button_save = document.getElementsByTagName('button')[0]
 
@@ -67,16 +69,24 @@ function getFileContents(event) {
 	const file = event.target.dataset.file
 	console.debug(file)
 	$button_save.dataset.file = file
+	$file_title.textContent = file
 	$file_content.value = `Loading ${file}`
 	fetch(`/file/${file}`)
 		.then(response => response.text())
-		.then((text)=>{$file_content.value = text})
+		.then((text)=>{
+			$file_content.value = text
+			$file_content.classList.remove('error')
+		})
 	.catch(err => console.error(err));
 }
 
 function postFileContents(event) {
 	const file = event.target.dataset.file
-	if (!file) {console.warn('no file selected'); return}
+	if (!file) {
+		$file_content.classList.add('error')
+		console.warn('no file selected');
+		return
+	}
 	console.log('save', file, $file_content.value)
 	fetch(`/file/${file}`, {
 		method: "POST",
