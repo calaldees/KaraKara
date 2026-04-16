@@ -4,34 +4,34 @@ version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-	"sanic ~= 25.3",
-	"sanic-ext ~= 24.12",
-	"sanic-openapi ~= 21.12",
-	"ujson ~= 5.11",
-	"aiomqtt ~= 2.4",
-	"pytimeparse2 ~= 1.7",
-	"dateparser ~= 1.2",
-	"setuptools ~= 80.9",
-	"pydantic ~= 2.11",  # To be replaced with msgspec?
+	"sanic",
+	"sanic-ext",
+	"sanic-openapi",
+	"ujson",
+	"aiomqtt",
+	"pytimeparse2",
+	"dateparser",
+	"setuptools",
+	"pydantic",  # To be replaced with msgspec?
 ]
 
 [dependency-groups]
 dev = [
-    "mypy ~= 1.18",
-	"pytest ~= 9.0",
-	"pytest-asyncio ~= 1.2",
-	"pytest-mypy ~= 1.0",
-	"ruff ~= 0.14",
-	"sanic-testing ~= 24.6",
-	"types-tqdm ~= 4.67",
-	"types-ujson ~= 5.10",
-	"types-dateparser ~= 1.2",
+    "mypy",
+	"pytest",
+	"pytest-asyncio",
+	"pytest-mypy",
+	"ruff",
+	"sanic-testing",
+	"types-tqdm",
+	"types-ujson",
+	"types-dateparser",
 ]
 
-#[project.optional-dependencies]
+[project.optional-dependencies]
 analytics = [
-    "ua_parser ~= 1.0.1",
-	"tqdm ~= 4.67",
+    "ua_parser",
+	"tqdm",
 ]
 
 [tool.mypy]
