@@ -2,9 +2,13 @@ name: ApiQueue
 
 on:
   push:
-    paths:
+    branches:
+      - master
+    paths: &paths
       - "api_queue/**"
       - ".github/workflows/api_queue.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:
@@ -14,8 +18,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Test
-        working-directory: api_queue
         run: docker build --target test .
+        working-directory: api_queue
       - name: Build
         run: docker build --target production .
         working-directory: api_queue

@@ -2,7 +2,9 @@ name: OpenAPI
 
 on:
   push:
-    paths:
+    branches:
+      - master
+    paths: &paths
       - "openapi/**"
       - "browser3/src/types.ts"
       - "browser3/src/schemas.ts"
@@ -10,6 +12,8 @@ on:
       - "player3/src/schemas.ts"
       - "processmedia3/pm3/lib/types.py"
       - ".github/workflows/openapi.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   validate:

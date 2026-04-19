@@ -2,9 +2,13 @@ name: Upload
 
 on:
   push:
-    paths:
+    branches:
+      - master
+    paths: &paths
       - "upload/**"
       - ".github/workflows/upload.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:

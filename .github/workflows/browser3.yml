@@ -2,9 +2,13 @@ name: Browser3
 
 on:
   push:
-    paths:
+    branches:
+      - master
+    paths: &paths
       - "browser3/**"
       - ".github/workflows/browser3.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:
@@ -13,6 +17,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Test
+        run: docker build --target test .
+        working-directory: browser3
       - name: Build
-        run: docker build --build-context root=.. .
+        run: docker build --target production .
         working-directory: browser3

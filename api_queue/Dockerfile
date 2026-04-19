@@ -5,7 +5,6 @@ FROM astral/uv:python3.14-alpine AS base
     ENV MYPY_CACHE_DIR=/.mypy_cache
     ENV UV_PROJECT_ENVIRONMENT=/.uv.venv
     ENV UV_NO_SYNC=True
-
     WORKDIR /app/
 
 FROM base AS dependencies
