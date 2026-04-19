@@ -2,9 +2,11 @@ name: Upload
 
 on:
   push:
-    paths:
+    paths: &paths
       - "upload/**"
       - ".github/workflows/upload.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:

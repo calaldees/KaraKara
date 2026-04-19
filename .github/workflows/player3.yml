@@ -2,9 +2,11 @@ name: Player3
 
 on:
   push:
-    paths:
+    paths: &paths
       - "player3/**"
       - ".github/workflows/player3.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:

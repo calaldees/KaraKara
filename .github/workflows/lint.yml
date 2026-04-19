@@ -2,9 +2,11 @@ name: Lint
 
 on:
   push:
-    paths:
+    paths: &paths
       - "lint/**"
       - ".github/workflows/lint.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:
