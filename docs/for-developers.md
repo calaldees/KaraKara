@@ -44,8 +44,10 @@ api_queue
 frontend -- http 80 --> browser
 frontend -- http 80 --> player
 frontend -- http 8000 --> api_queue
+frontend -- http 8000 --> api_edit
 api_queue --mqtt 1887--> mqtt
 api_queue <--> /data/queue/
+api_edit <--> /media/source/
 mqtt -- websocket 9001 --> frontend
 
 syncthing --> /media/source/
@@ -68,4 +70,5 @@ syncthing --> /media/source/
   * [processmedia3](../processmedia3/README.md)
   * [browser3](../browser3/README.md)
   * [api_queue](../api_queue/README.md)
+  * [api_edit](../api_edit/README.md)
   * [player3](../player3/README.md)

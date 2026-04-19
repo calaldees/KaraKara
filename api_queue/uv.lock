@@ -81,31 +81,31 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiomqtt", specifier = "~=2.4" },
-    { name = "dateparser", specifier = "~=1.4" },
-    { name = "pydantic", specifier = "~=2.11" },
-    { name = "pytimeparse2", specifier = "~=1.7" },
-    { name = "sanic", specifier = "~=25.3" },
-    { name = "sanic-ext", specifier = "~=25.12" },
-    { name = "sanic-openapi", specifier = "~=21.12" },
-    { name = "setuptools", specifier = "~=80.9" },
-    { name = "tqdm", marker = "extra == 'analytics'", specifier = "~=4.67" },
-    { name = "ua-parser", marker = "extra == 'analytics'", specifier = "~=1.0" },
-    { name = "ujson", specifier = "~=5.11" },
+    { name = "aiomqtt" },
+    { name = "dateparser" },
+    { name = "pydantic" },
+    { name = "pytimeparse2" },
+    { name = "sanic" },
+    { name = "sanic-ext" },
+    { name = "sanic-openapi" },
+    { name = "setuptools" },
+    { name = "tqdm", marker = "extra == 'analytics'" },
+    { name = "ua-parser", marker = "extra == 'analytics'" },
+    { name = "ujson" },
 ]
 provides-extras = ["analytics"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = "~=1.18" },
-    { name = "pytest", specifier = "~=9.0" },
-    { name = "pytest-asyncio", specifier = "~=1.2" },
-    { name = "pytest-mypy", specifier = "~=1.0" },
-    { name = "ruff", specifier = "~=0.15" },
-    { name = "sanic-testing", specifier = "~=24.6" },
-    { name = "types-dateparser", specifier = "~=1.4" },
-    { name = "types-tqdm", specifier = "~=4.67" },
-    { name = "types-ujson", specifier = "~=5.10" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-mypy" },
+    { name = "ruff" },
+    { name = "sanic-testing" },
+    { name = "types-dateparser" },
+    { name = "types-tqdm" },
+    { name = "types-ujson" },
 ]
 
 [[package]]
@@ -143,11 +143,11 @@ wheels = [
 
 [[package]]
 name = "filelock"
-version = "3.28.0"
+version = "3.29.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d6/17/6e8890271880903e3538660a21d63a6c1fea969ac71d0d6b608b78727fa9/filelock-3.28.0.tar.gz", hash = "sha256:4ed1010aae813c4ee8d9c660e4792475ee60c4a0ba76073ceaf862bd317e3ca6", size = 56474, upload-time = "2026-04-14T22:54:33.625Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/fe/997687a931ab51049acce6fa1f23e8f01216374ea81374ddee763c493db5/filelock-3.29.0.tar.gz", hash = "sha256:69974355e960702e789734cb4871f884ea6fe50bd8404051a3530bc07809cf90", size = 57571, upload-time = "2026-04-19T15:39:10.068Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/21/2f728888c45033d34a417bfcd248ea2564c9e08ab1bfd301377cf05d5586/filelock-3.28.0-py3-none-any.whl", hash = "sha256:de9af6712788e7171df1b28b15eba2446c69721433fa427a9bee07b17820a9db", size = 39189, upload-time = "2026-04-14T22:54:32.037Z" },
+    { url = "https://files.pythonhosted.org/packages/81/47/dd9a212ef6e343a6857485ffe25bba537304f1913bdbed446a23f7f592e1/filelock-3.29.0-py3-none-any.whl", hash = "sha256:96f5f6344709aa1572bbf631c640e4ebeeb519e08da902c39a001882f30ac258", size = 39812, upload-time = "2026-04-19T15:39:08.752Z" },
 ]
 
 [[package]]
@@ -681,11 +681,11 @@ wheels = [
 
 [[package]]
 name = "setuptools"
-version = "80.10.2"
+version = "82.0.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/76/95/faf61eb8363f26aa7e1d762267a8d602a1b26d4f3a1e758e92cb3cb8b054/setuptools-80.10.2.tar.gz", hash = "sha256:8b0e9d10c784bf7d262c4e5ec5d4ec94127ce206e8738f29a437945fbc219b70", size = 1200343, upload-time = "2026-01-25T22:38:17.252Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/db/cfac1baf10650ab4d1c111714410d2fbb77ac5a616db26775db562c8fab2/setuptools-82.0.1.tar.gz", hash = "sha256:7d872682c5d01cfde07da7bccc7b65469d3dca203318515ada1de5eda35efbf9", size = 1152316, upload-time = "2026-03-09T12:47:17.221Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/b8/f1f62a5e3c0ad2ff1d189590bfa4c46b4f3b6e49cef6f26c6ee4e575394d/setuptools-80.10.2-py3-none-any.whl", hash = "sha256:95b30ddfb717250edb492926c92b5221f7ef3fbcc2b07579bcd4a27da21d0173", size = 1064234, upload-time = "2026-01-25T22:38:15.216Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/76/f789f7a86709c6b087c5a2f52f911838cad707cc613162401badc665acfe/setuptools-82.0.1-py3-none-any.whl", hash = "sha256:a59e362652f08dcd477c78bb6e7bd9d80a7995bc73ce773050228a348ce2e5bb", size = 1006223, upload-time = "2026-03-09T12:47:15.026Z" },
 ]
 
 [[package]]
