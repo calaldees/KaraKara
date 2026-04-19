@@ -25,7 +25,7 @@ dev = [
 	"sanic-testing ~= 24.6",
 	"types-tqdm ~= 4.67",
 	"types-ujson ~= 5.10",
-	"types-dateparser ~= 1.2",
+	"types-dateparser ~= 1.4",
 ]
 
 [project.optional-dependencies]
