@@ -1,0 +1,6 @@
+# Mark generated files from openapi/components.yaml
+browser3/src/types.ts linguist-generated=true
+browser3/src/schemas.ts linguist-generated=true
+player3/src/types.ts linguist-generated=true
+player3/src/schemas.ts linguist-generated=true
+processmedia3/pm3/lib/types.py linguist-generated=true
