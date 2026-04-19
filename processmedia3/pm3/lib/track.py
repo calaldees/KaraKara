@@ -172,4 +172,5 @@ class Track:
                 image=attachments[MediaType.IMAGE],
             ),
             tags=tags,
+            sources=sorted(map(str, self.sources)),
         )

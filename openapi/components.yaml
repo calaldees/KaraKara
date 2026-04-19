@@ -57,6 +57,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Attachment"
+        sources:
+          type: array
+          items:
+            type: string
+          description: List of source files for the track
 
     Attachment:
       type: object

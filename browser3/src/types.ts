@@ -24,6 +24,8 @@ export interface components {
                 image: components["schemas"]["Attachment"][];
                 subtitle: components["schemas"]["Attachment"][];
             };
+            /** @description List of source files for the track */
+            sources?: string[];
         };
         Attachment: {
             /** @description Attachment variant name */
