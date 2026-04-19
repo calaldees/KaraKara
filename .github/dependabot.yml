@@ -1,0 +1,81 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      minor-bumps:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: pip
+    directories:
+      - /api_queue
+      - /processmedia3
+      - /scripts
+      - /upload
+    schedule:
+      interval: monthly
+    groups:
+      minor-bumps:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: npm
+    directories:
+      - /browser3
+      - /player3
+      - /upload
+    schedule:
+      interval: monthly
+    groups:
+      minor-bumps:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: cargo
+    directories:
+      - /lint
+    schedule:
+      interval: monthly
+    groups:
+      minor-bumps:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: docker
+    directories:
+      - /.devcontainer
+      - /api_queue
+      - /browser3
+      - /lint
+      - /player3
+      - /processmedia3
+      - /upload
+    schedule:
+      interval: monthly
+    groups:
+      minor-bumps:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
