@@ -9,6 +9,7 @@ COPY ./*.py ./
 FROM base AS test
 COPY pyproject.toml ./
 COPY ./tests ./tests
+RUN pip install -e . --group dev
 RUN pytest
 RUN mypy .
 
