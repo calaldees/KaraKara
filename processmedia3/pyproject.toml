@@ -8,7 +8,7 @@ dependencies = [
 	"pillow ~= 12.0",
 	"dateparser ~= 1.2",
 	"Brotli ~= 1.1",
-	"requests ~= 2.32",
+	"requests~=2.33",
 	"typed-argument-parser ~= 1.11",
 	"inotify ~= 0.2",
 ]
