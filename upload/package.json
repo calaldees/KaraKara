@@ -11,14 +11,14 @@
         "check": "biome check ."
     },
     "dependencies": {
-        "react": "^19.2.3",
-        "react-dom": "^19.2.3",
-        "react-router-dom": "^7.13.0",
+        "react": "^19.2.5",
+        "react-dom": "^19.2.5",
+        "react-router-dom": "^7.14.1",
         "tus-js-client": "^4.3.1",
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.9",
+        "@biomejs/biome": "^2.4.12",
         "@rsbuild/core": "^1.6.14",
         "@rsbuild/plugin-react": "^1.4.2",
         "@types/react": "^19.2.7",
