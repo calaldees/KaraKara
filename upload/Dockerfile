@@ -1,7 +1,7 @@
 FROM python:3.14-alpine AS base
 WORKDIR /app
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    pip install --no-cache-dir --group dev .
+COPY pyproject.toml uv.lock ./
+RUN pip install --no-cache-dir --group dev .
 COPY . /app
 
 FROM node:25 AS build-frontend

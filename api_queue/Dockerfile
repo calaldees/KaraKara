@@ -1,13 +1,12 @@
 FROM python:3.14-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache bash
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    pip install -e '.[analytics]'
+COPY pyproject.toml uv.lock ./
+RUN pip install -e '.[analytics]'
 COPY ./api_queue ./api_queue
 COPY ./*.py ./
 
 FROM base AS test
-COPY pyproject.toml ./
 COPY ./tests ./tests
 RUN pip install -e . --group dev
 RUN pytest
