@@ -30,7 +30,7 @@ dev = [
 
 [project.optional-dependencies]
 analytics = [
-    "ua_parser ~= 1.0.1",
+    "ua_parser ~= 1.0.2",
 	"tqdm ~= 4.67",
 ]
 
