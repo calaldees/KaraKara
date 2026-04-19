@@ -2,6 +2,8 @@ name: Player3
 
 on:
   push:
+    branches:
+      - master
     paths: &paths
       - "player3/**"
       - ".github/workflows/player3.yml"

@@ -2,6 +2,8 @@ name: ApiQueue
 
 on:
   push:
+    branches:
+      - master
     paths: &paths
       - "api_queue/**"
       - ".github/workflows/api_queue.yml"

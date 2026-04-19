@@ -2,6 +2,8 @@ name: Browser3
 
 on:
   push:
+    branches:
+      - master
     paths: &paths
       - "browser3/**"
       - ".github/workflows/browser3.yml"

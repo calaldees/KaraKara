@@ -2,6 +2,8 @@ name: OpenAPI
 
 on:
   push:
+    branches:
+      - master
     paths: &paths
       - "openapi/**"
       - "browser3/src/types.ts"
