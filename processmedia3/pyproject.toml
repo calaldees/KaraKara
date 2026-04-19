@@ -6,7 +6,7 @@ requires-python = ">=3.14"
 dependencies = [
 	"tqdm ~= 4.67",
 	"pillow ~= 12.0",
-	"dateparser ~= 1.2",
+	"dateparser ~= 1.4",
 	"Brotli ~= 1.1",
 	"requests ~= 2.32",
 	"typed-argument-parser ~= 1.11",
@@ -25,9 +25,9 @@ pm3-encoder = "pm3.lib.encoders:main"
 dev = [
 	"mypy ~= 1.15",
 	"pytest ~= 9.0",
-	"ruff ~= 0.14",
+	"ruff ~= 0.15",
 	"types-tqdm ~= 4.67",
-	"types-dateparser ~= 1.2",
+	"types-dateparser ~= 1.4",
 	"types-requests ~= 2.32",
 	"datamodel-code-generator ~= 0.25",
 ]

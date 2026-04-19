@@ -82,15 +82,15 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiomqtt", specifier = "~=2.4" },
-    { name = "dateparser", specifier = "~=1.2" },
+    { name = "dateparser", specifier = "~=1.4" },
     { name = "pydantic", specifier = "~=2.11" },
     { name = "pytimeparse2", specifier = "~=1.7" },
     { name = "sanic", specifier = "~=25.3" },
-    { name = "sanic-ext", specifier = "~=24.12" },
+    { name = "sanic-ext", specifier = "~=25.12" },
     { name = "sanic-openapi", specifier = "~=21.12" },
     { name = "setuptools", specifier = "~=80.9" },
     { name = "tqdm", marker = "extra == 'analytics'", specifier = "~=4.67" },
-    { name = "ua-parser", marker = "extra == 'analytics'", specifier = "~=1.0.1" },
+    { name = "ua-parser", marker = "extra == 'analytics'", specifier = "~=1.0" },
     { name = "ujson", specifier = "~=5.11" },
 ]
 provides-extras = ["analytics"]
@@ -101,9 +101,9 @@ dev = [
     { name = "pytest", specifier = "~=9.0" },
     { name = "pytest-asyncio", specifier = "~=1.2" },
     { name = "pytest-mypy", specifier = "~=1.0" },
-    { name = "ruff", specifier = "~=0.14" },
+    { name = "ruff", specifier = "~=0.15" },
     { name = "sanic-testing", specifier = "~=24.6" },
-    { name = "types-dateparser", specifier = "~=1.2" },
+    { name = "types-dateparser", specifier = "~=1.4" },
     { name = "types-tqdm", specifier = "~=4.67" },
     { name = "types-ujson", specifier = "~=5.10" },
 ]
@@ -634,14 +634,15 @@ wheels = [
 
 [[package]]
 name = "sanic-ext"
-version = "24.12.0"
+version = "25.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyyaml" },
+    { name = "sanic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/43/c6/f5f87268e72825e3cd39c5b833996a2ac47f98b888f4253c5830afebd057/sanic_ext-24.12.0.tar.gz", hash = "sha256:8f912f4c29f242bc638346d09b79f0c8896ff64e79bd0e7fa09eac4b6c0e23c8", size = 66209, upload-time = "2025-03-05T07:24:39.795Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e5/5c/85d5d82eccd8df3fb2fc4b8a3209b3c3a8149875130b4106eb0167f6a0cf/sanic_ext-25.12.0.tar.gz", hash = "sha256:db6f5c8b880bb6b4cb73717b655b63aea4e77cf57825678ec74310fd69581ce1", size = 48553, upload-time = "2026-01-20T12:34:09.78Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f4/3f/4c23be085bce45defd3863cbc707227fc82f49e7d9a5e1bb2656e2e1a2ed/sanic_ext-24.12.0-py3-none-any.whl", hash = "sha256:861f809f071770cf28acd5f13e97ed59985e07361b13b4b4540da1333730c83e", size = 96445, upload-time = "2025-03-05T07:24:38.059Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/74/c885d8744ecda12aff8211cf491f7214933c8667a815d0fe779d09744e1d/sanic_ext-25.12.0-py3-none-any.whl", hash = "sha256:4bf9afcb28c7abbc4bcac489cf4b6d53f12fa49ea4777200ea7d7d6d23ffe8ca", size = 63316, upload-time = "2026-01-20T12:34:08.844Z" },
 ]
 
 [[package]]

@@ -469,7 +469,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "brotli", specifier = "~=1.1" },
-    { name = "dateparser", specifier = "~=1.2" },
+    { name = "dateparser", specifier = "~=1.4" },
     { name = "inotify", specifier = "~=0.2" },
     { name = "pillow", specifier = "~=12.0" },
     { name = "requests", specifier = "~=2.32" },
@@ -482,8 +482,8 @@ dev = [
     { name = "datamodel-code-generator", specifier = "~=0.25" },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pytest", specifier = "~=9.0" },
-    { name = "ruff", specifier = "~=0.14" },
-    { name = "types-dateparser", specifier = "~=1.2" },
+    { name = "ruff", specifier = "~=0.15" },
+    { name = "types-dateparser", specifier = "~=1.4" },
     { name = "types-requests", specifier = "~=2.32" },
     { name = "types-tqdm", specifier = "~=4.67" },
 ]

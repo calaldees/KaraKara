@@ -5,12 +5,12 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
 	"sanic ~= 25.3",
-	"sanic-ext ~= 24.12",
+	"sanic-ext ~= 25.12",
 	"sanic-openapi ~= 21.12",
 	"ujson ~= 5.11",
 	"aiomqtt ~= 2.4",
 	"pytimeparse2 ~= 1.7",
-	"dateparser ~= 1.2",
+	"dateparser ~= 1.4",
 	"setuptools ~= 80.9",
 	"pydantic ~= 2.11",  # To be replaced with msgspec?
 ]
@@ -21,16 +21,16 @@ dev = [
 	"pytest ~= 9.0",
 	"pytest-asyncio ~= 1.2",
 	"pytest-mypy ~= 1.0",
-	"ruff ~= 0.14",
+	"ruff ~= 0.15",
 	"sanic-testing ~= 24.6",
 	"types-tqdm ~= 4.67",
 	"types-ujson ~= 5.10",
-	"types-dateparser ~= 1.2",
+	"types-dateparser ~= 1.4",
 ]
 
 [project.optional-dependencies]
 analytics = [
-    "ua_parser ~= 1.0.1",
+    "ua_parser ~= 1.0",
 	"tqdm ~= 4.67",
 ]
 
