@@ -1,14 +1,16 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.4.9/schema.json",
-    "vcs": {
-        "enabled": true,
-        "clientKind": "git",
-        "useIgnoreFile": true
+    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+    "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+    "files": {
+        "includes": ["**", "!src/types.ts", "!src/schemas.ts", "!!dist"]
+    },
+    "assist": { "actions": { "source": { "organizeImports": "on" } } },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4
     },
     "linter": {
-        "enabled": true,
         "rules": {
-            "recommended": true,
             "a11y": {
                 "noAutofocus": "off",
                 "useMediaCaption": "off",
@@ -31,31 +33,13 @@
             }
         }
     },
-    "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineEnding": "lf"
-    },
     "javascript": {
         "formatter": {
             "trailingCommas": "all",
             "quoteStyle": "double"
         }
     },
-    "files": {
-        "ignoreUnknown": true
-    },
     "overrides": [
-        {
-            "includes": ["src/types.ts", "src/schemas.ts"],
-            "linter": {
-                "enabled": false
-            },
-            "formatter": {
-                "enabled": false
-            }
-        },
         {
             "includes": ["src/**/*.stories.tsx"],
             "linter": {

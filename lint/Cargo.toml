@@ -29,5 +29,5 @@ path = "src/lib.rs"
 
 [lints.clippy]
 dbg_macro = "deny"
-#unwrap_used = "deny"
-expect_used = "deny"
+unwrap_used = "deny"
+#expect_used = "deny"

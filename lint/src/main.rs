@@ -77,7 +77,11 @@ fn run_check(processed_dir: &Path, format: OutputFormat) {
             let duration = start_time.elapsed();
 
             if matches!(format, OutputFormat::Json) {
-                println!("{}", serde_json::to_string_pretty(&errors).unwrap());
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&errors)
+                        .expect("Failed to serialize errors to JSON")
+                );
             } else {
                 for error in &errors {
                     if let Some(file) = &error.file {
@@ -122,7 +126,7 @@ fn load_and_lint(
         pb.set_style(
             ProgressStyle::default_bar()
                 .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos}/{len} {msg}")
-                .unwrap()
+                .expect("Failed to set progress bar style")
                 .progress_chars("=>-"),
         );
         pb.set_message("Scanning tracks...");
@@ -165,10 +169,14 @@ fn run_server(processed_dir: PathBuf, port: u16, host: String) {
     let addr = format!("{}:{}", host, port);
     println!("Server listening on http://{}", addr);
 
-    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let runtime = tokio::runtime::Runtime::new().expect("Failed to create Tokio runtime");
     runtime.block_on(async {
-        let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-        axum::serve(listener, app).await.unwrap();
+        let listener = tokio::net::TcpListener::bind(&addr)
+            .await
+            .expect("Failed to create TCP listener");
+        axum::serve(listener, app)
+            .await
+            .expect("Failed to start server");
     });
 
     async fn get_lint(State(state): State<AppState>) -> Json<Vec<LintError>> {

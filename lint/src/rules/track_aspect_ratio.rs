@@ -69,6 +69,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::unwrap_used)]
     fn test_aspect_ratio_validation() {
         // Test the ratio calculation
         let (w, h) = parse_aspect_ratio("16:9").unwrap();

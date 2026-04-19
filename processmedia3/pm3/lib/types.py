@@ -61,3 +61,4 @@ class Track(TypedDict):
     duration: float
     tags: dict[str, list[str]]
     attachments: Attachments
+    sources: NotRequired[list[str]]

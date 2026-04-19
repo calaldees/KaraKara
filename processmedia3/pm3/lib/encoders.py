@@ -162,7 +162,8 @@ class _BaseVideoToVideo(Encoder):
         )
         # fmt: on
 
-    def additional_vcodec_arguments(self, meta: MediaMeta) -> list[str]:
+    @classmethod
+    def additional_vcodec_arguments(cls, meta: MediaMeta) -> list[str]:
         return []
 
     @staticmethod
@@ -173,10 +174,14 @@ class _BaseVideoToVideo(Encoder):
         >>> _BaseVideoToVideo._append_ffmpeg_video_filter_string(('unknown1', '-vf', 'SOME_FILTER', 'unknown2'), 'ANOTHER_FILTER', 'MORE_FILTER')
         ['unknown1', '-vf', 'SOME_FILTER,ANOTHER_FILTER,MORE_FILTER', 'unknown2']
         """
+        replace = None
+        replacement = None
         for arg_a, arg_b in itertools.pairwise(args):
             if arg_a in {"-vf", "-filter:v"}:
                 replace = arg_b
                 replacement = ",".join(itertools.chain((arg_b,), filters))
+        if replace is None or replacement is None:
+            raise ValueError("Couldn't find video filter string to append to")
         return [arg if arg != replace else replacement for arg in args]
 
 

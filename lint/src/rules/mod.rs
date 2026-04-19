@@ -76,7 +76,7 @@ where
 
             // Update progress if callback exists
             if let Some(ref progress) = progress {
-                let mut count = counter.lock().unwrap();
+                let mut count = counter.lock().expect("Failed to lock counter");
                 *count += 1;
                 let current = *count;
                 drop(count);
