@@ -8,11 +8,13 @@ RUN npm install
 
 # Build app
 COPY . /app
-RUN npm run test-once
 RUN npm run build
 
+FROM build AS test
+RUN npm run test-once
+
 # Copy built app to httpd container
-FROM nginx:alpine
+FROM nginx:alpine AS production
 COPY --from=build /app/dist /app
 RUN cat > /etc/nginx/conf.d/default.conf <<'EOF'
 server {

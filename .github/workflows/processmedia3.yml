@@ -2,9 +2,13 @@ name: ProcessMedia3
 
 on:
   push:
-    paths:
+    branches:
+      - master
+    paths: &paths
       - "processmedia3/**"
       - ".github/workflows/processmedia3.yml"
+  pull_request:
+    paths: *paths
 
 jobs:
   publish:
