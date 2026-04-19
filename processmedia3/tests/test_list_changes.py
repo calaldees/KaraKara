@@ -23,6 +23,7 @@ class TestListChanges(unittest.TestCase):
                     {"mime": "text/srt", "variant": "Default", "path": "subs.srt"},
                 ],
             },
+            "sources": ["test1.txt", "test.srt", "test1.mp4"],
         }
         t2: TrackDict = {
             "id": "track1",
@@ -40,6 +41,7 @@ class TestListChanges(unittest.TestCase):
                     {"mime": "text/srt", "variant": "Default", "path": "subs.srt"},
                 ],
             },
+            "sources": ["test1.txt", "test.srt", "test1.mp4"],
         }
         self.assertEqual(list_changes(t1, t2), None)
 
@@ -61,6 +63,7 @@ class TestListChanges(unittest.TestCase):
                     {"mime": "text/srt", "variant": "Default", "path": "subs1.srt"},
                 ],
             },
+            "sources": ["test1.txt", "test.srt", "test1.mp4"],
         }
         t2: TrackDict = {
             "id": "track1",
@@ -78,6 +81,7 @@ class TestListChanges(unittest.TestCase):
                     {"mime": "text/srt", "variant": "Default", "path": "subs2.srt"},
                 ],
             },
+            "sources": ["test1.txt", "test.srt", "test1.mp4"],
         }
         self.assertEqual(list_changes(t1, t2), "tags (artist, title), subtitle")
 
@@ -98,6 +102,7 @@ class TestListChanges(unittest.TestCase):
                 "image": [],
                 "subtitle": [],
             },
+            "sources": ["test1.txt", "test.srt", "test1.mp4"],
         }
         t2: TrackDict = {
             "id": "track1",
@@ -113,5 +118,6 @@ class TestListChanges(unittest.TestCase):
                 "image": [],
                 "subtitle": [],
             },
+            "sources": ["test1.txt", "test.srt", "test1.mp4"],
         }
         self.assertEqual(list_changes(t1, t2), None)

@@ -58,6 +58,13 @@ export const TrackSchema = {
           }
         }
       }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of source files for the track"
     }
   }
 } as const;
