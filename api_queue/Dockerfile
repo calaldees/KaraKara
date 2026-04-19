@@ -1,4 +1,4 @@
-FROM python:3.13-alpine AS base
+FROM python:3.14-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache bash
 RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
