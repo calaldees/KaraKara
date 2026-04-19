@@ -19,13 +19,9 @@ FROM dependencies AS code
 
 FROM test_dependencies AS test
     COPY --from=code /app .
-    COPY ./tests .
-    # Both pytest and mypy fail
-    # Running pytest as part of docker:`RUN` is somehow broken?
-    # https://community.sanicframework.org/t/sanic-app-name-xxx-already-in-use-while-running-in-docker/1106/5
-    # Suggest moving away from sanic to litestar. Untangle the app logic from the framework by using a domain model.
-    #RUN uv run pytest
-    #RUN uv run mypy .
+    COPY ./tests ./tests
+    RUN uv run pytest
+    RUN uv run mypy .
 
 FROM code AS production
     VOLUME /logs

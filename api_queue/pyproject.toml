@@ -50,10 +50,7 @@ ignore_missing_imports = true
 
 [tool.pytest]
 addopts = ["--doctest-modules"]  #  "--mypy", "--ruff", "--ruff-format"
-testpaths = ["tests"]
 asyncio_mode = "auto"
-pythonpath = ["."]
-cache_dir = "../.pytest_cache"
 filterwarnings = [
 	"ignore:The `schema` method is deprecated.*",
 	"ignore:Pydantic serializer warnings",
