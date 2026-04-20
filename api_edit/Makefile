@@ -9,6 +9,7 @@ build:
 	docker build --tag ${DOCKER_IMAGE} --target test .
 test:
 	uv run pytest
+	docker compose --file compose.test.yml run --rm test --pdb
 clean:
 	rm -rf \
 		.venv \

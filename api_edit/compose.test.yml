@@ -1,0 +1,23 @@
+services:
+  edit:
+    build:
+      context: ./
+      target: production
+    environment:
+      PATH_SOURCE: /media/source
+    volumes:
+      - test_media_source:/media/source:rw
+
+  test:
+    build:
+      context: ./
+      target: test
+    environment:
+      PATH_SOURCE: /media/source
+      EDIT_ENDPOINT: http://edit:8000
+    entrypoint: ["uv", "run", "pytest", "tests_integration"]
+    volumes:
+      - test_media_source:/media/source:rw
+
+volumes:
+  test_media_source:
