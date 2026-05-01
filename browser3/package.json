@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@fortawesome/free-solid-svg-icons": "^7.0.1",
-        "@mantine/hooks": "^9.0",
+        "@mantine/hooks": "^9.1",
         "@rjsf/core": "^6.5.1",
         "@rjsf/utils": "^6.4.1",
         "@rjsf/validator-ajv8": "^6.5.1",
@@ -32,26 +32,26 @@
         "qrcode.react": "^4.2.0",
         "react": "^19.2.5",
         "react-dom": "^19.2.5",
-        "react-router-dom": "^7.14.1",
+        "react-router-dom": "^7.14.2",
         "react-to-print": "^3.1.1",
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.12",
+        "@biomejs/biome": "^2.4.13",
         "@rsbuild/core": "^1.1.13",
         "@rsbuild/plugin-react": "^1.1.1",
-        "@rsbuild/plugin-sass": "^1.1.1",
+        "@rsbuild/plugin-sass": "^1.5.2",
         "@types/jsdom": "^28.0.1",
         "@types/node": "^25.6",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
-        "cypress": "^15.14.0",
+        "cypress": "^15.14.2",
         "js-yaml": "^4.1.0",
-        "jsdom": "^29.0.2",
+        "jsdom": "^29.1.1",
         "openapi-typescript": "^7.4.4",
-        "storybook": "^10.3.5",
+        "storybook": "^10.3.6",
         "storybook-react-rsbuild": "^3.3.3",
         "typescript": "^5.9.3",
-        "vitest": "^4.1.4"
+        "vitest": "^4.1.5"
     }
 }
