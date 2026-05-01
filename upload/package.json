@@ -13,12 +13,12 @@
     "dependencies": {
         "react": "^19.2.5",
         "react-dom": "^19.2.5",
-        "react-router-dom": "^7.14.1",
+        "react-router-dom": "^7.14.2",
         "tus-js-client": "^4.3.1",
         "usehooks-ts": "^3.1.1"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.12",
+        "@biomejs/biome": "^2.4.13",
         "@rsbuild/core": "^1.6.14",
         "@rsbuild/plugin-react": "^1.4.2",
         "@types/react": "^19.2.7",
