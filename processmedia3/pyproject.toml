@@ -23,7 +23,7 @@ pm3-encoder = "pm3.lib.encoders:main"
 
 [dependency-groups]
 dev = [
-	"mypy ~= 1.15",
+	"mypy ~= 1.20",
 	"pytest ~= 9.0",
 	"ruff ~= 0.15",
 	"types-tqdm ~= 4.67",
