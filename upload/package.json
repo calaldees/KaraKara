@@ -19,7 +19,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.4.13",
-        "@rsbuild/core": "^1.6.14",
+        "@rsbuild/core": "^2.0.3",
         "@rsbuild/plugin-react": "^1.4.2",
         "@types/react": "^19.2.7",
         "@types/react-dom": "^19.2.3",
