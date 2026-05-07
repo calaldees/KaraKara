@@ -2,9 +2,9 @@
 **/.venv
 **/venv
 **/_env
-uv.lock
 
 **/node_modules
+**/dist
 
 **/.DS_Store
 /media
@@ -13,6 +13,7 @@ uv.lock
 **/*.py[oc]
 **/__pycache__
 **/.pytest_cache
+**/.mypy_cache
 **/*.egg-info
 
 **/coverage
@@ -30,7 +31,6 @@ hash_cache.pickle
 **/.idea
 **/.vscode
 **/.zed
-**/.mypy_cache
 
 analytics.json
 tracks.json

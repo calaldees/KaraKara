@@ -3,12 +3,11 @@ WORKDIR /app
 COPY --from=mwader/static-ffmpeg:7.1.1 /ffmpeg /ffprobe /usr/local/bin/
 RUN apk add --no-cache \
     imagemagick imagemagick-jpeg imagemagick-webp imagemagick-heic
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    pip install -e .
+COPY pyproject.toml uv.lock ./
+RUN pip install -e .
 COPY ./pm3 ./pm3
 
 FROM base AS test
-COPY pyproject.toml ./
 RUN pip install --group dev -e .
 COPY tests ./tests
 RUN pytest

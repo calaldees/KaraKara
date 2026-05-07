@@ -4,13 +4,13 @@ version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-	"tqdm ~= 4.67",
-	"pillow ~= 12.0",
-	"dateparser ~= 1.2",
-	"Brotli ~= 1.1",
-	"requests ~= 2.32",
-	"typed-argument-parser ~= 1.11",
-	"inotify ~= 0.2",
+	"tqdm",
+	"pillow",
+	"dateparser",
+	"Brotli",
+	"requests",
+	"typed-argument-parser",
+	"inotify",
 ]
 
 [tool.uv]
@@ -23,13 +23,13 @@ pm3-encoder = "pm3.lib.encoders:main"
 
 [dependency-groups]
 dev = [
-	"mypy ~= 1.15",
-	"pytest ~= 9.0",
-	"ruff ~= 0.14",
-	"types-tqdm ~= 4.67",
-	"types-dateparser ~= 1.2",
-	"types-requests ~= 2.32",
-	"datamodel-code-generator ~= 0.25",
+	"mypy",
+	"pytest",
+	"ruff",
+	"types-tqdm",
+	"types-dateparser",
+	"types-requests",
+	"datamodel-code-generator",
 ]
 
 [tool.mypy]

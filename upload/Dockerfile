@@ -1,10 +1,10 @@
 FROM python:3.14-alpine AS base
 WORKDIR /app
-RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    pip install --no-cache-dir --group dev .
+COPY pyproject.toml uv.lock ./
+RUN pip install --no-cache-dir --group dev .
 COPY . /app
 
-FROM node:24 AS build-frontend
+FROM node:25 AS build-frontend
 COPY package.json package-lock.json rsbuild.config.ts tsconfig.json /app/
 WORKDIR /app
 RUN npm install
