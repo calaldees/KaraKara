@@ -4,23 +4,23 @@ version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "fastapi ~= 0.121",
-    "uvicorn ~= 0.38",
-    "tuspyserver ~= 4.2",
-    "aiofiles ~= 25.1",
-    "requests ~= 2.32",
+    "fastapi",
+    "uvicorn",
+    "tuspyserver",
+    "aiofiles",
+    "requests",
 ]
 
 [dependency-groups]
 dev = [
-    "mypy ~= 1.18",
-    "pytest ~= 9.0",
-    "pytest-asyncio ~= 1.2",
-    "pytest-mypy ~= 1.0",
-    "ruff ~= 0.14",
-    "types-aiofiles ~= 25.1",
-    "types-dateparser ~= 1.2",
-    "types-requests ~= 2.32",
+    "mypy",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-mypy",
+    "ruff",
+    "types-aiofiles",
+    "types-dateparser",
+    "types-requests",
 ]
 
 [project.scripts]
