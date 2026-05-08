@@ -5,7 +5,7 @@ Automatically spot issues with the karakara database.
 ## Usage
 
 ```bash
-cargo run -- check --processed /path/to/processed
+cargo run -- --processed /path/to/processed check
 ```
 
 ```bash
