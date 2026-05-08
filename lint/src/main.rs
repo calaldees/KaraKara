@@ -161,7 +161,7 @@ fn run_server(processed_dir: PathBuf, port: u16, host: String) {
 
     let app = Router::new()
         .route("/api/lint/lint", get(get_lint))
-        .route("/api/lint/lint/:trackId", get(get_lint_for_track))
+        .route("/api/lint/lint/{trackId}", get(get_lint_for_track))
         .route("/api/lint/health", get(health_check))
         .layer(CorsLayer::permissive())
         .with_state(state);
