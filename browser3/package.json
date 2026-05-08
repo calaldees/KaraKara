@@ -29,6 +29,7 @@
         "@shish2k/react-use-servertime": "^0.1",
         "@ungap/global-this": "^0.4.4",
         "abortcontroller-polyfill": "^1.7.8",
+        "core-js": "^3.49.0",
         "qrcode.react": "^4.2.0",
         "react": "^19.2.5",
         "react-dom": "^19.2.5",
@@ -38,7 +39,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.4.13",
-        "@rsbuild/core": "^1.1.13",
+        "@rsbuild/core": "^2.0.3",
         "@rsbuild/plugin-react": "^1.1.1",
         "@rsbuild/plugin-sass": "^1.5.2",
         "@types/jsdom": "^28.0.1",
