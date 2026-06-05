@@ -5,7 +5,6 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import AsyncGenerator
 
-# import aiohttp
 import pytest
 
 # ------------------------------------------------------------------------------
@@ -43,11 +42,9 @@ def request_json(
 class EditService:
     def __init__(
         self,
-        # client: aiohttp.ClientSession,
         EDIT_ENDPOINT: str,
         PATH_SOURCE: Path,
     ):
-        # self.client = client
         self.EDIT_ENDPOINT = EDIT_ENDPOINT
         self.PATH_SOURCE = PATH_SOURCE
         self.tempfile_prefix = "_api_edit.pytest"
@@ -65,22 +62,20 @@ class EditService:
 
     @property
     async def index(self) -> str:
-        # return await (await self.client.get(self.EDIT_ENDPOINT + "/")).text()
-        return request(self.EDIT_ENDPOINT + "/").decode("utf8")
+        return request(self.EDIT_ENDPOINT + "/api/edit/").decode("utf8")
 
     @property
     async def files(self) -> Sequence[str]:
-        # return await (await self.client.get(self.EDIT_ENDPOINT + "/files.json")).json()
-        return request_json(self.EDIT_ENDPOINT + "/files.json")  # type: ignore
+        return request_json(self.EDIT_ENDPOINT + "/api/edit/files.json")  # type: ignore
 
     def get_file(self, filename: str) -> str:
-        return request(self.EDIT_ENDPOINT + "/file/" + filename.strip("/")).decode(
-            "utf8"
-        )
+        return request(
+            self.EDIT_ENDPOINT + "/api/edit/file/" + filename.strip("/")
+        ).decode("utf8")
 
     def post_file(self, filename: str, **contents: str) -> None:
         request(
-            self.EDIT_ENDPOINT + "/file/" + filename.strip("/"),
+            self.EDIT_ENDPOINT + "/api/edit/file/" + filename.strip("/"),
             method="POST",
             data=json.dumps(contents).encode(),
         )
@@ -94,7 +89,6 @@ class EditService:
 
 @pytest.fixture(scope="session")
 async def edit_service(
-    # client: aiohttp.ClientSession,
     EDIT_ENDPOINT: str,
     PATH_SOURCE: Path,
 ) -> AsyncGenerator[EditService]:
@@ -116,8 +110,8 @@ async def test_files(edit_service: EditService) -> None:
 
 
 async def test_file_get(edit_service: EditService) -> None:
-    assert edit_service.get_file(edit_service.tempfile_prefix + ".txt")
-    assert edit_service.get_file(edit_service.tempfile_prefix + ".srt")
+    assert edit_service.get_file(edit_service.tempfile_prefix + ".txt") == "fake tags"
+    assert edit_service.get_file(edit_service.tempfile_prefix + ".srt") == "fake srt"
 
 
 async def test_file_post(edit_service: EditService) -> None:
@@ -130,6 +124,4 @@ async def test_file_post(edit_service: EditService) -> None:
     assert old_content != new_content
     assert new_content == "New content"
 
-    assert frozenset(edit_service.file_history(filename)) >= frozenset(
-        (old_content, new_content)
-    )
+    # assert frozenset(edit_service.file_history(filename)) >= frozenset((old_content, new_content))

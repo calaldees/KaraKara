@@ -1,21 +1,31 @@
-FROM python:3.14-alpine AS base
-WORKDIR /app
-RUN apk add --no-cache bash
-COPY pyproject.toml uv.lock ./
-RUN pip install -e '.[analytics]'
-COPY ./api_queue ./api_queue
-COPY ./*.py ./
+FROM astral/uv:python3.14-alpine AS base
+    # https://docs.astral.sh/ruff/configuration/#full-command-line-interface
+    # https://mypy.readthedocs.io/en/stable/config_file.html#confval-cache_dir
+    ENV RUFF_CACHE_DIR=/.ruff_cache
+    ENV MYPY_CACHE_DIR=/.mypy_cache
+    ENV UV_PROJECT_ENVIRONMENT=/.uv.venv
+    ENV UV_NO_SYNC=True
+    WORKDIR /app/
 
-FROM base AS test
-COPY ./tests ./tests
-RUN pip install -e . --group dev
-RUN pytest
-RUN mypy .
+FROM base AS dependencies
+    COPY pyproject.toml uv.lock ./
+    RUN UV_NO_SYNC=False uv sync --no-dev
+FROM dependencies AS test_dependencies
+    RUN UV_NO_SYNC=False uv sync --all-extras
 
-FROM base AS production
-VOLUME /logs
-VOLUME /queues
-VOLUME /media/processed
-EXPOSE 8000
-CMD ["python", "-m", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--single-process"]
-# "--workers", "4"  # workers are python.multithreading rather than async. For now, we can just stick with single process
+FROM dependencies AS code
+    COPY ./api_queue ./api_queue
+    COPY ./*.py ./
+
+FROM test_dependencies AS test
+    COPY --from=code /app .
+    COPY ./tests ./tests
+    RUN uv run pytest
+    RUN uv run mypy .
+
+FROM code AS production
+    VOLUME /logs
+    VOLUME /queues
+    VOLUME /media/processed
+    EXPOSE 8000
+    CMD ["uv", "run", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--single-process"]

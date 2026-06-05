@@ -18,9 +18,7 @@ INDEX = Path(__file__).parent.joinpath("index.html").read_text()
 
 
 @litestar.get(
-    path="/",
-    tags=("Public",),
-    summary="Mini HTML frontend",
+    path="/api/edit/",
     description=textwrap.dedent("""
         Renders `index.html`
     """),
@@ -33,9 +31,7 @@ async def index() -> str:
 
 
 @litestar.get(
-    path="/files.json",
-    tags=("Public",),
-    summary="files",
+    path="/api/edit/files.json",
     description=textwrap.dedent("""
     """),
     # cache=, TODO
@@ -46,9 +42,7 @@ async def files(file_model: FileModel) -> Iterable[Path]:
 
 
 @litestar.get(
-    path="/file/{file_path:path}",
-    tags=("Public",),
-    summary="Single File Contents",
+    path="/api/edit/file/{file_path:path}",
     description=textwrap.dedent("""
     """),
     media_type=litestar.MediaType.TEXT,
@@ -63,9 +57,7 @@ class FileContents:
 
 
 @litestar.post(
-    path="/file/{file_path:path}",
-    tags=("Public",),
-    summary="Save File Contents",
+    path="/api/edit/file/{file_path:path}",
     description=textwrap.dedent("""
     """),
 )

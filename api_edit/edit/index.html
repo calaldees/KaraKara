@@ -71,7 +71,7 @@ function getFileContents(event) {
 	$button_save.dataset.file = file
 	$file_title.textContent = file
 	$file_content.value = `Loading ${file}`
-	fetch(`/file/${file}`)
+	fetch(`file/${file}`)
 		.then(response => response.text())
 		.then((text)=>{
 			$file_content.value = text
