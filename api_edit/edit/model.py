@@ -1,5 +1,5 @@
 import logging
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Generator
 # import subprocess
@@ -10,7 +10,12 @@ FILE_EXTS = (".txt", ".srt")
 
 
 class FileModel:
-    def __init__(self, path_source: Path, file_exts=FILE_EXTS):
+    def __init__(
+        self,
+        path_source: Path,
+        git_commit_on_write=False,
+        file_exts: Sequence[str] = FILE_EXTS,
+    ):
         self.path_source = path_source
         if not self.path_source.exists():
             raise Exception(f"{path_source} does not exist on filesystem")
@@ -18,6 +23,12 @@ class FileModel:
         if not next(iter(self.files), None):
             logger.warning(
                 f"No files matching {self.file_exts=}. Is path_source correct? {self.path_source=}"
+            )
+        self.git_commit_on_write = git_commit_on_write
+        if not self.git_commit_on_write:
+            logger.warning(
+                "Will not be running post_write hook to backup changes with git."
+                "This option should be on for production."
             )
 
     @property
@@ -76,4 +87,5 @@ class FileModel:
         # file_path.copy(file_path_backup)
         file_path.write_text(data)
         logger.debug("file_write - %s", path)
-        self._commit_change(file_path)
+        if self.git_commit_on_write:
+            self._commit_change(file_path)
