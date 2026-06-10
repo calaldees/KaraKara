@@ -56,12 +56,12 @@ app.config.FALLBACK_ERROR_FORMAT = "json"
 
 
 @app.listener("before_server_start")
-async def tracks_load(app: App, _loop):
+async def tracks_load(app: App):
     app.ctx.track_manager = TrackManager(Path(app.config.PATH_TRACKS))
 
 
 @app.listener("before_server_start")
-async def queue_manager(app: App, _loop):
+async def queue_manager(app: App):
     path_queue = Path(app.config.PATH_QUEUE)
     log.info(f"[queue_manager] - {path_queue=}")
     app.ctx.path_queue = path_queue
@@ -71,7 +71,7 @@ async def queue_manager(app: App, _loop):
 
 
 @app.listener("before_server_start")
-async def aio_mqtt_configure(app: App, _loop):
+async def aio_mqtt_configure(app: App):
     mqtt = app.config.MQTT
     if isinstance(mqtt, str):
         log.info("[mqtt] connecting")

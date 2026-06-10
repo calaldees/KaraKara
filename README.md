@@ -81,6 +81,8 @@ Core Components
 * [api_queue](api_queue/README.md) [![ApiQueue](https://github.com/shish/karakara/actions/workflows/api_queue.yml/badge.svg?branch=master)](https://github.com/shish/karakara/actions/workflows/api_queue.yml)
   * Takes requests from users and commands from admins
   * Publishes the current queue to the player
+* [api_edit](api_edit/README.md) [![ApiEdit](https://github.com/shish/karakara/actions/workflows/api_edit.yml/badge.svg?branch=master)](https://github.com/shish/karakara/actions/workflows/api_edit.yml)
+  * Facilitate user editing of tags and subtitle files (without needing the full source dataset locally)
 * [player3](player3/README.md) [![Player3](https://github.com/shish/karakara/actions/workflows/player3.yml/badge.svg?branch=master)](https://github.com/shish/karakara/actions/workflows/player3.yml)
   * Fullscreen video player for the projector
   * Displays the current queue in between tracks

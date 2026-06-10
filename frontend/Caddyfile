@@ -45,6 +45,10 @@
 		reverse_proxy api_queue:8000
 	}
 
+	handle /api/edit/* {
+		reverse_proxy api_edit:8000
+	}
+
 	handle /api/upload/* {
 		reverse_proxy upload:8000
 	}

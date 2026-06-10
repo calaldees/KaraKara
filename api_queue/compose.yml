@@ -25,6 +25,7 @@ services:
     links:
       - mqtt
     volumes:
+      # - /etc/localtime:/etc/localtime:ro
       - ${PWD}:/app/:ro
       #- ${PWD}/tests/tracks.json:/app/tracks.json:ro
       - queue_data:/data/queue/:rw

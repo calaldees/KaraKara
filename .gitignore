@@ -14,7 +14,12 @@
 **/__pycache__
 **/.pytest_cache
 **/.mypy_cache
+<<<<<<< HEAD
 **/*.egg-info
+||||||| parent of 33af0887 (api_edit now shows track being edited)
+**/*.egg-info
+=======
+>>>>>>> 33af0887 (api_edit now shows track being edited)
 
 **/coverage
 

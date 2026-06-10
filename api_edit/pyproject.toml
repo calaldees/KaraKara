@@ -1,0 +1,40 @@
+[project]
+name = "edit"
+version = "0.0.0"
+# https://docs.astral.sh/uv/concepts/projects/sync/#upgrading-locked-package-versions
+# Update `uv.lock` with the following commands
+#   `uv lock --upgrade` or `uv lock --upgrade-package <package>`
+requires-python = ">= 3.14"
+dependencies = [
+  "litestar[standard]",
+  "annotated-types",
+]
+
+[dependency-groups]
+dev = [
+  "mypy",
+  "ruff",
+  "pytest",
+  "pytest-mypy",
+  "pytest-ruff",
+  "pytest-asyncio",
+]
+
+[tool.mypy]
+exclude= [".venv"]
+
+[[tool.mypy.overrides]]
+module = "pytest"
+
+[tool.ruff]
+exclude = [".venv"]
+
+[tool.pytest]
+addopts = ["--doctest-modules", "--mypy", "--ruff", "--ruff-format"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["."]
+cache_dir = "../.pytest_cache"
+filterwarnings = [
+    "error",
+]

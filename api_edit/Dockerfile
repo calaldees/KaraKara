@@ -1,31 +1,29 @@
 FROM astral/uv:python3.14-alpine AS base
+
     # https://docs.astral.sh/ruff/configuration/#full-command-line-interface
     # https://mypy.readthedocs.io/en/stable/config_file.html#confval-cache_dir
     ENV RUFF_CACHE_DIR=/.ruff_cache
     ENV MYPY_CACHE_DIR=/.mypy_cache
     ENV UV_PROJECT_ENVIRONMENT=/.uv.venv
     ENV UV_NO_SYNC=True
+    ENV LITESTAR_PORT=8000
+    ENV LITESTAR_HOST=0.0.0.0
+
     WORKDIR /app/
+    ENV PATH_SOURCE=/media/source
+    EXPOSE 8000
 
 FROM base AS dependencies
     COPY pyproject.toml uv.lock ./
     RUN UV_NO_SYNC=False uv sync --no-dev
 FROM dependencies AS test_dependencies
-    RUN UV_NO_SYNC=False uv sync --all-extras
+    RUN UV_NO_SYNC=False uv sync
 
 FROM dependencies AS code
-    COPY ./api_queue ./api_queue
-    COPY ./*.py ./
+    COPY . .
 
 FROM test_dependencies AS test
     COPY --from=code /app .
-    COPY ./tests ./tests
-    RUN uv run pytest
-    RUN uv run mypy .
-
+    CMD [ "uv", "run", "litestar", "run" ]
 FROM code AS production
-    VOLUME /logs
-    VOLUME /queues
-    VOLUME /media/processed
-    EXPOSE 8000
-    CMD ["uv", "run", "sanic", "api_queue.server.app", "--host", "0.0.0.0", "--port", "8000", "--single-process"]
+    CMD [ "uv", "run", "litestar", "run" ]
