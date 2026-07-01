@@ -16,6 +16,7 @@ TARGET_TYPES = [
     # TargetType.VIDEO_H264,
     TargetType.VIDEO_AV1,
     TargetType.VIDEO_H265,
+    TargetType.AUDIO_OPUS,
     # TargetType.PREVIEW_AV1,
     # TargetType.PREVIEW_H265,
     # TargetType.PREVIEW_H264,

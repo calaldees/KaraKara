@@ -56,6 +56,7 @@ ACODEC_MP3 = ["-acodec", "mp3"]
 
 class MediaType(enum.StrEnum):
     VIDEO = enum.auto()
+    AUDIO = enum.auto()
     SUBTITLE = enum.auto()
     IMAGE = enum.auto()
 
@@ -64,6 +65,7 @@ class TargetType(enum.Enum):
     VIDEO_H264 = 10
     VIDEO_AV1 = 11
     VIDEO_H265 = 12
+    AUDIO_OPUS = 20
     IMAGE_WEBP = 30
     IMAGE_AVIF = 31
     IMAGE_JPEG = 32
@@ -93,6 +95,10 @@ class Encoder(ABC):
         confs = [getattr(self, k) for k in sorted(dir(self)) if k.startswith("conf_")]
         confs = list(itertools.chain.from_iterable(confs))
         self.salt = str(confs)
+
+    def __repr__(self) -> str:
+        # return f"{self.__class__.__name__}(target={self.target}, sources={self.sources})"
+        return f"{self.__class__.__name__}()"
 
     @abstractmethod
     def encode(self, target: Path, sources: set[Source]) -> None: ...
@@ -327,6 +333,51 @@ class ImageToH264(_BaseImageToVideo):
     conf_container = CONTINER_MP4
     conf_vcodec = VCODEC_H264
     conf_acodec = ACODEC_MP3
+
+
+#######################################################################
+# Video or Audio to Audio
+
+
+class _BaseToAudio(Encoder):
+    sources = {SourceType.AUDIO, SourceType.VIDEO}
+    category = MediaType.AUDIO
+    conf_audio = NORMALIZE_AUDIO
+
+    @t.override
+    def encode(self, target: Path, sources: set[Source]) -> None:
+        source = [s for s in sources if s.type in self.sources][0]
+        # fmt: off
+        self._run(
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel", "quiet",
+            "-stats",
+            "-i", source.file.absolute,
+            *self.conf_audio,
+            "-vn",
+            *self.conf_acodec,
+            target.as_posix(),
+            title=f"{self.__class__.__name__}({source.file.stem})",
+            duration=source.meta.duration.total_seconds(),
+        )
+        # fmt: on
+
+
+class VideoToOpus(_BaseToAudio):
+    sources = {SourceType.VIDEO}
+    target = TargetType.AUDIO_OPUS
+    ext = "opus"
+    mime = "audio/opus"
+    conf_acodec = ACODEC_OPUS
+
+
+class AudioToOpus(_BaseToAudio):
+    sources = {SourceType.AUDIO}
+    target = TargetType.AUDIO_OPUS
+    ext = "opus"
+    mime = "audio/opus"
+    conf_acodec = ACODEC_OPUS
 
 
 #######################################################################
