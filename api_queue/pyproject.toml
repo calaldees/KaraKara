@@ -26,6 +26,7 @@ dev = [
 	"types-tqdm",
 	"types-ujson",
 	"types-dateparser",
+	"datamodel-code-generator",
 ]
 
 [project.optional-dependencies]
@@ -68,3 +69,17 @@ reportUninitializedInstanceVariable = false
 reportUnreachable = false
 reportUnannotatedClassAttribute = false
 reportUnusedParameter = false
+
+[tool.datamodel-codegen]
+input = "../openapi/components.yaml"
+input-file-type = "openapi"
+output = "api_queue/types.py"
+output-model-type = "pydantic_v2.BaseModel"
+use-standard-collections = true
+use-schema-description = true
+snake-case-field = true
+target-python-version = "3.14"
+field-constraints = true
+collapse-root-models = true
+disable-timestamp = true
+formatters = ["ruff-check", "ruff-format"]
