@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import { ButtonRow } from "@/components";
 import { useApi } from "@/hooks/api";
@@ -33,8 +34,10 @@ export function TrackButtons({
     subtitleVariant: string;
     setSubtitleVariant: (v: string) => void;
 }) {
-    const { queue } = useContext(RoomContext);
-    const { performerName, setPerformerName } = useContext(ClientContext);
+    const { queue, isAdmin } = useContext(RoomContext);
+    const { performerName, setPerformerName, booth } =
+        useContext(ClientContext);
+    const { roomName } = useParams();
     const [action, setAction] = useState<TrackAction>(TrackAction.NONE);
     const { request, sessionId } = useApi();
 
@@ -136,6 +139,11 @@ export function TrackButtons({
                         Enqueue
                     </button>
                     <BookmarkButton trackId={track.id} />
+                    {isAdmin && !booth && (
+                        <Link to={`/${roomName}/edit/${track.id}`}>
+                            <button type="button">Edit</button>
+                        </Link>
+                    )}
                 </ButtonRow>
             </>
         );
