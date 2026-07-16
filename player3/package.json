@@ -1,20 +1,18 @@
 {
     "name": "player3",
-    "private": true,
     "version": "0.0.0",
+    "private": true,
     "type": "module",
     "scripts": {
-        "generate-types": "openapi-typescript ../openapi/components.yaml -o src/types.ts --root-types --root-types-no-schema-prefix",
-        "generate-schemas": "node ../openapi/extract-schemas.js",
         "serve": "rsbuild dev",
         "build": "tsc -b && rsbuild build",
-        "cypress": "npx cypress open",
         "format": "biome format --write .",
-        "preview": "rsbuild preview",
         "lint": "biome lint .",
         "check": "biome check .",
-        "test": "vitest",
-        "test-once": "vitest run"
+        "generate-types": "openapi-typescript ../openapi/components.yaml -o src/types.ts --root-types --root-types-no-schema-prefix",
+        "generate-schemas": "node ../openapi/extract-schemas.js",
+        "test": "rstest",
+        "test-watch": "rstest watch"
     },
     "dependencies": {
         "@fortawesome/free-solid-svg-icons": "^7.2.0",
@@ -37,6 +35,7 @@
         "@rsbuild/core": "^2.0.9",
         "@rsbuild/plugin-react": "^2.0.0",
         "@rsbuild/plugin-sass": "^1.5.3",
+        "@rstest/core": "^0.11.2",
         "@types/node": "^25.9",
         "@types/react": "^19.2.16",
         "@types/react-dom": "^19.0.4",
@@ -45,7 +44,6 @@
         "jsdom": "^29.1.1",
         "openapi-typescript": "git+https://github.com/shish/openapi-typescript.git?subdirectory=packages/openapi-typescript#ts7",
         "timezone-mock": "^1.3.6",
-        "typescript": "^7.0",
-        "vitest": "^4.1.8"
+        "typescript": "^7.0"
     }
 }

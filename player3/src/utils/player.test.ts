@@ -1,6 +1,6 @@
-import timezone_mock from "timezone-mock";
-import { afterEach, describe, expect, test } from "vitest";
-import * as utils from "./player";
+import timezone_mock from 'timezone-mock';
+import { afterEach, describe, expect, test } from '@rstest/core';
+import * as utils from './player';
 
 describe("short_date", () => {
     afterEach(() => {
