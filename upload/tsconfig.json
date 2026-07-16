@@ -1,25 +1,25 @@
 {
     "compilerOptions": {
-        "lib": ["DOM", "ES2020"],
-        "jsx": "react-jsx",
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
         "target": "ES2020",
-        "noEmit": true,
-        "skipLibCheck": true,
         "useDefineForClassFields": true,
+        "lib": ["ES2020", "DOM", "DOM.Iterable"],
+        "skipLibCheck": true,
+        "paths": { "@/*": ["./frontend/*"] },
 
-        /* modules */
-        "module": "ESNext",
-        "moduleDetection": "force",
+        /* Bundler mode */
         "moduleResolution": "bundler",
         "verbatimModuleSyntax": true,
-        "resolveJsonModule": true,
         "allowImportingTsExtensions": true,
-        "noUncheckedSideEffectImports": true,
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+        "jsx": "react-jsx",
 
-        /* type checking */
-        "strict": true,
+        /* Linting */
         "noUnusedLocals": true,
-        "noUnusedParameters": true
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
     },
     "include": ["frontend"]
 }

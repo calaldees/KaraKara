@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "serve": "rsbuild dev",
-        "build": "rsbuild build",
+        "build": "tsc -b && rsbuild build",
         "format": "biome format --write .",
         "lint": "biome lint .",
         "check": "biome check ."
@@ -23,6 +23,6 @@
         "@rsbuild/plugin-react": "^2.0.0",
         "@types/react": "^19.2.16",
         "@types/react-dom": "^19.2.3",
-        "typescript": "^5.9.3"
+        "typescript": "^7.0"
     }
 }
