@@ -49,10 +49,10 @@
         "cypress": "^15.16.0",
         "js-yaml": "^4.3.0",
         "jsdom": "^29.1.1",
-        "openapi-typescript": "^7.4.4",
+        "openapi-typescript": "git+https://github.com/shish/openapi-typescript.git?subdirectory=packages/openapi-typescript#ts7",
         "storybook": "^10.4.6",
         "storybook-react-rsbuild": "^3.3.4",
-        "typescript": "^5.9.3",
+        "typescript": "^7.0",
         "vitest": "^4.1.8"
     }
 }

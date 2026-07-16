@@ -4,12 +4,12 @@
         "target": "ES2020",
         "useDefineForClassFields": true,
         "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "module": "ESNext",
         "skipLibCheck": true,
         "paths": { "@/*": ["./src/*"] },
 
         /* Bundler mode */
         "moduleResolution": "bundler",
+        "verbatimModuleSyntax": true,
         "allowImportingTsExtensions": true,
         "isolatedModules": true,
         "moduleDetection": "force",
@@ -17,11 +17,9 @@
         "jsx": "react-jsx",
 
         /* Linting */
-        "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true
+        "noFallthroughCasesInSwitch": true
     },
-    "include": ["src"]
+    "include": ["src", "*.config.ts"]
 }
