@@ -11,8 +11,8 @@
         "check": "biome check .",
         "generate-types": "openapi-typescript ../openapi/components.yaml -o src/types.ts --root-types --root-types-no-schema-prefix",
         "generate-schemas": "node ../openapi/extract-schemas.js",
-        "test": "rstest",
-        "test-watch": "rstest watch"
+        "test": "rstest watch",
+        "test-once": "rstest"
     },
     "dependencies": {
         "@fortawesome/free-solid-svg-icons": "^7.2.0",
