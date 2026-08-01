@@ -46,7 +46,7 @@
         "@types/react": "^19.2.16",
         "@types/react-dom": "^19.0.4",
         "cypress": "^15.16.0",
-        "js-yaml": "^4.3.0",
+        "js-yaml": "^5.2.2",
         "jsdom": "^30.0.1",
         "openapi-typescript": "git+https://github.com/shish/openapi-typescript.git?subdirectory=packages/openapi-typescript#ts7",
         "storybook": "^10.4.6",
