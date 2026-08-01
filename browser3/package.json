@@ -42,7 +42,7 @@
         "@rsbuild/plugin-react": "^2.0.0",
         "@rsbuild/plugin-sass": "^1.5.3",
         "@types/jsdom": "^28.0.3",
-        "@types/node": "^25.9",
+        "@types/node": "^26.1",
         "@types/react": "^19.2.16",
         "@types/react-dom": "^19.0.4",
         "cypress": "^15.16.0",
