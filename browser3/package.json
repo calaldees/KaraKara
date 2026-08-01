@@ -47,7 +47,7 @@
         "@types/react-dom": "^19.0.4",
         "cypress": "^15.16.0",
         "js-yaml": "^4.3.0",
-        "jsdom": "^29.1.1",
+        "jsdom": "^30.0.1",
         "openapi-typescript": "git+https://github.com/shish/openapi-typescript.git?subdirectory=packages/openapi-typescript#ts7",
         "storybook": "^10.4.6",
         "storybook-react-rsbuild": "^3.3.4",
