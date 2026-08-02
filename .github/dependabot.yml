@@ -1,6 +1,8 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
+    assignees:
+      - shish
     directory: /
     schedule:
       interval: monthly
@@ -14,6 +16,8 @@ updates:
           - patch
 
   - package-ecosystem: pip
+    assignees:
+      - shish
     directories:
       - /api_queue
       - /processmedia3
@@ -31,6 +35,8 @@ updates:
           - patch
 
   - package-ecosystem: npm
+    assignees:
+      - shish
     directories:
       - /browser3
       - /player3
@@ -47,6 +53,8 @@ updates:
           - patch
 
   - package-ecosystem: cargo
+    assignees:
+      - shish
     directories:
       - /lint
     schedule:
@@ -61,6 +69,8 @@ updates:
           - patch
 
   - package-ecosystem: docker
+    assignees:
+      - shish
     directories:
       - /.devcontainer
       - /api_queue
