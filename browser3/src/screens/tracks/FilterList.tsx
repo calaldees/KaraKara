@@ -29,7 +29,7 @@ export function FilterList({
     const { setFilters, setExpanded } = useContext(ExploreContext);
 
     return (
-        <List>
+        <List twoColumn>
             {Object.keys(filters)
                 .sort(normalise_cmp)
                 .map((child) => (
