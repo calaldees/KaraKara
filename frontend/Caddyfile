@@ -53,6 +53,38 @@
 	# Application-specific routes
 	###################################################################
 
+	@browse host browse.*
+	handle @browse {
+		reverse_proxy browser3
+	}
+	handle_path /browser3/* {
+		redir browse.{host}{uri}
+	}
+
+	@play host play.*
+	handle @play {
+		reverse_proxy player3
+	}
+	handle_path /player3/* {
+		redir play.{host}{uri}
+	}
+
+	@upload host upload.*
+	handle @upload {
+		reverse_proxy upload:8000
+	}
+	handle_path /upload/* {
+		redir upload.{host}{uri}
+	}
+
+	@sync host sync.*
+	handle @sync {
+		reverse_proxy syncthing:8384
+	}
+	handle_path /syncthing/* {
+		redir sync.{host}{uri}
+	}
+
 	handle_path /logs/* {
 		root * /logs
 		file_server browse
@@ -66,22 +98,6 @@
 	handle_path /tools/* {
 		root * /static/tools
 		file_server
-	}
-
-	handle_path /browser3/* {
-		reverse_proxy browser3
-	}
-
-	handle_path /player3/* {
-		reverse_proxy player3
-	}
-
-	handle_path /upload/* {
-		reverse_proxy upload:8000
-	}
-
-	handle_path /syncthing/* {
-		reverse_proxy syncthing:8384
 	}
 
 	handle_path /* {

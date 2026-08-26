@@ -53,7 +53,6 @@ export default defineConfig({
         },
     },
     output: {
-        assetPrefix: "/browser3/",
         sourceMap: isDev,
         polyfill: "usage",
         inlineStyles: true,

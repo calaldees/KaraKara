@@ -20,10 +20,17 @@ services:
       - ${PWD}/frontend/:/etc/caddy/:ro
     labels:
       traefik.enable: true
-      traefik.http.routers.karakara.rule: "Host(`${HOSTNAME}`)"
+      # traefik can't generate SSL certs for wildcards
+      traefik.http.routers.karakara.rule: >-
+        Host(`${HOSTNAME}`) ||
+        Host(`play.${HOSTNAME}`) ||
+        Host(`browse.${HOSTNAME}`) ||
+        Host(`api.${HOSTNAME}`) ||
+        Host(`sync.${HOSTNAME}`) ||
+        Host(`upload.${HOSTNAME}`)
       traefik.http.routers.karakara.middlewares: "kkredir"
       traefik.http.middlewares.kkredir.redirectregex.regex: "^https://karakara.uk/$$"
-      traefik.http.middlewares.kkredir.redirectregex.replacement: "https://karakara.uk/browser3/"
+      traefik.http.middlewares.kkredir.redirectregex.replacement: "https://browse.karakara.uk/"
       kissycron.job-local.backup.schedule: "31 3 * * *"
       kissycron.job-local.backup.command: "backup ${PWD}/.env ${PWD}/data /backups/karakara/"
 
@@ -106,7 +113,6 @@ services:
     mem_limit: 1g
     env_file: .env
     environment:
-      BASE_PATH: /upload
       UPLOAD_DIR: /uploads
     volumes:
       - ${PATH_HOST_media}/wip:/uploads:rw

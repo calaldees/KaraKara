@@ -32,22 +32,6 @@ app = FastAPI(title="FastAPI TUS Upload Server")
 app.include_router(create_tus_router(files_dir=TEMP_DIR.as_posix(), prefix="api/upload/files"))
 
 
-# Hacky middleware to rewrite Location headers because tuspyserver is serving
-# from http://localhost/files but we want https://karakara.uk/upload/files
-class PrefixLocationMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response: Response = await call_next(request)
-        if BASE_PATH:
-            if "location" in response.headers:
-                loc = response.headers["location"]
-                loc = loc.replace("http://", "https://")
-                response.headers["location"] = loc
-        return response
-
-
-app.add_middleware(PrefixLocationMiddleware)
-
-
 @app.get("/api/upload/health")
 async def health() -> JSONResponse:
     """
