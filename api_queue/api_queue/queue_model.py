@@ -5,7 +5,7 @@ from functools import reduce
 from itertools import pairwise
 import pydantic
 
-from .settings_manager import QueueSettings, TimeDelta
+from .settings_manager import QueueSettings
 
 
 class QueueItem(pydantic.BaseModel):
@@ -71,7 +71,7 @@ class QueueItem(pydantic.BaseModel):
         return v.timestamp() if v else None
 
     track_id: str
-    track_duration: TimeDelta
+    track_duration: datetime.timedelta
     session_id: str
     performer_name: str
     start_time: datetime.datetime | None = None
@@ -101,7 +101,7 @@ class Queue:
 
     @property
     def track_space(self) -> datetime.timedelta:
-        return self.settings.track_space
+        return datetime.timedelta(seconds=self.settings.track_space)
 
     @property
     def now(self) -> datetime.datetime:
