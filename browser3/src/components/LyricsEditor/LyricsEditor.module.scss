@@ -1,0 +1,37 @@
+.subtitlesTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+
+    th,
+    td {
+        text-align: left;
+    }
+
+    thead,
+    tbody {
+        border-bottom: 1px solid var(--border-color, #ddd);
+    }
+
+    th {
+        background-color: var(--header-bg);
+    }
+
+    td:last-child {
+        text-align: right;
+    }
+}
+
+.timeColumn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.timeInput {
+    width: 80px;
+}
+
+.textInput {
+    width: 100%;
+}

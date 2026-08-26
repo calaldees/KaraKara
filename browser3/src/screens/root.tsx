@@ -93,6 +93,12 @@ export function Root(): React.ReactElement {
                             path="tracks/:trackId"
                             element={<TrackDetails />}
                         />
+						<Route path="edit/:trackId" element={<TrackEdit />} />
+						<Route path="edit/:trackId/tags" element={<TagsEdit />} />
+						<Route
+							path="edit/:trackId/subtitles/:subtitleVariant"
+							element={<SubtitlesEdit />}
+						/>
                         <Route
                             path="queue"
                             element={<TracksOrQueueOrControl />}
