@@ -41,7 +41,7 @@
         "@rsbuild/core": "^2.1.9",
         "@rsbuild/plugin-react": "^2.0.0",
         "@rsbuild/plugin-sass": "^2.0.1",
-        "@types/jsdom": "^28.0.3",
+        "@types/jsdom": "^30.0.0",
         "@types/node": "^26.1",
         "@types/react": "^19.2.16",
         "@types/react-dom": "^19.0.4",
