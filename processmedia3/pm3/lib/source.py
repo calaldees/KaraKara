@@ -33,7 +33,7 @@ class Source:
     def __init__(self, file: AbstractFile, cache: MutableMapping[str, t.Any]):
         self.file = file
         self.cache = cache
-        self.type: SourceType | None = next((type for type in SourceType if self.file.suffix in type.value), None)
+        self.type: SourceType | None = next((type for type in SourceType if self.file.suffix.lower() in type.value), None)
         variant_match = re.search(r"\[(.+?)\]$", self.file.stem)
         self.variant = variant_match.group(1) if variant_match else "Default"
 
